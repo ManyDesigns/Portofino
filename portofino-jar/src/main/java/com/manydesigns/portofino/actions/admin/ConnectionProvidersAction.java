@@ -358,30 +358,36 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         form.readFromRequest(context.getRequest());
 
         configureEditSchemas();
-        schemasForm.readFromRequest(context.getRequest());
-        if (form.validate() && schemasForm.validate()) {
-            schemasForm.writeToObject(selectableSchemas);
-            List<Schema> selectedSchemas = database.getSchemas();
-            List<String> selectedSchemaNames = new ArrayList<String>(selectedSchemas.size());
-            for(Schema schema : selectedSchemas) {
-                selectedSchemaNames.add(schema.getSchemaName().toLowerCase());
-            }
-            for(SelectableSchema schema : selectableSchemas) {
-                if(schema.selected && !selectedSchemaNames.contains(schema.schemaName.toLowerCase())) {
-                    Schema modelSchema = new Schema();
-                    modelSchema.setSchemaName(schema.schemaName);
-                    modelSchema.setDatabase(database);
-                    database.getSchemas().add(modelSchema);
-                } else if(!schema.selected && selectedSchemaNames.contains(schema.schemaName.toLowerCase())) {
-                    Schema toBeRemoved = null;
-                    for(Schema aSchema : database.getSchemas()) {
-                        if(aSchema.getSchemaName().equalsIgnoreCase(schema.schemaName)) {
-                            toBeRemoved = aSchema;
-                            break;
+        boolean schemasValid = true;
+        if(schemasForm != null){
+            schemasForm.readFromRequest(context.getRequest());
+            schemasValid = schemasForm.validate();
+        }
+        if (form.validate() && schemasValid) {
+            if(schemasForm != null) {
+                schemasForm.writeToObject(selectableSchemas);
+                List<Schema> selectedSchemas = database.getSchemas();
+                List<String> selectedSchemaNames = new ArrayList<String>(selectedSchemas.size());
+                for(Schema schema : selectedSchemas) {
+                    selectedSchemaNames.add(schema.getSchemaName().toLowerCase());
+                }
+                for(SelectableSchema schema : selectableSchemas) {
+                    if(schema.selected && !selectedSchemaNames.contains(schema.schemaName.toLowerCase())) {
+                        Schema modelSchema = new Schema();
+                        modelSchema.setSchemaName(schema.schemaName);
+                        modelSchema.setDatabase(database);
+                        database.getSchemas().add(modelSchema);
+                    } else if(!schema.selected && selectedSchemaNames.contains(schema.schemaName.toLowerCase())) {
+                        Schema toBeRemoved = null;
+                        for(Schema aSchema : database.getSchemas()) {
+                            if(aSchema.getSchemaName().equalsIgnoreCase(schema.schemaName)) {
+                                toBeRemoved = aSchema;
+                                break;
+                            }
                         }
-                    }
-                    if(toBeRemoved != null) {
-                        database.getSchemas().remove(toBeRemoved);
+                        if(toBeRemoved != null) {
+                            database.getSchemas().remove(toBeRemoved);
+                        }
                     }
                 }
             }
