@@ -11,6 +11,6 @@
     Model model = app.getModel();
     RootPage rootPage = model.getRootPage();
     Page landingPage = PageLogic.getLandingPage(rootPage);
-    String redirectURL = request.getContextPath() + "/" + landingPage.getFragment();
+    String redirectURL = request.getContextPath() + PageLogic.getPagePath(landingPage);
     response.sendRedirect(redirectURL);
 %>
