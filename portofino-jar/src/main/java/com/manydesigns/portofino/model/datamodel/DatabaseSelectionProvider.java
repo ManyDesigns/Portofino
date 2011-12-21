@@ -32,7 +32,6 @@ package com.manydesigns.portofino.model.datamodel;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelVisitor;
-import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,7 +135,6 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
         return references;
     }
 
-    @Identifier
     @XmlAttribute(required = true)
     public String getName() {
         return name;

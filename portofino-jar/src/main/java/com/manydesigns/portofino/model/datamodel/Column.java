@@ -37,7 +37,6 @@ import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.annotations.Annotated;
 import com.manydesigns.portofino.model.annotations.Annotation;
-import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -183,7 +182,6 @@ public class Column implements ModelObject, Annotated {
     }
 
     @Required
-    @Identifier
     @XmlAttribute(required = true)
     public String getColumnName() {
         return columnName;

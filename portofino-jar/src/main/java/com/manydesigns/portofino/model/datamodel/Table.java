@@ -37,7 +37,6 @@ import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.annotations.Annotated;
 import com.manydesigns.portofino.model.annotations.Annotation;
-import com.manydesigns.portofino.xml.Identifier;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -201,7 +200,6 @@ public class Table implements ModelObject, Annotated {
         return schema.getSchemaName();
     }
 
-    @Identifier
     @Required
     @XmlAttribute(required = true)
     public String getTableName() {

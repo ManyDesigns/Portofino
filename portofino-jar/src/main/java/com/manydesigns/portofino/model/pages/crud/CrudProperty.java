@@ -33,7 +33,6 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.annotations.Annotation;
-import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +124,6 @@ public class CrudProperty implements ModelObject {
         this.crud = crud;
     }
 
-    @Identifier
     @XmlAttribute(required = true)
     public String getName() {
         return name;

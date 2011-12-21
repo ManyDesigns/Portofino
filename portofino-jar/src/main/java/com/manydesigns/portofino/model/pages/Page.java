@@ -34,7 +34,6 @@ import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
-import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,7 +175,6 @@ public abstract class Page implements ModelObject, WithPermissions {
     // Getters/Setters
     //**************************************************************************
 
-    @Identifier
     @XmlAttribute(required = true)
     @Required
     public String getId() {

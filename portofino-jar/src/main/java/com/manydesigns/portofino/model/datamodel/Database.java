@@ -32,7 +32,6 @@ package com.manydesigns.portofino.model.datamodel;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
-import com.manydesigns.portofino.xml.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,7 +108,6 @@ public class Database implements ModelObject {
     // Getters/setter
     //**************************************************************************
 
-    @Identifier
     @XmlAttribute(required = true)
     public String getDatabaseName() {
         return databaseName;

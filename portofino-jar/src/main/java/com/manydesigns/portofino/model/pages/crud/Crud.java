@@ -38,7 +38,6 @@ import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.xml.Identifier;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
@@ -180,7 +179,6 @@ public class Crud implements ModelObject {
         return annotations;
     }
 
-    @Identifier
     @XmlAttribute(required = true)
     public String getName() {
         return name;
