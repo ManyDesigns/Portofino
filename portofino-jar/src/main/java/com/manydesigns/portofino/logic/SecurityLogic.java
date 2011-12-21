@@ -36,7 +36,6 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.interceptors.SecurityInterceptor;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.Permissions;
@@ -240,16 +239,16 @@ public class SecurityLogic {
     }
 
     public static boolean satisfiesRequiresAdministrator(HttpServletRequest request, ActionBean actionBean, Method handler) {
-        SecurityInterceptor.logger.debug("Checking if action or method required administrator");
+        logger.debug("Checking if action or method required administrator");
         boolean requiresAdministrator = false;
         if (handler.isAnnotationPresent(RequiresAdministrator.class)) {
-            SecurityInterceptor.logger.debug("Action method requires administrator: {}", handler);
+            logger.debug("Action method requires administrator: {}", handler);
             requiresAdministrator = true;
         } else {
             Class actionClass = actionBean.getClass();
             while (actionClass != null) {
                 if (actionClass.isAnnotationPresent(RequiresAdministrator.class)) {
-                    SecurityInterceptor.logger.debug("Action class requires administrator: {}",
+                    logger.debug("Action class requires administrator: {}",
                     actionClass);
                     requiresAdministrator = true;
                     break;
@@ -261,7 +260,7 @@ public class SecurityLogic {
         boolean isNotAdmin = !isAdministrator(request);
         boolean doesNotSatisfy = requiresAdministrator && isNotAdmin;
         if (doesNotSatisfy) {
-            SecurityInterceptor.logger.info("User is not an administrator");
+            logger.info("User is not an administrator");
             return false;
         }
         return true;

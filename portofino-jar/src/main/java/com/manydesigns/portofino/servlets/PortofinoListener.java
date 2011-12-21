@@ -52,6 +52,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
+import java.io.File;
 
 
 /*
@@ -142,11 +143,11 @@ public class PortofinoListener
         servletContext.setAttribute(
                 ApplicationAttributes.APPLICATION_STARTER, applicationStarter);
 
-        logger.info("\n" + SEPARATOR +
-                "\n--- ManyDesigns Portofino {} started successfully" +
-                "\n--- Context path: {}" +
-                "\n--- Real path: {}" +
-                "\n" + SEPARATOR,
+        logger.info(File.separator + SEPARATOR +
+                File.separator + "--- ManyDesigns Portofino {} started successfully" +
+                File.separator + "--- Context path: {}" +
+                File.separator + "--- Real path: {}" +
+                File.separator + SEPARATOR,
                 new String[] {
                         portofinoConfiguration.getString(
                                 PortofinoProperties.PORTOFINO_VERSION),

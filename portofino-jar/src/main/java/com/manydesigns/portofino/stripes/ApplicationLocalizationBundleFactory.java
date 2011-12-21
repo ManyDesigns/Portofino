@@ -49,6 +49,7 @@ import java.util.ResourceBundle;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+@SuppressWarnings({"UnusedDeclaration"}) //Autodiscovered by Stripes
 public class ApplicationLocalizationBundleFactory implements LocalizationBundleFactory {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
