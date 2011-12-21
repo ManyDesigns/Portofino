@@ -746,6 +746,13 @@ public class PortletAction extends AbstractActionBean {
                     destinationPageId = destinationPageId.substring(0, destinationPageId.length() - 7);
                 }
                 Page newParent = model.getRootPage().findDescendantPageById(destinationPageId);
+                if(!SecurityLogic.isAdministrator(context.getRequest())) {
+                    List<String> groups = (List<String>) context.getRequest().getAttribute(RequestAttributes.GROUPS);
+                    if(!SecurityLogic.hasPermissions(newParent.getPermissions(), groups, AccessLevel.EDIT)) {
+                        SessionMessages.addErrorMessage("You don't have edit access level on the destination page");
+                        return new RedirectResolution(dispatch.getOriginalPath());
+                    }
+                }
                 if(newParent != null) {
                     page.getParent().removeChild(page);
                     if(detail) {
@@ -784,6 +791,13 @@ public class PortletAction extends AbstractActionBean {
                     destinationPageId = destinationPageId.substring(0, destinationPageId.length() - length);
                 }
                 final Page newParent = model.getRootPage().findDescendantPageById(destinationPageId);
+                if(!SecurityLogic.isAdministrator(context.getRequest())) {
+                    List<String> groups = (List<String>) context.getRequest().getAttribute(RequestAttributes.GROUPS);
+                    if(!SecurityLogic.hasPermissions(newParent.getPermissions(), groups, AccessLevel.EDIT)) {
+                        SessionMessages.addErrorMessage("You don't have edit access level on the destination page");
+                        return new RedirectResolution(dispatch.getOriginalPath());
+                    }
+                }
                 if(newParent != null) {
                     Page newPage;
                     /*try {
