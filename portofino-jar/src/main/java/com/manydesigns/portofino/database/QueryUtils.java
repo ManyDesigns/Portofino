@@ -47,6 +47,7 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -360,9 +361,14 @@ public class QueryUtils {
             parsedQueryString =
                     (PlainSelect) ((Select) parserManager.parse(new StringReader(queryPrefix + formatString)))
                             .getSelectBody();
-            parsedCriteriaQuery =
-                    (PlainSelect) ((Select) parserManager.parse(new StringReader(queryPrefix + criteriaQueryString)))
-                            .getSelectBody();
+            if(StringUtils.isEmpty(criteriaQueryString)) {
+                parsedCriteriaQuery = new PlainSelect();
+            } else {
+                parsedCriteriaQuery =
+                        (PlainSelect) ((Select) parserManager.parse
+                                (new StringReader(queryPrefix + criteriaQueryString)))
+                                .getSelectBody();
+            }
         } catch (JSQLParserException e) {
             throw new RuntimeException("Couldn't merge query", e);
         }
