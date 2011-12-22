@@ -12,29 +12,17 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:if test="${not empty actionBean.searchForm}">
-            <div class="yui-gc">
-                <div class="yui-u first">
-                    <div class="search_results withSearchForm">
-        </c:if>
-        <c:if test="${empty actionBean.searchForm}">
-                    <div class="search_results">
-        </c:if>
-                        <%@include file="datatable.jsp"%>
-                        <portofino:buttons list="crud-search" cssClass="portletButton" />
-                    </div>
-        <c:if test="${not empty actionBean.searchForm}">
+            <div class="search_form inline">
+                <mde:write name="actionBean" property="searchForm"/>
+                <div class="searchFormButtons">
+                    <portofino:buttons list="crud-search-form" cssClass="portletButton" />
                 </div>
-                <div class="yui-u">
-                        <div class="search_form">
-                            <mde:write name="actionBean" property="searchForm"/>
-                            <div class="searchFormButtons">
-                                <portofino:buttons list="crud-search-form" cssClass="portletButton" />
-                            </div>
-                        </div>
-                </div>
-                <div style="clear: both;">&nbsp;</div>
             </div>
         </c:if>
+        <div class="search_results">
+            <%@include file="datatable.jsp"%>
+            <portofino:buttons list="crud-search" cssClass="portletButton" />
+        </div>
 
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
 

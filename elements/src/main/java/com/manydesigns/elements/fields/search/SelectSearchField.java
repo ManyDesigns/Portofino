@@ -180,8 +180,8 @@ public class SelectSearchField extends AbstractSearchField {
     }
 
     private void valueToXhtmlDropDown(XhtmlBuffer xb) {
-        xb.openElement("fieldset");
-        xb.writeLegend(StringUtils.capitalize(label), ATTR_NAME_HTML_CLASS);
+        xb.openElement("span");
+        xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
 
         Object[] values = (Object[]) selectionModel.getValue(selectionModelIndex);
         Map<Object, SelectionModel.Option> options =
@@ -208,7 +208,7 @@ public class SelectSearchField extends AbstractSearchField {
             xb.writeOption(optionStringValue, checked, optionLabel);
         }
         xb.closeElement("select");
-        xb.closeElement("fieldset");
+        xb.closeElement("span");
     }
 
     public void valueToXhtmlRadio(XhtmlBuffer xb) {

@@ -334,7 +334,9 @@ Search form
 
 .search_form {
     overflow: hidden;
-
+    border-bottom: 1px solid #AAAAAA;
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
 }
 
 .search_form th, .search_form td {
@@ -349,10 +351,9 @@ Search form
 }
 
 .search_form ul li {
-    display: block;
+    display: inline-block;
     list-style: none;
     padding-bottom: 0.5em;
-    border-bottom: 1px solid #AAAAAA;
     margin-bottom: 0.5em;
 }
 
@@ -363,17 +364,35 @@ Search form
 }
 
 .search_form legend.attr_name, .search_form label.attr_name {
-    margin: 0;
+    margin-right: 1em;
     padding: 0;
     border: 0 none;
     font-weight: bold;
     font-size: 1em;
+    display: inline;
 }
 
-.search_form label.attr_name {
-    display: block;
+.search_form input, .search_form select {
+    margin-right: 2em;
 }
 
+.mde-boolean-search-field {
+    margin-right: 2em;
+}
+
+.mde-boolean-search-field input {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+.mde-range-search-field {
+    margin-right: 1em;
+}
+
+.mde-range-search-field input {
+    margin-left: 1em;
+    margin-right: 1em;
+}
 
 .search_form table.range {
     border-collapse: collapse;
@@ -407,6 +426,10 @@ Search form
 
 .searchFormButtons {
     margin-top: 1em;
+}
+
+.yui-skin-sam .yui-dt table {
+    width: 100%;
 }
 
 /*******************************************************************************
