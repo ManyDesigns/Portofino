@@ -43,7 +43,6 @@ import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.JavaFieldAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
@@ -149,6 +148,7 @@ public class CrudAction extends PortletAction {
     public Integer maxResults;
     public String sortProperty;
     public String sortDirection;
+    public boolean searchVisible;
 
     //--------------------------------------------------------------------------
     // UI forms
@@ -377,6 +377,7 @@ public class CrudAction extends PortletAction {
 //            loadObjects();
             setupTableForm(Mode.VIEW);
 
+            searchVisible = true;
             return getSearchView();
         } catch(Exception e) {
             logger.warn("Crud not correctly configured", e);
@@ -2015,5 +2016,13 @@ public class CrudAction extends PortletAction {
 
     public void setPropertyName(String propertyName) {
         this.propertyName = propertyName;
+    }
+
+    public boolean isSearchVisible() {
+        return searchVisible;
+    }
+
+    public void setSearchVisible(boolean searchVisible) {
+        this.searchVisible = searchVisible;
     }
 }

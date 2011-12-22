@@ -12,7 +12,11 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:if test="${not empty actionBean.searchForm}">
-            <div class="search_form inline">
+            <a class="search_form_toggle_link" href="#">
+                <c:if test="${actionBean.searchVisible}"><fmt:message key="layouts.crud.search.hideSearch" /></c:if>
+                <c:if test="${!actionBean.searchVisible}"><fmt:message key="layouts.crud.search.showSearch" /></c:if>
+            </a>
+            <div class="search_form" <c:if test="${!actionBean.searchVisible}">style="display: none;"</c:if>>
                 <mde:write name="actionBean" property="searchForm"/>
                 <div class="searchFormButtons">
                     <portofino:buttons list="crud-search-form" cssClass="portletButton" />
@@ -32,5 +36,18 @@
         $(".search_results button[name=bulkDelete]").click(function() {
             return confirm ('Are you sure?');
         });
+        $(".search_form_toggle_link").click(makeToggleFunction());
+        function makeToggleFunction() {
+            var visible = ${actionBean.searchVisible};
+            return function(event) {
+                $(this).next().slideToggle(300);
+                visible = !visible;
+                if(visible) {
+                    $(event.target).html('<fmt:message key="layouts.crud.search.hideSearch" />');
+                } else {
+                    $(event.target).html('<fmt:message key="layouts.crud.search.showSearch" />');
+                }
+            };
+        }
     </script>
 </stripes:layout-render>

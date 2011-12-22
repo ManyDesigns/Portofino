@@ -337,6 +337,7 @@ Search form
     border-bottom: 1px solid #AAAAAA;
     padding-bottom: 0.5em;
     margin-bottom: 0.5em;
+    margin-top: 1em;
 }
 
 .search_form th, .search_form td {
