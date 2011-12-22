@@ -391,7 +391,7 @@ public class QueryUtils {
             whereExpression = parsedCriteriaQuery.getWhere();
         }
         parsedQueryString.setWhere(whereExpression);
-        if(criteria.getOrderBy() != null) {
+        if(criteria != null && criteria.getOrderBy() != null) {
             List orderByElements = new ArrayList();
             OrderByElement orderByElement = new OrderByElement();
             orderByElement.setAsc(criteria.getOrderBy().isAsc());
