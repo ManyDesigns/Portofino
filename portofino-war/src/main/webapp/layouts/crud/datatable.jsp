@@ -137,6 +137,7 @@
             //Disable loading message
             return true;
         };
+        myDataTable.doBeforeSortColumn = myDataTable.doBeforePaginatorChange;
     }();
 
 </script>
