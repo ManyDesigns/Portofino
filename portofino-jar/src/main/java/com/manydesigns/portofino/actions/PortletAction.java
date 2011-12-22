@@ -800,18 +800,6 @@ public class PortletAction extends AbstractActionBean {
                 }
                 if(newParent != null) {
                     Page newPage;
-                    /*try {
-                        newPage = page.getClass().newInstance();
-                        copyModelObject(page, newPage);
-                        //String pageId = RandomUtil.createRandomId();
-                        //newPage.setId(pageId);
-                        newPage.setLayoutContainer(DEFAULT_LAYOUT_CONTAINER);
-                        newPage.setLayoutOrder("0");
-                    } catch (Exception e) {
-                        SessionMessages.addErrorMessage("Error copying page");
-                        logger.error("Error copying page", e);
-                        return new RedirectResolution(dispatch.getOriginalPath());
-                    }*/
                     Model tmpModel = new Model();
                     tmpModel.setRootPage(new RootPage());
                     tmpModel.getRootPage().getChildPages().add(page);

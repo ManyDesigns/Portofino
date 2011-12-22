@@ -43,6 +43,7 @@ import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.JavaFieldAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
@@ -996,11 +997,32 @@ public class CrudAction extends PortletAction {
             nRows = objects.size();
         }
 
-        tableForm = tableFormBuilder
+        tableFormBuilder
                 .configPrefix(prefix)
                 .configNRows(nRows)
                 .configMode(mode)
-                .build();
+                .configReflectiveFields();
+
+        boolean isShowingKey = false;
+        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
+            if(tableFormBuilder.isPropertyVisible(property)) {
+                isShowingKey = true;
+                break;
+            }
+        }
+
+        if(!isShowingKey) {
+            for (PropertyAccessor property : classAccessor.getProperties()) {
+                if(tableFormBuilder.isPropertyVisible(property)) {
+                    tableFormBuilder.configHrefTextFormat(
+                        property.getName(), hrefFormat);
+                    break;
+                }
+            }
+        }
+
+        tableForm = tableFormBuilder.build();
+
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
         boolean selectable = false;
         selectable = selectable || SecurityLogic.hasPermissions(context.getRequest(), null, PERMISSION_EDIT);
