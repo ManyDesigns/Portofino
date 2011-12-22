@@ -348,7 +348,7 @@ public class CrudAction extends PortletAction {
             if(isEmbedded()) {
                 return embeddedSearch();
             } else {
-                return search();
+                return doSearch();
             }
         } else {
             return read();
@@ -361,6 +361,11 @@ public class CrudAction extends PortletAction {
 
     @Button(list = "crud-search-form", key = "commons.search", order = 1)
     public Resolution search() {
+        searchVisible = true;
+        return doSearch();
+    }
+
+    protected Resolution doSearch() {
         cancelReturnUrl = new UrlBuilder(
                     Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
                     .addParameter("searchString", searchString)
@@ -377,7 +382,7 @@ public class CrudAction extends PortletAction {
 //            loadObjects();
             setupTableForm(Mode.VIEW);
 
-            searchVisible = true;
+
             return getSearchView();
         } catch(Exception e) {
             logger.warn("Crud not correctly configured", e);
@@ -469,7 +474,7 @@ public class CrudAction extends PortletAction {
 
     @Button(list = "crud-search-form", key = "commons.resetSearch", order = 2)
     public Resolution resetSearch() {
-        return new RedirectResolution(dispatch.getOriginalPath());
+        return new RedirectResolution(dispatch.getOriginalPath()).addParameter("searchVisible", true);
     }
 
     //**************************************************************************
