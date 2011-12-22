@@ -116,6 +116,10 @@ public class SearchFormBuilder extends AbstractFormBuilder {
                 continue;
             }
 
+            if(!isPropertyEnabled(current)) {
+                continue;
+            }
+
             // check if field is searchable
             Searchable searchableAnnotation = current.getAnnotation(Searchable.class);
             if (searchableAnnotation != null && !searchableAnnotation.value()) {

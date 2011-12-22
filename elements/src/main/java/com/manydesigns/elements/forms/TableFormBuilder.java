@@ -30,7 +30,6 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.Enabled;
 import com.manydesigns.elements.annotations.InSummary;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
@@ -159,13 +158,10 @@ public class TableFormBuilder extends AbstractFormBuilder {
             return false;
         }
 
-        // check if field is enabled
-        Enabled enabled = current.getAnnotation(Enabled.class);
-        if(enabled != null && !enabled.value()) {
-            logger.debug("Skipping non-enabled field: {}",
-                    current.getName());
+        if (!isPropertyEnabled(current)) {
             return false;
         }
+
 
         // check if field is in summary
         InSummary inSummaryAnnotation =
