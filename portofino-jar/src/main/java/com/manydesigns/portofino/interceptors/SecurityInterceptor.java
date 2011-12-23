@@ -150,7 +150,8 @@ public class
             String returnUrl = urlBuilder.toString();
 
             return new RedirectResolution(LoginAction.class)
-                    .addParameter("returnUrl", returnUrl);
+                    .addParameter("returnUrl", returnUrl)
+                    .addParameter("cancelReturnUrl", "/");
         } else {
             logger.warn("User not authorized.");
             return new ErrorResolution(UNAUTHORIZED);

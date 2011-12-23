@@ -50,6 +50,7 @@
                             </div>
                             <div class="portletBody">
                                 <stripes:layout-component name="portletBody">
+                                    <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
                                     <table class="mde-form-table loginTable">
                                         <tbody>
                                         <tr>
@@ -64,8 +65,6 @@
                                             <th></th>
                                             <td>
                                                 <portofino:buttons list="login-buttons" cssClass="portletButton" />
-                                                <%--<stripes:submit name="login"  class="portletButton"><fmt:message key="commons.login"/></stripes:submit>
-                                                <stripes:submit name="cancel" class="portletButton"><fmt:message key="commons.cancel"/></stripes:submit>--%>
                                             </td>
                                         </tr>
                                         <c:if test="recoverPwd">

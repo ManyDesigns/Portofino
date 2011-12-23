@@ -103,6 +103,7 @@ public class LoginAction extends AbstractActionBean {
     public boolean recoverPwd;
 
     public String returnUrl;
+    public String cancelReturnUrl;
 
     public static final Logger logger =
             LoggerFactory.getLogger(LoginAction.class);
@@ -188,6 +189,17 @@ public class LoginAction extends AbstractActionBean {
         return new RedirectResolution(returnUrl);
     }
 
+    @Button(list = "login-buttons", key = "commons.cancel", order = 2)
+    public Resolution cancel() {
+        String url = "/";
+        if(!StringUtils.isBlank(cancelReturnUrl)) {
+            url = cancelReturnUrl;
+        } else if(!StringUtils.isBlank(returnUrl)) {
+            url = returnUrl;
+        }
+        return new RedirectResolution(url);
+    }
+
     private void updateFailedUser(String username) {
         User user;
         user = application.findUserByUserName(username);
@@ -250,6 +262,14 @@ public class LoginAction extends AbstractActionBean {
 
     public void setReturnUrl(String returnUrl) {
         this.returnUrl = returnUrl;
+    }
+
+    public String getCancelReturnUrl() {
+        return cancelReturnUrl;
+    }
+
+    public void setCancelReturnUrl(String cancelReturnUrl) {
+        this.cancelReturnUrl = cancelReturnUrl;
     }
 
     //**************************************************************************
