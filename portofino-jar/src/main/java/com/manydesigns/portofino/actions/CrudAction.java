@@ -67,6 +67,7 @@ import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import com.manydesigns.portofino.model.pages.crud.SelectionProviderReference;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import com.manydesigns.portofino.system.model.users.annotations.SupportsPermissions;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
@@ -460,7 +461,7 @@ public class CrudAction extends PortletAction {
         js.endArray();
         js.endObject();
         String jsonText = js.toString();
-        return new StreamingResolution("application/json", jsonText);
+        return new NoCacheStreamingResolution("application/json", jsonText);
     }
 
     protected String generateCountQuery(String queryString) throws JSQLParserException {
@@ -539,7 +540,8 @@ public class CrudAction extends PortletAction {
         String fileName = blob.getFilename();
         return new StreamingResolution(contentType, inputStream)
                 .setFilename(fileName)
-                .setLength(contentLength);
+                .setLength(contentLength)
+                .setLastModified(blob.getCreateTimestamp().getMillis());
     }
 
 
