@@ -64,7 +64,7 @@ public class ButtonsLogic {
         for(Method method : someClass.getMethods()) {
             Button button = getButtonForMethod(method, list);
             if(button != null) {
-                ButtonInfo buttonInfo = new ButtonInfo(button,method, someClass);
+                ButtonInfo buttonInfo = new ButtonInfo(button, method, someClass);
                 buttons.add(buttonInfo);
             }
         }

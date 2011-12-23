@@ -45,8 +45,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -111,7 +109,7 @@ public class JspAction extends PortletAction {
         }
     }
 
-    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1)
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configure() {
         prepareConfigurationForms();

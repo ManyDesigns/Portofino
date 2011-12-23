@@ -141,7 +141,7 @@ public class TextAction extends PortletAction {
                 new ByteArrayInputStream(contentByteArray), new FileOutputStream(dataFile));
     }
 
-    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1)
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configure() throws IOException {
         prepareConfigurationForms();
@@ -282,7 +282,7 @@ public class TextAction extends PortletAction {
         return new ForwardResolution("/layouts/text/browse.jsp");
     }
 
-    @Button(list = "portletHeaderButtons", key = "layouts.text.manage-attachments.manage_attachments_for_page", order = 2)
+    @Button(list = "portletHeaderButtons", key = "layouts.text.manage-attachments.manage_attachments_for_page", order = 2, icon = "ui-icon-link")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution manageAttachments() {
         logger.info("Manage attachments");

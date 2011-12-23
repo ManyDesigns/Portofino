@@ -100,34 +100,25 @@ function showCopyPageDialog(pageId, contextPath) {
 }
 
 $(function() {
-    $("input:submit.contentButton, button.contentButton").button();
-    
-    $("input:submit.portletButton, button.portletButton").button();
-
-    $(".portletHeaderButtons button[name=configure]").button({
-            icons: {
-                primary: "ui-icon-wrench"
-            },
-            text: false
+    var decorateButton = function(selector, options) {
+        $(selector).each(function(index, element) {
+            element = $(element);
+            element.html(element.find('.ui-button-text').html());
+            element.button(options);
         });
-
-    $(".portletHeaderButtons button[name=manageAttachments]").button({
-        icons: {
-            primary: "ui-icon-link"
-        },
-        text: false
-    });
+    };
 
     var decorateIconButton = function(selector, icon) {
-        var elem = $(selector);
-        elem.html(elem.find('.ui-button-text').html());
-        elem.button({
+        decorateButton(selector, {
             icons: {
                 primary: icon
             },
             text: false
         });
     };
+
+    decorateButton("button.contentButton");
+    decorateButton("button.portletButton");
 
     decorateIconButton("button.arrow-4", "ui-icon-arrow-4");
     decorateIconButton("button.refresh", "ui-icon-refresh");
@@ -136,6 +127,8 @@ $(function() {
     decorateIconButton("button.plusthick", "ui-icon-plusthick");
     decorateIconButton("button.minusthick", "ui-icon-minusthick");
     decorateIconButton("button.transferthick-e-w", "ui-icon-transferthick-e-w");
+    decorateIconButton(".portletHeaderButtons button[name=configure]", "ui-icon-wrench");
+    decorateIconButton(".portletHeaderButtons button[name=manageAttachments]", "ui-icon-link");
 });
 
 function enablePortletDragAndDrop(button) {

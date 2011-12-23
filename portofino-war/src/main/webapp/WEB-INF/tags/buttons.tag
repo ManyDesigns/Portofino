@@ -13,6 +13,7 @@
 <%@ tag import="java.util.MissingResourceException" %>
 <%@ tag import="com.manydesigns.portofino.buttons.GuardType" %>
 <%@ tag import="org.apache.taglibs.standard.tag.common.fmt.BundleSupport" %>
+<%@ tag import="com.manydesigns.portofino.buttons.annotations.Button" %>
 
 <%@ attribute name="list" required="true" %>
 <%@ attribute name="cssClass" required="false" %>
@@ -47,15 +48,33 @@
                 buffer.addAttribute("disabled", "disabled");
             }
             buffer.addAttribute("name", handler.getName());
+            Button theButton = button.getButton();
             %>
-                <fmt:message key="<%= button.getButton().key() %>" var="__buttonValue" scope="page" />
+                <fmt:message key="<%= theButton.key() %>" var="__buttonValue" scope="page" />
             <%
             String value = (String) jspContext.getAttribute("__buttonValue");
-            if(cssClass != null) {
-                buffer.addAttribute("class", cssClass);
-            }
+            jspContext.removeAttribute("__buttonValue");
             buffer.addAttribute("type", "submit");
+            String actualCssClass = "ui-button ui-widget ui-state-default ui-corner-all ";
+            if(cssClass != null) {
+                actualCssClass += cssClass;
+            }
+            boolean hasIcon = !StringUtils.isBlank(theButton.icon());
+            if(hasIcon) {
+                actualCssClass += " ui-button-icon-only";
+            } else {
+                actualCssClass += " ui-button-text-only";
+            }
+            buffer.addAttribute("class", actualCssClass);
+            if(hasIcon) {
+                buffer.openElement("span");
+                buffer.addAttribute("class", "ui-button-icon-primary ui-icon " + theButton.icon());
+                buffer.closeElement("span");
+            }
+            buffer.openElement("span");
+            buffer.addAttribute("class", "ui-button-text");
             buffer.write(value);
+            buffer.closeElement("span");
             buffer.closeElement("button");
         }
     }

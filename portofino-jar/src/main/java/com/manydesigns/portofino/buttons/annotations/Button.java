@@ -50,4 +50,5 @@ public @interface Button {
     double order() default 1.0;
     String key() default "";
 
+    String icon() default "";
 }

@@ -253,7 +253,7 @@ public class ChartAction extends PortletAction {
         }
     }
 
-    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1)
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configure() {
         prepareConfigurationForms();
