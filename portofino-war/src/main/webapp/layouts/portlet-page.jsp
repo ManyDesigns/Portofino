@@ -28,25 +28,76 @@
                         <div class="contentBarButtons">
                             <button onclick="enablePortletDragAndDrop(this); return false;"
                                     type="submit"
-                                    class="arrow-4">Edit page layout</button>
-                            <button name="reloadModel" type="submit" class="refresh">Reload model</button>
-                            <button name="pagePermissions" type="submit" class="person">Page permissions</button>
-                            <button class="copy" type="submit"
-                                    onclick="showCopyPageDialog(
+                                    class="arrow-4 ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
+                                    role="button" aria-disabled="false"
+                                    title="Edit page layout">
+                                <span class="ui-button-icon-primary ui-icon ui-icon-arrow-4"></span>
+                                <span class="ui-button-text">Edit page layout</span>
+                            </button>
+
+                            <button name="reloadModel"
+                                    type="submit"
+                                    class="refresh ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
+                                    role="button" aria-disabled="false"
+                                    title="Reload model">
+                                <span class="ui-button-icon-primary ui-icon ui-icon-refresh"></span>
+                                <span class="ui-button-text">Reload model</span>
+                            </button>
+
+                            <button name="pagePermissions"
+                                    type="submit"
+                                    class="person ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
+                                    role="button" aria-disabled="false"
+                                    title="Page permissions">
+                                <span class="ui-button-icon-primary ui-icon ui-icon-person"></span>
+                                <span class="ui-button-text">Page permissions</span>
+                            </button>
+
+                            <button onclick="showCopyPageDialog(
                                                 '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
                                                 '<%= request.getContextPath() %>');
-                                            return false;">Copy page</button>
-                            <button name="newPage" type="submit" class="plusthick">Add page</button>
-                            <button name="deletePage" type="submit" class="minusthick"
+                                            return false;"
+                                    type="submit"
+                                    class="copy ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
+                                    role="button" aria-disabled="false"
+                                    title="Copy page">
+                                <span class="ui-button-icon-primary ui-icon ui-icon-copy"></span>
+                                <span class="ui-button-text">Copy page</span>
+                            </button>
+
+                            <button name="newPage"
+                                    type="submit"
+                                    class="plusthick ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
+                                    role="button" aria-disabled="false"
+                                    title="Add page">
+                                <span class="ui-button-icon-primary ui-icon ui-icon-plusthick"></span>
+                                <span class="ui-button-text">Add page</span>
+                            </button>
+
+                            <button name="deletePage"
                                     onclick="confirmDeletePage(
                                                 '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
                                                 '<%= request.getContextPath() %>');
-                                            return false;">Delete page</button>
-                            <button class="transferthick-e-w" type="submit"
-                                    onclick="showMovePageDialog(
+                                            return false;"
+                                    type="submit"
+                                    class="minusthick ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
+                                    role="button" aria-disabled="false"
+                                    title="Delete page">
+                                <span class="ui-button-icon-primary ui-icon ui-icon-minusthick"></span>
+                                <span class="ui-button-text">Delete page</span>
+                            </button>
+
+                            <button onclick="showMovePageDialog(
                                                 '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
                                                 '<%= request.getContextPath() %>');
-                                            return false;">Move page</button>
+                                            return false;"
+                                    type="submit"
+                                    class="transferthick-e-w ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
+                                    role="button" aria-disabled="false"
+                                    title="Move page">
+                                <span class="ui-button-icon-primary ui-icon ui-icon-transferthick-e-w"></span>
+                                <span class="ui-button-text">Move page</span>
+                            </button>
                         </div>
                     <% } %>
                     <!-- End admin buttons -->

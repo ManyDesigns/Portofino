@@ -110,54 +110,32 @@ $(function() {
             },
             text: false
         });
-    $("button.arrow-4").button({
-            icons: {
-                primary: "ui-icon-arrow-4"
-            },
-            text: false
-        });
-    $("button.refresh").button({
-            icons: {
-                primary: "ui-icon-refresh"
-            },
-            text: false
-        });
+
     $(".portletHeaderButtons button[name=manageAttachments]").button({
+        icons: {
+            primary: "ui-icon-link"
+        },
+        text: false
+    });
+
+    var decorateIconButton = function(selector, icon) {
+        var elem = $(selector);
+        elem.html(elem.find('.ui-button-text').html());
+        elem.button({
             icons: {
-                primary: "ui-icon-link"
+                primary: icon
             },
             text: false
         });
-    $("button.person").button({
-            icons: {
-                primary: "ui-icon-person"
-            },
-            text: false
-        });
-    $("button.copy").button({
-            icons: {
-                primary: "ui-icon-copy"
-            },
-            text: false
-        });
-    $("button.plusthick").button({
-            icons: {
-                primary: "ui-icon-plusthick"
-            },
-            text: false
-        });
-    $("button.minusthick").button({
-            icons: {
-                primary: "ui-icon-minusthick"
-            },
-            text: false
-        });
-    $("button.transferthick-e-w").button({
-            icons: {
-                primary: "ui-icon-transferthick-e-w"
-            },
-            text: false
-        });
+    };
+
+    decorateIconButton("button.arrow-4", "ui-icon-arrow-4");
+    decorateIconButton("button.refresh", "ui-icon-refresh");
+    decorateIconButton("button.person", "ui-icon-person");
+    decorateIconButton("button.copy", "ui-icon-copy");
+    decorateIconButton("button.plusthick", "ui-icon-plusthick");
+    decorateIconButton("button.minusthick", "ui-icon-minusthick");
+    decorateIconButton("button.transferthick-e-w", "ui-icon-transferthick-e-w");
 });
 
 function enablePortletDragAndDrop(button) {
