@@ -27,21 +27,22 @@
                     <% if(SecurityLogic.isAdministrator(request)) { %>
                         <div class="contentBarButtons">
                             <button onclick="enablePortletDragAndDrop(this); return false;"
+                                    type="submit"
                                     class="arrow-4">Edit page layout</button>
-                            <button name="reloadModel" class="refresh">Reload model</button>
-                            <button name="pagePermissions" class="person">Page permissions</button>
+                            <button name="reloadModel" type="submit" class="refresh">Reload model</button>
+                            <button name="pagePermissions" type="submit" class="person">Page permissions</button>
                             <%--<button class="copy"
                                     onclick="showCopyPageDialog(
                                                 '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
                                                 '<%= request.getContextPath() %>');
                                             return false;">Copy page</button>--%>
-                            <button name="newPage" class="plusthick">Add page</button>
-                            <button name="deletePage" class="minusthick"
+                            <button name="newPage" type="submit" class="plusthick">Add page</button>
+                            <button name="deletePage" type="submit" class="minusthick"
                                     onclick="confirmDeletePage(
                                                 '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
                                                 '<%= request.getContextPath() %>');
                                             return false;">Delete page</button>
-                            <button class="transferthick-e-w"
+                            <button class="transferthick-e-w" type="submit"
                                     onclick="showMovePageDialog(
                                                 '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
                                                 '<%= request.getContextPath() %>');

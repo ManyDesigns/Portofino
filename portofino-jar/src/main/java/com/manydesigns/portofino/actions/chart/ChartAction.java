@@ -45,6 +45,7 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.ChartPage;
+import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
@@ -180,7 +181,7 @@ public class ChartAction extends PortletAction {
         File file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
 
         inputStream = new FileInputStream(file);
-        return new StreamingResolution("image/png", inputStream);
+        return new NoCacheStreamingResolution("image/png", inputStream);
     }
 
 
