@@ -292,13 +292,13 @@ ul.errorMessages, ul.warningMessages, ul.infoMessages {
 
 ul.errorMessages li, ul.warningMessages li, ul.infoMessages li {
     list-style-type: none;
-    padding-left: 32px;
+    padding-left: 24px;
 }
 
 ul.errorMessages {
     border: 1px dashed #c00;
     background-color: #fff8f0;
-    background-image: url("../../knob_icons/Knob Cancel.png");
+    background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-cross-24.png");
     background-repeat: no-repeat;
     background-position: 4px center;
 }
@@ -306,7 +306,7 @@ ul.errorMessages {
 ul.warningMessages {
     border: 1px dashed #880;
     background-color: #fffff0;
-    background-image: url("../../knob_icons/Knob Attention.png");
+    background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/warning-24.png");
     background-repeat: no-repeat;
     background-position: 4px center;
 }
@@ -314,7 +314,7 @@ ul.warningMessages {
 ul.infoMessages {
     border: 1px dashed #0a0;
     background-color: #f0fff0;
-    background-image: url("../../knob_icons/Knob Valid Green.png");
+    background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-check-24.png");
     background-repeat: no-repeat;
     background-position: 4px center;
 }
@@ -503,7 +503,7 @@ div#content-login {
 }
 
 div#content-login .userMessages {
-    border-bottom: 0;
+    margin-bottom: 0;
 }
 
 .loginTable {
