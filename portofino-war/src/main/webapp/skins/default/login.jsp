@@ -24,11 +24,7 @@
     </head>
     <body>
     <div id="doc3">
-        <div id="hd">
-            <div style="position: absolute; left: 20em;">
-                <mde:sessionMessages/>
-            </div>
-        </div>
+        <div id="hd"></div>
         <div id="bd">
         <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
         <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction" method="post">
@@ -47,9 +43,11 @@
                                         </stripes:layout-component>
                                     </div>
                                 </div>
+                                <div class="portletHeaderSeparator"></div>
                             </div>
                             <div class="portletBody">
                                 <stripes:layout-component name="portletBody">
+                                    <mde:sessionMessages/>
                                     <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
                                     <table class="mde-form-table loginTable">
                                         <tbody>

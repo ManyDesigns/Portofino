@@ -120,16 +120,19 @@ public class
             Permissions permissions;
             Dispatch dispatch =
                 (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
+            String resource;
             if(dispatch != null) {
                 PageInstance pageInstance = dispatch.getLastPageInstance();
                 Page page = pageInstance.getPage();
                 permissions = page.getPermissions();
+                resource = dispatch.getPathUrl();
             } else {
                 permissions = new Permissions();
+                resource = request.getRequestURI();
             }
             if(!SecurityLogic.hasPermissions(permissions, groups, handler, actionBean.getClass())) {
-                logger.info("User does not match page permissions. User's groups: {}",
-                        ArrayUtils.toString(groups));
+                logger.info("User does not match page permissions for {}. User's groups: {}",
+                        resource, ArrayUtils.toString(groups));
                 return handleAnonymousOrUnauthorized(userId, request);
             }
         }
@@ -153,7 +156,7 @@ public class
                     .addParameter("returnUrl", returnUrl)
                     .addParameter("cancelReturnUrl", "/");
         } else {
-            logger.warn("User not authorized.");
+            logger.warn("User {} not authorized.", userId);
             return new ErrorResolution(UNAUTHORIZED);
         }
     }

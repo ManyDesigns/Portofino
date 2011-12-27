@@ -41,6 +41,7 @@
                         <div class="contentBody">
                             <div class="portletWrapper">
                                 <div class="portlet">
+                                    <mde:sessionMessages/>
                                     <div class="portletHeader">
                                         <stripes:layout-component name="portletHeader">
                                             <div class="yui-g">

@@ -54,7 +54,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -278,7 +280,7 @@ public class ChartAction extends PortletAction {
         String[] orientationLabels = { "Horizontal", "Vertical" };
         DefaultSelectionProvider orientationSelectionProvider = new DefaultSelectionProvider("orientation");
         for(int i = 0; i < orientationValues.length; i++) {
-            typeSelectionProvider.appendRow(orientationValues[i], orientationLabels[i], true);
+            orientationSelectionProvider.appendRow(orientationValues[i], orientationLabels[i], true);
         }
         form = new FormBuilder(ChartPage.class)
                 .configFields(CONFIGURATION_FIELDS)
@@ -315,7 +317,10 @@ public class ChartAction extends PortletAction {
                 updatePageConfiguration();
                 form.writeToObject(chartPage);
                 saveModel();
-                SessionMessages.addInfoMessage("Configuration updated successfully");
+
+                Locale locale = context.getLocale();
+                ResourceBundle bundle = application.getBundle(locale);
+                SessionMessages.addInfoMessage(bundle.getString("commons.configuration.updated"));
                 return cancel();
             } else {
                 return new ForwardResolution("/layouts/chart/configure.jsp");

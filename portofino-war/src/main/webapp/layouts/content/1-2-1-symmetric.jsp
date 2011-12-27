@@ -4,6 +4,7 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.PortletAction"/>
+<mde:sessionMessages/>
 <div id="default" class="portletContainer">
     <c:forEach var="portletInstance" items="${ actionBean.portlets['default'] }">
         <input type="hidden" class="updateLayout" name="portletWrapper_default" value="<c:out value='${portletInstance.id}' />" />

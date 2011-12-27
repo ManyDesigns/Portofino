@@ -1764,7 +1764,10 @@ public class CrudAction extends PortletAction {
                 }
 
                 saveModel();
-                SessionMessages.addInfoMessage("Configuration updated successfully");
+
+                Locale locale = context.getLocale();
+                ResourceBundle bundle = application.getBundle(locale);
+                SessionMessages.addInfoMessage(bundle.getString("commons.configuration.updated"));
                 return cancel();
             } else {
                 SessionMessages.addErrorMessage("The configuration could not be saved. " +

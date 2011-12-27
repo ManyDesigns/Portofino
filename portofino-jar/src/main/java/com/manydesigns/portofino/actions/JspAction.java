@@ -45,6 +45,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -129,7 +131,10 @@ public class JspAction extends PortletAction {
                 updatePageConfiguration();
                 form.writeToObject(jspPage);
                 saveModel();
-                SessionMessages.addInfoMessage("Configuration updated successfully");
+
+                Locale locale = context.getLocale();
+                ResourceBundle bundle = application.getBundle(locale);
+                SessionMessages.addInfoMessage(bundle.getString("commons.configuration.updated"));
             }
             return cancel();
         }

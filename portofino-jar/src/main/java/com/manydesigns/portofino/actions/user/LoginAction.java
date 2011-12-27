@@ -60,6 +60,8 @@ import java.io.FileReader;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -159,19 +161,20 @@ public class LoginAction extends AbstractActionBean {
             user = SecurityLogic.defaultLogin(application, userName, pwd);
         }
 
+        Locale locale = context.getLocale();
+        ResourceBundle bundle = application.getBundle(locale);
+
         if (user==null) {
-            String errMsg = MessageFormat.format("FAILED AUTH for user {0}",
-                    userName);
-            SessionMessages.addInfoMessage(errMsg);
+            String errMsg = MessageFormat.format(bundle.getString("user.login.failed"), userName);
+            SessionMessages.addErrorMessage(errMsg);
             logger.warn(errMsg);
             updateFailedUser(userName);
             return new ForwardResolution("/layouts/user/login.jsp");
         }
 
         if (!user.getState().equals(SecurityLogic.ACTIVE)) {
-            String errMsg = MessageFormat.format("User {0} is not active. " +
-                    "Please contact the administrator", userName);
-            SessionMessages.addInfoMessage(errMsg);
+            String errMsg = MessageFormat.format(bundle.getString("user.not.active"), userName);
+            SessionMessages.addErrorMessage(errMsg);
             logger.warn(errMsg);
             return new ForwardResolution("/layouts/user/login.jsp");
         }
@@ -246,7 +249,11 @@ public class LoginAction extends AbstractActionBean {
         if (session != null) {
             session.invalidate();
         }
-        SessionMessages.addInfoMessage("User disconnected");
+
+        Locale locale = context.getLocale();
+        ResourceBundle bundle = application.getBundle(locale);
+        String msg = MessageFormat.format(bundle.getString("user.logout"), userName);
+        SessionMessages.addInfoMessage(msg);
 
         return new RedirectResolution("/");
     }

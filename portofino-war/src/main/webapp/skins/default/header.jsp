@@ -41,8 +41,5 @@
         <stripes:link href="/actions/user/help"><fmt:message key="skins.default.header.help"/></stripes:link>
     </c:if>
 </div>
-<div style="position: absolute; left: 20em;">
-    <mde:sessionMessages/>
-</div>
 <h1><stripes:link href="/"><c:out
         value="${model.rootPage.title}"/></stripes:link></h1>

@@ -278,9 +278,13 @@ div#sidebar.adminSidebar li li {
 Error/warning/info messages
 *******************************************************************************/
 
+.userMessages {
+    margin-bottom: 1em;
+}
+
 ul.errorMessages, ul.warningMessages, ul.infoMessages {
     margin: 0;
-    padding: 0 0.5em;
+    padding: 12px 0 12px 6px;
     font-weight: normal;
     font-style: italic;
     list-style-type: none;
@@ -288,21 +292,31 @@ ul.errorMessages, ul.warningMessages, ul.infoMessages {
 
 ul.errorMessages li, ul.warningMessages li, ul.infoMessages li {
     list-style-type: none;
+    padding-left: 32px;
 }
 
 ul.errorMessages {
     border: 1px dashed #c00;
     background-color: #fff8f0;
+    background-image: url("../../knob_icons/Knob Cancel.png");
+    background-repeat: no-repeat;
+    background-position: 4px center;
 }
 
 ul.warningMessages {
     border: 1px dashed #880;
     background-color: #fffff0;
+    background-image: url("../../knob_icons/Knob Attention.png");
+    background-repeat: no-repeat;
+    background-position: 4px center;
 }
 
 ul.infoMessages {
     border: 1px dashed #0a0;
     background-color: #f0fff0;
+    background-image: url("../../knob_icons/Knob Valid Green.png");
+    background-repeat: no-repeat;
+    background-position: 4px center;
 }
 
 
@@ -486,6 +500,10 @@ div#content-login {
     margin: 12em auto;
     width: 400px;
     background-color: white;
+}
+
+div#content-login .userMessages {
+    border-bottom: 0;
 }
 
 .loginTable {
