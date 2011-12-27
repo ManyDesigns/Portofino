@@ -616,13 +616,12 @@ li.group, li.groupPlaceholder {
     margin-bottom: 0.5em;
 }
 
-.inheritedPermission {
-    margin: 1em 0;
-    border-left: 1px solid black;
-    padding-left: 1em;
-}
+/*******************************************************************************
+Permissions
+*******************************************************************************/
 
-.inheritedPermission .inheritedPageName {
-    font-weight: bold;
-    color: #555;
+table#userPermissionTestResults th,
+table#userPermissionTestResults td {
+    border: none;
+    text-align: left;
 }

@@ -19,6 +19,7 @@ import com.manydesigns.portofino.actions.forms.NewPage;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
+import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
@@ -32,6 +33,7 @@ import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.stripes.ModelActionResolver;
+import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import com.manydesigns.portofino.util.ShortNameUtils;
@@ -247,12 +249,17 @@ public class PortletAction extends AbstractActionBean {
     // Page permisssions
     //--------------------------------------------------------------------------
 
-    List<com.manydesigns.portofino.system.model.users.Group> groups;
+    protected List<com.manydesigns.portofino.system.model.users.Group> groups;
 
     //<group, level>
-    Map<String, String> accessLevels = new HashMap<String, String>();
+    protected Map<String, String> accessLevels = new HashMap<String, String>();
     //<group, permissions>
-    Map<String, List<String>> permissions = new HashMap<String, List<String>>();
+    protected Map<String, List<String>> permissions = new HashMap<String, List<String>>();
+
+    protected String testUserId;
+    protected List<User> users;
+    protected AccessLevel testedAccessLevel;
+    protected Set<String> testedPermissions;
 
     @RequiresAdministrator
     public Resolution pagePermissions() {
@@ -260,7 +267,34 @@ public class PortletAction extends AbstractActionBean {
 
         setupGroups(page);
 
+        Session session = application.getSession("portofino");
+        users = (List) QueryUtils.runHqlQuery(session, "from users", null);
+
         return forwardToPagePermissions();
+    }
+
+    @Button(list = "testUserPermissions", key = "user.permissions.test")
+    public Resolution testUserPermissions() {
+        if(StringUtils.isBlank(testUserId)) {
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
+        List<String> groups = SecurityLogic.manageGroups(application, testUserId);
+        Permissions permissions = getPage().getPermissions();
+        testedAccessLevel = AccessLevel.NONE;
+        testedPermissions = new HashSet<String>();
+        for(String group : groups) {
+            AccessLevel accessLevel = permissions.getActualLevels().get(group);
+            if(accessLevel != null &&
+               accessLevel.isGreaterThanOrEqual(testedAccessLevel)) {
+                testedAccessLevel = accessLevel;
+            }
+            Set<String> perms = permissions.getActualPermissions().get(group);
+            if(perms != null) {
+                testedPermissions.addAll(perms);
+            }
+        }
+
+        return pagePermissions();
     }
 
     protected Resolution forwardToPagePermissions() {
@@ -280,7 +314,10 @@ public class PortletAction extends AbstractActionBean {
         synchronized (application) {
             updatePagePermissions(page);
             saveModel();
-            SessionMessages.addInfoMessage("Page permissions saved successfully.");
+
+            Locale locale = context.getLocale();
+            ResourceBundle bundle = application.getBundle(locale);
+            SessionMessages.addInfoMessage(bundle.getString("permissions.page.updated"));
         }
 
         return new RedirectResolution(dispatch.getOriginalPath())
@@ -459,6 +496,26 @@ public class PortletAction extends AbstractActionBean {
 
     public void setCancelReturnUrl(String cancelReturnUrl) {
         this.cancelReturnUrl = cancelReturnUrl;
+    }
+
+    public String getTestUserId() {
+        return testUserId;
+    }
+
+    public void setTestUserId(String testUserId) {
+        this.testUserId = testUserId;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public AccessLevel getTestedAccessLevel() {
+        return testedAccessLevel;
+    }
+
+    public Set<String> getTestedPermissions() {
+        return testedPermissions;
     }
 
     //--------------------------------------------------------------------------
