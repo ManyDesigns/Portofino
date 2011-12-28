@@ -1064,6 +1064,15 @@ public class CrudAction extends PortletAction {
         return sb.toString();
     }
 
+    //**************************************************************************
+    // Page realization
+    //**************************************************************************
+
+    public Resolution pageRealizationFailed() throws IOException {
+        SessionMessages.addWarningMessage(
+                MessageFormat.format("Object {0} not in use case", getPageInstance().getPk()));
+        return new ForwardResolution("/layouts/crud/notInUseCase.jsp");
+    }
 
     //**************************************************************************
     // Object loading

@@ -86,16 +86,19 @@ public class CrudPageInstance extends PageInstance {
         pkHelper = tmpPkHelper;
     }
 
-    public void realize() {
+    @Override
+    public boolean realize() {
         if(CrudPage.MODE_DETAIL.equals(mode)) {
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
             loadObject(pk);
             if(object != null) {
                 ognlContext.put(crud.getActualVariable(), object);
             } else {
-                throw new RuntimeException("Not in use case: " + crud.getName());
+                logger.info("Not in use case: " + crud.getName());
+                return false;
             }
         }
+        return true;
     }
 
     private void loadObject(String pk) {

@@ -38,7 +38,9 @@ import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.navigation.Navigation;
+import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
@@ -108,8 +110,15 @@ public class ApplicationInterceptor implements Interceptor {
                     new Navigation(application, dispatch, groups, admin);
             request.setAttribute(RequestAttributes.NAVIGATION, navigation);
 
-            for(PageInstance page : dispatch.getPageInstancePath()) {
-                page.realize();
+            if(request.getAttribute("pageRealizationFailed") == null) {
+                for(PageInstance page : dispatch.getPageInstancePath()) {
+                    if(!page.realize()) {
+                        Class<? extends ActionBean> actionClass =
+                                (Class<? extends ActionBean>) page.getPage().getActualActionClass();
+                        request.setAttribute("pageRealizationFailed", true);
+                        return new ForwardResolution(actionClass, "pageRealizationFailed");
+                    }
+                }
             }
             PageInstance pageInstance = dispatch.getLastPageInstance();
             request.setAttribute(RequestAttributes.PAGE_INSTANCE, pageInstance);

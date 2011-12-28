@@ -75,7 +75,8 @@ public class PageInstance {
         return application;
     }
 
-    public void realize() {
+    public boolean realize() {
+        return true;
     }
 
     public PageInstance dereference() {

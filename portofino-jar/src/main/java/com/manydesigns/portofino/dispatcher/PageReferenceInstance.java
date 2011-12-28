@@ -65,8 +65,8 @@ public class PageReferenceInstance extends PageInstance {
     }
 
     @Override
-    public void realize() {
-        wrappedPageInstance.realize();
+    public boolean realize() {
+        return wrappedPageInstance.realize();
     }
 
     @Override
