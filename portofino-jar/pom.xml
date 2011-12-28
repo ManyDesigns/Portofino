@@ -16,13 +16,13 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>elements</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>elements-extras</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

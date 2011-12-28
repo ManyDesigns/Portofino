@@ -73,7 +73,7 @@
                         </manifest>
                         <manifestEntries>
                             <mode>development</mode>
-                            <url>${pom.url}</url>
+                            <url>${project.url}</url>
                             <key>value</key>
                         </manifestEntries>
                     </archive>
