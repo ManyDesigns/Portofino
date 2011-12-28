@@ -141,6 +141,7 @@ public class ChartAction extends PortletAction {
             String portletUrl = chartResolution.toString();
 
             File file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
+            file.deleteOnExit();
             fileName = file.getName();
 
             jfreeChartInstance =
