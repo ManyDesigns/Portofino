@@ -12,9 +12,11 @@
             <div class="yui-g">
                 <div class="contentBarLeft">
                     <c:if test="${not empty actionBean.returnToParentTarget}">
-                        <stripes:submit name="returnToParent"
-                                        value="<< Return to ${actionBean.returnToParentTarget}"
-                                        class="contentButton"/>
+                        <button type="submit"
+                                name="returnToParent"
+                                class="contentButton">
+                            <span class="ui-button-text">&lt;&lt; Return to ${actionBean.returnToParentTarget}</span>
+                        </button>
                     </c:if>
                     <div class="breadcrumbs">
                         <div class="inner">
