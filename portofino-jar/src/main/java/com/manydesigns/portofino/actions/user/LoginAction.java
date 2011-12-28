@@ -254,8 +254,6 @@ public class LoginAction extends AbstractActionBean {
         ResourceBundle bundle = application.getBundle(locale);
         String msg = bundle.getString("user.logout");
         SessionMessages.addInfoMessage(msg);
-        SessionMessages.addWarningMessage(msg);
-        SessionMessages.addErrorMessage(msg);
 
         return new RedirectResolution("/");
     }

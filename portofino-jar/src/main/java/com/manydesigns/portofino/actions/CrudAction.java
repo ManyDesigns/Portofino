@@ -797,7 +797,8 @@ public class CrudAction extends PortletAction {
         @Button(list = "crud-create", key = "commons.cancel", order = 99),
         @Button(list = "crud-bulk-edit", key = "commons.cancel", order = 99),
         @Button(list = "page-permissions-edit", key = "commons.cancel", order = 99),
-        @Button(list = "configuration", key = "commons.cancel", order = 99)
+        @Button(list = "configuration", key = "commons.cancel", order = 99),
+        @Button(list = "page-create", key = "commons.cancel", order = 99)
     })
     public Resolution cancel() {
         return super.cancel();
@@ -1144,7 +1145,7 @@ public class CrudAction extends PortletAction {
             WritableSheet sheet =
                     workbook.createSheet(crud.getSearchTitle(), 0);
 
-            addHeaderToSheet(sheet);
+            addHeaderToSearchSheet(sheet);
 
             int i = 1;
             for ( TableForm.Row row : tableForm.getRows()) {
@@ -1215,7 +1216,7 @@ public class CrudAction extends PortletAction {
                 workbook.createSheet(crud.getReadTitle(),
                         workbook.getNumberOfSheets());
 
-            addHeaderToSheet(sheet);
+            addHeaderToReadSheet(sheet);
 
             int i = 1;
             for (FieldSet fieldset : form) {
@@ -1297,7 +1298,7 @@ public class CrudAction extends PortletAction {
     }
 
 
-    private void addHeaderToSheet(WritableSheet sheet) throws WriteException {
+    private void addHeaderToReadSheet(WritableSheet sheet) throws WriteException {
         WritableCellFormat formatCell = headerExcel();
         int i = 0;
         for (FieldSet fieldset : form) {
@@ -1305,6 +1306,15 @@ public class CrudAction extends PortletAction {
                 sheet.addCell(new jxl.write.Label(i, 0, field.getLabel(), formatCell));
                 i++;
             }
+        }
+    }
+
+    private void addHeaderToSearchSheet(WritableSheet sheet) throws WriteException {
+        WritableCellFormat formatCell = headerExcel();
+        int l = 0;
+        for (TableForm.Column col : tableForm.getColumns()) {
+            sheet.addCell(new jxl.write.Label(l, 0, col.getLabel(), formatCell));
+            l++;
         }
     }
 

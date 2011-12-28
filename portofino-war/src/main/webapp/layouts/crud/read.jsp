@@ -22,9 +22,7 @@
             <portofino:buttons list="crud-read" cssClass="portletButton" />
         </div>
         <!--<stripes:submit name="duplicate" value="Duplicate" disabled="true" class="portletButton"/>
-        <stripes:submit name="print" value="Print" disabled="true" class="portletButton"/>
-        <stripes:submit name="exportReadExcel" value="Excel" disabled="true" class="portletButton"/>
-        <stripes:submit name="exportReadPdf" value="Pdf" disabled="false" class="portletButton"/>-->
+        <stripes:submit name="print" value="Print" disabled="true" class="portletButton"/>-->
     </stripes:layout-component>
     <script type="text/javascript">
         $(".crudReadButtons button[name=delete]").click(function() {

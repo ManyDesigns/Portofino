@@ -455,7 +455,8 @@ public class PortletAction extends AbstractActionBean {
 
     @Buttons({
         @Button(list = "page-permissions-edit", key = "commons.cancel", order = 99),
-        @Button(list = "configuration", key = "commons.cancel", order = 99)
+        @Button(list = "configuration", key = "commons.cancel", order = 99),
+        @Button(list = "page-create", key = "commons.cancel", order = 99)
     })
     public Resolution cancel() {
         if (StringUtils.isEmpty(cancelReturnUrl)) {
@@ -690,6 +691,7 @@ public class PortletAction extends AbstractActionBean {
     }
 
     @RequiresAdministrator
+    @Button(list = "page-create", key = "commons.create", order = 1)
     public Resolution createPage() {
         try {
             return doCreateNewPage();
