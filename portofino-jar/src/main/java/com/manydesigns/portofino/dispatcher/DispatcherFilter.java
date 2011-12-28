@@ -39,6 +39,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.jstl.core.Config;
+import javax.servlet.jsp.jstl.fmt.LocalizationContext;
 import java.io.IOException;
 import java.util.*;
 
@@ -86,6 +88,12 @@ public class DispatcherFilter implements Filter {
         if (application != null) {
             Model model = application.getModel();
             request.setAttribute(RequestAttributes.MODEL, model);
+
+            //I18n
+            Locale locale = request.getLocale();
+            LocalizationContext localizationContext =
+                    new LocalizationContext(application.getBundle(locale), locale);
+            request.setAttribute(Config.FMT_LOCALIZATION_CONTEXT + ".request", localizationContext);
         }
 
         logger.debug("Invoking the dispatcher to create a dispatch");

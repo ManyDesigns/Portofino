@@ -133,12 +133,6 @@ public class ApplicationInterceptor implements Interceptor {
             request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
         }
 
-        //I18n - TODO spostare
-        Locale locale = request.getLocale();
-        LocalizationContext localizationContext =
-                new LocalizationContext(application.getBundle(locale), locale);
-        request.setAttribute(Config.FMT_LOCALIZATION_CONTEXT + ".request", localizationContext);
-
         return context.proceed();
     }
 

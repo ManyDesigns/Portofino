@@ -1,3 +1,6 @@
+<%@page contentType="text/javascript; UTF-8" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 function fixSideBar() {
     $(
         function() {
@@ -36,14 +39,15 @@ function confirmDeletePage(pageId, contextPath) {
     dialogDiv.load(contextPath + "/actions/page?confirmDelete&pageId=" + pageId, function() {
         dialogDiv.find("#dialog-confirm-delete-page").dialog({
             modal: true,
+            width: 500,
             buttons: {
-                "Delete": function() {
+                '<fmt:message key="commons.delete" />': function() {
                     var form = $("#contentHeaderForm");
                     copyFormAsHiddenFields($(this), form);
                     form.submit();
                     $(this).dialog("close");
                 },
-                Cancel: function() {
+                '<fmt:message key="commons.cancel" />': function() {
                     $(this).dialog("close");
                     dialogDiv.remove();
                 }
@@ -60,13 +64,13 @@ function showMovePageDialog(pageId, contextPath) {
             modal: true,
             width: 500,
             buttons: {
-                "Move": function() {
+                '<fmt:message key="commons.move"/>': function() {
                     var form = $("#contentHeaderForm");
                     copyFormAsHiddenFields($(this), form);
                     form.submit();
                     $(this).dialog("close");
                 },
-                Cancel: function() {
+                '<fmt:message key="commons.cancel" />': function() {
                     $(this).dialog("close");
                     dialogDiv.remove();
                 }
@@ -83,13 +87,13 @@ function showCopyPageDialog(pageId, contextPath) {
             modal: true,
             width: 500,
             buttons: {
-                "Copy": function() {
+                '<fmt:message key="commons.copy"/>': function() {
                     var form = $("#contentHeaderForm");
                     copyFormAsHiddenFields($(this), form);
                     form.submit();
                     $(this).dialog("close");
                 },
-                Cancel: function() {
+                '<fmt:message key="commons.cancel" />': function() {
                     $(this).dialog("close");
                     dialogDiv.remove();
                 }

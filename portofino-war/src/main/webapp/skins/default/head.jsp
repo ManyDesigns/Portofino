@@ -41,4 +41,4 @@
 <script type="text/javascript"
         src="<stripes:url value="/elements.js"/>"></script>
 <script type="text/javascript"
-        src="<stripes:url value="/skins/default/portofino.js"/>"></script>
+        src="<stripes:url value="/skins/default/portofino.js.jsp"/>"></script>
