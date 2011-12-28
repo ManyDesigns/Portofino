@@ -423,7 +423,6 @@ public class DatabaseSyncer {
             try {
                 BeanUtils.copyProperties(targetSP, sourceSP);
                 targetSP.setFromTable(targetTable);
-                targetSP.setToTable(null);
                 targetTable.getSelectionProviders().add(targetSP);
                 for (Reference sourceReference : sourceSP.getReferences()) {
                     Reference targetReference = new Reference(targetSP);

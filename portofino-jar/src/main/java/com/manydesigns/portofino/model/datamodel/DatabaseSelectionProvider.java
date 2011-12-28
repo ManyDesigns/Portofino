@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelVisitor;
 import org.slf4j.Logger;
@@ -60,13 +59,6 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
     protected String hql;
 
     protected Table fromTable;
-    protected Table toTable;
-
-    //**************************************************************************
-    // Support fields
-    //**************************************************************************
-
-    protected String toTableName;
 
     //**************************************************************************
     // Logging
@@ -96,25 +88,15 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
         fromTable = (Table) parent;
     }
 
-    public void reset() {
-        toTable = null;
-    }
+    public void reset() {}
 
     public void init(Model model) {
         assert name != null;
         assert toDatabase != null;
         assert toSchema != null;
-        assert toTableName != null;
     }
 
-    public void link(Model model) {
-        String qualifiedToTableName =
-                Table.composeQualifiedName(toDatabase, toSchema, toTableName);
-        toTable = DataModelLogic.findTableByQualifiedName(model, qualifiedToTableName);
-        if (toTable == null) {
-            logger.warn("Cannot find destination table '{}'", qualifiedToTableName);
-        }
-    }
+    public void link(Model model) {}
 
     public void visitChildren(ModelVisitor visitor) {
         for (Reference reference : references) {
@@ -189,19 +171,7 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
     }
 
     public Table getToTable() {
-        return toTable;
+        return null;
     }
 
-    public void setToTable(Table toTable) {
-        this.toTable = toTable;
-    }
-
-    @XmlAttribute(name = "toTable")
-    public String getToTableName() {
-        return toTableName;
-    }
-
-    public void setToTableName(String toTableName) {
-        this.toTableName = toTableName;
-    }
 }

@@ -1,12 +1,13 @@
-function updateSelectOptions(relName, selectionProviderIndex) {
-    var selectFieldId = arguments[2 + selectionProviderIndex];
+function updateSelectOptions(relName, selectionProviderIndex, mode) {
+    var selectFieldId = arguments[3 + selectionProviderIndex];
 
     var data = {
         relName : relName,
         selectionProviderIndex : selectionProviderIndex,
-        'method:jsonSelectFieldOptions' : ''
+        jsonSelectFieldOptions : '',
+        selectFieldMode : mode
     };
-    for (var i = 2; i < arguments.length; i++ ) {
+    for (var i = 3; i < arguments.length; i++ ) {
         var currentId = arguments[i];
         var current = $(currentId);
         data[current.attr('name')] = current.attr('value');
@@ -18,7 +19,7 @@ function updateSelectOptions(relName, selectionProviderIndex) {
         url: postUrl,
         data: data,
         success: function(responseData) {
-            var options = jQuery.parseJSON(responseData);
+            var options = responseData; //jQuery.parseJSON(responseData);
 
             var selectField = $(selectFieldId);
             var selOptions = selectField.attr('options');

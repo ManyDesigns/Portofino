@@ -47,6 +47,5 @@ public interface HasReferences {
     void setFromTable(Table fromTable);
 
     Table getToTable();
-    void setToTable(Table toTable);
 
 }

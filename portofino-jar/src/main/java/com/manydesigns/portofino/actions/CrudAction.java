@@ -151,6 +151,11 @@ public class CrudAction extends PortletAction {
     public String sortDirection;
     public boolean searchVisible;
 
+    //Selection providers
+    protected String relName;
+    protected int selectionProviderIndex;
+    protected String selectFieldMode;
+
     //--------------------------------------------------------------------------
     // UI forms
     //--------------------------------------------------------------------------
@@ -281,21 +286,18 @@ public class CrudAction extends PortletAction {
             }
         }
 
-        SelectionProvider selectionProvider;
-
         if(ref == null || ref.isEnabled()) {
             DisplayMode dm = ref != null ? ref.getDisplayMode() : DisplayMode.DROPDOWN;
-            selectionProvider = createSelectionProvider
+            SelectionProvider selectionProvider = createSelectionProvider
                     (current, fieldNames, fieldTypes, dm);
-        } else {
-            selectionProvider = null;
-        }
-
-        CrudSelectionProvider crudSelectionProvider =
+            CrudSelectionProvider crudSelectionProvider =
                 new CrudSelectionProvider(selectionProvider, fieldNames);
-        crudSelectionProviders.add(crudSelectionProvider);
-        Collections.addAll(configuredSPs, fieldNames);
-        return true;
+            crudSelectionProviders.add(crudSelectionProvider);
+            Collections.addAll(configuredSPs, fieldNames);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     protected SelectionProvider createSelectionProvider
@@ -808,7 +810,11 @@ public class CrudAction extends PortletAction {
     // Ajax
     //**************************************************************************
 
-    public String jsonOptions(String selectionProviderName,
+    public Resolution jsonSelectFieldOptions() {
+        return jsonOptions(relName, selectionProviderIndex, null, true);
+    }
+
+    protected Resolution jsonOptions(String selectionProviderName,
                               int selectionProviderIndex,
                               String labelSearch,
                               boolean includeSelectPrompt) {
@@ -822,7 +828,7 @@ public class CrudAction extends PortletAction {
             }
         }
         if (crudSelectionProvider == null) {
-            return "ActionSupport.ERROR";
+            return new ErrorResolution(500);
         }
 
         SelectionProvider selectionProvider =
@@ -833,9 +839,10 @@ public class CrudAction extends PortletAction {
                 .configFields(fieldNames)
                 .configSelectionProvider(selectionProvider, fieldNames)
                 .configPrefix(prefix)
-                .configMode(Mode.EDIT)
+                .configMode(Mode.valueOf(selectFieldMode))
                 .build();
         form.readFromRequest(context.getRequest());
+        form.validate(); //Force selection model instantiation
 
         SelectField targetField =
                 (SelectField) form.get(0).get(selectionProviderIndex);
@@ -843,7 +850,7 @@ public class CrudAction extends PortletAction {
 
         String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
         logger.debug("jsonSelectFieldOptions: {}", text);
-        return text;
+        return new NoCacheStreamingResolution("application/json", text);
     }
 
 
@@ -950,20 +957,22 @@ public class CrudAction extends PortletAction {
                 continue;
             }
             String[] fieldNames = current.getFieldNames();
-            Object[] values = new Object[fieldNames.length];
-            boolean valuesRead = true;
-            for(int i = 0; i < fieldNames.length; i++) {
-                String fieldName = fieldNames[i];
-                try {
-                    PropertyAccessor propertyAccessor = classAccessor.getProperty(fieldName);
-                    values[i] = propertyAccessor.get(object);
-                } catch (Exception e) {
-                    logger.error("Couldn't read property " + fieldName, e);
-                    valuesRead = false;
+            if(object != null) {
+                Object[] values = new Object[fieldNames.length];
+                boolean valuesRead = true;
+                for(int i = 0; i < fieldNames.length; i++) {
+                    String fieldName = fieldNames[i];
+                    try {
+                        PropertyAccessor propertyAccessor = classAccessor.getProperty(fieldName);
+                        values[i] = propertyAccessor.get(object);
+                    } catch (Exception e) {
+                        logger.error("Couldn't read property " + fieldName, e);
+                        valuesRead = false;
+                    }
                 }
-            }
-            if(valuesRead) {
-                selectionProvider.ensureActive(values);
+                if(valuesRead) {
+                    selectionProvider.ensureActive(values);
+                }
             }
             formBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
@@ -2098,5 +2107,29 @@ public class CrudAction extends PortletAction {
 
     public void setSearchVisible(boolean searchVisible) {
         this.searchVisible = searchVisible;
+    }
+
+    public String getRelName() {
+        return relName;
+    }
+
+    public void setRelName(String relName) {
+        this.relName = relName;
+    }
+
+    public int getSelectionProviderIndex() {
+        return selectionProviderIndex;
+    }
+
+    public void setSelectionProviderIndex(int selectionProviderIndex) {
+        this.selectionProviderIndex = selectionProviderIndex;
+    }
+
+    public String getSelectFieldMode() {
+        return selectFieldMode;
+    }
+
+    public void setSelectFieldMode(String selectFieldMode) {
+        this.selectFieldMode = selectFieldMode;
     }
 }
