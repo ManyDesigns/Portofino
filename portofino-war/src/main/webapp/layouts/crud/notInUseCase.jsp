@@ -1,12 +1,13 @@
-<%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %><%@
+<%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
+<%@ page import="com.manydesigns.portofino.actions.RequestAttributes" %>
+<%@
     page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
-%><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"
-/><%
+%><%
 
     response.setStatus(404);
 
@@ -17,10 +18,9 @@
     response.addHeader("Cache-Control", "no-store");
     response.setDateHeader("Expires", 0);
 
-    Dispatch dispatch = actionBean.getDispatch();
-    String originalPath = dispatch.getAbsoluteOriginalPath();
-    int lastSlashPos = originalPath.lastIndexOf("/");
-    String targetUrl = originalPath.substring(0, lastSlashPos);
+    String targetUrl = (String) request.getAttribute("pageRealizationFailed");
+    int lastSlashPos = targetUrl.lastIndexOf("/");
+    targetUrl = targetUrl.substring(0, lastSlashPos);
 
     response.setHeader("Refresh", "0; " + targetUrl);
     

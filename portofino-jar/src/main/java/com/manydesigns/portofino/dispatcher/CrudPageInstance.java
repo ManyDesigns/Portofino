@@ -98,7 +98,7 @@ public class CrudPageInstance extends PageInstance {
                 return false;
             }
         }
-        return true;
+        return realized = true;
     }
 
     private void loadObject(String pk) {

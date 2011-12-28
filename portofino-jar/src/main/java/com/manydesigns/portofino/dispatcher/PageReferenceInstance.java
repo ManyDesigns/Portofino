@@ -70,6 +70,11 @@ public class PageReferenceInstance extends PageInstance {
     }
 
     @Override
+    public boolean isRealized() {
+        return wrappedPageInstance.isRealized();
+    }
+
+    @Override
     public PageInstance findChildPageByFragment(String fragment) {
         return wrappedPageInstance.findChildPageByFragment(fragment);
     }

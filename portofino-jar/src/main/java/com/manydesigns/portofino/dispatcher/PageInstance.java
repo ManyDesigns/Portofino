@@ -50,6 +50,8 @@ public class PageInstance {
     protected final String mode;
     protected final List<PageInstance> childPageInstances;
 
+    protected boolean realized = false;
+
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -76,7 +78,11 @@ public class PageInstance {
     }
 
     public boolean realize() {
-        return true;
+        return realized = true;
+    }
+
+    public boolean isRealized() {
+        return realized;
     }
 
     public PageInstance dereference() {

@@ -38,10 +38,7 @@ import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.navigation.Navigation;
-import net.sourceforge.stripes.action.ActionBean;
-import net.sourceforge.stripes.action.ActionBeanContext;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
@@ -53,6 +50,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.jstl.core.Config;
 import javax.servlet.jsp.jstl.fmt.LocalizationContext;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;
 
@@ -110,13 +108,20 @@ public class ApplicationInterceptor implements Interceptor {
                     new Navigation(application, dispatch, groups, admin);
             request.setAttribute(RequestAttributes.NAVIGATION, navigation);
 
-            if(request.getAttribute("pageRealizationFailed") == null) {
-                for(PageInstance page : dispatch.getPageInstancePath()) {
-                    if(!page.realize()) {
-                        Class<? extends ActionBean> actionClass =
-                                (Class<? extends ActionBean>) page.getPage().getActualActionClass();
-                        request.setAttribute("pageRealizationFailed", true);
-                        return new ForwardResolution(actionClass, "pageRealizationFailed");
+            int i = 0;
+            for(PageInstance page : dispatch.getPageInstancePath()) {
+                i++;
+                if(!page.realize()) {
+                    Class<?> actionClass = page.getPage().getActualActionClass();
+                    Method pageRealizationFailed = getPageRealizationFailedMethod(actionClass);
+                    if(pageRealizationFailed != null) {
+                        String pathUrl = dispatch.getPathUrl(i);
+                        request.setAttribute("pageRealizationFailed", request.getContextPath() + pathUrl);
+                        Resolution resolution =
+                                (Resolution) pageRealizationFailed.invoke(actionClass.newInstance());
+                        return resolution;
+                    } else {
+                        return new ErrorResolution(404);
                     }
                 }
             }
@@ -135,5 +140,14 @@ public class ApplicationInterceptor implements Interceptor {
         request.setAttribute(Config.FMT_LOCALIZATION_CONTEXT + ".request", localizationContext);
 
         return context.proceed();
+    }
+
+    protected Method getPageRealizationFailedMethod(Class<?> actionClass) {
+        try {
+            return actionClass.getMethod("pageRealizationFailed");
+        } catch (NoSuchMethodException e) {
+            logger.debug("Method pageRealizationFailed() not found in {}", actionClass);
+            return null;
+        }
     }
 }

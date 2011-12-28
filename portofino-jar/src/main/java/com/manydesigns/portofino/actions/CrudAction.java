@@ -1069,8 +1069,7 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     public Resolution pageRealizationFailed() throws IOException {
-        SessionMessages.addWarningMessage(
-                MessageFormat.format("Object {0} not in use case", getPageInstance().getPk()));
+        SessionMessages.addWarningMessage("Object not in use case");
         return new ForwardResolution("/layouts/crud/notInUseCase.jsp");
     }
 
