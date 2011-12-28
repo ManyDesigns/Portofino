@@ -1,13 +1,12 @@
-function updateSelectOptions(relName, selectionProviderIndex, mode) {
-    var selectFieldId = arguments[3 + selectionProviderIndex];
+function updateSelectOptions(relName, selectionProviderIndex) {
+    var selectFieldId = arguments[2 + selectionProviderIndex];
 
     var data = {
         relName : relName,
         selectionProviderIndex : selectionProviderIndex,
-        jsonSelectFieldOptions : '',
-        selectFieldMode : mode
+        jsonSelectFieldOptions : ''
     };
-    for (var i = 3; i < arguments.length; i++ ) {
+    for (var i = 2; i < arguments.length; i++ ) {
         var currentId = arguments[i];
         var current = $(currentId);
         data[current.attr('name')] = current.attr('value');
@@ -48,11 +47,11 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex) {
             var data = {
                 relName : relName,
                 selectionProviderIndex : selectionProviderIndex,
-                'method:jsonAutocompleteOptions' : '',
+                jsonAutocompleteOptions : '',
                 labelSearch : request.term
             };
             for (var i = 3; i < setupArguments.length; i++ ) {
-                var currentId = arguments[i];
+                var currentId = setupArguments[i];
                 var current = $(currentId);
                 data[current.attr('name')] = current.attr('value');
             }

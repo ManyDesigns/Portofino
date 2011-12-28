@@ -155,6 +155,7 @@ public class CrudAction extends PortletAction {
     protected String relName;
     protected int selectionProviderIndex;
     protected String selectFieldMode;
+    protected String labelSearch;
 
     //--------------------------------------------------------------------------
     // UI forms
@@ -811,18 +812,19 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     public Resolution jsonSelectFieldOptions() {
-        return jsonOptions(relName, selectionProviderIndex, null, true);
+        return jsonOptions(true);
     }
 
-    protected Resolution jsonOptions(String selectionProviderName,
-                              int selectionProviderIndex,
-                              String labelSearch,
-                              boolean includeSelectPrompt) {
+    public Resolution jsonAutocompleteOptions() {
+        return jsonOptions(false);
+    }
+
+    protected Resolution jsonOptions(boolean includeSelectPrompt) {
         CrudSelectionProvider crudSelectionProvider = null;
         for (CrudSelectionProvider current : crudSelectionProviders) {
             SelectionProvider selectionProvider =
                     current.getSelectionProvider();
-            if (selectionProvider.getName().equals(selectionProviderName)) {
+            if (selectionProvider.getName().equals(relName)) {
                 crudSelectionProvider = current;
                 break;
             }
@@ -839,13 +841,18 @@ public class CrudAction extends PortletAction {
                 .configFields(fieldNames)
                 .configSelectionProvider(selectionProvider, fieldNames)
                 .configPrefix(prefix)
-                .configMode(Mode.valueOf(selectFieldMode))
+                .configMode(Mode.EDIT)
                 .build();
+
+        FieldSet fieldSet = form.get(0);
+        //Ensure the value is actually read from the request
+        for(Field field : fieldSet) {
+            field.setUpdatable(true);
+        }
         form.readFromRequest(context.getRequest());
-        form.validate(); //Force selection model instantiation
 
         SelectField targetField =
-                (SelectField) form.get(0).get(selectionProviderIndex);
+                (SelectField) fieldSet.get(selectionProviderIndex);
         targetField.setLabelSearch(labelSearch);
 
         String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
@@ -2131,5 +2138,13 @@ public class CrudAction extends PortletAction {
 
     public void setSelectFieldMode(String selectFieldMode) {
         this.selectFieldMode = selectFieldMode;
+    }
+
+    public String getLabelSearch() {
+        return labelSearch;
+    }
+
+    public void setLabelSearch(String labelSearch) {
+        this.labelSearch = labelSearch;
     }
 }

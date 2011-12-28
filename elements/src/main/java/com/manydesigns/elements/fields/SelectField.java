@@ -280,11 +280,10 @@ public class SelectField extends AbstractField {
         sb.append(MessageFormat.format(
                 "$(''#{0}'').change(" +
                         "function() '{'" +
-                        "updateSelectOptions(''{1}'', {2}, ''{3}''",
+                        "updateSelectOptions(''{1}'', {2}",
                 StringEscapeUtils.escapeJavaScript(id),
                 StringEscapeUtils.escapeJavaScript(selectionModel.getName()),
-                selectionModelIndex + 1,
-                StringEscapeUtils.escapeJavaScript(mode.name())));
+                selectionModelIndex + 1));
         appendIds(sb);
         sb.append(");});");
         return sb.toString();
