@@ -1113,10 +1113,26 @@ public class CrudAction extends PortletAction {
     // ExportSearch
     //**************************************************************************
 
+    @Button(list = "crud-search", key = "commons.exportExcel", order = 5)
+    public Resolution exportSearchExcel() {
+        try {
+            File tmpFile = File.createTempFile(crud.getName(), ".search.xls");
+            exportSearchExcel(tmpFile);
+            FileInputStream fileInputStream = new FileInputStream(tmpFile);
+            tmpFile.deleteOnExit();
+            return new StreamingResolution("application/vnd.ms-excel", fileInputStream)
+                    .setFilename(crud.getSearchTitle() + ".xls");
+        } catch (Exception e) {
+            logger.error("Excel export failed", e);
+            SessionMessages.addErrorMessage("Export failed");
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
+    }
+
     public void exportSearchExcel(File fileTemp) {
         setupSearchForm();
         loadObjects();
-//        setupTableForm(Mode.VIEW);
+        setupTableForm(Mode.VIEW);
 
         writeFileSearchExcel(fileTemp);
     }
@@ -1162,70 +1178,106 @@ public class CrudAction extends PortletAction {
     // ExportRead
     //**************************************************************************
 
-    public void exportReadExcel(WritableWorkbook workbook)
+    @Button(list = "crud-read", key = "commons.exportExcel", order = 4)
+    public Resolution exportReadExcel() {
+        try {
+            File tmpFile = File.createTempFile(crud.getName(), ".read.xls");
+            exportReadExcel(tmpFile);
+            FileInputStream fileInputStream = new FileInputStream(tmpFile);
+            tmpFile.deleteOnExit();
+            return new StreamingResolution("application/vnd.ms-excel", fileInputStream)
+                    .setFilename(crud.getReadTitle() + ".xls");
+        } catch (Exception e) {
+            logger.error("Excel export failed", e);
+            SessionMessages.addErrorMessage("Export failed");
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
+    }
+
+    public void exportReadExcel(File tempFile)
             throws IOException, WriteException {
         setupSearchForm();
 
         loadObjects();
 
-//        setupTableForm(Mode.VIEW);
         setupForm(Mode.VIEW);
         form.readFromObject(object);
 
-        writeFileReadExcel(workbook);
+        writeFileReadExcel(tempFile);
     }
 
-
-    private void writeFileReadExcel(WritableWorkbook workbook)
+    private void writeFileReadExcel(File fileTemp)
             throws IOException, WriteException {
-        WritableSheet sheet =
+        WritableWorkbook workbook = null;
+        try {
+            workbook = Workbook.createWorkbook(fileTemp);
+            WritableSheet sheet =
                 workbook.createSheet(crud.getReadTitle(),
                         workbook.getNumberOfSheets());
 
-        addHeaderToSheet(sheet);
+            addHeaderToSheet(sheet);
 
-        int i = 1;
-        for (FieldSet fieldset : form) {
-            int j = 0;
-            for (Field field : fieldset) {
-                addFieldToCell(sheet, i, j, field);
-                j++;
-            }
-            i++;
-        }
-
-        /*
-        ValueStack valueStack = Struts2Utils.getValueStack();
-        valueStack.push(object);
-
-        //Aggiungo le relazioni/sheet
-        WritableCellFormat formatCell = headerExcel();
-        for (CrudUnit subCrudUnit: subCrudUnits) {
-            subCrudUnit.setupSearchForm();
-            subCrudUnit.loadObjects();
-            subCrudUnit.setupTableForm(Mode.VIEW);
-
-            sheet = workbook.createSheet(subCrudUnit.searchTitle ,
-                    workbook.getNumberOfSheets());
-
-            int m = 0;
-            for (TableForm.Column col : subCrudUnit.tableForm.getColumns()) {
-                sheet.addCell(new Label(m, 0, col.getLabel(), formatCell));
-                m++;
-            }
-            int k = 1;
-            for (TableForm.Row row : subCrudUnit.tableForm.getRows()) {
+            int i = 1;
+            for (FieldSet fieldset : form) {
                 int j = 0;
-                for (Field field : Arrays.asList(row.getFields())) {
-                    addFieldToCell(sheet, k, j, field);
+                for (Field field : fieldset) {
+                    addFieldToCell(sheet, i, j, field);
                     j++;
                 }
-                k++;
+                i++;
+            }
+
+            /*
+            ValueStack valueStack = Struts2Utils.getValueStack();
+            valueStack.push(object);
+
+            //Aggiungo le relazioni/sheet
+            WritableCellFormat formatCell = headerExcel();
+            for (CrudUnit subCrudUnit: subCrudUnits) {
+                subCrudUnit.setupSearchForm();
+                subCrudUnit.loadObjects();
+                subCrudUnit.setupTableForm(Mode.VIEW);
+
+                sheet = workbook.createSheet(subCrudUnit.searchTitle ,
+                        workbook.getNumberOfSheets());
+
+                int m = 0;
+                for (TableForm.Column col : subCrudUnit.tableForm.getColumns()) {
+                    sheet.addCell(new Label(m, 0, col.getLabel(), formatCell));
+                    m++;
+                }
+                int k = 1;
+                for (TableForm.Row row : subCrudUnit.tableForm.getRows()) {
+                    int j = 0;
+                    for (Field field : Arrays.asList(row.getFields())) {
+                        addFieldToCell(sheet, k, j, field);
+                        j++;
+                    }
+                    k++;
+                }
+            }
+            valueStack.pop();
+            */
+            workbook.write();
+        } catch (IOException e) {
+            logger.warn("IOException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } catch (RowsExceededException e) {
+            logger.warn("RowsExceededException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } catch (WriteException e) {
+            logger.warn("WriteException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } finally {
+            try {
+                if (workbook != null)
+                    workbook.close();
+            }
+            catch (Exception e) {
+                logger.warn("IOException", e);
+                SessionMessages.addErrorMessage(e.getMessage());
             }
         }
-        valueStack.pop();
-        */
-        workbook.write();
     }
 
 
@@ -1247,10 +1299,12 @@ public class CrudAction extends PortletAction {
 
     private void addHeaderToSheet(WritableSheet sheet) throws WriteException {
         WritableCellFormat formatCell = headerExcel();
-        int l = 0;
-        for (TableForm.Column col : tableForm.getColumns()) {
-            sheet.addCell(new jxl.write.Label(l, 0, col.getLabel(), formatCell));
-            l++;
+        int i = 0;
+        for (FieldSet fieldset : form) {
+            for (Field field : fieldset) {
+                sheet.addCell(new jxl.write.Label(i, 0, field.getLabel(), formatCell));
+                i++;
+            }
         }
     }
 
@@ -1307,6 +1361,22 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
     // exportSearchPdf
     //**************************************************************************
+
+    @Button(list = "crud-search", key = "commons.exportPdf", order = 4)
+    public Resolution exportSearchPdf() {
+        try {
+            File tmpFile = File.createTempFile(crud.getName(), ".search.pdf");
+            exportSearchPdf(tmpFile);
+            FileInputStream fileInputStream = new FileInputStream(tmpFile);
+            tmpFile.deleteOnExit();
+            return new StreamingResolution("application/pdf", fileInputStream)
+                    .setFilename(crud.getSearchTitle() + ".pdf");
+        } catch (Exception e) {
+            logger.error("PDF export failed", e);
+            SessionMessages.addErrorMessage("Export failed");
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
+    }
 
     public void exportSearchPdf(File tempPdfFile) throws FOPException,
             IOException, TransformerException {
@@ -1441,46 +1511,6 @@ public class CrudAction extends PortletAction {
             xb.closeElement("tableData");
         }
 
-        /*
-        ValueStack valueStack = Struts2Utils.getValueStack();
-        valueStack.push(object);
-
-        //Aggiungo le relazioni
-        for (CrudUnit subCrudUnit: subCrudUnits) {
-            xb.openElement("tablerel");
-            subCrudUnit.setupSearchForm();
-            subCrudUnit.loadObjects();
-            subCrudUnit.setupTableForm(Mode.VIEW);
-
-            xb.openElement("nametablerel");
-            xb.write(subCrudUnit.searchTitle);
-            xb.closeElement("nametablerel");
-
-            //stampo header
-            for (TableForm.Column col : subCrudUnit.tableForm.getColumns()) {
-                xb.openElement("headerrel");
-                xb.openElement("nameColumn");
-                xb.write(col.getLabel());
-                xb.closeElement("nameColumn");
-                xb.closeElement("headerrel");
-            }
-
-            for (TableForm.Row row : subCrudUnit.tableForm.getRows()) {
-                xb.openElement("rowsrel");
-                for (Field field : Arrays.asList(row.getFields())) {
-                    xb.openElement("rowrel");
-                    xb.openElement("value");
-                    xb.write(field.getStringValue());
-                    xb.closeElement("value");
-                    xb.closeElement("rowrel");
-                }
-                xb.closeElement("rowsrel");
-            }
-            xb.closeElement("tablerel");
-        }
-        valueStack.pop();
-        */
-
         xb.closeElement("class");
         return xb;
     }
@@ -1537,6 +1567,22 @@ public class CrudAction extends PortletAction {
                 logger.warn("IOException", e);
                 SessionMessages.addErrorMessage(e.getMessage());
             }
+        }
+    }
+
+    @Button(list = "crud-read", key = "commons.exportPdf", order = 3)
+    public Resolution exportReadPdf() {
+        try {
+            File tmpFile = File.createTempFile(crud.getName(), ".read.pdf");
+            exportReadPdf(tmpFile);
+            FileInputStream fileInputStream = new FileInputStream(tmpFile);
+            tmpFile.deleteOnExit();
+            return new StreamingResolution("application/pdf", fileInputStream)
+                    .setFilename(crud.getReadTitle() + ".pdf");
+        } catch (Exception e) {
+            logger.error("PDF export failed", e);
+            SessionMessages.addErrorMessage("Export failed");
+            return new RedirectResolution(dispatch.getOriginalPath());
         }
     }
 
