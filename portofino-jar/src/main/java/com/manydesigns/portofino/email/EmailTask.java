@@ -36,6 +36,7 @@ import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import com.manydesigns.portofino.system.model.users.User;
@@ -74,7 +75,6 @@ public class EmailTask extends TimerTask {
     protected static final Logger logger =
             LoggerFactory.getLogger(TimerTask.class);
     protected final Application application;
-    private static final String USERTABLE = SecurityLogic.USERTABLE;
 
     public EmailTask(Application application) {
         this.application = application;
@@ -125,14 +125,13 @@ public class EmailTask extends TimerTask {
 
     public synchronized void createQueue() {
         try {
-            ClassAccessor accessor = application.getTableAccessor(
-                    EmailUtils.EMAILQUEUE_TABLE);
+            ClassAccessor accessor = application.getTableAccessor(EmailUtils.PORTOFINO, EmailUtils.EMAILQUEUE_ENTITY);
             Model model = application.getModel();
-            Table table = DataModelLogic.findTableByQualifiedName(
-                    model, EmailUtils.EMAILQUEUE_TABLE);
+            Database database = DataModelLogic.findDatabaseByName(model, EmailUtils.PORTOFINO);
+            Table table = DataModelLogic.findTableByEntityName(database, EmailUtils.EMAILQUEUE_ENTITY);
             TableCriteria criteria = new TableCriteria(table);
             criteria.eq(accessor.getProperty("state"), EmailUtils.TOBESENT);
-            Session session = application.getSessionByQualifiedTableName(EmailUtils.EMAILQUEUE_TABLE);
+            Session session = application.getSession(EmailUtils.PORTOFINO);
             List<Object> emails = QueryUtils.getObjects(
                     session,
                     criteria.eq(accessor.getProperty("state"),
@@ -143,7 +142,7 @@ public class EmailTask extends TimerTask {
                 EmailBean email = emailSender.getEmailBean();
                 try {
                     email.setState(EmailUtils.SENDING);
-                    session.save(EmailUtils.EMAILQUEUE_TABLE, email);
+                    session.save(EmailUtils.EMAILQUEUE_ENTITY, email);
                     session.getTransaction().commit();
                 } catch (Throwable e) {
                     logger.warn("cannot store email state", e);
@@ -158,7 +157,7 @@ public class EmailTask extends TimerTask {
 
     private synchronized void checkBounce() {
         if (client != null) {
-            Session session = application.getSessionByQualifiedTableName(USERTABLE);
+            Session session = application.getSession("portofino");
             Set<String> emails = client.read();
             for (String email : emails) {
                 incrementBounce(session, email);
@@ -170,11 +169,11 @@ public class EmailTask extends TimerTask {
     private void incrementBounce(Session session, String email) {
         try {
             Model model = application.getModel();
-            Table table = DataModelLogic.findTableByQualifiedName(
-                    model, EmailUtils.EMAILQUEUE_TABLE);
+            Database database = DataModelLogic.findDatabaseByName(model, EmailUtils.PORTOFINO);
+            Table table = DataModelLogic.findTableByEntityName(database, EmailUtils.EMAILQUEUE_ENTITY);
             TableCriteria criteria = new TableCriteria(table);
 
-            ClassAccessor accessor = application.getTableAccessor(USERTABLE);
+            ClassAccessor accessor = application.getTableAccessor("portofino", SecurityLogic.USER_ENTITY_NAME);
             List<Object> users = QueryUtils.getObjects(session,
                     criteria.gt(accessor.getProperty("email"), email), null, null);
             if (users.size() == 0) {
@@ -189,7 +188,7 @@ public class EmailTask extends TimerTask {
                 value++;
             }
             user.setBounced(value);
-            session.save(USERTABLE, user);
+            session.save(SecurityLogic.USER_ENTITY_NAME, user);
         } catch (NoSuchFieldException e) {
             logger.warn("cannot increment bounce for user", e);
         }

@@ -135,8 +135,8 @@ public class EmailTest extends AbstractPortofinoTest {
             EmailBean bean = new EmailBean ("subj:" + i,
                     "body:" + i, "granatella@gmail.com",
                     "spammer@spam.it");
-            Session session = application.getSessionByQualifiedTableName(EmailUtils.EMAILQUEUE_TABLE);
-            session.save(EmailUtils.EMAILQUEUE_TABLE, bean);
+            Session session = application.getSession(EmailUtils.PORTOFINO);
+            session.save(EmailUtils.EMAILQUEUE_ENTITY, bean);
             session.getTransaction().commit();
         }
         try {

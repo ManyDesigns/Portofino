@@ -57,7 +57,6 @@ public class EmailUtils {
     public static final String ATTACHMENT_PATH = "attachmentPath";
     public static final String ATTACHMENT_DESCRIPTION = "attachmentDescription";
     public static final String ATTACHMENT_NAME = "attachmentName";
-    public static final String EMAILQUEUE_TABLE = "portofino.public.emailqueue";
     public static final String EMAILQUEUE_ENTITY = "emailqueue";
     public static final String PORTOFINO = "portofino";
 

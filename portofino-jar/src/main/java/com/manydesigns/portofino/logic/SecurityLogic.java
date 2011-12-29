@@ -71,9 +71,6 @@ public class SecurityLogic {
 
     public static final Logger logger = LoggerFactory.getLogger(SecurityLogic.class);
 
-    public static final String USERTABLE = "portofino.public.users";
-    public static final String GROUPTABLE = "portofino.public.groups";
-
     public static final String USER_ENTITY_NAME = "users";
     public static final String GROUP_ENTITY_NAME = "groups";
 

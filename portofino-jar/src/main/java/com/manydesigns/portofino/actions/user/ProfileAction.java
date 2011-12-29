@@ -116,7 +116,7 @@ public class ProfileAction extends AbstractActionBean {
         User thisUser =
             (User) QueryUtils.getObjectByPk
                     (application, "portofino", SecurityLogic.USER_ENTITY_NAME, new User(userId));
-        ClassAccessor accessor = application.getTableAccessor(SecurityLogic.USERTABLE);
+        ClassAccessor accessor = application.getTableAccessor("portofino", SecurityLogic.USER_ENTITY_NAME);
         FormBuilder formBuilder = new FormBuilder(accessor);
         formBuilder.configFields("email", "userName", "firstName",
                 "middleName", "lastName", "creationDate");
@@ -140,7 +140,7 @@ public class ProfileAction extends AbstractActionBean {
             (User) QueryUtils.getObjectByPk
                 (application, "portofino", SecurityLogic.USER_ENTITY_NAME, new User(userId));
 
-        ClassAccessor accessor = application.getTableAccessor(SecurityLogic.USERTABLE);
+        ClassAccessor accessor = application.getTableAccessor("portofino", SecurityLogic.USER_ENTITY_NAME);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
                 .configFields("email", "userName", "firstName",
@@ -156,7 +156,7 @@ public class ProfileAction extends AbstractActionBean {
         User thisUser =
             (User) QueryUtils.getObjectByPk
                 (application, "portofino", SecurityLogic.USER_ENTITY_NAME, new User(userId));
-        ClassAccessor accessor = application.getTableAccessor(SecurityLogic.USERTABLE);
+        ClassAccessor accessor = application.getTableAccessor("portofino", SecurityLogic.USER_ENTITY_NAME);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
                 .configFields("email", "userName", "firstName",

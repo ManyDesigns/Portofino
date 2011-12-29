@@ -61,7 +61,7 @@ public class EmailSender implements Runnable{
     }
 
     public void run() {
-        Session session = application.getSessionByQualifiedTableName(EmailUtils.EMAILQUEUE_TABLE);
+        Session session = application.getSession("portofino");
         try {
             Configuration configuration = application.getPortofinoProperties();
             String server = configuration

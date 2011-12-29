@@ -574,24 +574,21 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
 
     public User findUserByEmail(String email) {
-        String qualifiedTableName = SecurityLogic.USERTABLE;
-        Session session = getSessionByQualifiedTableName(qualifiedTableName);
+        Session session = getSession("portofino");
         org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("email", email));
         return (User) criteria.uniqueResult();
     }
 
     public User findUserByUserName(String username) {
-        String qualifiedTableName = SecurityLogic.USERTABLE;
-        Session session = getSessionByQualifiedTableName(qualifiedTableName);
+        Session session = getSession("portofino");
         org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
         return (User) criteria.uniqueResult();
     }
 
     public User findUserByToken(String token) {
-        String qualifiedTableName = SecurityLogic.USERTABLE;
-        Session session = getSessionByQualifiedTableName(qualifiedTableName);
+        Session session = getSession("portofino");
         org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("token", token));
         return (User) criteria.uniqueResult();
@@ -629,11 +626,11 @@ public class HibernateApplicationImpl implements Application {
     }
 
     protected Group getGroup(String name) {
-        TableAccessor table = getTableAccessor(SecurityLogic.GROUPTABLE);
+        TableAccessor table = getTableAccessor("portofino", SecurityLogic.GROUP_ENTITY_NAME);
         assert table != null;
 
         String actualEntityName = table.getTable().getActualEntityName();
-        Session session = getSessionByQualifiedTableName(SecurityLogic.GROUPTABLE);
+        Session session = getSession("portofino");
         List result = QueryUtils.runHqlQuery
                 (session,
                         "FROM " + actualEntityName + " WHERE name = ?",
