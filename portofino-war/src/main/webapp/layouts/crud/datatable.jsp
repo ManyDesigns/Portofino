@@ -21,7 +21,7 @@
         </thead>
         <tbody>
         <tr>
-            <td colspan="<%=columns.length%>">Loading data...</td>
+            <td colspan="<%=columns.length%>"><fmt:message key="layouts.crud.datatable.loading_data"/></td>
         </tr>
         </tbody>
     </table>
@@ -35,7 +35,7 @@
                         htmlEscape(sData.displayValue) +
                         '</a>';
             } else {
-                elCell.innerHTML = sData.displayValue;
+                elCell.innerHTML = htmlEscape(sData.displayValue);
             }
         };
 
@@ -123,7 +123,8 @@
             dynamicData: true,
             paginator : new YAHOO.widget.Paginator({
                 rowsPerPage: 10
-            })
+            }),
+            MSG_EMPTY: '<fmt:message key="layouts.crud.datatable.msg_empty"/>'
         };
 
         var myDataTable = new YAHOO.widget.DataTable(

@@ -586,6 +586,7 @@ table.mde-form-table th {
 .horizontalSeparator {
     border-top: 1px solid #eeeeee;
     margin: 1.5em 0;
+    clear: both;
 }
 
 .attachment {
