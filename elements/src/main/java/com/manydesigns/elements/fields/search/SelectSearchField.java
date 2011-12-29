@@ -369,7 +369,7 @@ public class SelectSearchField extends AbstractSearchField {
     public String composeAutocompleteJs() {
         StringBuilder sb = new StringBuilder();
         sb.append(MessageFormat.format(
-                "setupAutocomplete(''#{0}'', ''{1}'', {2}",
+                "setupAutocomplete(''#{0}'', ''{1}'', {2}, ''jsonAutocompleteSearchOptions''",
                 StringEscapeUtils.escapeJavaScript(autocompleteId),
                 StringEscapeUtils.escapeJavaScript(selectionModel.getName()),
                 selectionModelIndex));

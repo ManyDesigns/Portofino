@@ -39,6 +39,7 @@ import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -162,15 +163,36 @@ public class SelectField extends AbstractField {
         }
 
         String stringValue = req.getParameter(inputName);
-        if (stringValue == null) {
-            return;
-        }
-        
         Object value;
-        if (stringValue.length() == 0) {
-            value = null;
+        if(DisplayMode.AUTOCOMPLETE == displayMode) {
+            if (StringUtils.isEmpty(stringValue)) {
+                value = null;
+                //Attempt to find the value among the options
+                String userValue = req.getParameter(autocompleteInputName);
+                Map<Object, SelectionModel.Option> options = selectionModel.getOptions(selectionModelIndex);
+                boolean found = false;
+                for(SelectionModel.Option option : options.values()) {
+                    if(ObjectUtils.equals(userValue, option.label)) {
+                        found = true;
+                        value = option.value;
+                    }
+                }
+                if(!found) {
+                    return;
+                }
+            } else {
+                value = OgnlUtils.convertValue(stringValue, accessor.getType());
+            }
         } else {
-            value = OgnlUtils.convertValue(stringValue, accessor.getType());
+            if (stringValue == null) {
+                return;
+            }
+
+            if (stringValue.length() == 0) {
+                value = null;
+            } else {
+                value = OgnlUtils.convertValue(stringValue, accessor.getType());
+            }
         }
         selectionModel.setValue(selectionModelIndex, value);
     }
@@ -292,7 +314,7 @@ public class SelectField extends AbstractField {
     public String composeAutocompleteJs() {
         StringBuilder sb = new StringBuilder();
         sb.append(MessageFormat.format(
-                "setupAutocomplete(''#{0}'', ''{1}'', {2}",
+                "setupAutocomplete(''#{0}'', ''{1}'', {2}, ''jsonAutocompleteOptions''",
                 StringEscapeUtils.escapeJavaScript(autocompleteId),
                 StringEscapeUtils.escapeJavaScript(selectionModel.getName()),
                 selectionModelIndex));

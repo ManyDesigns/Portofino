@@ -41,19 +41,20 @@ function updateSelectOptions(relName, selectionProviderIndex, methodName) {
     });
 }
 
-function setupAutocomplete(autocompleteId, relName, selectionProviderIndex) {
+function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, methodName) {
     var setupArguments = arguments;
-    var selectFieldId = setupArguments[3 + selectionProviderIndex];
+    var selectFieldId = setupArguments[4 + selectionProviderIndex];
     var autocompleteObj = $(autocompleteId);
+    var selectField = $(selectFieldId);
     autocompleteObj.autocomplete({
         source: function( request, response ) {
             var data = {
                 relName : relName,
                 selectionProviderIndex : selectionProviderIndex,
-                jsonAutocompleteOptions : '',
                 labelSearch : request.term
             };
-            for (var i = 3; i < setupArguments.length; i++ ) {
+            data[methodName] = '';
+            for (var i = 4; i < setupArguments.length; i++ ) {
                 var currentId = setupArguments[i];
                 var current = $(currentId);
                 data[current.attr('name')] = current.attr('value');
@@ -81,10 +82,14 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex) {
         },
         minLength: 1,
         select: function( event, ui ) {
-            var selectField = $(selectFieldId);
             if (ui.item) {
                 selectField.val(ui.item.optionValue);
             } else {
+                selectField.val("");
+            }
+        },
+        change: function(event, ui) {
+            if (!ui.item) {
                 selectField.val("");
             }
         },
