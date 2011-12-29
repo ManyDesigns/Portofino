@@ -139,9 +139,8 @@
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="trackers" shortName="%{name}">
-                            <annotations>
-                            </annotations>
+                        <table shortName="%{name}" tableName="trackers">
+                            <annotations/>
                             <columns>
 <column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
@@ -747,9 +746,8 @@
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="issue_statuses" shortName="%{name}">
-                            <annotations>
-                            </annotations>
+                        <table shortName="%{name}" tableName="issue_statuses">
+                            <annotations/>
                             <columns>
 <column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
@@ -823,9 +821,8 @@
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="enumerations" shortName="%{name}">
-                            <annotations>
-                            </annotations>
+                        <table shortName="%{name}" tableName="enumerations">
+                            <annotations/>
                             <columns>
 <column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
@@ -1476,10 +1473,8 @@
             <schemas>
                 <schema schemaName="PUBLIC">
                     <tables>
-                        <table javaClass="com.manydesigns.portofino.system.model.users.UserState" tableName="USERSTATE"
-                               shortName="%{name}">
-                            <annotations>
-                            </annotations>
+                        <table javaClass="com.manydesigns.portofino.system.model.users.UserState" shortName="%{name}" tableName="USERSTATE">
+                            <annotations/>
                             <columns>
 <column autoincrement="false" columnName="ID" columnType="DECIMAL" javaType="java.lang.Integer" jdbcType="3" length="10" nullable="false" propertyName="id" scale="0">
     <annotations/>
@@ -1572,10 +1567,8 @@
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table javaClass="com.manydesigns.portofino.system.model.users.User" tableName="USERS"
-                               shortName="%{userName} (%{email})">
-                            <annotations>
-                            </annotations>
+                        <table javaClass="com.manydesigns.portofino.system.model.users.User" shortName="%{userName} (%{email})" tableName="USERS">
+                            <annotations/>
                             <columns>
 <column autoincrement="false" columnName="USERID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="userId" scale="0">
     <annotations/>
@@ -1685,10 +1678,8 @@
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table javaClass="com.manydesigns.portofino.system.model.users.Group" tableName="GROUPS"
-                               shortName="%{name} ">
-                            <annotations>
-                            </annotations>
+                        <table javaClass="com.manydesigns.portofino.system.model.users.Group" shortName="%{name} " tableName="GROUPS">
+                            <annotations/>
                             <columns>
 <column autoincrement="false" columnName="GROUPID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="groupId" scale="0">
     <annotations/>
@@ -1868,6 +1859,8 @@
                     <attachment contentType="image/gif" filename="icon_favourites.gif" id="s6jrmb9cn403tmrea4c7kjy8n" size="243"/>
                     <attachment contentType="image/gif" filename="list_users.gif" id="9s9f7rf9n4m0i12qqt9ypkjep" size="246"/>
                     <attachment contentType="image/gif" filename="icon_clock.gif" id="8pfh3et9vh3wi49gesguy4k19" size="207"/>
+                    <attachment contentType="image/png" filename="logo3w.png" id="0cxyzldl5og2jv2r3kt7chn63" size="7007"/>
+                    <attachment contentType="image/png" filename="logo3w.png" id="r2xwg12s37yfdordmndpyi7kt" size="7007"/>
                 </attachments>
             </textPage>
             <crudPage detailLayoutContainer="contentLayoutLeft" detailLayoutOrder="1" description="Projects" fragment="projects" id="1" layoutContainer="default" layoutOrder="2" showInNavigation="true" title="Projects">
@@ -1995,10 +1988,10 @@
 </property>
                             </properties>
                             <selectionProviders>
-<selectionProvider enabled="false" selectionProvider="sp_issue_status"/>
 <selectionProvider displayMode="DROPDOWN" enabled="true" selectionProvider="sp_issue_priority"/>
-<selectionProvider displayMode="DROPDOWN" enabled="true" selectionProvider="sp_issue_tracker_and_status"/>
-<selectionProvider enabled="false" selectionProvider="sp_issue_tracker"/>
+<selectionProvider displayMode="DROPDOWN" enabled="true" selectionProvider="sp_issue_status"/>
+<selectionProvider enabled="false" selectionProvider="sp_issue_tracker_and_status"/>
+<selectionProvider displayMode="DROPDOWN" enabled="true" selectionProvider="sp_issue_tracker"/>
                             </selectionProviders>
                         </crud>
                         <detailChildPages/>
