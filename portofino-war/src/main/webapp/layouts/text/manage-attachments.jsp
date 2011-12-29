@@ -8,7 +8,7 @@
 <stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.TextAction"/>
     <stripes:layout-component name="contentHeader">
-        <stripes:submit name="cancel" value="Ok" class="contentButton"/>
+        <button type="submit" name="cancel" value="Ok" class="contentButton"/>
         <div class="breadcrumbs">
             <div class="inner">
                 <mde:write name="breadcrumbs"/>
@@ -30,7 +30,7 @@
                 </c:forEach>
             </p>
             <br/>
-            <stripes:submit name="deleteAttachments" value="Delete selected attachments" class="portletButton"/>
+            <button type="submit" name="deleteAttachments" value="Delete selected attachments" class="portletButton"/>
         </c:if><c:if test="${empty actionBean.textPage.attachments}">
             <fmt:message key="layouts.text.manage-attachments.manage_attachments_for_page"/>
         </c:if>
@@ -39,9 +39,9 @@
         <stripes:file name="upload"/>
         <br/>
         <br/>
-        <stripes:submit name="uploadAttachment" value="Upload" class="portletButton"/>
+        <button type="submit" name="uploadAttachment" value="Upload" class="portletButton"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <stripes:submit name="cancel" value="Ok" class="contentButton"/>
+        <button type="submit" name="cancel" value="Ok" class="contentButton"/>
     </stripes:layout-component>
 </stripes:layout-render>

@@ -18,7 +18,10 @@ function updateSelectOptions(relName, selectionProviderIndex) {
         url: postUrl,
         data: data,
         success: function(responseData) {
-            var options = responseData; //jQuery.parseJSON(responseData);
+            var options = responseData;
+            if('string' === typeof(options)) {
+                options = jQuery.parseJSON(options);
+            }
 
             var selectField = $(selectFieldId);
             var selOptions = selectField.attr('options');
@@ -64,12 +67,12 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex) {
                 data: data,
                 success: function( responseData ) {
                     response( $.map( responseData, function( item ) {
-							return {
+                          return {
                                 label: item.l,
                                 value: item.l,
                                 optionValue: item.v
                             };
-						}));
+                        }));
                 },
                 error: function(request, textStatus) {
                     alert(textStatus);

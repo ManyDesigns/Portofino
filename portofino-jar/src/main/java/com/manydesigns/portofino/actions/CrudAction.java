@@ -363,7 +363,10 @@ public class CrudAction extends PortletAction {
     // Search
     //**************************************************************************
 
-    @Button(list = "crud-search-form", key = "commons.search", order = 1)
+    @Buttons({
+        @Button(list = "crud-search-form", key = "commons.search", order = 1),
+        @Button(list = "portlet-default-button", key = "commons.search")
+    })
     public Resolution search() {
         searchVisible = true;
         return doSearch();
@@ -371,7 +374,7 @@ public class CrudAction extends PortletAction {
 
     protected Resolution doSearch() {
         cancelReturnUrl = new UrlBuilder(
-                    Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
+                    context.getLocale(), dispatch.getAbsoluteOriginalPath(), false)
                     .addParameter("searchString", searchString)
                     .toString();
         setupReturnToParentTarget();

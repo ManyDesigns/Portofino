@@ -10,6 +10,8 @@
         <jsp:useBean id="actionBean" scope="request"
                      type="com.manydesigns.portofino.actions.PortletAction"/>
         <stripes:form action="${actionBean.dispatch.originalPath}" method="post">
+            <%-- Hidden submit so that ENTER on a form executes the default action --%>
+            <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
             <div class="portletHeader">
                 <stripes:layout-component name="portletHeader">
                     <div class="yui-g">

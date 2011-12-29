@@ -16,7 +16,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletHeader">
         <mde:write name="actionBean" property="form" />
-        <stripes:submit name="configureReferencedPage" value="Configure referenced page" />
+        <button type="submit" name="configureReferencedPage" value="Configure referenced page" />
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
