@@ -139,11 +139,8 @@
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="trackers">
+                        <table tableName="trackers" shortName="%{name}">
                             <annotations>
-<annotation type="com.manydesigns.elements.annotations.ShortName">
-    <value>%{name}</value>
-</annotation>
                             </annotations>
                             <columns>
 <column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
@@ -659,7 +656,7 @@
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders>
-<query name="sp_issue_tracker_and_status" sql="select t.&quot;id&quot;, t.&quot;name&quot;, s.&quot;id&quot;, s.&quot;name&quot;, s.&quot;name&quot; <> 'work in progress' from &quot;trackers&quot; t, &quot;issue_statuses&quot; s" toDatabase="redmine" toSchema="PUBLIC">
+<query name="sp_issue_tracker_and_status" sql="select t.&quot;id&quot;, t.&quot;name&quot;, s.&quot;id&quot;, s.&quot;name&quot; from &quot;trackers&quot; t, &quot;issue_statuses&quot; s" toDatabase="redmine" toSchema="PUBLIC">
     <references>
         <reference fromColumn="tracker_id"/>
         <reference fromColumn="status_id"/>
@@ -750,11 +747,8 @@
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="issue_statuses">
+                        <table tableName="issue_statuses" shortName="%{name}">
                             <annotations>
-<annotation type="com.manydesigns.elements.annotations.ShortName">
-    <value>%{name}</value>
-</annotation>
                             </annotations>
                             <columns>
 <column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
@@ -829,11 +823,8 @@
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="enumerations">
+                        <table tableName="enumerations" shortName="%{name}">
                             <annotations>
-<annotation type="com.manydesigns.elements.annotations.ShortName">
-    <value>%{name}</value>
-</annotation>
                             </annotations>
                             <columns>
 <column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
@@ -1485,11 +1476,9 @@
             <schemas>
                 <schema schemaName="PUBLIC">
                     <tables>
-                        <table javaClass="com.manydesigns.portofino.system.model.users.UserState" tableName="USERSTATE">
+                        <table javaClass="com.manydesigns.portofino.system.model.users.UserState" tableName="USERSTATE"
+                               shortName="%{name}">
                             <annotations>
-<annotation type="com.manydesigns.elements.annotations.ShortName">
-    <value>%{name}</value>
-</annotation>
                             </annotations>
                             <columns>
 <column autoincrement="false" columnName="ID" columnType="DECIMAL" javaType="java.lang.Integer" jdbcType="3" length="10" nullable="false" propertyName="id" scale="0">
@@ -1583,11 +1572,9 @@
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table javaClass="com.manydesigns.portofino.system.model.users.User" tableName="USERS">
+                        <table javaClass="com.manydesigns.portofino.system.model.users.User" tableName="USERS"
+                               shortName="%{userName} (%{email})">
                             <annotations>
-<annotation type="com.manydesigns.elements.annotations.ShortName">
-    <value>%{userName} (%{email})</value>
-</annotation>
                             </annotations>
                             <columns>
 <column autoincrement="false" columnName="USERID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="userId" scale="0">
@@ -1698,11 +1685,9 @@
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table javaClass="com.manydesigns.portofino.system.model.users.Group" tableName="GROUPS">
+                        <table javaClass="com.manydesigns.portofino.system.model.users.Group" tableName="GROUPS"
+                               shortName="%{name} ">
                             <annotations>
-<annotation type="com.manydesigns.elements.annotations.ShortName">
-    <value>%{name} </value>
-</annotation>
                             </annotations>
                             <columns>
 <column autoincrement="false" columnName="GROUPID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="groupId" scale="0">

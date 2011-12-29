@@ -69,12 +69,12 @@ public class Table implements ModelObject, Annotated {
 
     protected Schema schema;
     protected String tableName;
-
     protected String entityName;
-    protected String actualEntityName;
 
     protected Boolean manyToMany;
     protected String javaClass;
+
+    protected String shortName;
 
     protected PrimaryKey primaryKey;
 
@@ -84,6 +84,7 @@ public class Table implements ModelObject, Annotated {
 
     protected final List<ForeignKey> oneToManyRelationships;
     protected Class actualJavaClass;
+    protected String actualEntityName;
 
     //**************************************************************************
     // Logging
@@ -284,6 +285,15 @@ public class Table implements ModelObject, Annotated {
     @XmlElement(name="query",type=DatabaseSelectionProvider.class)
     public List<ModelSelectionProvider> getSelectionProviders() {
         return selectionProviders;
+    }
+
+    @XmlAttribute(required = false)
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 
     //**************************************************************************

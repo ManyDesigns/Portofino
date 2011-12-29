@@ -29,12 +29,15 @@
 
 package com.manydesigns.portofino.reflection;
 
+import com.manydesigns.elements.annotations.ShortName;
+import com.manydesigns.elements.annotations.impl.ShortNameImpl;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.PrimaryKey;
 import com.manydesigns.portofino.model.datamodel.Table;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +75,12 @@ public class TableAccessor
 
     public TableAccessor(@NotNull Table table) {
         super(table.getAnnotations());
+
+        if(!StringUtils.isEmpty(table.getShortName())) {
+            ShortName shortName = new ShortNameImpl(table.getShortName());
+            annotations.put(ShortName.class, shortName);
+        }
+
         Class clazz = table.getActualJavaClass();
         if (clazz != null) {
             javaClassAccessor = JavaClassAccessor.getClassAccessor(clazz);
