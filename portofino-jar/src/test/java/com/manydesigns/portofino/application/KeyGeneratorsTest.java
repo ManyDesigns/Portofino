@@ -31,6 +31,7 @@ package com.manydesigns.portofino.application;
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.logic.DataModelLogic;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -175,8 +176,9 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         Session session = application.getSystemSession();
         session.save("groups", myGroup);
         session.getTransaction().commit();
-        Table table = DataModelLogic.findTableByQualifiedName(
-                model, "portofino.public.groups");
+
+        Table table = DataModelLogic.findTableByEntityName(
+                application.getSystemDatabase(), SecurityLogic.GROUP_ENTITY_NAME);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         final long expectedId = 3L;
