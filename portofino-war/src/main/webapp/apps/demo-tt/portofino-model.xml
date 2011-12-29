@@ -659,7 +659,7 @@
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders>
-<query name="sp_issue_tracker_and_status" sql="select t.&quot;id&quot;, t.&quot;name&quot;, s.&quot;id&quot;, s.&quot;name&quot; from &quot;trackers&quot; t, &quot;issue_statuses&quot; s" toDatabase="redmine" toSchema="PUBLIC">
+<query name="sp_issue_tracker_and_status" sql="select t.&quot;id&quot;, t.&quot;name&quot;, s.&quot;id&quot;, s.&quot;name&quot;, s.&quot;name&quot; <> 'work in progress' from &quot;trackers&quot; t, &quot;issue_statuses&quot; s" toDatabase="redmine" toSchema="PUBLIC">
     <references>
         <reference fromColumn="tracker_id"/>
         <reference fromColumn="status_id"/>
