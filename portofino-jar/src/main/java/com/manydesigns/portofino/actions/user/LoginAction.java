@@ -212,7 +212,7 @@ public class LoginAction extends AbstractActionBean {
         user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
         int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
         user.setFailedLoginAttempts(failedAttempts+1);
-        Session session = application.getSession("portofino");
+        Session session = application.getSystemSession();
         session.update(user);
         session.getTransaction().commit();
     }
@@ -221,7 +221,7 @@ public class LoginAction extends AbstractActionBean {
         user.setFailedLoginAttempts(0);
         user.setLastLoginDate(new Timestamp(new Date().getTime()));
         user.setToken(null);
-        Session session = application.getSession("portofino");
+        Session session = application.getSystemSession();
         Transaction tx = session.getTransaction();
         try {
             User existingUser = application.findUserByUserName(user.getUserName());

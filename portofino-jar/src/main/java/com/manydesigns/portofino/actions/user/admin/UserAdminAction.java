@@ -149,7 +149,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
     }
 
     protected void setupUserGroups() {
-        Session session = application.getSession("portofino");
+        Session session = application.getSystemSession();
         Criteria criteria = session.createCriteria(SecurityLogic.GROUP_ENTITY_NAME);
         List<Group> groups = new ArrayList(criteria.list());
         availableUserGroups = new ArrayList<Group>();
@@ -203,8 +203,8 @@ public class UserAdminAction extends CrudAction implements AdminAction {
                 }
             }
         }
+        Session session = application.getSystemSession();
         for(String groupName : names) {
-            Session session = application.getSession("portofino");
             Group group = (Group) session
                     .createCriteria(SecurityLogic.GROUP_ENTITY_NAME)
                     .add(Restrictions.eq("name", groupName))

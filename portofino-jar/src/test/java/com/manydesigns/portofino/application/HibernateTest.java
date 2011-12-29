@@ -73,7 +73,7 @@ public class HibernateTest extends AbstractPortofinoTest {
     }
 
     public void testUsers() {
-        Session session = application.getSession("portofino");
+        Session session = application.getSystemSession();
         Criteria criteria = session.createCriteria(SecurityLogic.GROUP_ENTITY_NAME);
         List<Group> groupList = new ArrayList(criteria.list());
         assertEquals( 2, groupList.size());
@@ -328,7 +328,7 @@ public class HibernateTest extends AbstractPortofinoTest {
 
         //Faccio una seconda operazione
         try {
-            Session session = application.getSession("portofino");
+            Session session = application.getSystemSession();
             Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
             List<Object> users = criteria.list();
             assertNotNull(users);

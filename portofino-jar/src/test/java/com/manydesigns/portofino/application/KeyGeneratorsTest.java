@@ -172,7 +172,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         myGroup.setCreationDate(new Timestamp(new Date().getTime()));
         myGroup.setName("testGroup");
         myGroup.setDescription("this is a description");
-        Session session = application.getSession("portofino");
+        Session session = application.getSystemSession();
         session.save("groups", myGroup);
         session.getTransaction().commit();
         Table table = DataModelLogic.findTableByQualifiedName(

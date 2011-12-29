@@ -267,7 +267,7 @@ public class PortletAction extends AbstractActionBean {
 
         setupGroups(page);
 
-        Session session = application.getSession("portofino");
+        Session session = application.getSystemSession();
         users = (List) QueryUtils.runHqlQuery(session, "from users", null);
 
         return forwardToPagePermissions();
@@ -302,7 +302,7 @@ public class PortletAction extends AbstractActionBean {
     }
 
     public void setupGroups(Page page) {
-        Session session = application.getSession("portofino");
+        Session session = application.getSystemSession();
         Criteria criteria = session.createCriteria(SecurityLogic.GROUP_ENTITY_NAME).addOrder(Order.asc("name"));
         groups = new ArrayList(criteria.list());
     }

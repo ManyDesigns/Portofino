@@ -91,6 +91,8 @@ public interface Application {
     void deleteDatabases(String[] databases);
     void deleteDatabase(String database);
     void updateDatabase(Database database);
+    String getSystemDatabaseName();
+    Database getSystemDatabase();
 
     //**************************************************************************
     // Configuration access
@@ -116,6 +118,8 @@ public interface Application {
     //**************************************************************************
 
     Session getSession(String databaseName);
+
+    Session getSystemSession();
 
     Session getSessionByQualifiedTableName(String qualifiedTableName);
 

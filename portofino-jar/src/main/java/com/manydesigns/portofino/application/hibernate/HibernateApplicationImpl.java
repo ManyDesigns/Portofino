@@ -374,7 +374,15 @@ public class HibernateApplicationImpl implements Application {
             }
         }
     }
-    
+
+    public String getSystemDatabaseName() {
+        return portofinoConfiguration.getString(PortofinoProperties.SYSTEM_DATABASE);
+    }
+
+    public Database getSystemDatabase() {
+        return DataModelLogic.findDatabaseByName(model, getSystemDatabaseName());
+    }
+
     public org.apache.commons.configuration.Configuration getPortofinoProperties() {
         return portofinoConfiguration;
     }
@@ -422,6 +430,10 @@ public class HibernateApplicationImpl implements Application {
 
     public Session getSession(String databaseName) {
         return ensureDatabaseSetup(databaseName).getThreadSession();
+    }
+
+    public Session getSystemSession() {
+        return getSession(getSystemDatabaseName());
     }
 
     protected HibernateDatabaseSetup ensureDatabaseSetup(String databaseName) {
@@ -574,21 +586,21 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
 
     public User findUserByEmail(String email) {
-        Session session = getSession("portofino");
+        Session session = getSystemSession();
         org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("email", email));
         return (User) criteria.uniqueResult();
     }
 
     public User findUserByUserName(String username) {
-        Session session = getSession("portofino");
+        Session session = getSystemSession();
         org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
         return (User) criteria.uniqueResult();
     }
 
     public User findUserByToken(String token) {
-        Session session = getSession("portofino");
+        Session session = getSystemSession();
         org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("token", token));
         return (User) criteria.uniqueResult();
@@ -626,11 +638,11 @@ public class HibernateApplicationImpl implements Application {
     }
 
     protected Group getGroup(String name) {
-        TableAccessor table = getTableAccessor("portofino", SecurityLogic.GROUP_ENTITY_NAME);
+        TableAccessor table = getTableAccessor(getSystemDatabaseName(), SecurityLogic.GROUP_ENTITY_NAME);
         assert table != null;
 
         String actualEntityName = table.getTable().getActualEntityName();
-        Session session = getSession("portofino");
+        Session session = getSystemSession();
         List result = QueryUtils.runHqlQuery
                 (session,
                         "FROM " + actualEntityName + " WHERE name = ?",

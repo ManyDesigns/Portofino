@@ -90,7 +90,7 @@ public class SecurityLogic {
             groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
         } else {
             User u = (User) QueryUtils.getObjectByPk
-                    (application, "portofino", USER_ENTITY_NAME, new User(userId));
+                    (application, application.getSystemDatabaseName(), USER_ENTITY_NAME, new User(userId));
             groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
 
             for (UsersGroups ug : u.getGroups()) {
@@ -216,11 +216,12 @@ public class SecurityLogic {
     }
 
     private static Group findGroupById(Application application, String groupId) {
-        return (Group) QueryUtils.getObjectByPk(application, "portofino", GROUP_ENTITY_NAME, groupId);
+        return (Group) QueryUtils.getObjectByPk(application, application.getSystemDatabaseName(),
+                                                GROUP_ENTITY_NAME, groupId);
     }
 
     public static User defaultLogin(Application application, String username, String password) {
-        Session session = application.getSession("portofino");
+        Session session = application.getSystemSession();
         org.hibernate.Criteria criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
         criteria.add(Restrictions.eq(PASSWORD, password));

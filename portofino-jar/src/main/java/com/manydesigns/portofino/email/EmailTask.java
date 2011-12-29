@@ -125,13 +125,14 @@ public class EmailTask extends TimerTask {
 
     public synchronized void createQueue() {
         try {
-            ClassAccessor accessor = application.getTableAccessor(EmailUtils.PORTOFINO, EmailUtils.EMAILQUEUE_ENTITY);
+            ClassAccessor accessor =
+                    application.getTableAccessor(application.getSystemDatabaseName(), EmailUtils.EMAILQUEUE_ENTITY);
             Model model = application.getModel();
-            Database database = DataModelLogic.findDatabaseByName(model, EmailUtils.PORTOFINO);
+            Database database = application.getSystemDatabase();
             Table table = DataModelLogic.findTableByEntityName(database, EmailUtils.EMAILQUEUE_ENTITY);
             TableCriteria criteria = new TableCriteria(table);
             criteria.eq(accessor.getProperty("state"), EmailUtils.TOBESENT);
-            Session session = application.getSession(EmailUtils.PORTOFINO);
+            Session session = application.getSystemSession();
             List<Object> emails = QueryUtils.getObjects(
                     session,
                     criteria.eq(accessor.getProperty("state"),
@@ -157,7 +158,7 @@ public class EmailTask extends TimerTask {
 
     private synchronized void checkBounce() {
         if (client != null) {
-            Session session = application.getSession("portofino");
+            Session session = application.getSystemSession();
             Set<String> emails = client.read();
             for (String email : emails) {
                 incrementBounce(session, email);
@@ -169,11 +170,12 @@ public class EmailTask extends TimerTask {
     private void incrementBounce(Session session, String email) {
         try {
             Model model = application.getModel();
-            Database database = DataModelLogic.findDatabaseByName(model, EmailUtils.PORTOFINO);
+            Database database = application.getSystemDatabase();
             Table table = DataModelLogic.findTableByEntityName(database, EmailUtils.EMAILQUEUE_ENTITY);
             TableCriteria criteria = new TableCriteria(table);
 
-            ClassAccessor accessor = application.getTableAccessor("portofino", SecurityLogic.USER_ENTITY_NAME);
+            ClassAccessor accessor =
+                    application.getTableAccessor(application.getSystemDatabaseName(), SecurityLogic.USER_ENTITY_NAME);
             List<Object> users = QueryUtils.getObjects(session,
                     criteria.gt(accessor.getProperty("email"), email), null, null);
             if (users.size() == 0) {
