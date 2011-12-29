@@ -208,7 +208,27 @@ public class SelectSearchField extends AbstractSearchField {
             xb.writeOption(optionStringValue, checked, optionLabel);
         }
         xb.closeElement("select");
+
+        if (nextSelectField != null) {
+            String js = composeDropDownJs();
+            xb.writeJavaScript(js);
+        }
+
         xb.closeElement("span");
+    }
+
+    public String composeDropDownJs() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(MessageFormat.format(
+                "$(''#{0}'').change(" +
+                        "function() '{'" +
+                        "updateSelectOptions(''{1}'', {2}, ''jsonSelectFieldSearchOptions''",
+                StringEscapeUtils.escapeJavaScript(id),
+                StringEscapeUtils.escapeJavaScript(selectionModel.getName()),
+                selectionModelIndex + 1));
+        appendIds(sb);
+        sb.append(");});");
+        return sb.toString();
     }
 
     public void valueToXhtmlRadio(XhtmlBuffer xb) {

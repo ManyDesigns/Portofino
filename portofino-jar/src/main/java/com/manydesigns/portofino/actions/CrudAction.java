@@ -815,14 +815,22 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     public Resolution jsonSelectFieldOptions() {
-        return jsonOptions(true);
+        return jsonOptions(prefix, true);
+    }
+
+    public Resolution jsonSelectFieldSearchOptions() {
+        return jsonOptions(searchPrefix, true);
     }
 
     public Resolution jsonAutocompleteOptions() {
-        return jsonOptions(false);
+        return jsonOptions(prefix, false);
     }
 
-    protected Resolution jsonOptions(boolean includeSelectPrompt) {
+    public Resolution jsonAutocompleteSearchOptions() {
+        return jsonOptions(searchPrefix, false);
+    }
+
+    protected Resolution jsonOptions(String prefix, boolean includeSelectPrompt) {
         CrudSelectionProvider crudSelectionProvider = null;
         for (CrudSelectionProvider current : crudSelectionProviders) {
             SelectionProvider selectionProvider =
@@ -859,7 +867,7 @@ public class CrudAction extends PortletAction {
         targetField.setLabelSearch(labelSearch);
 
         String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
-        logger.debug("jsonSelectFieldOptions: {}", text);
+        logger.debug("jsonOptions: {}", text);
         return new NoCacheStreamingResolution("application/json", text);
     }
 

@@ -1,12 +1,12 @@
-function updateSelectOptions(relName, selectionProviderIndex) {
-    var selectFieldId = arguments[2 + selectionProviderIndex];
+function updateSelectOptions(relName, selectionProviderIndex, methodName) {
+    var selectFieldId = arguments[3 + selectionProviderIndex];
 
     var data = {
         relName : relName,
         selectionProviderIndex : selectionProviderIndex,
-        jsonSelectFieldOptions : ''
     };
-    for (var i = 2; i < arguments.length; i++ ) {
+    data[methodName] = '';
+    for (var i = 3; i < arguments.length; i++ ) {
         var currentId = arguments[i];
         var current = $(currentId);
         data[current.attr('name')] = current.attr('value');
