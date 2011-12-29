@@ -29,6 +29,9 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.i18n.SimpleTextProvider;
+import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
@@ -94,6 +97,10 @@ public class DispatcherFilter implements Filter {
             LocalizationContext localizationContext =
                     new LocalizationContext(application.getBundle(locale), locale);
             request.setAttribute(Config.FMT_LOCALIZATION_CONTEXT + ".request", localizationContext);
+
+            //Setup Elements I18n
+            TextProvider textProvider = SimpleTextProvider.create(locale);
+            ElementsThreadLocals.setTextProvider(textProvider);
         }
 
         logger.debug("Invoking the dispatcher to create a dispatch");
