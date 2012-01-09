@@ -307,9 +307,7 @@ public class PortletAction extends AbstractActionBean {
             updatePagePermissions(page);
             saveModel();
 
-            Locale locale = context.getLocale();
-            ResourceBundle bundle = application.getBundle(locale);
-            SessionMessages.addInfoMessage(bundle.getString("permissions.page.updated"));
+            SessionMessages.addInfoMessage(getMessage("permissions.page.updated"));
         }
 
         return new RedirectResolution(dispatch.getOriginalPath())

@@ -153,9 +153,7 @@ public class PageReferenceAction extends PortletAction {
                 form.writeToObject(pageReference);
                 saveModel();
 
-                Locale locale = context.getLocale();
-                ResourceBundle bundle = application.getBundle(locale);
-                SessionMessages.addInfoMessage(bundle.getString("commons.configuration.updated"));
+                SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
             }
             return cancel();
         }
