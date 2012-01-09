@@ -88,6 +88,13 @@ Struttura dell'XML:
 <model>
     <databases>
         <database databaseName="portofino">
+            <jdbcConnection
+                    databaseName="portofino"
+                    driver="org.h2.Driver"
+                    url="jdbc:h2:${app}/dbs/portofino"
+                    username="sa"
+                    password=""
+                    />
             <schemas>
                 <schema schemaName="PUBLIC">
                     <tables>
