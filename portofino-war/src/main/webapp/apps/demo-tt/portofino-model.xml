@@ -1859,8 +1859,6 @@
                     <attachment contentType="image/gif" filename="icon_favourites.gif" id="s6jrmb9cn403tmrea4c7kjy8n" size="243"/>
                     <attachment contentType="image/gif" filename="list_users.gif" id="9s9f7rf9n4m0i12qqt9ypkjep" size="246"/>
                     <attachment contentType="image/gif" filename="icon_clock.gif" id="8pfh3et9vh3wi49gesguy4k19" size="207"/>
-                    <attachment contentType="image/png" filename="logo3w.png" id="0cxyzldl5og2jv2r3kt7chn63" size="7007"/>
-                    <attachment contentType="image/png" filename="logo3w.png" id="r2xwg12s37yfdordmndpyi7kt" size="7007"/>
                 </attachments>
             </textPage>
             <crudPage detailLayoutContainer="contentLayoutLeft" detailLayoutOrder="1" description="Projects" fragment="projects" id="1" layoutContainer="default" layoutOrder="2" showInNavigation="true" title="Projects">
