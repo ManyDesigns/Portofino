@@ -27,9 +27,6 @@
             <%@include file="datatable.jsp"%>
             <portofino:buttons list="crud-search" cssClass="portletButton" />
         </div>
-
-        <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
-
     </stripes:layout-component>
 
     <script type="text/javascript">

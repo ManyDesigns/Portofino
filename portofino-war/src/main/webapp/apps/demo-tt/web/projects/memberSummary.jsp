@@ -17,23 +17,26 @@
         <c:out value="${actionBean.jspPage.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <ul>
-            <%
-                Application appl = (Application) request.getAttribute("application");
-                Session hSession = appl.getSession("redmine");
-                List<?> objects = QueryUtils.getObjects(hSession,
-                        "SELECT r.name, u.login " +
-                                "FROM members m, users u, " +
-                                "     roles r, member_roles mr " +
-                                "WHERE m.project_id = %{#project.id}" +
-                                "  AND m.user_id = u.id " +
-                                "  AND mr.member_id = m.id " +
-                                "  AND mr.role_id = r.id ", null, null);
-                MultiMap mm = new MultiHashMap();
-                for(Object obj : objects) {
-                    Object[] obArr = (Object[]) obj;
-                    mm.put(obArr[0], obArr);
-                }
+        <%
+            Application appl = (Application) request.getAttribute("application");
+            Session hSession = appl.getSession("redmine");
+            List<?> objects = QueryUtils.getObjects(hSession,
+                    "SELECT r.name, u.login " +
+                            "FROM members m, users u, " +
+                            "     roles r, member_roles mr " +
+                            "WHERE m.project_id = %{#project.id}" +
+                            "  AND m.user_id = u.id " +
+                            "  AND mr.member_id = m.id " +
+                            "  AND mr.role_id = r.id ", null, null);
+            MultiMap mm = new MultiHashMap();
+            for(Object obj : objects) {
+                Object[] obArr = (Object[]) obj;
+                mm.put(obArr[0], obArr);
+            }
+            if(mm.isEmpty()) { %>
+               The project has no members.
+            <% } %>
+            <ul><%
                 for(Object entry : mm.entrySet()) {
                     Map.Entry ee = (Map.Entry) entry;
                     out.print("<li>" + ee.getKey());
@@ -44,8 +47,7 @@
                     }
                     out.print("</li>");
                 }
-            %>
-        </ul>
+            %></ul>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
     </stripes:layout-component>

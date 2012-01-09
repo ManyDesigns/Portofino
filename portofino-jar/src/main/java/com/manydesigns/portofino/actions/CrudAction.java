@@ -772,26 +772,43 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
     // Return to parent
     //**************************************************************************
 
+
+    @Override
+    public void setupReturnToParentTarget() {
+        if (CrudPage.MODE_DETAIL.equals(getPageInstance().getMode())) {
+            returnToParentTarget = "search";
+        } else {
+            super.setupReturnToParentTarget();
+        }
+    }
+
     public Resolution returnToParent() {
-        PageInstance[] pageInstancePath =
-                dispatch.getPageInstancePath();
-        int previousPos = pageInstancePath.length - 2;
         RedirectResolution resolution;
-        if (previousPos >= 0) {
-            PageInstance previousPageInstance = pageInstancePath[previousPos];
-            if (previousPageInstance instanceof CrudPageInstance) {
-                String url = dispatch.getPathUrl(previousPos + 1);
-                resolution = new RedirectResolution(url, true);
+        if (CrudPage.MODE_DETAIL.equals(getPageInstance().getMode())) {
+            resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
+            if(!StringUtils.isEmpty(searchString)) {
+                resolution.addParameter(SEARCH_STRING_PARAM, searchString);
+            }
+        } else {
+            PageInstance[] pageInstancePath =
+                    dispatch.getPageInstancePath();
+            int previousPos = pageInstancePath.length - 2;
+            if (previousPos >= 0) {
+                PageInstance previousPageInstance = pageInstancePath[previousPos];
+                if (previousPageInstance instanceof CrudPageInstance) {
+                    String url = dispatch.getPathUrl(previousPos + 1);
+                    resolution = new RedirectResolution(url, true);
+                } else {
+                    resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
+                    if(!StringUtils.isEmpty(searchString)) {
+                        resolution.addParameter(SEARCH_STRING_PARAM, searchString);
+                    }
+                }
             } else {
                 resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
                 if(!StringUtils.isEmpty(searchString)) {
                     resolution.addParameter(SEARCH_STRING_PARAM, searchString);
                 }
-            }
-        } else {
-            resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
-            if(!StringUtils.isEmpty(searchString)) {
-                resolution.addParameter(SEARCH_STRING_PARAM, searchString);
             }
         }
 

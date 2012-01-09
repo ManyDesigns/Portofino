@@ -180,14 +180,6 @@ public class PortletAction extends AbstractActionBean {
                     }
                 }
             }
-        } else {
-            if (thisPageInstance instanceof CrudPageInstance) {
-                CrudPageInstance crudPageInstance =
-                        (CrudPageInstance) thisPageInstance;
-                if (CrudPage.MODE_DETAIL.equals(crudPageInstance.getMode())) {
-                    returnToParentTarget = "search";
-                }
-            }
         }
     }
 

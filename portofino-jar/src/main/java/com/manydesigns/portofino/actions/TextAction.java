@@ -31,6 +31,7 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.logic.TextLogic;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.Attachment;
@@ -172,6 +173,7 @@ public class TextAction extends PortletAction {
     }
 
     @RequiresPermissions(level = AccessLevel.EDIT)
+    @Button(list = "manage-attachments-upload", key = "text.attachment.upload", order = 1)
     public Resolution uploadAttachment() {
         if (upload == null) {
             SessionMessages.addWarningMessage(getMessage("text.attachment.noFileSelected"));
@@ -292,6 +294,7 @@ public class TextAction extends PortletAction {
     }
 
     @RequiresPermissions(level = AccessLevel.EDIT)
+    @Button(list = "manage-attachments-delete", key = "commons.delete", order = 1)
     public Resolution deleteAttachments() {
         if (selection == null || selection.length == 0) {
             SessionMessages.addWarningMessage(getMessage("text.attachment.noAttachmentSelected"));
@@ -326,6 +329,17 @@ public class TextAction extends PortletAction {
         return new RedirectResolution(dispatch.getOriginalPath())
                 .addParameter("manageAttachments")
                 .addParameter("cancelReturnUrl", cancelReturnUrl);
+    }
+
+    @Buttons({
+        @Button(list = "page-permissions-edit", key = "commons.cancel", order = 99),
+        @Button(list = "configuration", key = "commons.cancel", order = 99),
+        @Button(list = "page-create", key = "commons.cancel", order = 99),
+        @Button(list = "manage-attachments", key = "commons.ok", order = 1)
+    })
+    @Override
+    public Resolution cancel() {
+        return super.cancel();
     }
 
     //**************************************************************************

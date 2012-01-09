@@ -25,8 +25,5 @@
             %>. Consult the log files for details.
         </div>
     </stripes:layout-component>
-    <stripes:layout-component name="portletFooter">
-        <input type="hidden" name="cancelReturnUrl"
-               value="<c:out value="${actionBean.cancelReturnUrl}"/> "/>
-    </stripes:layout-component>
+    <stripes:layout-component name="portletFooter" />
 </stripes:layout-render>

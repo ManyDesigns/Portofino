@@ -12,6 +12,7 @@
         <stripes:form action="${actionBean.dispatch.originalPath}" method="post">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
+            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
             <div class="portletHeader">
                 <stripes:layout-component name="portletHeader">
                     <div class="yui-g">
