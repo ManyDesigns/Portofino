@@ -441,7 +441,7 @@ public class PortletAction extends AbstractActionBean {
     protected Resolution forwardToPortletPage(String pageJsp) {
         setupPortlets(pageInstance, pageJsp);
         HttpServletRequest request = context.getRequest();
-        request.setAttribute("cancelReturnUrl", cancelReturnUrl);
+        request.setAttribute("cancelReturnUrl", getCancelReturnUrl());
         return new ForwardResolution("/layouts/portlet-page.jsp");
     }
 
@@ -451,12 +451,7 @@ public class PortletAction extends AbstractActionBean {
         @Button(list = "page-create", key = "commons.cancel", order = 99)
     })
     public Resolution cancel() {
-        if (StringUtils.isEmpty(cancelReturnUrl)) {
-            String url = dispatch.getOriginalPath();
-            return new RedirectResolution(url);
-        } else {
-            return new RedirectResolution(cancelReturnUrl, false);
-        }
+        return new RedirectResolution(getCancelReturnUrl(), false);
     }
 
     public PageInstance getPageInstance() {
@@ -480,10 +475,15 @@ public class PortletAction extends AbstractActionBean {
     }
 
     public String getCancelReturnUrl() {
-        if (cancelReturnUrl == null) {
-            return (String) context.getRequest().getAttribute("cancelReturnUrl");
-        } else {
+        if (!StringUtils.isEmpty(cancelReturnUrl)) {
             return cancelReturnUrl;
+        } else {
+            String url = (String) context.getRequest().getAttribute("cancelReturnUrl");
+            if(!StringUtils.isEmpty(url)) {
+                return url;
+            } else {
+                return dispatch.getAbsoluteOriginalPath();
+            }
         }
     }
 
