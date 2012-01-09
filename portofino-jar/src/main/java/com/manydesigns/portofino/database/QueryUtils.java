@@ -41,6 +41,14 @@ import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.statement.select.OrderByElement;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -51,6 +59,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.io.StringReader;
 import java.sql.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -339,39 +348,62 @@ public class QueryUtils {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
         String formatString = sqlFormat.getFormatString();
         Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
-        boolean formatStringContainsWhere = formatString.toUpperCase().contains(WHERE_STRING);
 
         QueryStringWithParameters criteriaQuery =
                 getQueryStringWithParametersForCriteria(criteria);
         String criteriaQueryString = criteriaQuery.getQueryString();
         Object[] criteriaParameters = criteriaQuery.getParamaters();
 
-        // merge the hql strings
-        int whereIndex = criteriaQueryString.toUpperCase().indexOf(WHERE_STRING);
-        String criteriaWhereClause;
-        if (whereIndex >= 0) {
-            criteriaWhereClause =
-                    criteriaQueryString.substring(
-                            whereIndex + WHERE_STRING.length());
-        } else {
-            criteriaWhereClause = "";
+        CCJSqlParserManager parserManager = new CCJSqlParserManager();
+        PlainSelect parsedQueryString;
+        PlainSelect parsedCriteriaQuery;
+        String queryPrefix = "select __portofino_fake_select__ ";
+        try {
+            if(!formatString.toLowerCase().trim().startsWith("select")) {
+                formatString = queryPrefix + formatString;
+            }
+            parsedQueryString =
+                    (PlainSelect) ((Select) parserManager.parse(new StringReader(formatString)))
+                            .getSelectBody();
+            if(StringUtils.isEmpty(criteriaQueryString)) {
+                parsedCriteriaQuery = new PlainSelect();
+            } else {
+                if(!criteriaQueryString.toLowerCase().trim().startsWith("select")) {
+                    criteriaQueryString = queryPrefix + criteriaQueryString;
+                }
+                parsedCriteriaQuery =
+                        (PlainSelect) ((Select) parserManager.parse
+                                (new StringReader(criteriaQueryString)))
+                                .getSelectBody();
+            }
+        } catch (JSQLParserException e) {
+            throw new RuntimeException("Couldn't merge query", e);
         }
 
-        String fullQueryString;
-        if (criteriaWhereClause.length() > 0) {
-            if (formatStringContainsWhere) {
-                fullQueryString = MessageFormat.format(
-                        "{0} AND {1}",
-                        formatString,
-                        criteriaWhereClause);
+        Expression whereExpression;
+        if(parsedQueryString.getWhere() != null) {
+            if(parsedCriteriaQuery.getWhere() != null) {
+                whereExpression = new AndExpression(parsedQueryString.getWhere(), parsedCriteriaQuery.getWhere());
             } else {
-                fullQueryString = MessageFormat.format(
-                        "{0} WHERE {1}",
-                        formatString,
-                        criteriaWhereClause);
+                whereExpression = parsedQueryString.getWhere();
             }
         } else {
-            fullQueryString = formatString;
+            whereExpression = parsedCriteriaQuery.getWhere();
+        }
+        parsedQueryString.setWhere(whereExpression);
+        if(criteria != null && criteria.getOrderBy() != null) {
+            List orderByElements = new ArrayList();
+            OrderByElement orderByElement = new OrderByElement();
+            orderByElement.setAsc(criteria.getOrderBy().isAsc());
+            String propertyName = criteria.getOrderBy().getPropertyAccessor().getName();
+            orderByElement.setExpression(
+                    new net.sf.jsqlparser.schema.Column(new net.sf.jsqlparser.schema.Table(), propertyName));
+            orderByElements.add(orderByElement);
+            parsedQueryString.setOrderByElements(orderByElements);
+        }
+        String fullQueryString = parsedQueryString.toString();
+        if(fullQueryString.toLowerCase().startsWith(queryPrefix)) {
+            fullQueryString = fullQueryString.substring(queryPrefix.length());
         }
 
         // merge the parameters
@@ -499,9 +531,11 @@ public class QueryUtils {
         ForeignKey relationship =
                 DataModelLogic.findOneToManyRelationship(model, databaseName,
                         entityName, oneToManyRelationshipName);
-        //Table toTable = relationship.getActualToTable();
+        if(relationship == null) {
+            throw new IllegalArgumentException("Relationship not defined: " + oneToManyRelationshipName);
+        }
         Table fromTable = relationship.getFromTable();
-        Session session = application.getSessionByQualifiedTableName(fromTable.getQualifiedName());
+        Session session = application.getSession(fromTable.getDatabaseName());
 
         ClassAccessor toAccessor = application.getTableAccessor(databaseName, entityName);
 

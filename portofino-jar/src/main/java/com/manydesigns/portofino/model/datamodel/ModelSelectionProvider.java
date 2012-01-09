@@ -50,7 +50,4 @@ public interface ModelSelectionProvider extends ModelObject, HasReferences {
     String getToSchema();
     void setToSchema(String toSchema);
 
-    String getToTableName();
-    void setToTableName(String toTableName);
-
 }

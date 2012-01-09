@@ -3,12 +3,12 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+%><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
+%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.TextAction"/>
     <stripes:layout-component name="contentHeader">
-        <stripes:submit name="cancel" value="Ok" class="contentButton"/>
+        <portofino:buttons list="manage-attachments" cssClass="contentButton" />
         <div class="breadcrumbs">
             <div class="inner">
                 <mde:write name="breadcrumbs"/>
@@ -19,6 +19,7 @@
         <fmt:message key="layouts.text.manage-attachments.manage_attachments_for_page"/> <c:out value="${actionBean.textPage.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
+        <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
         <c:if test="${not empty actionBean.textPage.attachments}">
             <fmt:message key="commons.attachments"/>:
             <p>
@@ -30,7 +31,7 @@
                 </c:forEach>
             </p>
             <br/>
-            <stripes:submit name="deleteAttachments" value="Delete selected attachments" class="portletButton"/>
+            <portofino:buttons list="manage-attachments-delete" cssClass="portletButton" />
         </c:if><c:if test="${empty actionBean.textPage.attachments}">
             <fmt:message key="layouts.text.manage-attachments.manage_attachments_for_page"/>
         </c:if>
@@ -39,9 +40,9 @@
         <stripes:file name="upload"/>
         <br/>
         <br/>
-        <stripes:submit name="uploadAttachment" value="Upload" class="portletButton"/>
+        <portofino:buttons list="manage-attachments-upload" cssClass="portletButton" />
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <stripes:submit name="cancel" value="Ok" class="contentButton"/>
+        <portofino:buttons list="manage-attachments" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>

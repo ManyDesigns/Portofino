@@ -31,12 +31,11 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.elements.options.SelectionModel;
-import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.util.Util;
 
 /*
@@ -62,15 +61,17 @@ public class SelectFieldTest3 extends AbstractElementsTest {
             "label3"
     };
 
-    protected SelectionProvider selectionProvider;
+    protected DefaultSelectionProvider selectionProvider;
     protected SelectionModel selectionModel;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
 
-        selectionProvider = DefaultSelectionProvider.create(
-                "selectionProvider", valuesArray, labelsArray);
+        selectionProvider = new DefaultSelectionProvider("selectionProvider");
+        for(int i = 0; i < valuesArray.length; i++) {
+            selectionProvider.appendRow(valuesArray[i], labelsArray[i], true);
+        }
         selectionModel = selectionProvider.createSelectionModel();
     }
 
@@ -95,7 +96,7 @@ public class SelectFieldTest3 extends AbstractElementsTest {
         setupSelectFields(Mode.EDIT);
 
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"longValue\" class=\"field\"><span class=\"required\">*</span>&nbsp;Long value:" +
+        assertEquals("<th><label for=\"longValue\" class=\"mde-field-label\"><span class=\"required\">*</span>&nbsp;Long value:" +
                 "</label></th><td><fieldset id=\"longValue\" class=\"radio\">" +
                 "<input type=\"radio\" id=\"longValue_0\" name=\"longValue\" value=\"1000\" />&nbsp;<label for=\"longValue_0\">label1</label><br />" +
                 "<input type=\"radio\" id=\"longValue_1\" name=\"longValue\" value=\"2000\" />&nbsp;<label for=\"longValue_1\">label2</label><br />" +

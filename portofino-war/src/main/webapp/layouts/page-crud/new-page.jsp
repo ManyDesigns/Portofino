@@ -2,17 +2,16 @@
 <%@ page import="com.manydesigns.elements.util.Util" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
-         pageEncoding="ISO-8859-1"
-%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
-%><%@taglib prefix="mde" uri="/manydesigns-elements"
-%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+         pageEncoding="ISO-8859-1" %><%@
+    taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%><%@
+    taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%><%@
+    taglib prefix="mde" uri="/manydesigns-elements"%><%@
+    taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%@
+    taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.PortletAction"/>
     <stripes:layout-component name="contentHeader">
-        <stripes:submit name="createPage" value="Create" class="contentButton"/>
-        <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
+        <portofino:buttons list="page-create" cssClass="contentButton"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <fmt:message key="layouts.page-crud.new-page.add_new_page"/>
@@ -39,8 +38,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">
-        <stripes:submit name="createPage" value="Create" class="contentButton"/>
-        <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
+        <portofino:buttons list="page-create" cssClass="contentButton"/>
         <script type="text/javascript">
             var rootPath = "<%= request.getContextPath() %>";
             var rootBreadcrumbs = ""; //"<span class='breadcrumb-item'>${actionBean.application.model.rootPage.title}</span>";

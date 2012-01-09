@@ -60,7 +60,7 @@ public class Navigation implements XhtmlFragment {
     protected final Application application;
     protected final Dispatch dispatch;
     protected final List<String> groups;
-    protected final boolean admin;
+    protected final boolean skipPermissions;
 
     public static final Logger logger =
             LoggerFactory.getLogger(Navigation.class);
@@ -71,11 +71,11 @@ public class Navigation implements XhtmlFragment {
 
     public Navigation(
             Application application, Dispatch dispatch, List<String> groups,
-            boolean admin) {
+            boolean skipPermissions) {
         this.application = application;
         this.dispatch = dispatch;
         this.groups = groups;
-        this.admin = admin;
+        this.skipPermissions = skipPermissions;
         //TODO gestire deploy sotto ROOT
     }
 
@@ -84,7 +84,7 @@ public class Navigation implements XhtmlFragment {
     //**************************************************************************
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
-        String contextPath = dispatch.getRequest().getContextPath();
+        String contextPath = dispatch.getContextPath();
         PageInstance rootPageInstance = dispatch.getRootPageInstance();
         List<PageInstance> pageInstances =
                 rootPageInstance.getChildPageInstances();
@@ -100,7 +100,7 @@ public class Navigation implements XhtmlFragment {
         PageInstance expand = null;
         for (PageInstance current : pageInstances) {
             Page page = current.getPage();
-            if (!admin && !SecurityLogic.hasPermissions(page.getPermissions(), groups, AccessLevel.VIEW)) {
+            if (!skipPermissions && !SecurityLogic.hasPermissions(page.getPermissions(), groups, AccessLevel.VIEW)) {
                 continue;
             }
             if(!page.isShowInNavigation()) {
@@ -167,7 +167,7 @@ public class Navigation implements XhtmlFragment {
         return groups;
     }
 
-    public boolean isAdmin() {
-        return admin;
+    public boolean isSkipPermissions() {
+        return skipPermissions;
     }
 }

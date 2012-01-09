@@ -32,6 +32,7 @@ package com.manydesigns.elements.fields;
 import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Select;
+import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
@@ -75,19 +76,19 @@ public class AnnotatedSelectFieldTest extends AbstractElementsTest {
     public void testOptions() throws Exception {
         setupField(Mode.EDIT);
 
-        Map<Object,String> options = selectField.getOptions();
+        Map<Object,SelectionModel.Option> options = selectField.getOptions();
         assertNotNull(options);
         assertEquals(2, options.size());
 
-        assertEquals("l1", options.get("v1"));
-        assertEquals("l2", options.get("v2"));
+        assertEquals("l1", options.get("v1").label);
+        assertEquals("l2", options.get("v2").label);
     }
 
     public void testEditNull() throws Exception {
         setupField(Mode.EDIT);
 
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
                 "<option value=\"\" selected=\"selected\">-- Select my text --</option>" +
                 "<option value=\"v1\">l1</option>" +
@@ -100,7 +101,7 @@ public class AnnotatedSelectFieldTest extends AbstractElementsTest {
 
         selectField.setValue("v2");
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\">l2</div></td>", text);
     }

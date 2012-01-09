@@ -47,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -85,34 +86,54 @@ public class PageReferenceAction extends PortletAction {
     @DefaultHandler
     public Resolution execute() {
         if(pageReference.getToPage() == null) {
-            if(isEmbedded()) {
-                return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
-            } else {
-                return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
-            }
+            return forwardToPageNotConfigured();
         } else {
             //Never embed in this case - the referenced action will take
             //care of it.
+            try {
+                Class<? extends ActionBean> targetActionClass =
+                        Dispatcher.getActionBeanClass(application, pageReference.getToPage());
+                return new ForwardResolution(targetActionClass, getContext().getEventName());
+            } catch (ClassNotFoundException e) {
+                logger.error("Invalid action class", e);
+                return forwardToPageNotConfigured();
+            }
+            /*//Never embed in this case - the referenced action will take
+            //care of it.
             String fwd = Dispatcher.getRewrittenPath(pageReference.getToPage());
-            return new ForwardResolution(fwd);
+            return new ForwardResolution(fwd);*/
+            //throw new UnsupportedOperationException("Not yet implemented");
         }
     }
 
-    @Button(list = "configuration", key = "commons.updateConfiguration")
-    @RequiresPermissions(level = AccessLevel.EDIT)
+    protected Resolution forwardToPageNotConfigured() {
+        if(isEmbedded()) {
+            return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
+        } else {
+            return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
+        }
+    }
+
     public Resolution configureReferencedPage() {
         if(pageReference.getToPage() == null) {
             SessionMessages.addErrorMessage("No referenced page specified");
             return configure();
         } else {
-            String fwd = Dispatcher.getRewrittenPath(pageReference.getToPage());
-            UrlBuilder cancelReturnUrlBuilder =
+            try {
+                Class<? extends ActionBean> targetActionClass =
+                        Dispatcher.getActionBeanClass(application, pageReference.getToPage());
+                ForwardResolution fwd = new ForwardResolution(targetActionClass, getContext().getEventName());
+                UrlBuilder cancelReturnUrlBuilder =
                     new UrlBuilder(Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), true);
-            cancelReturnUrlBuilder.addParameter("configure");
-            cancelReturnUrlBuilder.addParameter("cancelReturnUrl", cancelReturnUrl);
-            context.getRequest().setAttribute
-                    ("cancelReturnUrl", cancelReturnUrlBuilder.toString());
-            return new ForwardResolution(fwd).addParameter("configure");
+                cancelReturnUrlBuilder.addParameter("configure");
+                cancelReturnUrlBuilder.addParameter("cancelReturnUrl", cancelReturnUrl);
+                context.getRequest().setAttribute
+                        ("cancelReturnUrl", cancelReturnUrlBuilder.toString());
+                return fwd.addParameter("configure");
+            } catch (ClassNotFoundException e) {
+                logger.error("Invalid action class", e);
+                return forwardToPageNotConfigured();
+            }
         }
     }
 
@@ -121,6 +142,8 @@ public class PageReferenceAction extends PortletAction {
         return new ForwardResolution("/layouts/page/configure.jsp");
     }
 
+    @Button(list = "configuration", key = "commons.updateConfiguration")
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updateConfiguration() {
         synchronized (application) {
             setupConfigurationForm();
@@ -129,7 +152,10 @@ public class PageReferenceAction extends PortletAction {
             if(valid) {
                 form.writeToObject(pageReference);
                 saveModel();
-                SessionMessages.addInfoMessage("Configuration updated successfully");
+
+                Locale locale = context.getLocale();
+                ResourceBundle bundle = application.getBundle(locale);
+                SessionMessages.addInfoMessage(bundle.getString("commons.configuration.updated"));
             }
             return cancel();
         }

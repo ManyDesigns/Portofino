@@ -55,6 +55,8 @@ public final class PortofinoProperties {
 
     public static final String PORTOFINO_VERSION =
             "portofino.version";
+    public static final String SYSTEM_DATABASE =
+            "portofino.system.database";
     public static final String DATABASE_PLATFORMS_LIST =
             "database.platforms.list";
     public static final String SECURITY_TYPE =

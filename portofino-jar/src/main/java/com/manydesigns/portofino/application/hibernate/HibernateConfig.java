@@ -32,8 +32,6 @@ package com.manydesigns.portofino.application.hibernate;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.connections.JdbcConnectionProvider;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.StringBooleanType;
 import com.manydesigns.portofino.model.datamodel.*;
@@ -41,7 +39,6 @@ import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import liquibase.database.structure.ForeignKeyConstraintType;
 import org.apache.commons.lang.BooleanUtils;
 import org.hibernate.FetchMode;
-import org.hibernate.Hibernate;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Mappings;
 import org.hibernate.id.IncrementGenerator;
@@ -52,6 +49,7 @@ import org.hibernate.mapping.*;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PrimaryKey;
 import org.hibernate.mapping.Table;
+import org.hibernate.type.*;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -198,8 +196,6 @@ public class HibernateConfig {
         }
     }
 
-
-
     protected RootClass createTableMapping(Mappings mappings,
                                            com.manydesigns.portofino.model.datamodel.Table aTable) {
 
@@ -224,7 +220,26 @@ public class HibernateConfig {
 
         List<com.manydesigns.portofino.model.datamodel.Column> columnList =
                 new ArrayList<com.manydesigns.portofino.model.datamodel.Column>();
-        columnList.addAll(aTable.getColumns());
+
+        for(com.manydesigns.portofino.model.datamodel.Column modelColumn : aTable.getColumns()) {
+            int jdbcType = modelColumn.getJdbcType();
+            Class javaType = modelColumn.getActualJavaType();
+            
+            //First param = null ==> doesn't really set anything, just check
+            boolean hibernateTypeOk =
+                    HibernateConfig.setHibernateType(null, modelColumn, javaType, jdbcType);
+            if (hibernateTypeOk) {
+                columnList.add(modelColumn);
+            } else {
+                logger.error("Cannot find Hibernate type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
+                        new Object[]{
+                                aTable.getTableName(),
+                                modelColumn.getColumnName(),
+                                jdbcType,
+                                javaType.getName()
+                        });
+            }
+        }
 
         //Primary keys
         List<com.manydesigns.portofino.model.datamodel.Column> columnPKList
@@ -270,8 +285,7 @@ public class HibernateConfig {
         prop.setName(column.getActualPropertyName());
         prop.setNodeName(column.getActualPropertyName());
 
-        SimpleValue value = new SimpleValue();
-        value.setTable(tab);
+        SimpleValue value = new SimpleValue(mappings, tab);
 
         if (!setHibernateType(value, column, column.getActualJavaType(), jdbcType)) {
             logger.error("Skipping column");
@@ -298,7 +312,7 @@ public class HibernateConfig {
         primaryKey.setTable(tab);
 
         clazz.setEmbeddedIdentifier(true);
-        Component component = new Component(clazz);
+        Component component = new Component(mappings, clazz);
         component.setDynamic(mdTable.getActualJavaClass()==null);
         String name;
         name = mdTable.getQualifiedName();
@@ -329,8 +343,7 @@ public class HibernateConfig {
             col.setSqlTypeCode(jdbcType);
             col.setSqlType(columnType);
             primaryKey.addColumn(col);
-            SimpleValue value = new SimpleValue();
-            value.setTable(tab);
+            SimpleValue value = new SimpleValue(mappings, tab);
 
             hasErrors = !setHibernateType(value, column, column.getActualJavaType(), jdbcType) || hasErrors;
 
@@ -368,7 +381,7 @@ public class HibernateConfig {
         PrimaryKeyColumn pkcol =mdTable.getPrimaryKey().getPrimaryKeyColumns().get(0);
         com.manydesigns.portofino.model.datamodel.Column
                 column = columnPKList.get(0);
-        SimpleValue id = new SimpleValue(tab);
+        SimpleValue id = new SimpleValue(mappings, tab);
         final PrimaryKey primaryKey = new PrimaryKey();
         primaryKey.setName(pkName);
         primaryKey.setTable(tab);
@@ -565,7 +578,7 @@ public class HibernateConfig {
         }
 
         //Uso i Bag perché i set non funzionano con i componenti dinamici
-        Bag set = new Bag(clazzOne);
+        Bag set = new Bag(mappings, clazzOne);
         // Mettere Lazy in debug a false per ottenere subito eventuali errori
         // nelle relazioni
         set.setLazy(LAZY);
@@ -573,7 +586,7 @@ public class HibernateConfig {
         set.setRole(relationship.getToTable()+"."+relationship.getActualManyPropertyName());
         set.setNodeName(relationship.getActualManyPropertyName());
         set.setCollectionTable(clazzMany.getTable());
-        OneToMany oneToMany = new OneToMany(set.getOwner());
+        OneToMany oneToMany = new OneToMany(mappings, set.getOwner());
         set.setElement(oneToMany);
 
 
@@ -594,10 +607,10 @@ public class HibernateConfig {
         //Chiave multipla
         final List<Reference> refs = relationship.getReferences();
         if (refs.size() > 1) {
-            dv = createFKComposite(relationship, manyMDTable, clazzOne,
+            dv = createFKComposite(mappings, relationship, manyMDTable, clazzOne,
                     clazzMany, set, tableMany, tableOne, oneColumns, manyColumns);
         } else {  //chiave straniera singola
-            dv = createFKSingle(clazzOne, clazzMany, tableOne,
+            dv = createFKSingle(mappings, clazzOne, clazzMany, tableOne,
                     oneColumns, manyColumns, refs);
         }
 
@@ -625,18 +638,20 @@ public class HibernateConfig {
         //if(!StringUtils.)
     }
 
-    private DependantValue createFKComposite(com.manydesigns.portofino.model.datamodel.ForeignKey relationship,
-                                             com.manydesigns.portofino.model.datamodel.Table manyMDTable,
-                                             PersistentClass clazzOne,
-                                             PersistentClass clazzMany, Bag set,
-                                             Table tableMany, Table tableOne,
-                                             List<Column> oneColumns,
-                                             List<Column> manyColumns) {
+    private DependantValue createFKComposite(
+            Mappings mappings,
+            com.manydesigns.portofino.model.datamodel.ForeignKey relationship,
+            com.manydesigns.portofino.model.datamodel.Table manyMDTable,
+            PersistentClass clazzOne,
+            PersistentClass clazzMany, Bag set,
+            Table tableMany, Table tableOne,
+            List<Column> oneColumns,
+            List<Column> manyColumns) {
         DependantValue dv;
-        Component component = new Component(set);
+        Component component = new Component(mappings, set);
         component.setDynamic(manyMDTable.getActualJavaClass()==null);
         component.setEmbedded(true);
-        dv = new DependantValue(clazzMany.getTable(), component);
+        dv = new DependantValue(mappings, clazzMany.getTable(), component);
         dv.setNullable(true);
         dv.setUpdateable(true);
 
@@ -669,18 +684,17 @@ public class HibernateConfig {
         return dv;
     }
 
-    private DependantValue createFKSingle(PersistentClass clazzOne,
-                                          PersistentClass clazzMany,
-                                          Table tableOne, List<Column> oneColumns,
-                                          List<Column> manyColumns,
-                                          List<Reference> refs) {
+    private DependantValue createFKSingle(
+            Mappings mappings, PersistentClass clazzOne,
+            PersistentClass clazzMany, Table tableOne, List<Column> oneColumns,
+            List<Column> manyColumns, List<Reference> refs) {
         DependantValue dv;
         Property refProp;
 
         String colFromName = refs.get(0).getFromColumn();
         String colToName = refs.get(0).getToColumn();
         refProp = getRefProperty(clazzOne, colToName);
-        dv = new DependantValue(clazzMany.getTable(),
+        dv = new DependantValue(mappings, clazzMany.getTable(),
                 refProp.getPersistentClass().getKey());
         dv.setNullable(true);
         dv.setUpdateable(true);
@@ -725,7 +739,7 @@ public class HibernateConfig {
             columnNames.add(ref.getFromColumn());
         }
 
-        ManyToOne m2o = new ManyToOne(tab);
+        ManyToOne m2o = new ManyToOne(mappings, tab);
         m2o.setLazy(LAZY);
         final HashMap<String, PersistentClass> persistentClasses =
                 new HashMap<String, PersistentClass>();
@@ -774,39 +788,42 @@ public class HibernateConfig {
                                  final int jdbcType) {
         String typeName;
         Properties typeParams = null;
+        if(javaType == null) {
+            return false;
+        }
         if (javaType == Long.class) {
-            typeName = Hibernate.LONG.getName();
+            typeName = LongType.INSTANCE.getName();
         } else if (javaType == Short.class) {
-            typeName = Hibernate.SHORT.getName();
+            typeName = ShortType.INSTANCE.getName();
         } else if (javaType == Integer.class) {
-            typeName = Hibernate.INTEGER.getName();
+            typeName = IntegerType.INSTANCE.getName();
         } else if (javaType == Byte.class) {
-            typeName = Hibernate.BYTE.getName();
+            typeName = ByteType.INSTANCE.getName();
         } else if (javaType == Float.class) {
-            typeName = Hibernate.FLOAT.getName();
+            typeName = FloatType.INSTANCE.getName();
         } else if (javaType == Double.class) {
-            typeName = Hibernate.DOUBLE.getName();
+            typeName = DoubleType.INSTANCE.getName();
         } else if (javaType == Character.class) {
-            typeName = Hibernate.CHARACTER.getName();
+            typeName = CharacterType.INSTANCE.getName();
         } else if (javaType == String.class) {
-            typeName = Hibernate.STRING.getName();
+            typeName = StringType.INSTANCE.getName();
         } else if (java.util.Date.class.isAssignableFrom(javaType)) {
             switch (jdbcType) {
                 case Types.DATE:
-                    typeName = Hibernate.DATE.getName();
+                    typeName = DateType.INSTANCE.getName();
                     break;
                 case Types.TIME:
-                    typeName = Hibernate.TIME.getName();
+                    typeName = TimeType.INSTANCE.getName();
                     break;
                 case Types.TIMESTAMP:
-                    typeName = Hibernate.TIMESTAMP.getName();
+                    typeName = TimestampType.INSTANCE.getName();
                     break;
                 default:
                     typeName = null;
             }
         } else if (javaType == Boolean.class) {
             if(jdbcType == Types.BIT || jdbcType == Types.BOOLEAN) {
-                typeName = Hibernate.BOOLEAN.getName();
+                typeName = BooleanType.INSTANCE.getName();
             } else if(jdbcType == Types.NUMERIC || jdbcType == Types.DECIMAL) {
                 typeName = DbUtil.NUMERIC_BOOLEAN.getName();
             } else if(jdbcType == Types.CHAR || jdbcType == Types.VARCHAR) {
@@ -819,11 +836,11 @@ public class HibernateConfig {
                 typeName = null;
             }
         } else if (javaType == BigDecimal.class) {
-            typeName = Hibernate.BIG_DECIMAL.getName();
+            typeName = BigDecimalType.INSTANCE.getName();
         } else if (javaType == BigInteger.class) {
-            typeName = Hibernate.BIG_INTEGER.getName();
+            typeName = BigIntegerType.INSTANCE.getName();
         } else if (javaType == byte[].class) {
-            typeName = Hibernate.BLOB.getName();
+            typeName = BlobType.INSTANCE.getName();
         } else {
             typeName = null;
         }

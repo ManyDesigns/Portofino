@@ -30,14 +30,22 @@
 package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.servlet.ServletUtils;
+import com.manydesigns.portofino.actions.CrudAction;
+import com.manydesigns.portofino.actions.JspAction;
+import com.manydesigns.portofino.actions.PageReferenceAction;
+import com.manydesigns.portofino.actions.TextAction;
+import com.manydesigns.portofino.actions.chart.ChartAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.*;
+import com.manydesigns.portofino.scripting.ScriptingUtil;
+import net.sourceforge.stripes.action.ActionBean;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -65,12 +73,16 @@ public class Dispatcher {
     public Dispatch createDispatch(HttpServletRequest request) {
         String originalPath = ServletUtils.getOriginalPath(request);
 
-        if(originalPath.endsWith(".jsp")) {
-            logger.debug("Path is a JSP page ({}), not dispatching.", originalPath);
+        return createDispatch(request.getContextPath(), originalPath);
+    }
+
+    public Dispatch createDispatch(String contextPath, String path) {
+        if(path.endsWith(".jsp")) {
+            logger.debug("Path is a JSP page ({}), not dispatching.", path);
             return null;
         }
 
-        List<PageInstance> path = new ArrayList<PageInstance>();
+        List<PageInstance> pagePath = new ArrayList<PageInstance>();
 
         Model model = application.getModel();
 
@@ -79,13 +91,13 @@ public class Dispatcher {
             throw new Error("Model is null");
         }
 
-        String[] fragments = StringUtils.split(originalPath, '/');
+        String[] fragments = StringUtils.split(path, '/');
 
         List<String> fragmentsAsList = Arrays.asList(fragments);
         ListIterator<String> fragmentsIterator = fragmentsAsList.listIterator();
 
         Page rootPage = model.getRootPage();
-        visitPageInPath(path, fragmentsIterator, rootPage);
+        visitPageInPath(pagePath, fragmentsIterator, rootPage);
 
         if (fragmentsIterator.hasNext()) {
             logger.debug("Not all fragments matched");
@@ -93,46 +105,82 @@ public class Dispatcher {
         }
 
         // check path contains root page and some child page at least
-        if (path.size() <= 1) {
+        if (pagePath.size() <= 1) {
             return null;
         }
 
-        PageInstance pageInstance = path.get(path.size() - 1);
+        PageInstance pageInstance = pagePath.get(pagePath.size() - 1);
         Page page = pageInstance.getPage();
-        String rewrittenPath = getRewrittenPath(page);
-        
-        PageInstance[] pageArray =
-                new PageInstance[path.size()];
-        path.toArray(pageArray);
+        Class<? extends ActionBean> actionBeanClass = null;
+        try {
+            actionBeanClass = getActionBeanClass(application, page);
+        } catch (ClassNotFoundException e) {
+            logger.error("Couldn't get action bean class for " + page, e);
+        }
 
-        return new Dispatch(request, originalPath, rewrittenPath, pageArray);
+        PageInstance[] pageArray =
+                new PageInstance[pagePath.size()];
+        pagePath.toArray(pageArray);
+
+        return new Dispatch(contextPath, path, actionBeanClass, pageArray);
     }
 
-    public static String getRewrittenPath(Page page) {
+    public static Class<? extends ActionBean> getActionBeanClass(Application application, Page page)
+            throws ClassNotFoundException {
         if(page == null) {
             return null;
         }
-        String rewrittenPath = page.getUrl();
-        if (rewrittenPath == null) {
-            if (page instanceof TextPage) {
-                rewrittenPath = "/actions/text";
-            } else if (page instanceof ChartPage) {
-                rewrittenPath = "/actions/chart";
-            } else if (page instanceof FolderPage) {
-                rewrittenPath = "/actions/index";
-            } else if (page instanceof CrudPage) {
-                rewrittenPath = "/actions/crud";
-            } else if (page instanceof JspPage) {
-                rewrittenPath = "/actions/jsp";
-            } else if (page instanceof PageReference) {
-                rewrittenPath = "/actions/ref";
-            } else if (page instanceof RootPage) {
-                rewrittenPath = "/";
-            } else {
-                throw new Error("Unrecognized page type: " + page.getClass().getName());
-            }
+        Class<?> actionClass = page.getActualActionClass();
+        if (!isValidActionClass(actionClass)) {
+            actionClass = getScriptActionClass(application, page);
         }
-        return rewrittenPath;
+        if (!isValidActionClass(actionClass)) {
+            actionClass = getDefaultActionClass(page);
+        }
+        page.setActualActionClass(actionClass);
+        return (Class<? extends ActionBean>) actionClass;
+    }
+
+    protected static boolean isValidActionClass(Class<?> actionClass) {
+        if(actionClass == null) {
+            return false;
+        }
+        if(!ActionBean.class.isAssignableFrom(actionClass)) {
+            logger.error("Action class must implement ActionBean: " + actionClass);
+            return false;
+        }
+        return true;
+    }
+
+    public static Class<?> getScriptActionClass(Application application, Page page) {
+        try {
+            File scriptsDirFile = application.getAppScriptsDir();
+            String id = page.getId();
+            return ScriptingUtil.getGroovyClass(scriptsDirFile, id);
+        } catch (Exception e) {
+            logger.error("Couldn't load script for " + page, e);
+            return null;
+        }
+    }
+
+    protected static Class<? extends ActionBean> getDefaultActionClass(Page page) {
+        if (page instanceof TextPage) {
+            return TextAction.class;
+        } else if (page instanceof ChartPage) {
+            return ChartAction.class;
+        }/* else if (page instanceof FolderPage) {
+            className = "/actions/index";
+        }*/ else if (page instanceof CrudPage) {
+            return CrudAction.class;
+        } else if (page instanceof JspPage) {
+            return JspAction.class;
+        } else if (page instanceof PageReference) {
+            return PageReferenceAction.class;
+        } else if (page instanceof RootPage) {
+            return null;
+        } else {
+            throw new Error("Unrecognized page type: " + page.getClass().getName());
+        }
     }
 
     private void visitPagesInPath(List<PageInstance> path,
@@ -256,4 +304,5 @@ public class Dispatcher {
             tree.add(pageInstance);
         }
     }
+
 }

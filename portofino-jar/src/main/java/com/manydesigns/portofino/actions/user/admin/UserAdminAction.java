@@ -50,7 +50,6 @@ import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import javax.servlet.http.HttpServletRequest;
@@ -129,7 +128,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
         PageInstance rootPageInstance = new PageInstance(application, model.getRootPage(), null);
         HttpServletRequest request = context.getRequest();
         String originalPath = ServletUtils.getOriginalPath(request);
-        dispatch = new Dispatch(request, originalPath, originalPath, rootPageInstance, pageInstance);
+        dispatch = new Dispatch(request.getContextPath(), originalPath, getClass(), rootPageInstance, pageInstance);
         Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
         request.setAttribute(RequestAttributes.DISPATCH, dispatch);
         request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
@@ -150,7 +149,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
     }
 
     protected void setupUserGroups() {
-        Session session = application.getSession("portofino");
+        Session session = application.getSystemSession();
         Criteria criteria = session.createCriteria(SecurityLogic.GROUP_ENTITY_NAME);
         List<Group> groups = new ArrayList(criteria.list());
         availableUserGroups = new ArrayList<Group>();
@@ -204,8 +203,8 @@ public class UserAdminAction extends CrudAction implements AdminAction {
                 }
             }
         }
+        Session session = application.getSystemSession();
         for(String groupName : names) {
-            Session session = application.getSession("portofino");
             Group group = (Group) session
                     .createCriteria(SecurityLogic.GROUP_ENTITY_NAME)
                     .add(Restrictions.eq("name", groupName))
@@ -222,6 +221,31 @@ public class UserAdminAction extends CrudAction implements AdminAction {
         }
 
         return true;
+    }
+
+    @Override
+    protected Resolution getEditView() {
+        return new ForwardResolution("/layouts/admin/users/userEdit.jsp");
+    }
+
+    @Override
+    protected Resolution getBulkEditView() {
+        return new ForwardResolution("/layouts/admin/users/userBulkEdit.jsp");
+    }
+
+    @Override
+    protected Resolution getCreateView() {
+        return new ForwardResolution("/layouts/admin/users/userCreate.jsp");
+    }
+
+    @Override
+    protected Resolution getReadView() {
+        return forwardToPortletPage("/layouts/admin/users/userRead.jsp");
+    }
+
+    @Override
+    protected Resolution getSearchView() {
+        return forwardToPortletPage("/layouts/admin/users/userSearch.jsp");
     }
 
     @Button(list = "contentButtons", key = "commons.returnToPages", order = 1)

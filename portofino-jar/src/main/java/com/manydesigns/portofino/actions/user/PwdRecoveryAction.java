@@ -78,7 +78,7 @@ public class PwdRecoveryAction extends AbstractActionBean implements LoginUnAwar
 
     public String send(){
         User user;
-        Session session = application.getSession("portofino");
+        Session session = application.getSystemSession();
         try {
 
             user = application.findUserByEmail(email);
@@ -113,7 +113,7 @@ public class PwdRecoveryAction extends AbstractActionBean implements LoginUnAwar
             session.getTransaction().commit();
             SessionMessages.addInfoMessage("An email was sent to your address. " +
                     "Please check your email.");
-            QueryUtils.commit(application, "portofino");
+            QueryUtils.commit(application, application.getSystemDatabaseName());
             return SUCCESS;
         } catch (Exception e) {
             final String errore = "Errore nella verifica della email. " +

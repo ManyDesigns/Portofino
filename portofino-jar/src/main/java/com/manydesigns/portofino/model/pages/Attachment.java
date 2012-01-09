@@ -32,7 +32,6 @@ package com.manydesigns.portofino.model.pages;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
-import com.manydesigns.portofino.xml.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,7 +116,6 @@ public class Attachment implements ModelObject {
         this.textPage = textPage;
     }
 
-    @Identifier
     @XmlAttribute(required = true)
     public String getId() {
         return id;

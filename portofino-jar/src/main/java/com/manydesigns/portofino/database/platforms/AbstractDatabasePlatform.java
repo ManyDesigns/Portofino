@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.database.platforms;
 
-import com.manydesigns.portofino.connections.ConnectionProvider;
+import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.PrimaryKeyColumn;
 import com.manydesigns.portofino.model.datamodel.Reference;
 import org.apache.commons.dbutils.DbUtils;
@@ -122,7 +122,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
 
     public void shutdown(ConnectionProvider connectionProvider) {
         logger.info("Shutting down connection provider: {}",
-                connectionProvider.getDatabaseName());
+                connectionProvider.getDatabase().getDatabaseName());
     }
 
     //**************************************************************************

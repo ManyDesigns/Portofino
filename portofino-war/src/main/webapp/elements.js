@@ -1,12 +1,12 @@
-function updateSelectOptions(relName, selectionProviderIndex) {
-    var selectFieldId = arguments[2 + selectionProviderIndex];
+function updateSelectOptions(relName, selectionProviderIndex, methodName) {
+    var selectFieldId = arguments[3 + selectionProviderIndex];
 
     var data = {
         relName : relName,
         selectionProviderIndex : selectionProviderIndex,
-        'method:jsonSelectFieldOptions' : ''
     };
-    for (var i = 2; i < arguments.length; i++ ) {
+    data[methodName] = '';
+    for (var i = 3; i < arguments.length; i++ ) {
         var currentId = arguments[i];
         var current = $(currentId);
         data[current.attr('name')] = current.attr('value');
@@ -18,7 +18,10 @@ function updateSelectOptions(relName, selectionProviderIndex) {
         url: postUrl,
         data: data,
         success: function(responseData) {
-            var options = jQuery.parseJSON(responseData);
+            var options = responseData;
+            if('string' === typeof(options)) {
+                options = jQuery.parseJSON(options);
+            }
 
             var selectField = $(selectFieldId);
             var selOptions = selectField.attr('options');
@@ -38,20 +41,21 @@ function updateSelectOptions(relName, selectionProviderIndex) {
     });
 }
 
-function setupAutocomplete(autocompleteId, relName, selectionProviderIndex) {
+function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, methodName) {
     var setupArguments = arguments;
-    var selectFieldId = setupArguments[3 + selectionProviderIndex];
+    var selectFieldId = setupArguments[4 + selectionProviderIndex];
     var autocompleteObj = $(autocompleteId);
+    var selectField = $(selectFieldId);
     autocompleteObj.autocomplete({
         source: function( request, response ) {
             var data = {
                 relName : relName,
                 selectionProviderIndex : selectionProviderIndex,
-                'method:jsonAutocompleteOptions' : '',
                 labelSearch : request.term
             };
-            for (var i = 3; i < setupArguments.length; i++ ) {
-                var currentId = arguments[i];
+            data[methodName] = '';
+            for (var i = 4; i < setupArguments.length; i++ ) {
+                var currentId = setupArguments[i];
                 var current = $(currentId);
                 data[current.attr('name')] = current.attr('value');
             }
@@ -64,12 +68,12 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex) {
                 data: data,
                 success: function( responseData ) {
                     response( $.map( responseData, function( item ) {
-							return {
+                          return {
                                 label: item.l,
                                 value: item.l,
                                 optionValue: item.v
                             };
-						}));
+                        }));
                 },
                 error: function(request, textStatus) {
                     alert(textStatus);
@@ -78,10 +82,14 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex) {
         },
         minLength: 1,
         select: function( event, ui ) {
-            var selectField = $(selectFieldId);
             if (ui.item) {
                 selectField.val(ui.item.optionValue);
             } else {
+                selectField.val("");
+            }
+        },
+        change: function(event, ui) {
+            if (!ui.item) {
                 selectField.val("");
             }
         },

@@ -62,19 +62,17 @@ public class PageLogic {
             valuesList.add(rootPage.getId());
             labelsList.add(rootPage.getTitle() + " (top level)");
         }
+
+        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("pages");
         for (Page page : rootPage.getChildPages()) {
-            recursive(page, null, valuesList, labelsList, includeDetailChildren, excludes);
+            createPagesSelectionProvider(page, null, selectionProvider, includeDetailChildren, excludes);
         }
 
-        String[] values = new String[valuesList.size()];
-        valuesList.toArray(values);
-        String[] labels = new String[labelsList.size()];
-        labelsList.toArray(labels);
-        return DefaultSelectionProvider.create("pages", values, labels);
+        return selectionProvider;
     }
 
-    private static void recursive(Page page, String breadcrumb,
-                           List<String> valuesList, List<String> labelsList,
+    private static void createPagesSelectionProvider(Page page, String breadcrumb,
+                           DefaultSelectionProvider selectionProvider,
                            boolean includeDetailChildren, Page... excludes) {
         if(ArrayUtils.contains(excludes, page)) {
             return;
@@ -85,18 +83,16 @@ public class PageLogic {
         } else {
             pageBreadcrumb = String.format("%s > %s", breadcrumb, page.getTitle());
         }
-        valuesList.add(page.getId());
-        labelsList.add(pageBreadcrumb);
+        selectionProvider.appendRow(page.getId(), pageBreadcrumb, true);
         List<Page> children = page.getChildPages();
         for (Page subPage : children) {
-            recursive(subPage, pageBreadcrumb, valuesList, labelsList, includeDetailChildren, excludes);
+            createPagesSelectionProvider(subPage, pageBreadcrumb, selectionProvider, includeDetailChildren, excludes);
         }
         if(page instanceof CrudPage && includeDetailChildren) {
-            valuesList.add(page.getId() + "-detail");
             pageBreadcrumb += " (detail)";
-            labelsList.add(pageBreadcrumb);
+            selectionProvider.appendRow(page.getId() + "-detail", pageBreadcrumb, true);
             for (Page subPage : ((CrudPage) page).getDetailChildPages()) {
-               recursive(subPage, pageBreadcrumb, valuesList, labelsList, includeDetailChildren, excludes);
+               createPagesSelectionProvider(subPage, pageBreadcrumb, selectionProvider, includeDetailChildren, excludes);
             }
         }
     }

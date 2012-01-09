@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.forms;
 
+import com.manydesigns.elements.annotations.Enabled;
 import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -121,5 +122,16 @@ public class AbstractFormBuilder {
         for (String[] current : removeList) {
             selectionProviders.remove(current);
         }
+    }
+
+    protected boolean isPropertyEnabled(PropertyAccessor propertyAccessor) {
+        // check if field is enabled
+        Enabled enabled = propertyAccessor.getAnnotation(Enabled.class);
+        if(enabled != null && !enabled.value()) {
+        logger.debug("Skipping non-enabled field: {}",
+                propertyAccessor.getName());
+            return false;
+    }
+        return true;
     }
 }

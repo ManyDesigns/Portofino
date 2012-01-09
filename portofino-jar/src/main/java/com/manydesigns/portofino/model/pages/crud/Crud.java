@@ -38,7 +38,6 @@ import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.xml.Identifier;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
@@ -66,7 +65,6 @@ public class Crud implements ModelObject {
     protected final Crud parentCrud;
     protected final List<CrudProperty> properties;
     protected final List<Annotation> annotations;
-    protected final List<Button> buttons;
     protected final List<SelectionProviderReference> selectionProviders;
 
     protected String name;
@@ -79,6 +77,8 @@ public class Crud implements ModelObject {
     protected String variable;
 
     protected boolean largeResultSet;
+
+    protected Integer rowsPerPage;
 
     //**************************************************************************
     // Fields for wire-up
@@ -99,7 +99,6 @@ public class Crud implements ModelObject {
         this.parentCrud = parentCrud;
         properties = new ArrayList<CrudProperty>();
         annotations = new ArrayList<Annotation>();
-        buttons = new ArrayList<Button>();
         selectionProviders = new ArrayList<SelectionProviderReference>();
     }
 
@@ -147,10 +146,6 @@ public class Crud implements ModelObject {
             visitor.visit(annotation);
         }
 
-        for (Button button : buttons) {
-            visitor.visit(button);
-        }
-
         for(SelectionProviderReference ref : selectionProviders) {
             visitor.visit(ref);
         }
@@ -186,13 +181,6 @@ public class Crud implements ModelObject {
         return annotations;
     }
 
-    @XmlElementWrapper(name="buttons")
-    @XmlElement(name="button",type=Button.class)
-    public List<Button> getButtons() {
-        return buttons;
-    }
-
-    @Identifier
     @XmlAttribute(required = true)
     public String getName() {
         return name;
@@ -297,5 +285,18 @@ public class Crud implements ModelObject {
 
     public Table getActualTable() {
         return actualTable;
+    }
+
+    @XmlAttribute(required = false)
+    public Integer getRowsPerPage() {
+        return rowsPerPage;
+    }
+
+    public void setRowsPerPage(Integer rowsPerPage) {
+        this.rowsPerPage = rowsPerPage;
+    }
+
+    public int getActualRowsPerPage() {
+        return getRowsPerPage() != null ? getRowsPerPage() : 10;
     }
 }

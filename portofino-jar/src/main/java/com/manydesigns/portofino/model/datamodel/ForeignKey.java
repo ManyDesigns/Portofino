@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
+import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.util.Pair;
@@ -67,6 +68,7 @@ public class ForeignKey extends DatabaseSelectionProvider
 
     protected String manyPropertyName;
     protected String onePropertyName;
+    protected String toTableName;
 
     //**************************************************************************
     // Fields for wire-up
@@ -74,6 +76,7 @@ public class ForeignKey extends DatabaseSelectionProvider
 
     protected String actualManyPropertyName;
     protected String actualOnePropertyName;
+    protected Table toTable;
 
     //**************************************************************************
     // Logging
@@ -107,9 +110,9 @@ public class ForeignKey extends DatabaseSelectionProvider
     @Override
     public void reset() {
         super.reset();
+        toTable = null;
         actualManyPropertyName = null;
         actualOnePropertyName = null;
-
     }
 
     @Override
@@ -119,6 +122,7 @@ public class ForeignKey extends DatabaseSelectionProvider
         assert fromTable != null;
         assert name != null;
         assert toSchema != null;
+        assert toTableName != null;
 
         if (references.isEmpty()) {
             throw new Error(MessageFormat.format(
@@ -138,10 +142,15 @@ public class ForeignKey extends DatabaseSelectionProvider
     @Override
     public void link(Model model) {
         super.link(model);
+        String qualifiedToTableName =
+                Table.composeQualifiedName(toDatabase, toSchema, toTableName);
+        toTable = DataModelLogic.findTableByQualifiedName(model, qualifiedToTableName);
         if(toTable != null) {
             // wire up Table.oneToManyRelationships
             toTable.getOneToManyRelationships().add(this);
             hql = "from " + toTable.getActualEntityName();
+        } else {
+            logger.warn("Cannot find destination table '{}'", qualifiedToTableName);
         }
     }
 
@@ -215,22 +224,31 @@ public class ForeignKey extends DatabaseSelectionProvider
         return actualManyPropertyName;
     }
 
-    public void setActualManyPropertyName(String actualManyPropertyName) {
-        this.actualManyPropertyName = actualManyPropertyName;
-    }
-
     public String getActualOnePropertyName() {
         return actualOnePropertyName;
-    }
-
-    public void setActualOnePropertyName(String actualOnePropertyName) {
-        this.actualOnePropertyName = actualOnePropertyName;
     }
 
     @Override
     @XmlTransient
     public String getHql() {
         return hql;
+    }
+
+    public Table getToTable() {
+        return toTable;
+    }
+
+    public void setToTable(Table toTable) {
+        this.toTable = toTable;
+    }
+
+    @XmlAttribute(name = "toTable")
+    public String getToTableName() {
+        return toTableName;
+    }
+
+    public void setToTableName(String toTableName) {
+        this.toTableName = toTableName;
     }
 
     //**************************************************************************

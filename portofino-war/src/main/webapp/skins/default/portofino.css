@@ -3,6 +3,18 @@ html {
 }
 
 /*******************************************************************************
+YUI reset/base overrides
+*******************************************************************************/
+
+ol > li {
+    list-style: decimal outside;
+}
+
+ul > li {
+    list-style: disc outside;
+}
+
+/*******************************************************************************
 Links
 *******************************************************************************/
 
@@ -278,9 +290,13 @@ div#sidebar.adminSidebar li li {
 Error/warning/info messages
 *******************************************************************************/
 
+.userMessages {
+    margin-bottom: 1em;
+}
+
 ul.errorMessages, ul.warningMessages, ul.infoMessages {
     margin: 0;
-    padding: 0 0.5em;
+    padding: 12px 0 12px 6px;
     font-weight: normal;
     font-style: italic;
     list-style-type: none;
@@ -288,23 +304,45 @@ ul.errorMessages, ul.warningMessages, ul.infoMessages {
 
 ul.errorMessages li, ul.warningMessages li, ul.infoMessages li {
     list-style-type: none;
+    padding-left: 24px;
 }
 
 ul.errorMessages {
     border: 1px dashed #c00;
     background-color: #fff8f0;
+    background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-cross-24.png");
+    background-repeat: no-repeat;
+    background-position: 4px center;
 }
 
 ul.warningMessages {
     border: 1px dashed #880;
     background-color: #fffff0;
+    background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/warning-24.png");
+    background-repeat: no-repeat;
+    background-position: 4px center;
 }
 
 ul.infoMessages {
     border: 1px dashed #0a0;
     background-color: #f0fff0;
+    background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-check-24.png");
+    background-repeat: no-repeat;
+    background-position: 4px center;
 }
 
+/*******************************************************************************
+Forms
+*******************************************************************************/
+
+.hidden-submit {
+    border: 0 none;
+    height: 0;
+    width: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
 
 /*******************************************************************************
 Inline form errors
@@ -334,7 +372,10 @@ Search form
 
 .search_form {
     overflow: hidden;
-
+    border-bottom: 1px solid #AAAAAA;
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
+    margin-top: 1em;
 }
 
 .search_form th, .search_form td {
@@ -349,10 +390,9 @@ Search form
 }
 
 .search_form ul li {
-    display: block;
+    display: inline-block;
     list-style: none;
     padding-bottom: 0.5em;
-    border-bottom: 1px solid #AAAAAA;
     margin-bottom: 0.5em;
 }
 
@@ -363,17 +403,35 @@ Search form
 }
 
 .search_form legend.attr_name, .search_form label.attr_name {
-    margin: 0;
+    margin-right: 1em;
     padding: 0;
     border: 0 none;
     font-weight: bold;
     font-size: 1em;
+    display: inline;
 }
 
-.search_form label.attr_name {
-    display: block;
+.search_form input, .search_form select {
+    margin-right: 2em;
 }
 
+.mde-boolean-search-field {
+    margin-right: 2em;
+}
+
+.mde-boolean-search-field input {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+.mde-range-search-field {
+    margin-right: 1em;
+}
+
+.mde-range-search-field input {
+    margin-left: 1em;
+    margin-right: 1em;
+}
 
 .search_form table.range {
     border-collapse: collapse;
@@ -407,6 +465,10 @@ Search form
 
 .searchFormButtons {
     margin-top: 1em;
+}
+
+.yui-skin-sam .yui-dt table {
+    width: 100%;
 }
 
 /*******************************************************************************
@@ -462,6 +524,10 @@ div#content-login {
     margin: 12em auto;
     width: 400px;
     background-color: white;
+}
+
+div#content-login .userMessages {
+    margin-bottom: 0;
 }
 
 .loginTable {
@@ -520,6 +586,7 @@ table.mde-form-table th {
 .horizontalSeparator {
     border-top: 1px solid #eeeeee;
     margin: 1.5em 0;
+    clear: both;
 }
 
 .attachment {
@@ -574,13 +641,12 @@ li.group, li.groupPlaceholder {
     margin-bottom: 0.5em;
 }
 
-.inheritedPermission {
-    margin: 1em 0;
-    border-left: 1px solid black;
-    padding-left: 1em;
-}
+/*******************************************************************************
+Permissions
+*******************************************************************************/
 
-.inheritedPermission .inheritedPageName {
-    font-weight: bold;
-    color: #555;
+table#userPermissionTestResults th,
+table#userPermissionTestResults td {
+    border: none;
+    text-align: left;
 }

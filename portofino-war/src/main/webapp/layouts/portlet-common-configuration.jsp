@@ -8,9 +8,7 @@
         </h1>
     </div>
     <div class="portletHeaderButtons">
-        <stripes:layout-component name="portletHeaderButtons">
-            <portofino:buttons list="portletHeaderButtons" />
-        </stripes:layout-component>
+        <stripes:layout-component name="portletHeaderButtons"></stripes:layout-component>
     </div>
 </div>
 <div class="portletHeaderSeparator"></div>

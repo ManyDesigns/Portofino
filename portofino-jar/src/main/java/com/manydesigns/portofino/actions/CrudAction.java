@@ -51,6 +51,7 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.actions.forms.CrudPropertyEdit;
 import com.manydesigns.portofino.actions.forms.CrudSelectionProviderEdit;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.TableCriteria;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
@@ -67,16 +68,11 @@ import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import com.manydesigns.portofino.model.pages.crud.SelectionProviderReference;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import com.manydesigns.portofino.system.model.users.annotations.SupportsPermissions;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
-import groovy.lang.Binding;
-import groovy.lang.GroovyObject;
-import groovy.lang.MissingMethodException;
-import groovy.lang.Script;
 import jxl.Workbook;
 import jxl.write.DateFormat;
 import jxl.write.*;
@@ -91,7 +87,6 @@ import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.fop.apps.FOPException;
@@ -109,7 +104,6 @@ import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.lang.Boolean;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.*;
@@ -125,7 +119,7 @@ import java.util.regex.Pattern;
 @UrlBinding("/actions/crud")
 @SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
 @RequiresPermissions(level = AccessLevel.VIEW)
-public class CrudAction extends PortletAction {
+public class CrudAction extends PortletAction implements PageRealizationAware {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -154,6 +148,15 @@ public class CrudAction extends PortletAction {
     public String successReturnUrl;
     public Integer firstResult;
     public Integer maxResults;
+    public String sortProperty;
+    public String sortDirection;
+    public boolean searchVisible;
+
+    //Selection providers
+    protected String relName;
+    protected int selectionProviderIndex;
+    protected String selectFieldMode;
+    protected String labelSearch;
 
     //--------------------------------------------------------------------------
     // UI forms
@@ -171,6 +174,22 @@ public class CrudAction extends PortletAction {
     public Object object;
     public Session session;
 
+    //--------------------------------------------------------------------------
+    // Scripting
+    //--------------------------------------------------------------------------
+
+    public static final String SCRIPT_TEMPLATE;
+
+    static {
+        String scriptTemplate;
+        try {
+            scriptTemplate = IOUtils.toString(CrudAction.class.getResourceAsStream("crud/script_template.txt"));
+        } catch (Exception e) {
+            scriptTemplate = null;
+        }
+        SCRIPT_TEMPLATE = scriptTemplate;
+    }
+
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -184,14 +203,6 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
     private static final String TEMPLATE_FOP_SEARCH = "templateFOP-Search.xsl";
     private static final String TEMPLATE_FOP_READ = "templateFOP-Read.xsl";
-
-    //**************************************************************************
-    // Scripting
-    //**************************************************************************
-
-    protected GroovyObject groovyObject;
-    protected String script;
-    protected File storageDirFile;
 
     //**************************************************************************
     // Setup
@@ -216,42 +227,12 @@ public class CrudAction extends PortletAction {
 
             setupSelectionProviders();
         }
-
-        storageDirFile = application.getAppStorageDir();
-
-        if(script == null) {
-            prepareScript();
-        }
-    }
-
-    protected void prepareScript() {
-        File file = ScriptingUtil.getGroovyScriptFile(storageDirFile, crudPage.getId());
-        if(file.exists()) {
-            try {
-                FileReader fr = new FileReader(file);
-                script = IOUtils.toString(fr);
-                IOUtils.closeQuietly(fr);
-                String path = file.getAbsolutePath();
-                groovyObject = compileScript(script, path);
-            } catch (Exception e) {
-                logger.warn("Couldn't load script for crud page " + crudPage.getId(), e);
-            }
-        }
-    }
-
-    protected GroovyObject compileScript(String script, String path) {
-        GroovyObject groovyObject = ScriptingUtil.getGroovyObject(script, path);
-        Script scriptObject = (Script) groovyObject;
-        Binding binding = new Binding(ElementsThreadLocals.getOgnlContext());
-        binding.setVariable("actionBean", this);
-        scriptObject.setBinding(binding);
-        return groovyObject;
     }
 
     private void setupSelectionProviders() {
         Set<String> configuredSPs = new HashSet<String>();
         for(SelectionProviderReference ref : crud.getSelectionProviders()) {
-            boolean added = false;
+            boolean added;
             if(ref.getForeignKey() != null) {
                 added = setupSelectionProvider(ref, ref.getForeignKey(), configuredSPs);
             } else if(ref.getSelectionProvider() instanceof DatabaseSelectionProvider) {
@@ -277,7 +258,6 @@ public class CrudAction extends PortletAction {
                     setupSelectionProvider(null, (DatabaseSelectionProvider) dsp, configuredSPs);
                 } else {
                     logger.error("Unsupported selection provider: " + dsp);
-                    continue;
                 }
             }
         }
@@ -295,8 +275,7 @@ public class CrudAction extends PortletAction {
         int i = 0;
         for (Reference reference : references) {
             Column column = reference.getActualFromColumn();
-            String propertyName = column.getPropertyName();
-            fieldNames[i] = propertyName != null ? propertyName : column.getColumnName();
+            fieldNames[i] = column.getActualPropertyName();
             fieldTypes[i] = column.getActualJavaType();
             i++;
         }
@@ -309,21 +288,18 @@ public class CrudAction extends PortletAction {
             }
         }
 
-        SelectionProvider selectionProvider;
-
         if(ref == null || ref.isEnabled()) {
             DisplayMode dm = ref != null ? ref.getDisplayMode() : DisplayMode.DROPDOWN;
-            selectionProvider = createSelectionProvider
+            SelectionProvider selectionProvider = createSelectionProvider
                     (current, fieldNames, fieldTypes, dm);
-        } else {
-            selectionProvider = null;
-        }
-
-        CrudSelectionProvider crudSelectionProvider =
+            CrudSelectionProvider crudSelectionProvider =
                 new CrudSelectionProvider(selectionProvider, fieldNames);
-        crudSelectionProviders.add(crudSelectionProvider);
-        Collections.addAll(configuredSPs, fieldNames);
-        return true;
+            crudSelectionProviders.add(crudSelectionProvider);
+            Collections.addAll(configuredSPs, fieldNames);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     protected SelectionProvider createSelectionProvider
@@ -338,8 +314,7 @@ public class CrudAction extends PortletAction {
         if (sql != null) {
             Session session = application.getSession(databaseName);
             Collection<Object[]> objects = QueryUtils.runSql(session, sql);
-            selectionProvider = DefaultSelectionProvider.create(
-                    name, fieldNames.length, fieldTypes, objects);
+            selectionProvider = createSelectionProvider(name, fieldNames.length, fieldTypes, objects);
             selectionProvider.setDisplayMode(dm);
         } else if (hql != null) {
             Database database = DataModelLogic.findDatabaseByName(model, databaseName);
@@ -358,8 +333,8 @@ public class CrudAction extends PortletAction {
                 };
             }
 
-            selectionProvider = DefaultSelectionProvider.create(
-                    name, objects, tableAccessor, textFormats);
+            selectionProvider = createSelectionProvider
+                    (name, objects, tableAccessor.getKeyProperties(), textFormats);
             selectionProvider.setDisplayMode(dm);
         } else {
             logger.warn("ModelSelection provider '{}':" +
@@ -378,7 +353,7 @@ public class CrudAction extends PortletAction {
             if(isEmbedded()) {
                 return embeddedSearch();
             } else {
-                return search();
+                return doSearch();
             }
         } else {
             return read();
@@ -389,11 +364,19 @@ public class CrudAction extends PortletAction {
     // Search
     //**************************************************************************
 
-    @Button(list = "crud-search-form", key = "commons.search", order = 1)
+    @Buttons({
+        @Button(list = "crud-search-form", key = "commons.search", order = 1),
+        @Button(list = "portlet-default-button", key = "commons.search")
+    })
     public Resolution search() {
+        searchVisible = true;
+        return doSearch();
+    }
+
+    protected Resolution doSearch() {
         cancelReturnUrl = new UrlBuilder(
-                    Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
-                    .addParameter("searchString", searchString)
+                    context.getLocale(), dispatch.getAbsoluteOriginalPath(), false)
+                    .addParameter(SEARCH_STRING_PARAM, searchString)
                     .toString();
         setupReturnToParentTarget();
 
@@ -407,11 +390,8 @@ public class CrudAction extends PortletAction {
 //            loadObjects();
             setupTableForm(Mode.VIEW);
 
-            String fwd = crudPage.getSearchUrl();
-            if(StringUtils.isEmpty(fwd)) {
-                fwd = "/layouts/crud/search.jsp";
-            }
-            return forwardToPortletPage(fwd);
+
+            return getSearchView();
         } catch(Exception e) {
             logger.warn("Crud not correctly configured", e);
             return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
@@ -428,11 +408,7 @@ public class CrudAction extends PortletAction {
             loadObjects();
             setupTableForm(Mode.VIEW);
             tableForm.setSelectable(false);
-            String fwd = crudPage.getEmbeddedSearchUrl();
-            if(StringUtils.isEmpty(fwd)) {
-                fwd = "/layouts/crud/embedded-search.jsp";
-            }
-            return new ForwardResolution(fwd);
+            return getEmbeddedSearchView();
         } catch(Exception e) {
             logger.error("Crud not correctly configured", e);
             return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
@@ -506,7 +482,7 @@ public class CrudAction extends PortletAction {
 
     @Button(list = "crud-search-form", key = "commons.resetSearch", order = 2)
     public Resolution resetSearch() {
-        return new RedirectResolution(dispatch.getOriginalPath());
+        return new RedirectResolution(dispatch.getOriginalPath()).addParameter("searchVisible", true);
     }
 
     //**************************************************************************
@@ -526,16 +502,12 @@ public class CrudAction extends PortletAction {
 
         cancelReturnUrl = new UrlBuilder(
                 Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
-                .addParameter("searchString", searchString)
+                .addParameter(SEARCH_STRING_PARAM, searchString)
                 .toString();
 
         setupReturnToParentTarget();
 
-        String fwd = crudPage.getReadUrl();
-        if(StringUtils.isEmpty(fwd)) {
-            fwd = "/layouts/crud/read.jsp";
-        }
-        return forwardToPortletPage(fwd);
+        return getReadView();
     }
 
     protected void refreshBlobDownloadHref() {
@@ -593,15 +565,7 @@ public class CrudAction extends PortletAction {
         createSetup(object);
         form.readFromObject(object);
 
-        return forwardToCreatePage();
-    }
-
-    protected Resolution forwardToCreatePage() {
-        String fwd = crudPage.getCreateUrl();
-        if(StringUtils.isEmpty(fwd)) {
-            fwd = "/layouts/crud/create.jsp";
-        }
-        return new ForwardResolution(fwd);
+        return getCreateView();
     }
 
     @Button(list = "crud-create", key = "commons.save", order = 1)
@@ -624,7 +588,7 @@ public class CrudAction extends PortletAction {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
                     SessionMessages.addErrorMessage(rootCauseMessage);
-                    return forwardToCreatePage();
+                    return getCreateView();
                 }
                 pk = pkHelper.generatePkString(object);
                 String url = dispatch.getOriginalPath() + "/" + pk;
@@ -632,7 +596,7 @@ public class CrudAction extends PortletAction {
             }
         }
 
-        return forwardToCreatePage();
+        return getCreateView();
     }
 
     //**************************************************************************
@@ -645,15 +609,7 @@ public class CrudAction extends PortletAction {
         setupForm(Mode.EDIT);
         editSetup(object);
         form.readFromObject(object);
-        return forwardToEditPage();
-    }
-
-    protected Resolution forwardToEditPage() {
-        String fwd = crudPage.getEditUrl();
-        if(StringUtils.isEmpty(fwd)) {
-            fwd = "/layouts/crud/edit.jsp";
-        }
-        return new ForwardResolution(fwd);
+        return getEditView();
     }
 
     @Button(list = "crud-edit", key = "commons.update", order = 1)
@@ -674,14 +630,14 @@ public class CrudAction extends PortletAction {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
                     SessionMessages.addErrorMessage(rootCauseMessage);
-                    return forwardToEditPage();
+                    return getEditView();
                 }
-                SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
+                SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
                 return new RedirectResolution(dispatch.getOriginalPath())
                         .addParameter(SEARCH_STRING_PARAM, searchString);
             }
         }
-        return forwardToEditPage();
+        return getEditView();
     }
 
     //**************************************************************************
@@ -707,11 +663,7 @@ public class CrudAction extends PortletAction {
 
         setupForm(Mode.BULK_EDIT);
 
-        String fwd = crudPage.getBulkEditUrl();
-        if(StringUtils.isEmpty(fwd)) {
-            fwd = "/layouts/crud/bulk-edit.jsp";
-        }
-        return new ForwardResolution(fwd);
+        return getBulkEditView();
     }
 
     @Button(list = "crud-bulk-edit", key = "commons.update", order = 1)
@@ -722,8 +674,12 @@ public class CrudAction extends PortletAction {
         if (form.validate()) {
             for (String current : selection) {
                 loadObject(current);
+                editSetup(object);
                 form.writeToObject(object);
-                session.update(baseTable.getActualEntityName(), object);
+                if(editValidate(object)) {
+                    session.update(baseTable.getActualEntityName(), object);
+                }
+                editPostProcess(object);
             }
             try {
                 session.getTransaction().commit();
@@ -750,17 +706,20 @@ public class CrudAction extends PortletAction {
     @Button(list = "crud-read", key = "commons.delete", order = 2)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution delete() {
-        session.delete(baseTable.getActualEntityName(), object);
-        try {
-            session.getTransaction().commit();
-            SessionMessages.addInfoMessage("DELETE avvenuto con successo");
+        if(deleteValidate(object)) {
+            session.delete(baseTable.getActualEntityName(), object);
+            try {
+                deletePostProcess(object);
+                session.getTransaction().commit();
+                SessionMessages.addInfoMessage(getMessage("commons.delete.successful"));
 
-            // invalidate the pk on this crud unit
-            pk = null;
-        } catch (Exception e) {
-            String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-            logger.debug(rootCauseMessage, e);
-            SessionMessages.addErrorMessage(rootCauseMessage);
+                // invalidate the pk on this crud unit
+                pk = null;
+            } catch (Exception e) {
+                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                logger.debug(rootCauseMessage, e);
+                SessionMessages.addErrorMessage(rootCauseMessage);
+            }
         }
         int lastSlashPos = dispatch.getOriginalPath().lastIndexOf("/");
         String url = dispatch.getOriginalPath().substring(0, lastSlashPos);
@@ -771,6 +730,7 @@ public class CrudAction extends PortletAction {
     @Button(list = "crud-search", key = "commons.delete", order = 3)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution bulkDelete() {
+        int deleted = 0;
         if (selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
@@ -780,13 +740,17 @@ public class CrudAction extends PortletAction {
         for (String current : selection) {
             Serializable pkObject = pkHelper.parsePkString(current);
             Object obj = QueryUtils.getObjectByPk(application, baseTable, pkObject);
-            session.delete(baseTable.getActualEntityName(), obj);
+            if(deleteValidate(obj)) {
+                session.delete(baseTable.getActualEntityName(), obj);
+                deletePostProcess(obj);
+                deleted++;
+            }
         }
         try {
             session.getTransaction().commit();
             SessionMessages.addInfoMessage(MessageFormat.format(
             "DELETE di {0} oggetti avvenuto con successo",
-            selection.length));
+            deleted));
         } catch (Exception e) {
             logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
             SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
@@ -808,26 +772,43 @@ public class CrudAction extends PortletAction {
     // Return to parent
     //**************************************************************************
 
+
+    @Override
+    public void setupReturnToParentTarget() {
+        if (CrudPage.MODE_DETAIL.equals(getPageInstance().getMode())) {
+            returnToParentTarget = "search";
+        } else {
+            super.setupReturnToParentTarget();
+        }
+    }
+
     public Resolution returnToParent() {
-        PageInstance[] pageInstancePath =
-                dispatch.getPageInstancePath();
-        int previousPos = pageInstancePath.length - 2;
         RedirectResolution resolution;
-        if (previousPos >= 0) {
-            PageInstance previousPageInstance = pageInstancePath[previousPos];
-            if (previousPageInstance instanceof CrudPageInstance) {
-                String url = dispatch.getPathUrl(previousPos + 1);
-                resolution = new RedirectResolution(url, true);
+        if (CrudPage.MODE_DETAIL.equals(getPageInstance().getMode())) {
+            resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
+            if(!StringUtils.isEmpty(searchString)) {
+                resolution.addParameter(SEARCH_STRING_PARAM, searchString);
+            }
+        } else {
+            PageInstance[] pageInstancePath =
+                    dispatch.getPageInstancePath();
+            int previousPos = pageInstancePath.length - 2;
+            if (previousPos >= 0) {
+                PageInstance previousPageInstance = pageInstancePath[previousPos];
+                if (previousPageInstance instanceof CrudPageInstance) {
+                    String url = dispatch.getPathUrl(previousPos + 1);
+                    resolution = new RedirectResolution(url, true);
+                } else {
+                    resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
+                    if(!StringUtils.isEmpty(searchString)) {
+                        resolution.addParameter(SEARCH_STRING_PARAM, searchString);
+                    }
+                }
             } else {
                 resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
                 if(!StringUtils.isEmpty(searchString)) {
-                    resolution.addParameter("searchString", searchString);
+                    resolution.addParameter(SEARCH_STRING_PARAM, searchString);
                 }
-            }
-        } else {
-            resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
-            if(!StringUtils.isEmpty(searchString)) {
-                resolution.addParameter("searchString", searchString);
             }
         }
 
@@ -840,7 +821,8 @@ public class CrudAction extends PortletAction {
         @Button(list = "crud-create", key = "commons.cancel", order = 99),
         @Button(list = "crud-bulk-edit", key = "commons.cancel", order = 99),
         @Button(list = "page-permissions-edit", key = "commons.cancel", order = 99),
-        @Button(list = "configuration", key = "commons.cancel", order = 99)
+        @Button(list = "configuration", key = "commons.cancel", order = 99),
+        @Button(list = "page-create", key = "commons.cancel", order = 99)
     })
     public Resolution cancel() {
         return super.cancel();
@@ -850,21 +832,34 @@ public class CrudAction extends PortletAction {
     // Ajax
     //**************************************************************************
 
-    public String jsonOptions(String selectionProviderName,
-                              int selectionProviderIndex,
-                              String labelSearch,
-                              boolean includeSelectPrompt) {
+    public Resolution jsonSelectFieldOptions() {
+        return jsonOptions(prefix, true);
+    }
+
+    public Resolution jsonSelectFieldSearchOptions() {
+        return jsonOptions(searchPrefix, true);
+    }
+
+    public Resolution jsonAutocompleteOptions() {
+        return jsonOptions(prefix, false);
+    }
+
+    public Resolution jsonAutocompleteSearchOptions() {
+        return jsonOptions(searchPrefix, false);
+    }
+
+    protected Resolution jsonOptions(String prefix, boolean includeSelectPrompt) {
         CrudSelectionProvider crudSelectionProvider = null;
         for (CrudSelectionProvider current : crudSelectionProviders) {
             SelectionProvider selectionProvider =
                     current.getSelectionProvider();
-            if (selectionProvider.getName().equals(selectionProviderName)) {
+            if (selectionProvider.getName().equals(relName)) {
                 crudSelectionProvider = current;
                 break;
             }
         }
         if (crudSelectionProvider == null) {
-            return "ActionSupport.ERROR";
+            return new ErrorResolution(500);
         }
 
         SelectionProvider selectionProvider =
@@ -877,15 +872,21 @@ public class CrudAction extends PortletAction {
                 .configPrefix(prefix)
                 .configMode(Mode.EDIT)
                 .build();
+
+        FieldSet fieldSet = form.get(0);
+        //Ensure the value is actually read from the request
+        for(Field field : fieldSet) {
+            field.setUpdatable(true);
+        }
         form.readFromRequest(context.getRequest());
 
         SelectField targetField =
-                (SelectField) form.get(0).get(selectionProviderIndex);
+                (SelectField) fieldSet.get(selectionProviderIndex);
         targetField.setLabelSearch(labelSearch);
 
         String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
-        logger.debug("jsonSelectFieldOptions: {}", text);
-        return text;
+        logger.debug("jsonOptions: {}", text);
+        return new NoCacheStreamingResolution("application/json", text);
     }
 
 
@@ -932,7 +933,7 @@ public class CrudAction extends PortletAction {
         String objPk = pkHelper.generatePkString(o);
         return new UrlBuilder(
                 Locale.getDefault(), baseUrl + "/" + objPk, false)
-                .addParameter("searchString", searchString)
+                .addParameter(SEARCH_STRING_PARAM, searchString)
                 .toString();
     }
 
@@ -948,21 +949,6 @@ public class CrudAction extends PortletAction {
                 continue;
             }
             String[] fieldNames = current.getFieldNames();
-            /*
-            //Include only searchable fields
-            List<String> actualFieldNames = new ArrayList<String>();
-            for(PropertyAccessor p : classAccessor.getProperties()) {
-                if(ArrayUtils.contains(fieldNames, p.getName())) {
-                    Searchable searchable = p.getAnnotation(Searchable.class);
-                    if(searchable != null && searchable.value()) {
-                        actualFieldNames.add(p.getName());
-                    }
-                }
-            }
-            if(!actualFieldNames.isEmpty()) {
-                String[] actualFieldNamesArr = actualFieldNames.toArray(new String[actualFieldNames.size()]);
-                searchFormBuilder.configSelectionProvider(selectionProvider, actualFieldNamesArr);
-            }*/
             searchFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
 
@@ -1007,6 +993,23 @@ public class CrudAction extends PortletAction {
                 continue;
             }
             String[] fieldNames = current.getFieldNames();
+            if(object != null) {
+                Object[] values = new Object[fieldNames.length];
+                boolean valuesRead = true;
+                for(int i = 0; i < fieldNames.length; i++) {
+                    String fieldName = fieldNames[i];
+                    try {
+                        PropertyAccessor propertyAccessor = classAccessor.getProperty(fieldName);
+                        values[i] = propertyAccessor.get(object);
+                    } catch (Exception e) {
+                        logger.error("Couldn't read property " + fieldName, e);
+                        valuesRead = false;
+                    }
+                }
+                if(valuesRead) {
+                    selectionProvider.ensureActive(values);
+                }
+            }
             formBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
 
@@ -1048,11 +1051,32 @@ public class CrudAction extends PortletAction {
             nRows = objects.size();
         }
 
-        tableForm = tableFormBuilder
+        tableFormBuilder
                 .configPrefix(prefix)
                 .configNRows(nRows)
                 .configMode(mode)
-                .build();
+                .configReflectiveFields();
+
+        boolean isShowingKey = false;
+        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
+            if(tableFormBuilder.isPropertyVisible(property)) {
+                isShowingKey = true;
+                break;
+            }
+        }
+
+        if(!isShowingKey) {
+            for (PropertyAccessor property : classAccessor.getProperties()) {
+                if(tableFormBuilder.isPropertyVisible(property)) {
+                    tableFormBuilder.configHrefTextFormat(
+                        property.getName(), hrefFormat);
+                    break;
+                }
+            }
+        }
+
+        tableForm = tableFormBuilder.build();
+
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
         boolean selectable = false;
         selectable = selectable || SecurityLogic.hasPermissions(context.getRequest(), null, PERMISSION_EDIT);
@@ -1086,6 +1110,16 @@ public class CrudAction extends PortletAction {
         return sb.toString();
     }
 
+    //**************************************************************************
+    // Page realization
+    //**************************************************************************
+
+    public Resolution pageRealizationFailed(ActionBeanContext context, Application application) {
+        Locale locale = context.getLocale();
+        ResourceBundle resourceBundle = application.getBundle(locale);
+        SessionMessages.addWarningMessage(resourceBundle.getString("crud.notInUseCase"));
+        return new ForwardResolution("/layouts/crud/notInUseCase.jsp");
+    }
 
     //**************************************************************************
     // Object loading
@@ -1101,12 +1135,20 @@ public class CrudAction extends PortletAction {
             }
             String databaseName = crud.getActualTable().getDatabaseName();
             Session session = application.getSession(databaseName);
+            if(!StringUtils.isBlank(sortProperty) && !StringUtils.isBlank(sortDirection)) {
+                try {
+                    PropertyAccessor orderByProperty = classAccessor.getProperty(sortProperty);
+                    criteria.orderBy(orderByProperty, sortDirection);
+                } catch (NoSuchFieldException e) {
+                    logger.error("Can't order by " + sortProperty + ", property accessor not found", e);
+                }
+            }
             objects = QueryUtils.getObjects(session,
                     crud.getQuery(), criteria, this, firstResult, maxResults);
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
             logger.warn("Incorrect Field Type", e);
-            SessionMessages.addWarningMessage("Incorrect Field Type");
+            SessionMessages.addWarningMessage(getMessage("crud.incorrectFieldType"));
         }
     }
 
@@ -1119,10 +1161,26 @@ public class CrudAction extends PortletAction {
     // ExportSearch
     //**************************************************************************
 
+    @Button(list = "crud-search", key = "commons.exportExcel", order = 5)
+    public Resolution exportSearchExcel() {
+        try {
+            File tmpFile = File.createTempFile(crud.getName(), ".search.xls");
+            exportSearchExcel(tmpFile);
+            FileInputStream fileInputStream = new FileInputStream(tmpFile);
+            tmpFile.deleteOnExit();
+            return new StreamingResolution("application/vnd.ms-excel", fileInputStream)
+                    .setFilename(crud.getSearchTitle() + ".xls");
+        } catch (Exception e) {
+            logger.error("Excel export failed", e);
+            SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
+    }
+
     public void exportSearchExcel(File fileTemp) {
         setupSearchForm();
         loadObjects();
-//        setupTableForm(Mode.VIEW);
+        setupTableForm(Mode.VIEW);
 
         writeFileSearchExcel(fileTemp);
     }
@@ -1134,7 +1192,7 @@ public class CrudAction extends PortletAction {
             WritableSheet sheet =
                     workbook.createSheet(crud.getSearchTitle(), 0);
 
-            addHeaderToSheet(sheet);
+            addHeaderToSearchSheet(sheet);
 
             int i = 1;
             for ( TableForm.Row row : tableForm.getRows()) {
@@ -1168,70 +1226,106 @@ public class CrudAction extends PortletAction {
     // ExportRead
     //**************************************************************************
 
-    public void exportReadExcel(WritableWorkbook workbook)
+    @Button(list = "crud-read", key = "commons.exportExcel", order = 4)
+    public Resolution exportReadExcel() {
+        try {
+            File tmpFile = File.createTempFile(crud.getName(), ".read.xls");
+            exportReadExcel(tmpFile);
+            FileInputStream fileInputStream = new FileInputStream(tmpFile);
+            tmpFile.deleteOnExit();
+            return new StreamingResolution("application/vnd.ms-excel", fileInputStream)
+                    .setFilename(crud.getReadTitle() + ".xls");
+        } catch (Exception e) {
+            logger.error("Excel export failed", e);
+            SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
+    }
+
+    public void exportReadExcel(File tempFile)
             throws IOException, WriteException {
         setupSearchForm();
 
         loadObjects();
 
-//        setupTableForm(Mode.VIEW);
         setupForm(Mode.VIEW);
         form.readFromObject(object);
 
-        writeFileReadExcel(workbook);
+        writeFileReadExcel(tempFile);
     }
 
-
-    private void writeFileReadExcel(WritableWorkbook workbook)
+    private void writeFileReadExcel(File fileTemp)
             throws IOException, WriteException {
-        WritableSheet sheet =
+        WritableWorkbook workbook = null;
+        try {
+            workbook = Workbook.createWorkbook(fileTemp);
+            WritableSheet sheet =
                 workbook.createSheet(crud.getReadTitle(),
                         workbook.getNumberOfSheets());
 
-        addHeaderToSheet(sheet);
+            addHeaderToReadSheet(sheet);
 
-        int i = 1;
-        for (FieldSet fieldset : form) {
-            int j = 0;
-            for (Field field : fieldset) {
-                addFieldToCell(sheet, i, j, field);
-                j++;
-            }
-            i++;
-        }
-
-        /*
-        ValueStack valueStack = Struts2Utils.getValueStack();
-        valueStack.push(object);
-
-        //Aggiungo le relazioni/sheet
-        WritableCellFormat formatCell = headerExcel();
-        for (CrudUnit subCrudUnit: subCrudUnits) {
-            subCrudUnit.setupSearchForm();
-            subCrudUnit.loadObjects();
-            subCrudUnit.setupTableForm(Mode.VIEW);
-
-            sheet = workbook.createSheet(subCrudUnit.searchTitle ,
-                    workbook.getNumberOfSheets());
-
-            int m = 0;
-            for (TableForm.Column col : subCrudUnit.tableForm.getColumns()) {
-                sheet.addCell(new Label(m, 0, col.getLabel(), formatCell));
-                m++;
-            }
-            int k = 1;
-            for (TableForm.Row row : subCrudUnit.tableForm.getRows()) {
+            int i = 1;
+            for (FieldSet fieldset : form) {
                 int j = 0;
-                for (Field field : Arrays.asList(row.getFields())) {
-                    addFieldToCell(sheet, k, j, field);
+                for (Field field : fieldset) {
+                    addFieldToCell(sheet, i, j, field);
                     j++;
                 }
-                k++;
+                i++;
+            }
+
+            /*
+            ValueStack valueStack = Struts2Utils.getValueStack();
+            valueStack.push(object);
+
+            //Aggiungo le relazioni/sheet
+            WritableCellFormat formatCell = headerExcel();
+            for (CrudUnit subCrudUnit: subCrudUnits) {
+                subCrudUnit.setupSearchForm();
+                subCrudUnit.loadObjects();
+                subCrudUnit.setupTableForm(Mode.VIEW);
+
+                sheet = workbook.createSheet(subCrudUnit.searchTitle ,
+                        workbook.getNumberOfSheets());
+
+                int m = 0;
+                for (TableForm.Column col : subCrudUnit.tableForm.getColumns()) {
+                    sheet.addCell(new Label(m, 0, col.getLabel(), formatCell));
+                    m++;
+                }
+                int k = 1;
+                for (TableForm.Row row : subCrudUnit.tableForm.getRows()) {
+                    int j = 0;
+                    for (Field field : Arrays.asList(row.getFields())) {
+                        addFieldToCell(sheet, k, j, field);
+                        j++;
+                    }
+                    k++;
+                }
+            }
+            valueStack.pop();
+            */
+            workbook.write();
+        } catch (IOException e) {
+            logger.warn("IOException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } catch (RowsExceededException e) {
+            logger.warn("RowsExceededException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } catch (WriteException e) {
+            logger.warn("WriteException", e);
+            SessionMessages.addErrorMessage(e.getMessage());
+        } finally {
+            try {
+                if (workbook != null)
+                    workbook.close();
+            }
+            catch (Exception e) {
+                logger.warn("IOException", e);
+                SessionMessages.addErrorMessage(e.getMessage());
             }
         }
-        valueStack.pop();
-        */
-        workbook.write();
     }
 
 
@@ -1251,7 +1345,18 @@ public class CrudAction extends PortletAction {
     }
 
 
-    private void addHeaderToSheet(WritableSheet sheet) throws WriteException {
+    private void addHeaderToReadSheet(WritableSheet sheet) throws WriteException {
+        WritableCellFormat formatCell = headerExcel();
+        int i = 0;
+        for (FieldSet fieldset : form) {
+            for (Field field : fieldset) {
+                sheet.addCell(new jxl.write.Label(i, 0, field.getLabel(), formatCell));
+                i++;
+            }
+        }
+    }
+
+    private void addHeaderToSearchSheet(WritableSheet sheet) throws WriteException {
         WritableCellFormat formatCell = headerExcel();
         int l = 0;
         for (TableForm.Column col : tableForm.getColumns()) {
@@ -1313,6 +1418,22 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
     // exportSearchPdf
     //**************************************************************************
+
+    @Button(list = "crud-search", key = "commons.exportPdf", order = 4)
+    public Resolution exportSearchPdf() {
+        try {
+            File tmpFile = File.createTempFile(crud.getName(), ".search.pdf");
+            exportSearchPdf(tmpFile);
+            FileInputStream fileInputStream = new FileInputStream(tmpFile);
+            tmpFile.deleteOnExit();
+            return new StreamingResolution("application/pdf", fileInputStream)
+                    .setFilename(crud.getSearchTitle() + ".pdf");
+        } catch (Exception e) {
+            logger.error("PDF export failed", e);
+            SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
+    }
 
     public void exportSearchPdf(File tempPdfFile) throws FOPException,
             IOException, TransformerException {
@@ -1447,46 +1568,6 @@ public class CrudAction extends PortletAction {
             xb.closeElement("tableData");
         }
 
-        /*
-        ValueStack valueStack = Struts2Utils.getValueStack();
-        valueStack.push(object);
-
-        //Aggiungo le relazioni
-        for (CrudUnit subCrudUnit: subCrudUnits) {
-            xb.openElement("tablerel");
-            subCrudUnit.setupSearchForm();
-            subCrudUnit.loadObjects();
-            subCrudUnit.setupTableForm(Mode.VIEW);
-
-            xb.openElement("nametablerel");
-            xb.write(subCrudUnit.searchTitle);
-            xb.closeElement("nametablerel");
-
-            //stampo header
-            for (TableForm.Column col : subCrudUnit.tableForm.getColumns()) {
-                xb.openElement("headerrel");
-                xb.openElement("nameColumn");
-                xb.write(col.getLabel());
-                xb.closeElement("nameColumn");
-                xb.closeElement("headerrel");
-            }
-
-            for (TableForm.Row row : subCrudUnit.tableForm.getRows()) {
-                xb.openElement("rowsrel");
-                for (Field field : Arrays.asList(row.getFields())) {
-                    xb.openElement("rowrel");
-                    xb.openElement("value");
-                    xb.write(field.getStringValue());
-                    xb.closeElement("value");
-                    xb.closeElement("rowrel");
-                }
-                xb.closeElement("rowsrel");
-            }
-            xb.closeElement("tablerel");
-        }
-        valueStack.pop();
-        */
-
         xb.closeElement("class");
         return xb;
     }
@@ -1546,63 +1627,78 @@ public class CrudAction extends PortletAction {
         }
     }
 
+    @Button(list = "crud-read", key = "commons.exportPdf", order = 3)
+    public Resolution exportReadPdf() {
+        try {
+            File tmpFile = File.createTempFile(crud.getName(), ".read.pdf");
+            exportReadPdf(tmpFile);
+            FileInputStream fileInputStream = new FileInputStream(tmpFile);
+            tmpFile.deleteOnExit();
+            return new StreamingResolution("application/pdf", fileInputStream)
+                    .setFilename(crud.getReadTitle() + ".pdf");
+        } catch (Exception e) {
+            logger.error("PDF export failed", e);
+            SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
+    }
+
     //**************************************************************************
     // Hooks/scripting
     //**************************************************************************
 
-    protected void createSetup(Object object) {
-        String methodName = "createSetup";
-        Object methodArgs = new Object[] { object };
-        invokeGroovyMethod(methodName, methodArgs);
+    @Override
+    public String getScriptTemplate() {
+        return SCRIPT_TEMPLATE;
     }
+
+    protected void createSetup(Object object) {}
 
     protected boolean createValidate(Object object) {
-        String methodName = "createValidate";
-        Object methodArgs = new Object[] { object };
-        return invokeBooleanGroovyMethod(methodName, methodArgs);
+        return true;
     }
 
-    protected void createPostProcess(Object object) {
-        String methodName = "createPostProcess";
-        Object methodArgs = new Object[] { object };
-        invokeGroovyMethod(methodName, methodArgs);
-    }
+    protected void createPostProcess(Object object) {}
 
-    protected void editSetup(Object object) {
-        String methodName = "editSetup";
-        Object methodArgs = new Object[] { object };
-        invokeGroovyMethod(methodName, methodArgs);
-    }
+
+    protected void editSetup(Object object) {}
 
     protected boolean editValidate(Object object) {
-        String methodName = "editValidate";
-        Object methodArgs = new Object[] { object };
-        return invokeBooleanGroovyMethod(methodName, methodArgs);
+        return true;
     }
 
-    protected void editPostProcess(Object object) {
-        String methodName = "editPostProcess";
-        Object methodArgs = new Object[] { object };
-        invokeGroovyMethod(methodName, methodArgs);
+    protected void editPostProcess(Object object) {}
+
+
+    protected boolean deleteValidate(Object object) {
+        return true;
     }
 
-    protected Object invokeGroovyMethod(String methodName, Object methodArgs) {
-        if(groovyObject != null) {
-            try {
-                logger.debug("Invoking Groovy method {}", methodName);
-                return groovyObject.invokeMethod(methodName, methodArgs);
-            } catch(MissingMethodException e) {
-                logger.debug("The Groovy method {} is missing", methodName);
-            }
-        } else {
-            logger.debug("No script for this page: {}", crudPage.getId());
-        }
-        return null;
+    protected void deletePostProcess(Object object) {}
+    
+
+    protected Resolution getBulkEditView() {
+        return new ForwardResolution("/layouts/crud/bulk-edit.jsp");
     }
 
-    protected boolean invokeBooleanGroovyMethod(String methodName, Object methodArgs) {
-        Object result = invokeGroovyMethod(methodName, methodArgs);
-        return !(result instanceof Boolean && (Boolean) result == false);
+    protected Resolution getCreateView() {
+        return new ForwardResolution("/layouts/crud/create.jsp");
+    }
+
+    protected Resolution getEditView() {
+        return new ForwardResolution("/layouts/crud/edit.jsp");
+    }
+
+    protected Resolution getReadView() {
+        return forwardToPortletPage("/layouts/crud/read.jsp");
+    }
+
+    protected Resolution getSearchView() {
+        return forwardToPortletPage("/layouts/crud/search.jsp");
+    }
+
+    protected Resolution getEmbeddedSearchView() {
+        return new ForwardResolution("/layouts/crud/embedded-search.jsp");
     }
 
     //**************************************************************************
@@ -1611,7 +1707,7 @@ public class CrudAction extends PortletAction {
 
     public static final String[][] CRUD_CONFIGURATION_FIELDS =
             {{"name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
-              "largeResultSet"}};
+              "largeResultSet", "rowsPerPage"}};
 
     public Form crudConfigurationForm;
     public TableForm propertiesTableForm;
@@ -1619,7 +1715,7 @@ public class CrudAction extends PortletAction {
     public TableForm selectionProvidersForm;
     public CrudSelectionProviderEdit[] selectionProviderEdits;
 
-    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1)
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configure() {
         prepareConfigurationForms();
@@ -1641,11 +1737,12 @@ public class CrudAction extends PortletAction {
         super.prepareConfigurationForms();
 
         SelectionProvider databaseSelectionProvider =
-                DefaultSelectionProvider.create("database",
+                createSelectionProvider(
+                        "database",
                         model.getDatabases(),
                         Database.class,
                         null,
-                        "databaseName");
+                        new String[] { "databaseName" });
         crudConfigurationForm = new FormBuilder(Crud.class)
                 .configFields(CRUD_CONFIGURATION_FIELDS)
                 .configFieldSetNames("Crud")
@@ -1673,18 +1770,12 @@ public class CrudAction extends PortletAction {
                 if(availableProviders == null || availableProviders.size() == 0) {
                     continue;
                 }
-                String[] availableProviderNames = new String[availableProviders.size() + 1];
-                String[] availableProviderValues = new String[availableProviderNames.length];
-                availableProviderNames[0] = "None";
-                int j = 1;
-                for(ModelSelectionProvider sp : availableProviders) {
-                    availableProviderNames[j] = sp.getName();
-                    availableProviderValues[j] = sp.getName();
-                    j++;
-                }
                 DefaultSelectionProvider selectionProvider =
-                        DefaultSelectionProvider.create
-                                (selectionProviderEdits[i].columns, availableProviderValues, availableProviderNames);
+                        new DefaultSelectionProvider(selectionProviderEdits[i].columns);
+                selectionProvider.appendRow(null, "None", true);
+                for(ModelSelectionProvider sp : availableProviders) {
+                    selectionProvider.appendRow(sp.getName(), sp.getName(), true);
+                }
                 tableFormBuilder.configSelectionProvider(i, selectionProvider, "selectionProvider");
             }
             selectionProvidersForm = tableFormBuilder.build();
@@ -1783,36 +1874,12 @@ public class CrudAction extends PortletAction {
                     updateSelectionProviders();
                 }
 
-                File groovyScriptFile =
-                        ScriptingUtil.getGroovyScriptFile(storageDirFile, crudPage.getId());
-                if(!StringUtils.isBlank(script)) {
-                    FileWriter fw = null;
-                    try {
-                        fw = new FileWriter(groovyScriptFile);
-                        fw.write(script);
-                        try {
-                            compileScript(script, groovyScriptFile.getAbsolutePath());
-                        } catch (Exception e) {
-                            logger.warn("Couldn't compile script for crud page " + crudPage.getId(), e);
-                            String msg = "Couldn't compile script - see logs for details";
-                            SessionMessages.addErrorMessage(msg);
-                            return new ForwardResolution("/layouts/crud/configure.jsp");
-                        }
-                    } catch (IOException e) {
-                        logger.error("Error writing script to " + groovyScriptFile, e);
-                    } finally {
-                        IOUtils.closeQuietly(fw);
-                    }
-                } else {
-                    groovyScriptFile.delete();
-                }
-
                 saveModel();
-                SessionMessages.addInfoMessage("Configuration updated successfully");
+
+                SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
                 return cancel();
             } else {
-                SessionMessages.addErrorMessage("The configuration could not be saved. " +
-                        "Review any errors below and submit again.");
+                SessionMessages.addErrorMessage(getMessage("commons.configuration.notUpdated"));
                 return new ForwardResolution("/layouts/crud/configure.jsp");
             }
         }
@@ -2028,15 +2095,7 @@ public class CrudAction extends PortletAction {
     public TableForm getSelectionProvidersForm() {
         return selectionProvidersForm;
     }
-
-    public String getScript() {
-        return script;
-    }
-
-    public void setScript(String script) {
-        this.script = script;
-    }
-
+    
     public Integer getFirstResult() {
         return firstResult;
     }
@@ -2053,11 +2112,67 @@ public class CrudAction extends PortletAction {
         this.maxResults = maxResults;
     }
 
+    public String getSortProperty() {
+        return sortProperty;
+    }
+
+    public void setSortProperty(String sortProperty) {
+        this.sortProperty = sortProperty;
+    }
+
+    public String getSortDirection() {
+        return sortDirection;
+    }
+
+    public void setSortDirection(String sortDirection) {
+        this.sortDirection = sortDirection;
+    }
+
     public String getPropertyName() {
         return propertyName;
     }
 
     public void setPropertyName(String propertyName) {
         this.propertyName = propertyName;
+    }
+
+    public boolean isSearchVisible() {
+        return searchVisible;
+    }
+
+    public void setSearchVisible(boolean searchVisible) {
+        this.searchVisible = searchVisible;
+    }
+
+    public String getRelName() {
+        return relName;
+    }
+
+    public void setRelName(String relName) {
+        this.relName = relName;
+    }
+
+    public int getSelectionProviderIndex() {
+        return selectionProviderIndex;
+    }
+
+    public void setSelectionProviderIndex(int selectionProviderIndex) {
+        this.selectionProviderIndex = selectionProviderIndex;
+    }
+
+    public String getSelectFieldMode() {
+        return selectFieldMode;
+    }
+
+    public void setSelectFieldMode(String selectFieldMode) {
+        this.selectFieldMode = selectFieldMode;
+    }
+
+    public String getLabelSearch() {
+        return labelSearch;
+    }
+
+    public void setLabelSearch(String labelSearch) {
+        this.labelSearch = labelSearch;
     }
 }

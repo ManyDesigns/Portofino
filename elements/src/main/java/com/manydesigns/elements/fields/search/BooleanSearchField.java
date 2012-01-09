@@ -52,6 +52,7 @@ public class BooleanSearchField extends AbstractSearchField {
     //**************************************************************************
 
     protected BooleanSearchValue value = BooleanSearchValue.ANY;
+    private static final String BOOLEAN_SEARCH_FIELD_HTML_CLASS = "mde-boolean-search-field";
 
     //**************************************************************************
     // Costruttori
@@ -116,8 +117,12 @@ public class BooleanSearchField extends AbstractSearchField {
     }
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
-        xb.openElement("fieldset");
-        xb.writeLegend(StringUtils.capitalize(label), ATTR_NAME_HTML_CLASS);
+        xb.openElement("span");
+        xb.addAttribute("class", BOOLEAN_SEARCH_FIELD_HTML_CLASS);
+        xb.openElement("label");
+        xb.addAttribute("class", ATTR_NAME_HTML_CLASS);
+        xb.write(StringUtils.capitalize(label));
+        xb.closeElement("label");
 
         for (BooleanSearchValue current : BooleanSearchValue.values()) {
             // don't print null if the attribute is required
@@ -127,13 +132,11 @@ public class BooleanSearchField extends AbstractSearchField {
             String idStr = id + "_" + current.name();
             String stringValue = current.getStringValue();
             boolean checked = (value == current);
-            xb.openElement("div");
             xb.writeInputRadio(idStr, inputName, stringValue, checked);
             String label = getText(current.getLabelI18N());
             xb.writeLabel(label, idStr, null);
-            xb.closeElement("div");
         }
-        xb.closeElement("fieldset");
+        xb.closeElement("span");
     }
 
     //**************************************************************************

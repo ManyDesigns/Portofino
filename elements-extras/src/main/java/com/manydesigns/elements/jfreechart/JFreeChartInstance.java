@@ -73,7 +73,6 @@ public class JFreeChartInstance implements XhtmlFragment {
         this.chartUrl = chartUrl;
         renderingInfo = new ChartRenderingInfo();
         ChartUtilities.saveChartAsPNG(file, chart, width, height, renderingInfo);
-
     }
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {

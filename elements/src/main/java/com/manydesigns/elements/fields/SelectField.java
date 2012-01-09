@@ -39,10 +39,12 @@ import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Map;
 
@@ -98,13 +100,9 @@ public class SelectField extends AbstractField {
 
             assert(values.length == labels.length);
             if(values.length > 0) {
-                selectionProvider =
-                        DefaultSelectionProvider.create(
-                                accessor.getName(), values, labels);
+                selectionProvider = createValuesSelectionProvider(accessor, values, labels);
             } else if (accessor.getType().isEnum()) {
-                selectionProvider =
-                    DefaultSelectionProvider.create(
-                            accessor.getName(), accessor.getType());
+                selectionProvider = createEnumSelectionProvider(accessor);
             }
         } else {
             displayMode = selectionProvider.getDisplayMode();
@@ -129,6 +127,30 @@ public class SelectField extends AbstractField {
         autocompleteInputName = inputName + AUTOCOMPLETE_SUFFIX;
     }
 
+    public static SelectionProvider createEnumSelectionProvider(PropertyAccessor accessor) {
+        try {
+            Method valuesMethod = accessor.getType().getMethod("values");
+            Enum[] values = (Enum[]) valuesMethod.invoke(null);
+            String[] labels = new String[values.length];
+            for (int i = 0; i < values.length; i++) {
+                labels[i] = values[i].name();
+            }
+            return createValuesSelectionProvider(accessor, values, labels);
+        } catch (Exception e) {
+            logger.error("Cannot create Selection provider from enumeration", e);
+            throw new Error(e);
+        }
+    }
+
+    public static SelectionProvider createValuesSelectionProvider
+            (PropertyAccessor accessor, Object[] values, String[] labels) {
+        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider(accessor.getName(), 1);
+        for(int i = 0; i < values.length; i++) {
+            selectionProvider.appendRow(values[i], labels[i], true);
+        }
+        return selectionProvider;
+    }
+
     //**************************************************************************
     // Element implementation
     //**************************************************************************
@@ -141,15 +163,36 @@ public class SelectField extends AbstractField {
         }
 
         String stringValue = req.getParameter(inputName);
-        if (stringValue == null) {
-            return;
-        }
-        
         Object value;
-        if (stringValue.length() == 0) {
-            value = null;
+        if(DisplayMode.AUTOCOMPLETE == displayMode) {
+            if (StringUtils.isEmpty(stringValue)) {
+                value = null;
+                //Attempt to find the value among the options
+                String userValue = req.getParameter(autocompleteInputName);
+                Map<Object, SelectionModel.Option> options = selectionModel.getOptions(selectionModelIndex);
+                boolean found = false;
+                for(SelectionModel.Option option : options.values()) {
+                    if(ObjectUtils.equals(userValue, option.label)) {
+                        found = true;
+                        value = option.value;
+                    }
+                }
+                if(!found) {
+                    return;
+                }
+            } else {
+                value = OgnlUtils.convertValue(stringValue, accessor.getType());
+            }
         } else {
-            value = OgnlUtils.convertValue(stringValue, accessor.getType());
+            if (stringValue == null) {
+                return;
+            }
+
+            if (stringValue.length() == 0) {
+                value = null;
+            } else {
+                value = OgnlUtils.convertValue(stringValue, accessor.getType());
+            }
         }
         selectionModel.setValue(selectionModelIndex, value);
     }
@@ -220,7 +263,7 @@ public class SelectField extends AbstractField {
 
     public void valueToXhtmlEditDropDown(XhtmlBuffer xb) {
         Object value = selectionModel.getValue(selectionModelIndex);
-        Map<Object, String> options =
+        Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
 
         xb.openElement("select");
@@ -232,13 +275,16 @@ public class SelectField extends AbstractField {
             xb.writeOption("", checked, comboLabel);
         }
 
-        for (Map.Entry<Object,String> option :
+        for (Map.Entry<Object,SelectionModel.Option> option :
                 options.entrySet()) {
+            if(!option.getValue().active) {
+                continue;
+            }
             Object optionValue = option.getKey();
             String optionStringValue =
                     (String) OgnlUtils.convertValue(optionValue, String.class);
             optionStringValue = StringUtils.defaultString(optionStringValue);
-            String optionLabel = option.getValue();
+            String optionLabel = option.getValue().label;
             checked =  (optionValue == value) ||
                        (optionValue != null && optionValue.equals(value));
             xb.writeOption(optionStringValue, checked, optionLabel);
@@ -256,7 +302,7 @@ public class SelectField extends AbstractField {
         sb.append(MessageFormat.format(
                 "$(''#{0}'').change(" +
                         "function() '{'" +
-                        "updateSelectOptions(''{1}'', {2}",
+                        "updateSelectOptions(''{1}'', {2}, ''jsonSelectFieldOptions''",
                 StringEscapeUtils.escapeJavaScript(id),
                 StringEscapeUtils.escapeJavaScript(selectionModel.getName()),
                 selectionModelIndex + 1));
@@ -268,7 +314,7 @@ public class SelectField extends AbstractField {
     public String composeAutocompleteJs() {
         StringBuilder sb = new StringBuilder();
         sb.append(MessageFormat.format(
-                "setupAutocomplete(''#{0}'', ''{1}'', {2}",
+                "setupAutocomplete(''#{0}'', ''{1}'', {2}, ''jsonAutocompleteOptions''",
                 StringEscapeUtils.escapeJavaScript(autocompleteId),
                 StringEscapeUtils.escapeJavaScript(selectionModel.getName()),
                 selectionModelIndex));
@@ -292,7 +338,7 @@ public class SelectField extends AbstractField {
 
     public void valueToXhtmlEditRadio(XhtmlBuffer xb) {
         Object value = selectionModel.getValue(selectionModelIndex);
-        Map<Object, String> options =
+        Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
 
         xb.openElement("fieldset");
@@ -309,12 +355,15 @@ public class SelectField extends AbstractField {
             counter++;
         }
 
-        for (Map.Entry<Object,String> option :
+        for (Map.Entry<Object,SelectionModel.Option> option :
                 options.entrySet()) {
+            if(!option.getValue().active) {
+                continue;
+            }
             Object optionValue = option.getKey();
             String optionStringValue =
                     (String) OgnlUtils.convertValue(optionValue, String.class);
-            String optionLabel = option.getValue();
+            String optionLabel = option.getValue().label;
             String radioId = id + "_" + counter;
             boolean checked =  optionValue.equals(value);
             writeRadioWithLabel(xb, radioId, optionLabel,
@@ -384,13 +433,11 @@ public class SelectField extends AbstractField {
 
     public String getStringValue() {
         Object value = selectionModel.getValue(selectionModelIndex);
-        Map<Object, String> options =
-                selectionModel.getOptions(selectionModelIndex);
-        return options.get(value);
+        return selectionModel.getOption(selectionModelIndex, value, true);
     }
 
     public String jsonSelectFieldOptions(boolean includeSelectPrompt) {
-        Map<Object, String> options =
+        Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
         // prepariamo Json
         JsonBuffer jb = new JsonBuffer();
@@ -406,11 +453,14 @@ public class SelectField extends AbstractField {
             jb.closeObject();
         }
 
-        for (Map.Entry<Object,String> option : options.entrySet()) {
+        for (Map.Entry<Object,SelectionModel.Option> option : options.entrySet()) {
+            if(!option.getValue().active) {
+                continue;
+            }
             jb.openObject();
             Object optionValue = option.getKey();
             String optionStringValue = OgnlUtils.convertValueToString(optionValue);
-            String optionLabel = option.getValue();
+            String optionLabel = option.getValue().label;
 
             jb.writeKeyValue("v", optionStringValue);
             jb.writeKeyValue("l", optionLabel);
@@ -436,7 +486,7 @@ public class SelectField extends AbstractField {
         selectionModel.setValue(selectionModelIndex, value);
     }
 
-    public Map<Object, String> getOptions() {
+    public Map<Object, SelectionModel.Option> getOptions() {
         return selectionModel.getOptions(selectionModelIndex);
     }
 

@@ -39,6 +39,8 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -138,6 +140,14 @@ public class CrudAccessor
         return tableAccessor.newInstance();
     }
 
+    @Override
+    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+        T annotation = super.getAnnotation(annotationClass);
+        if (annotation != null) {
+            return annotation;
+        }
+        return tableAccessor.getAnnotation(annotationClass);
+    }
 
     //**************************************************************************
     // Getters/setters

@@ -31,7 +31,7 @@ package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.connections.ConnectionProvider;
+import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

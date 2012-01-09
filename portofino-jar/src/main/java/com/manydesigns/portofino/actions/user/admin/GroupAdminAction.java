@@ -104,7 +104,7 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
         PageInstance rootPageInstance = new PageInstance(application, model.getRootPage(), null);
         HttpServletRequest request = context.getRequest();
         String originalPath = ServletUtils.getOriginalPath(request);
-        dispatch = new Dispatch(request, originalPath, originalPath, rootPageInstance, pageInstance);
+        dispatch = new Dispatch(request.getContextPath(), originalPath, getClass(), rootPageInstance, pageInstance);
         Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
         request.setAttribute(RequestAttributes.DISPATCH, dispatch);
         request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
@@ -130,6 +130,31 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
             String usersPath = contextPath + UserAdminAction.BASE_PATH + "/";
             form.findFieldByPropertyName("creatorId").setHref(usersPath + group.getCreatorId());
         }
+    }
+
+    @Override
+    protected Resolution getEditView() {
+        return new ForwardResolution("/layouts/admin/groups/groupEdit.jsp");
+    }
+
+    @Override
+    protected Resolution getBulkEditView() {
+        return new ForwardResolution("/layouts/admin/groups/groupBulkEdit.jsp");
+    }
+
+    @Override
+    protected Resolution getCreateView() {
+        return new ForwardResolution("/layouts/admin/groups/groupCreate.jsp");
+    }
+
+    @Override
+    protected Resolution getReadView() {
+        return forwardToPortletPage("/layouts/admin/groups/groupRead.jsp");
+    }
+
+    @Override
+    protected Resolution getSearchView() {
+        return forwardToPortletPage("/layouts/admin/groups/groupSearch.jsp");
     }
 
     //Do not show the configure button

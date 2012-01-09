@@ -71,8 +71,10 @@ public class SearchFormCascadeTest  extends AbstractElementsTest {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        selectionProvider = DefaultSelectionProvider.create(
-                "selectionProvider", 2, valuesArray, labelsArray);
+        selectionProvider = new DefaultSelectionProvider("selectionProvider", 2);
+        for(int i = 0; i < valuesArray.length; i++) {
+            selectionProvider.appendRow(valuesArray[i], labelsArray[i], true);
+        }
 
         form = new SearchFormBuilder(SelectFieldTest2.Bean.class)
                 .configSelectionProvider(selectionProvider, "p1", "p2")
@@ -103,18 +105,18 @@ public class SearchFormCascadeTest  extends AbstractElementsTest {
         assertNotNull(selectField1.getValues());
         assertEquals(1, selectField1.getValues()[0]);
         assertNull(selectField2.getValues());
-        Map<Object,String> options0 = selectField1.getOptions();
+        Map<Object,SelectionModel.Option> options0 = selectField1.getOptions();
         assertNotNull(options0);
         assertEquals(2, options0.size());
-        assertEquals("paperino", options0.get(1));
+        assertEquals("paperino", options0.get(1).label);
 
 
-        Map<Object,String> options1 = selectField2.getOptions();
+        Map<Object,SelectionModel.Option> options1 = selectField2.getOptions();
         assertNotNull(options1);
         assertEquals(3, options1.size());
-        assertEquals("qui", options1.get(1));
-        assertEquals("quo", options1.get(2));
-        assertEquals("qua", options1.get(3));
+        assertEquals("qui", options1.get(1).label);
+        assertEquals("quo", options1.get(2).label);
+        assertEquals("qua", options1.get(3).label);
 
         assertEquals("<ul class=\"searchform\"><li><fieldset><legend class=\"attr_name\">P1</legend><select id=\"p1\" name=\"p1\"><option value=\"\">-- Select p1 --</option><option value=\"1\" selected=\"selected\">paperino</option><option value=\"2\">cip</option></select></fieldset></li><li><fieldset><legend class=\"attr_name\">P2</legend><select id=\"p2\" name=\"p2\"><option value=\"\" selected=\"selected\">-- Select p2 --</option><option value=\"1\">qui</option><option value=\"2\">quo</option><option value=\"3\">qua</option></select></fieldset></li></ul>",text);
     }

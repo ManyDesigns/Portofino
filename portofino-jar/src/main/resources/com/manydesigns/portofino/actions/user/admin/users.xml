@@ -4,9 +4,6 @@
     <rootPage fragment="" title="" description="">
         <childPages>
             <crudPage id="users"
-                      createUrl="/layouts/admin/users/userCreate.jsp" editUrl="/layouts/admin/users/userEdit.jsp"
-                      readUrl="/layouts/admin/users/userRead.jsp" searchUrl="/layouts/admin/users/userSearch.jsp"
-                      bulkEditUrl="/layouts/admin/users/userBulkEdit.jsp"
                       description="Users administration" fragment="actions/admin/users"
                       title="Users">
                 <childPages/>
@@ -15,7 +12,7 @@
                     <deny/>
                 </permissions>
                 <crud createTitle="Create user" editTitle="Edit user" largeResultSet="false"
-                      query="FROM users" readTitle="User" searchTitle="Users"
+                      query="FROM users ORDER BY username" readTitle="User" searchTitle="Users"
                       database="portofino">
                     <buttons/>
                     <annotations/>
@@ -122,9 +119,6 @@
                 <detailChildPages/>
             </crudPage>
             <crudPage id="groups"
-                      createUrl="/layouts/admin/groups/groupCreate.jsp" editUrl="/layouts/admin/groups/groupEdit.jsp"
-                      readUrl="/layouts/admin/groups/groupRead.jsp" searchUrl="/layouts/admin/groups/groupSearch.jsp"
-                      bulkEditUrl="/layouts/admin/groups/groupBulkEdit.jsp"
                       description="Groups administration" fragment="actions/admin/groups" showInNavigation="true"
                       variable="group" title="Groups">
                 <childPages />
@@ -133,7 +127,7 @@
                     <deny/>
                 </permissions>
                 <crud createTitle="Create group" editTitle="Edit group" largeResultSet="false"
-                      query="FROM groups" readTitle="Group" searchTitle="Groups"
+                      query="FROM groups ORDER BY name" readTitle="Group" searchTitle="Groups"
                       database="portofino">
                     <buttons/>
                     <annotations/>

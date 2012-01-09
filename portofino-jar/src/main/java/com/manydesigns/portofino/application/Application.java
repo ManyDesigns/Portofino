@@ -29,9 +29,10 @@
 
 package com.manydesigns.portofino.application;
 
-import com.manydesigns.portofino.connections.ConnectionProvider;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
+import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -42,6 +43,8 @@ import org.hibernate.Session;
 
 import java.io.File;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 
 /*
@@ -74,7 +77,6 @@ public interface Application {
     // Model loading
     //**************************************************************************
 
-    void loadConnections();
     void loadXmlModel();
     void saveXmlModel();
 
@@ -85,10 +87,12 @@ public interface Application {
 
     List<ConnectionProvider> getConnectionProviders();
     ConnectionProvider getConnectionProvider(String databaseName);
-    void addConnectionProvider(ConnectionProvider connectionProvider);
-    void deleteConnectionProvider(String[] connectionProvider);
-    void deleteConnectionProvider(String connectionProvider);
-    void updateConnectionProvider(ConnectionProvider connectionProvider);
+    void addDatabase(Database database);
+    void deleteDatabases(String[] databases);
+    void deleteDatabase(String database);
+    void updateDatabase(Database database);
+    String getSystemDatabaseName();
+    Database getSystemDatabase();
 
     //**************************************************************************
     // Configuration access
@@ -114,6 +118,8 @@ public interface Application {
     //**************************************************************************
 
     Session getSession(String databaseName);
+
+    Session getSystemSession();
 
     Session getSessionByQualifiedTableName(String qualifiedTableName);
 
@@ -151,4 +157,11 @@ public interface Application {
 
     void shutdown();
 
+    //**************************************************************************
+    // I18n
+    //**************************************************************************
+
+    ResourceBundle getBundle(Locale locale);
+
+    File getAppTextDir();
 }

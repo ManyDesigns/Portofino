@@ -29,8 +29,9 @@
 package com.manydesigns.portofino.application;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
-import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.connections.JdbcConnectionProvider;
+import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
+import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.model.datamodel.JdbcConnectionProvider;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
@@ -61,14 +62,16 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
         assertEquals(3, connectionProviders.size());
 
         JdbcConnectionProvider conn = new JdbcConnectionProvider();
-        conn.setDatabaseName("test");
         conn.setDriver("org.h2.Driver");
         conn.setUrl("jdbc:h2:mem:test");
         conn.setUsername("manydesigns");
         conn.setPassword("manydesigns");
+        Database database = new Database();
+        database.setDatabaseName("test");
+        database.setConnectionProvider(conn);
+        conn.setDatabase(database);
 
-
-        application.addConnectionProvider(conn);
+        application.addDatabase(database);
 
         File connectionsFile = application.getAppConnectionsFile();
 
@@ -83,13 +86,16 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
         }
 
         conn = new JdbcConnectionProvider();
-        conn.setDatabaseName("test");
         conn.setDriver("org.h2.Driver");
         conn.setUrl("jdbc:h2:mem:test2");
         conn.setUsername("manydesigns2");
         conn.setPassword("manydesigns2");
+        database = new Database();
+        database.setDatabaseName("test");
+        database.setConnectionProvider(conn);
+        conn.setDatabase(database);
 
-        application.updateConnectionProvider(conn);
+        application.updateDatabase(database);
         assertEquals(4, connectionProviders.size());
         is = null;
         try {
@@ -100,7 +106,7 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
             IOUtils.closeQuietly(is);
         }
 
-        application.deleteConnectionProvider("test");
+        application.deleteDatabase("test");
         assertEquals(3, connectionProviders.size());
         is = null;
         try {

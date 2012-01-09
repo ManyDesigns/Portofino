@@ -22,6 +22,11 @@
         <c:if test="${actionBean.detectedValuesForm != null}">
             <div class="horizontalSeparator"></div>
         </c:if>
+        <c:if test="${actionBean.schemasForm != null}">
+            <div class="horizontalSeparator"></div>
+            <h2><fmt:message key="layouts.admin.connectionProviders.read.detected_values"/></h2>
+            <mde:write name="actionBean" property="schemasForm"/>
+        </c:if>
         <stripes:hidden name="databaseName" value="${actionBean.databaseName}"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">

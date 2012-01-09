@@ -59,9 +59,9 @@ public class TextFieldTest extends AbstractElementsTest {
         setupFields(Mode.EDIT);
 
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><input id=\"myText\" type=\"text\" " +
-                "name=\"myText\" class=\"text\" /></td>", text);
+                "name=\"myText\" class=\"mde-text-field\" /></td>", text);
 
         assertEquals(Mode.EDIT, textField.getMode());
         assertNull(textField.getStringValue());
@@ -83,9 +83,9 @@ public class TextFieldTest extends AbstractElementsTest {
 
         textField.setStringValue("myValue");
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><input id=\"myText\" type=\"text\" " +
-                "name=\"myText\" value=\"myValue\" class=\"text\" />" +
+                "name=\"myText\" value=\"myValue\" class=\"mde-text-field\" />" +
                 "</td>", text);
     }
 
@@ -94,10 +94,10 @@ public class TextFieldTest extends AbstractElementsTest {
 
         textField.setRequired(true);
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">" +
                 "<span class=\"required\">*</span>&nbsp;My text:" +
                 "</label></th><td><input id=\"myText\" type=\"text\" " +
-                "name=\"myText\" class=\"text\" />" +
+                "name=\"myText\" class=\"mde-text-field\" />" +
                 "</td>", text);
     }
 
@@ -106,7 +106,7 @@ public class TextFieldTest extends AbstractElementsTest {
 
         textField.setStringValue("www.manydesigns.com");
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><div class=\"value\" id=\"myText\">" +
                 "www.manydesigns.com</div></td>", text);
     }
@@ -118,7 +118,7 @@ public class TextFieldTest extends AbstractElementsTest {
         textField.setStringValue("www.manydesigns.com - http://www.google.com - info@manydesigns.com");
         textField.setHighlightLinks(true);
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><div class=\"value\" id=\"myText\">" +
                 "<a href=\"http://www.manydesigns.com\">www.manydesigns.com" +
                 "</a> - <a href=\"http://www.google.com\">" +
@@ -134,9 +134,9 @@ public class TextFieldTest extends AbstractElementsTest {
         textField.setAutoCapitalize(true);
         textField.readFromRequest(req);
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><input id=\"myText\" type=\"text\" " +
-                "name=\"myText\" value=\"MYVALUE\" class=\"text\" />" +
+                "name=\"myText\" value=\"MYVALUE\" class=\"mde-text-field\" />" +
                 "</td>", text);
     }
 
@@ -145,9 +145,9 @@ public class TextFieldTest extends AbstractElementsTest {
 
         textField.setHelp("myHelp");
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><input id=\"myText\" type=\"text\" " +
-                "name=\"myText\" class=\"text\" />" +
+                "name=\"myText\" class=\"mde-text-field\" />" +
                 "<div class=\"inputdescription\">myHelp</div></td>", text);
     }
 
@@ -156,9 +156,9 @@ public class TextFieldTest extends AbstractElementsTest {
 
         textField.setId("myId");
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myId\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myId\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><input id=\"myId\" type=\"text\" " +
-                "name=\"myText\" class=\"text\" /></td>", text);
+                "name=\"myText\" class=\"mde-text-field\" /></td>", text);
     }
 
     public void testInputName() {
@@ -166,9 +166,9 @@ public class TextFieldTest extends AbstractElementsTest {
 
         textField.setInputName("myInput");
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><input id=\"myText\" type=\"text\" " +
-                "name=\"myInput\" class=\"text\" /></td>", text);
+                "name=\"myInput\" class=\"mde-text-field\" /></td>", text);
     }
 
     public void testLabel() {
@@ -176,9 +176,9 @@ public class TextFieldTest extends AbstractElementsTest {
 
         textField.setLabel("myLabel");
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">MyLabel:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">MyLabel:" +
                 "</label></th><td><input id=\"myText\" type=\"text\" " +
-                "name=\"myText\" class=\"text\" /></td>", text);
+                "name=\"myText\" class=\"mde-text-field\" /></td>", text);
     }
 
     public void testValidateRequired() {
@@ -189,10 +189,10 @@ public class TextFieldTest extends AbstractElementsTest {
         assertNull(textField.getStringValue());
         assertFalse(textField.validate());
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">" +
                 "<span class=\"required\">*</span>&nbsp;My text:" +
                 "</label></th><td><input id=\"myText\" type=\"text\" " +
-                "name=\"myText\" class=\"text\" />" +
+                "name=\"myText\" class=\"mde-text-field\" />" +
                 "<ul class=\"errors\">" +
                 "<li>Required field" +
                 "</li></ul></td>", text);
@@ -207,9 +207,9 @@ public class TextFieldTest extends AbstractElementsTest {
         assertFalse(textField.validate());
         assertEquals("myValue", textField.getStringValue());
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><input id=\"myText\" type=\"text\" " +
-                "name=\"myText\" value=\"myValue\" class=\"text\" " +
+                "name=\"myText\" value=\"myValue\" class=\"mde-text-field\" " +
                 "size=\"3\" maxlength=\"3\" /><ul class=\"errors\">" +
                 "<li>Max permitted length is 3 characters" +
                 "</li></ul></td>", text);
@@ -224,9 +224,9 @@ public class TextFieldTest extends AbstractElementsTest {
         textField.validate();
         assertEquals("123", textField.getStringValue());
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><input id=\"myText\" type=\"text\" " +
-                "name=\"myText\" value=\"123\" class=\"text\" " +
+                "name=\"myText\" value=\"123\" class=\"mde-text-field\" " +
                 "size=\"3\" maxlength=\"3\" /></td>", text);
     }
 
@@ -237,7 +237,7 @@ public class TextFieldTest extends AbstractElementsTest {
         req.setParameter("myText", "myValue");
         textField.readFromRequest(req);
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><textarea id=\"myText\" name=\"myText\" " +
                 "cols=\"70\" rows=\"4\">myValue" +
                 "</textarea></td>", text);
@@ -252,7 +252,7 @@ public class TextFieldTest extends AbstractElementsTest {
         req.setParameter("myText", "myValue");
         textField.readFromRequest(req);
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><textarea id=\"myText\" name=\"myText\" " +
                 "cols=\"60\" rows=\"5\">myValue" +
                 "</textarea></td>", text);
@@ -265,7 +265,7 @@ public class TextFieldTest extends AbstractElementsTest {
         myText = "\tmy\nValue";
         textField.readFromObject(this);
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><div class=\"value\" id=\"myText\">" +
                 "&nbsp;&nbsp;&nbsp;&nbsp;my<br />Value" +
                 "</div></td>", text);
@@ -276,7 +276,7 @@ public class TextFieldTest extends AbstractElementsTest {
 
         textField.readFromObject(null);
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><div class=\"value\" id=\"myText\">" +
                 "</div></td>", text);
     }
@@ -286,9 +286,9 @@ public class TextFieldTest extends AbstractElementsTest {
 
         textField.setMaxLength(100);
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><input id=\"myText\" type=\"text\" " +
-                "name=\"myText\" class=\"text\" size=\"70\" maxlength=\"100\" />" +
+                "name=\"myText\" class=\"mde-text-field\" size=\"70\" maxlength=\"100\" />" +
                 "</td>", text);
     }
 
@@ -298,9 +298,9 @@ public class TextFieldTest extends AbstractElementsTest {
         textField.setMaxLength(100);
         textField.setSize(20);
         String text = Util.elementToString(textField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><input id=\"myText\" type=\"text\" " +
-                "name=\"myText\" class=\"text\" size=\"20\" maxlength=\"100\" />" +
+                "name=\"myText\" class=\"mde-text-field\" size=\"20\" maxlength=\"100\" />" +
                 "</td>", text);
     }
 

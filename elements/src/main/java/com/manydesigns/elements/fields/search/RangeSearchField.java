@@ -63,6 +63,7 @@ public class RangeSearchField extends AbstractSearchField {
     protected Object maxValue;
 
     protected boolean searchNullValue;
+    private static final String RANGE_SEARCH_FIELD_HTML_CLASS = "mde-range-search-field";
 
     //**************************************************************************
     // Costruttori
@@ -88,36 +89,29 @@ public class RangeSearchField extends AbstractSearchField {
     //**************************************************************************
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
-        xb.openElement("fieldset");
-        xb.writeLegend(StringUtils.capitalize(label), ATTR_NAME_HTML_CLASS);
-
-        xb.openElement("table");
-        xb.addAttribute("class", "range");
+        xb.openElement("span");
+        xb.addAttribute("class", RANGE_SEARCH_FIELD_HTML_CLASS);
+        xb.openElement("label");
+        xb.addAttribute("for", minId);
+        xb.addAttribute("class", ATTR_NAME_HTML_CLASS);
+        xb.write(StringUtils.capitalize(label));
+        xb.closeElement("label");
 
         rangeEndToXhtml(xb, minId, minInputName, minStringValue,
                 getText("elements.search.range.from"));
         rangeEndToXhtml(xb, maxId, maxInputName, maxStringValue,
                 getText("elements.search.range.to"));
-
-        xb.closeElement("table");
-
-        xb.closeElement("fieldset");
+        xb.closeElement("span");
     }
 
     public void rangeEndToXhtml(XhtmlBuffer xb, String id,
                                 String inputName, String stringValue,
                                 String label) {
-        xb.openElement("tr");
-        xb.openElement("th");
         xb.openElement("label");
         xb.addAttribute("for", id);
         xb.write(label);
         xb.closeElement("label");
-        xb.closeElement("th");
-        xb.openElement("td");
         xb.writeInputText(id, inputName, stringValue, "text", null, null);
-        xb.closeElement("td");
-        xb.closeElement("tr");
     }
 
 

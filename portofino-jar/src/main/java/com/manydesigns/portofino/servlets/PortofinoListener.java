@@ -114,6 +114,7 @@ public class PortofinoListener
         setupCommonsConfiguration();
 
         LiquibaseUtils.setupDatabaseFactory();
+        LiquibaseUtils.setupSqlGeneratorFactory();
 
         elementsConfiguration = ElementsProperties.getConfiguration();
         servletContext.setAttribute(
@@ -141,11 +142,12 @@ public class PortofinoListener
         servletContext.setAttribute(
                 ApplicationAttributes.APPLICATION_STARTER, applicationStarter);
 
-        logger.info("\n" + SEPARATOR +
-                "\n--- ManyDesigns Portofino {} started successfully" +
-                "\n--- Context path: {}" +
-                "\n--- Real path: {}" +
-                "\n" + SEPARATOR,
+        String lineSeparator = System.getProperty("line.separator", "\n");
+        logger.info(lineSeparator + SEPARATOR +
+                lineSeparator + "--- ManyDesigns Portofino {} started successfully" +
+                lineSeparator + "--- Context path: {}" +
+                lineSeparator + "--- Real path: {}" +
+                lineSeparator + SEPARATOR,
                 new String[] {
                         portofinoConfiguration.getString(
                                 PortofinoProperties.PORTOFINO_VERSION),

@@ -21,7 +21,7 @@
         </thead>
         <tbody>
         <tr>
-            <td colspan="<%=columns.length%>">Loading data...</td>
+            <td colspan="<%=columns.length%>"><fmt:message key="layouts.crud.datatable.loading_data"/></td>
         </tr>
         </tbody>
     </table>
@@ -35,7 +35,7 @@
                         htmlEscape(sData.displayValue) +
                         '</a>';
             } else {
-                elCell.innerHTML = sData.displayValue;
+                elCell.innerHTML = htmlEscape(sData.displayValue);
             }
         };
 
@@ -93,7 +93,7 @@
                     out.print(", label : \"");
                     out.print(StringEscapeUtils.escapeJavaScript(column.getLabel()));
                     out.print("\"");
-                    out.print(", formatter : elementsFormatter");
+                    out.print(", formatter : elementsFormatter, sortable : true");
                     out.print("}");
                 }
             %>
@@ -102,14 +102,14 @@
         var generateRequest = function(oState, oSelf) {
             // Get states or use defaults
             oState = oState || { pagination: null, sortedBy: null };
-            var sort = (oState.sortedBy) ? oState.sortedBy.key : "id";
+            var sort = (oState.sortedBy) ? oState.sortedBy.key : "";
             var dir = (oState.sortedBy && oState.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc";
             var startIndex = (oState.pagination) ? oState.pagination.recordOffset : 0;
-            var results = (oState.pagination) ? oState.pagination.rowsPerPage : 10;
+            var maxResults = (oState.pagination) ? oState.pagination.rowsPerPage : <%= actionBean.getCrud().getActualRowsPerPage() %>;
 
             // Build custom request
             var url = "&firstResult=" + startIndex +
-                    "&maxResults=10";
+                    "&maxResults=" + maxResults + "&sortProperty=" + sort + "&sortDirection=" + dir;
             <c:if test="${not empty actionBean.searchString}">
                 url = url + "&searchString=" + encodeURIComponent(
                     '<%= StringEscapeUtils.escapeJavaScript(actionBean.getSearchString()) %>');
@@ -122,12 +122,13 @@
             initialRequest: generateRequest(),
             dynamicData: true,
             paginator : new YAHOO.widget.Paginator({
-                rowsPerPage: 10
-            })
+                rowsPerPage: <%= actionBean.getCrud().getActualRowsPerPage() %>
+            }),
+            MSG_EMPTY: '<fmt:message key="layouts.crud.datatable.msg_empty"/>'
         };
 
         var myDataTable = new YAHOO.widget.DataTable(
-                "<c:out value="tableContainer-${pageId}" />", myColumnDefs, myDataSource, myConfigs);
+                '<c:out value="tableContainer-${pageId}" />', myColumnDefs, myDataSource, myConfigs);
         myDataTable.doBeforeLoadData = function(oRequest, oResponse, oPayload) {
             oPayload.totalRecords = oResponse.meta.totalRecords;
             oPayload.pagination.recordOffset = oResponse.meta.startIndex;
@@ -137,6 +138,7 @@
             //Disable loading message
             return true;
         };
+        myDataTable.doBeforeSortColumn = myDataTable.doBeforePaginatorChange;
     }();
 
 </script>

@@ -34,7 +34,6 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SelectionModel;
-import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -54,6 +53,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
     private SelectField selectField;
     private SelectField selectField2;
+    private SelectField selectField3;
 
     private String[][] valuesArray = {
             {"value1"},
@@ -73,11 +73,14 @@ public class SelectFieldTest extends AbstractElementsTest {
             {"label1"}
     };
 
-    protected SelectionProvider selectionProvider;
+    protected DefaultSelectionProvider selectionProvider;
     protected SelectionModel selectionModel;
 
-    protected SelectionProvider selectionProvider2;
+    protected DefaultSelectionProvider selectionProvider2;
     protected SelectionModel selectionModel2;
+
+    protected DefaultSelectionProvider selectionProvider3;
+    protected SelectionModel selectionModel3;
 
     @Override
     public void setUp() throws Exception {
@@ -85,13 +88,23 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         myText = null;
 
-        selectionProvider = DefaultSelectionProvider.create(
-                "selectionProvider", 1, valuesArray, labelsArray);
+        selectionProvider = new DefaultSelectionProvider("selectionProvider");
+        for(int i = 0; i < valuesArray.length; i++) {
+            selectionProvider.appendRow(valuesArray[i], labelsArray[i], true);
+        }
         selectionModel = selectionProvider.createSelectionModel();
 
-        selectionProvider2 = DefaultSelectionProvider.create(
-                "selectionProvider", 1, valuesArray2, labelsArray2);
+        selectionProvider2 = new DefaultSelectionProvider("selectionProvider");
+        for(int i = 0; i < valuesArray2.length; i++) {
+            selectionProvider2.appendRow(valuesArray2[i], labelsArray2[i], true);
+        }
         selectionModel2 = selectionProvider2.createSelectionModel();
+
+        selectionProvider3 = new DefaultSelectionProvider("selectionProvider");
+        selectionProvider3.appendRow("value1", "label1", true);
+        selectionProvider3.appendRow("value2", "label2", false);
+
+        selectionModel3 = selectionProvider3.createSelectionModel();
     }
 
     private void setupSelectFields(Mode mode) {
@@ -112,6 +125,9 @@ public class SelectFieldTest extends AbstractElementsTest {
         // impostiamo selectField2
         selectField2 = new SelectField(myPropertyAccessor, mode, null);
         selectField2.setSelectionModel(selectionModel2);
+        // impostiamo selectField3
+        selectField3 = new SelectField(myPropertyAccessor, mode, null);
+        selectField3.setSelectionModel(selectionModel3);
     }
 
     public void testSimple() {
@@ -150,7 +166,7 @@ public class SelectFieldTest extends AbstractElementsTest {
     public void testEditNull() {
         setupSelectFields(Mode.EDIT);
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
                 "<option value=\"\" selected=\"selected\">-- Select my text --</option>" +
                 "<option value=\"value1\">label1</option>" +
@@ -164,7 +180,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         selectField.setDisplayMode(DisplayMode.RADIO);
 
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><fieldset id=\"myText\" class=\"radio\">" +
                 "<input type=\"radio\" id=\"myText_0\" name=\"myText\" value=\"\" checked=\"checked\" />&nbsp;<label for=\"myText_0\">None</label><br />" +
                 "<input type=\"radio\" id=\"myText_1\" name=\"myText\" value=\"value1\" />&nbsp;<label for=\"myText_1\">label1</label><br />" +
@@ -178,7 +194,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         selectField.setRequired(true);
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">" +
                 "<span class=\"required\">*</span>&nbsp;My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
                 "<option value=\"\" selected=\"selected\">-- Select my text --</option>" +
@@ -189,7 +205,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         assertFalse(selectField.validate());
         text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">" +
                 "<span class=\"required\">*</span>&nbsp;My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
                 "<option value=\"\" selected=\"selected\">-- Select my text --</option>" +
@@ -207,7 +223,7 @@ public class SelectFieldTest extends AbstractElementsTest {
                 
         selectField.setRequired(true);
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\"><span class=\"required\">*</span>&nbsp;My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\"><span class=\"required\">*</span>&nbsp;My text:" +
                 "</label></th><td><fieldset id=\"myText\" class=\"radio\">" +
                 "<input type=\"radio\" id=\"myText_0\" name=\"myText\" value=\"value1\" />&nbsp;<label for=\"myText_0\">label1</label><br />" +
                 "<input type=\"radio\" id=\"myText_1\" name=\"myText\" value=\"value2\" />&nbsp;<label for=\"myText_1\">label2</label><br />" +
@@ -220,7 +236,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         selectField.setComboLabel("-- Scegli opzione --");
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
                 "<option value=\"\" selected=\"selected\">-- Scegli opzione --</option>" +
                 "<option value=\"value1\">label1</option>" +
@@ -235,7 +251,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         selectField.setValue("value1");
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
                 "<option value=\"\">-- Select my text --</option>" +
                 "<option value=\"value1\" selected=\"selected\">label1</option>" +
@@ -244,12 +260,34 @@ public class SelectFieldTest extends AbstractElementsTest {
                 "</select></td>", text);
     }
 
+    public void testEditInactiveSelection() {
+        setupSelectFields(Mode.EDIT);
+
+        selectField3.setValue("value1");
+        String text = Util.elementToString(selectField3);
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
+                "</label></th><td><select id=\"myText\" name=\"myText\">" +
+                "<option value=\"\">-- Select my text --</option>" +
+                "<option value=\"value1\" selected=\"selected\">label1</option>" +
+                "</select></td>", text);
+
+        selectionProvider3.ensureActive("value2");
+        selectField3.setValue("value2");
+        text = Util.elementToString(selectField3);
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
+                "</label></th><td><select id=\"myText\" name=\"myText\">" +
+                "<option value=\"\">-- Select my text --</option>" +
+                "<option value=\"value1\">label1</option>" +
+                "<option value=\"value2\" selected=\"selected\">label2</option>" +
+                "</select></td>", text);
+    }
+
     public void testEditInvalidSelection() {
         setupSelectFields(Mode.EDIT);
 
         selectField.setValue("value4");
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
                 "<option value=\"\" selected=\"selected\">-- Select my text --</option>" +
                 "<option value=\"value1\">label1</option>" +
@@ -266,7 +304,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         setupSelectFields(Mode.VIEW);
 
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\"></div>" +
                 "</td>", text);
@@ -277,7 +315,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         selectField.setValue("value1");
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\">label1</div>" +
                 "</td>", text);
@@ -288,9 +326,21 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         selectField.setValue("value3");
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\">label3</div>" +
+                "</td>", text);
+    }
+
+    public void testViewInactiveSelection() {
+        setupSelectFields(Mode.VIEW);
+
+        selectionProvider3.ensureActive("value2");
+        selectField3.setValue("value2");
+        String text = Util.elementToString(selectField3);
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
+                "</label></th><td>" +
+                "<div class=\"value\" id=\"myText\">label2</div>" +
                 "</td>", text);
     }
 
@@ -299,7 +349,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         selectField.setValue("value4");
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\"></div>" +
                 "</td>", text);
@@ -313,7 +363,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         setupSelectFields(Mode.PREVIEW);
 
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\"></div>" +
                 "<input type=\"hidden\" id=\"myText\" name=\"myText\" />" +
@@ -325,7 +375,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         selectField.setValue("value1");
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\">label1</div>" +
                 "<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value1\" />" +
@@ -337,7 +387,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         selectField.setValue("value3");
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\">label3</div>" +
                 "<input type=\"hidden\" id=\"myText\" name=\"myText\" value=\"value3\" />" +
@@ -349,7 +399,7 @@ public class SelectFieldTest extends AbstractElementsTest {
 
         selectField.setValue("value4");
         String text = Util.elementToString(selectField);
-        assertEquals("<th><label for=\"myText\" class=\"field\">My text:" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">My text:" +
                 "</label></th><td>" +
                 "<div class=\"value\" id=\"myText\"></div>" +
                 "<input type=\"hidden\" id=\"myText\" name=\"myText\" />" +
@@ -427,7 +477,7 @@ public class SelectFieldTest extends AbstractElementsTest {
         assertNull(selectField2.getValue());
         selectField2.readFromRequest(req);
         String text = Util.elementToString(selectField2);
-        assertEquals("<th><label for=\"myText\" class=\"field\">" +
+        assertEquals("<th><label for=\"myText\" class=\"mde-field-label\">" +
                 "<span class=\"required\">*</span>&nbsp;My text:" +
                 "</label></th><td><select id=\"myText\" name=\"myText\">" +
                 "<option value=\"\" selected=\"selected\">-- Select my text --</option>" +

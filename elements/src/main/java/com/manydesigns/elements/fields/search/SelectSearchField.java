@@ -32,7 +32,6 @@ import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionModel;
-import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.ArrayUtils;
@@ -85,9 +84,10 @@ public class SelectSearchField extends AbstractSearchField {
             Object[] values = annotation.values();
             String[] labels = annotation.labels();
             assert(values.length == labels.length);
-            SelectionProvider selectionProvider =
-                    DefaultSelectionProvider.create(
-                            accessor.getName(), values, labels);
+            DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider(accessor.getName(), 1);
+            for(int i = 0; i < values.length; i++) {
+                selectionProvider.appendRow(values[i], labels[i], true);
+            }
             selectionModel = selectionProvider.createSelectionModel();
             displayMode = annotation.searchDisplayMode();
         } else {
@@ -180,11 +180,11 @@ public class SelectSearchField extends AbstractSearchField {
     }
 
     private void valueToXhtmlDropDown(XhtmlBuffer xb) {
-        xb.openElement("fieldset");
-        xb.writeLegend(StringUtils.capitalize(label), ATTR_NAME_HTML_CLASS);
+        xb.openElement("span");
+        xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
 
         Object[] values = (Object[]) selectionModel.getValue(selectionModelIndex);
-        Map<Object, String> options =
+        Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
         xb.openElement("select");
         xb.addAttribute("id", id);
@@ -195,22 +195,45 @@ public class SelectSearchField extends AbstractSearchField {
             xb.writeOption("", checked, comboLabel);
         }
 
-        for (Map.Entry<Object,String> option :
+        for (Map.Entry<Object,SelectionModel.Option> option :
                 options.entrySet()) {
+            if(!option.getValue().active) {
+                continue;
+            }
             Object optionValue = option.getKey();
             String optionStringValue =
                     OgnlUtils.convertValueToString(optionValue);
-            String optionLabel = option.getValue();
+            String optionLabel = option.getValue().label;
             checked = ArrayUtils.contains(values, optionValue);
             xb.writeOption(optionStringValue, checked, optionLabel);
         }
         xb.closeElement("select");
-        xb.closeElement("fieldset");
+
+        if (nextSelectField != null) {
+            String js = composeDropDownJs();
+            xb.writeJavaScript(js);
+        }
+
+        xb.closeElement("span");
+    }
+
+    public String composeDropDownJs() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(MessageFormat.format(
+                "$(''#{0}'').change(" +
+                        "function() '{'" +
+                        "updateSelectOptions(''{1}'', {2}, ''jsonSelectFieldSearchOptions''",
+                StringEscapeUtils.escapeJavaScript(id),
+                StringEscapeUtils.escapeJavaScript(selectionModel.getName()),
+                selectionModelIndex + 1));
+        appendIds(sb);
+        sb.append(");});");
+        return sb.toString();
     }
 
     public void valueToXhtmlRadio(XhtmlBuffer xb) {
         Object[] values = (Object[]) selectionModel.getValue(selectionModelIndex);
-        Map<Object, String> options =
+        Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
 
         xb.openElement("fieldset");
@@ -228,12 +251,15 @@ public class SelectSearchField extends AbstractSearchField {
             counter++;
         }
 
-        for (Map.Entry<Object,String> option :
+        for (Map.Entry<Object,SelectionModel.Option> option :
                 options.entrySet()) {
+            if(!option.getValue().active) {
+                continue;
+            }
             Object optionValue = option.getKey();
             String optionStringValue =
                     OgnlUtils.convertValueToString(optionValue);
-            String optionLabel = option.getValue();
+            String optionLabel = option.getValue().label;
             String radioId = id + "_" + counter;
             boolean checked =  ArrayUtils.contains(values, optionValue);
             writeRadioWithLabel(xb, radioId, optionLabel,
@@ -287,15 +313,18 @@ public class SelectSearchField extends AbstractSearchField {
         xb.writeLegend(StringUtils.capitalize(label), ATTR_NAME_HTML_CLASS);
 
         Object[] values = (Object[]) selectionModel.getValue(selectionModelIndex);
-        Map<Object, String> options =
+        Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
         int counter=0;
-        for (Map.Entry<Object,String> option :
+        for (Map.Entry<Object,SelectionModel.Option> option :
                 options.entrySet()) {
+            if(!option.getValue().active) {
+                continue;
+            }
             Object optionValue = option.getKey();
             String optionStringValue =
                     OgnlUtils.convertValueToString(optionValue);
-            String optionLabel = option.getValue();
+            String optionLabel = option.getValue().label;
             boolean checked =  ArrayUtils.contains(values, optionValue);
             xb.writeInputCheckbox(id + "_" + counter,inputName, optionStringValue, checked);
             xb.writeNbsp();
@@ -311,7 +340,7 @@ public class SelectSearchField extends AbstractSearchField {
         xb.writeLegend(StringUtils.capitalize(label), ATTR_NAME_HTML_CLASS);
 
         Object[] values = (Object[]) selectionModel.getValue(selectionModelIndex);
-        Map<Object, String> options =
+        Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
         xb.openElement("select");
         xb.addAttribute("id", id);
@@ -321,12 +350,15 @@ public class SelectSearchField extends AbstractSearchField {
 
         boolean checked;
 
-        for (Map.Entry<Object,String> option :
+        for (Map.Entry<Object,SelectionModel.Option> option :
                 options.entrySet()) {
+            if(!option.getValue().active) {
+                continue;
+            }
             Object optionValue = option.getKey();
             String optionStringValue =
                     OgnlUtils.convertValueToString(optionValue);
-            String optionLabel = option.getValue();
+            String optionLabel = option.getValue().label;
             checked =  ArrayUtils.contains(values, optionValue);
             xb.writeOption(optionStringValue, checked, optionLabel);
         }
@@ -337,7 +369,7 @@ public class SelectSearchField extends AbstractSearchField {
     public String composeAutocompleteJs() {
         StringBuilder sb = new StringBuilder();
         sb.append(MessageFormat.format(
-                "setupAutocomplete(''#{0}'', ''{1}'', {2}",
+                "setupAutocomplete(''#{0}'', ''{1}'', {2}, ''jsonAutocompleteSearchOptions''",
                 StringEscapeUtils.escapeJavaScript(autocompleteId),
                 StringEscapeUtils.escapeJavaScript(selectionModel.getName()),
                 selectionModelIndex));
@@ -434,7 +466,7 @@ public class SelectSearchField extends AbstractSearchField {
         selectionModel.setValue(selectionModelIndex, values);
     }
 
-    public Map<Object, String> getOptions() {
+    public Map<Object, SelectionModel.Option> getOptions() {
         return selectionModel.getOptions(selectionModelIndex);
     }
 

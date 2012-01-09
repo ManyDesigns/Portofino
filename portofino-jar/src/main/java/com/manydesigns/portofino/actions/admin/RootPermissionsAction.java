@@ -39,6 +39,9 @@ import net.sourceforge.stripes.controller.ActionResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -75,7 +78,10 @@ public class RootPermissionsAction extends PortletAction implements AdminAction 
         synchronized (application) {
             updatePagePermissions(page);
             saveModel();
-            SessionMessages.addInfoMessage("Root permissions saved successfully.");
+
+            Locale locale = context.getLocale();
+            ResourceBundle bundle = application.getBundle(locale);
+            SessionMessages.addInfoMessage(bundle.getString("permissions.root.updated"));
         }
 
         return new RedirectResolution(this.getClass());

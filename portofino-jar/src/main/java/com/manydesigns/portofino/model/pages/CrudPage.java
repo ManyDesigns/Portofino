@@ -64,13 +64,6 @@ public class CrudPage extends Page {
 
     protected int actualDetailLayoutOrder;
 
-    protected String searchUrl;
-    protected String embeddedSearchUrl;
-    protected String readUrl;
-    protected String editUrl;
-    protected String bulkEditUrl;
-    protected String createUrl;
-
     public CrudPage() {
         super();
         detailChildPages = new ArrayList<Page>();
@@ -170,57 +163,4 @@ public class CrudPage extends Page {
         return null;
     }
 
-    @XmlAttribute
-    public String getSearchUrl() {
-        return searchUrl;
-    }
-
-    public void setSearchUrl(String searchUrl) {
-        this.searchUrl = searchUrl;
-    }
-
-    @XmlAttribute
-    public String getEmbeddedSearchUrl() {
-        return embeddedSearchUrl;
-    }
-
-    public void setEmbeddedSearchUrl(String embeddedSearchUrl) {
-        this.embeddedSearchUrl = embeddedSearchUrl;
-    }
-
-    @XmlAttribute
-    public String getReadUrl() {
-        return readUrl;
-    }
-
-    public void setReadUrl(String readUrl) {
-        this.readUrl = readUrl;
-    }
-
-    @XmlAttribute
-    public String getEditUrl() {
-        return editUrl;
-    }
-
-    public void setEditUrl(String editUrl) {
-        this.editUrl = editUrl;
-    }
-
-    @XmlAttribute
-    public String getCreateUrl() {
-        return createUrl;
-    }
-
-    public void setCreateUrl(String createUrl) {
-        this.createUrl = createUrl;
-    }
-
-    @XmlAttribute
-    public String getBulkEditUrl() {
-        return bulkEditUrl;
-    }
-
-    public void setBulkEditUrl(String bulkEditUrl) {
-        this.bulkEditUrl = bulkEditUrl;
-    }
 }

@@ -14,7 +14,5 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
         <portofino:buttons list="chart-buttons" cssClass="portletButton" />
-        <input type="hidden" name="cancelReturnUrl"
-               value="<c:out value="${actionBean.cancelReturnUrl}"/> "/>
     </stripes:layout-component>
 </stripes:layout-render>

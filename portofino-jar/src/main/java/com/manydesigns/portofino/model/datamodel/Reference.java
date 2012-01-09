@@ -32,7 +32,6 @@ package com.manydesigns.portofino.model.datamodel;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
-import com.manydesigns.portofino.xml.Identifier;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -127,7 +126,6 @@ public class Reference implements ModelObject {
         this.owner = owner;
     }
 
-    @Identifier
     @XmlAttribute(required = true)
     public String getFromColumn() {
         return fromColumn;
@@ -137,7 +135,6 @@ public class Reference implements ModelObject {
         this.fromColumn = fromColumn;
     }
 
-    @Identifier
     @XmlAttribute(required = true)
     public String getToColumn() {
         return toColumn;

@@ -36,7 +36,6 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.interceptors.SecurityInterceptor;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.Permissions;
@@ -72,9 +71,6 @@ public class SecurityLogic {
 
     public static final Logger logger = LoggerFactory.getLogger(SecurityLogic.class);
 
-    public static final String USERTABLE = "portofino.public.users";
-    public static final String GROUPTABLE = "portofino.public.groups";
-
     public static final String USER_ENTITY_NAME = "users";
     public static final String GROUP_ENTITY_NAME = "groups";
 
@@ -94,7 +90,7 @@ public class SecurityLogic {
             groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
         } else {
             User u = (User) QueryUtils.getObjectByPk
-                    (application, "portofino", USER_ENTITY_NAME, new User(userId));
+                    (application, application.getSystemDatabaseName(), USER_ENTITY_NAME, new User(userId));
             groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
 
             for (UsersGroups ug : u.getGroups()) {
@@ -134,14 +130,7 @@ public class SecurityLogic {
 
     public static boolean hasPermissions
             (Permissions configuration, Collection<String> groups, RequiresPermissions thing) {
-        if(hasPermissions(configuration, groups,
-                          thing.level(), thing.permissions())) {
-            return true;
-        } else {
-            logger.info("User does not match action permissions. User's groups: {}",
-                        ArrayUtils.toString(groups));
-            return false;
-        }
+        return hasPermissions(configuration, groups, thing.level(), thing.permissions());
     }
 
     public static RequiresPermissions getRequiresPermissionsAnnotation(Method handler, Class<?> theClass) {
@@ -187,7 +176,11 @@ public class SecurityLogic {
             hasPermissions &= permMap.containsKey(permission);
         }
 
-        return hasLevel && hasPermissions;
+        hasPermissions = hasLevel && hasPermissions;
+        if(!hasPermissions) {
+            logger.debug("User does not have permissions. User's groups: {}", ArrayUtils.toString(groups));
+        }
+        return hasPermissions;
     }
 
     public static String encryptPassword(String password) {
@@ -223,11 +216,12 @@ public class SecurityLogic {
     }
 
     private static Group findGroupById(Application application, String groupId) {
-        return (Group) QueryUtils.getObjectByPk(application, "portofino", GROUP_ENTITY_NAME, groupId);
+        return (Group) QueryUtils.getObjectByPk(application, application.getSystemDatabaseName(),
+                                                GROUP_ENTITY_NAME, groupId);
     }
 
     public static User defaultLogin(Application application, String username, String password) {
-        Session session = application.getSession("portofino");
+        Session session = application.getSystemSession();
         org.hibernate.Criteria criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
         criteria.add(Restrictions.eq(PASSWORD, password));
@@ -243,16 +237,16 @@ public class SecurityLogic {
     }
 
     public static boolean satisfiesRequiresAdministrator(HttpServletRequest request, ActionBean actionBean, Method handler) {
-        SecurityInterceptor.logger.debug("Checking if action or method required administrator");
+        logger.debug("Checking if action or method required administrator");
         boolean requiresAdministrator = false;
         if (handler.isAnnotationPresent(RequiresAdministrator.class)) {
-            SecurityInterceptor.logger.debug("Action method requires administrator: {}", handler);
+            logger.debug("Action method requires administrator: {}", handler);
             requiresAdministrator = true;
         } else {
             Class actionClass = actionBean.getClass();
             while (actionClass != null) {
                 if (actionClass.isAnnotationPresent(RequiresAdministrator.class)) {
-                    SecurityInterceptor.logger.debug("Action class requires administrator: {}",
+                    logger.debug("Action class requires administrator: {}",
                     actionClass);
                     requiresAdministrator = true;
                     break;
@@ -264,7 +258,7 @@ public class SecurityLogic {
         boolean isNotAdmin = !isAdministrator(request);
         boolean doesNotSatisfy = requiresAdministrator && isNotAdmin;
         if (doesNotSatisfy) {
-            SecurityInterceptor.logger.info("User is not an administrator");
+            logger.info("User is not an administrator");
             return false;
         }
         return true;

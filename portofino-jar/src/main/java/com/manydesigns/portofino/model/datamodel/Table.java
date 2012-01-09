@@ -37,7 +37,6 @@ import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.annotations.Annotated;
 import com.manydesigns.portofino.model.annotations.Annotation;
-import com.manydesigns.portofino.xml.Identifier;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,12 +69,12 @@ public class Table implements ModelObject, Annotated {
 
     protected Schema schema;
     protected String tableName;
-
     protected String entityName;
-    protected String actualEntityName;
 
     protected Boolean manyToMany;
     protected String javaClass;
+
+    protected String shortName;
 
     protected PrimaryKey primaryKey;
 
@@ -85,6 +84,7 @@ public class Table implements ModelObject, Annotated {
 
     protected final List<ForeignKey> oneToManyRelationships;
     protected Class actualJavaClass;
+    protected String actualEntityName;
 
     //**************************************************************************
     // Logging
@@ -136,9 +136,9 @@ public class Table implements ModelObject, Annotated {
 
         String baseEntityName;
         if (entityName == null) {
-            baseEntityName = defineEntityName(getTableName());
+            baseEntityName = normalizeName(getTableName());
         } else {
-            baseEntityName = defineEntityName(entityName);
+            baseEntityName = normalizeName(entityName);
         }
 
         String calculatedEntityName = baseEntityName;
@@ -201,7 +201,6 @@ public class Table implements ModelObject, Annotated {
         return schema.getSchemaName();
     }
 
-    @Identifier
     @Required
     @XmlAttribute(required = true)
     public String getTableName() {
@@ -271,10 +270,6 @@ public class Table implements ModelObject, Annotated {
         return actualEntityName;
     }
 
-    public void setActualEntityName(String actualEntityName) {
-        this.actualEntityName = actualEntityName;
-    }
-
     public List<ForeignKey> getOneToManyRelationships() {
         return oneToManyRelationships;
     }
@@ -290,6 +285,15 @@ public class Table implements ModelObject, Annotated {
     @XmlElement(name="query",type=DatabaseSelectionProvider.class)
     public List<ModelSelectionProvider> getSelectionProviders() {
         return selectionProviders;
+    }
+
+    @XmlAttribute(required = false)
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
     }
 
     //**************************************************************************
@@ -384,7 +388,7 @@ public class Table implements ModelObject, Annotated {
     //|    '0'..'9'
     //;
     //**************************************************************************
-    public static String defineEntityName (String name) {
+    public static String normalizeName(String name) {
         name = StringUtils.replaceChars(name, ".", "_");
         String firstLetter = name.substring(0,1);
         String others = name.substring(1);

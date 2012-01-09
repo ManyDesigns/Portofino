@@ -60,6 +60,8 @@ import java.io.FileReader;
 import java.sql.Timestamp;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -96,7 +98,6 @@ public class LoginAction extends AbstractActionBean {
 
     protected GroovyObject groovyObject;
     protected String script;
-    protected File storageDirFile;
 
     //**************************************************************************
     // Presentation elements
@@ -104,6 +105,7 @@ public class LoginAction extends AbstractActionBean {
     public boolean recoverPwd;
 
     public String returnUrl;
+    public String cancelReturnUrl;
 
     public static final Logger logger =
             LoggerFactory.getLogger(LoginAction.class);
@@ -126,8 +128,7 @@ public class LoginAction extends AbstractActionBean {
     }
 
     protected void prepareScript() {
-        storageDirFile = application.getAppStorageDir();
-        File file = new File(storageDirFile, "security.groovy");
+        File file = new File(application.getAppTextDir(), "security.groovy");
         if(file.exists()) {
             try {
                 FileReader fr = new FileReader(file);
@@ -160,19 +161,20 @@ public class LoginAction extends AbstractActionBean {
             user = SecurityLogic.defaultLogin(application, userName, pwd);
         }
 
+        Locale locale = context.getLocale();
+        ResourceBundle bundle = application.getBundle(locale);
+
         if (user==null) {
-            String errMsg = MessageFormat.format("FAILED AUTH for user {0}",
-                    userName);
-            SessionMessages.addInfoMessage(errMsg);
+            String errMsg = MessageFormat.format(bundle.getString("user.login.failed"), userName);
+            SessionMessages.addErrorMessage(errMsg);
             logger.warn(errMsg);
             updateFailedUser(userName);
             return new ForwardResolution("/layouts/user/login.jsp");
         }
 
         if (!user.getState().equals(SecurityLogic.ACTIVE)) {
-            String errMsg = MessageFormat.format("User {0} is not active. " +
-                    "Please contact the administrator", userName);
-            SessionMessages.addInfoMessage(errMsg);
+            String errMsg = MessageFormat.format(bundle.getString("user.not.active"), userName);
+            SessionMessages.addErrorMessage(errMsg);
             logger.warn(errMsg);
             return new ForwardResolution("/layouts/user/login.jsp");
         }
@@ -190,6 +192,17 @@ public class LoginAction extends AbstractActionBean {
         return new RedirectResolution(returnUrl);
     }
 
+    @Button(list = "login-buttons", key = "commons.cancel", order = 2)
+    public Resolution cancel() {
+        String url = "/";
+        if(!StringUtils.isBlank(cancelReturnUrl)) {
+            url = cancelReturnUrl;
+        } else if(!StringUtils.isBlank(returnUrl)) {
+            url = returnUrl;
+        }
+        return new RedirectResolution(url);
+    }
+
     private void updateFailedUser(String username) {
         User user;
         user = application.findUserByUserName(username);
@@ -199,7 +212,7 @@ public class LoginAction extends AbstractActionBean {
         user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
         int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
         user.setFailedLoginAttempts(failedAttempts+1);
-        Session session = application.getSession("portofino");
+        Session session = application.getSystemSession();
         session.update(user);
         session.getTransaction().commit();
     }
@@ -208,7 +221,7 @@ public class LoginAction extends AbstractActionBean {
         user.setFailedLoginAttempts(0);
         user.setLastLoginDate(new Timestamp(new Date().getTime()));
         user.setToken(null);
-        Session session = application.getSession("portofino");
+        Session session = application.getSystemSession();
         Transaction tx = session.getTransaction();
         try {
             User existingUser = application.findUserByUserName(user.getUserName());
@@ -236,7 +249,11 @@ public class LoginAction extends AbstractActionBean {
         if (session != null) {
             session.invalidate();
         }
-        SessionMessages.addInfoMessage("User disconnected");
+
+        Locale locale = context.getLocale();
+        ResourceBundle bundle = application.getBundle(locale);
+        String msg = bundle.getString("user.logout");
+        SessionMessages.addInfoMessage(msg);
 
         return new RedirectResolution("/");
     }
@@ -252,6 +269,14 @@ public class LoginAction extends AbstractActionBean {
 
     public void setReturnUrl(String returnUrl) {
         this.returnUrl = returnUrl;
+    }
+
+    public String getCancelReturnUrl() {
+        return cancelReturnUrl;
+    }
+
+    public void setCancelReturnUrl(String cancelReturnUrl) {
+        this.cancelReturnUrl = cancelReturnUrl;
     }
 
     //**************************************************************************

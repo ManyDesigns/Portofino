@@ -39,13 +39,14 @@ import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.JspPage;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -60,22 +61,43 @@ public class JspAction extends PortletAction {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     protected JspPage jspPage;
-
+    protected String jsp;
     protected Form form;
 
     public static final Logger logger =
             LoggerFactory.getLogger(JspAction.class);
+
+    //--------------------------------------------------------------------------
+    // Scripting
+    //--------------------------------------------------------------------------
+
+    public static final String SCRIPT_TEMPLATE;
+
+    static {
+        String scriptTemplate;
+        try {
+            scriptTemplate = IOUtils.toString(CrudAction.class.getResourceAsStream("jsp/script_template.txt"));
+        } catch (Exception e) {
+            scriptTemplate = null;
+        }
+        SCRIPT_TEMPLATE = scriptTemplate;
+    }
 
     @Before
     @Override
     public void prepare() {
         super.prepare();
         jspPage = (JspPage) getPageInstance().getPage();
+        jsp = jspPage.getJsp();
     }
 
     @DefaultHandler
     public Resolution execute() {
-        String jsp = jspPage.getJsp();
+        return forwardToJsp(jsp);
+    }
+
+    protected Resolution forwardToJsp(String jsp) {
+        this.jsp = jsp;
         String fwd;
         if(StringUtils.isEmpty(jsp)) {
             fwd = PAGE_PORTLET_NOT_CONFIGURED;
@@ -89,7 +111,7 @@ public class JspAction extends PortletAction {
         }
     }
 
-    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1)
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configure() {
         prepareConfigurationForms();
@@ -109,7 +131,10 @@ public class JspAction extends PortletAction {
                 updatePageConfiguration();
                 form.writeToObject(jspPage);
                 saveModel();
-                SessionMessages.addInfoMessage("Configuration updated successfully");
+
+                Locale locale = context.getLocale();
+                ResourceBundle bundle = application.getBundle(locale);
+                SessionMessages.addInfoMessage(bundle.getString("commons.configuration.updated"));
             }
             return cancel();
         }
@@ -131,24 +156,20 @@ public class JspAction extends PortletAction {
 
     private SelectionProvider createJspSelectionProvider() {
         File appWebDir = application.getAppWebDir();
-        List<String> values = new ArrayList<String>();
-        List<String> labels = new ArrayList<String>();
         File[] files = appWebDir.listFiles();
-        visitJspFiles(appWebDir, files, values, labels);
-        String[] valuesArr = values.toArray(new String[values.size()]);
-        String[] labelsArr = labels.toArray(new String[labels.size()]);
-        return DefaultSelectionProvider.create("jsp", valuesArr, labelsArr);
+        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("jsp");
+        visitJspFiles(appWebDir, files, selectionProvider);
+        return selectionProvider;
     }
 
     private void visitJspFiles(File root, File[] files,
-                               List<String> values, List<String> labels) {
+                               DefaultSelectionProvider selectionProvider) {
         for(File file : files) {
             if(file.isFile() && file.getName().endsWith(".jsp")) {
                 String path = getRelativeFilePath(file, root);
-                values.add(path);
-                labels.add(path);
+                selectionProvider.appendRow(path, path, true);
             } else if(file.isDirectory()) {
-                visitJspFiles(root, file.listFiles(), values, labels);
+                visitJspFiles(root, file.listFiles(), selectionProvider);
             }
         }
     }
@@ -163,12 +184,25 @@ public class JspAction extends PortletAction {
         return path;
     }
 
+    @Override
+    public String getScriptTemplate() {
+        return SCRIPT_TEMPLATE;
+    }
+
     public JspPage getJspPage() {
         return jspPage;
     }
 
+    public String getJsp() {
+        return jsp;
+    }
+
     public Form getForm() {
         return form;
+    }
+
+    public String getJspPrefix() {
+        return "/apps/" + application.getAppId() + "/web/";
     }
 
 }

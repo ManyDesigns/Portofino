@@ -73,8 +73,10 @@ public class SelectFieldTest2 extends AbstractElementsTest {
     public void setUp() throws Exception {
         super.setUp();
 
-        selectionProvider = DefaultSelectionProvider.create(
-                "selectionProvider", 2, valuesArray, labelsArray);
+        selectionProvider = new DefaultSelectionProvider("selectionProvider", 2);
+        for(int i = 0; i < valuesArray.length; i++) {
+            selectionProvider.appendRow(valuesArray[i], labelsArray[i], true);
+        }
 
         form = new FormBuilder(Bean.class)
                 .configSelectionProvider(selectionProvider, "p1", "p2")
@@ -121,18 +123,18 @@ public class SelectFieldTest2 extends AbstractElementsTest {
         assertNotNull(selectField1.getValue());
         assertEquals(1, selectField1.getValue());
         assertNull(selectField2.getValue());
-        Map<Object,String> options0 = selectField1.getOptions();
+        Map<Object,SelectionModel.Option> options0 = selectField1.getOptions();
         assertNotNull(options0);
         assertEquals(2, options0.size());
-        assertEquals("paperino", options0.get(1));
-        assertEquals("cip", options0.get(2));
+        assertEquals("paperino", options0.get(1).label);
+        assertEquals("cip", options0.get(2).label);
 
-        Map<Object,String> options1 = selectField2.getOptions();
+        Map<Object,SelectionModel.Option> options1 = selectField2.getOptions();
         assertNotNull(options1);
         assertEquals(3, options1.size());
-        assertEquals("qui", options1.get(1));
-        assertEquals("quo", options1.get(2));
-        assertEquals("qua", options1.get(3));
+        assertEquals("qui", options1.get(1).label);
+        assertEquals("quo", options1.get(2).label);
+        assertEquals("qua", options1.get(3).label);
     }
 
 
@@ -148,13 +150,13 @@ public class SelectFieldTest2 extends AbstractElementsTest {
     }
 
     private void checkOptions1() {
-        Map<Object,String> options0 = selectField1.getOptions();
+        Map<Object,SelectionModel.Option> options0 = selectField1.getOptions();
         assertNotNull(options0);
         assertEquals(2, options0.size());
-        assertEquals("paperino", options0.get(1));
-        assertEquals("cip", options0.get(2));
+        assertEquals("paperino", options0.get(1).label);
+        assertEquals("cip", options0.get(2).label);
 
-        Map<Object,String> options1 = selectField2.getOptions();
+        Map<Object,SelectionModel.Option> options1 = selectField2.getOptions();
         assertNotNull(options1);
         assertEquals(0, options1.size());
     }
@@ -183,18 +185,18 @@ public class SelectFieldTest2 extends AbstractElementsTest {
     }
 
     private void checkOptions2() {
-        Map<Object,String> options0 = selectField1.getOptions();
+        Map<Object,SelectionModel.Option> options0 = selectField1.getOptions();
         assertNotNull(options0);
         assertEquals(2, options0.size());
-        assertEquals("paperino", options0.get(1));
-        assertEquals("cip", options0.get(2));
+        assertEquals("paperino", options0.get(1).label);
+        assertEquals("cip", options0.get(2).label);
 
-        Map<Object,String> options1 = selectField2.getOptions();
+        Map<Object,SelectionModel.Option> options1 = selectField2.getOptions();
         assertNotNull(options1);
         assertEquals(3, options1.size());
-        assertEquals("qui", options1.get(1));
-        assertEquals("quo", options1.get(2));
-        assertEquals("qua", options1.get(3));
+        assertEquals("qui", options1.get(1).label);
+        assertEquals("quo", options1.get(2).label);
+        assertEquals("qua", options1.get(3).label);
     }
 
     public void testSelectField7() {

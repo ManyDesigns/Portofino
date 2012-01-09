@@ -29,22 +29,13 @@
 
 package com.manydesigns.elements.options;
 
-import com.manydesigns.elements.ognl.OgnlUtils;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.JavaClassAccessor;
-import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.text.TextFormat;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
-import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -62,8 +53,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
     protected final String name;
     protected final int fieldCount;
-    protected final Object[][] valuesArray;
-    protected final String[][] labelsArray;
+    protected final List<Row> rows;
 
     protected DisplayMode displayMode;
 
@@ -76,22 +66,20 @@ public class DefaultSelectionProvider implements SelectionProvider {
     // Static builders
     //**************************************************************************
 
-    public static DefaultSelectionProvider create(String name,
+    /*public static DefaultSelectionProvider create(String name,
                                                   Object[] values,
                                                   String[] labels) {
-        Object[][] valuesArray = new Object[values.length][];
+        Row[] rows = new Row[values.length];
         for (int i = 0; i < values.length; i++) {
-            valuesArray[i] = new Object[1];
-            valuesArray[i][0] = values[i];
+            Row row = new Row(
+                    new Object[] {values[i]},
+                    new String[] {labels[i]},
+                    true
+            );
+            rows[i] = row;
         }
 
-        String[][] labelsArray = new String[labels.length][];
-        for (int i = 0; i < labels.length; i++) {
-            labelsArray[i] = new String[1];
-            labelsArray[i][0] = labels[i];
-        }
-
-        return create(name, 1, valuesArray, labelsArray);
+        return new DefaultSelectionProvider(name, 1, rows);
     }
 
     public static DefaultSelectionProvider create(String name,
@@ -99,14 +87,11 @@ public class DefaultSelectionProvider implements SelectionProvider {
                                                Class[] valueTypes,
                                                Collection<Object[]> valuesAndLabels) {
         int size = valuesAndLabels.size();
-        Object[][] valuesArray = new Object[size][];
-        String[][] labelsArray = new String[size][];
+        Row[] rows = new Row[size];
         int i = 0;
         for (Object[] valueAndLabel : valuesAndLabels) {
             Object[] values = new Object[fieldCount];
             String[] labels = new String[fieldCount];
-            valuesArray[i] = values;
-            labelsArray[i] = labels;
 
             for (int j = 0; j < fieldCount; j++) {
                 Class valueType = valueTypes[j];
@@ -114,11 +99,16 @@ public class DefaultSelectionProvider implements SelectionProvider {
                 labels[j] = OgnlUtils.convertValueToString(valueAndLabel[j*2+1]);
             }
 
+            boolean active = true;
+            if(valueAndLabel.length > fieldCount) {
+                active = (Boolean) OgnlUtils.convertValue(valueAndLabel[fieldCount], Boolean.class);
+            }
+
+            rows[i] = new Row(values, labels, active);
             i++;
         }
 
-
-        return create(name, fieldCount, valuesArray, labelsArray);
+        return new DefaultSelectionProvider(name, fieldCount, rows);
     }
 
 
@@ -126,8 +116,15 @@ public class DefaultSelectionProvider implements SelectionProvider {
                                                int fieldCount,
                                                Object[][] valuesArray,
                                                String[][] labelsArray) {
-        return new DefaultSelectionProvider(name, fieldCount,
-                valuesArray, labelsArray);
+        int size = valuesArray.length;
+        Row[] rows = new Row[size];
+        for (int i = 0; i < size; i++) {
+            Object[] values = valuesArray[i];
+            String[] labels = labelsArray[i];
+            rows[i] = new Row(values, labels, true);
+        }
+
+        return new DefaultSelectionProvider(name, fieldCount, rows);
     }
 
     public static DefaultSelectionProvider create(String name,
@@ -199,8 +196,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
             PropertyAccessor[] propertyAccessors
     ) {
         int fieldsCount = propertyAccessors.length;
-        Object[][] valuesArray = new Object[objects.size()][fieldsCount];
-        String[][] labelsArray = new String[objects.size()][fieldsCount];
+        Row[] rows = new Row[objects.size()];
         int i = 0;
         for (Object current : objects) {
             Object[] values = new Object[fieldsCount];
@@ -218,26 +214,41 @@ public class DefaultSelectionProvider implements SelectionProvider {
                 }
                 j++;
             }
-            valuesArray[i] = values;
-            labelsArray[i] = labels;
+            rows[i] = new Row(values, labels, true);
             i++;
         }
-        return new DefaultSelectionProvider(
-                name, fieldsCount, valuesArray, labelsArray);
-    }
+        return new DefaultSelectionProvider(name, fieldsCount, rows);
+    }*/
 
     //**************************************************************************
     // Constructor
     //**************************************************************************
 
-    protected DefaultSelectionProvider(String name,
+    public DefaultSelectionProvider(String name,
                                     int fieldCount,
-                                    Object[][] valuesArray,
-                                    String[][] labelsArray) {
+                                    Row[] rows) {
+        this(name, fieldCount, new ArrayList<Row>(Arrays.asList(rows)));
+    }
+
+    public DefaultSelectionProvider(String name,
+                                    int fieldCount,
+                                    List<Row> rows) {
         this.name = name;
         this.fieldCount = fieldCount;
-        this.valuesArray = valuesArray;
-        this.labelsArray = labelsArray;
+        this.rows = rows;
+    }
+
+    public DefaultSelectionProvider(String name,
+                                    int fieldCount) {
+        this(name, fieldCount, new Row[0]);
+    }
+
+    public DefaultSelectionProvider(String name) {
+        this(name, 1);
+    }
+
+    public DefaultSelectionProvider(DefaultSelectionProvider copy) {
+        this(copy.getName(), copy.getFieldCount(), new ArrayList<Row>(copy.rows));
     }
 
     //**************************************************************************
@@ -256,7 +267,51 @@ public class DefaultSelectionProvider implements SelectionProvider {
         return new DefaultSelectionModel();
     }
 
-    public static SelectionProvider create(String name, Class<? extends Enum> enumeration) {
+    public void appendRow(Row row) {
+        if(row.values.length != fieldCount) {
+            throw new IllegalArgumentException("Field count mismatch");
+        }
+        rows.add(row);
+    }
+
+    public void appendRow(Object[] values, String[] labels, boolean active) {
+        Row row = new Row(values, labels, active);
+        appendRow(row);
+    }
+
+    public void appendRow(Object value, String label, boolean active) {
+        appendRow(new Object[] { value }, new String[] { label }, active);
+    }
+
+    public void ensureActive(Object... values) {
+        Row row = null;
+        ListIterator<Row> iterator = rows.listIterator();
+        while(iterator.hasNext()) {
+            Row current = iterator.next();
+            boolean found = true;
+            for(int i = 0; i < fieldCount; i++) {
+                if(!ObjectUtils.equals(values[i], current.getValues()[i])) {
+                    found = false;
+                    break;
+                }
+            }
+            if(found) {
+                row = new Row(values, current.getLabels(), true);
+                iterator.set(row);
+                break;
+            }
+        }
+        if(row == null) {
+            String[] labels = new String[fieldCount];
+            for(int i = 0; i < fieldCount; i++) {
+                labels[i] = ObjectUtils.toString(values[i]);
+            }
+            row = new Row(values, labels, true);
+            rows.add(row);
+        }
+    }
+
+    /*public static SelectionProvider create(String name, Class<? extends Enum> enumeration) {
         try {
             Method valuesMethod = enumeration.getMethod("values");
             Enum[] values = (Enum[]) valuesMethod.invoke(null);
@@ -269,7 +324,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
             logger.error("Cannot create Selection provider from enumeration", e);
             throw new Error(e);
         }
-    }
+    }*/
 
     //**************************************************************************
     // inner class
@@ -281,7 +336,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
         private final Object[] values;
         private final String[] labelSearches;
-        private final Map<Object,String>[] optionsArray;
+        private final Map<Object, Option>[] optionsArray;
 
         private boolean needsValidation;
 
@@ -291,7 +346,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
             //noinspection unchecked
             optionsArray = new Map[fieldCount];
             for (int i = 0; i < fieldCount; i++) {
-                optionsArray[i] = new LinkedHashMap<Object, String>();
+                optionsArray[i] = new LinkedHashMap<Object, Option>();
             }
             needsValidation = true;
         }
@@ -323,9 +378,20 @@ public class DefaultSelectionProvider implements SelectionProvider {
             return labelSearches[index];
         }
 
-        public Map<Object, String> getOptions(int index) {
+        public Map<Object, Option> getOptions(int index) {
             validate();
             return optionsArray[index];
+        }
+
+        public String getOption(int index, Object value, boolean includeInactive) {
+            Map<Object, SelectionModel.Option> options = getOptions(index);
+            SelectionModel.Option option = options.get(value);
+            if(option != null) {
+                if(option.active || includeInactive) {
+                    return option.label;
+                }
+            }
+            return null;
         }
 
         private void validate() {
@@ -347,9 +413,9 @@ public class DefaultSelectionProvider implements SelectionProvider {
             }
 
             int maxMatchingIndex = -1;
-            for (int i = 0; i < valuesArray.length; i++) {
-                Object[] currentValueRow = valuesArray[i];
-                String[] currentLabelRow = labelsArray[i];
+            for (Row row : rows) {
+                Object[] currentValueRow = row.getValues();
+                String[] currentLabelRow = row.getLabels();
                 boolean matching = true;
                 for (int j = 0; j < fieldCount; j++) {
                     Object cellValue = currentValueRow[j];
@@ -358,7 +424,10 @@ public class DefaultSelectionProvider implements SelectionProvider {
                     String labelSearch = labelSearches[j];
 
                     if (matching && matchLabel(cellLabel, labelSearch)) {
-                        optionsArray[j].put(cellValue, cellLabel);
+                        Option currentOption = optionsArray[j].get(cellValue);
+                        if(currentOption == null || !currentOption.active) {
+                            optionsArray[j].put(cellValue, new Option(cellValue, cellLabel, row.isActive()));
+                        }
                     }
 
                     if (matching && value != null
@@ -366,14 +435,13 @@ public class DefaultSelectionProvider implements SelectionProvider {
                         if (j > maxMatchingIndex) {
                             maxMatchingIndex = j;
                         }
-                    } else if (matching && value!=null &&
+                    } else if (matching && value != null &&
                             value instanceof Object[]
                             && ArrayUtils.contains((Object[]) value, cellValue)) {
-                         if (j > maxMatchingIndex) {
+                        if (j > maxMatchingIndex) {
                             maxMatchingIndex = j;
-                         }
-                    }
-                    else {
+                        }
+                    } else {
                         matching = false;
                     }
                 }
@@ -407,5 +475,29 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
     public void setDisplayMode(DisplayMode displayMode) {
         this.displayMode = displayMode;
+    }
+
+    public static class Row {
+        final Object[] values;
+        final String[] labels;
+        final boolean active;
+
+        public Row(Object[] values, String[] labels, boolean active) {
+            this.values = values;
+            this.labels = labels;
+            this.active = active;
+        }
+
+        public Object[] getValues() {
+            return values;
+        }
+
+        public String[] getLabels() {
+            return labels;
+        }
+
+        public boolean isActive() {
+            return active;
+        }
     }
 }

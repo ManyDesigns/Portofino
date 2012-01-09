@@ -115,8 +115,10 @@ public class ProfileAction extends AbstractActionBean {
     private Resolution read() {
         User thisUser =
             (User) QueryUtils.getObjectByPk
-                    (application, "portofino", SecurityLogic.USER_ENTITY_NAME, new User(userId));
-        ClassAccessor accessor = application.getTableAccessor(SecurityLogic.USERTABLE);
+                    (application, application.getSystemDatabaseName(),
+                     SecurityLogic.USER_ENTITY_NAME, new User(userId));
+        ClassAccessor accessor =
+                application.getTableAccessor(application.getSystemDatabaseName(), SecurityLogic.USER_ENTITY_NAME);
         FormBuilder formBuilder = new FormBuilder(accessor);
         formBuilder.configFields("email", "userName", "firstName",
                 "middleName", "lastName", "creationDate");
@@ -138,9 +140,11 @@ public class ProfileAction extends AbstractActionBean {
         userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) QueryUtils.getObjectByPk
-                (application, "portofino", SecurityLogic.USER_ENTITY_NAME, new User(userId));
+                (application, application.getSystemDatabaseName(),
+                 SecurityLogic.USER_ENTITY_NAME, new User(userId));
 
-        ClassAccessor accessor = application.getTableAccessor(SecurityLogic.USERTABLE);
+        ClassAccessor accessor =
+                application.getTableAccessor(application.getSystemDatabaseName(), SecurityLogic.USER_ENTITY_NAME);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
                 .configFields("email", "userName", "firstName",
@@ -155,8 +159,10 @@ public class ProfileAction extends AbstractActionBean {
         userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) QueryUtils.getObjectByPk
-                (application, "portofino", SecurityLogic.USER_ENTITY_NAME, new User(userId));
-        ClassAccessor accessor = application.getTableAccessor(SecurityLogic.USERTABLE);
+                (application, application.getSystemDatabaseName(),
+                 SecurityLogic.USER_ENTITY_NAME, new User(userId));
+        ClassAccessor accessor =
+                application.getTableAccessor(application.getSystemDatabaseName(), SecurityLogic.USER_ENTITY_NAME);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
                 .configFields("email", "userName", "firstName",
@@ -168,7 +174,7 @@ public class ProfileAction extends AbstractActionBean {
         
         if(form.validate()){
             form.writeToObject(thisUser);
-            Session session = application.getSession("portofino");
+            Session session = application.getSystemSession();
             session.update(SecurityLogic.USER_ENTITY_NAME, thisUser);
             session.getTransaction().commit();
             logger.debug("User {} updated", thisUser.getEmail());
@@ -191,7 +197,8 @@ public class ProfileAction extends AbstractActionBean {
         userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) QueryUtils.getObjectByPk
-                (application, "portofino", SecurityLogic.USER_ENTITY_NAME, new User(userId));
+                (application, application.getSystemDatabaseName(),
+                 SecurityLogic.USER_ENTITY_NAME, new User(userId));
 
         form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
                 .configMode(Mode.EDIT)
@@ -225,7 +232,7 @@ public class ProfileAction extends AbstractActionBean {
                 }
                 thisUser.setPwdModDate(new Timestamp(new Date().getTime()));
 
-                Session session = application.getSession("portofino");
+                Session session = application.getSystemSession();
                 session.update(SecurityLogic.USER_ENTITY_NAME, thisUser);
                 session.getTransaction().commit();
                 logger.debug("User {} updated", thisUser.getEmail());

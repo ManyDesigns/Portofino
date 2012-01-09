@@ -16,7 +16,7 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-jar</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

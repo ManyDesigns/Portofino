@@ -31,6 +31,7 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.logic.TextLogic;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.Attachment;
@@ -44,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -58,8 +60,8 @@ public class TextAction extends PortletAction {
             "Copyright (c) 2005-2011, ManyDesigns srl";
     public static final String CONTENT_ENCODING = "UTF-8";
     public static final String EMPTY_STRING = "";
-    public static final String TEXT_FILE_NAME_PATTERN = "text-{0}.html";
-    public static final String ATTACHMENT_FILE_NAME_PATTERN = "attachment-{0}.data";
+    public static final String TEXT_FILE_NAME_PATTERN = "{0}.html";
+    public static final String ATTACHMENT_FILE_NAME_PATTERN = "{0}.data";
 
     public String content;
     public String[] selection;
@@ -81,7 +83,6 @@ public class TextAction extends PortletAction {
     //**************************************************************************
 
     public TextPage textPage;
-    public File storageDirFile;
     public File textFile;
 
     public static final Logger logger =
@@ -96,7 +97,6 @@ public class TextAction extends PortletAction {
     public void prepare() {
         super.prepare();
         textPage = (TextPage) pageInstance.getPage();
-        storageDirFile = application.getAppStorageDir();
     }
 
     //**************************************************************************
@@ -120,7 +120,7 @@ public class TextAction extends PortletAction {
 
     protected void loadContent() throws IOException {
         String textCode = textPage.getId();
-        textFile = RandomUtil.getCodeFile(storageDirFile, TEXT_FILE_NAME_PATTERN, textCode);
+        textFile = RandomUtil.getCodeFile(application.getAppTextDir(), TEXT_FILE_NAME_PATTERN, textCode);
         try {
             content = FileUtils.readFileToString(textFile, CONTENT_ENCODING);
         } catch (FileNotFoundException e) {
@@ -136,14 +136,14 @@ public class TextAction extends PortletAction {
         byte[] contentByteArray = content.getBytes(CONTENT_ENCODING);
         String textCode = textPage.getId();
         File dataFile =
-                RandomUtil.getCodeFile(storageDirFile, TEXT_FILE_NAME_PATTERN, textCode);
+                RandomUtil.getCodeFile(application.getAppTextDir(), TEXT_FILE_NAME_PATTERN, textCode);
 
         // copy the data
         long size = IOUtils.copyLarge(
                 new ByteArrayInputStream(contentByteArray), new FileOutputStream(dataFile));
     }
 
-    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1)
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configure() throws IOException {
         prepareConfigurationForms();
@@ -162,7 +162,8 @@ public class TextAction extends PortletAction {
                 updatePageConfiguration();
                 saveContent();
                 saveModel();
-                SessionMessages.addInfoMessage("Configuration updated successfully");
+
+                SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
                 return cancel();
             } else {
                 return new ForwardResolution("/layouts/text/configure.jsp");
@@ -172,16 +173,17 @@ public class TextAction extends PortletAction {
     }
 
     @RequiresPermissions(level = AccessLevel.EDIT)
+    @Button(list = "manage-attachments-upload", key = "text.attachment.upload", order = 1)
     public Resolution uploadAttachment() {
         if (upload == null) {
-            SessionMessages.addWarningMessage("No file selected for upload");
+            SessionMessages.addWarningMessage(getMessage("text.attachment.noFileSelected"));
         } else {
             try {
                 commonUploadAttachment();
-                SessionMessages.addInfoMessage("File uploaded successfully");
+                SessionMessages.addInfoMessage(getMessage("text.attachment.uploadSuccessful"));
             } catch (IOException e) {
                 logger.error("Upload failed", e);
-                SessionMessages.addErrorMessage("Upload failed!");
+                SessionMessages.addErrorMessage(getMessage("text.attachment.uploadFailed"));
             }
         }
         return new RedirectResolution(dispatch.getOriginalPath())
@@ -209,7 +211,7 @@ public class TextAction extends PortletAction {
             InputStream attachmentStream = upload.getInputStream();
             String attachmentId = RandomUtil.createRandomId();
             File dataFile = RandomUtil.getCodeFile(
-                    storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
+                    application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
 
             // copy the data
             IOUtils.copyLarge(attachmentStream, new FileOutputStream(dataFile));
@@ -238,7 +240,7 @@ public class TextAction extends PortletAction {
         try {
             String attachmentId = attachment.getId();
             File file = RandomUtil.getCodeFile(
-                    storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
+                    application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
             InputStream is = new FileInputStream(file);
             Resolution resolution =
                     new StreamingResolution(attachment.getContentType(), is)
@@ -264,7 +266,7 @@ public class TextAction extends PortletAction {
         try {
             String attachmentId = attachment.getId();
             File file = RandomUtil.getCodeFile(
-                    storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
+                    application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
             InputStream is = new FileInputStream(file);
             Resolution resolution =
                     new StreamingResolution(attachment.getContentType(), is)
@@ -284,7 +286,7 @@ public class TextAction extends PortletAction {
         return new ForwardResolution("/layouts/text/browse.jsp");
     }
 
-    @Button(list = "portletHeaderButtons", key = "layouts.text.manage-attachments.manage_attachments_for_page", order = 2)
+    @Button(list = "portletHeaderButtons", key = "layouts.text.manage-attachments.manage_attachments_for_page", order = 2, icon = "ui-icon-link")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution manageAttachments() {
         logger.info("Manage attachments");
@@ -292,9 +294,10 @@ public class TextAction extends PortletAction {
     }
 
     @RequiresPermissions(level = AccessLevel.EDIT)
+    @Button(list = "manage-attachments-delete", key = "commons.delete", order = 1)
     public Resolution deleteAttachments() {
         if (selection == null || selection.length == 0) {
-            SessionMessages.addWarningMessage("No attachments selected");
+            SessionMessages.addWarningMessage(getMessage("text.attachment.noAttachmentSelected"));
         } else {
             synchronized (application) {
                 int counter = 0;
@@ -305,7 +308,7 @@ public class TextAction extends PortletAction {
                         logger.warn("Ignoring non-existing attachment with code: {}", code);
                         continue;
                     }
-                    File file = RandomUtil.getCodeFile(storageDirFile, ATTACHMENT_FILE_NAME_PATTERN, attachment.getId());
+                    File file = RandomUtil.getCodeFile(application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachment.getId());
                     if(!FileUtils.deleteQuietly(file)) {
                         logger.warn("File wasn't deleted: {}", file.getAbsolutePath());
                     }
@@ -314,11 +317,11 @@ public class TextAction extends PortletAction {
                 }
                 saveModel();
                 if (counter == 1) {
-                    SessionMessages.addInfoMessage("1 attachment deleted successfully");
+                    SessionMessages.addInfoMessage(getMessage("text.attachment.oneDeleted"));
                 } else if (counter > 1) {
                     SessionMessages.addInfoMessage(
-                            String.format(
-                                    "%d attachments deleted successfully",
+                            MessageFormat.format(
+                                    getMessage("text.attachment.nDeleted"),
                                     counter));
                 }
             }
@@ -326,6 +329,17 @@ public class TextAction extends PortletAction {
         return new RedirectResolution(dispatch.getOriginalPath())
                 .addParameter("manageAttachments")
                 .addParameter("cancelReturnUrl", cancelReturnUrl);
+    }
+
+    @Buttons({
+        @Button(list = "page-permissions-edit", key = "commons.cancel", order = 99),
+        @Button(list = "configuration", key = "commons.cancel", order = 99),
+        @Button(list = "page-create", key = "commons.cancel", order = 99),
+        @Button(list = "manage-attachments", key = "commons.ok", order = 1)
+    })
+    @Override
+    public Resolution cancel() {
+        return super.cancel();
     }
 
     //**************************************************************************

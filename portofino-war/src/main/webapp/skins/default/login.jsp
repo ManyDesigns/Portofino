@@ -1,10 +1,10 @@
-<%@ page contentType="text/html;charset=ISO-8859-1" language="java" pageEncoding="ISO-8859-1"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
-<%@ taglib prefix="mde" uri="/manydesigns-elements"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt" %>
-<%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-definition><%--
+<%@ page contentType="text/html;charset=ISO-8859-1" language="java" pageEncoding="ISO-8859-1"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
+%><%@ taglib prefix="mde" uri="/manydesigns-elements"
+%><%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt"
+%><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
+%><stripes:layout-definition><%--
 --%><%
     // Avoid caching of dynamic pages
     response.setHeader("Pragma", "no-cache");
@@ -24,11 +24,7 @@
     </head>
     <body>
     <div id="doc3">
-        <div id="hd">
-            <div style="position: absolute; left: 20em;">
-                <mde:sessionMessages/>
-            </div>
-        </div>
+        <div id="hd"></div>
         <div id="bd">
         <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
         <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction" method="post">
@@ -47,9 +43,12 @@
                                         </stripes:layout-component>
                                     </div>
                                 </div>
+                                <div class="portletHeaderSeparator"></div>
                             </div>
                             <div class="portletBody">
                                 <stripes:layout-component name="portletBody">
+                                    <mde:sessionMessages/>
+                                    <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
                                     <table class="mde-form-table loginTable">
                                         <tbody>
                                         <tr>
@@ -64,8 +63,6 @@
                                             <th></th>
                                             <td>
                                                 <portofino:buttons list="login-buttons" cssClass="portletButton" />
-                                                <%--<stripes:submit name="login"  class="portletButton"><fmt:message key="commons.login"/></stripes:submit>
-                                                <stripes:submit name="cancel" class="portletButton"><fmt:message key="commons.cancel"/></stripes:submit>--%>
                                             </td>
                                         </tr>
                                         <c:if test="recoverPwd">

@@ -65,8 +65,13 @@ public class PageReferenceInstance extends PageInstance {
     }
 
     @Override
-    public void realize() {
-        wrappedPageInstance.realize();
+    public boolean realize() {
+        return wrappedPageInstance.realize();
+    }
+
+    @Override
+    public boolean isRealized() {
+        return wrappedPageInstance.isRealized();
     }
 
     @Override
@@ -114,10 +119,10 @@ public class PageReferenceInstance extends PageInstance {
         return wrappedPageInstance.removeChild(page);
     }
 
-    @Override
+    /*@Override
     public String getUrlFragment() {
         return wrappedPageInstance.getUrlFragment();
-    }
+    }*/
 
     @Override
     public Application getApplication() {

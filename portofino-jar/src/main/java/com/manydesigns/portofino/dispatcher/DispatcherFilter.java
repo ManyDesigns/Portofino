@@ -29,17 +29,21 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.i18n.SimpleTextProvider;
+import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ApplicationStarter;
 import com.manydesigns.portofino.model.Model;
-import net.sourceforge.stripes.controller.StripesConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.jstl.core.Config;
+import javax.servlet.jsp.jstl.fmt.LocalizationContext;
 import java.io.IOException;
 import java.util.*;
 
@@ -87,6 +91,16 @@ public class DispatcherFilter implements Filter {
         if (application != null) {
             Model model = application.getModel();
             request.setAttribute(RequestAttributes.MODEL, model);
+
+            //I18n
+            Locale locale = request.getLocale();
+            LocalizationContext localizationContext =
+                    new LocalizationContext(application.getBundle(locale), locale);
+            request.setAttribute(Config.FMT_LOCALIZATION_CONTEXT + ".request", localizationContext);
+
+            //Setup Elements I18n
+            TextProvider textProvider = SimpleTextProvider.create(locale);
+            ElementsThreadLocals.setTextProvider(textProvider);
         }
 
         logger.debug("Invoking the dispatcher to create a dispatch");
@@ -101,25 +115,12 @@ public class DispatcherFilter implements Filter {
             return;
         }
 
-        String rewrittenPath = dispatch.getRewrittenPath();
-        RequestDispatcher requestDispatcher =
-                servletContext.getRequestDispatcher(rewrittenPath);
-
         Map<String, Object> savedAttributes =
                 saveAndResetRequestAttributes(request);
         request.setAttribute(RequestAttributes.DISPATCH, dispatch);
         try {
-            if(request.getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH) == null) {
-                logger.debug("Forwarding '{}' to '{}'",
-                    dispatch.getOriginalPath(),
-                    rewrittenPath);
-                    requestDispatcher.forward(request, response);
-            } else {
-                logger.debug("Including '{}' to '{}'",
-                    dispatch.getOriginalPath(),
-                    rewrittenPath);
-                requestDispatcher.include(request, response);
-            }
+            //Handle through the ModelActionResolver
+            chain.doFilter(request, response);
         } finally {
             restoreRequestAttributes(request, savedAttributes);
         }

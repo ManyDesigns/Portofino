@@ -34,6 +34,7 @@ import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import org.jetbrains.annotations.NotNull;
@@ -76,7 +77,7 @@ public class Breadcrumbs implements XhtmlFragment {
         items = new ArrayList<BreadcrumbItem>();
 
         StringBuilder sb = new StringBuilder();
-        sb.append(dispatch.getRequest().getContextPath());
+        sb.append(dispatch.getContextPath());
         for (int i = 1; i < upto; i++) {
             PageInstance current = dispatch.getPageInstancePath()[i];
             //Resolve references to treat Crud pages differently below
@@ -91,7 +92,7 @@ public class Breadcrumbs implements XhtmlFragment {
             if (current instanceof CrudPageInstance) {
                 CrudPageInstance instance =
                         (CrudPageInstance) current;
-                if (instance.getPk() != null) {
+                if (CrudPage.MODE_DETAIL.equals(instance.getMode())) {
                     sb.append("/");
                     sb.append(instance.getPk());
                     String name = ShortNameUtils.getName(

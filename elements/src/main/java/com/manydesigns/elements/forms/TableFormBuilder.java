@@ -30,7 +30,6 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.Enabled;
 import com.manydesigns.elements.annotations.InSummary;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
@@ -146,29 +145,33 @@ public class TableFormBuilder extends AbstractFormBuilder {
     public void configReflectiveFields() {
         propertyAccessors = new ArrayList<PropertyAccessor>();
         for (PropertyAccessor current : classAccessor.getProperties()) {
-            if (skippableProperty(current)) {
-                continue;
-            }
-
-            // check if field is enabled
-            Enabled enabled = current.getAnnotation(Enabled.class);
-            if(enabled != null && !enabled.value()) {
-                logger.debug("Skipping non-enabled field: {}",
-                        current.getName());
-                continue;
-            }
-
-            // check if field is in summary
-            InSummary inSummaryAnnotation =
-                    current.getAnnotation(InSummary.class);
-            if (inSummaryAnnotation != null && !inSummaryAnnotation.value()) {
-                logger.debug("Skipping non-in-summary field: {}",
-                        current.getName());
+            if (!isPropertyVisible(current)) {
                 continue;
             }
 
             propertyAccessors.add(current);
         }
+    }
+
+    public boolean isPropertyVisible(PropertyAccessor current) {
+        if (skippableProperty(current)) {
+            return false;
+        }
+
+        if (!isPropertyEnabled(current)) {
+            return false;
+        }
+
+
+        // check if field is in summary
+        InSummary inSummaryAnnotation =
+                current.getAnnotation(InSummary.class);
+        if (inSummaryAnnotation != null && !inSummaryAnnotation.value()) {
+            logger.debug("Skipping non-in-summary field: {}",
+                    current.getName());
+            return false;
+        }
+        return true;
     }
 
     public TableFormBuilder configHrefTextFormat(

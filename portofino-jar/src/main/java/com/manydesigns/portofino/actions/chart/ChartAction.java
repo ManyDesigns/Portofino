@@ -53,7 +53,10 @@ import org.jfree.chart.JFreeChart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /*
@@ -139,6 +142,7 @@ public class ChartAction extends PortletAction {
             String portletUrl = chartResolution.toString();
 
             File file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
+            file.deleteOnExit();
             fileName = file.getName();
 
             jfreeChartInstance =
@@ -253,7 +257,7 @@ public class ChartAction extends PortletAction {
         }
     }
 
-    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1)
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configure() {
         prepareConfigurationForms();
@@ -264,18 +268,22 @@ public class ChartAction extends PortletAction {
     protected void prepareConfigurationForms() {
         super.prepareConfigurationForms();
         SelectionProvider databaseSelectionProvider =
-                DefaultSelectionProvider.create("database",
+                createSelectionProvider("database",
                         model.getDatabases(),
                         Database.class,
                         null,
-                        "databaseName");
-        SelectionProvider typeSelectionProvider =
-                DefaultSelectionProvider.create("type", chartTypeValues, chartTypeLabels);
+                        new String[] { "databaseName" });
+        DefaultSelectionProvider typeSelectionProvider = new DefaultSelectionProvider("type");
+        for(int i = 0; i < chartTypeValues.length; i++) {
+            typeSelectionProvider.appendRow(chartTypeValues[i], chartTypeLabels[i], true);
+        }
         String[] orientationValues =
                 { ChartPage.Orientation.HORIZONTAL.name(), ChartPage.Orientation.VERTICAL.name() };
         String[] orientationLabels = { "Horizontal", "Vertical" };
-        SelectionProvider orientationSelectionProvider =
-                DefaultSelectionProvider.create("orientation", orientationValues, orientationLabels);
+        DefaultSelectionProvider orientationSelectionProvider = new DefaultSelectionProvider("orientation");
+        for(int i = 0; i < orientationValues.length; i++) {
+            orientationSelectionProvider.appendRow(orientationValues[i], orientationLabels[i], true);
+        }
         form = new FormBuilder(ChartPage.class)
                 .configFields(CONFIGURATION_FIELDS)
                 .configFieldSetNames("Chart")
@@ -311,7 +319,8 @@ public class ChartAction extends PortletAction {
                 updatePageConfiguration();
                 form.writeToObject(chartPage);
                 saveModel();
-                SessionMessages.addInfoMessage("Configuration updated successfully");
+
+                SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
                 return cancel();
             } else {
                 return new ForwardResolution("/layouts/chart/configure.jsp");

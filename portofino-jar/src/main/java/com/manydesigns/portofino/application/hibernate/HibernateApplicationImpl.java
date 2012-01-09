@@ -32,28 +32,31 @@ package com.manydesigns.portofino.application.hibernate;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.connections.ConnectionProvider;
-import com.manydesigns.portofino.connections.Connections;
+import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
+import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.util.ConfigurationResourceBundle;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -76,6 +79,8 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -95,7 +100,7 @@ public class HibernateApplicationImpl implements Application {
 
     protected final org.apache.commons.configuration.Configuration portofinoConfiguration;
     protected final DatabasePlatformsManager databasePlatformsManager;
-    protected Connections connectionProviders;
+    protected List<ConnectionProvider> connectionProviders;
     protected Model model;
     protected Map<String, HibernateDatabaseSetup> setups;
 
@@ -107,6 +112,7 @@ public class HibernateApplicationImpl implements Application {
     protected final File appDbsDir;
     protected final File appModelFile;
     protected final File appScriptsDir;
+    protected final File appTextDir;
     protected final File appStorageDir;
     protected final File appWebDir;
 
@@ -127,6 +133,7 @@ public class HibernateApplicationImpl implements Application {
                                     File appDbsDir,
                                     File appModelFile,
                                     File appScriptsDir,
+                                    File appTextDir,
                                     File appStorageDir,
                                     File appWebDir
     ) {
@@ -139,6 +146,7 @@ public class HibernateApplicationImpl implements Application {
         this.appDbsDir = appDbsDir;
         this.appModelFile = appModelFile;
         this.appScriptsDir = appScriptsDir;
+        this.appTextDir = appTextDir;
         this.appStorageDir = appStorageDir;
         this.appWebDir = appWebDir;
     }
@@ -147,51 +155,14 @@ public class HibernateApplicationImpl implements Application {
     // Model loading
     //**************************************************************************
 
-    public void loadConnections() {
-        logger.info("Loading connections from file: {}", appConnectionsFile);
-        try {
-            JAXBContext jc = JAXBContext.newInstance(
-                    Connections.JAXB_CONNECTIONS_PACKAGES);
-            Unmarshaller um = jc.createUnmarshaller();
-            connectionProviders = (Connections) um.unmarshal(appConnectionsFile);
-            connectionProviders.reset();
-            connectionProviders.init(databasePlatformsManager);
-        } catch (Exception e) {
-            logger.error("Cannot load/parse file: " + appConnectionsFile, e);
-            return;
+    private String calculateRelativePath(File ancestor, File changelogFile) {
+        String path = changelogFile.getName();
+        File parent = changelogFile.getParentFile();
+        while (parent != null && !parent.equals(ancestor)) {
+            path = parent.getName() + File.separator + path;
+            parent = parent.getParentFile();
         }
-
-        logger.info("Updating database definitions");
-        ResourceAccessor resourceAccessor =
-                new FileSystemResourceAccessor();
-        for (ConnectionProvider current : connectionProviders.getConnections()) {
-            String databaseName = current.getDatabaseName();
-            String changelogFileName =
-                    MessageFormat.format(
-                            changelogFileNameTemplate, databaseName);
-            File changelogFile =
-                new File(appDbsDir, changelogFileName);
-            logger.info("Running changelog file: {}", changelogFile);
-            Connection connection = null;
-            try {
-                connection = current.acquireConnection();
-                JdbcConnection jdbcConnection = new JdbcConnection(connection);
-                liquibase.database.Database lqDatabase =
-                        DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
-                //XXX temporaneo funziona con uno schema solo
-                //lqDatabase.setDefaultSchemaName(current.getIncludeSchemas());
-                Liquibase lq = new Liquibase(
-                        changelogFile.getAbsolutePath(),
-                        resourceAccessor,
-                        lqDatabase);
-                lq.update(null);
-            } catch (Exception e) {
-                logger.error("Couldn't update database: " + databaseName, e);
-            } finally {
-                current.releaseConnection(connection);
-            }
-
-        }
+        return path;
     }
 
     public synchronized void loadXmlModel() {
@@ -202,11 +173,12 @@ public class HibernateApplicationImpl implements Application {
             JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
             Unmarshaller um = jc.createUnmarshaller();
             Model loadedModel = (Model) um.unmarshal(appModelFile);
+            initConnections(loadedModel);
             boolean syncOnStart = false;
             if (syncOnStart) {
                 for (ConnectionProvider connectionProvider :
-                        connectionProviders.getConnections()) {
-                    String databaseName = connectionProvider.getDatabaseName();
+                        connectionProviders) {
+                    String databaseName = connectionProvider.getDatabase().getDatabaseName();
                     Database sourceDatabase =
                             DataModelLogic.findDatabaseByName(loadedModel, databaseName);
                     DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
@@ -219,6 +191,56 @@ public class HibernateApplicationImpl implements Application {
             installDataModel(loadedModel);
         } catch (Exception e) {
             logger.error("Cannot load/parse model: " + appModelFile, e);
+        }
+    }
+
+    protected void initConnections(Model loadedModel) {
+        loadedModel.initDatabases(this);
+        connectionProviders = new ArrayList<ConnectionProvider>();
+        for(Database db : loadedModel.getDatabases()) {
+            ConnectionProvider connectionProvider = db.getConnectionProvider();
+            if(connectionProvider != null) {
+                connectionProviders.add(connectionProvider);
+            }
+        }
+        logger.info("Updating database definitions");
+        File appsDir = appDir.getParentFile();
+        ResourceAccessor resourceAccessor =
+                new FileSystemResourceAccessor(appsDir.getAbsolutePath());
+        for (ConnectionProvider current : connectionProviders) {
+            Database database = current.getDatabase();
+            String databaseName = database.getDatabaseName();
+            for(Schema schema : database.getSchemas()) {
+                String schemaName = schema.getSchemaName();
+                String changelogFileName =
+                        MessageFormat.format(
+                                changelogFileNameTemplate, databaseName + "-" + schemaName);
+                File changelogFile =
+                    new File(appDbsDir, changelogFileName);
+                logger.info("Running changelog file: {}", changelogFile);
+                Connection connection = null;
+                try {
+                    connection = current.acquireConnection();
+                    JdbcConnection jdbcConnection = new JdbcConnection(connection);
+                    liquibase.database.Database lqDatabase =
+                            DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
+                    lqDatabase.setDefaultSchemaName(schemaName);
+                    String relativeChangelogPath = calculateRelativePath(appsDir, changelogFile);
+                    if(new File(relativeChangelogPath).isAbsolute()) {
+                        logger.warn("The application dbs dir {} is not inside the apps dir {}; using an absolute path for Liquibase update",
+                                appDbsDir, appsDir);
+                    }
+                    Liquibase lq = new Liquibase(
+                            relativeChangelogPath,
+                            resourceAccessor,
+                            lqDatabase);
+                    lq.update(null);
+                } catch (Exception e) {
+                    logger.error("Couldn't update database: " + schemaName, e);
+                } finally {
+                    current.releaseConnection(connection);
+                }
+            }
         }
     }
 
@@ -300,59 +322,67 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
 
     public ConnectionProvider getConnectionProvider(String databaseName) {
-        for (ConnectionProvider current : connectionProviders.getConnections()) {
-            if (current.getDatabaseName().equals(databaseName)) {
+        for (ConnectionProvider current : connectionProviders) {
+            if (current.getDatabase().getDatabaseName().equals(databaseName)) {
                 return current;
             }
         }
         return null;
     }
 
-    public void addConnectionProvider(ConnectionProvider connectionProvider) {
-        logger.info("Adding a new connection Provider: {}", connectionProvider);
-        connectionProviders.getConnections().add(connectionProvider);
-        writeToConnectionFile();
+    public void addDatabase(Database database) {
+        logger.info("Adding a new database: {}", database);
+        model.getDatabases().add(database);
+        connectionProviders.add(database.getConnectionProvider());
+        saveXmlModel();
     }
 
-    public void deleteConnectionProvider(String[] connectionProvider) {
-        logger.info("Deleting connection Provider: {}", connectionProvider);
-        List<ConnectionProvider> toBeRemoved = new ArrayList<ConnectionProvider>();
-        for(String databaseName : connectionProvider){
-            for(ConnectionProvider current : connectionProviders.getConnections()){
+    public void deleteDatabases(String[] databases) {
+        logger.info("Deleting databases: {}", databases);
+        List<Database> toBeRemoved = new ArrayList<Database>();
+        for(String databaseName : databases) {
+            for(Database current : model.getDatabases()){
                 if(current.getDatabaseName().equals(databaseName)){
                     toBeRemoved.add(current);
+                    connectionProviders.remove(current.getConnectionProvider());
                 }
             }
         }
-        connectionProviders.getConnections().removeAll(toBeRemoved);
-        writeToConnectionFile();
+        model.getDatabases().removeAll(toBeRemoved);
+        saveXmlModel();
     }
 
-     public void deleteConnectionProvider(String connectionProvider) {
-        logger.info("Deleting connection Provider: {}", connectionProvider);
-        for(ConnectionProvider current : connectionProviders.getConnections()){
-            if(current.getDatabaseName().equals(connectionProvider)){
-                connectionProviders.getConnections().remove(current);
+     public void deleteDatabase(String databaseName) {
+        logger.info("Deleting database: {}", databaseName);
+        for(Database current : model.getDatabases()){
+            if(current.getDatabaseName().equals(databaseName)){
+                model.getDatabases().remove(current);
+                connectionProviders.remove(current.getConnectionProvider());
+                saveXmlModel();
                 break;
             }
         }
-
-        writeToConnectionFile();
     }
 
-    public void updateConnectionProvider(ConnectionProvider connectionProvider) {
-        logger.info("Updating connection Provider: {}", 
-                connectionProvider.toString());
-        for (ConnectionProvider conn : connectionProviders.getConnections()){
-            if (conn.getDatabaseName().equals(connectionProvider.getDatabaseName())){
-                deleteConnectionProvider(connectionProvider.getDatabaseName());
-                addConnectionProvider(connectionProvider);
+    public void updateDatabase(Database database) {
+        logger.info("Updating database: {}", database);
+        for (Database db : model.getDatabases()){
+            if (db.getDatabaseName().equals(database.getDatabaseName())){
+                deleteDatabase(database.getDatabaseName());
+                addDatabase(db); //TODO salva il modello 2 volte
                 return;
             }
         }
-        writeToConnectionFile();
     }
-    
+
+    public String getSystemDatabaseName() {
+        return portofinoConfiguration.getString(PortofinoProperties.SYSTEM_DATABASE);
+    }
+
+    public Database getSystemDatabase() {
+        return DataModelLogic.findDatabaseByName(model, getSystemDatabaseName());
+    }
+
     public org.apache.commons.configuration.Configuration getPortofinoProperties() {
         return portofinoConfiguration;
     }
@@ -366,7 +396,7 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
 
     public List<ConnectionProvider> getConnectionProviders() {
-        return connectionProviders.getConnections();
+        return connectionProviders;
     }
 
     public Model getModel() {
@@ -400,6 +430,10 @@ public class HibernateApplicationImpl implements Application {
 
     public Session getSession(String databaseName) {
         return ensureDatabaseSetup(databaseName).getThreadSession();
+    }
+
+    public Session getSystemSession() {
+        return getSession(getSystemDatabaseName());
     }
 
     protected HibernateDatabaseSetup ensureDatabaseSetup(String databaseName) {
@@ -552,24 +586,21 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
 
     public User findUserByEmail(String email) {
-        String qualifiedTableName = SecurityLogic.USERTABLE;
-        Session session = getSessionByQualifiedTableName(qualifiedTableName);
+        Session session = getSystemSession();
         org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("email", email));
         return (User) criteria.uniqueResult();
     }
 
     public User findUserByUserName(String username) {
-        String qualifiedTableName = SecurityLogic.USERTABLE;
-        Session session = getSessionByQualifiedTableName(qualifiedTableName);
+        Session session = getSystemSession();
         org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
         return (User) criteria.uniqueResult();
     }
 
     public User findUserByToken(String token) {
-        String qualifiedTableName = SecurityLogic.USERTABLE;
-        Session session = getSessionByQualifiedTableName(qualifiedTableName);
+        Session session = getSystemSession();
         org.hibernate.Criteria criteria = session.createCriteria(SecurityLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("token", token));
         return (User) criteria.uniqueResult();
@@ -607,11 +638,11 @@ public class HibernateApplicationImpl implements Application {
     }
 
     protected Group getGroup(String name) {
-        TableAccessor table = getTableAccessor(SecurityLogic.GROUPTABLE);
+        TableAccessor table = getTableAccessor(getSystemDatabaseName(), SecurityLogic.GROUP_ENTITY_NAME);
         assert table != null;
 
         String actualEntityName = table.getTable().getActualEntityName();
-        Session session = getSessionByQualifiedTableName(SecurityLogic.GROUPTABLE);
+        Session session = getSystemSession();
         List result = QueryUtils.runHqlQuery
                 (session,
                         "FROM " + actualEntityName + " WHERE name = ?",
@@ -629,23 +660,6 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
     // File Access
     //**************************************************************************
-
-    private void writeToConnectionFile() {
-        try {
-            File tempFile = File.createTempFile("portofino", "connections.xml");
-
-            JAXBContext jc = JAXBContext.newInstance(Connections.JAXB_CONNECTIONS_PACKAGES);
-            Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            m.marshal(connectionProviders, tempFile);
-
-            moveFileSafely(tempFile, appConnectionsFile.getAbsolutePath());
-
-            logger.info("Saved connections to file: {}", appConnectionsFile);
-        } catch (Throwable e) {
-            logger.error("Cannot save connections to file: " + appConnectionsFile, e);
-        }
-    }
 
     protected void moveFileSafely(File tempFile, String fileName) throws IOException {
         File destination = new File(fileName);
@@ -693,6 +707,10 @@ public class HibernateApplicationImpl implements Application {
         return appScriptsDir;
     }
 
+    public File getAppTextDir() {
+        return appTextDir;
+    }
+
     public File getAppStorageDir() {
         return appStorageDir;
     }
@@ -700,4 +718,68 @@ public class HibernateApplicationImpl implements Application {
     public File getAppWebDir() {
         return appWebDir;
     }
+
+    //**************************************************************************
+    // I18n
+    //**************************************************************************
+
+    private final ConcurrentMap<Locale, ConfigurationResourceBundle> resourceBundles =
+            new ConcurrentHashMap<Locale, ConfigurationResourceBundle>();
+
+    protected String getBundleFileName(String baseName, Locale locale) {
+        return getBundleName(baseName, locale) + ".properties";
+    }
+
+    protected String getBundleName(String baseName, Locale locale) {
+        String language = locale.getLanguage();
+        String country = locale.getCountry();
+        String variant = locale.getVariant();
+
+        if (StringUtils.isBlank(language) && StringUtils.isBlank(country) && StringUtils.isBlank(variant)) {
+            return baseName;
+        }
+
+        String name = baseName + "_";
+        if (!StringUtils.isBlank(variant)) {
+            name += language + "_" + country + "_" + variant;
+        } else if (!StringUtils.isBlank(country)) {
+            name += language + "_" + country;
+        } else {
+            name += language;
+        }
+        return name;
+    }
+
+    public ResourceBundle getBundle(Locale locale) {
+        ConfigurationResourceBundle bundle = resourceBundles.get(locale);
+        if(bundle == null) {
+            ResourceBundle parentBundle = ResourceBundle.getBundle("portofino-messages", locale);
+            PropertiesConfiguration configuration;
+            try {
+                File bundleFile = getBundleFile(locale);
+                if(!bundleFile.exists() && !locale.equals(parentBundle.getLocale())) {
+                    bundleFile = getBundleFile(parentBundle.getLocale());
+                }
+                if(!bundleFile.exists()) {
+                    return parentBundle;
+                }
+                configuration = new PropertiesConfiguration(bundleFile);
+                FileChangedReloadingStrategy reloadingStrategy = new FileChangedReloadingStrategy();
+                configuration.setReloadingStrategy(reloadingStrategy);
+                bundle = new ConfigurationResourceBundle(configuration);
+                bundle.setParent(parentBundle);
+                resourceBundles.put(locale, bundle);
+            } catch (ConfigurationException e) {
+                logger.warn("Couldn't load app resource bundle for locale " + locale, e);
+                return parentBundle;
+            }
+        }
+        return bundle;
+    }
+
+    protected File getBundleFile(Locale locale) {
+        String resourceName = getBundleFileName("portofino-messages", locale);
+        return new File(appDir, resourceName);
+    }
+
 }

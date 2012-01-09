@@ -31,14 +31,16 @@ package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.BlobManager;
+import com.manydesigns.portofino.actions.PageRealizationAware;
 import com.manydesigns.portofino.actions.RequestAttributes;
-import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.navigation.Navigation;
 import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
@@ -105,8 +107,21 @@ public class ApplicationInterceptor implements Interceptor {
                     new Navigation(application, dispatch, groups, admin);
             request.setAttribute(RequestAttributes.NAVIGATION, navigation);
 
+            int i = 0;
             for(PageInstance page : dispatch.getPageInstancePath()) {
-                page.realize();
+                i++;
+                if(!page.realize()) {
+                    logger.error("Page realization failed for {}", page);
+                    Class<?> actionClass = page.getPage().getActualActionClass();
+                    if(PageRealizationAware.class.isAssignableFrom(actionClass)) {
+                        String pathUrl = dispatch.getPathUrl(i);
+                        request.setAttribute("pageRealizationFailed", request.getContextPath() + pathUrl);
+                        PageRealizationAware action = (PageRealizationAware) actionClass.newInstance();
+                        return action.pageRealizationFailed(actionContext, application);
+                    } else {
+                        return new ErrorResolution(404);
+                    }
+                }
             }
             PageInstance pageInstance = dispatch.getLastPageInstance();
             request.setAttribute(RequestAttributes.PAGE_INSTANCE, pageInstance);
@@ -115,6 +130,8 @@ public class ApplicationInterceptor implements Interceptor {
             Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
             request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
         }
+
         return context.proceed();
     }
+
 }

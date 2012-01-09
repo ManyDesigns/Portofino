@@ -16,13 +16,13 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>elements</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>elements-extras</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -178,6 +178,11 @@
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
             <version>${liquibase.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.tuckey</groupId>
+            <artifactId>urlrewritefilter</artifactId>
+            <version>3.1.0</version>
         </dependency>
 
         <!-- stuff for testing -->

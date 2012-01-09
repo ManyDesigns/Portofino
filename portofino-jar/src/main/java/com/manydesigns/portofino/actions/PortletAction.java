@@ -1,12 +1,16 @@
 package com.manydesigns.portofino.actions;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ApplicationAttributes;
@@ -15,6 +19,7 @@ import com.manydesigns.portofino.actions.forms.NewPage;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
+import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
@@ -22,20 +27,32 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
+import com.manydesigns.portofino.scripting.ScriptingUtil;
+import com.manydesigns.portofino.stripes.ModelActionResolver;
+import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import com.manydesigns.portofino.util.ShortNameUtils;
+import groovy.lang.GroovyClassLoader;
+import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.StripesConstants;
+import net.sourceforge.stripes.controller.StripesFilter;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.converters.ClassConverter;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -44,7 +61,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.*;
 
 @RequiresPermissions(level = AccessLevel.VIEW)
@@ -103,6 +126,12 @@ public class PortletAction extends AbstractActionBean {
     protected String fragment;
 
     //**************************************************************************
+    // Scripting
+    //**************************************************************************
+
+    protected String script;
+
+    //**************************************************************************
     // Logging
     //**************************************************************************
 
@@ -149,14 +178,6 @@ public class PortletAction extends AbstractActionBean {
                         returnToParentTarget = ShortNameUtils.getName(
                                 previousPageClassAccessor, previousPageObject);
                     }
-                }
-            }
-        } else {
-            if (thisPageInstance instanceof CrudPageInstance) {
-                CrudPageInstance crudPageInstance =
-                        (CrudPageInstance) thisPageInstance;
-                if (CrudPage.MODE_DETAIL.equals(crudPageInstance.getMode())) {
-                    returnToParentTarget = "search";
                 }
             }
         }
@@ -220,12 +241,17 @@ public class PortletAction extends AbstractActionBean {
     // Page permisssions
     //--------------------------------------------------------------------------
 
-    List<com.manydesigns.portofino.system.model.users.Group> groups;
+    protected List<com.manydesigns.portofino.system.model.users.Group> groups;
 
     //<group, level>
-    Map<String, String> accessLevels = new HashMap<String, String>();
+    protected Map<String, String> accessLevels = new HashMap<String, String>();
     //<group, permissions>
-    Map<String, List<String>> permissions = new HashMap<String, List<String>>();
+    protected Map<String, List<String>> permissions = new HashMap<String, List<String>>();
+
+    protected String testUserId;
+    protected List<User> users;
+    protected AccessLevel testedAccessLevel;
+    protected Set<String> testedPermissions;
 
     @RequiresAdministrator
     public Resolution pagePermissions() {
@@ -233,7 +259,34 @@ public class PortletAction extends AbstractActionBean {
 
         setupGroups(page);
 
+        Session session = application.getSystemSession();
+        users = (List) QueryUtils.runHqlQuery(session, "from users", null);
+
         return forwardToPagePermissions();
+    }
+
+    @Button(list = "testUserPermissions", key = "user.permissions.test")
+    public Resolution testUserPermissions() {
+        if(StringUtils.isBlank(testUserId)) {
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
+        List<String> groups = SecurityLogic.manageGroups(application, testUserId);
+        Permissions permissions = getPage().getPermissions();
+        testedAccessLevel = AccessLevel.NONE;
+        testedPermissions = new HashSet<String>();
+        for(String group : groups) {
+            AccessLevel accessLevel = permissions.getActualLevels().get(group);
+            if(accessLevel != null &&
+               accessLevel.isGreaterThanOrEqual(testedAccessLevel)) {
+                testedAccessLevel = accessLevel;
+            }
+            Set<String> perms = permissions.getActualPermissions().get(group);
+            if(perms != null) {
+                testedPermissions.addAll(perms);
+            }
+        }
+
+        return pagePermissions();
     }
 
     protected Resolution forwardToPagePermissions() {
@@ -241,7 +294,7 @@ public class PortletAction extends AbstractActionBean {
     }
 
     public void setupGroups(Page page) {
-        Session session = application.getSession("portofino");
+        Session session = application.getSystemSession();
         Criteria criteria = session.createCriteria(SecurityLogic.GROUP_ENTITY_NAME).addOrder(Order.asc("name"));
         groups = new ArrayList(criteria.list());
     }
@@ -253,7 +306,10 @@ public class PortletAction extends AbstractActionBean {
         synchronized (application) {
             updatePagePermissions(page);
             saveModel();
-            SessionMessages.addInfoMessage("Page permissions saved successfully.");
+
+            Locale locale = context.getLocale();
+            ResourceBundle bundle = application.getBundle(locale);
+            SessionMessages.addInfoMessage(bundle.getString("permissions.page.updated"));
         }
 
         return new RedirectResolution(dispatch.getOriginalPath())
@@ -391,7 +447,8 @@ public class PortletAction extends AbstractActionBean {
 
     @Buttons({
         @Button(list = "page-permissions-edit", key = "commons.cancel", order = 99),
-        @Button(list = "configuration", key = "commons.cancel", order = 99)
+        @Button(list = "configuration", key = "commons.cancel", order = 99),
+        @Button(list = "page-create", key = "commons.cancel", order = 99)
     })
     public Resolution cancel() {
         if (StringUtils.isEmpty(cancelReturnUrl)) {
@@ -434,6 +491,26 @@ public class PortletAction extends AbstractActionBean {
         this.cancelReturnUrl = cancelReturnUrl;
     }
 
+    public String getTestUserId() {
+        return testUserId;
+    }
+
+    public void setTestUserId(String testUserId) {
+        this.testUserId = testUserId;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public AccessLevel getTestedAccessLevel() {
+        return testedAccessLevel;
+    }
+
+    public Set<String> getTestedPermissions() {
+        return testedPermissions;
+    }
+
     //--------------------------------------------------------------------------
     // Page configuration
     //--------------------------------------------------------------------------
@@ -455,6 +532,10 @@ public class PortletAction extends AbstractActionBean {
         edit.showInNavigation = page.isShowInNavigation();
         pageConfigurationForm.readFromObject(edit);
         title = page.getTitle();
+
+        if(script == null) {
+            prepareScript();
+        }
     }
 
     protected void readPageConfigurationFromRequest() {
@@ -466,7 +547,7 @@ public class PortletAction extends AbstractActionBean {
         boolean valid = true;
         title = StringUtils.trimToNull(title);
         if (title == null) {
-            SessionMessages.addErrorMessage("Title cannot be empty");
+            SessionMessages.addErrorMessage(getMessage("commons.configuration.titleEmpty"));
             valid = false;
         }
 
@@ -474,8 +555,6 @@ public class PortletAction extends AbstractActionBean {
 
         return valid;
     }
-
-
 
     protected void updatePageConfiguration() {
         EditPage edit = new EditPage();
@@ -496,6 +575,101 @@ public class PortletAction extends AbstractActionBean {
             SessionMessages.addWarningMessage(
                     "The page is not embedded and not included in navigation - it will only be reachable by URL or explicit linking.");
         }
+
+        updateScript();
+    }
+
+    //**************************************************************************
+    // Selection Providers
+    //**************************************************************************
+
+    protected DefaultSelectionProvider createSelectionProvider
+            (String name, int fieldCount, Class[] fieldTypes, Collection<Object[]> objects) {
+        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider(name, fieldCount);
+        for (Object[] valueAndLabel : objects) {
+            Object[] values = new Object[fieldCount];
+            String[] labels = new String[fieldCount];
+
+            for (int j = 0; j < fieldCount; j++) {
+                Class valueType = fieldTypes[j];
+                values[j] = OgnlUtils.convertValue(valueAndLabel[j * 2], valueType);
+                labels[j] = OgnlUtils.convertValueToString(valueAndLabel[j*2+1]);
+            }
+
+            boolean active = true;
+            if(valueAndLabel.length > 2 * fieldCount) {
+                active =
+                        valueAndLabel[2 * fieldCount] instanceof Boolean &&
+                        (Boolean) valueAndLabel[2 * fieldCount];
+            }
+
+            selectionProvider.appendRow(values, labels, active);
+        }
+        return selectionProvider;
+    }
+
+    protected DefaultSelectionProvider createSelectionProvider(
+            String name,
+            Collection objects,
+            PropertyAccessor[] propertyAccessors,
+            TextFormat[] textFormats
+    ) {
+        int fieldsCount = propertyAccessors.length;
+        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider(name, propertyAccessors.length);
+        for (Object current : objects) {
+            boolean active = true;
+            if(current instanceof Object[]) {
+                Object[] valueAndActive = (Object[]) current;
+                if(valueAndActive.length > 1) {
+                    active = valueAndActive[1] instanceof Boolean && (Boolean) valueAndActive[1];
+                }
+                if(valueAndActive.length > 0) {
+                    current = valueAndActive[0];
+                } else {
+                    throw new IllegalArgumentException("Invalid selection provider query result - sp: " + name);
+                }
+            }
+            Object[] values = new Object[fieldsCount];
+            String[] labels = new String[fieldsCount];
+            int j = 0;
+            for (PropertyAccessor property : propertyAccessors) {
+                Object value = property.get(current);
+                values[j] = value;
+                if (textFormats == null || textFormats[j] == null) {
+                    String label = OgnlUtils.convertValueToString(value);
+                    labels[j] = label;
+                } else {
+                    TextFormat textFormat = textFormats[j];
+                    labels[j] = textFormat.format(current);
+                }
+                j++;
+            }
+            selectionProvider.appendRow(values, labels, active);
+        }
+        return selectionProvider;
+    }
+
+    protected DefaultSelectionProvider createSelectionProvider
+            (String name, Collection objects, Class objectClass,
+             TextFormat[] textFormats, String[] propertyNames) {
+        ClassAccessor classAccessor =
+                JavaClassAccessor.getClassAccessor(objectClass);
+        PropertyAccessor[] propertyAccessors =
+                new PropertyAccessor[propertyNames.length];
+        for (int i = 0; i < propertyNames.length; i++) {
+            String currentName = propertyNames[i];
+            try {
+                PropertyAccessor propertyAccessor =
+                        classAccessor.getProperty(currentName);
+                propertyAccessors[i] = propertyAccessor;
+            } catch (Throwable e) {
+                String msg = MessageFormat.format(
+                        "Could not access property: {0}", currentName);
+                logger.warn(msg, e);
+                throw new IllegalArgumentException(msg, e);
+            }
+        }
+        return createSelectionProvider(name, objects, propertyAccessors, textFormats);
     }
 
     //--------------------------------------------------------------------------
@@ -509,12 +683,15 @@ public class PortletAction extends AbstractActionBean {
     }
 
     @RequiresAdministrator
+    @Button(list = "page-create", key = "commons.create", order = 1)
     public Resolution createPage() {
         try {
             return doCreateNewPage();
         } catch (Exception e) {
             logger.error("Error creating page", e);
-            SessionMessages.addErrorMessage("Error creating page: " + e.getMessage() + " (see the logs for more details)");
+            String msg = getMessage("page.create.failed");
+            msg = MessageFormat.format(msg, e.getMessage());
+            SessionMessages.addErrorMessage(msg);
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
         }
     }
@@ -550,7 +727,7 @@ public class PortletAction extends AbstractActionBean {
                     InsertPosition.valueOf(newPage.getInsertPositionName());
             String pageClassName = newPage.getPageClassName();
             Page page = (Page) ReflectionUtil.newInstance(pageClassName);
-            BeanUtils.copyProperties(page, newPage);
+            copyModelObject(newPage, page);
             String pageId = RandomUtil.createRandomId();
             page.setId(pageId);
             page.setLayoutContainer(DEFAULT_LAYOUT_CONTAINER);
@@ -575,11 +752,17 @@ public class PortletAction extends AbstractActionBean {
                 }
                 saveModel();
             }
-            SessionMessages.addInfoMessage("Page created successfully. You should now configure it.");
+            SessionMessages.addInfoMessage(getMessage("page.create.successful"));
             return new RedirectResolution(configurePath + "/" + page.getFragment()).addParameter("configure");
         } else {
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
         }
+    }
+
+    protected void copyModelObject(ModelObject src, ModelObject dest) throws IllegalAccessException, InvocationTargetException {
+        //To handle actualActionClass = null, ClassConverter must have a null return value
+        BeanUtilsBean.getInstance().getConvertUtils().register(new ClassConverter(null), Class.class);
+        BeanUtils.copyProperties(dest, src);
     }
 
     @RequiresAdministrator
@@ -588,9 +771,9 @@ public class PortletAction extends AbstractActionBean {
         Page page = dispatch.getLastPageInstance().getPage();
         synchronized (application) {
             if(page.getParent() == null) {
-                SessionMessages.addErrorMessage("You can't delete the root page!");
+                SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.root"));
             }  else if(PageLogic.isLandingPage(model.getRootPage(), page)) {
-                SessionMessages.addErrorMessage("You can't delete the landing page!");
+                SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.landing"));
             } else {
                 parentPageInstance.removeChild(page);
                 saveModel();
@@ -603,19 +786,27 @@ public class PortletAction extends AbstractActionBean {
     @RequiresAdministrator
     public Resolution movePage() {
         if(destinationPageId == null) {
-            SessionMessages.addErrorMessage("You must select a destination");
+            SessionMessages.addErrorMessage(getMessage("page.move.noDestination"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
         Page page = dispatch.getLastPageInstance().getPage();
         synchronized (application) {
             if(page.getParent() == null) {
-                SessionMessages.addErrorMessage("You can't move the root page!");
+                SessionMessages.addErrorMessage(getMessage("page.move.forbidden.root"));
             } else {
                 boolean detail = destinationPageId.endsWith("-detail");
                 if(detail) {
                     destinationPageId = destinationPageId.substring(0, destinationPageId.length() - 7);
                 }
                 Page newParent = model.getRootPage().findDescendantPageById(destinationPageId);
+                if(!SecurityLogic.isAdministrator(context.getRequest())) {
+                    List<String> groups =
+                            (List<String>) context.getRequest().getAttribute(RequestAttributes.GROUPS);
+                    if(!SecurityLogic.hasPermissions(newParent.getPermissions(), groups, AccessLevel.EDIT)) {
+                        SessionMessages.addErrorMessage(getMessage("page.move.forbidden.accessLevel"));
+                        return new RedirectResolution(dispatch.getOriginalPath());
+                    }
+                }
                 if(newParent != null) {
                     page.getParent().removeChild(page);
                     if(detail) {
@@ -626,7 +817,8 @@ public class PortletAction extends AbstractActionBean {
                     saveModel();
                     return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
                 } else {
-                    SessionMessages.addErrorMessage("Invalid destination: " + destinationPageId);
+                    String msg = MessageFormat.format(getMessage("page.move.invalidDestination"), destinationPageId);
+                    SessionMessages.addErrorMessage(msg);
                 }
             }
         }
@@ -636,17 +828,17 @@ public class PortletAction extends AbstractActionBean {
     @RequiresAdministrator
     public Resolution copyPage() {
         if(destinationPageId == null) {
-            SessionMessages.addErrorMessage("You must select a destination");
+            SessionMessages.addErrorMessage(getMessage("page.copy.noDestination"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
         if(fragment == null) {
-            SessionMessages.addErrorMessage("You must select a fragment");
+            SessionMessages.addErrorMessage(getMessage("page.copy.noFragment"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
         Page page = dispatch.getLastPageInstance().getPage();
         synchronized (application) {
             if(page.getParent() == null) {
-                SessionMessages.addErrorMessage("You can't copy the root page!");
+                SessionMessages.addErrorMessage(getMessage("page.copy.forbidden.root"));
             } else {
                 boolean detail = destinationPageId.endsWith("-detail");
                 if(detail) {
@@ -654,46 +846,90 @@ public class PortletAction extends AbstractActionBean {
                     destinationPageId = destinationPageId.substring(0, destinationPageId.length() - length);
                 }
                 final Page newParent = model.getRootPage().findDescendantPageById(destinationPageId);
+                if(!SecurityLogic.isAdministrator(context.getRequest())) {
+                    List<String> groups = (List<String>) context.getRequest().getAttribute(RequestAttributes.GROUPS);
+                    if(!SecurityLogic.hasPermissions(newParent.getPermissions(), groups, AccessLevel.EDIT)) {
+                        SessionMessages.addErrorMessage(getMessage("page.copy.forbidden.accessLevel"));
+                        return new RedirectResolution(dispatch.getOriginalPath());
+                    }
+                }
                 if(newParent != null) {
                     Page newPage;
+                    Model tmpModel = new Model();
+                    tmpModel.setRootPage(new RootPage());
+                    tmpModel.getRootPage().getChildPages().add(page);
                     try {
-
-
-                        newPage = page.getClass().newInstance();
-                        BeanUtils.copyProperties(newPage, page);
-                        String pageId = RandomUtil.createRandomId();
-                        newPage.setId(pageId);
-                        newPage.setLayoutContainer(DEFAULT_LAYOUT_CONTAINER);
-                        newPage.setLayoutOrder("0");
-                    } catch (Exception e) {
-                        SessionMessages.addErrorMessage("Error copying page");
+                        JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
+                        Marshaller marshaller = jc.createMarshaller();
+                        StringWriter sw = new StringWriter();
+                        marshaller.marshal(tmpModel, sw);
+                        Unmarshaller unmarshaller = jc.createUnmarshaller();
+                        tmpModel = (Model) unmarshaller.unmarshal(new StringReader(sw.toString()));
+                    } catch (JAXBException e) {
+                        SessionMessages.addErrorMessage(getMessage("page.copy.error"));
                         logger.error("Error copying page", e);
                         return new RedirectResolution(dispatch.getOriginalPath());
                     }
+                    newPage = tmpModel.getRootPage().getChildPages().get(0);
+                    newPage.setFragment(fragment);
+                    new CopyVisitor().visit(newPage);
                     if(detail) {
                         ((CrudPage) newParent).addDetailChild(newPage);
                     } else {
                         newParent.addChild(newPage);
                     }
-                    throw new UnsupportedOperationException("TODO deep copy");
-                    //saveModel();
-                    //return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
+                    saveModel();
+                    return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
                 } else {
-                    SessionMessages.addErrorMessage("Invalid destination: " + destinationPageId);
+                    String msg = MessageFormat.format(getMessage("page.copy.invalidDestination"), destinationPageId);
+                    SessionMessages.addErrorMessage(msg);
                 }
             }
         }
         return new RedirectResolution(dispatch.getOriginalPath());
     }
 
+    protected class CopyVisitor extends ModelVisitor {
+
+        @Override
+        public void visitNodeBeforeChildren(ModelObject node) {
+            if(node instanceof Page) {
+                Page page = (Page) node;
+                final String oldPageId = page.getId();
+                final String pageId = RandomUtil.createRandomId();
+                page.setId(pageId);
+                File storageDirFile = application.getAppStorageDir();
+                copyPageFiles(oldPageId, pageId, storageDirFile);
+                File scriptsFile = application.getAppScriptsDir();
+                copyPageFiles(oldPageId, pageId, scriptsFile);
+            }
+        }
+
+        private void copyPageFiles(final String oldPageId, String pageId, File dirFile) {
+            File[] resources = dirFile.listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.startsWith(oldPageId + ".");
+                }
+            });
+            for(File res : resources) {
+                File dest = new File(dirFile, pageId + res.getName().substring(oldPageId.length()));
+                try {
+                    FileUtils.copyFile(res, dest);
+                } catch (IOException e) {
+                    logger.error("Couldn't copy resource file " + res + " to " + dest, e);
+                }
+            }
+        }
+
+    }
+
     private void prepareNewPageForm() {
-        SelectionProvider classSelectionProvider =
-                DefaultSelectionProvider.create("pageClassName",
-                        new String[] {
-                                CrudPage.class.getName(), ChartPage.class.getName(),
-                                TextPage.class.getName(), JspPage.class.getName(),
-                                /*PageReference.class.getName()*/ },
-                        new String[] { "Crud", "Chart", "Text", "JSP", /*"Reference to another page"*/ });
+        DefaultSelectionProvider classSelectionProvider = new DefaultSelectionProvider("pageClassName");
+        classSelectionProvider.appendRow(CrudPage.class.getName(), "Crud", true);
+        classSelectionProvider.appendRow(ChartPage.class.getName(), "Chart", true);
+        classSelectionProvider.appendRow(TextPage.class.getName(), "Text", true);
+        classSelectionProvider.appendRow(JspPage.class.getName(), "JSP", true);
+        /*PageReference.class.getName(), "Reference to another page"*/
         //root + at least 1 child
         boolean includeSiblingOption = dispatch.getPageInstancePath().length > 2;
         int fieldCount = includeSiblingOption ? 3 : 2;
@@ -707,8 +943,10 @@ public class PortletAction extends AbstractActionBean {
             insertPositions[2] = InsertPosition.SIBLING.name();
             labels[2] = "as a sibling of " + dispatch.getLastPageInstance().getPage().getTitle();
         }
-        SelectionProvider insertPositionSelectionProvider =
-                DefaultSelectionProvider.create("insertPositionName", insertPositions, labels);
+        DefaultSelectionProvider insertPositionSelectionProvider = new DefaultSelectionProvider("insertPositionName");
+        for(int i = 0; i < insertPositions.length; i++) {
+            insertPositionSelectionProvider.appendRow(insertPositions[i], labels[i], true);
+        }
         newPageForm = new FormBuilder(NewPage.class)
                 .configFields(NEW_PAGE_SETUP_FIELDS)
                 .configFieldSetNames("Page setup")
@@ -736,6 +974,97 @@ public class PortletAction extends AbstractActionBean {
 
     public void setFragment(String fragment) {
         this.fragment = fragment;
+    }
+
+    //--------------------------------------------------------------------------
+    // Scripting
+    //--------------------------------------------------------------------------
+
+    protected void prepareScript() {
+        String pageId = pageInstance.getPage().getId();
+        File file = ScriptingUtil.getGroovyScriptFile(application.getAppScriptsDir(), pageId);
+        if(file.exists()) {
+            try {
+                FileReader fr = new FileReader(file);
+                script = IOUtils.toString(fr);
+                IOUtils.closeQuietly(fr);
+            } catch (Exception e) {
+                logger.warn("Couldn't load script for page " + pageId, e);
+            }
+        } else {
+            String template = getScriptTemplate();
+            String className = pageId;
+            if(Character.isDigit(className.charAt(0))) {
+                className = "_" + className;
+            }
+            if(template != null) {
+                try {
+                    script = template.replace("__CLASS_NAME__", className);
+                } catch (Exception e) {
+                    logger.warn("Invalid default script template: " + template, e);
+                }
+            }
+        }
+    }
+
+    public String getScriptTemplate() {
+        return null;
+    }
+
+    protected void updateScript() {
+        File groovyScriptFile =
+                ScriptingUtil.getGroovyScriptFile(application.getAppScriptsDir(), pageInstance.getPage().getId());
+        if(!StringUtils.isBlank(script)) {
+            FileWriter fw = null;
+            try {
+                fw = new FileWriter(groovyScriptFile);
+                fw.write(script);
+                try {
+                    GroovyClassLoader loader = new GroovyClassLoader();
+                    loader.parseClass(script, groovyScriptFile.getAbsolutePath());
+                    if(this instanceof GroovyObject) {
+                        //Attempt to remove old instance of custom action bean
+                        //not guaranteed to work
+                        try {
+                            ModelActionResolver actionResolver =
+                                    (ModelActionResolver) StripesFilter.getConfiguration().getActionResolver();
+                            actionResolver.removeActionBean(getClass());
+                        } catch (Exception e) {
+                            logger.warn("Couldn't remove action bean " + this, e);
+                        }
+                    }
+                } catch (Exception e) {
+                    String pageId = pageInstance.getPage().getId();
+                    logger.warn("Couldn't compile script for page " + pageId, e);
+                    String key = "script.compile.failed";
+                    SessionMessages.addErrorMessage(getMessage(key));
+                }
+            } catch (IOException e) {
+                logger.error("Error writing script to " + groovyScriptFile, e);
+            } finally {
+                IOUtils.closeQuietly(fw);
+            }
+        } else {
+            groovyScriptFile.delete();
+        }
+    }
+
+    protected String getMessage(String key) {
+        Locale locale = context.getLocale();
+        ResourceBundle resourceBundle = application.getBundle(locale);
+        return resourceBundle.getString(key);
+    }
+
+    public Map getOgnlContext() {
+        return ElementsThreadLocals.getOgnlContext();
+    }
+
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
     }
 
 }
