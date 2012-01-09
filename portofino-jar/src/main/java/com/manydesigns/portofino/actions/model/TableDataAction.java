@@ -29,15 +29,13 @@
 
 package com.manydesigns.portofino.actions.model;
 
-import com.manydesigns.portofino.actions.AbstractCrudAction;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class TableDataAction extends AbstractCrudAction {
+public class TableDataAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 

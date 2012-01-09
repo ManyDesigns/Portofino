@@ -51,6 +51,7 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.actions.forms.CrudPropertyEdit;
 import com.manydesigns.portofino.actions.forms.CrudSelectionProviderEdit;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.TableCriteria;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
@@ -118,7 +119,7 @@ import java.util.regex.Pattern;
 @UrlBinding("/actions/crud")
 @SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
 @RequiresPermissions(level = AccessLevel.VIEW)
-public class CrudAction extends PortletAction {
+public class CrudAction extends PortletAction implements PageRealizationAware {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -375,7 +376,7 @@ public class CrudAction extends PortletAction {
     protected Resolution doSearch() {
         cancelReturnUrl = new UrlBuilder(
                     context.getLocale(), dispatch.getAbsoluteOriginalPath(), false)
-                    .addParameter("searchString", searchString)
+                    .addParameter(SEARCH_STRING_PARAM, searchString)
                     .toString();
         setupReturnToParentTarget();
 
@@ -501,7 +502,7 @@ public class CrudAction extends PortletAction {
 
         cancelReturnUrl = new UrlBuilder(
                 Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
-                .addParameter("searchString", searchString)
+                .addParameter(SEARCH_STRING_PARAM, searchString)
                 .toString();
 
         setupReturnToParentTarget();
@@ -784,13 +785,13 @@ public class CrudAction extends PortletAction {
             } else {
                 resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
                 if(!StringUtils.isEmpty(searchString)) {
-                    resolution.addParameter("searchString", searchString);
+                    resolution.addParameter(SEARCH_STRING_PARAM, searchString);
                 }
             }
         } else {
             resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
             if(!StringUtils.isEmpty(searchString)) {
-                resolution.addParameter("searchString", searchString);
+                resolution.addParameter(SEARCH_STRING_PARAM, searchString);
             }
         }
 
@@ -915,7 +916,7 @@ public class CrudAction extends PortletAction {
         String objPk = pkHelper.generatePkString(o);
         return new UrlBuilder(
                 Locale.getDefault(), baseUrl + "/" + objPk, false)
-                .addParameter("searchString", searchString)
+                .addParameter(SEARCH_STRING_PARAM, searchString)
                 .toString();
     }
 
@@ -1096,8 +1097,10 @@ public class CrudAction extends PortletAction {
     // Page realization
     //**************************************************************************
 
-    public Resolution pageRealizationFailed() throws IOException {
-        SessionMessages.addWarningMessage(getMessage("crud.notInUseCase"));
+    public Resolution pageRealizationFailed(ActionBeanContext context, Application application) {
+        Locale locale = context.getLocale();
+        ResourceBundle resourceBundle = application.getBundle(locale);
+        SessionMessages.addWarningMessage(resourceBundle.getString("crud.notInUseCase"));
         return new ForwardResolution("/layouts/crud/notInUseCase.jsp");
     }
 

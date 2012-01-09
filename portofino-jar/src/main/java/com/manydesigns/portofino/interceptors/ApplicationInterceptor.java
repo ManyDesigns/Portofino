@@ -31,6 +31,7 @@ package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.BlobManager;
+import com.manydesigns.portofino.actions.PageRealizationAware;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
@@ -38,7 +39,9 @@ import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.navigation.Navigation;
-import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.ErrorResolution;
+import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
@@ -48,11 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.jstl.core.Config;
-import javax.servlet.jsp.jstl.fmt.LocalizationContext;
-import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -112,14 +111,13 @@ public class ApplicationInterceptor implements Interceptor {
             for(PageInstance page : dispatch.getPageInstancePath()) {
                 i++;
                 if(!page.realize()) {
+                    logger.error("Page realization failed for {}", page);
                     Class<?> actionClass = page.getPage().getActualActionClass();
-                    Method pageRealizationFailed = getPageRealizationFailedMethod(actionClass);
-                    if(pageRealizationFailed != null) {
+                    if(PageRealizationAware.class.isAssignableFrom(actionClass)) {
                         String pathUrl = dispatch.getPathUrl(i);
                         request.setAttribute("pageRealizationFailed", request.getContextPath() + pathUrl);
-                        Resolution resolution =
-                                (Resolution) pageRealizationFailed.invoke(actionClass.newInstance());
-                        return resolution;
+                        PageRealizationAware action = (PageRealizationAware) actionClass.newInstance();
+                        return action.pageRealizationFailed(actionContext, application);
                     } else {
                         return new ErrorResolution(404);
                     }
@@ -136,12 +134,4 @@ public class ApplicationInterceptor implements Interceptor {
         return context.proceed();
     }
 
-    protected Method getPageRealizationFailedMethod(Class<?> actionClass) {
-        try {
-            return actionClass.getMethod("pageRealizationFailed");
-        } catch (NoSuchMethodException e) {
-            logger.debug("Method pageRealizationFailed() not found in {}", actionClass);
-            return null;
-        }
-    }
 }
