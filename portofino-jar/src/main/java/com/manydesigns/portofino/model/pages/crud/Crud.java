@@ -78,6 +78,8 @@ public class Crud implements ModelObject {
 
     protected boolean largeResultSet;
 
+    protected Integer rowsPerPage;
+
     //**************************************************************************
     // Fields for wire-up
     //**************************************************************************
@@ -283,5 +285,18 @@ public class Crud implements ModelObject {
 
     public Table getActualTable() {
         return actualTable;
+    }
+
+    @XmlAttribute(required = false)
+    public Integer getRowsPerPage() {
+        return rowsPerPage;
+    }
+
+    public void setRowsPerPage(Integer rowsPerPage) {
+        this.rowsPerPage = rowsPerPage;
+    }
+
+    public int getActualRowsPerPage() {
+        return getRowsPerPage() != null ? getRowsPerPage() : 10;
     }
 }

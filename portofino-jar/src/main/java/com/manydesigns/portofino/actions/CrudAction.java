@@ -1687,7 +1687,7 @@ public class CrudAction extends PortletAction {
 
     public static final String[][] CRUD_CONFIGURATION_FIELDS =
             {{"name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
-              "largeResultSet"}};
+              "largeResultSet", "rowsPerPage"}};
 
     public Form crudConfigurationForm;
     public TableForm propertiesTableForm;
