@@ -555,7 +555,7 @@ public class PortletAction extends AbstractActionBean {
         boolean valid = true;
         title = StringUtils.trimToNull(title);
         if (title == null) {
-            SessionMessages.addErrorMessage("Title cannot be empty");
+            SessionMessages.addErrorMessage(getMessage("commons.configuration.titleEmpty"));
             valid = false;
         }
 
@@ -697,7 +697,9 @@ public class PortletAction extends AbstractActionBean {
             return doCreateNewPage();
         } catch (Exception e) {
             logger.error("Error creating page", e);
-            SessionMessages.addErrorMessage("Error creating page: " + e.getMessage() + " (see the logs for more details)");
+            String msg = getMessage("page.create.failed");
+            msg = MessageFormat.format(msg, e.getMessage());
+            SessionMessages.addErrorMessage(msg);
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
         }
     }
@@ -758,7 +760,7 @@ public class PortletAction extends AbstractActionBean {
                 }
                 saveModel();
             }
-            SessionMessages.addInfoMessage("Page created successfully. You should now configure it.");
+            SessionMessages.addInfoMessage(getMessage("page.create.successful"));
             return new RedirectResolution(configurePath + "/" + page.getFragment()).addParameter("configure");
         } else {
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
@@ -777,9 +779,9 @@ public class PortletAction extends AbstractActionBean {
         Page page = dispatch.getLastPageInstance().getPage();
         synchronized (application) {
             if(page.getParent() == null) {
-                SessionMessages.addErrorMessage("You can't delete the root page!");
+                SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.root"));
             }  else if(PageLogic.isLandingPage(model.getRootPage(), page)) {
-                SessionMessages.addErrorMessage("You can't delete the landing page!");
+                SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.landing"));
             } else {
                 parentPageInstance.removeChild(page);
                 saveModel();
@@ -792,13 +794,13 @@ public class PortletAction extends AbstractActionBean {
     @RequiresAdministrator
     public Resolution movePage() {
         if(destinationPageId == null) {
-            SessionMessages.addErrorMessage("You must select a destination");
+            SessionMessages.addErrorMessage(getMessage("page.move.noDestination"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
         Page page = dispatch.getLastPageInstance().getPage();
         synchronized (application) {
             if(page.getParent() == null) {
-                SessionMessages.addErrorMessage("You can't move the root page!");
+                SessionMessages.addErrorMessage(getMessage("page.move.forbidden.root"));
             } else {
                 boolean detail = destinationPageId.endsWith("-detail");
                 if(detail) {
@@ -806,9 +808,10 @@ public class PortletAction extends AbstractActionBean {
                 }
                 Page newParent = model.getRootPage().findDescendantPageById(destinationPageId);
                 if(!SecurityLogic.isAdministrator(context.getRequest())) {
-                    List<String> groups = (List<String>) context.getRequest().getAttribute(RequestAttributes.GROUPS);
+                    List<String> groups =
+                            (List<String>) context.getRequest().getAttribute(RequestAttributes.GROUPS);
                     if(!SecurityLogic.hasPermissions(newParent.getPermissions(), groups, AccessLevel.EDIT)) {
-                        SessionMessages.addErrorMessage("You don't have edit access level on the destination page");
+                        SessionMessages.addErrorMessage(getMessage("page.move.forbidden.accessLevel"));
                         return new RedirectResolution(dispatch.getOriginalPath());
                     }
                 }
@@ -822,7 +825,8 @@ public class PortletAction extends AbstractActionBean {
                     saveModel();
                     return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
                 } else {
-                    SessionMessages.addErrorMessage("Invalid destination: " + destinationPageId);
+                    String msg = MessageFormat.format(getMessage("page.move.invalidDestination"), destinationPageId);
+                    SessionMessages.addErrorMessage(msg);
                 }
             }
         }
@@ -832,17 +836,17 @@ public class PortletAction extends AbstractActionBean {
     @RequiresAdministrator
     public Resolution copyPage() {
         if(destinationPageId == null) {
-            SessionMessages.addErrorMessage("You must select a destination");
+            SessionMessages.addErrorMessage(getMessage("page.copy.noDestination"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
         if(fragment == null) {
-            SessionMessages.addErrorMessage("You must select a fragment");
+            SessionMessages.addErrorMessage(getMessage("page.copy.noFragment"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
         Page page = dispatch.getLastPageInstance().getPage();
         synchronized (application) {
             if(page.getParent() == null) {
-                SessionMessages.addErrorMessage("You can't copy the root page!");
+                SessionMessages.addErrorMessage(getMessage("page.copy.forbidden.root"));
             } else {
                 boolean detail = destinationPageId.endsWith("-detail");
                 if(detail) {
@@ -853,7 +857,7 @@ public class PortletAction extends AbstractActionBean {
                 if(!SecurityLogic.isAdministrator(context.getRequest())) {
                     List<String> groups = (List<String>) context.getRequest().getAttribute(RequestAttributes.GROUPS);
                     if(!SecurityLogic.hasPermissions(newParent.getPermissions(), groups, AccessLevel.EDIT)) {
-                        SessionMessages.addErrorMessage("You don't have edit access level on the destination page");
+                        SessionMessages.addErrorMessage(getMessage("page.copy.forbidden.accessLevel"));
                         return new RedirectResolution(dispatch.getOriginalPath());
                     }
                 }
@@ -870,7 +874,7 @@ public class PortletAction extends AbstractActionBean {
                         Unmarshaller unmarshaller = jc.createUnmarshaller();
                         tmpModel = (Model) unmarshaller.unmarshal(new StringReader(sw.toString()));
                     } catch (JAXBException e) {
-                        SessionMessages.addErrorMessage("Error copying page");
+                        SessionMessages.addErrorMessage(getMessage("page.copy.error"));
                         logger.error("Error copying page", e);
                         return new RedirectResolution(dispatch.getOriginalPath());
                     }
@@ -885,7 +889,8 @@ public class PortletAction extends AbstractActionBean {
                     saveModel();
                     return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
                 } else {
-                    SessionMessages.addErrorMessage("Invalid destination: " + destinationPageId);
+                    String msg = MessageFormat.format(getMessage("page.copy.invalidDestination"), destinationPageId);
+                    SessionMessages.addErrorMessage(msg);
                 }
             }
         }
@@ -1039,8 +1044,8 @@ public class PortletAction extends AbstractActionBean {
                 } catch (Exception e) {
                     String pageId = pageInstance.getPage().getId();
                     logger.warn("Couldn't compile script for page " + pageId, e);
-                    String msg = "Couldn't compile script - see logs for details";
-                    SessionMessages.addErrorMessage(msg);
+                    String key = "script.compile.failed";
+                    SessionMessages.addErrorMessage(getMessage(key));
                 }
             } catch (IOException e) {
                 logger.error("Error writing script to " + groovyScriptFile, e);
@@ -1050,6 +1055,12 @@ public class PortletAction extends AbstractActionBean {
         } else {
             groovyScriptFile.delete();
         }
+    }
+
+    protected String getMessage(String key) {
+        Locale locale = context.getLocale();
+        ResourceBundle resourceBundle = application.getBundle(locale);
+        return resourceBundle.getString(key);
     }
 
     public Map getOgnlContext() {

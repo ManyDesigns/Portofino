@@ -631,7 +631,7 @@ public class CrudAction extends PortletAction {
                     SessionMessages.addErrorMessage(rootCauseMessage);
                     return getEditView();
                 }
-                SessionMessages.addInfoMessage("UPDATE avvenuto con successo");
+                SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
                 return new RedirectResolution(dispatch.getOriginalPath())
                         .addParameter(SEARCH_STRING_PARAM, searchString);
             }
@@ -710,7 +710,7 @@ public class CrudAction extends PortletAction {
             try {
                 deletePostProcess(object);
                 session.getTransaction().commit();
-                SessionMessages.addInfoMessage("DELETE avvenuto con successo");
+                SessionMessages.addInfoMessage(getMessage("commons.delete.successful"));
 
                 // invalidate the pk on this crud unit
                 pk = null;
@@ -1097,7 +1097,7 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     public Resolution pageRealizationFailed() throws IOException {
-        SessionMessages.addWarningMessage("Object not in use case");
+        SessionMessages.addWarningMessage(getMessage("crud.notInUseCase"));
         return new ForwardResolution("/layouts/crud/notInUseCase.jsp");
     }
 
@@ -1128,7 +1128,7 @@ public class CrudAction extends PortletAction {
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
             logger.warn("Incorrect Field Type", e);
-            SessionMessages.addWarningMessage("Incorrect Field Type");
+            SessionMessages.addWarningMessage(getMessage("crud.incorrectFieldType"));
         }
     }
 
@@ -1152,7 +1152,7 @@ public class CrudAction extends PortletAction {
                     .setFilename(crud.getSearchTitle() + ".xls");
         } catch (Exception e) {
             logger.error("Excel export failed", e);
-            SessionMessages.addErrorMessage("Export failed");
+            SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
     }
@@ -1217,7 +1217,7 @@ public class CrudAction extends PortletAction {
                     .setFilename(crud.getReadTitle() + ".xls");
         } catch (Exception e) {
             logger.error("Excel export failed", e);
-            SessionMessages.addErrorMessage("Export failed");
+            SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
     }
@@ -1410,7 +1410,7 @@ public class CrudAction extends PortletAction {
                     .setFilename(crud.getSearchTitle() + ".pdf");
         } catch (Exception e) {
             logger.error("PDF export failed", e);
-            SessionMessages.addErrorMessage("Export failed");
+            SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
     }
@@ -1618,7 +1618,7 @@ public class CrudAction extends PortletAction {
                     .setFilename(crud.getReadTitle() + ".pdf");
         } catch (Exception e) {
             logger.error("PDF export failed", e);
-            SessionMessages.addErrorMessage("Export failed");
+            SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
     }
@@ -1856,13 +1856,10 @@ public class CrudAction extends PortletAction {
 
                 saveModel();
 
-                Locale locale = context.getLocale();
-                ResourceBundle bundle = application.getBundle(locale);
-                SessionMessages.addInfoMessage(bundle.getString("commons.configuration.updated"));
+                SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
                 return cancel();
             } else {
-                SessionMessages.addErrorMessage("The configuration could not be saved. " +
-                        "Review any errors below and submit again.");
+                SessionMessages.addErrorMessage(getMessage("commons.configuration.notUpdated"));
                 return new ForwardResolution("/layouts/crud/configure.jsp");
             }
         }

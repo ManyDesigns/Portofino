@@ -53,10 +53,11 @@ import org.jfree.chart.JFreeChart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.Locale;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.Properties;
-import java.util.ResourceBundle;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -319,9 +320,7 @@ public class ChartAction extends PortletAction {
                 form.writeToObject(chartPage);
                 saveModel();
 
-                Locale locale = context.getLocale();
-                ResourceBundle bundle = application.getBundle(locale);
-                SessionMessages.addInfoMessage(bundle.getString("commons.configuration.updated"));
+                SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
                 return cancel();
             } else {
                 return new ForwardResolution("/layouts/chart/configure.jsp");

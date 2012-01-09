@@ -58,8 +58,11 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -266,10 +269,10 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         connectionProvider.init(application);
         String status = connectionProvider.getStatus();
         if (ConnectionProvider.STATUS_CONNECTED.equals(status)) {
-            SessionMessages.addInfoMessage("Connection tested successfully");
+            SessionMessages.addInfoMessage(getMessage("connectionProviders.test.successful"));
         } else {
             SessionMessages.addErrorMessage(
-                    String.format("Connection failed. Status: %s. Error message: %s",
+                    MessageFormat.format(getMessage("connectionProviders.test.failed"),
                             status, connectionProvider.getErrorMessage()));
         }
         return new RedirectResolution(this.getClass())
@@ -316,7 +319,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
             form.writeToObject(connectionProviderForm);
             if(DataModelLogic.findDatabaseByName
                     (application.getModel(), connectionProviderForm.getDatabaseName()) != null) {
-                SessionMessages.addErrorMessage("Another database with the same name already exists");
+                SessionMessages.addErrorMessage(getMessage("connectionProviders.save.duplicateDatabaseName"));
                 return new ForwardResolution("/layouts/admin/connectionProviders/create.jsp");
             }
             Database database = connectionProvider.getDatabase();
@@ -324,7 +327,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
             connectionProvider.setDatabase(database);
             application.addDatabase(database);
             connectionProvider.init(application);
-            SessionMessages.addInfoMessage("Connection provider created successfully");
+            SessionMessages.addInfoMessage(getMessage("connectionProviders.save.successful"));
             return new RedirectResolution(this.getClass());
         } else {
             return new ForwardResolution("/layouts/admin/connectionProviders/create.jsp");
@@ -394,7 +397,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
             form.writeToObject(connectionProviderForm);
             application.saveXmlModel();
             connectionProvider.init(application);
-            SessionMessages.addInfoMessage("Connection provider updated successfully");
+            SessionMessages.addInfoMessage(getMessage("connectionProviders.update.successful"));
         }
         return new RedirectResolution(this.getClass())
                 .addParameter("databaseName", databaseName);
@@ -426,7 +429,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
             SessionMessages.addInfoMessage(
                     "Connection providers deleted successfully");
         } else {
-            SessionMessages.addInfoMessage("No Connection providers selected");
+            SessionMessages.addInfoMessage(getMessage("connectionProviders.delete.noneSelected"));
         }
         return new RedirectResolution(this.getClass());
     }
@@ -462,6 +465,12 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
 
     public String getActionPath() {
         return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
+    }
+
+    protected String getMessage(String key) {
+        Locale locale = context.getLocale();
+        ResourceBundle resourceBundle = application.getBundle(locale);
+        return resourceBundle.getString(key);
     }
 
     public String getDatabaseName() {

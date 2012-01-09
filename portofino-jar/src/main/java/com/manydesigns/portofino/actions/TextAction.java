@@ -44,8 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -163,9 +162,7 @@ public class TextAction extends PortletAction {
                 saveContent();
                 saveModel();
 
-                Locale locale = context.getLocale();
-                ResourceBundle bundle = application.getBundle(locale);
-                SessionMessages.addInfoMessage(bundle.getString("commons.configuration.updated"));
+                SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
                 return cancel();
             } else {
                 return new ForwardResolution("/layouts/text/configure.jsp");
@@ -177,14 +174,14 @@ public class TextAction extends PortletAction {
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution uploadAttachment() {
         if (upload == null) {
-            SessionMessages.addWarningMessage("No file selected for upload");
+            SessionMessages.addWarningMessage(getMessage("text.attachment.noFileSelected"));
         } else {
             try {
                 commonUploadAttachment();
-                SessionMessages.addInfoMessage("File uploaded successfully");
+                SessionMessages.addInfoMessage(getMessage("text.attachment.uploadSuccessful"));
             } catch (IOException e) {
                 logger.error("Upload failed", e);
-                SessionMessages.addErrorMessage("Upload failed!");
+                SessionMessages.addErrorMessage(getMessage("text.attachment.uploadFailed"));
             }
         }
         return new RedirectResolution(dispatch.getOriginalPath())
@@ -297,7 +294,7 @@ public class TextAction extends PortletAction {
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution deleteAttachments() {
         if (selection == null || selection.length == 0) {
-            SessionMessages.addWarningMessage("No attachments selected");
+            SessionMessages.addWarningMessage(getMessage("text.attachment.noAttachmentSelected"));
         } else {
             synchronized (application) {
                 int counter = 0;
@@ -317,11 +314,11 @@ public class TextAction extends PortletAction {
                 }
                 saveModel();
                 if (counter == 1) {
-                    SessionMessages.addInfoMessage("1 attachment deleted successfully");
+                    SessionMessages.addInfoMessage(getMessage("text.attachment.oneDeleted"));
                 } else if (counter > 1) {
                     SessionMessages.addInfoMessage(
-                            String.format(
-                                    "%d attachments deleted successfully",
+                            MessageFormat.format(
+                                    getMessage("text.attachment.nDeleted"),
                                     counter));
                 }
             }
