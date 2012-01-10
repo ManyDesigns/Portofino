@@ -31,7 +31,6 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.logic.TextLogic;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.Attachment;
@@ -40,12 +39,15 @@ import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissi
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -65,6 +67,7 @@ public class TextAction extends PortletAction {
 
     public String content;
     public String[] selection;
+    public String[] downloadable;
 
     //**************************************************************************
     // File upload with CKEditor
@@ -331,15 +334,17 @@ public class TextAction extends PortletAction {
                 .addParameter("cancelReturnUrl", cancelReturnUrl);
     }
 
-    @Buttons({
-        @Button(list = "page-permissions-edit", key = "commons.cancel", order = 99),
-        @Button(list = "configuration", key = "commons.cancel", order = 99),
-        @Button(list = "page-create", key = "commons.cancel", order = 99),
-        @Button(list = "manage-attachments", key = "commons.ok", order = 1)
-    })
-    @Override
-    public Resolution cancel() {
-        return super.cancel();
+    @Button(list = "manage-attachments", key = "commons.ok", order = 1)
+    public Resolution save() {
+        if(downloadable == null) {
+            downloadable = new String[0];
+        }
+        for(Attachment attachment : textPage.getAttachments()) {
+            boolean contained = ArrayUtils.contains(downloadable, attachment.getId());
+            attachment.setDownloadable(contained);
+        }
+        saveModel();
+        return cancel();
     }
 
     //**************************************************************************
@@ -421,5 +426,15 @@ public class TextAction extends PortletAction {
 
     public void setTextFile(File textFile) {
         this.textFile = textFile;
+    }
+
+    public List<Attachment> getDownloadableAttachments() {
+        List<Attachment> downloadableAttachments = new ArrayList<Attachment>();
+        for(Attachment attachment : getTextPage().getAttachments()) {
+            if(attachment.isDownloadable()) {
+                downloadableAttachments.add(attachment);
+            }
+        }
+        return downloadableAttachments;
     }
 }

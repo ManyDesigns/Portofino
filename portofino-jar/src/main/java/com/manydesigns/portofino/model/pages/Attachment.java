@@ -60,6 +60,7 @@ public class Attachment implements ModelObject {
     protected String id;
     protected String contentType;
     protected String filename;
+    protected boolean downloadable = true;
     protected long size;
 
     //**************************************************************************
@@ -150,5 +151,14 @@ public class Attachment implements ModelObject {
 
     public void setSize(long size) {
         this.size = size;
+    }
+
+    @XmlAttribute
+    public boolean isDownloadable() {
+        return downloadable;
+    }
+
+    public void setDownloadable(boolean downloadable) {
+        this.downloadable = downloadable;
     }
 }

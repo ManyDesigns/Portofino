@@ -22,14 +22,23 @@
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
         <c:if test="${not empty actionBean.textPage.attachments}">
             <fmt:message key="commons.attachments"/>:
-            <p>
+            <br/>
+            <table class="noBorder">
                 <c:forEach var="attachment" items="${actionBean.textPage.attachments}">
-                    <br/>
-                    <stripes:checkbox name="selection" value="${attachment.id}"/>
-                    <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?downloadAttachment=&id=${attachment.id}"/>"
-                            ><c:out value="${attachment.filename}"/></a>
+                    <tr>
+                        <td>
+                            <stripes:checkbox name="selection" value="${attachment.id}"/>
+                            <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?downloadAttachment=&id=${attachment.id}"/>"
+                                    ><c:out value="${attachment.filename}"/></a>
+                        </td>
+                        <td>
+                            <stripes:checkbox name="downloadable" value="${attachment.id}"
+                                              checked="${attachment.downloadable ? attachment.id : null}"/>
+                            Download
+                        </td>
+                    </tr>
                 </c:forEach>
-            </p>
+            </table>
             <br/>
             <portofino:buttons list="manage-attachments-delete" cssClass="portletButton" />
         </c:if><c:if test="${empty actionBean.textPage.attachments}">
