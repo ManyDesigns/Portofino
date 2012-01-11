@@ -122,7 +122,11 @@
             initialRequest: generateRequest(),
             dynamicData: true,
             paginator : new YAHOO.widget.Paginator({
-                rowsPerPage: <%= actionBean.getCrud().getActualRowsPerPage() %>
+                rowsPerPage: <%= actionBean.getCrud().getActualRowsPerPage() %>,
+                firstPageLinkLabel: '<fmt:message key="commons.first" />',
+                previousPageLinkLabel: '<fmt:message key="commons.prev" />',
+                nextPageLinkLabel: '<fmt:message key="commons.next" />',
+                lastPageLinkLabel: '<fmt:message key="commons.last" />'
             }),
             MSG_EMPTY: '<fmt:message key="layouts.crud.datatable.msg_empty"/>'
         };

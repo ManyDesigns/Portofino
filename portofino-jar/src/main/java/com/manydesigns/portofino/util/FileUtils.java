@@ -29,9 +29,7 @@
 
 package com.manydesigns.portofino.util;
 
-import org.apache.commons.configuration.Configuration;
-
-import java.util.*;
+import java.io.File;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -39,45 +37,17 @@ import java.util.*;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class ConfigurationResourceBundle extends ResourceBundle {
+public class FileUtils {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    protected Configuration configuration;
-
-    public ConfigurationResourceBundle(Configuration configuration) {
-        this.configuration = configuration;
-    }
-
-    public Object handleGetObject(String key) {
-        if (key == null) {
-            throw new NullPointerException();
+    public static String getRelativePath(File ancestor, File file) {
+        String path = file.getName();
+        File parent = file.getParentFile();
+        while (parent != null && !parent.equals(ancestor)) {
+            path = parent.getName() + File.separator + path;
+            parent = parent.getParentFile();
         }
-        return configuration.getProperty(key);
-    }
-
-    public Enumeration<String> getKeys() {
-        Set<String> myKeys = handleKeySet();
-        if(parent != null) {
-            Enumeration<String> parentKeysEnum = parent.getKeys();
-            while (parentKeysEnum.hasMoreElements()) {
-                myKeys.add(parentKeysEnum.nextElement());
-            }
-        }
-        return Collections.enumeration(myKeys);
-    }
-
-    protected Set<String> handleKeySet() {
-        Iterator<String> iterator = configuration.getKeys();
-        Set<String> keys = new HashSet<String>();
-        while (iterator.hasNext()) {
-            keys.add(iterator.next());
-        }
-        return keys;
-    }
-
-    @Override
-    public void setParent(ResourceBundle parent) {
-        super.setParent(parent);
+        return path;
     }
 }

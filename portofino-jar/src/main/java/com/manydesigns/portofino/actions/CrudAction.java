@@ -1105,10 +1105,7 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
         tableForm = tableFormBuilder.build();
 
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
-        boolean selectable = false;
-        selectable = selectable || SecurityLogic.hasPermissions(context.getRequest(), null, PERMISSION_EDIT);
-        selectable = selectable || SecurityLogic.hasPermissions(context.getRequest(), null, PERMISSION_DELETE);
-        tableForm.setSelectable(selectable);
+        tableForm.setSelectable(true);
         if (objects != null) {
             tableForm.readFromObject(objects);
             refreshTableBlobDownloadHref();

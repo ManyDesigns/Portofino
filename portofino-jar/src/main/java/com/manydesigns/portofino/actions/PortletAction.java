@@ -7,6 +7,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -14,6 +15,7 @@ import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.forms.EditPage;
 import com.manydesigns.portofino.actions.forms.NewPage;
 import com.manydesigns.portofino.application.Application;
@@ -74,9 +76,9 @@ import java.util.*;
 public class PortletAction extends AbstractActionBean {
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
-            {{"id", "description", "embedInParent", "showInNavigation"}};
+            {{"id", "embedInParent", "showInNavigation", "layout", "description"}};
     public static final String[][] TOP_LEVEL_PAGE_CONFIGURATION_FIELDS =
-            {{"id", "description", "showInNavigation"}};
+            {{"id", "showInNavigation", "layout", "description"}};
     public static final String PAGE_PORTLET_NOT_CONFIGURED = "/layouts/portlet-not-configured.jsp";
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
@@ -440,11 +442,15 @@ public class PortletAction extends AbstractActionBean {
         setupPortlets(pageInstance, pageJsp);
         HttpServletRequest request = context.getRequest();
         request.setAttribute("cancelReturnUrl", getCancelReturnUrl());
+        return new ForwardResolution(getLayout());
+    }
+
+    protected String getLayout() {
         String layout = pageInstance.getPage().getLayout();
         if(StringUtils.isBlank(layout)) {
             layout = "/layouts/portlet/portlet-page-1-2-1-symmetric.jsp";
         }
-        return new ForwardResolution(layout);
+        return layout;
     }
 
     @Buttons({
@@ -521,22 +527,50 @@ public class PortletAction extends AbstractActionBean {
         Page page = pageInstance.getPage();
 
         boolean isTopLevelPage = pageInstance.getPage().getParent() instanceof RootPage;
-        pageConfigurationForm = new FormBuilder(EditPage.class)
+        FormBuilder formBuilder = new FormBuilder(EditPage.class)
                 .configPrefix(CONF_FORM_PREFIX)
                 .configFields(isTopLevelPage ? TOP_LEVEL_PAGE_CONFIGURATION_FIELDS : PAGE_CONFIGURATION_FIELDS)
-                .configFieldSetNames("Page")
-                .build();
+                .configFieldSetNames("Page");
 
+        SelectionProvider layoutSelectionProvider = createLayoutSelectionProvider();
+        formBuilder.configSelectionProvider(layoutSelectionProvider, "layout");
+
+        pageConfigurationForm = formBuilder.build();
         EditPage edit = new EditPage();
         edit.id = page.getId();
         edit.description = page.getDescription();
         edit.embedInParent = page.getLayoutContainerInParent() != null;
         edit.showInNavigation = page.isShowInNavigation();
+        edit.layout = getLayout();
         pageConfigurationForm.readFromObject(edit);
         title = page.getTitle();
 
         if(script == null) {
             prepareScript();
+        }
+    }
+
+    private SelectionProvider createLayoutSelectionProvider() {
+        String warRealPath =
+                portofinoConfiguration.getString(
+                        PortofinoProperties.WAR_REAL_PATH);
+        File webappFile = new File(warRealPath);
+        File layoutsDir = new File(new File(warRealPath, "layouts"), "portlet");
+        File[] files = layoutsDir.listFiles();
+        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("jsp");
+        visitJspFiles(webappFile, files, selectionProvider);
+        return selectionProvider;
+    }
+
+    private void visitJspFiles(File root, File[] files,
+                               DefaultSelectionProvider selectionProvider) {
+        for(File file : files) {
+            if(file.isFile() && file.getName().endsWith(".jsp")) {
+                String path = File.separator + com.manydesigns.portofino.util.FileUtils.getRelativePath(root, file);
+                selectionProvider.appendRow(path, file.getName(), true);
+            } else if(file.isDirectory()) {
+                visitJspFiles(root, file.listFiles(), selectionProvider);
+            }
         }
     }
 
@@ -577,6 +611,7 @@ public class PortletAction extends AbstractActionBean {
             SessionMessages.addWarningMessage(
                     "The page is not embedded and not included in navigation - it will only be reachable by URL or explicit linking.");
         }
+        page.setLayout(edit.layout);
 
         updateScript();
     }

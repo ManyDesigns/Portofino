@@ -27,12 +27,11 @@
 *
 */
 
-package com.manydesigns.portofino.actions.forms;
+package com.manydesigns.portofino.i18n;
 
-import com.manydesigns.elements.annotations.LabelI18N;
-import com.manydesigns.elements.annotations.Multiline;
-import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.elements.annotations.Updatable;
+import org.apache.commons.configuration.Configuration;
+
+import java.util.*;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -40,27 +39,45 @@ import com.manydesigns.elements.annotations.Updatable;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class EditPage {
+public class ConfigurationResourceBundle extends ResourceBundle {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.id")
-    @Updatable(false)
-    public String id;
+    protected Configuration configuration;
 
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.description")
-    @Required
-    @Multiline
-    public String description;
+    public ConfigurationResourceBundle(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.embedInParent")
-    public boolean embedInParent;
+    public Object handleGetObject(String key) {
+        if (key == null) {
+            throw new NullPointerException();
+        }
+        return configuration.getProperty(key);
+    }
 
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.showInNavigation")
-    public boolean showInNavigation;
+    public Enumeration<String> getKeys() {
+        Set<String> myKeys = handleKeySet();
+        if(parent != null) {
+            Enumeration<String> parentKeysEnum = parent.getKeys();
+            while (parentKeysEnum.hasMoreElements()) {
+                myKeys.add(parentKeysEnum.nextElement());
+            }
+        }
+        return Collections.enumeration(myKeys);
+    }
 
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.layout")
-    @Required
-    public String layout;
+    protected Set<String> handleKeySet() {
+        Iterator<String> iterator = configuration.getKeys();
+        Set<String> keys = new HashSet<String>();
+        while (iterator.hasNext()) {
+            keys.add(iterator.next());
+        }
+        return keys;
+    }
 
+    @Override
+    public void setParent(ResourceBundle parent) {
+        super.setParent(parent);
+    }
 }
