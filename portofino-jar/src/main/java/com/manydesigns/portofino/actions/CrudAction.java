@@ -526,6 +526,33 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
         }
     }
 
+    protected void refreshTableBlobDownloadHref() {
+        Iterator<?> objIterator = objects.iterator();
+        for (TableForm.Row row : tableForm.getRows()) {
+            Iterator<Field> fieldIterator = row.iterator();
+            Object obj = objIterator.next();
+            String baseUrl = null;
+            while (fieldIterator.hasNext()) {
+                Field field = fieldIterator.next();
+                if (field instanceof FileBlobField) {
+                    if(baseUrl == null) {
+                        String readLinkExpression = getReadLinkExpression();
+                        OgnlTextFormat hrefFormat =
+                                OgnlTextFormat.create(readLinkExpression);
+                        hrefFormat.setUrl(true);
+                        baseUrl = hrefFormat.format(obj);
+                    }
+
+                    UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), baseUrl, false)
+                        .addParameter("downloadBlob","")
+                        .addParameter("propertyName", field.getPropertyAccessor().getName());
+
+                    field.setHref(urlBuilder.toString());
+                }
+            }
+        }
+    }
+
     public String getBlobDownloadUrl(PropertyAccessor propertyAccessor) {
         UrlBuilder urlBuilder = new UrlBuilder(
                 Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
@@ -1084,6 +1111,7 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
         tableForm.setSelectable(selectable);
         if (objects != null) {
             tableForm.readFromObject(objects);
+            refreshTableBlobDownloadHref();
         }
     }
 
