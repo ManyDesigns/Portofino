@@ -440,7 +440,11 @@ public class PortletAction extends AbstractActionBean {
         setupPortlets(pageInstance, pageJsp);
         HttpServletRequest request = context.getRequest();
         request.setAttribute("cancelReturnUrl", getCancelReturnUrl());
-        return new ForwardResolution("/layouts/portlet-page.jsp");
+        String layout = pageInstance.getPage().getLayout();
+        if(StringUtils.isBlank(layout)) {
+            layout = "/layouts/portlet/portlet-page-1-2-1-symmetric.jsp";
+        }
+        return new ForwardResolution(layout);
     }
 
     @Buttons({
