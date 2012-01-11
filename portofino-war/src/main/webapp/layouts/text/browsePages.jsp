@@ -16,33 +16,37 @@
              type="com.manydesigns.portofino.actions.TextAction"/>
 <head>
     <title><fmt:message key="layouts.text.browse.browse_server"/></title>
-    <jsp:include page="/skins/${skin}/head.jsp"/>
+    <jsp:include page="/skins/${skin}/head.jsp" />
 </head>
 <body>
-<form action="${actionBean.dispatch.absoluteOriginalPath}">
+<form action="${actionBean.dispatch.absoluteOriginalPath}" method="post">
     Choose a page:
     <button onclick="window.opener.CKEDITOR.tools.callFunction(
                         <c:out value='${actionBean.CKEditorFuncNum}'/>,
                         $('#iframe').attr('contentWindow').location.href
-                    ); window.close();">
+                    ); window.close();"
+            class="contentButton">
         <span class="ui-button-text">Choose</span>
     </button>
-    <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"></input>
-    <button name="cancel">
+    <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
+    <button name="cancel" type="submit" class="contentButton">
         <span class="ui-button-text">Cancel</span>
     </button>
 </form>
-<iframe src="${actionBean.dispatch.absoluteOriginalPath}" id="iframe" style="width: 100%; height: 600px; border: 1px dashed black;"></iframe>
-<form action="${actionBean.dispatch.absoluteOriginalPath}">
+<iframe src="${actionBean.dispatch.absoluteOriginalPath}" id="iframe"
+        style="width: 100%; height: 600px; border: 1px dashed black;">
+</iframe>
+<form action="${actionBean.dispatch.absoluteOriginalPath}" method="post">
     Choose a page:
     <button onclick="window.opener.CKEDITOR.tools.callFunction(
                         <c:out value='${actionBean.CKEditorFuncNum}'/>,
                         $('#iframe').attr('contentWindow').location.href
-                    ); window.close();">
+                    ); window.close();"
+            class="contentButton">
         <span class="ui-button-text">Choose</span>
     </button>
-    <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"></input>
-    <button name="cancel">
+    <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
+    <button name="cancel" type="submit" class="contentButton">
         <span class="ui-button-text">Cancel</span>
     </button>
 </form>
