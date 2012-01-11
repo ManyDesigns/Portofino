@@ -284,9 +284,15 @@ public class TextAction extends PortletAction {
     }
 
     @RequiresPermissions(level = AccessLevel.EDIT)
-    public Resolution browse() throws IOException {
+    public Resolution browse() {
         logger.info("Browse");
         return new ForwardResolution("/layouts/text/browse.jsp");
+    }
+
+    @RequiresPermissions(level = AccessLevel.EDIT)
+    public Resolution browsePages() {
+        logger.info("Browse Pages");
+        return new ForwardResolution("/layouts/text/browsePages.jsp");
     }
 
     @Button(list = "portletHeaderButtons", key = "layouts.text.manage-attachments.manage_attachments_for_page", order = 2, icon = "ui-icon-link")

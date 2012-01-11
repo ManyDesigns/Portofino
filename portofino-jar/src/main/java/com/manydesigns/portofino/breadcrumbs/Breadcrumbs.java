@@ -51,6 +51,7 @@ import java.util.List;
 public class Breadcrumbs implements XhtmlFragment {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
+    public static final String SELECTED_CSS_CLASS = "selected";
     public static final String ITEM_CSS_CLASS = "breadcrumb-item";
     public static final String SEPARATOR_CSS_CLASS = "breadcrumb-separator";
 
@@ -120,16 +121,21 @@ public class Breadcrumbs implements XhtmlFragment {
                 xb.write(separator);
                 xb.closeElement("span");
             }
-            if (!clickable || (i == items.size() - 1)) {
+            boolean last = i == items.size() - 1;
+            String cssClass = ITEM_CSS_CLASS;
+            if(last) {
+                cssClass += " " + SELECTED_CSS_CLASS;
+            }
+            if (!clickable || last) {
                 xb.openElement("span");
-                xb.addAttribute("class", ITEM_CSS_CLASS);
+                xb.addAttribute("class", cssClass);
                 xb.addAttribute("title", current.getTitle());
                 xb.write(current.getText());
                 xb.closeElement("span");
             } else {
                 xb.writeAnchor(current.getHref(),
                         current.getText(),
-                        ITEM_CSS_CLASS,
+                        cssClass,
                         current.getTitle());
             }
         }
