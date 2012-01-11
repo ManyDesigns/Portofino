@@ -152,16 +152,19 @@ function enablePortletDragAndDrop(button) {
     container.children("button[name=updateLayout]").button();
     $("button[name=updateLayout]").click(function() {
         var theButton = $(this);
-        $('div.portletContainer').each( function(index, element) {
+        $('div.portletContainer').each(function(index, element) {
             var wrapper = $(element);
+            var templateHiddenField = wrapper.children("input[type=hidden]").first();
             var elements = wrapper.sortable('toArray');
-            for(var index in elements) {
+            console.log(templateHiddenField);
+            for(var e in elements) {
+                var id = elements[e];
                 var hiddenField = document.createElement("input");
                 hiddenField.setAttribute("type", "hidden");
-                hiddenField.setAttribute("name", "portletWrapper_" + element.id);
-                hiddenField.setAttribute("value", elements[index].substring("portletWrapper_".length));
-                hiddenField.setAttribute("class", "updateLayout");
+                hiddenField.setAttribute("name", templateHiddenField.val());
+                hiddenField.setAttribute("value", id.substring("portletWrapper_".length));
                 theButton.before(hiddenField);
+                console.log(hiddenField);
             }
         });
         return true;

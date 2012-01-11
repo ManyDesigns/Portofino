@@ -83,6 +83,7 @@ public class PortletAction extends AbstractActionBean {
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
     public static final String CONF_FORM_PREFIX = "config";
+    public static final String DEFAULT_LAYOUT = "/layouts/portlet/portlet-page-1-2-1-symmetric.jsp";
 
     //--------------------------------------------------------------------------
     // Properties
@@ -448,7 +449,7 @@ public class PortletAction extends AbstractActionBean {
     protected String getLayout() {
         String layout = pageInstance.getPage().getLayout();
         if(StringUtils.isBlank(layout)) {
-            layout = "/layouts/portlet/portlet-page-1-2-1-symmetric.jsp";
+            layout = DEFAULT_LAYOUT;
         }
         return layout;
     }
@@ -555,10 +556,17 @@ public class PortletAction extends AbstractActionBean {
                 portofinoConfiguration.getString(
                         PortofinoProperties.WAR_REAL_PATH);
         File webappFile = new File(warRealPath);
+
         File layoutsDir = new File(new File(warRealPath, "layouts"), "portlet");
         File[] files = layoutsDir.listFiles();
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("jsp");
         visitJspFiles(webappFile, files, selectionProvider);
+
+        layoutsDir = new File(application.getAppDir(), "layouts");
+        if(layoutsDir.isDirectory()) {
+            files = layoutsDir.listFiles();
+            visitJspFiles(webappFile, files, selectionProvider);
+        }
         return selectionProvider;
     }
 
@@ -567,7 +575,11 @@ public class PortletAction extends AbstractActionBean {
         for(File file : files) {
             if(file.isFile() && file.getName().endsWith(".jsp")) {
                 String path = File.separator + com.manydesigns.portofino.util.FileUtils.getRelativePath(root, file);
-                selectionProvider.appendRow(path, file.getName(), true);
+                String name = file.getName();
+                if(DEFAULT_LAYOUT.equals(path)) {
+                    name += " (default)";
+                }
+                selectionProvider.appendRow(path, name, true);
             } else if(file.isDirectory()) {
                 visitJspFiles(root, file.listFiles(), selectionProvider);
             }
