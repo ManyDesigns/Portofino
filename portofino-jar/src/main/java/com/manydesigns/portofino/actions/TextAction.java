@@ -30,10 +30,15 @@ package com.manydesigns.portofino.actions;
 
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.Dispatcher;
+import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.TextLogic;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.Attachment;
+import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.TextPage;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
@@ -48,6 +53,8 @@ import java.io.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -126,6 +133,7 @@ public class TextAction extends PortletAction {
         textFile = RandomUtil.getCodeFile(application.getAppTextDir(), TEXT_FILE_NAME_PATTERN, textCode);
         try {
             content = FileUtils.readFileToString(textFile, CONTENT_ENCODING);
+            content = processContentBeforeView(content);
         } catch (FileNotFoundException e) {
             content = EMPTY_STRING;
             logger.debug("Content file not found. Content set to empty.", e);
@@ -136,14 +144,135 @@ public class TextAction extends PortletAction {
         if (content == null) {
             content = EMPTY_STRING;
         }
+        content = processContentBeforeSave(content);
         byte[] contentByteArray = content.getBytes(CONTENT_ENCODING);
         String textCode = textPage.getId();
         File dataFile =
                 RandomUtil.getCodeFile(application.getAppTextDir(), TEXT_FILE_NAME_PATTERN, textCode);
 
         // copy the data
-        long size = IOUtils.copyLarge(
-                new ByteArrayInputStream(contentByteArray), new FileOutputStream(dataFile));
+        FileOutputStream fileOutputStream = new FileOutputStream(dataFile);
+        try {
+            long size = IOUtils.copyLarge(
+                    new ByteArrayInputStream(contentByteArray), fileOutputStream);
+        } finally {
+            fileOutputStream.close();
+        }
+    }
+
+    protected static final String BASE_USER_URL_PATTERN =
+            "href=\"((http(s)?://)?((HOSTS)(:\\d+)?)?)?((/[^/?]*)+)(\\?[^\"]*)?\"";
+
+    protected String processContentBeforeSave(String content) {
+        List<String> hosts = new ArrayList<String>();
+        hosts.add(context.getRequest().getLocalAddr());
+        hosts.add(context.getRequest().getLocalName());
+        hosts.addAll(application.getPortofinoProperties().getList(PortofinoProperties.HOSTNAMES));
+        String patternString = BASE_USER_URL_PATTERN.replace("HOSTS", "(" + StringUtils.join(hosts, ")|(") + ")");
+        Pattern pattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(content);
+        int lastEnd = 0;
+        StringBuilder sb = new StringBuilder();
+        while (matcher.find()) {
+            String prefix = matcher.group(1);
+            String path = matcher.group(7 + hosts.size());
+            String queryString = matcher.group(9 + hosts.size());
+
+            sb.append(content.substring(lastEnd, matcher.start()));
+
+            if(prefix == null) {
+                prefix = "";
+            }
+            String contextPath = context.getRequest().getContextPath();
+            if(path.startsWith(contextPath)) {
+                prefix += contextPath;
+                path = path.substring(contextPath.length());
+            }
+
+            if(!StringUtils.isBlank(prefix)) {
+                sb.append("portofino:hrefPrefix=\"").append(prefix).append("\" ");
+            }
+            path = convertPathToInternalLink(path);
+            sb.append("portofino:link=\"").append(path).append("\"");
+            if(!StringUtils.isBlank(queryString)) {
+                sb.append(" portofino:queryString=\"").append(queryString).append("\"");
+            }
+
+            lastEnd = matcher.end();
+        }
+
+        sb.append(content.substring(lastEnd));
+
+        return sb.toString();
+    }
+
+    protected String convertPathToInternalLink(String path) {
+        Dispatcher dispatcher = new Dispatcher(application);
+        Dispatch pathDispatch = dispatcher.createDispatch(context.getRequest().getContextPath(), path);
+        PageInstance[] pageInstancePath = pathDispatch.getPageInstancePath();
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (PageInstance current : pageInstancePath) {
+            String pageId = current.getPage().getId();
+            String fragment = current.formatUrlFragment(pageId);
+            if (first) {
+                first = false;
+                // ignore fragment of root node
+            } else {
+                sb.append("/");
+                sb.append(fragment);
+            }
+        }
+        return sb.toString();
+    }
+
+    protected static final String PORTOFINO_HREF_PATTERN =
+            "(portofino:hrefPrefix=\"([^\"]+)\" )?" +
+            "(portofino:link=\"([^\"]+)\")" +
+            "( portofino:queryString=\"([^\"]+)\")?";
+
+    protected String processContentBeforeView(String content) {
+        Pattern pattern = Pattern.compile(PORTOFINO_HREF_PATTERN);
+        Matcher matcher = pattern.matcher(content);
+        int lastEnd = 0;
+        StringBuilder sb = new StringBuilder();
+        while (matcher.find()) {
+            String prefix = matcher.group(2);
+            String link = matcher.group(4);
+            String queryString = matcher.group(6);
+
+            sb.append(content.substring(lastEnd, matcher.start()));
+            sb.append(" href=\"");
+
+            if(!StringUtils.isBlank(prefix)) {
+                sb.append(prefix);
+            }
+            link = convertInternalLinkToPath(link);
+            sb.append(link);
+            if(!StringUtils.isBlank(queryString)) {
+                sb.append(queryString);
+            }
+            sb.append("\"");
+
+            lastEnd = matcher.end();
+        }
+
+        sb.append(content.substring(lastEnd));
+
+        return sb.toString();
+    }
+
+    protected String convertInternalLinkToPath(String link) {
+        Dispatcher dispatcher = new Dispatcher(application) {
+            @Override
+            protected String getFragmentToMatch(Page page) {
+                return page.getId();
+            }
+            @Override
+            protected void checkDispatch(Dispatch dispatch) {}
+        };
+        Dispatch pathDispatch = dispatcher.createDispatch(context.getRequest().getContextPath(), link);
+        return pathDispatch.getPathUrl();
     }
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")

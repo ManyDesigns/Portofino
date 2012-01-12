@@ -56,7 +56,6 @@ import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -467,35 +466,6 @@ public class HibernateApplicationImpl implements Application {
                 logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
             }
             current.removeThreadSession();
-        }
-    }
-    
-    public void commit() {
-        for (HibernateDatabaseSetup current : setups.values()) {
-            Session session = current.getThreadSession();
-            if (session != null) {
-                Transaction tx = session.getTransaction();
-                if (null != tx && tx.isActive()) {
-                    try {
-                        tx.commit();
-                    } catch (HibernateException e) {
-                        closeSession(current);
-                        throw e;
-                    }
-                }
-            }
-        }
-    }
-
-    public void rollback() {
-        for (HibernateDatabaseSetup current : setups.values()) {
-            Session session = current.getThreadSession();
-            if (session != null) {
-                Transaction tx = session.getTransaction();
-                if (null != tx && tx.isActive()) {
-                    tx.rollback();
-                }
-            }
         }
     }
 

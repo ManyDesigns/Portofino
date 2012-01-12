@@ -104,7 +104,11 @@ public class PageInstance {
     }
 
     public String getUrlFragment() {
-        return page.getFragment();
+        return formatUrlFragment(page.getFragment());
+    }
+
+    public String formatUrlFragment(String baseFragment) {
+        return baseFragment;
     }
 
     public List<PageInstance> getChildPageInstances() {

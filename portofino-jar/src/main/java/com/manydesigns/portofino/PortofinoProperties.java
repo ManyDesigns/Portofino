@@ -67,6 +67,7 @@ public final class PortofinoProperties {
             "apps.dir.path";
     public static final String APP_ID =
             "app.id";
+    public static final String HOSTNAMES = "portofino.hostnames";
 
     //Email properties
     public static final String MAIL_ENABLED = "mail.enabled";

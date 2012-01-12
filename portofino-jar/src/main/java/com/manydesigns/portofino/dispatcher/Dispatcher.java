@@ -122,7 +122,26 @@ public class Dispatcher {
                 new PageInstance[pagePath.size()];
         pagePath.toArray(pageArray);
 
-        return new Dispatch(contextPath, path, actionBeanClass, pageArray);
+        Dispatch dispatch = new Dispatch(contextPath, path, actionBeanClass, pageArray);
+        checkDispatch(dispatch);
+        return dispatch;
+    }
+
+    protected void checkDispatch(Dispatch dispatch) {
+        String pathUrl = dispatch.getPathUrl();
+        assert pathUrl.equals(normalizePath(dispatch.getOriginalPath()));
+    }
+
+    protected static String normalizePath(String originalPath) {
+        int trimPosition = originalPath.length() - 1;
+        while(trimPosition >= 0 && originalPath.charAt(trimPosition) == '/') {
+            trimPosition--;
+        }
+        String withoutTrailingSlashes = originalPath.substring(0, trimPosition + 1);
+        while (withoutTrailingSlashes.contains("//")) {
+            withoutTrailingSlashes = withoutTrailingSlashes.replace("//", "/");
+        }
+        return withoutTrailingSlashes;
     }
 
     public static Class<? extends ActionBean> getActionBeanClass(Application application, Page page)
@@ -199,7 +218,7 @@ public class Dispatcher {
         for (Page page : pages) {
             // Wrap Page in PageInstance
             PageInstance pageInstance;
-            if (fragment.equals(page.getFragment())) {
+            if (fragment.equals(getFragmentToMatch(page))) {
                 pageInstance = visitPageInPath(path, fragmentsIterator, page);
                 visitedInPath = true;
             } else {
@@ -210,6 +229,10 @@ public class Dispatcher {
         if (!visitedInPath) {
             fragmentsIterator.previous();
         }
+    }
+
+    protected String getFragmentToMatch(Page page) {
+        return page.getFragment();
     }
 
     private PageInstance visitPageInPath(List<PageInstance> path,
@@ -270,7 +293,7 @@ public class Dispatcher {
 
     private boolean matchSearchChildren(Page page, String peek) {
         for (Page current : page.getChildPages()) {
-            if (peek.equals(current.getFragment())) {
+            if (peek.equals(getFragmentToMatch(current))) {
                 return true;
             }
         }
