@@ -59,7 +59,6 @@ import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.DataModelLogic;
-import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.CrudPage;
@@ -988,6 +987,8 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
             searchString = searchForm.toSearchString();
             if (searchString.length() == 0) {
                 searchString = null;
+            } else {
+                searchVisible = true;
             }
         } else {
             DummyHttpServletRequest dummyRequest =

@@ -51,7 +51,7 @@
                 toolbar: 'Full',
                 toolbarCanCollapse: false,
                 filebrowserWindowWidth : windowWidth,
-                filebrowserWindowHeight : 720,
+                filebrowserWindowHeight : windowHeight,
                 filebrowserBrowseUrl : '<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>?browse=',
                 filebrowserImageBrowseUrl : '<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>?browse=&images-only=',
                 filebrowserUploadUrl : '<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>?uploadAttachmentFromCKEditor='
