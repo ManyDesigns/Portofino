@@ -161,7 +161,7 @@ public class TextAction extends PortletAction {
     }
 
     protected static final String BASE_USER_URL_PATTERN =
-            "(href|src)=\"((http(s)?://)?((HOSTS)(:\\d+)?)?)?((/[^/?]*)+)(\\?[^\"]*)?\"";
+            "(href|src)\\s*=\\s*\"\\s*((http(s)?://)?((HOSTS)(:\\d+)?)?)?((/[^/?]*)+)(\\?[^\"]*)?\\s*\"";
 
     protected String processContentBeforeSave(String content) {
         List<String> hosts = new ArrayList<String>();
