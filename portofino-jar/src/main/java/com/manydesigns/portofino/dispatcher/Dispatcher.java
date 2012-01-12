@@ -123,13 +123,13 @@ public class Dispatcher {
         pagePath.toArray(pageArray);
 
         Dispatch dispatch = new Dispatch(contextPath, path, actionBeanClass, pageArray);
-        checkDispatch(dispatch);
-        return dispatch;
+        return checkDispatch(dispatch);
     }
 
-    protected void checkDispatch(Dispatch dispatch) {
+    protected Dispatch checkDispatch(Dispatch dispatch) {
         String pathUrl = dispatch.getPathUrl();
         assert pathUrl.equals(normalizePath(dispatch.getOriginalPath()));
+        return dispatch;
     }
 
     protected static String normalizePath(String originalPath) {

@@ -161,7 +161,7 @@ public class TextAction extends PortletAction {
     }
 
     protected static final String BASE_USER_URL_PATTERN =
-            "href=\"((http(s)?://)?((HOSTS)(:\\d+)?)?)?((/[^/?]*)+)(\\?[^\"]*)?\"";
+            "(href|src)=\"((http(s)?://)?((HOSTS)(:\\d+)?)?)?((/[^/?]*)+)(\\?[^\"]*)?\"";
 
     protected String processContentBeforeSave(String content) {
         List<String> hosts = new ArrayList<String>();
@@ -174,26 +174,20 @@ public class TextAction extends PortletAction {
         int lastEnd = 0;
         StringBuilder sb = new StringBuilder();
         while (matcher.find()) {
-            String prefix = matcher.group(1);
-            String path = matcher.group(7 + hosts.size());
-            String queryString = matcher.group(9 + hosts.size());
+            String attribute = matcher.group(1);
+            String path = matcher.group(8 + hosts.size());
+            String queryString = matcher.group(10 + hosts.size());
 
             sb.append(content.substring(lastEnd, matcher.start()));
+            sb.append("portofino:hrefAttribute=\"").append(attribute).append("\"");
 
-            if(prefix == null) {
-                prefix = "";
-            }
             String contextPath = context.getRequest().getContextPath();
             if(path.startsWith(contextPath)) {
-                prefix += contextPath;
                 path = path.substring(contextPath.length());
             }
 
-            if(!StringUtils.isBlank(prefix)) {
-                sb.append("portofino:hrefPrefix=\"").append(prefix).append("\" ");
-            }
-            path = convertPathToInternalLink(path);
-            sb.append("portofino:link=\"").append(path).append("\"");
+            //path = convertPathToInternalLink(path);
+            sb.append(" portofino:link=\"").append(path).append("\"");
             if(!StringUtils.isBlank(queryString)) {
                 sb.append(" portofino:queryString=\"").append(queryString).append("\"");
             }
@@ -227,8 +221,8 @@ public class TextAction extends PortletAction {
     }
 
     protected static final String PORTOFINO_HREF_PATTERN =
-            "(portofino:hrefPrefix=\"([^\"]+)\" )?" +
-            "(portofino:link=\"([^\"]+)\")" +
+            "portofino:hrefAttribute=\"([^\"]+)\" " +
+            "portofino:link=\"([^\"]+)\"" +
             "( portofino:queryString=\"([^\"]+)\")?";
 
     protected String processContentBeforeView(String content) {
@@ -237,17 +231,15 @@ public class TextAction extends PortletAction {
         int lastEnd = 0;
         StringBuilder sb = new StringBuilder();
         while (matcher.find()) {
-            String prefix = matcher.group(2);
-            String link = matcher.group(4);
-            String queryString = matcher.group(6);
+            String attribute = matcher.group(1);
+            String link = matcher.group(2);
+            String queryString = matcher.group(4);
 
             sb.append(content.substring(lastEnd, matcher.start()));
-            sb.append(" href=\"");
+            sb.append(attribute).append("=\"");
 
-            if(!StringUtils.isBlank(prefix)) {
-                sb.append(prefix);
-            }
-            link = convertInternalLinkToPath(link);
+            sb.append(context.getRequest().getContextPath());
+            //link = convertInternalLinkToPath(link);
             sb.append(link);
             if(!StringUtils.isBlank(queryString)) {
                 sb.append(queryString);
@@ -269,7 +261,9 @@ public class TextAction extends PortletAction {
                 return page.getId();
             }
             @Override
-            protected void checkDispatch(Dispatch dispatch) {}
+            protected Dispatch checkDispatch(Dispatch dispatch) {
+                return dispatch;
+            }
         };
         Dispatch pathDispatch = dispatcher.createDispatch(context.getRequest().getContextPath(), link);
         return pathDispatch.getPathUrl();
