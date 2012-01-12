@@ -110,6 +110,7 @@ public class PortletAction extends AbstractActionBean {
 
     public final MultiMap portlets = new MultiHashMap();
     public String returnToParentTarget;
+    public final Map<String, String> returnToParentParams = new HashMap<String, String>();
 
     //--------------------------------------------------------------------------
     // Navigation
@@ -387,6 +388,10 @@ public class PortletAction extends AbstractActionBean {
 
     public String getReturnToParentTarget() {
         return returnToParentTarget;
+    }
+
+    public Map<String, String> getReturnToParentParams() {
+        return returnToParentParams;
     }
 
     public MultiMap getPortlets() {

@@ -801,6 +801,9 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
 
     @Override
     public void setupReturnToParentTarget() {
+        if(!StringUtils.isBlank(searchString)) {
+            returnToParentParams.put(SEARCH_STRING_PARAM, searchString);
+        }
         if (CrudPage.MODE_DETAIL.equals(getPageInstance().getMode())) {
             returnToParentTarget = "search";
         } else {
@@ -1007,6 +1010,7 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
                 }
             }
             searchForm.readFromRequest(dummyRequest);
+            searchVisible = true;
         }
     }
 

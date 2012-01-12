@@ -6,7 +6,9 @@
     response.addHeader("Cache-Control", "no-store");
     response.setDateHeader("Expires", 0);
 %><%@ page import="com.manydesigns.portofino.logic.SecurityLogic"
-%><%@ page contentType="text/html;charset=ISO-8859-1" language="java" pageEncoding="ISO-8859-1"
+%>
+<%@ page import="java.util.Map" %>
+<%@ page contentType="text/html;charset=ISO-8859-1" language="java" pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
@@ -40,6 +42,9 @@
                                                     class="contentButton">
                                                 <span class="ui-button-text">&lt;&lt; Return to ${actionBean.returnToParentTarget}</span>
                                             </button>
+                                            <% for(Map.Entry<String, String> param : actionBean.getReturnToParentParams().entrySet()) { %>
+                                                <input type="hidden" name="<%= param.getKey() %>" value="<%= param.getValue() %>" />
+                                            <% } %>
                                         </c:if>
                                         <div class="breadcrumbs">
                                             <div class="inner">
