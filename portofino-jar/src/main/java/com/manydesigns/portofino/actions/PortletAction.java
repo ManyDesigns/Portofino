@@ -146,6 +146,10 @@ public class PortletAction extends AbstractActionBean {
         if (hasPrevious) {
             int previousPos = pageInstancePath.length - 2;
             PageInstance previousPageInstance = pageInstancePath[previousPos];
+            Page previousPage = previousPageInstance.getPage();
+            if(!previousPage.isShowInNavigation()) {
+                return;
+            }
             if (previousPageInstance instanceof CrudPageInstance) {
                 CrudPageInstance crudPageInstance =
                         (CrudPageInstance) previousPageInstance;
