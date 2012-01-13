@@ -56,6 +56,7 @@ public class RegExpTextField extends TextField {
                            String prefix, String regExp) {
         super(accessor, mode, prefix);
         pattern = Pattern.compile(regExp);
+        setErrorString(getText("", regExp));
     }
 
     //**************************************************************************

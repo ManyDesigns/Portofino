@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.model.pages;
 
 import com.manydesigns.elements.annotations.FieldSize;
+import com.manydesigns.elements.annotations.RegExp;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
@@ -187,6 +188,7 @@ public abstract class Page implements ModelObject, WithPermissions {
 
     @XmlAttribute(required = true)
     @Required
+    @RegExp(value = "[a-zA-Z0-9_\\-]+", errorMessage = "page.invalid.fragment")
     public String getFragment() {
         return fragment;
     }
