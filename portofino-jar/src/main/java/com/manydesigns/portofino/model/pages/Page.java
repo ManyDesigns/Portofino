@@ -73,6 +73,7 @@ public abstract class Page implements ModelObject, WithPermissions {
     protected String layoutOrder;
     protected String layout;
     protected boolean showInNavigation = true;
+    protected boolean subtreeRoot = false;
 
     //**************************************************************************
     // Actual fields
@@ -359,5 +360,14 @@ public abstract class Page implements ModelObject, WithPermissions {
 
     public void setActualActionClass(Class<?> actualActionClass) {
         this.actualActionClass = actualActionClass;
+    }
+
+    @XmlAttribute
+    public boolean isSubtreeRoot() {
+        return subtreeRoot;
+    }
+
+    public void setSubtreeRoot(boolean subtreeRoot) {
+        this.subtreeRoot = subtreeRoot;
     }
 }

@@ -32,6 +32,7 @@ package com.manydesigns.elements.fields;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.HighlightLinks;
 import com.manydesigns.elements.annotations.Multiline;
+import com.manydesigns.elements.annotations.RichText;
 import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -61,6 +62,7 @@ public class TextField extends AbstractTextField {
 
     protected boolean highlightLinks = false;
     protected boolean multiline = false;
+    protected boolean richText = false;
     protected int textAreaWidth = 70;
     protected int textAreaMinRows = 4;
     protected String[] red;
@@ -90,6 +92,14 @@ public class TextField extends AbstractTextField {
         if (multilineAnnotation != null) {
             multiline = multilineAnnotation.value();
             logger.debug("Multiline annotation present with value: {}",
+                    multiline);
+        }
+
+        RichText richTextAnnotation = accessor.getAnnotation(RichText.class);
+        if (richTextAnnotation != null) {
+            multiline = richTextAnnotation.value();
+            richText = richTextAnnotation.value();
+            logger.debug("RichText annotation present with value: {}",
                     multiline);
         }
         
@@ -143,6 +153,9 @@ public class TextField extends AbstractTextField {
             xb.addAttribute("cols", Integer.toString(textAreaWidth));
             xb.addAttribute("rows", Integer.toString(
                     numRowTextArea(stringValue, textAreaWidth)));
+            if(richText) {
+                xb.addAttribute("class", "mde-form-rich-text");
+            }
             xb.write(stringValue);
             xb.closeElement("textarea");
         } else {
@@ -311,6 +324,14 @@ public class TextField extends AbstractTextField {
 
     public void setMultiline(boolean multiline) {
         this.multiline = multiline;
+    }
+
+    public boolean isRichText() {
+        return richText;
+    }
+
+    public void setRichText(boolean richText) {
+        this.richText = richText;
     }
 
     public int getTextAreaWidth() {

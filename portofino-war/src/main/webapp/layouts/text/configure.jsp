@@ -25,7 +25,7 @@
     <stripes:layout-component name="portletBody">
         <fieldset class="mde-form-fieldset" style="padding-top: 1em;">
             <legend><fmt:message key="layouts.text.configure.content"/></legend>
-            <stripes:textarea class="editor" name="content" value="${actionBean.content}"/>
+            <stripes:textarea class="mde-form-rich-text" name="content" value="${actionBean.content}"/>
         </fieldset>
         <div class="horizontalSeparator"></div>
         <fmt:message key="layouts.text.configure.this_document_is_saved"/> <c:out value="${actionBean.textFile.name}"/>
@@ -47,7 +47,7 @@
                 windowHeight = document.body.offsetHeight;
             }
 
-            $('textarea.editor').ckeditor({
+            $('textarea.mde-form-rich-text').data('mdeRichTextConfig', {
                 toolbar: 'Full',
                 toolbarCanCollapse: false,
                 filebrowserWindowWidth : windowWidth,

@@ -111,3 +111,14 @@ function stripQueryString(url) {
     var regexp = new RegExp("\\?.*");
     return url.replace(regexp, "");
 }
+
+$(function() {
+    $('textarea.mde-form-rich-text').each(function(index, element) {
+        element = $(element);
+        var conf = element.data('mdeRichTextConfig') || {
+            toolbar: 'Full',
+            toolbarCanCollapse: false
+        };
+        element.ckeditor(conf);
+    });
+});

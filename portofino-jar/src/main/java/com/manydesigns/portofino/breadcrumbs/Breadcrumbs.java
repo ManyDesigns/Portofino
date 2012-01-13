@@ -36,6 +36,7 @@ import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.model.pages.RootPage;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -78,31 +79,39 @@ public class Breadcrumbs implements XhtmlFragment {
         items = new ArrayList<BreadcrumbItem>();
 
         StringBuilder sb = new StringBuilder();
-        sb.append(dispatch.getContextPath());
-        for (int i = 1; i < upto; i++) {
+        int start = dispatch.getClosestSubtreeRootIndex();
+        sb.append(dispatch.getContextPath()).append(dispatch.getPathUrl(start));
+        if(dispatch.getPageInstance(start).getPage() instanceof RootPage) {
+            start++;
+        }
+        for (int i = start; i < upto; i++) {
             PageInstance current = dispatch.getPageInstancePath()[i];
             //Resolve references to treat Crud pages differently below
             current = current.dereference();
             sb.append("/");
             Page page = current.getPage();
             sb.append(page.getFragment());
-            BreadcrumbItem item = new BreadcrumbItem(
-                    sb.toString(), page.getTitle(),
-                    page.getDescription());
-            items.add(item);
+            if(page.isShowInNavigation()) {
+                BreadcrumbItem item = new BreadcrumbItem(
+                        sb.toString(), page.getTitle(),
+                        page.getDescription());
+                items.add(item);
+            }
             if (current instanceof CrudPageInstance) {
                 CrudPageInstance instance =
                         (CrudPageInstance) current;
                 if (CrudPage.MODE_DETAIL.equals(instance.getMode())) {
                     sb.append("/");
                     sb.append(instance.getPk());
-                    String name = ShortNameUtils.getName(
-                            instance.getClassAccessor(), instance.getObject());
-                    String title = String.format("%s (%s)",
-                            name, page.getTitle());
-                    BreadcrumbItem item2 = new BreadcrumbItem(
-                            sb.toString(), name, title);
-                    items.add(item2);
+                    if(page.isShowInNavigation()) {
+                        String name = ShortNameUtils.getName(
+                                instance.getClassAccessor(), instance.getObject());
+                        String title = String.format("%s (%s)",
+                                name, page.getTitle());
+                        BreadcrumbItem item2 = new BreadcrumbItem(
+                                sb.toString(), name, title);
+                        items.add(item2);
+                    }
                 }
             }
         }

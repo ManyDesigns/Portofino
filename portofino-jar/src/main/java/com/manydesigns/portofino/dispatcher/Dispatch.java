@@ -124,4 +124,14 @@ public class Dispatch {
     public PageInstance getParentPageInstance() {
         return getPageInstance(-2);
     }
+
+    public int getClosestSubtreeRootIndex() {
+        PageInstance[] path = getPageInstancePath();
+        for(int i = path.length - 1; i > 0; i--) {
+            if(path[i].getPage().isSubtreeRoot()) {
+                return i;
+            }
+        }
+        return 0;
+    }
 }

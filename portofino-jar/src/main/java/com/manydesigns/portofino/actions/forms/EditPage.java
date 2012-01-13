@@ -29,10 +29,7 @@
 
 package com.manydesigns.portofino.actions.forms;
 
-import com.manydesigns.elements.annotations.LabelI18N;
-import com.manydesigns.elements.annotations.Multiline;
-import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.elements.annotations.Updatable;
+import com.manydesigns.elements.annotations.*;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -58,6 +55,9 @@ public class EditPage {
 
     @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.showInNavigation")
     public boolean showInNavigation;
+
+    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.subtreeRoot")
+    public boolean subtreeRoot;
 
     @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.layout")
     @Required

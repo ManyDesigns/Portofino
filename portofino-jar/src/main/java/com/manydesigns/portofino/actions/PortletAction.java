@@ -76,9 +76,9 @@ import java.util.*;
 public class PortletAction extends AbstractActionBean {
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
-            {{"id", "embedInParent", "showInNavigation", "layout", "description"}};
+            {{"id", "embedInParent", "showInNavigation", "subtreeRoot", "layout", "description"}};
     public static final String[][] TOP_LEVEL_PAGE_CONFIGURATION_FIELDS =
-            {{"id", "showInNavigation", "layout", "description"}};
+            {{"id", "showInNavigation", "subtreeRoot", "layout", "description"}};
     public static final String PAGE_PORTLET_NOT_CONFIGURED = "/layouts/portlet-not-configured.jsp";
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
@@ -163,8 +163,7 @@ public class PortletAction extends AbstractActionBean {
     public void setupReturnToParentTarget() {
         PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
-        PageInstance thisPageInstance = dispatch.getLastPageInstance();
-        boolean hasPrevious = pageInstancePath.length > 1;
+        boolean hasPrevious = !getPage().isSubtreeRoot() && pageInstancePath.length > 1;
         returnToParentTarget = null;
         if (hasPrevious) {
             int previousPos = pageInstancePath.length - 2;
@@ -547,6 +546,7 @@ public class PortletAction extends AbstractActionBean {
         edit.description = page.getDescription();
         edit.embedInParent = page.getLayoutContainerInParent() != null;
         edit.showInNavigation = page.isShowInNavigation();
+        edit.subtreeRoot = page.isSubtreeRoot();
         edit.layout = getLayout();
         pageConfigurationForm.readFromObject(edit);
         title = page.getTitle();
@@ -624,9 +624,9 @@ public class PortletAction extends AbstractActionBean {
             page.setLayoutOrderInParent(null);
         }
         page.setShowInNavigation(edit.showInNavigation);
+        page.setSubtreeRoot(edit.subtreeRoot);
         if(!edit.embedInParent && !edit.showInNavigation) {
-            SessionMessages.addWarningMessage(
-                    "The page is not embedded and not included in navigation - it will only be reachable by URL or explicit linking.");
+            SessionMessages.addWarningMessage(getMessage("page.warnNotShowInNavigationNotEmbedded"));
         }
         page.setLayout(edit.layout);
 
