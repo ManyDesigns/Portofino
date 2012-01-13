@@ -42,7 +42,7 @@ function confirmDeletePage(pageId, contextPath) {
             width: 500,
             buttons: {
                 '<fmt:message key="commons.delete" />': function() {
-                    var form = $("#contentHeaderForm");
+                    var form = $("#pageAdminForm");
                     copyFormAsHiddenFields($(this), form);
                     form.submit();
                     $(this).dialog("close");
@@ -65,7 +65,7 @@ function showMovePageDialog(pageId, contextPath) {
             width: 500,
             buttons: {
                 '<fmt:message key="commons.move"/>': function() {
-                    var form = $("#contentHeaderForm");
+                    var form = $("#pageAdminForm");
                     copyFormAsHiddenFields($(this), form);
                     form.submit();
                     $(this).dialog("close");
@@ -88,7 +88,7 @@ function showCopyPageDialog(pageId, contextPath) {
             width: 500,
             buttons: {
                 '<fmt:message key="commons.copy"/>': function() {
-                    var form = $("#contentHeaderForm");
+                    var form = $("#pageAdminForm");
                     copyFormAsHiddenFields($(this), form);
                     form.submit();
                     $(this).dialog("close");

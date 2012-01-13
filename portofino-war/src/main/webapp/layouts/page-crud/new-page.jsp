@@ -8,8 +8,8 @@
     taglib prefix="mde" uri="/manydesigns-elements"%><%@
     taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%@
     taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="/skins/${skin}/modal-page.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.PortletAction"/>
+<stripes:layout-render name="/skins/${skin}/modal-page.jsp" formActionUrl="/actions/admin/page">
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.PageAdminAction"/>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="page-create" cssClass="contentButton"/>
     </stripes:layout-component>
@@ -17,6 +17,7 @@
         <fmt:message key="layouts.page-crud.new-page.add_new_page"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
+        <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
         <mde:write name="actionBean" property="newPageForm"/>
         <br /><br />
         <fieldset class="mde-form-fieldset">

@@ -33,9 +33,9 @@
                 <div id="content" class="yui-b">
                     <div class="contentHeader">
                         <stripes:layout-component name="contentHeader">
-                            <stripes:form action="${actionBean.dispatch.originalPath}" method="post" id="contentHeaderForm">
-                                <div class="yui-g">
-                                    <div class="contentBarLeft">
+                            <div class="yui-g">
+                                <div class="contentBarLeft">
+                                    <stripes:form action="${actionBean.dispatch.originalPath}" method="post">
                                         <c:if test="${not empty actionBean.returnToParentTarget}">
                                             <button type="submit"
                                                     name="returnToParent"
@@ -51,8 +51,11 @@
                                                 <mde:write name="breadcrumbs"/>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="contentBarRight">
+                                    </stripes:form>
+                                </div>
+                                <div class="contentBarRight">
+                                    <stripes:form action="/actions/admin/page" method="post" id="pageAdminForm">
+                                        <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
                                         <!-- Admin buttons -->
                                         <% if(SecurityLogic.isAdministrator(request)) { %>
                                             <div class="contentBarButtons">
@@ -65,11 +68,11 @@
                                                 <portofino:page-move-button />
                                             </div>
                                         <% } %>
-                                        <!-- End admin buttons -->
-                                        <portofino:result-set-navigation />
-                                    </div>
+                                    </stripes:form>
+                                    <!-- End admin buttons -->
+                                    <portofino:result-set-navigation />
                                 </div>
-                            </stripes:form>
+                            </div>
                         </stripes:layout-component>
                     </div>
                     <div class="contentBody">

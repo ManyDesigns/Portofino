@@ -162,6 +162,15 @@ public class ChartAction extends PortletAction {
         }
     }
 
+    protected Resolution portletError(Throwable e) {
+        context.getRequest().setAttribute(PORTOFINO_PORTLET_EXCEPTION, e);
+        if(isEmbedded()) {
+            return new ForwardResolution("/layouts/portlet-error.jsp");
+        } else {
+            return forwardToPortletPage("/layouts/portlet-error.jsp");
+        }
+    }
+
     public void generateChart() {
         ChartGenerator chartGenerator;
 

@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.actions.PortletAction;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
@@ -47,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 @RequiresAdministrator
 @UrlBinding("/actions/admin/root-permissions")
-public class RootPermissionsAction extends PortletAction implements AdminAction {
+public class RootPermissionsAction extends PageAdminAction implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
