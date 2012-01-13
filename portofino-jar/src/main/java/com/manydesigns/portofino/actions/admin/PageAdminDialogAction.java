@@ -27,11 +27,13 @@
 *
 */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.portofino.actions.AbstractActionBean;
+import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.forms.CopyPage;
 import com.manydesigns.portofino.actions.forms.MovePage;
 import com.manydesigns.portofino.di.Inject;
@@ -50,8 +52,8 @@ import net.sourceforge.stripes.action.UrlBinding;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@UrlBinding("/actions/page")
-public class PageAction extends AbstractActionBean {
+@UrlBinding("/actions/admin/page/dialog")
+public class PageAdminDialogAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 

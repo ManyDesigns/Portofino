@@ -2,7 +2,7 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="com.manydesigns.portofino.model.pages.Page" %>
 <jsp:useBean id="actionBean" scope="request"
-             type="com.manydesigns.portofino.actions.PageAction"/>
+             type="com.manydesigns.portofino.actions.admin.PageAdminDialogAction"/>
 <div id="dialog-confirm-delete-page" title='<fmt:message key="layouts.admin.deletePageDialog.really_delete"/>'>
     <p><fmt:message key="layouts.admin.deletePageDialog.are_you_sure"/></p>
     <%
