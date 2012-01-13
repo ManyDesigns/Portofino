@@ -495,6 +495,7 @@ public class PageAdminAction extends AbstractActionBean {
     }
 
     @Button(list = "testUserPermissions", key = "user.permissions.test")
+    @RequiresAdministrator
     public Resolution testUserPermissions() {
         if(StringUtils.isBlank(testUserId)) {
             return new RedirectResolution(dispatch.getOriginalPath());
@@ -525,7 +526,9 @@ public class PageAdminAction extends AbstractActionBean {
 
     public void setupGroups(Page page) {
         Session session = application.getSystemSession();
-        Criteria criteria = session.createCriteria(SecurityLogic.GROUP_ENTITY_NAME).addOrder(Order.asc("name"));
+        Criteria criteria =
+                session.createCriteria(SecurityLogic.GROUP_ENTITY_NAME)
+                       .addOrder(Order.asc("name"));
         groups = new ArrayList(criteria.list());
     }
 

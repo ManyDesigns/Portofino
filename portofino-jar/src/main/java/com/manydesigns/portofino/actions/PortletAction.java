@@ -16,7 +16,6 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.forms.EditPage;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
@@ -258,9 +257,7 @@ public class PortletAction extends AbstractActionBean {
         return layout;
     }
 
-    @Buttons({
-        @Button(list = "configuration", key = "commons.cancel", order = 99)
-    })
+    @Button(list = "configuration", key = "commons.cancel", order = 99)
     public Resolution cancel() {
         return new RedirectResolution(getCancelReturnUrl(), false);
     }
