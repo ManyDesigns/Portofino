@@ -32,7 +32,6 @@ package com.manydesigns.portofino.model;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.pages.RootPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,8 +57,6 @@ public class Model {
     //**************************************************************************
 
     protected final ArrayList<Database> databases;
-    protected RootPage rootPage;
-
 
     public static final Logger logger = LoggerFactory.getLogger(Model.class);
 
@@ -132,11 +129,6 @@ public class Model {
         for (Database database : databases) {
             visitor.visit(database);
         }
-
-        // pages
-        if (rootPage != null) {
-            visitor.visit(rootPage);
-        }
     }
 
     //**************************************************************************
@@ -148,15 +140,6 @@ public class Model {
             type = com.manydesigns.portofino.model.datamodel.Database.class)
     public List<Database> getDatabases() {
         return databases;
-    }
-
-    @XmlElement(required = false)
-    public RootPage getRootPage() {
-        return rootPage;
-    }
-
-    public void setRootPage(RootPage rootPage) {
-        this.rootPage = rootPage;
     }
 
 }

@@ -1,0 +1,14 @@
+<page description="Welcome to Ticket Tracker" id="tkwxs2rtbixy6c6hy2b3h3n0i" title="Welcome">
+    <permissions />
+    <layout>
+        <self container="contentLayoutLeft" order="1"/>
+        <childPages>
+            <childPage name="latestProjects" container="contentLayoutRight" order="4" showInNavigation="false"/>
+            <childPage name="workload" container="contentLayoutRight" order="1" showInNavigation="false"/>
+            <childPage name="issues-by-status-bar" showInNavigation="false" container="contentLayoutLeft"  order="5"/>
+            <childPage name="issues-by-tracker-bar" container="contentLayoutLeft" order="3" showInNavigation="false"/>
+            <childPage name="issues-by-priority-bar" container="contentLayoutLeft" order="7" showInNavigation="false"/>
+            <childPage name="prjstatus" container="contentLayoutRight" order="3" showInNavigation="false" />
+        </childPages>
+    </layout>
+</page>

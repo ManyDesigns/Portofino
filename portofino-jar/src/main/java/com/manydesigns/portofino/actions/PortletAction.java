@@ -17,14 +17,10 @@ import com.manydesigns.portofino.actions.forms.EditPage;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.pages.AccessLevel;
-import com.manydesigns.portofino.model.pages.CrudPage;
-import com.manydesigns.portofino.model.pages.Page;
-import com.manydesigns.portofino.model.pages.RootPage;
+import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.stripes.ModelActionResolver;
@@ -128,16 +124,19 @@ public class PortletAction extends AbstractActionBean {
 
     @Before
     protected void prepare() {
-        dereferencePageInstance();
+        //dereferencePageInstance();
     }
 
-    protected void dereferencePageInstance() {
+    /*protected void dereferencePageInstance() {
         if(pageInstance != null) {
             pageInstance = pageInstance.dereference();
         }
-    }
+    }*/
 
     public void setupReturnToParentTarget() {
+        //TODO!!!
+
+        /*
         PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
         boolean hasPrevious = !getPage().isSubtreeRoot() && pageInstancePath.length > 1;
@@ -152,9 +151,9 @@ public class PortletAction extends AbstractActionBean {
             if (previousPageInstance instanceof CrudPageInstance) {
                 CrudPageInstance crudPageInstance =
                         (CrudPageInstance) previousPageInstance;
-                if(crudPageInstance.getCrud() != null) {
+                if(crudPageInstance.getCrudConfiguration() != null) {
                     if (CrudPage.MODE_SEARCH.equals(crudPageInstance.getMode())) {
-                        returnToParentTarget = crudPageInstance.getCrud().getName();
+                        returnToParentTarget = crudPageInstance.getCrudConfiguration().getName();
                     } else if (CrudPage.MODE_DETAIL.equals(crudPageInstance.getMode())) {
                         Object previousPageObject = crudPageInstance.getObject();
                         ClassAccessor previousPageClassAccessor =
@@ -164,7 +163,7 @@ public class PortletAction extends AbstractActionBean {
                     }
                 }
             }
-        }
+        }*/
     }
 
     //--------------------------------------------------------------------------
@@ -217,20 +216,23 @@ public class PortletAction extends AbstractActionBean {
     }
 
     protected void setupPortlets(PageInstance pageInstance, String myself) {
-        PortletInstance myPortletInstance = new PortletInstance("p", pageInstance.getLayoutOrder(), myself);
-        String layoutContainer = pageInstance.getLayoutContainer();
+        Layout layout = pageInstance.getPage().getLayout();
+        Self self = layout.getSelf();
+        int myOrder = self.getActualOrder();
+        PortletInstance myPortletInstance = new PortletInstance("p", myOrder, myself);
+        String layoutContainer = self.getContainer();
         if (layoutContainer == null) {
             layoutContainer = DEFAULT_LAYOUT_CONTAINER;
         }
         portlets.put(layoutContainer, myPortletInstance);
-        for(Page page : pageInstance.getChildPages()) {
-            String layoutContainerInParent = page.getLayoutContainerInParent();
+        for(ChildPage page : layout.getChildPages()) {
+            String layoutContainerInParent = page.getContainer();
             if(layoutContainerInParent != null) {
                 PortletInstance portletInstance =
                         new PortletInstance(
-                                "c" + page.getFragment(),
-                                page.getActualLayoutOrderInParent(),
-                                dispatch.getOriginalPath() + "/" + page.getFragment());
+                                "c" + page.getName(),
+                                page.getActualOrder(),
+                                dispatch.getOriginalPath() + "/" + page.getName());
 
                 portlets.put(layoutContainerInParent, portletInstance);
             }
@@ -250,7 +252,7 @@ public class PortletAction extends AbstractActionBean {
     }
 
     protected String getLayout() {
-        String layout = pageInstance.getPage().getLayout();
+        String layout = pageInstance.getPage().getLayout().getLayout();
         if(StringUtils.isBlank(layout)) {
             layout = DEFAULT_LAYOUT;
         }

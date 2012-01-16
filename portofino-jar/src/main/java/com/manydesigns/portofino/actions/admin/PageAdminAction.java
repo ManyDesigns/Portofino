@@ -39,7 +39,11 @@ import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.PortletAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.actions.chart.configuration.ChartConfiguration;
+import com.manydesigns.portofino.actions.crud.configuration.CrudPage;
 import com.manydesigns.portofino.actions.forms.NewPage;
+import com.manydesigns.portofino.actions.jsp.configuration.JspConfiguration;
+import com.manydesigns.portofino.actions.text.configuration.TextConfiguration;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
@@ -436,9 +440,9 @@ public class PageAdminAction extends AbstractActionBean {
     private void prepareNewPageForm() {
         DefaultSelectionProvider classSelectionProvider = new DefaultSelectionProvider("pageClassName");
         classSelectionProvider.appendRow(CrudPage.class.getName(), "Crud", true);
-        classSelectionProvider.appendRow(ChartPage.class.getName(), "Chart", true);
-        classSelectionProvider.appendRow(TextPage.class.getName(), "Text", true);
-        classSelectionProvider.appendRow(JspPage.class.getName(), "JSP", true);
+        classSelectionProvider.appendRow(ChartConfiguration.class.getName(), "Chart", true);
+        classSelectionProvider.appendRow(TextConfiguration.class.getName(), "Text", true);
+        classSelectionProvider.appendRow(JspConfiguration.class.getName(), "JSP", true);
         /*PageReference.class.getName(), "Reference to another page"*/
         //root + at least 1 child
         boolean includeSiblingOption = dispatch.getPageInstancePath().length > 2;

@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.chart;
 
-import com.manydesigns.portofino.model.pages.ChartPage;
+import com.manydesigns.portofino.actions.chart.configuration.ChartConfiguration;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.general.PieDataset;
@@ -44,9 +44,9 @@ public class ChartPie3DGenerator extends Chart1DGenerator {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    protected JFreeChart createChart(ChartPage chartPage, PieDataset dataset) {
+    protected JFreeChart createChart(ChartConfiguration chartConfiguration, PieDataset dataset) {
         return ChartFactory.createPieChart3D(
-                chartPage.getName(), dataset, true, true, true);
+                chartConfiguration.getName(), dataset, true, true, true);
     }
 
 }

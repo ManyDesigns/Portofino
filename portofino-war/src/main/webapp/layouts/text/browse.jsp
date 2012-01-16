@@ -13,7 +13,7 @@
 --%><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <jsp:useBean id="actionBean" scope="request"
-             type="com.manydesigns.portofino.actions.TextAction"/>
+             type="com.manydesigns.portofino.actions.text.TextAction"/>
 <head>
     <title><fmt:message key="layouts.text.browse.browse_server"/></title>
 </head>
@@ -26,10 +26,10 @@
         Pagine: <button name="browsePages" type="submit">Browse</button> (TODO) 
     </form>
 <% } %>
-<c:if test="${not empty actionBean.textPage.attachments}">
+<c:if test="${not empty actionBean.textConfiguration.attachments}">
     <fmt:message key="commons.attachments"/>:
     <ul>
-        <c:forEach var="attachment" items="${actionBean.textPage.attachments}">
+        <c:forEach var="attachment" items="${actionBean.textConfiguration.attachments}">
             <li><a href="#"
                     onclick="window.opener.CKEDITOR.tools.callFunction(
                     <c:out value='${actionBean.CKEditorFuncNum}'/>,
@@ -39,7 +39,7 @@
             </a></li>
         </c:forEach>
     </ul>
-</c:if><c:if test="${empty actionBean.textPage.attachments}">
+</c:if><c:if test="${empty actionBean.textConfiguration.attachments}">
     <fmt:message key="layouts.text.browse.there_are_no_attachments"/>
     <a href="#" onclick="window.close()"><fmt:message key="layouts.text.browse.close_window"/></a>
 </c:if>

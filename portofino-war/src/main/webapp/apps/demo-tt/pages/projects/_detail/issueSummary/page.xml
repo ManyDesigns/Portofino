@@ -1,0 +1,7 @@
+<page description="Issue tracking" id="t7ki2cz4dpyuhuodamjuuoe1e" title="Issue tracking">
+    <permissions />
+    <layout>
+        <self container="default" order="0"/>
+        <childPages/>
+    </layout>
+</page>

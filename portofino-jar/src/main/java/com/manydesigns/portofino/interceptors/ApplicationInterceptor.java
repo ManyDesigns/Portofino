@@ -31,8 +31,9 @@ package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.BlobManager;
-import com.manydesigns.portofino.actions.PageRealizationAware;
+import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.dispatcher.Dispatch;
@@ -40,7 +41,6 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.navigation.Navigation;
 import net.sourceforge.stripes.action.ActionBeanContext;
-import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
@@ -51,6 +51,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 
 /*
@@ -87,7 +93,7 @@ public class ApplicationInterceptor implements Interceptor {
 
         logger.debug("Setting skin");
         if(request.getAttribute("skin") == null) {
-            String skin = application.getModel().getRootPage().getSkin();
+            String skin = application.getAppConfiguration().getString(AppProperties.SKIN);
             request.setAttribute("skin", skin);
         }
 
@@ -110,17 +116,12 @@ public class ApplicationInterceptor implements Interceptor {
             int i = 0;
             for(PageInstance page : dispatch.getPageInstancePath()) {
                 i++;
-                if(!page.realize()) {
+                PortofinoAction actionBean = instantiateActionBean(page);
+                configureActionBean(actionBean, page);
+                Resolution resolution = actionBean.prepare(page, actionContext);
+                if(resolution != null) {
                     logger.error("Page realization failed for {}", page);
-                    Class<?> actionClass = page.getPage().getActualActionClass();
-                    if(PageRealizationAware.class.isAssignableFrom(actionClass)) {
-                        String pathUrl = dispatch.getPathUrl(i);
-                        request.setAttribute("pageRealizationFailed", request.getContextPath() + pathUrl);
-                        PageRealizationAware action = (PageRealizationAware) actionClass.newInstance();
-                        return action.pageRealizationFailed(actionContext, application);
-                    } else {
-                        return new ErrorResolution(404);
-                    }
+                    return resolution;
                 }
             }
             PageInstance pageInstance = dispatch.getLastPageInstance();
@@ -132,6 +133,35 @@ public class ApplicationInterceptor implements Interceptor {
         }
 
         return context.proceed();
+    }
+
+    protected PortofinoAction instantiateActionBean(PageInstance page) throws IllegalAccessException, InstantiationException {
+        PortofinoAction action = page.getActionClass().newInstance();
+        page.setActionBean(action);
+        return action;
+    }
+
+    protected void configureActionBean(PortofinoAction actionBean, PageInstance page) throws JAXBException, IOException {
+        Class<?> configurationClass = actionBean.getConfigurationClass();
+        String configurationPackage = configurationClass.getPackage().getName();
+
+        //TODO!!!
+        File pageFile = new File(page.getDirectory(), "configuration.xml");
+        if(pageFile.exists()) {
+            JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            FileInputStream in = new FileInputStream(pageFile);
+            try {
+                Object configuration = unmarshaller.unmarshal(in);
+                if(!configurationClass.isInstance(configuration)) {
+                    logger.error("Invalid configuration: expected " + configurationClass + ", got " + configuration);
+                    return;
+                }
+                page.setConfiguration(configuration);
+            } finally {
+                in.close();
+            }
+        }
     }
 
 }

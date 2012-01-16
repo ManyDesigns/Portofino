@@ -29,31 +29,16 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.database.QueryUtils;
-import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.model.pages.CrudPage;
-import com.manydesigns.portofino.model.pages.Page;
-import com.manydesigns.portofino.model.pages.crud.Crud;
-import com.manydesigns.portofino.util.PkHelper;
-import ognl.OgnlContext;
-
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla - alessio.stalla@manydesigns.com
 */
-public class CrudPageInstance extends PageInstance {
+/*public class CrudPageInstance extends PageInstance {
 
     protected final String pk;
-    protected final Crud crud;
+    protected final CrudConfiguration crudConfiguration;
 
     protected final ClassAccessor classAccessor;
     protected final Table baseTable;
@@ -64,15 +49,15 @@ public class CrudPageInstance extends PageInstance {
     public CrudPageInstance(Application application, CrudPage page, String mode, String param) {
         super(application, page, mode);
         this.pk = param;
-        this.crud = page.getCrud();
+        this.crudConfiguration = page.getCrud();
 
         ClassAccessor tmpClassAccessor = null;
         Table tmpBaseTable = null;
         PkHelper tmpPkHelper = null;
-        if(crud != null && crud.getActualTable() != null) {
+        if(crudConfiguration != null && crudConfiguration.getActualTable() != null) {
             try {
-                tmpClassAccessor = application.getCrudAccessor(crud);
-                tmpBaseTable = crud.getActualTable();
+                tmpClassAccessor = application.getCrudAccessor(crudConfiguration);
+                tmpBaseTable = crudConfiguration.getActualTable();
                 tmpPkHelper = new PkHelper(tmpClassAccessor);
             } catch (Exception e) {
                 logger.warn("Crud threw exception (probably not configured).", e);
@@ -92,9 +77,9 @@ public class CrudPageInstance extends PageInstance {
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
             loadObject(pk);
             if(object != null) {
-                ognlContext.put(crud.getActualVariable(), object);
+                ognlContext.put(crudConfiguration.getActualVariable(), object);
             } else {
-                logger.info("Not in use case: " + crud.getName());
+                logger.info("Not in use case: " + crudConfiguration.getName());
                 return false;
             }
         }
@@ -106,7 +91,7 @@ public class CrudPageInstance extends PageInstance {
         object = QueryUtils.getObjectByPk(
                 application,
                 baseTable, pkObject,
-                crud.getQuery(), null);
+                crudConfiguration.getQuery(), null);
     }
 
     // Getter/setter
@@ -129,8 +114,8 @@ public class CrudPageInstance extends PageInstance {
         }
     }
 
-    public Crud getCrud() {
-        return crud;
+    public CrudConfiguration getCrudConfiguration() {
+        return crudConfiguration;
     }
 
     public ClassAccessor getClassAccessor() {
@@ -225,4 +210,4 @@ public class CrudPageInstance extends PageInstance {
             throw new IllegalStateException("Unsupported mode: " + mode);
         }
     }
-}
+}*/

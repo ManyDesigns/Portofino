@@ -31,7 +31,7 @@ package com.manydesigns.portofino.logic;
 
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.portofino.model.pages.CrudPage;
+import com.manydesigns.portofino.actions.crud.configuration.CrudPage;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.RootPage;
 import org.apache.commons.lang.ArrayUtils;

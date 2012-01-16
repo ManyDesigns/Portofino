@@ -56,8 +56,6 @@ public class Permissions implements ModelObject {
 
     protected final List<Group> groups;
 
-    protected WithPermissions parent;
-
     protected final Map<String, AccessLevel> actualLevels;
     //<group, set<permission>>
     protected final Map<String, Set<String>> actualPermissions;
@@ -73,17 +71,11 @@ public class Permissions implements ModelObject {
         actualPermissions = new HashMap<String, Set<String>>();
     }
 
-    public Permissions(WithPermissions parent) {
-        this();
-        this.parent = parent;
-    }
-
     //**************************************************************************
     // ModelObject implementation
     //**************************************************************************
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
-        this.parent = (WithPermissions) parent;
     }
 
     public void reset() {
@@ -100,17 +92,18 @@ public class Permissions implements ModelObject {
         }
 
         //Inherited permissions
-        WithPermissions ancestor = (parent != null) ? parent.getParent() : null;
-        if(ancestor != null) {
-            Map<String, AccessLevel> parentLevels = ancestor.getPermissions().getActualLevels();
-            for(Map.Entry<String, AccessLevel> entry : parentLevels.entrySet()) {
-                String key = entry.getKey();
-                AccessLevel value = entry.getValue();
-                if(value == AccessLevel.DENY || actualLevels.get(key) == null) {
-                    actualLevels.put(key, value);
-                }
-            }
-        }
+        // TODO: rivedere in ottica locale
+//        WithPermissions ancestor = (parent != null) ? parent.getParent() : null;
+//        if(ancestor != null) {
+//            Map<String, AccessLevel> parentLevels = ancestor.getPermissions().getActualLevels();
+//            for(Map.Entry<String, AccessLevel> entry : parentLevels.entrySet()) {
+//                String key = entry.getKey();
+//                AccessLevel value = entry.getValue();
+//                if(value == AccessLevel.DENY || actualLevels.get(key) == null) {
+//                    actualLevels.put(key, value);
+//                }
+//            }
+//        }
     }
 
     public void visitChildren(ModelVisitor visitor) {
@@ -130,14 +123,6 @@ public class Permissions implements ModelObject {
     @XmlElement(name = "group", type = Group.class)
     public List<Group> getGroups() {
         return groups;
-    }
-
-    public WithPermissions getParent() {
-        return parent;
-    }
-
-    public void setParent(WithPermissions parent) {
-        this.parent = parent;
     }
 
     public Map<String, Set<String>> getActualPermissions() {

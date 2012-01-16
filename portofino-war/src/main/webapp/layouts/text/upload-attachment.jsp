@@ -3,7 +3,7 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.TextAction"
+%><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.text.TextAction"
 /><html>
 <body>
 <script type="text/javascript">

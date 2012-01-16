@@ -16,10 +16,10 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
-        <c:out value="${actionBean.crud.readTitle}"/>
+        <c:out value="${actionBean.crudConfiguration.readTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.crud.readTitle}"/>
+        <c:out value="${actionBean.crudConfiguration.readTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="form"/>

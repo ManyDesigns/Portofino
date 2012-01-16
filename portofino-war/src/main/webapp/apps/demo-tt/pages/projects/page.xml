@@ -1,0 +1,23 @@
+<page  description="Projects" id="1" title="Projects">
+    <permissions />
+    <layout layout="">
+        <self container="default" order="2"/>
+        <childPages>
+            <childPage name="report" showInNavigation="true"/>
+        </childPages>
+    </layout>
+    <detailLayout layout="">
+        <self container="contentLayoutLeft" order="1"/>
+        <childPages>
+            <childPage name="issues" showInNavigation="true"/>
+            <childPage name="issues-by-date" container="contentLayoutLeft"  order="4" showInNavigation="false"/>
+            <childPage name="issues-by-priority" container="contentLayoutRight" order="4" showInNavigation="false"/>
+            <childPage name="issues-by-status" container="contentLayoutRight"  order="6" showInNavigation="false"/>
+            <childPage name="issues-by-tracker" container="contentLayoutLeft"  order="2" showInNavigation="false"/>
+            <childPage name="issueSummary" container="contentLayoutRight"  order="1" showInNavigation="false"/>
+            <childPage name="latestNews" container="contentLayoutLeft" order="8" showInNavigation="false"/>
+            <childPage name="memberSummary" container="contentLayoutRight" order="2" showInNavigation="false"/>
+            <childPage name="versions" showInNavigation="true"/>
+        </childPages>
+    </detailLayout>
+</page>

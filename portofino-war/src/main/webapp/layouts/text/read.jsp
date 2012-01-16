@@ -8,9 +8,9 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.TextAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.text.TextAction"/>
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.textPage.title}"/>
+        <c:out value="${actionBean.textConfiguration.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:out value="${actionBean.content}" escapeXml="false"/>

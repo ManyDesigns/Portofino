@@ -29,8 +29,8 @@
 
 package com.manydesigns.portofino.logic;
 
-import com.manydesigns.portofino.model.pages.crud.Crud;
-import com.manydesigns.portofino.model.pages.crud.CrudProperty;
+import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
+import com.manydesigns.portofino.actions.crud.configuration.CrudProperty;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,8 +42,8 @@ public class CrudLogic {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public static CrudProperty findCrudPropertyByName(Crud crud, String propertyName) {
-        for (CrudProperty current : crud.getProperties()) {
+    public static CrudProperty findCrudPropertyByName(CrudConfiguration crudConfiguration, String propertyName) {
+        for (CrudProperty current : crudConfiguration.getProperties()) {
             if (current.getName().equalsIgnoreCase(propertyName)) {
                 return current;
             }

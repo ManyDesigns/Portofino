@@ -13,10 +13,10 @@
         <portofino:buttons list="crud-edit" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
-        <c:out value="${actionBean.crud.editTitle}"/>
+        <c:out value="${actionBean.crudConfiguration.editTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.crud.editTitle}"/>
+        <c:out value="${actionBean.crudConfiguration.editTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:if test="${actionBean.requiredFieldsPresent}">

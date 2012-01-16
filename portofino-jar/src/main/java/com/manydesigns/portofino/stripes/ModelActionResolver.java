@@ -31,12 +31,16 @@ package com.manydesigns.portofino.stripes;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ApplicationStarter;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.Dispatcher;
+import com.manydesigns.portofino.dispatcher.PageInstance;
 import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.ActionBean;
+import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.config.Configuration;
 import net.sourceforge.stripes.controller.NameBasedActionResolver;
 import org.slf4j.Logger;
@@ -94,6 +98,28 @@ public class ModelActionResolver extends NameBasedActionResolver {
         } else {
             return super.getActionBeanType(path);
         }
+    }
+
+    @Override
+    protected ActionBean makeNewActionBean(Class<? extends ActionBean> type, ActionBeanContext context) throws Exception {
+        Dispatch dispatch = (Dispatch) context.getRequest().getAttribute(RequestAttributes.DISPATCH);
+        if(dispatch != null) {
+            PageInstance pageInstance = dispatch.getLastPageInstance();
+            if(type.equals(pageInstance.getActionClass())) {
+                if(pageInstance.getActionBean() != null) {
+                    return pageInstance.getActionBean();
+                } else {
+                    ActionBean actionBean = super.makeNewActionBean(type, context);
+                    if(Dispatcher.isValidActionClass(type)) {
+                        pageInstance.setActionBean((PortofinoAction) actionBean);
+                    } else {
+                        throw new Exception("Invalid action bean for dispatch: " + actionBean); //TODO
+                    }
+                    return actionBean;
+                }
+            }
+        }
+        return super.makeNewActionBean(type, context);
     }
 
     @Override

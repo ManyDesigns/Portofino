@@ -30,22 +30,22 @@
 package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.servlet.ServletUtils;
-import com.manydesigns.portofino.actions.CrudAction;
-import com.manydesigns.portofino.actions.JspAction;
-import com.manydesigns.portofino.actions.PageReferenceAction;
-import com.manydesigns.portofino.actions.TextAction;
-import com.manydesigns.portofino.actions.chart.ChartAction;
+import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.pages.*;
+import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
-import net.sourceforge.stripes.action.ActionBean;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -96,8 +96,16 @@ public class Dispatcher {
         List<String> fragmentsAsList = Arrays.asList(fragments);
         ListIterator<String> fragmentsIterator = fragmentsAsList.listIterator();
 
-        Page rootPage = model.getRootPage();
-        visitPageInPath(pagePath, fragmentsIterator, rootPage);
+        File rootDir = application.getPagesDir();
+        try {
+            Page rootPage = getPage(rootDir);
+            PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage);
+            pagePath.add(rootPageInstance);
+            makePageInstancePath(pagePath, fragmentsIterator, rootPageInstance);
+        } catch (Exception e) {
+            logger.error("Cannot load root page", e);
+            return null;
+        }
 
         if (fragmentsIterator.hasNext()) {
             logger.debug("Not all fragments matched");
@@ -109,21 +117,84 @@ public class Dispatcher {
             return null;
         }
 
-        PageInstance pageInstance = pagePath.get(pagePath.size() - 1);
+        /*PageInstance pageInstance = pagePath.get(pagePath.size() - 1);
         Page page = pageInstance.getPage();
         Class<? extends ActionBean> actionBeanClass = null;
         try {
             actionBeanClass = getActionBeanClass(application, page);
         } catch (ClassNotFoundException e) {
             logger.error("Couldn't get action bean class for " + page, e);
-        }
+        }*/
 
         PageInstance[] pageArray =
                 new PageInstance[pagePath.size()];
         pagePath.toArray(pageArray);
 
-        Dispatch dispatch = new Dispatch(contextPath, path, actionBeanClass, pageArray);
-        return checkDispatch(dispatch);
+        Dispatch dispatch = new Dispatch(contextPath, path, pageArray);
+        return dispatch;
+        //return checkDispatch(dispatch);
+    }
+
+    protected void makePageInstancePath
+            (List<PageInstance> pagePath, ListIterator<String> fragmentsIterator, PageInstance parentPageInstance)
+            throws JAXBException, IOException {
+        File currentDirectory = parentPageInstance.getDirectory();
+        boolean params = false;
+        while(fragmentsIterator.hasNext()) {
+            String nextFragment = fragmentsIterator.next();
+            File childDirectory = new File(currentDirectory, nextFragment);
+            if(childDirectory.isDirectory()) {
+                Page page = getPage(childDirectory);
+                PageInstance pageInstance = new PageInstance(parentPageInstance, childDirectory, application, page);
+                Class<?> actionClass = getActionClass(childDirectory);
+                if(isValidActionClass(actionClass)) {
+                    pageInstance.setActionClass((Class<PortofinoAction>) actionClass);
+                } else {
+                    throw new RuntimeException("Invalid action class for " + nextFragment); //TODO
+                }
+                pagePath.add(pageInstance);
+                makePageInstancePath(pagePath, fragmentsIterator, pageInstance);
+                return;
+            } else {
+                if(!params) {
+                    currentDirectory = new File(currentDirectory, "_detail"); //TODO
+                    params = true;
+                }
+                parentPageInstance.getParameters().add(nextFragment);
+            }
+        }
+    }
+
+    public static Page getPage(File directory) throws JAXBException, IOException {
+        File pageFile = new File(directory, "page.xml");
+        JAXBContext jaxbContext = JAXBContext.newInstance("com.manydesigns.portofino.model.pages");
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        FileInputStream in = new FileInputStream(pageFile);
+        try {
+            return (Page) unmarshaller.unmarshal(in);
+        } finally {
+            in.close();
+        }
+    }
+
+    public static boolean isValidActionClass(Class<?> actionClass) {
+        if(actionClass == null) {
+            return false;
+        }
+        if(!PortofinoAction.class.isAssignableFrom(actionClass)) {
+            logger.error("Action class must implement PortofinoAction: " + actionClass);
+            return false;
+        }
+        return true;
+    }
+
+    public static Class<?> getActionClass(File file) {
+        try {
+            return ScriptingUtil.getGroovyClass(file, "action");
+        } catch (Exception e) {
+            logger.error("Couldn't load script for " + file, e);
+            return null;
+        }
     }
 
     protected Dispatch checkDispatch(Dispatch dispatch) {
@@ -144,7 +215,7 @@ public class Dispatcher {
         return withoutTrailingSlashes;
     }
 
-    public static Class<? extends ActionBean> getActionBeanClass(Application application, Page page)
+    /*public static Class<? extends ActionBean> getActionBeanClass(Application application, Page page)
             throws ClassNotFoundException {
         if(page == null) {
             return null;
@@ -183,17 +254,15 @@ public class Dispatcher {
     }
 
     protected static Class<? extends ActionBean> getDefaultActionClass(Page page) {
-        if (page instanceof TextPage) {
+        if (page instanceof TextConfiguration) {
             return TextAction.class;
-        } else if (page instanceof ChartPage) {
+        } else if (page instanceof ChartConfiguration) {
             return ChartAction.class;
-        }/* else if (page instanceof FolderPage) {
-            className = "/actions/index";
-        }*/ else if (page instanceof CrudPage) {
+        } else if (page instanceof CrudPage) {
             return CrudAction.class;
-        } else if (page instanceof JspPage) {
+        } else if (page instanceof JspConfiguration) {
             return JspAction.class;
-        } else if (page instanceof PageReference) {
+        } else if (page instanceof PageReferenceConfiguration) {
             return PageReferenceAction.class;
         } else if (page instanceof RootPage) {
             return null;
@@ -275,8 +344,8 @@ public class Dispatcher {
             }
             pageInstance = new CrudPageInstance(
                     application, crudPage, mode, param);
-        } else if(page instanceof PageReference) {
-            Page toPage = ((PageReference) page).getToPage();
+        } else if(page instanceof PageReferenceConfiguration) {
+            Page toPage = ((PageReferenceConfiguration) page).getToPage();
             if(toPage != null) {
                 PageInstance wrappedPageInstance = makePageInstance(toPage, fragmentsIterator);
                 pageInstance = new PageReferenceInstance(application, page, null, wrappedPageInstance);
@@ -326,6 +395,6 @@ public class Dispatcher {
             PageInstance pageInstance = visitPageOutsidePath(page);
             tree.add(pageInstance);
         }
-    }
+    }*/
 
 }

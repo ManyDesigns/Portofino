@@ -1,0 +1,77 @@
+<configuration createTitle="Create issue" database="redmine" editTitle="Edit issue" largeResultSet="false" name="issue" query="FROM issues WHERE project_id = %{#project.id}" readTitle="Issue" searchTitle="Issues" variable="issue">
+                            <annotations/>
+                            <properties>
+<property enabled="true" inSummary="true" insertable="false" label="#" name="id" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="true" inSummary="true" insertable="true" label="Tracker" name="tracker_id" searchable="true" updatable="false">
+    <annotations/>
+</property>
+<property enabled="false" inSummary="false" insertable="true" name="project_id" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="true" inSummary="true" insertable="true" label="" name="subject" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="true" inSummary="false" insertable="true" label="" name="description" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="false" inSummary="true" insertable="false" label="Due date" name="due_date" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="false" inSummary="false" insertable="false" name="category_id" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="true" inSummary="true" insertable="true" label="Status" name="status_id" searchable="true" updatable="true">
+    <annotations/>
+</property>
+<property enabled="true" inSummary="true" insertable="true" label="Assignee" name="assigned_to_id" searchable="false" updatable="true">
+    <annotations/>
+</property>
+<property enabled="true" inSummary="true" insertable="true" label="Priority" name="priority_id" searchable="true" updatable="true">
+    <annotations/>
+</property>
+<property enabled="false" inSummary="false" insertable="false" name="fixed_version_id" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="false" inSummary="false" insertable="false" name="author_id" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="false" inSummary="false" insertable="false" name="lock_version" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="true" inSummary="true" insertable="false" label="Created" name="created_on" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="true" inSummary="false" insertable="false" label="Updated" name="updated_on" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="false" inSummary="false" insertable="false" name="start_date" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="false" inSummary="false" insertable="false" name="done_ratio" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="false" inSummary="false" insertable="false" name="estimated_hours" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="false" inSummary="false" insertable="false" name="parent_id" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="false" inSummary="false" insertable="false" name="root_id" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="false" inSummary="false" insertable="false" name="lft" searchable="false" updatable="false">
+    <annotations/>
+</property>
+<property enabled="false" inSummary="false" insertable="false" name="rgt" searchable="false" updatable="false">
+    <annotations/>
+</property>
+                            </properties>
+                            <selectionProviders>
+<selectionProvider displayMode="DROPDOWN" enabled="true" selectionProvider="sp_issue_priority"/>
+<selectionProvider displayMode="DROPDOWN" enabled="true" selectionProvider="sp_issue_status"/>
+<selectionProvider enabled="false" selectionProvider="sp_issue_tracker_and_status"/>
+<selectionProvider displayMode="DROPDOWN" enabled="true" selectionProvider="sp_issue_tracker"/>
+                            </selectionProviders>
+</configuration>

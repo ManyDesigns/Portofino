@@ -28,6 +28,7 @@
  */
 package com.manydesigns.portofino.model;
 
+import com.manydesigns.portofino.actions.text.configuration.TextConfiguration;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.pages.*;
 import junit.framework.TestCase;
@@ -84,7 +85,7 @@ public class PageTest extends TestCase {
         //Nessun permesso
 
         //1.1
-        n1_1 = new TextPage();
+        n1_1 = new TextConfiguration();
         n1_1.setParent(root);
         n1_1_perm = new Permissions();
         n1_1.setPermissions(n1_1_perm);

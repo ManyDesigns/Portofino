@@ -31,10 +31,10 @@ package com.manydesigns.portofino.breadcrumbs;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
+import com.manydesigns.portofino.actions.crud.configuration.CrudPage;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.model.pages.CrudPage;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.RootPage;
 import com.manydesigns.portofino.util.ShortNameUtils;

@@ -31,6 +31,8 @@ package com.manydesigns.portofino.application.hibernate;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
+import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
+import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
@@ -43,7 +45,6 @@ import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.Schema;
 import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
@@ -54,6 +55,8 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.Session;
@@ -94,6 +97,7 @@ public class HibernateApplicationImpl implements Application {
     //**************************************************************************
 
     protected final org.apache.commons.configuration.Configuration portofinoConfiguration;
+    protected final org.apache.commons.configuration.Configuration appConfiguration;
     protected final DatabasePlatformsManager databasePlatformsManager;
     protected List<ConnectionProvider> connectionProviders;
     protected Model model;
@@ -133,7 +137,7 @@ public class HibernateApplicationImpl implements Application {
                                     File appTextDir,
                                     File appStorageDir,
                                     File appWebDir
-    ) {
+    ) throws ConfigurationException {
         this.appId = appId;
         this.portofinoConfiguration = portofinoConfiguration;
         this.databasePlatformsManager = databasePlatformsManager;
@@ -147,6 +151,8 @@ public class HibernateApplicationImpl implements Application {
         this.appStorageDir = appStorageDir;
         this.appWebDir = appWebDir;
         resourceBundleManager = new ResourceBundleManager(appDir);
+        File appConfigurationFile = new File(appDir, AppProperties.PROPERTIES_RESOURCE);
+        appConfiguration = new PropertiesConfiguration(appConfigurationFile);
     }
 
     //**************************************************************************
@@ -539,9 +545,9 @@ public class HibernateApplicationImpl implements Application {
         return new TableAccessor(table);
     }
 
-    public @NotNull CrudAccessor getCrudAccessor(@NotNull Crud crud) {
-        TableAccessor tableAccessor = new TableAccessor(crud.getActualTable());
-        return new CrudAccessor(crud, tableAccessor);
+    public @NotNull CrudAccessor getCrudAccessor(@NotNull CrudConfiguration crudConfiguration) {
+        TableAccessor tableAccessor = new TableAccessor(crudConfiguration.getActualTable());
+        return new CrudAccessor(crudConfiguration, tableAccessor);
     }
 
     //**************************************************************************
@@ -658,6 +664,11 @@ public class HibernateApplicationImpl implements Application {
         return appConnectionsFile;
     }
 
+    public File getPagesDir() {
+        //TODO!!
+        return new File(getAppDir(), "pages");
+    }
+
     public File getAppDbsDir() {
         return appDbsDir;
     }
@@ -680,6 +691,10 @@ public class HibernateApplicationImpl implements Application {
 
     public File getAppWebDir() {
         return appWebDir;
+    }
+
+    public org.apache.commons.configuration.Configuration getAppConfiguration() {
+        return appConfiguration;
     }
 
     //**************************************************************************

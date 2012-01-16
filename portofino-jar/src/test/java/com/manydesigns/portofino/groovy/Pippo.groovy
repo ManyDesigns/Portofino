@@ -1,6 +1,6 @@
 package com.manydesigns.portofino.groovy
 
-import com.manydesigns.portofino.actions.CrudAction
+import com.manydesigns.portofino.actions.crud.CrudAction
 
 /**
  * Created by IntelliJ IDEA.

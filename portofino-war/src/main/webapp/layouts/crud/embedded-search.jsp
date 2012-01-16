@@ -6,9 +6,9 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.crud.CrudAction"/>
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.crud.searchTitle}"/>
+        <c:out value="${actionBean.crudConfiguration.searchTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <div class="embedded-content">

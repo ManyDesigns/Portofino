@@ -105,7 +105,7 @@
             var sort = (oState.sortedBy) ? oState.sortedBy.key : "";
             var dir = (oState.sortedBy && oState.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc";
             var startIndex = (oState.pagination) ? oState.pagination.recordOffset : 0;
-            var maxResults = (oState.pagination) ? oState.pagination.rowsPerPage : <%= actionBean.getCrud().getActualRowsPerPage() %>;
+            var maxResults = (oState.pagination) ? oState.pagination.rowsPerPage : <%= actionBean.getCrudConfiguration().getActualRowsPerPage() %>;
 
             // Build custom request
             var url = "&firstResult=" + startIndex +
@@ -122,7 +122,7 @@
             initialRequest: generateRequest(),
             dynamicData: true,
             paginator : new YAHOO.widget.Paginator({
-                rowsPerPage: <%= actionBean.getCrud().getActualRowsPerPage() %>,
+                rowsPerPage: <%= actionBean.getCrudConfiguration().getActualRowsPerPage() %>,
                 firstPageLinkLabel: '&lt;&lt; <fmt:message key="commons.first" />',
                 previousPageLinkLabel: '&lt; <fmt:message key="commons.prev" />',
                 nextPageLinkLabel: '<fmt:message key="commons.next" /> &gt;',

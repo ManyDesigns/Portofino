@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.chart;
 
-import com.manydesigns.portofino.model.pages.ChartPage;
+import com.manydesigns.portofino.actions.chart.configuration.ChartConfiguration;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
@@ -45,10 +45,10 @@ public class ChartLineGenerator extends Chart2DGenerator {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    protected JFreeChart createChart(ChartPage chartPage,
+    protected JFreeChart createChart(ChartConfiguration chartConfiguration,
                                      CategoryDataset dataset, PlotOrientation plotOrientation) {
         return ChartFactory.createLineChart(
-                chartPage.getName(), chartPage.getXAxisName(), chartPage.getYAxisName(), dataset,
+                chartConfiguration.getName(), chartConfiguration.getXAxisName(), chartConfiguration.getYAxisName(), dataset,
                 plotOrientation, true, true, true);
     }
 

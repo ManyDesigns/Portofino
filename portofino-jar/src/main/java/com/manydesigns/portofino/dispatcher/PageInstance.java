@@ -29,11 +29,13 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.pages.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,10 +49,12 @@ public class PageInstance {
 
     protected final Application application;
     protected final Page page;
-    protected final String mode;
-    protected final List<PageInstance> childPageInstances;
-
-    protected boolean realized = false;
+    protected final File directory;
+    protected final List<String> parameters;
+    protected Object configuration;
+    protected Class<PortofinoAction> actionClass;
+    protected PortofinoAction actionBean;
+    protected final PageInstance parent;
 
     //**************************************************************************
     // Logging
@@ -58,42 +62,27 @@ public class PageInstance {
 
     public static final Logger logger = LoggerFactory.getLogger(PageInstance.class);
 
-    public PageInstance(Application application, Page page, String mode) {
+    public PageInstance(PageInstance parent, File directory, Application application, Page page) {
+        this.parent = parent;
+        this.directory = directory;
         this.application = application;
         this.page = page;
-        this.mode = mode;
-        childPageInstances = new ArrayList<PageInstance>();
+        this.parameters = new ArrayList<String>();
     }
 
     public Page getPage() {
         return page;
     }
 
-    public String getMode() {
-        return mode;
-    }
-
     public Application getApplication() {
         return application;
-    }
-
-    public boolean realize() {
-        return realized = true;
-    }
-
-    public boolean isRealized() {
-        return realized;
-    }
-
-    public PageInstance dereference() {
-        return this;
     }
 
     //**************************************************************************
     // Utility Methods
     //**************************************************************************
 
-    public PageInstance findChildPageByFragment(String fragment) {
+    /*public PageInstance findChildPageByFragment(String fragment) {
         for(PageInstance page : getChildPageInstances()) {
             if(fragment.equals(page.getPage().getFragment())) {
                 return page;
@@ -101,45 +90,49 @@ public class PageInstance {
         }
         logger.debug("Child page not found: {}", fragment);
         return null;
-    }
+    }*/
 
     public String getUrlFragment() {
-        return formatUrlFragment(page.getFragment());
+        return formatUrlFragment(directory.getName());
     }
 
     public String formatUrlFragment(String baseFragment) {
         return baseFragment;
     }
 
-    public List<PageInstance> getChildPageInstances() {
-        return childPageInstances;
+    public File getDirectory() {
+        return directory;
     }
 
-    public List<Page> getChildPages() {
-        return page.getChildPages();
+    public List<String> getParameters() {
+        return parameters;
     }
 
-    public String getLayoutContainer() {
-        return page.getLayoutContainer();
+    public Object getConfiguration() {
+        return configuration;
     }
 
-    public void setLayoutContainer(String layoutContainer) {
-        page.setLayoutContainer(layoutContainer);
+    public void setConfiguration(Object configuration) {
+        this.configuration = configuration;
     }
 
-    public int getLayoutOrder() {
-        return page.getActualLayoutOrder();
+    public void setActionClass(Class<PortofinoAction> actionClass) {
+        this.actionClass = actionClass;
     }
 
-    public void setLayoutOrder(int order) {
-        page.setLayoutOrder(Integer.toString(order));
+    public Class<PortofinoAction> getActionClass() {
+        return actionClass;
     }
 
-    public void addChild(Page page) {
-        this.page.addChild(page);
+    public PortofinoAction getActionBean() {
+        return actionBean;
     }
 
-    public boolean removeChild(Page page) {
-        return this.page.removeChild(page);
+    public void setActionBean(PortofinoAction actionBean) {
+        this.actionBean = actionBean;
+    }
+
+    public PageInstance getParent() {
+        return parent;
     }
 }

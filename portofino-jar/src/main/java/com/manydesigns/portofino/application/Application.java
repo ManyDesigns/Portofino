@@ -29,11 +29,11 @@
 
 package com.manydesigns.portofino.application;
 
+import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
@@ -66,6 +66,7 @@ public interface Application {
     File getAppDir();
     File getAppBlobsDir();
     File getAppConnectionsFile();
+    File getPagesDir();
     File getAppDbsDir();
     File getAppModelFile();
     File getAppScriptsDir();
@@ -135,7 +136,7 @@ public interface Application {
 
     public TableAccessor getTableAccessor(String qualifiedTableName);
     public TableAccessor getTableAccessor(String database, String entityName);
-    public CrudAccessor getCrudAccessor(Crud crud);
+    public CrudAccessor getCrudAccessor(CrudConfiguration crudConfiguration);
 
     //**************************************************************************
     // User
@@ -164,4 +165,6 @@ public interface Application {
     ResourceBundle getBundle(Locale locale);
 
     File getAppTextDir();
+
+    Configuration getAppConfiguration();
 }

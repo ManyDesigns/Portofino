@@ -31,9 +31,9 @@ package com.manydesigns.portofino.reflection;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
+import com.manydesigns.portofino.actions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.logic.CrudLogic;
-import com.manydesigns.portofino.model.pages.crud.Crud;
-import com.manydesigns.portofino.model.pages.crud.CrudProperty;
 import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public class CrudAccessor
     // Fields
     //**************************************************************************
 
-    protected final Crud crud;
+    protected final CrudConfiguration crudConfiguration;
     protected final ClassAccessor tableAccessor;
     protected final CrudPropertyAccessor[] propertyAccessors;
     protected final CrudPropertyAccessor[] keyPropertyAccessors;
@@ -70,9 +70,9 @@ public class CrudAccessor
     // Constructors
     //**************************************************************************
 
-    public CrudAccessor(@NotNull Crud crud, @NotNull ClassAccessor tableAccessor) {
-        super(crud.getModelAnnotations());
-        this.crud = crud;
+    public CrudAccessor(@NotNull CrudConfiguration crudConfiguration, @NotNull ClassAccessor tableAccessor) {
+        super(crudConfiguration.getModelAnnotations());
+        this.crudConfiguration = crudConfiguration;
         this.tableAccessor = tableAccessor;
         PropertyAccessor[] columnAccessors = tableAccessor.getProperties();
         PropertyAccessor[] keyColumnAccessors = tableAccessor.getKeyProperties();
@@ -86,7 +86,7 @@ public class CrudAccessor
         for (PropertyAccessor columnAccessor : columnAccessors) {
             CrudProperty crudProperty =
                     CrudLogic.findCrudPropertyByName(
-                            crud, columnAccessor.getName());
+                            crudConfiguration, columnAccessor.getName());
             boolean inKey = ArrayUtils.contains(keyColumnAccessors, columnAccessor);
             CrudPropertyAccessor propertyAccessor =
                         new CrudPropertyAccessor(crudProperty, columnAccessor, inKey);
@@ -114,7 +114,7 @@ public class CrudAccessor
     //**************************************************************************
 
     public String getName() {
-        return crud.getName();
+        return crudConfiguration.getName();
     }
 
     public CrudPropertyAccessor getProperty(String propertyName) throws NoSuchFieldException {
@@ -153,8 +153,8 @@ public class CrudAccessor
     // Getters/setters
     //**************************************************************************
 
-    public Crud getCrud() {
-        return crud;
+    public CrudConfiguration getCrudConfiguration() {
+        return crudConfiguration;
     }
 
 }

@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.model.pages;
 
 import com.manydesigns.elements.annotations.FieldSize;
-import com.manydesigns.elements.annotations.RegExp;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
@@ -40,8 +39,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,8 +46,9 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@XmlRootElement
 @XmlAccessorType(value = XmlAccessType.NONE)
-public abstract class Page implements ModelObject, WithPermissions {
+public class Page implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -59,29 +57,12 @@ public abstract class Page implements ModelObject, WithPermissions {
     //**************************************************************************
 
     protected String id;
-    protected Page parent;
-    protected final ArrayList<Page> childPages;
-
-    protected Permissions permissions;
-    protected String fragment;
     protected String title;
     protected String description;
-    protected String actionClass;
-    protected String layoutContainerInParent;
-    protected String layoutOrderInParent;
-    protected String layoutContainer;
-    protected String layoutOrder;
-    protected String layout;
-    protected boolean showInNavigation = true;
+    protected final Layout layout;
+    protected final Layout detailLayout;
+    protected final Permissions permissions;
     protected boolean subtreeRoot = false;
-
-    //**************************************************************************
-    // Actual fields
-    //**************************************************************************
-
-    protected Integer actualLayoutOrderInParent;
-    protected int actualLayoutOrder;
-    protected Class<?> actualActionClass;
 
     //**************************************************************************
     // Logging
@@ -94,8 +75,9 @@ public abstract class Page implements ModelObject, WithPermissions {
     //**************************************************************************
 
     public Page() {
-        childPages = new ArrayList<Page>();
-        permissions = new Permissions(this);
+        layout = new Layout();
+        detailLayout = new Layout();
+        permissions = new Permissions();
     }
 
     //**************************************************************************
@@ -103,43 +85,22 @@ public abstract class Page implements ModelObject, WithPermissions {
     //**************************************************************************
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
-        this.parent = (Page) parent;
     }
 
     public void reset() {
-        actualLayoutOrderInParent = null;
-        actualLayoutOrder = 0;
-        actualActionClass = null;
     }
 
     public void init(Model model) {
-        assert fragment != null;
         assert title != null;
         assert description != null;
-
-        if (layoutOrderInParent != null) {
-            //TODO controllare che sia non-null anche layoutContainerInParent
-            actualLayoutOrderInParent = Integer.parseInt(layoutOrderInParent);
-        }
-        if(layoutOrder != null) {
-            actualLayoutOrder = Integer.parseInt(layoutOrder);
-        }
-        if(actionClass != null) {
-            try {
-                actualActionClass = Class.forName(actionClass);
-            } catch (ClassNotFoundException e) {
-                logger.error("Couldn't find action class " + actionClass + " for page " + getQualifiedName(), e);
-            }
-        }
     }
 
     public void link(Model model) {}
 
     public void visitChildren(ModelVisitor visitor) {
+        visitor.visit(layout);
+        visitor.visit(detailLayout);
         visitor.visit(permissions);
-        for (Page childPage : childPages) {
-            visitor.visit(childPage);
-        }
     }
 
     public String getQualifiedName() {
@@ -150,17 +111,7 @@ public abstract class Page implements ModelObject, WithPermissions {
     // Utility Methods
     //**************************************************************************
 
-    public Page findChildPageByFragment(String fragment) {
-        for(Page page : getChildPages()) {
-            if(fragment.equals(page.getFragment())) {
-                return page;
-            }
-        }
-        logger.debug("Child page not found: {}", fragment);
-        return null;
-    }
-
-    public Page findDescendantPageById(String pageId) {
+    /*public Page findDescendantPageById(String pageId) {
         if(pageId.equals(getId())) {
             return this;
         }
@@ -171,7 +122,7 @@ public abstract class Page implements ModelObject, WithPermissions {
             }
         }
         return null;
-    }
+    }*/
 
     //**************************************************************************
     // Getters/Setters
@@ -187,16 +138,16 @@ public abstract class Page implements ModelObject, WithPermissions {
         this.id = id;
     }
 
-    @XmlAttribute(required = true)
-    @Required
-    @RegExp(value = "[a-zA-Z0-9_\\-]+", errorMessage = "page.invalid.fragment")
-    public String getFragment() {
-        return fragment;
-    }
-
-    public void setFragment(String fragment) {
-        this.fragment = fragment;
-    }
+//    @XmlAttribute(required = true)
+//    @Required
+//    @RegExp(value = "[a-zA-Z0-9_\\-]+", errorMessage = "page.invalid.fragment")
+//    public String getFragment() {
+//        return fragment;
+//    }
+//
+//    public void setFragment(String fragment) {
+//        this.fragment = fragment;
+//    }
 
     @XmlAttribute(required = true)
     @Required
@@ -220,114 +171,21 @@ public abstract class Page implements ModelObject, WithPermissions {
     }
 
     @XmlElement()
+    public Layout getLayout() {
+        return layout;
+    }
+
+    @XmlElement()
+    public Layout getDetailLayout() {
+        return detailLayout;
+    }
+
+    @XmlElement()
     public Permissions getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(Permissions permissions) {
-        this.permissions = permissions;
-    }
-
-    @XmlElementWrapper(name="childPages")
-    @XmlElements({
-          @XmlElement(name="textPage",type=TextPage.class),
-          @XmlElement(name="folderPage",type=FolderPage.class),
-          @XmlElement(name="customPage",type=CustomPage.class),
-          @XmlElement(name="customFolderPage",type=CustomFolderPage.class),
-          @XmlElement(name="crudPage",type=CrudPage.class),
-          @XmlElement(name="chartPage",type=ChartPage.class),
-          @XmlElement(name="jspPage",type=JspPage.class),
-          @XmlElement(name="pageReference",type=PageReference.class)
-    })
-    public List<Page> getChildPages() {
-        return childPages;
-    }
-
-    public Page getParent() {
-        return parent;
-    }
-
-    public void setParent(Page parent) {
-        this.parent = parent;
-    }
-
-    @XmlAttribute()
-    public String getActionClass() {
-        return actionClass;
-    }
-
-    public void setActionClass(String actionClass) {
-        this.actionClass = actionClass;
-    }
-
-    @XmlAttribute(required = false)
-    public String getLayoutContainerInParent() {
-        return layoutContainerInParent;
-    }
-
-    public void setLayoutContainerInParent(String layoutContainerInParent) {
-        this.layoutContainerInParent = layoutContainerInParent;
-    }
-
-    @XmlAttribute(required = false)
-    public String getLayoutOrderInParent() {
-        return layoutOrderInParent;
-    }
-
-    public void setLayoutOrderInParent(String layoutOrderInParent) {
-        this.layoutOrderInParent = layoutOrderInParent;
-    }
-
-    @XmlAttribute(required = true)
-    public String getLayoutContainer() {
-        return layoutContainer;
-    }
-
-    public void setLayoutContainer(String layoutContainer) {
-        this.layoutContainer = layoutContainer;
-    }
-
-    @XmlAttribute(required = true)
-    public String getLayoutOrder() {
-        return layoutOrder;
-    }
-
-    public void setLayoutOrder(String layoutOrder) {
-        this.layoutOrder = layoutOrder;
-    }
-
-    @XmlAttribute(required = true)
-    public String getLayout() {
-        return layout;
-    }
-
-    public void setLayout(String layout) {
-        this.layout = layout;
-    }
-
-    @XmlAttribute
-    public boolean isShowInNavigation() {
-        return showInNavigation;
-    }
-
-    public void setShowInNavigation(boolean showInNavigation) {
-        this.showInNavigation = showInNavigation;
-    }
-
-    public Integer getActualLayoutOrderInParent() {
-        return actualLayoutOrderInParent;
-    }
-
-    public int getActualLayoutOrder() {
-        return actualLayoutOrder;
-    }
-
-    public void addChild(Page page) {
-        List<Page> children = getChildPages();
-        addChild(page, children);
-    }
-
-    protected void addChild(Page page, List<Page> children) {
+    /*protected void addChild(Page page, List<Page> children) {
         for(Page child : children) {
             if(child.getFragment().equals(page.getFragment())) {
                 throw new IllegalArgumentException(
@@ -352,15 +210,7 @@ public abstract class Page implements ModelObject, WithPermissions {
         } else {
             return false;
         }
-    }
-
-    public Class<?> getActualActionClass() {
-        return actualActionClass;
-    }
-
-    public void setActualActionClass(Class<?> actualActionClass) {
-        this.actualActionClass = actualActionClass;
-    }
+    }*/
 
     @XmlAttribute
     public boolean isSubtreeRoot() {

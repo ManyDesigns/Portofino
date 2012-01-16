@@ -6,9 +6,9 @@
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.crud.CrudAction"/>
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.crud.searchTitle}"/>
+        <c:out value="${actionBean.crudConfiguration.searchTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:if test="${not empty actionBean.searchForm}">

@@ -12,10 +12,10 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.JspAction"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.jsp.JspAction"/>
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.jspPage.title}"/>
+        <c:out value="${actionBean.jspConfiguration.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <ul>

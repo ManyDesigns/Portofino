@@ -43,25 +43,18 @@ public class Dispatch {
 
     protected final String contextPath;
     protected final String originalPath;
-    protected final Class<? extends ActionBean> actionBeanClass;
     protected final PageInstance[] pageInstancePath;
 
     public Dispatch(String contextPath,
                     String originalPath,
-                    Class<? extends ActionBean> actionBeanClass,
                     PageInstance... pageInstancePath) {
         this.contextPath = contextPath;
         this.originalPath = originalPath;
-        this.actionBeanClass = actionBeanClass;
         this.pageInstancePath = pageInstancePath;
     }
 
     public String getContextPath() {
         return contextPath;
-    }
-
-    public Class<? extends ActionBean> getActionBeanClass() {
-        return actionBeanClass;
     }
 
     public PageInstance[] getPageInstancePath() {
@@ -133,5 +126,9 @@ public class Dispatch {
             }
         }
         return 0;
+    }
+
+    public Class<? extends ActionBean> getActionBeanClass() {
+        return (Class<? extends ActionBean>) getLastPageInstance().getActionClass(); //TODO
     }
 }

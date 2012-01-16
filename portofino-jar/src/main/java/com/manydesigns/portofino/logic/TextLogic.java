@@ -29,8 +29,8 @@
 
 package com.manydesigns.portofino.logic;
 
-import com.manydesigns.portofino.model.pages.Attachment;
-import com.manydesigns.portofino.model.pages.TextPage;
+import com.manydesigns.portofino.actions.text.configuration.Attachment;
+import com.manydesigns.portofino.actions.text.configuration.TextConfiguration;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,19 +42,19 @@ public class TextLogic {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public static Attachment createAttachment(TextPage textPage, String id, String fileName,
+    public static Attachment createAttachment(TextConfiguration textConfiguration, String id, String fileName,
                                               String contentType, long size) {
-        Attachment attachment = new Attachment(textPage, id);
+        Attachment attachment = new Attachment(textConfiguration, id);
         attachment.setFilename(fileName);
         attachment.setContentType(contentType);
         attachment.setSize(size);
-        textPage.getAttachments().add(attachment);
+        textConfiguration.getAttachments().add(attachment);
         return attachment;
     }
 
     public static Attachment findAttachmentById(
-            TextPage textPage, String code) {
-        for (Attachment current : textPage.getAttachments()) {
+            TextConfiguration textConfiguration, String code) {
+        for (Attachment current : textConfiguration.getAttachments()) {
             if (current.getId().equals(code)) {
                 return current;
             }
@@ -62,13 +62,13 @@ public class TextLogic {
         return null;
     }
 
-    public static Attachment deleteAttachmentByCode(TextPage textPage, String code) {
-        Attachment attachment = findAttachmentById(textPage, code);
+    public static Attachment deleteAttachmentByCode(TextConfiguration textConfiguration, String code) {
+        Attachment attachment = findAttachmentById(textConfiguration, code);
         if (attachment == null) {
             return null;
         } else {
-            textPage.getAttachments().remove(attachment);
-            attachment.setTextPage(null);
+            textConfiguration.getAttachments().remove(attachment);
+            attachment.setTextConfiguration(null);
             return attachment;
         }
     }

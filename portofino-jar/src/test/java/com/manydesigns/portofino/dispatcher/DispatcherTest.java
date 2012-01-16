@@ -31,9 +31,9 @@ package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.AbstractPortofinoTest;
-import com.manydesigns.portofino.actions.CrudAction;
+import com.manydesigns.portofino.actions.crud.CrudAction;
 import com.manydesigns.portofino.actions.chart.ChartAction;
-import com.manydesigns.portofino.model.pages.CrudPage;
+import com.manydesigns.portofino.actions.crud.configuration.CrudPage;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.RootPage;
 import com.manydesigns.portofino.navigation.Navigation;

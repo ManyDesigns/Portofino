@@ -39,12 +39,12 @@ import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.actions.PortletAction;
+import com.manydesigns.portofino.actions.chart.configuration.ChartConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.chart.ChartGenerator;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.pages.AccessLevel;
-import com.manydesigns.portofino.model.pages.ChartPage;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
@@ -92,7 +92,7 @@ public class ChartAction extends PortletAction {
     // Model metadata
     //**************************************************************************
 
-    public ChartPage chartPage;
+    public ChartConfiguration chartConfiguration;
 
     //**************************************************************************
     // Presentation elements
@@ -113,7 +113,7 @@ public class ChartAction extends PortletAction {
     @Override
     public void prepare() {
         super.prepare();
-        chartPage = (ChartPage) pageInstance.getPage();
+        chartConfiguration = (ChartConfiguration) pageInstance.getPage();
     }
 
     //**************************************************************************
@@ -174,11 +174,11 @@ public class ChartAction extends PortletAction {
     public void generateChart() {
         ChartGenerator chartGenerator;
 
-        if(chartPage.getGeneratorClass() == null) {
-            throw new IllegalStateException("Invalid chart type: " + chartPage.getActualType());
+        if(chartConfiguration.getGeneratorClass() == null) {
+            throw new IllegalStateException("Invalid chart type: " + chartConfiguration.getActualType());
         }
         try {
-            chartGenerator = chartPage.getGeneratorClass().newInstance();
+            chartGenerator = chartConfiguration.getGeneratorClass().newInstance();
         } catch (Exception e) {
             throw new RuntimeException("Invalid generator for chart", e);
         }
@@ -187,7 +187,7 @@ public class ChartAction extends PortletAction {
         chartGenerator.setBorderVisible(borderVisible);
         chartGenerator.setHeight(height);
         chartGenerator.setWidth(width);
-        chart = chartGenerator.generate(chartPage, application);
+        chart = chartGenerator.generate(chartConfiguration, application);
     }
 
     public Resolution chart() throws FileNotFoundException {
@@ -222,19 +222,19 @@ public class ChartAction extends PortletAction {
             {{"name", "type", "orientation", "legend", "database", "query", "urlExpression"}};
 
     public static final String[] chartTypes1D = {
-        ChartPage.Type.PIE.name(),
-        ChartPage.Type.PIE3D.name(),
-        ChartPage.Type.RING.name()
+        ChartConfiguration.Type.PIE.name(),
+        ChartConfiguration.Type.PIE3D.name(),
+        ChartConfiguration.Type.RING.name()
     };
 
     public static final String[] chartTypes2D = {
-        ChartPage.Type.AREA.name(),
-        ChartPage.Type.BAR.name(),
-        ChartPage.Type.BAR3D.name(),
-        ChartPage.Type.LINE.name(),
-        ChartPage.Type.LINE3D.name(),
-        ChartPage.Type.STACKED_BAR.name(),
-        ChartPage.Type.STACKED_BAR_3D.name()
+        ChartConfiguration.Type.AREA.name(),
+        ChartConfiguration.Type.BAR.name(),
+        ChartConfiguration.Type.BAR3D.name(),
+        ChartConfiguration.Type.LINE.name(),
+        ChartConfiguration.Type.LINE3D.name(),
+        ChartConfiguration.Type.STACKED_BAR.name(),
+        ChartConfiguration.Type.STACKED_BAR_3D.name()
     };
 
     public static final String[] chartTypeValues =
@@ -287,20 +287,20 @@ public class ChartAction extends PortletAction {
             typeSelectionProvider.appendRow(chartTypeValues[i], chartTypeLabels[i], true);
         }
         String[] orientationValues =
-                { ChartPage.Orientation.HORIZONTAL.name(), ChartPage.Orientation.VERTICAL.name() };
+                { ChartConfiguration.Orientation.HORIZONTAL.name(), ChartConfiguration.Orientation.VERTICAL.name() };
         String[] orientationLabels = { "Horizontal", "Vertical" };
         DefaultSelectionProvider orientationSelectionProvider = new DefaultSelectionProvider("orientation");
         for(int i = 0; i < orientationValues.length; i++) {
             orientationSelectionProvider.appendRow(orientationValues[i], orientationLabels[i], true);
         }
-        form = new FormBuilder(ChartPage.class)
+        form = new FormBuilder(ChartConfiguration.class)
                 .configFields(CONFIGURATION_FIELDS)
                 .configFieldSetNames("Chart")
                 .configSelectionProvider(typeSelectionProvider, "type")
                 .configSelectionProvider(orientationSelectionProvider, "orientation")
                 .configSelectionProvider(databaseSelectionProvider, "database")
                 .build();
-        form.readFromObject(chartPage);
+        form.readFromObject(chartConfiguration);
     }
 
     @Button(list = "configuration", key = "commons.updateConfiguration")
@@ -308,7 +308,7 @@ public class ChartAction extends PortletAction {
     public Resolution updateConfiguration() {
         synchronized (application) {
             prepareConfigurationForms();
-            form.readFromObject(chartPage);
+            form.readFromObject(chartConfiguration);
             form.readFromRequest(context.getRequest());
             readPageConfigurationFromRequest();
             boolean valid = form.validate();
@@ -326,7 +326,7 @@ public class ChartAction extends PortletAction {
             }
             if (valid) {
                 updatePageConfiguration();
-                form.writeToObject(chartPage);
+                form.writeToObject(chartConfiguration);
                 saveModel();
 
                 SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
@@ -382,12 +382,12 @@ public class ChartAction extends PortletAction {
         this.borderVisible = borderVisible;
     }
 
-    public ChartPage getChartPage() {
-        return chartPage;
+    public ChartConfiguration getChartConfiguration() {
+        return chartConfiguration;
     }
 
-    public void setChartPage(ChartPage chartPage) {
-        this.chartPage = chartPage;
+    public void setChartConfiguration(ChartConfiguration chartConfiguration) {
+        this.chartConfiguration = chartConfiguration;
     }
 
     public Form getForm() {

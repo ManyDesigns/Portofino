@@ -7,7 +7,7 @@
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.chart.ChartAction"/>
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.chartPage.title}"/>
+        <c:out value="${actionBean.chartConfiguration.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="jfreeChartInstance"/>

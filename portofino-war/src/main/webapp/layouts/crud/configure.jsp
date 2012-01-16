@@ -6,7 +6,7 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/${skin}/modal-page.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.crud.CrudAction"/>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="configuration" cssClass="contentButton" />
         <div class="breadcrumbs">
