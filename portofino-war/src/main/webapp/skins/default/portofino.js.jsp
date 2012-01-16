@@ -184,6 +184,9 @@ var HTML_CHARS = {
 };
 
 function htmlEscape (string) {
+    if(string == null) {
+        return string;
+    }
     return (string + '').replace(/[&<>"'\/`]/g, function (match) {
         return HTML_CHARS[match];
     });
