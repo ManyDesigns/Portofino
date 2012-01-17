@@ -134,7 +134,12 @@ public class ModelActionResolver extends NameBasedActionResolver {
 
     protected Dispatch getDispatch(String path) {
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-        return dispatcher.createDispatch(request.getContextPath(), path);
+        Dispatch dispatch = (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
+        if(path.equals(dispatch.getOriginalPath())) {
+            return dispatch;
+        } else {
+            return dispatcher.createDispatch(request.getContextPath(), path);
+        }
     }
 
     @Override

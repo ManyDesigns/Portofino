@@ -46,7 +46,6 @@ import com.manydesigns.portofino.system.model.users.annotations.RequiresAdminist
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.ActionBean;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.ArrayUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -57,7 +56,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -149,6 +150,8 @@ public class SecurityLogic {
 
     public static boolean hasPermissions
             (Permissions configuration, Collection<String> groups, AccessLevel level, String... permissions) {
+        return true; //TODO ripristinare
+        /*
         boolean hasLevel = level == null;
         boolean hasPermissions = true;
         Map<String, Boolean> permMap = new HashMap<String, Boolean>(permissions.length);
@@ -180,7 +183,7 @@ public class SecurityLogic {
         if(!hasPermissions) {
             logger.debug("User does not have permissions. User's groups: {}", ArrayUtils.toString(groups));
         }
-        return hasPermissions;
+        return hasPermissions;*/
     }
 
     public static String encryptPassword(String password) {

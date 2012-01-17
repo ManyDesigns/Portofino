@@ -65,9 +65,16 @@ public class Dispatcher {
             LoggerFactory.getLogger(Dispatcher.class);
 
     protected final Application application;
+    protected final JAXBContext jaxbContext;
 
     public Dispatcher(Application application) {
         this.application = application;
+
+        try {
+            jaxbContext = JAXBContext.newInstance("com.manydesigns.portofino.model.pages");
+        } catch (JAXBException e) {
+            throw new Error("Can't instantiate pages jaxb context", e);
+        }
     }
 
     public Dispatch createDispatch(HttpServletRequest request) {
@@ -150,7 +157,7 @@ public class Dispatcher {
                 if(isValidActionClass(actionClass)) {
                     pageInstance.setActionClass((Class<PortofinoAction>) actionClass);
                 } else {
-                    throw new RuntimeException("Invalid action class for " + nextFragment); //TODO
+                    throw new RuntimeException("Invalid action class for " + nextFragment + ": " + actionClass); //TODO
                 }
                 pagePath.add(pageInstance);
                 makePageInstancePath(pagePath, fragmentsIterator, pageInstance);
@@ -165,13 +172,14 @@ public class Dispatcher {
         }
     }
 
-    public static Page getPage(File directory) throws JAXBException, IOException {
+    public Page getPage(File directory) throws JAXBException, IOException {
         File pageFile = new File(directory, "page.xml");
-        JAXBContext jaxbContext = JAXBContext.newInstance("com.manydesigns.portofino.model.pages");
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         FileInputStream in = new FileInputStream(pageFile);
         try {
-            return (Page) unmarshaller.unmarshal(in);
+            Page page = (Page) unmarshaller.unmarshal(in);
+            application.getModel().init(page);
+            return page;
         } finally {
             in.close();
         }

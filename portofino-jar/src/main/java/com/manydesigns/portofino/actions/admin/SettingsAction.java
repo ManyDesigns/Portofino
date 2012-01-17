@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
@@ -41,9 +40,7 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ServerInfo;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.pages.RootPage;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
@@ -77,7 +74,7 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
     Model model;
 
     Form form;
-    RootPage rootPage;
+    //RootPage rootPage;
 
     //--------------------------------------------------------------------------
     // Logging
@@ -98,6 +95,8 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
     }
 
     private void setupFormAndBean() {
+        //TODO ripristinare
+        /*
         rootPage = model.getRootPage();
 
         SelectionProvider skinSelectionProvider =
@@ -111,7 +110,7 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
                 .configSelectionProvider(pagesSelectionProvider, "landingPage")
                 .build();
         form.findFieldByPropertyName("title").setLabel("Application name");
-        form.readFromObject(rootPage);
+        form.readFromObject(rootPage);*/
     }
 
     @Button(list = "settings", key = "commons.update", order = 1)
@@ -121,7 +120,7 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
             form.readFromRequest(context.getRequest());
             if (form.validate()) {
                 logger.debug("Applying settings to model");
-                form.writeToObject(rootPage);
+                //form.writeToObject(rootPage);
 
                 model.init();
                 application.saveXmlModel();

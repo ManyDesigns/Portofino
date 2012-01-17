@@ -35,12 +35,10 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.util.RandomUtil;
-import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.actions.AbstractActionBean;
-import com.manydesigns.portofino.actions.PortletAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.chart.configuration.ChartConfiguration;
-import com.manydesigns.portofino.actions.crud.configuration.CrudPage;
+import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.actions.forms.NewPage;
 import com.manydesigns.portofino.actions.jsp.configuration.JspConfiguration;
 import com.manydesigns.portofino.actions.text.configuration.TextConfiguration;
@@ -52,7 +50,6 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
@@ -74,11 +71,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import java.io.*;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.*;
@@ -164,18 +159,22 @@ public class PageAdminAction extends AbstractActionBean {
     }
 
     protected void updateLayout(String layoutContainer, String[] portletWrapperIds) {
-        PageInstance myself = dispatch.getLastPageInstance();
+        //TODO verificare
+        PageInstance myparent = dispatch.getLastPageInstance().getParent();
+        Layout parentLayout = myparent.getPage().getLayout();
         for(int i = 0; i < portletWrapperIds.length; i++) {
             String current = portletWrapperIds[i];
             if("p".equals(current)) {
-                myself.setLayoutContainer(layoutContainer);
-                myself.setLayoutOrder(i);
+                parentLayout.getSelf().setContainer(layoutContainer);
+                parentLayout.getSelf().setOrder(i + "");
             } else if (current.startsWith("c")) {
-                String pageId = current.substring(1); //current = c...
-                PageInstance childPageInstance = myself.findChildPageByFragment(pageId);
-                Page childPage = childPageInstance.getPage();
-                childPage.setLayoutContainerInParent(layoutContainer);
-                childPage.setLayoutOrderInParent(i + "");
+                String pageFragment = current.substring(1); //current = c...
+                for(ChildPage p : parentLayout.getChildPages()) {
+                    if(pageFragment.equals(p.getName())) {
+                        p.setContainer(layoutContainer);
+                        p.setOrder(i + "");
+                    }
+                }
             } else {
                 logger.debug("Ignoring: {}", current);
             }
@@ -223,6 +222,9 @@ public class PageAdminAction extends AbstractActionBean {
     }
 
     private Resolution doCreateNewPage() throws IllegalAccessException, InvocationTargetException {
+        return null;
+        //TODO ripristinare
+        /*
         prepareNewPageForm();
         newPageForm.readFromRequest(context.getRequest());
         if(newPageForm.validate()) {
@@ -261,7 +263,7 @@ public class PageAdminAction extends AbstractActionBean {
             return new RedirectResolution(configurePath + "/" + page.getFragment()).addParameter("configure");
         } else {
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
-        }
+        }*/
     }
 
     protected void saveModel() {
@@ -277,6 +279,8 @@ public class PageAdminAction extends AbstractActionBean {
 
     @RequiresAdministrator
     public Resolution deletePage() {
+        return null; //TODO ripristinare
+        /*
         PageInstance parentPageInstance = dispatch.getParentPageInstance();
         Page page = getPage();
         synchronized (application) {
@@ -290,7 +294,7 @@ public class PageAdminAction extends AbstractActionBean {
                 return new RedirectResolution(dispatch.getParentPathUrl());
             }
         }
-        return new RedirectResolution(dispatch.getOriginalPath());
+        return new RedirectResolution(dispatch.getOriginalPath());*/
     }
 
     public Page getPage() {
@@ -299,6 +303,9 @@ public class PageAdminAction extends AbstractActionBean {
 
     @RequiresAdministrator
     public Resolution movePage() {
+        return null; //TODO ripristinare
+
+        /*
         if(destinationPageId == null) {
             SessionMessages.addErrorMessage(getMessage("page.move.noDestination"));
             return new RedirectResolution(dispatch.getOriginalPath());
@@ -337,10 +344,14 @@ public class PageAdminAction extends AbstractActionBean {
             }
         }
         return new RedirectResolution(dispatch.getOriginalPath());
+        */
     }
 
     @RequiresAdministrator
     public Resolution copyPage() {
+        return null; //TODO ripristinare
+
+        /*
         if(destinationPageId == null) {
             SessionMessages.addErrorMessage(getMessage("page.copy.noDestination"));
             return new RedirectResolution(dispatch.getOriginalPath());
@@ -401,6 +412,7 @@ public class PageAdminAction extends AbstractActionBean {
             }
         }
         return new RedirectResolution(dispatch.getOriginalPath());
+        */
     }
 
     protected class CopyVisitor extends ModelVisitor {
@@ -439,7 +451,7 @@ public class PageAdminAction extends AbstractActionBean {
 
     private void prepareNewPageForm() {
         DefaultSelectionProvider classSelectionProvider = new DefaultSelectionProvider("pageClassName");
-        classSelectionProvider.appendRow(CrudPage.class.getName(), "Crud", true);
+        classSelectionProvider.appendRow(CrudConfiguration.class.getName(), "Crud", true);
         classSelectionProvider.appendRow(ChartConfiguration.class.getName(), "Chart", true);
         classSelectionProvider.appendRow(TextConfiguration.class.getName(), "Text", true);
         classSelectionProvider.appendRow(JspConfiguration.class.getName(), "JSP", true);

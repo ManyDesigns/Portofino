@@ -31,6 +31,8 @@ package com.manydesigns.portofino.dispatcher;
 
 import net.sourceforge.stripes.action.ActionBean;
 
+import java.util.Arrays;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -59,6 +61,10 @@ public class Dispatch {
 
     public PageInstance[] getPageInstancePath() {
         return pageInstancePath;
+    }
+
+    public PageInstance[] getPageInstancePath(int startIndex) {
+        return Arrays.copyOfRange(pageInstancePath, startIndex, pageInstancePath.length);
     }
 
     public PageInstance getRootPageInstance() {
@@ -129,6 +135,6 @@ public class Dispatch {
     }
 
     public Class<? extends ActionBean> getActionBeanClass() {
-        return (Class<? extends ActionBean>) getLastPageInstance().getActionClass(); //TODO
+        return getLastPageInstance().getActionClass(); //TODO
     }
 }

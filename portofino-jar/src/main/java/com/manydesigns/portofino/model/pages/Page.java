@@ -59,9 +59,9 @@ public class Page implements ModelObject {
     protected String id;
     protected String title;
     protected String description;
-    protected final Layout layout;
-    protected final Layout detailLayout;
-    protected final Permissions permissions;
+    protected Layout layout;
+    protected Layout detailLayout;
+    protected Permissions permissions;
     protected boolean subtreeRoot = false;
 
     //**************************************************************************
@@ -75,9 +75,6 @@ public class Page implements ModelObject {
     //**************************************************************************
 
     public Page() {
-        layout = new Layout();
-        detailLayout = new Layout();
-        permissions = new Permissions();
     }
 
     //**************************************************************************
@@ -98,9 +95,15 @@ public class Page implements ModelObject {
     public void link(Model model) {}
 
     public void visitChildren(ModelVisitor visitor) {
-        visitor.visit(layout);
-        visitor.visit(detailLayout);
-        visitor.visit(permissions);
+        if(layout != null) {
+            visitor.visit(layout);
+        }
+        if(detailLayout != null) {
+            visitor.visit(detailLayout);
+        }
+        if(permissions != null) {
+            visitor.visit(permissions);
+        }
     }
 
     public String getQualifiedName() {
@@ -175,14 +178,26 @@ public class Page implements ModelObject {
         return layout;
     }
 
+    public void setLayout(Layout layout) {
+        this.layout = layout;
+    }
+
     @XmlElement()
     public Layout getDetailLayout() {
         return detailLayout;
     }
 
+    public void setDetailLayout(Layout detailLayout) {
+        this.detailLayout = detailLayout;
+    }
+
     @XmlElement()
     public Permissions getPermissions() {
         return permissions;
+    }
+
+    public void setPermissions(Permissions permissions) {
+        this.permissions = permissions;
     }
 
     /*protected void addChild(Page page, List<Page> children) {

@@ -29,29 +29,16 @@
 package com.manydesigns.portofino.actions.user.admin;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.SessionAttributes;
-import com.manydesigns.portofino.actions.crud.CrudAction;
-import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
-import com.manydesigns.portofino.actions.crud.configuration.CrudPage;
-import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
+import com.manydesigns.portofino.actions.crud.CrudAction;
 import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.dispatcher.CrudPageInstance;
-import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
-import org.apache.commons.lang.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.sql.Timestamp;
 
 /*
@@ -80,7 +67,7 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
     @Override
     @Before
     public void prepare() {
-        Model myModel;
+        /*Model myModel;
         try {
             JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
             Unmarshaller unmarshaller = jc.createUnmarshaller();
@@ -107,7 +94,8 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
         dispatch = new Dispatch(request.getContextPath(), originalPath, getClass(), rootPageInstance, pageInstance);
         Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
         request.setAttribute(RequestAttributes.DISPATCH, dispatch);
-        request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
+        request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);*/
+        //TODO ripristinare
         super.prepare();
     }
 

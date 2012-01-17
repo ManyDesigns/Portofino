@@ -16,7 +16,8 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.text.manage-attachments.manage_attachments_for_page"/> <c:out value="${actionBean.textConfiguration.title}"/>
+        <fmt:message key="layouts.text.manage-attachments.manage_attachments_for_page"/>
+        <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>

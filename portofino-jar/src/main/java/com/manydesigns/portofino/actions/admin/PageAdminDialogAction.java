@@ -30,14 +30,9 @@
 package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
-import com.manydesigns.portofino.actions.forms.CopyPage;
-import com.manydesigns.portofino.actions.forms.MovePage;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
@@ -67,7 +62,7 @@ public class PageAdminDialogAction extends AbstractActionBean {
 
     @Before
     public void prepare() {
-        page = model.getRootPage().findDescendantPageById(pageId);
+        //TODO page = model.getRootPage().findDescendantPageById(pageId);
     }
 
     @RequiresAdministrator
@@ -77,24 +72,30 @@ public class PageAdminDialogAction extends AbstractActionBean {
 
     @RequiresAdministrator
     public Resolution chooseNewLocation() {
+        return null; //TODO ripristinare
+
+        /*
         SelectionProvider pagesSelectionProvider =
                 PageLogic.createPagesSelectionProvider(model.getRootPage(), true, true, page);
         moveForm = new FormBuilder(MovePage.class)
                 .configReflectiveFields()
                 .configSelectionProvider(pagesSelectionProvider, "destinationPageId")
                 .build();
-        return new ForwardResolution("/layouts/admin/movePageDialog.jsp");
+        return new ForwardResolution("/layouts/admin/movePageDialog.jsp");*/
     }
 
     @RequiresAdministrator
     public Resolution copyPageDialog() {
+        return null; //TODO ripristinare
+
+        /*
         SelectionProvider pagesSelectionProvider =
                 PageLogic.createPagesSelectionProvider(model.getRootPage(), true, true, page);
         copyForm = new FormBuilder(CopyPage.class)
                 .configReflectiveFields()
                 .configSelectionProvider(pagesSelectionProvider, "destinationPageId")
                 .build();
-        return new ForwardResolution("/layouts/admin/copyPageDialog.jsp");
+        return new ForwardResolution("/layouts/admin/copyPageDialog.jsp");*/
     }
 
     public String getPageId() {

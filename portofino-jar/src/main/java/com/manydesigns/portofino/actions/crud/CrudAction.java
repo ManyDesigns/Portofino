@@ -49,11 +49,12 @@ import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
-import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.PortletAction;
+import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
+import com.manydesigns.portofino.actions.crud.configuration.CrudProperty;
+import com.manydesigns.portofino.actions.crud.configuration.SelectionProviderReference;
 import com.manydesigns.portofino.actions.forms.CrudPropertyEdit;
 import com.manydesigns.portofino.actions.forms.CrudSelectionProviderEdit;
-import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.TableCriteria;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
@@ -62,9 +63,6 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.pages.AccessLevel;
-import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
-import com.manydesigns.portofino.actions.crud.configuration.CrudProperty;
-import com.manydesigns.portofino.actions.crud.configuration.SelectionProviderReference;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
@@ -119,7 +117,7 @@ import java.util.regex.Pattern;
 @UrlBinding("/actions/crud")
 @SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
 @RequiresPermissions(level = AccessLevel.VIEW)
-public class CrudAction extends PortletAction implements PortofinoAction {
+public class CrudAction extends PortletAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 

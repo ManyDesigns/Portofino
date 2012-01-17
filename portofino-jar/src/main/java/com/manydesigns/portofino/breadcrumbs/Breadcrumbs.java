@@ -31,13 +31,9 @@ package com.manydesigns.portofino.breadcrumbs;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
-import com.manydesigns.portofino.actions.crud.configuration.CrudPage;
-import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.pages.Page;
-import com.manydesigns.portofino.model.pages.RootPage;
-import com.manydesigns.portofino.util.ShortNameUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -81,23 +77,24 @@ public class Breadcrumbs implements XhtmlFragment {
         StringBuilder sb = new StringBuilder();
         int start = dispatch.getClosestSubtreeRootIndex();
         sb.append(dispatch.getContextPath()).append(dispatch.getPathUrl(start));
-        if(dispatch.getPageInstance(start).getPage() instanceof RootPage) {
+        if(dispatch.getPageInstance(start).getParent() == null) {
             start++;
         }
         for (int i = start; i < upto; i++) {
             PageInstance current = dispatch.getPageInstancePath()[i];
             //Resolve references to treat Crud pages differently below
-            current = current.dereference();
+            //TODO current = current.dereference();
             sb.append("/");
             Page page = current.getPage();
-            sb.append(page.getFragment());
-            if(page.isShowInNavigation()) {
+            sb.append(current.getUrlFragment());
+            if(true) { //TODO page.isShowInNavigation()) {
                 BreadcrumbItem item = new BreadcrumbItem(
                         sb.toString(), page.getTitle(),
                         page.getDescription());
                 items.add(item);
             }
-            if (current instanceof CrudPageInstance) {
+            //TODO ripristinare
+            /*if (current instanceof CrudPageInstance) {
                 CrudPageInstance instance =
                         (CrudPageInstance) current;
                 if (CrudPage.MODE_DETAIL.equals(instance.getMode())) {
@@ -113,7 +110,7 @@ public class Breadcrumbs implements XhtmlFragment {
                         items.add(item2);
                     }
                 }
-            }
+            }*/
         }
     }
 

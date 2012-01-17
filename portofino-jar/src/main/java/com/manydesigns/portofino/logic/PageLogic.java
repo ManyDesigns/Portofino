@@ -29,15 +29,6 @@
 
 package com.manydesigns.portofino.logic;
 
-import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.portofino.actions.crud.configuration.CrudPage;
-import com.manydesigns.portofino.model.pages.Page;
-import com.manydesigns.portofino.model.pages.RootPage;
-import org.apache.commons.lang.ArrayUtils;
-
-import java.util.List;
-
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -48,6 +39,8 @@ public class PageLogic {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
+    //TODO ripristinare
+    /*
     public static SelectionProvider createPagesSelectionProvider(RootPage rootPage, Page... excludes) {
         return createPagesSelectionProvider(rootPage, false, false, excludes);
     }
@@ -63,8 +56,10 @@ public class PageLogic {
         }
 
         return selectionProvider;
-    }
+    }*/
 
+    //TODO ripristinare
+    /*
     private static void appendToPagesSelectionProvider(Page page, String breadcrumb,
                                                        DefaultSelectionProvider selectionProvider,
                                                        boolean includeDetailChildren, Page... excludes) {
@@ -110,5 +105,5 @@ public class PageLogic {
 
     public static boolean isLandingPage(RootPage root, Page page) {
         return page.equals(getLandingPage(root));
-    }
+    }*/
 }

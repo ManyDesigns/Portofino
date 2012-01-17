@@ -29,11 +29,13 @@
 
 package com.manydesigns.portofino.actions.admin;
 
-import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
-import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.controller.ActionResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,14 +65,15 @@ public class RootPermissionsAction extends PageAdminAction implements AdminActio
 
     @DefaultHandler
     public Resolution execute() {
-        Page page = model.getRootPage();
+        /*Page page = model.getRootPage();
         setupGroups(page);
-        return new ForwardResolution("/layouts/admin/rootPermissions.jsp");
+        return new ForwardResolution("/layouts/admin/rootPermissions.jsp");*/
+        return null; //TODO ripristinare
     }
 
     @Button(list = "root-permissions", key = "commons.update", order = 1)
     public Resolution updatePagePermissions() {
-        Page page = model.getRootPage();
+        /*Page page = model.getRootPage();
         synchronized (application) {
             updatePagePermissions(page);
             saveModel();
@@ -78,7 +81,8 @@ public class RootPermissionsAction extends PageAdminAction implements AdminActio
             SessionMessages.addInfoMessage(getMessage("permissions.root.updated"));
         }
 
-        return new RedirectResolution(this.getClass());
+        return new RedirectResolution(this.getClass());*/
+        return null; //TODO ripristinare
     }
 
     @Button(list = "root-permissions", key = "commons.returnToPages", order = 2)
@@ -96,6 +100,6 @@ public class RootPermissionsAction extends PageAdminAction implements AdminActio
 
     @Override
     public Page getPage() {
-        return model.getRootPage();
+        return null; //TODO ripristinare return model.getRootPage();
     }
 }

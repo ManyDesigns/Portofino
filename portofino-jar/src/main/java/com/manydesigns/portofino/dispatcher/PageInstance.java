@@ -51,10 +51,10 @@ public class PageInstance {
     protected final Page page;
     protected final File directory;
     protected final List<String> parameters;
+    protected final PageInstance parent;
     protected Object configuration;
     protected Class<PortofinoAction> actionClass;
     protected PortofinoAction actionBean;
-    protected final PageInstance parent;
 
     //**************************************************************************
     // Logging
@@ -93,11 +93,11 @@ public class PageInstance {
     }*/
 
     public String getUrlFragment() {
-        return formatUrlFragment(directory.getName());
-    }
-
-    public String formatUrlFragment(String baseFragment) {
-        return baseFragment;
+        String fragment = directory.getName();
+        for(String param : parameters) {
+            fragment += "/" + param;
+        }
+        return fragment;
     }
 
     public File getDirectory() {

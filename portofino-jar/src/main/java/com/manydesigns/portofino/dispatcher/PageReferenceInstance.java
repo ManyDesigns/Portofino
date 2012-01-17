@@ -29,17 +29,13 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.model.pages.Page;
-
-import java.util.List;
-
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+/*
 public class PageReferenceInstance extends PageInstance {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
@@ -119,11 +115,6 @@ public class PageReferenceInstance extends PageInstance {
         return wrappedPageInstance.removeChild(page);
     }
 
-    /*@Override
-    public String getUrlFragment() {
-        return wrappedPageInstance.getUrlFragment();
-    }*/
-
     @Override
     public Application getApplication() {
         return wrappedPageInstance.getApplication();
@@ -134,3 +125,4 @@ public class PageReferenceInstance extends PageInstance {
         return wrappedPageInstance.getMode();
     }
 }
+*/

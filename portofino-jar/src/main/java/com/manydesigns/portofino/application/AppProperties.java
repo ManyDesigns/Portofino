@@ -54,4 +54,6 @@ public class AppProperties {
             "landing.page";
     public static final String SKIN =
             "skin";
+    public static final String APPLICATION_NAME =
+            "app.name";
 }

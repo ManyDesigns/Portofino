@@ -53,6 +53,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 
+@XmlRootElement(name = "configuration")
 @XmlAccessorType(value = XmlAccessType.NONE)
 public class CrudConfiguration implements ModelObject {
     public static final String copyright =

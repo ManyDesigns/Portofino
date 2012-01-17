@@ -25,7 +25,6 @@ import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.stripes.ModelActionResolver;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
-import com.manydesigns.portofino.util.ShortNameUtils;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.Before;
@@ -51,7 +50,7 @@ import java.text.MessageFormat;
 import java.util.*;
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-public class PortletAction extends AbstractActionBean {
+public abstract class PortletAction extends AbstractActionBean implements PortofinoAction {
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
             {{"id", "embedInParent", "showInNavigation", "subtreeRoot", "layout", "description"}};
@@ -308,7 +307,12 @@ public class PortletAction extends AbstractActionBean {
     protected void prepareConfigurationForms() {
         Page page = pageInstance.getPage();
 
-        boolean isTopLevelPage = pageInstance.getPage().getParent() instanceof RootPage;
+        PageInstance parent = pageInstance.getParent();
+        if(parent == null) {
+            return; //TODO
+        }
+
+        boolean isTopLevelPage = parent.getParent() == null; //TODO
         FormBuilder formBuilder = new FormBuilder(EditPage.class)
                 .configPrefix(CONF_FORM_PREFIX)
                 .configFields(isTopLevelPage ? TOP_LEVEL_PAGE_CONFIGURATION_FIELDS : PAGE_CONFIGURATION_FIELDS)
@@ -321,8 +325,9 @@ public class PortletAction extends AbstractActionBean {
         EditPage edit = new EditPage();
         edit.id = page.getId();
         edit.description = page.getDescription();
-        edit.embedInParent = page.getLayoutContainerInParent() != null;
-        edit.showInNavigation = page.isShowInNavigation();
+        //TODO ripristinare
+        //edit.embedInParent = page.getLayoutContainerInParent() != null;
+        //edit.showInNavigation = page.isShowInNavigation();
         edit.subtreeRoot = page.isSubtreeRoot();
         edit.layout = getLayout();
         pageConfigurationForm.readFromObject(edit);
@@ -392,7 +397,8 @@ public class PortletAction extends AbstractActionBean {
         Page page = pageInstance.getPage();
         page.setTitle(title);
         page.setDescription(edit.description);
-        if(edit.embedInParent) {
+        //TODO ripristinare
+        /*if(edit.embedInParent) {
             if(page.getLayoutContainerInParent() == null) {
                 page.setLayoutContainerInParent(DEFAULT_LAYOUT_CONTAINER);
             }
@@ -400,12 +406,12 @@ public class PortletAction extends AbstractActionBean {
             page.setLayoutContainerInParent(null);
             page.setLayoutOrderInParent(null);
         }
-        page.setShowInNavigation(edit.showInNavigation);
+        page.setShowInNavigation(edit.showInNavigation);*/
         page.setSubtreeRoot(edit.subtreeRoot);
         if(!edit.embedInParent && !edit.showInNavigation) {
             SessionMessages.addWarningMessage(getMessage("page.warnNotShowInNavigationNotEmbedded"));
         }
-        page.setLayout(edit.layout);
+        page.getLayout().setLayout(edit.layout);
 
         updateScript();
     }

@@ -29,11 +29,10 @@
 
 package com.manydesigns.portofino.actions.jsp.configuration;
 
-import com.manydesigns.portofino.model.pages.Page;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,6 +40,7 @@ import javax.xml.bind.annotation.XmlAttribute;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+@XmlRootElement(name = "configuration")
 @XmlAccessorType(XmlAccessType.NONE)
 public class JspConfiguration {
     public static final String copyright =

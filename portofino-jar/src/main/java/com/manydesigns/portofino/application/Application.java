@@ -58,6 +58,7 @@ public interface Application {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     String getAppId();
+    String getName();
 
     //**************************************************************************
     // App directories and files

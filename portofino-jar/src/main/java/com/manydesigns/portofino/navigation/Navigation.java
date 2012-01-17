@@ -36,13 +36,13 @@ import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.pages.AccessLevel;
+import com.manydesigns.portofino.model.pages.ChildPage;
 import com.manydesigns.portofino.model.pages.Page;
-import com.manydesigns.portofino.model.pages.RootPage;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /*
@@ -88,24 +88,26 @@ public class Navigation implements XhtmlFragment {
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         String contextPath = dispatch.getContextPath();
         int rootPageIndex = dispatch.getClosestSubtreeRootIndex();
-        PageInstance rootPageInstance = dispatch.getPageInstance(rootPageIndex);
-        List<PageInstance> pageInstances;
-        if(rootPageInstance.getPage() instanceof RootPage) {
-            pageInstances = rootPageInstance.getChildPageInstances();
+        //PageInstance rootPageInstance = dispatch.getPageInstance(rootPageIndex);
+        PageInstance[] pageInstances = dispatch.getPageInstancePath(rootPageIndex);
+        /*if(rootPageInstance.getParent() == null) {
+            pageInstances = new ArrayList<PageInstance>(); //TODO rootPageInstance.getChildPageInstances();
         } else {
             pageInstances = Collections.singletonList(rootPageInstance);
-        }
+        }*/
         String prefix = contextPath + dispatch.getPathUrl(rootPageIndex);
         print(prefix, pageInstances, xb, false);
     }
 
-    private void print(String path, List<PageInstance> pageInstances,
+    private void print(String path, PageInstance[] pageInstances,
                        XhtmlBuffer xb, boolean recursive) {
-        if (pageInstances == null) {
+        if (pageInstances == null || pageInstances.length == 0) {
             return;
         }
         boolean first = true;
+        boolean firstChild = true;
         PageInstance expand = null;
+        List<ChildPage> siblings = new ArrayList<ChildPage>();
         for (PageInstance current : pageInstances) {
             Page page = current.getPage();
             if (!skipPermissions && !SecurityLogic.hasPermissions(page.getPermissions(), groups, AccessLevel.VIEW)) {
@@ -116,32 +118,62 @@ public class Navigation implements XhtmlFragment {
                 expand = current;
             }
 
-            if(!page.isShowInNavigation()) {
+            /*if(!page.isShowInNavigation()) {
                 continue;
-            }
+            }*/
 
-            if(first) {
-                if(recursive) { xb.writeHr(); }
-                xb.openElement("ul");
+
+
+            if(current.getParent() != null) {
+                //Root doesn't print anything for itself
+                printNavigationElement(path, xb, first, firstChild, current, siblings);
+                firstChild = false;
                 first = false;
             }
-            xb.openElement("li");
-            if (isSelected(current)) {
-                xb.addAttribute("class", "selected");
-            } else if (isInPath(current)) {
-                xb.addAttribute("class", "path");
-            }
-            String url = path + "/" + page.getFragment();
-            xb.writeAnchor(url, page.getTitle(), null, page.getDescription());
-            xb.closeElement("li");
+
+            siblings = current.getPage().getLayout().getChildPages();
         }
-        if(!first) {
+        if(!firstChild) {
             xb.closeElement("ul");
         }
         if (expand != null) {
-            path = path + "/" + expand.getUrlFragment();
-            boolean showInNavigation = expand.getPage().isShowInNavigation();
-            print(path, expand.getChildPageInstances(), xb, showInNavigation);
+            path = path + "/" + expand.getDirectory().getName();
+            //TODO ripristinare
+            /*boolean showInNavigation = expand.getPage().isShowInNavigation();
+            print(path, expand.getChildPageInstances(), xb, showInNavigation);*/
+        }
+    }
+
+    private void printNavigationElement
+            (String path, XhtmlBuffer xb, boolean first, boolean firstChild,
+             PageInstance current, List<ChildPage> siblings) {
+        Page page = current.getPage();
+        if(firstChild) {
+            if(!first) { xb.writeHr(); }
+            xb.openElement("ul");
+
+        }
+        if(!siblings.isEmpty()) {
+            for (ChildPage p : siblings) {
+                if(!p.isShowInNavigation()) {
+                    continue;
+                }
+
+                xb.openElement("li");
+                if(p.getName().equals(current.getDirectory().getName())) {
+                    if (isSelected(current)) {
+                        xb.addAttribute("class", "selected");
+                    } else {
+                        xb.addAttribute("class", "path");
+                    }
+                    String url = path + "/" + current.getDirectory().getName();
+                    xb.writeAnchor(url, page.getTitle(), null, page.getDescription());
+                } else {
+                    String url = path + "/" + p.getName();
+                    xb.writeAnchor(url, "TODO " + p.getName(), null, "TODO descr");
+                }
+                xb.closeElement("li");
+            }
         }
     }
 

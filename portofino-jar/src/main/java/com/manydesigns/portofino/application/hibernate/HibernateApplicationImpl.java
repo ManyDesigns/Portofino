@@ -652,6 +652,10 @@ public class HibernateApplicationImpl implements Application {
         return appId;
     }
 
+    public String getName() {
+        return getAppConfiguration().getString(AppProperties.APPLICATION_NAME);
+    }
+
     public File getAppDir() {
         return appDir;
     }

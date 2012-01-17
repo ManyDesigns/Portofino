@@ -28,13 +28,7 @@
  */
 package com.manydesigns.portofino.model;
 
-import com.manydesigns.portofino.actions.text.configuration.TextConfiguration;
-import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.model.pages.*;
 import junit.framework.TestCase;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -43,7 +37,7 @@ import java.util.List;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class PageTest extends TestCase {
-
+/*
     Model model;
     RootPage root;
     Page n1_1;
@@ -388,7 +382,7 @@ public class PageTest extends TestCase {
     public void testPermissions3_5() {
         groups.add("altro");
         assertFalse(SecurityLogic.hasPermissions(permissions3, groups, AccessLevel.VIEW));
-    }
+    }*/
 
 
 

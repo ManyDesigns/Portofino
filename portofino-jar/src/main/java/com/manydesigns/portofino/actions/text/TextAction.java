@@ -32,15 +32,13 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.PortletAction;
+import com.manydesigns.portofino.actions.pagereference.configuration.PageReferenceConfiguration;
 import com.manydesigns.portofino.actions.text.configuration.Attachment;
 import com.manydesigns.portofino.actions.text.configuration.TextConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.TextLogic;
 import com.manydesigns.portofino.model.pages.AccessLevel;
-import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.FileUtils;
@@ -107,7 +105,7 @@ public class TextAction extends PortletAction {
     @Override
     public void prepare() {
         super.prepare();
-        textConfiguration = (TextConfiguration) pageInstance.getPage();
+        textConfiguration = (TextConfiguration) pageInstance.getConfiguration();
     }
 
     //**************************************************************************
@@ -130,8 +128,7 @@ public class TextAction extends PortletAction {
     }
 
     protected void loadContent() throws IOException {
-        String textCode = textConfiguration.getId();
-        textFile = RandomUtil.getCodeFile(application.getAppTextDir(), TEXT_FILE_NAME_PATTERN, textCode);
+        textFile = RandomUtil.getCodeFile(pageInstance.getDirectory(), TEXT_FILE_NAME_PATTERN, "text");
         try {
             content = FileUtils.readFileToString(textFile, CONTENT_ENCODING);
             content = processContentBeforeView(content);
@@ -147,9 +144,8 @@ public class TextAction extends PortletAction {
         }
         content = processContentBeforeSave(content);
         byte[] contentByteArray = content.getBytes(CONTENT_ENCODING);
-        String textCode = textConfiguration.getId();
         File dataFile =
-                RandomUtil.getCodeFile(application.getAppTextDir(), TEXT_FILE_NAME_PATTERN, textCode);
+                textFile = RandomUtil.getCodeFile(pageInstance.getDirectory(), TEXT_FILE_NAME_PATTERN, "text");
 
         // copy the data
         FileOutputStream fileOutputStream = new FileOutputStream(dataFile);
@@ -201,7 +197,7 @@ public class TextAction extends PortletAction {
         return sb.toString();
     }
 
-    protected String convertPathToInternalLink(String path) {
+    /*protected String convertPathToInternalLink(String path) {
         Dispatcher dispatcher = new Dispatcher(application);
         Dispatch pathDispatch = dispatcher.createDispatch(context.getRequest().getContextPath(), path);
         PageInstance[] pageInstancePath = pathDispatch.getPageInstancePath();
@@ -219,7 +215,7 @@ public class TextAction extends PortletAction {
             }
         }
         return sb.toString();
-    }
+    }*/
 
     protected static final String PORTOFINO_HREF_PATTERN =
             "portofino:hrefAttribute=\"([^\"]+)\" " +
@@ -255,7 +251,7 @@ public class TextAction extends PortletAction {
         return sb.toString();
     }
 
-    protected String convertInternalLinkToPath(String link) {
+    /*protected String convertInternalLinkToPath(String link) {
         Dispatcher dispatcher = new Dispatcher(application) {
             @Override
             protected String getFragmentToMatch(Page page) {
@@ -268,7 +264,7 @@ public class TextAction extends PortletAction {
         };
         Dispatch pathDispatch = dispatcher.createDispatch(context.getRequest().getContextPath(), link);
         return pathDispatch.getPathUrl();
-    }
+    }*/
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
     @RequiresPermissions(level = AccessLevel.EDIT)
@@ -481,6 +477,13 @@ public class TextAction extends PortletAction {
     // Getters/setters
     //**************************************************************************
 
+    public Class<?> getConfigurationClass() {
+        return TextConfiguration.class;
+    }
+
+    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
+        return null;
+    }
 
     public String getContent() {
         return content;

@@ -113,7 +113,7 @@ public class ChartAction extends PortletAction {
     @Override
     public void prepare() {
         super.prepare();
-        chartConfiguration = (ChartConfiguration) pageInstance.getPage();
+        chartConfiguration = (ChartConfiguration) pageInstance.getConfiguration();
     }
 
     //**************************************************************************
@@ -335,6 +335,14 @@ public class ChartAction extends PortletAction {
                 return new ForwardResolution("/layouts/chart/configure.jsp");
             }
         }
+    }
+
+    public Class<?> getConfigurationClass() {
+        return ChartConfiguration.class;
+    }
+
+    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
+        return null;
     }
 
     //**************************************************************************

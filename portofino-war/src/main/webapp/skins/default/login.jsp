@@ -19,7 +19,9 @@
         <stripes:layout-component name="customScripts"/>
         <jsp:useBean id="model" scope="request"
                      type="com.manydesigns.portofino.model.Model"/>
-        <c:set var="applicationName" value="${model.rootPage.title}"/>
+        <jsp:useBean id="app" scope="request"
+                     type="com.manydesigns.portofino.application.Application"/>
+        <c:set var="applicationName" value="${app.name}"/>
         <title><fmt:message key="skins.default.login.login_to"/> <c:out value="${applicationName}"/></title>
     </head>
     <body>

@@ -115,7 +115,7 @@ public class
         }
 
         logger.debug("Checking page permissions");
-        boolean isNotAdmin = false; //!SecurityLogic.isAdministrator(request); //TODO skipping permissions for now
+        boolean isNotAdmin = !SecurityLogic.isAdministrator(request);
         if (isNotAdmin) {
             Permissions permissions;
             Dispatch dispatch =

@@ -1,12 +1,7 @@
+<%@ page import="com.manydesigns.portofino.actions.RequestAttributes" %>
 <%@ page import="com.manydesigns.portofino.application.Application" %>
-<%@ page import="org.apache.commons.collections.MultiHashMap" %>
-<%@ page import="org.apache.commons.collections.MultiMap" %>
-<%@ page import="java.util.Collection" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="ognl.Ognl" %>
 <%@ page import="org.hibernate.Session" %>
-<%@ page import="com.manydesigns.portofino.database.QueryUtils" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -15,12 +10,12 @@
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.jsp.JspAction"/>
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.jspConfiguration.title}"/>
+        <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
 
             <%
-                Application appl = (Application) request.getAttribute("application");
+                Application appl = (Application) request.getAttribute(RequestAttributes.APPLICATION);
                 Session hSession = appl.getSession("redmine");
                 List<?> objects = com.manydesigns.portofino.database.QueryUtils.runSql
                         (hSession, "select count(*), \"project_id\", status.\"name\", \"projects\".\"name\" " +
@@ -66,10 +61,10 @@
                 }
             %>
             </table>
-            <script src="<%= request.getContextPath() %>/jquery-treetable-2.3.0/jquery.treeTable.min.js" >
+            <script type="text/javascript" src="<%= request.getContextPath() %>/jquery-treetable-2.3.0/jquery.treeTable.min.js" >
             </script>
 
-            <script>
+            <script type="text/javascript">
                 $("#projectTree").treeTable({"clickableNodeNames": true, "expandable":true, "treeColumn":0, "indent":20 });
             </script>
 

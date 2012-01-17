@@ -39,6 +39,8 @@ import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.navigation.Navigation;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Resolution;
@@ -113,11 +115,12 @@ public class ApplicationInterceptor implements Interceptor {
                     new Navigation(application, dispatch, groups, admin);
             request.setAttribute(RequestAttributes.NAVIGATION, navigation);
 
-            int i = 0;
             for(PageInstance page : dispatch.getPageInstancePath()) {
-                i++;
+                if(page.getParent() == null) {
+                    continue; //Don't instantiate root
+                }
                 PortofinoAction actionBean = instantiateActionBean(page);
-                configureActionBean(actionBean, page);
+                configureActionBean(actionBean, page, application);
                 Resolution resolution = actionBean.prepare(page, actionContext);
                 if(resolution != null) {
                     logger.error("Page realization failed for {}", page);
@@ -136,28 +139,41 @@ public class ApplicationInterceptor implements Interceptor {
     }
 
     protected PortofinoAction instantiateActionBean(PageInstance page) throws IllegalAccessException, InstantiationException {
-        PortofinoAction action = page.getActionClass().newInstance();
-        page.setActionBean(action);
+        PortofinoAction action = page.getActionBean();
+        if(action == null) {
+            action = page.getActionClass().newInstance();
+            page.setActionBean(action);
+        }
         return action;
     }
 
-    protected void configureActionBean(PortofinoAction actionBean, PageInstance page) throws JAXBException, IOException {
+    protected void configureActionBean
+            (PortofinoAction actionBean, PageInstance pageInstance, Application application)
+            throws JAXBException, IOException {
         Class<?> configurationClass = actionBean.getConfigurationClass();
         String configurationPackage = configurationClass.getPackage().getName();
 
         //TODO!!!
-        File pageFile = new File(page.getDirectory(), "configuration.xml");
+        File pageFile = new File(pageInstance.getDirectory(), "configuration.xml");
         if(pageFile.exists()) {
             JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             FileInputStream in = new FileInputStream(pageFile);
             try {
                 Object configuration = unmarshaller.unmarshal(in);
+                if(configuration instanceof ModelObject) {
+                    Model model = application.getModel();
+                    if(model != null) {
+                        model.init((ModelObject) configuration);
+                    } else {
+                        logger.error("Model is null, cannot init configuration");
+                    }
+                }
                 if(!configurationClass.isInstance(configuration)) {
                     logger.error("Invalid configuration: expected " + configurationClass + ", got " + configuration);
                     return;
                 }
-                page.setConfiguration(configuration);
+                pageInstance.setConfiguration(configuration);
             } finally {
                 in.close();
             }

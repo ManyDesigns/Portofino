@@ -30,25 +30,19 @@
 package com.manydesigns.portofino.actions.pagereference;
 
 import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.portofino.actions.PortletAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.pagereference.configuration.PageReferenceConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.Dispatcher;
-import com.manydesigns.portofino.logic.PageLogic;
+import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
-import net.sourceforge.stripes.util.UrlBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Locale;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -76,35 +70,38 @@ public class PageReferenceAction extends PortletAction {
     @Override
     public void prepare() {
         super.prepare();
-        pageReferenceConfiguration = (PageReferenceConfiguration) getPageInstance().getPage();
+        pageReferenceConfiguration = (PageReferenceConfiguration) getPageInstance().getConfiguration();
     }
 
-    @Override
+    /*@Override
     protected void dereferencePageInstance() {
         //Do nothing. I need the raw PageReferenceInstance.
-    }
+    }*/
 
     @DefaultHandler
     public Resolution execute() {
-        if(pageReferenceConfiguration.getToPage() == null) {
-            return forwardToPageNotConfigured();
-        } else {
-            //Never embed in this case - the referenced action will take
-            //care of it.
-            try {
-                Class<? extends ActionBean> targetActionClass =
-                        Dispatcher.getActionBeanClass(application, pageReferenceConfiguration.getToPage());
-                return new ForwardResolution(targetActionClass, getContext().getEventName());
-            } catch (ClassNotFoundException e) {
-                logger.error("Invalid action class", e);
-                return forwardToPageNotConfigured();
-            }
-            /*//Never embed in this case - the referenced action will take
-            //care of it.
-            String fwd = Dispatcher.getRewrittenPath(pageReference.getToPage());
-            return new ForwardResolution(fwd);*/
-            //throw new UnsupportedOperationException("Not yet implemented");
-        }
+        return null; //TODO ripristinare
+
+//
+//        if(pageReferenceConfiguration.getToPage() == null) {
+//            return forwardToPageNotConfigured();
+//        } else {
+//            //Never embed in this case - the referenced action will take
+//            //care of it.
+//            try {
+//                Class<? extends ActionBean> targetActionClass =
+//                        Dispatcher.getActionBeanClass(application, pageReferenceConfiguration.getToPage());
+//                return new ForwardResolution(targetActionClass, getContext().getEventName());
+//            } catch (ClassNotFoundException e) {
+//                logger.error("Invalid action class", e);
+//                return forwardToPageNotConfigured();
+//            }
+//            /*//Never embed in this case - the referenced action will take
+//            //care of it.
+//            String fwd = Dispatcher.getRewrittenPath(pageReference.getToPage());
+//            return new ForwardResolution(fwd);*/
+//            //throw new UnsupportedOperationException("Not yet implemented");
+//        }
     }
 
     protected Resolution forwardToPageNotConfigured() {
@@ -116,6 +113,8 @@ public class PageReferenceAction extends PortletAction {
     }
 
     public Resolution configureReferencedPage() {
+        return null; //TODO ripristinare
+        /*
         if(pageReferenceConfiguration.getToPage() == null) {
             SessionMessages.addErrorMessage("No referenced page specified");
             return configure();
@@ -135,7 +134,7 @@ public class PageReferenceAction extends PortletAction {
                 logger.error("Invalid action class", e);
                 return forwardToPageNotConfigured();
             }
-        }
+        }*/
     }
 
     public Resolution configure() {
@@ -161,9 +160,11 @@ public class PageReferenceAction extends PortletAction {
     }
 
     protected void setupConfigurationForm() {
+        //TODO ripristinare
+
         //Do NOT include root page: since it issues a redirect, it is impossible
         //to update the PageReference configuration.
-        SelectionProvider pagesSelectionProvider =
+        /*SelectionProvider pagesSelectionProvider =
                 PageLogic.createPagesSelectionProvider(model.getRootPage(), false,
                                                        true, pageReferenceConfiguration);
 
@@ -171,7 +172,7 @@ public class PageReferenceAction extends PortletAction {
                 .configFields("to")
                 .configSelectionProvider(pagesSelectionProvider, "to")
                 .build();
-        form.readFromObject(pageReferenceConfiguration);
+        form.readFromObject(pageReferenceConfiguration);*/
     }
 
     public PageReferenceConfiguration getPageReferenceConfiguration() {
@@ -182,4 +183,11 @@ public class PageReferenceAction extends PortletAction {
         return form;
     }
 
+    public Class<?> getConfigurationClass() {
+        return PageReferenceConfiguration.class;
+    }
+
+    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
+        return null;
+    }
 }

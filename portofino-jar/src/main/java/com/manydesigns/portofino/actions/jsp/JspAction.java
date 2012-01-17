@@ -38,6 +38,7 @@ import com.manydesigns.portofino.actions.PortletAction;
 import com.manydesigns.portofino.actions.crud.CrudAction;
 import com.manydesigns.portofino.actions.jsp.configuration.JspConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import com.manydesigns.portofino.util.FileUtils;
@@ -88,7 +89,7 @@ public class JspAction extends PortletAction {
     @Override
     public void prepare() {
         super.prepare();
-        jspConfiguration = (JspConfiguration) getPageInstance().getPage();
+        jspConfiguration = (JspConfiguration) getPageInstance().getConfiguration();
         jsp = jspConfiguration.getJsp();
     }
 
@@ -194,4 +195,11 @@ public class JspAction extends PortletAction {
         return "/apps/" + application.getAppId() + "/web/";
     }
 
+    public Class<?> getConfigurationClass() {
+        return JspConfiguration.class;
+    }
+
+    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
+        return null;
+    }
 }
