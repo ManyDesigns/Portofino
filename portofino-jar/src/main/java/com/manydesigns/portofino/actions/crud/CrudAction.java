@@ -1197,7 +1197,10 @@ public class CrudAction extends PortletAction {
 
     private void loadObject(String pk) {
         Serializable pkObject = pkHelper.parsePkString(pk);
-        object = QueryUtils.getObjectByPk(application, baseTable, pkObject);
+        object = QueryUtils.getObjectByPk(
+                application,
+                baseTable, pkObject,
+                crudConfiguration.getQuery(), null);
     }
 
     //**************************************************************************

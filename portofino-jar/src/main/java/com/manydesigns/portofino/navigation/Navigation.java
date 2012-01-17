@@ -37,11 +37,13 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.ChildPage;
+import com.manydesigns.portofino.model.pages.Layout;
 import com.manydesigns.portofino.model.pages.Page;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,84 +98,106 @@ public class Navigation implements XhtmlFragment {
             pageInstances = Collections.singletonList(rootPageInstance);
         }*/
         String prefix = contextPath + dispatch.getPathUrl(rootPageIndex);
-        print(prefix, pageInstances, xb, false);
+        print(prefix, pageInstances, xb);
     }
 
-    private void print(String path, PageInstance[] pageInstances,
-                       XhtmlBuffer xb, boolean recursive) {
+    private void print(String path, PageInstance[] pageInstances, XhtmlBuffer xb) {
         if (pageInstances == null || pageInstances.length == 0) {
             return;
         }
         boolean first = true;
-        boolean firstChild = true;
-        PageInstance expand = null;
         List<ChildPage> siblings = new ArrayList<ChildPage>();
+        PageInstance last = null;
         for (PageInstance current : pageInstances) {
             Page page = current.getPage();
             if (!skipPermissions && !SecurityLogic.hasPermissions(page.getPermissions(), groups, AccessLevel.VIEW)) {
-                continue;
-            }
-
-            if (isSelected(current) || isInPath(current)) {
-                expand = current;
+                break;
             }
 
             /*if(!page.isShowInNavigation()) {
                 continue;
             }*/
 
-
-
             if(current.getParent() != null) {
                 //Root doesn't print anything for itself
-                printNavigationElement(path, xb, first, firstChild, current, siblings);
-                firstChild = false;
+                printNavigationElement(path, xb, current, siblings, first);
+                path = path + "/" + current.getUrlFragment();
                 first = false;
             }
 
-            siblings = current.getPage().getLayout().getChildPages();
+            Layout layout = current.getLayout();
+            if(layout != null) {
+                siblings = layout.getChildPages();
+            } else {
+                siblings = new ArrayList<ChildPage>();
+            }
+            last = current;
+        }
+
+        boolean firstChild = true;
+        for (ChildPage p : siblings) {
+            if(!p.isShowInNavigation()) {
+                continue;
+            }
+            if(firstChild) {
+                if(!first) { xb.writeHr(); }
+                xb.openElement("ul");
+                firstChild = false;
+            }
+            xb.openElement("li");
+            String url = path + "/" + p.getName();
+            File pageDir = new File(last.getDirectory(), p.getName());
+            Page page = application.getPage(pageDir);
+            xb.writeAnchor(url, page.getTitle(), null, page.getDescription());
+            xb.closeElement("li");
         }
         if(!firstChild) {
             xb.closeElement("ul");
         }
-        if (expand != null) {
-            path = path + "/" + expand.getDirectory().getName();
-            //TODO ripristinare
-            /*boolean showInNavigation = expand.getPage().isShowInNavigation();
-            print(path, expand.getChildPageInstances(), xb, showInNavigation);*/
-        }
     }
 
     private void printNavigationElement
-            (String path, XhtmlBuffer xb, boolean first, boolean firstChild,
-             PageInstance current, List<ChildPage> siblings) {
-        Page page = current.getPage();
-        if(firstChild) {
-            if(!first) { xb.writeHr(); }
-            xb.openElement("ul");
-
-        }
+            (String path, XhtmlBuffer xb, PageInstance current, List<ChildPage> siblings, boolean first) {
+        boolean firstChild = true;
         if(!siblings.isEmpty()) {
             for (ChildPage p : siblings) {
                 if(!p.isShowInNavigation()) {
                     continue;
                 }
-
-                xb.openElement("li");
+                Page page;
                 if(p.getName().equals(current.getDirectory().getName())) {
+                    page = current.getPage();
+                } else {
+                    File pageDir = new File(current.getParent().getDirectory(), p.getName());
+                    page = application.getPage(pageDir);
+                }
+                if (!skipPermissions && !SecurityLogic.hasPermissions(page.getPermissions(), groups, AccessLevel.VIEW)) {
+                    continue;
+                }
+
+                if(firstChild) {
+                    if(!first) { xb.writeHr(); }
+                    xb.openElement("ul");
+                    firstChild = false;
+                }
+                xb.openElement("li");
+                String url;
+                if(page == current.getPage()) {
                     if (isSelected(current)) {
                         xb.addAttribute("class", "selected");
                     } else {
                         xb.addAttribute("class", "path");
                     }
-                    String url = path + "/" + current.getDirectory().getName();
-                    xb.writeAnchor(url, page.getTitle(), null, page.getDescription());
+                    url = path + "/" + current.getDirectory().getName();
                 } else {
-                    String url = path + "/" + p.getName();
-                    xb.writeAnchor(url, "TODO " + p.getName(), null, "TODO descr");
+                    url = path + "/" + p.getName();
                 }
+                xb.writeAnchor(url, page.getTitle(), null, page.getDescription());
                 xb.closeElement("li");
             }
+        }
+        if(!firstChild) {
+            xb.closeElement("ul");
         }
     }
 

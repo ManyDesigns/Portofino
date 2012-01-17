@@ -40,16 +40,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -65,16 +64,9 @@ public class Dispatcher {
             LoggerFactory.getLogger(Dispatcher.class);
 
     protected final Application application;
-    protected final JAXBContext jaxbContext;
 
     public Dispatcher(Application application) {
         this.application = application;
-
-        try {
-            jaxbContext = JAXBContext.newInstance("com.manydesigns.portofino.model.pages");
-        } catch (JAXBException e) {
-            throw new Error("Can't instantiate pages jaxb context", e);
-        }
     }
 
     public Dispatch createDispatch(HttpServletRequest request) {
@@ -105,7 +97,7 @@ public class Dispatcher {
 
         File rootDir = application.getPagesDir();
         try {
-            Page rootPage = getPage(rootDir);
+            Page rootPage = application.getPage(rootDir);
             PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage);
             pagePath.add(rootPageInstance);
             makePageInstancePath(pagePath, fragmentsIterator, rootPageInstance);
@@ -151,14 +143,10 @@ public class Dispatcher {
             String nextFragment = fragmentsIterator.next();
             File childDirectory = new File(currentDirectory, nextFragment);
             if(childDirectory.isDirectory()) {
-                Page page = getPage(childDirectory);
+                Page page = application.getPage(childDirectory);
                 PageInstance pageInstance = new PageInstance(parentPageInstance, childDirectory, application, page);
                 Class<?> actionClass = getActionClass(childDirectory);
-                if(isValidActionClass(actionClass)) {
-                    pageInstance.setActionClass((Class<PortofinoAction>) actionClass);
-                } else {
-                    throw new RuntimeException("Invalid action class for " + nextFragment + ": " + actionClass); //TODO
-                }
+                pageInstance.setActionClass((Class<PortofinoAction>) actionClass);
                 pagePath.add(pageInstance);
                 makePageInstancePath(pagePath, fragmentsIterator, pageInstance);
                 return;
@@ -169,19 +157,6 @@ public class Dispatcher {
                 }
                 parentPageInstance.getParameters().add(nextFragment);
             }
-        }
-    }
-
-    public Page getPage(File directory) throws JAXBException, IOException {
-        File pageFile = new File(directory, "page.xml");
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        FileInputStream in = new FileInputStream(pageFile);
-        try {
-            Page page = (Page) unmarshaller.unmarshal(in);
-            application.getModel().init(page);
-            return page;
-        } finally {
-            in.close();
         }
     }
 
@@ -196,12 +171,25 @@ public class Dispatcher {
         return true;
     }
 
-    public static Class<?> getActionClass(File file) {
-        try {
-            return ScriptingUtil.getGroovyClass(file, "action");
-        } catch (Exception e) {
-            logger.error("Couldn't load script for " + file, e);
-            return null;
+    //TODO!!!
+    private static final ConcurrentMap<File, Class<?>> actionClassCache = new ConcurrentHashMap<File, Class<?>>();
+
+    public Class<?> getActionClass(File file) {
+        Class<?> actionClass = actionClassCache.get(file);
+        if(actionClass != null) {
+            return actionClass;
+        } else {
+            try {
+                actionClass = ScriptingUtil.getGroovyClass(file, "action");
+            } catch (IOException e) {
+                throw new RuntimeException("Couldn't load action class for " + file.getName(), e); //TODO
+            }
+            if(isValidActionClass(actionClass)) {
+                actionClassCache.put(file, actionClass);
+                return actionClass;
+            } else {
+                throw new RuntimeException("Invalid action class for " + file.getName() + ": " + actionClass); //TODO
+            }
         }
     }
 

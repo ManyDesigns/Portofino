@@ -34,6 +34,7 @@ import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
@@ -114,6 +115,7 @@ public interface Application {
 
     Model getModel();
     void syncDataModel(String databaseName) throws Exception;
+    Page getPage(File directory);
 
     //**************************************************************************
     // Persistance

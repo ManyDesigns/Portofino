@@ -109,13 +109,13 @@ public class ModelActionResolver extends NameBasedActionResolver {
                 if(pageInstance.getActionBean() != null) {
                     return pageInstance.getActionBean();
                 } else {
-                    ActionBean actionBean = super.makeNewActionBean(type, context);
                     if(Dispatcher.isValidActionClass(type)) {
+                        ActionBean actionBean = super.makeNewActionBean(type, context);
                         pageInstance.setActionBean((PortofinoAction) actionBean);
+                        return actionBean;
                     } else {
-                        throw new Exception("Invalid action bean for dispatch: " + actionBean); //TODO
+                        throw new Exception("Invalid action bean type for dispatch: " + type); //TODO
                     }
-                    return actionBean;
                 }
             }
         }
@@ -135,7 +135,7 @@ public class ModelActionResolver extends NameBasedActionResolver {
     protected Dispatch getDispatch(String path) {
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
         Dispatch dispatch = (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
-        if(path.equals(dispatch.getOriginalPath())) {
+        if(dispatch != null && path.equals(dispatch.getOriginalPath())) {
             return dispatch;
         } else {
             return dispatcher.createDispatch(request.getContextPath(), path);

@@ -31,6 +31,7 @@ package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.model.pages.Layout;
 import com.manydesigns.portofino.model.pages.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,5 +135,13 @@ public class PageInstance {
 
     public PageInstance getParent() {
         return parent;
+    }
+
+    public Layout getLayout() {
+        if(getParameters().isEmpty()) {
+            return getPage().getLayout();
+        } else {
+            return getPage().getDetailLayout();
+        }
     }
 }

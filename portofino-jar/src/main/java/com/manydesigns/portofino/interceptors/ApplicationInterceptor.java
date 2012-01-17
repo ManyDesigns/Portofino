@@ -115,7 +115,9 @@ public class ApplicationInterceptor implements Interceptor {
                     new Navigation(application, dispatch, groups, admin);
             request.setAttribute(RequestAttributes.NAVIGATION, navigation);
 
+            int i = 0;
             for(PageInstance page : dispatch.getPageInstancePath()) {
+                i++;
                 if(page.getParent() == null) {
                     continue; //Don't instantiate root
                 }
@@ -123,6 +125,8 @@ public class ApplicationInterceptor implements Interceptor {
                 configureActionBean(actionBean, page, application);
                 Resolution resolution = actionBean.prepare(page, actionContext);
                 if(resolution != null) {
+                    String pathUrl = dispatch.getPathUrl(i);
+                    request.setAttribute("redirectUrl", request.getContextPath() + pathUrl);
                     logger.error("Page realization failed for {}", page);
                     return resolution;
                 }
@@ -150,34 +154,50 @@ public class ApplicationInterceptor implements Interceptor {
     protected void configureActionBean
             (PortofinoAction actionBean, PageInstance pageInstance, Application application)
             throws JAXBException, IOException {
-        Class<?> configurationClass = actionBean.getConfigurationClass();
-        String configurationPackage = configurationClass.getPackage().getName();
-
         //TODO!!!
         File pageFile = new File(pageInstance.getDirectory(), "configuration.xml");
-        if(pageFile.exists()) {
-            JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            FileInputStream in = new FileInputStream(pageFile);
-            try {
-                Object configuration = unmarshaller.unmarshal(in);
-                if(configuration instanceof ModelObject) {
-                    Model model = application.getModel();
-                    if(model != null) {
-                        model.init((ModelObject) configuration);
-                    } else {
-                        logger.error("Model is null, cannot init configuration");
+        Object configuration = getConfigurationFromCache(pageFile);
+        if(configuration != null) {
+            pageInstance.setConfiguration(configuration);
+        } else {
+            if(pageFile.exists()) {
+                Class<?> configurationClass = actionBean.getConfigurationClass();
+                String configurationPackage = configurationClass.getPackage().getName();
+                JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
+                Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+                FileInputStream in = new FileInputStream(pageFile);
+                try {
+                    configuration = unmarshaller.unmarshal(in);
+                    if(configuration instanceof ModelObject) {
+                        Model model = application.getModel();
+                        if(model != null) {
+                            model.init((ModelObject) configuration);
+                        } else {
+                            logger.error("Model is null, cannot init configuration");
+                        }
                     }
+                    if(!configurationClass.isInstance(configuration)) {
+                        logger.error("Invalid configuration: expected " + configurationClass + ", got " + configuration);
+                        return;
+                    }
+                    putConfigurationInCache(pageFile, configuration);
+                    pageInstance.setConfiguration(configuration);
+                } finally {
+                    in.close();
                 }
-                if(!configurationClass.isInstance(configuration)) {
-                    logger.error("Invalid configuration: expected " + configurationClass + ", got " + configuration);
-                    return;
-                }
-                pageInstance.setConfiguration(configuration);
-            } finally {
-                in.close();
             }
         }
+    }
+
+    //TODO!!!
+    //private ConcurrentMap<File, Object> configurationCache = new ConcurrentHashMap<File, Object>();
+
+    private void putConfigurationInCache(File pageFile, Object configuration) {
+        //configurationCache.put(pageFile, configuration);
+    }
+
+    private Object getConfigurationFromCache(File pageFile) {
+        return null; //configurationCache.get(pageFile);
     }
 
 }
