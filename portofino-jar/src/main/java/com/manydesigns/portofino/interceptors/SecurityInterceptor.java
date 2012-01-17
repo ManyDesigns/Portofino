@@ -35,9 +35,7 @@ import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.Permissions;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ExecutionContext;
@@ -121,17 +119,17 @@ public class
             Dispatch dispatch =
                 (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
             String resource;
+            boolean allowed;
             if(dispatch != null) {
-                PageInstance pageInstance = dispatch.getLastPageInstance();
-                Page page = pageInstance.getPage();
-                permissions = page.getPermissions();
                 resource = dispatch.getPathUrl();
+                allowed = SecurityLogic.hasPermissions(dispatch, groups, handler);
             } else {
-                permissions = new Permissions();
                 resource = request.getRequestURI();
+                permissions = new Permissions();
+                allowed = SecurityLogic.hasPermissions(permissions, groups, handler, actionBean.getClass());
             }
-            if(!SecurityLogic.hasPermissions(permissions, groups, handler, actionBean.getClass())) {
-                logger.info("User does not match page permissions for {}. User's groups: {}",
+            if(!allowed) {
+                logger.info("User is not allowed for {}. User's groups: {}",
                         resource, ArrayUtils.toString(groups));
                 return handleAnonymousOrUnauthorized(userId, request);
             }

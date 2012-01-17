@@ -33,12 +33,16 @@ import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.pages.Layout;
 import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.scripting.ScriptingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -54,8 +58,10 @@ public class PageInstance {
     protected final List<String> parameters;
     protected final PageInstance parent;
     protected Object configuration;
-    protected Class<PortofinoAction> actionClass;
+    protected Class<? extends PortofinoAction> actionClass;
     protected PortofinoAction actionBean;
+
+    public static final String DETAIL = "_detail";
 
     //**************************************************************************
     // Logging
@@ -117,12 +123,38 @@ public class PageInstance {
         this.configuration = configuration;
     }
 
-    public void setActionClass(Class<PortofinoAction> actionClass) {
+    public void setActionClass(Class<? extends PortofinoAction> actionClass) {
         this.actionClass = actionClass;
     }
 
-    public Class<PortofinoAction> getActionClass() {
+    public Class<? extends PortofinoAction> getActionClass() {
+        if(actionClass == null) {
+            actionClass = getActionClass(directory);
+        }
         return actionClass;
+    }
+
+    //TODO!!!
+    private static final ConcurrentMap<File, Class<? extends PortofinoAction>> actionClassCache =
+            new ConcurrentHashMap<File, Class<? extends PortofinoAction>>();
+
+    protected Class<? extends PortofinoAction> getActionClass(File file) {
+        Class<? extends PortofinoAction> actionClass = actionClassCache.get(file);
+        if(actionClass != null) {
+            return actionClass;
+        } else {
+            try {
+                actionClass = (Class<? extends PortofinoAction>) ScriptingUtil.getGroovyClass(file, "action");
+            } catch (IOException e) {
+                throw new RuntimeException("Couldn't load action class for " + file.getName(), e); //TODO
+            }
+            if(Dispatcher.isValidActionClass(actionClass)) {
+                actionClassCache.put(file, actionClass);
+                return actionClass;
+            } else {
+                throw new RuntimeException("Invalid action class for " + file.getName() + ": " + actionClass); //TODO
+            }
+        }
     }
 
     public PortofinoAction getActionBean() {
@@ -143,5 +175,18 @@ public class PageInstance {
         } else {
             return getPage().getDetailLayout();
         }
+    }
+
+    public Page getChildPage(String name) {
+        File childDirectory = getChildPageDirectory(name);
+        return application.getPage(childDirectory);
+    }
+
+    public File getChildPageDirectory(String name) {
+        File baseDir = directory;
+        if(!parameters.isEmpty()) {
+            baseDir = new File(baseDir, DETAIL);
+        }
+        return new File(baseDir, name);
     }
 }

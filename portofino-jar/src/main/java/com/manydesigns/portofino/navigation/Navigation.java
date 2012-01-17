@@ -90,13 +90,7 @@ public class Navigation implements XhtmlFragment {
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         String contextPath = dispatch.getContextPath();
         int rootPageIndex = dispatch.getClosestSubtreeRootIndex();
-        //PageInstance rootPageInstance = dispatch.getPageInstance(rootPageIndex);
         PageInstance[] pageInstances = dispatch.getPageInstancePath(rootPageIndex);
-        /*if(rootPageInstance.getParent() == null) {
-            pageInstances = new ArrayList<PageInstance>(); //TODO rootPageInstance.getChildPageInstances();
-        } else {
-            pageInstances = Collections.singletonList(rootPageInstance);
-        }*/
         String prefix = contextPath + dispatch.getPathUrl(rootPageIndex);
         print(prefix, pageInstances, xb);
     }
@@ -109,14 +103,9 @@ public class Navigation implements XhtmlFragment {
         List<ChildPage> siblings = new ArrayList<ChildPage>();
         PageInstance last = null;
         for (PageInstance current : pageInstances) {
-            Page page = current.getPage();
-            if (!skipPermissions && !SecurityLogic.hasPermissions(page.getPermissions(), groups, AccessLevel.VIEW)) {
+            if (!skipPermissions && !SecurityLogic.hasPermissions(current, groups, AccessLevel.VIEW)) {
                 break;
             }
-
-            /*if(!page.isShowInNavigation()) {
-                continue;
-            }*/
 
             if(current.getParent() != null) {
                 //Root doesn't print anything for itself
@@ -135,21 +124,29 @@ public class Navigation implements XhtmlFragment {
         }
 
         boolean firstChild = true;
-        for (ChildPage p : siblings) {
-            if(!p.isShowInNavigation()) {
-                continue;
+        if(!siblings.isEmpty()) {
+            for (ChildPage p : siblings) {
+                if(!p.isShowInNavigation()) {
+                    continue;
+                }
+                assert last != null;
+                File pageDir = last.getChildPageDirectory(p.getName());
+                Page page = application.getPage(pageDir);
+                PageInstance pageInstance = new PageInstance(last, pageDir, application, page);
+                if (!skipPermissions && !SecurityLogic.hasPermissions(pageInstance, groups, AccessLevel.VIEW)) {
+                    continue;
+                }
+
+                if(firstChild) {
+                    if(!first) { xb.writeHr(); }
+                    xb.openElement("ul");
+                    firstChild = false;
+                }
+                xb.openElement("li");
+                String url = path + "/" + p.getName();
+                xb.writeAnchor(url, page.getTitle(), null, page.getDescription());
+                xb.closeElement("li");
             }
-            if(firstChild) {
-                if(!first) { xb.writeHr(); }
-                xb.openElement("ul");
-                firstChild = false;
-            }
-            xb.openElement("li");
-            String url = path + "/" + p.getName();
-            File pageDir = new File(last.getDirectory(), p.getName());
-            Page page = application.getPage(pageDir);
-            xb.writeAnchor(url, page.getTitle(), null, page.getDescription());
-            xb.closeElement("li");
         }
         if(!firstChild) {
             xb.closeElement("ul");
@@ -157,7 +154,8 @@ public class Navigation implements XhtmlFragment {
     }
 
     private void printNavigationElement
-            (String path, XhtmlBuffer xb, PageInstance current, List<ChildPage> siblings, boolean first) {
+            (String path, XhtmlBuffer xb, PageInstance current,
+             List<ChildPage> siblings, boolean first) {
         boolean firstChild = true;
         if(!siblings.isEmpty()) {
             for (ChildPage p : siblings) {
@@ -165,13 +163,16 @@ public class Navigation implements XhtmlFragment {
                     continue;
                 }
                 Page page;
+                PageInstance pageInstance;
                 if(p.getName().equals(current.getDirectory().getName())) {
                     page = current.getPage();
+                    pageInstance = current;
                 } else {
-                    File pageDir = new File(current.getParent().getDirectory(), p.getName());
+                    File pageDir = current.getParent().getChildPageDirectory(p.getName());
                     page = application.getPage(pageDir);
+                    pageInstance = new PageInstance(current, pageDir, application, page);
                 }
-                if (!skipPermissions && !SecurityLogic.hasPermissions(page.getPermissions(), groups, AccessLevel.VIEW)) {
+                if (!skipPermissions && !SecurityLogic.hasPermissions(pageInstance, groups, AccessLevel.VIEW)) {
                     continue;
                 }
 
@@ -203,19 +204,6 @@ public class Navigation implements XhtmlFragment {
 
     protected boolean isSelected(PageInstance pageInstance) {
         return pageInstance == dispatch.getLastPageInstance();
-    }
-
-    protected boolean isInPath(PageInstance pageInstance) {
-        return findInPath(pageInstance) != null;
-    }
-
-    protected PageInstance findInPath(PageInstance pageInstance) {
-        for (PageInstance current : dispatch.getPageInstancePath()) {
-            if (pageInstance == current) {
-                return current;
-            }
-        }
-        return null;
     }
 
     //**************************************************************************

@@ -55,7 +55,7 @@ public class Layout implements ModelObject {
     //**************************************************************************
 
     protected String layout;
-    protected final Self self;
+    protected Self self;
     protected final ArrayList<ChildPage> childPages;
 
     //**************************************************************************
@@ -69,7 +69,6 @@ public class Layout implements ModelObject {
     //**************************************************************************
 
     public Layout() {
-        self = new Self();
         childPages = new ArrayList<ChildPage>();
     }
 
@@ -90,7 +89,9 @@ public class Layout implements ModelObject {
     }
 
     public void visitChildren(ModelVisitor visitor) {
-        visitor.visit(self);
+        if(self != null) {
+            visitor.visit(self);
+        }
         for (ChildPage current : childPages) {
             visitor.visit(current);
         }
@@ -116,6 +117,10 @@ public class Layout implements ModelObject {
     @XmlElement
     public Self getSelf() {
         return self;
+    }
+
+    public void setSelf(Self self) {
+        this.self = self;
     }
 
     @XmlElementWrapper(name="childPages")

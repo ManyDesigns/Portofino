@@ -216,6 +216,11 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
 
     protected void setupPortlets(PageInstance pageInstance, String myself) {
         Layout layout = pageInstance.getLayout();
+        if(layout == null) {
+            PortletInstance myPortletInstance = new PortletInstance("p", 0, myself);
+            portlets.put(DEFAULT_LAYOUT_CONTAINER, myPortletInstance);
+            return;
+        }
         Self self = layout.getSelf();
         int myOrder = self.getActualOrder();
         PortletInstance myPortletInstance = new PortletInstance("p", myOrder, myself);

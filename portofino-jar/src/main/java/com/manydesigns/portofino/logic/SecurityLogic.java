@@ -46,6 +46,7 @@ import com.manydesigns.portofino.system.model.users.annotations.RequiresAdminist
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.ActionBean;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.ArrayUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -56,9 +57,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -118,6 +117,46 @@ public class SecurityLogic {
         }
     }
 
+    public static boolean hasPermissions(Dispatch dispatch, Collection<String> groups, Method handler) {
+        logger.debug("Checking action permissions");
+        return hasPermissions(dispatch.getLastPageInstance(), groups, handler);
+    }
+
+    public static boolean hasPermissions(PageInstance instance, Collection<String> groups, Method handler) {
+        logger.debug("Checking action permissions");
+        Class<?> theClass = instance.getActionClass();
+        RequiresPermissions requiresPermissions = getRequiresPermissionsAnnotation(handler, theClass);
+        if(requiresPermissions != null) {
+            AccessLevel accessLevel = requiresPermissions.level();
+            String[] permissions = requiresPermissions.permissions();
+            return hasPermissions(instance, groups, accessLevel, permissions);
+        }
+        return true;
+    }
+
+    public static boolean hasPermissions
+            (PageInstance instance, Collection<String> groups, AccessLevel accessLevel, String... permissions) {
+        Permissions configuration = new Permissions();
+        List<PageInstance> path = new LinkedList<PageInstance>();
+        PageInstance current = instance;
+        while (current != null) {
+            path.add(0, current);
+            current = current.getParent();
+        }
+        for(PageInstance p : path) {
+            Permissions localPermissions = p.getPage().getPermissions();
+            Map<String, AccessLevel> parentLevels = localPermissions.getActualLevels();
+            for(Map.Entry<String, AccessLevel> entry : parentLevels.entrySet()) {
+                String key = entry.getKey();
+                AccessLevel value = entry.getValue();
+                if(value == AccessLevel.DENY || configuration.getActualLevels().get(key) == null) {
+                    configuration.getActualLevels().put(key, value);
+                }
+            }
+        }
+        return hasPermissions(configuration, groups, accessLevel, permissions);
+    }
+
     public static boolean hasPermissions
             (Permissions configuration, Collection<String> groups, Method handler, Class<?> theClass) {
         logger.debug("Checking action permissions");
@@ -150,8 +189,6 @@ public class SecurityLogic {
 
     public static boolean hasPermissions
             (Permissions configuration, Collection<String> groups, AccessLevel level, String... permissions) {
-        return true; //TODO ripristinare
-        /*
         boolean hasLevel = level == null;
         boolean hasPermissions = true;
         Map<String, Boolean> permMap = new HashMap<String, Boolean>(permissions.length);
@@ -183,7 +220,7 @@ public class SecurityLogic {
         if(!hasPermissions) {
             logger.debug("User does not have permissions. User's groups: {}", ArrayUtils.toString(groups));
         }
-        return hasPermissions;*/
+        return hasPermissions;
     }
 
     public static String encryptPassword(String password) {

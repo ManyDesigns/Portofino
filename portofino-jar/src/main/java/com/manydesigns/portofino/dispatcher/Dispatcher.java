@@ -34,7 +34,6 @@ import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.Page;
-import com.manydesigns.portofino.scripting.ScriptingUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,8 +46,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -145,14 +142,12 @@ public class Dispatcher {
             if(childDirectory.isDirectory()) {
                 Page page = application.getPage(childDirectory);
                 PageInstance pageInstance = new PageInstance(parentPageInstance, childDirectory, application, page);
-                Class<?> actionClass = getActionClass(childDirectory);
-                pageInstance.setActionClass((Class<PortofinoAction>) actionClass);
                 pagePath.add(pageInstance);
                 makePageInstancePath(pagePath, fragmentsIterator, pageInstance);
                 return;
             } else {
                 if(!params) {
-                    currentDirectory = new File(currentDirectory, "_detail"); //TODO
+                    currentDirectory = new File(currentDirectory, PageInstance.DETAIL);
                     params = true;
                 }
                 parentPageInstance.getParameters().add(nextFragment);
@@ -169,28 +164,6 @@ public class Dispatcher {
             return false;
         }
         return true;
-    }
-
-    //TODO!!!
-    private static final ConcurrentMap<File, Class<?>> actionClassCache = new ConcurrentHashMap<File, Class<?>>();
-
-    public Class<?> getActionClass(File file) {
-        Class<?> actionClass = actionClassCache.get(file);
-        if(actionClass != null) {
-            return actionClass;
-        } else {
-            try {
-                actionClass = ScriptingUtil.getGroovyClass(file, "action");
-            } catch (IOException e) {
-                throw new RuntimeException("Couldn't load action class for " + file.getName(), e); //TODO
-            }
-            if(isValidActionClass(actionClass)) {
-                actionClassCache.put(file, actionClass);
-                return actionClass;
-            } else {
-                throw new RuntimeException("Invalid action class for " + file.getName() + ": " + actionClass); //TODO
-            }
-        }
     }
 
     protected Dispatch checkDispatch(Dispatch dispatch) {
