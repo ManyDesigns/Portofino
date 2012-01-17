@@ -42,7 +42,7 @@
         <portofino:buttons list="page-create" cssClass="contentButton"/>
         <script type="text/javascript">
             var rootPath = "<%= request.getContextPath() %>";
-            var rootBreadcrumbs = ""; //"<span class='breadcrumb-item'>${actionBean.application.model.rootPage.title}</span>";
+            var rootBreadcrumbs = "";
 
             var currentPath = "<%= actionBean.dispatch.getPathUrl() %>";
             var currentBreadcrumbs =

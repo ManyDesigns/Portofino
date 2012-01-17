@@ -177,6 +177,14 @@ public class PageInstance {
         }
     }
 
+    public void setLayout(Layout layout) {
+        if(getParameters().isEmpty()) {
+            getPage().setLayout(layout);
+        } else {
+            getPage().setDetailLayout(layout);
+        }
+    }
+
     public Page getChildPage(String name) {
         File childDirectory = getChildPageDirectory(name);
         return application.getPage(childDirectory);
@@ -188,5 +196,9 @@ public class PageInstance {
             baseDir = new File(baseDir, DETAIL);
         }
         return new File(baseDir, name);
+    }
+
+    public String getName() {
+        return directory.getName();
     }
 }

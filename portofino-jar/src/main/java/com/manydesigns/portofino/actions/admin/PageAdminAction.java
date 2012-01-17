@@ -161,7 +161,11 @@ public class PageAdminAction extends AbstractActionBean {
     protected void updateLayout(String layoutContainer, String[] portletWrapperIds) {
         //TODO verificare
         PageInstance myparent = dispatch.getLastPageInstance().getParent();
-        Layout parentLayout = myparent.getPage().getLayout();
+        Layout parentLayout = myparent.getLayout();
+        if(parentLayout == null) {
+            parentLayout = new Layout();
+            myparent.setLayout(parentLayout);
+        }
         for(int i = 0; i < portletWrapperIds.length; i++) {
             String current = portletWrapperIds[i];
             if("p".equals(current)) {
@@ -222,10 +226,8 @@ public class PageAdminAction extends AbstractActionBean {
     }
 
     private Resolution doCreateNewPage() throws IllegalAccessException, InvocationTargetException {
-        return null;
-        //TODO ripristinare
-        /*
-        prepareNewPageForm();
+        return null; //TODO ripristinare
+        /*prepareNewPageForm();
         newPageForm.readFromRequest(context.getRequest());
         if(newPageForm.validate()) {
             NewPage newPage = new NewPage();
@@ -237,8 +239,6 @@ public class PageAdminAction extends AbstractActionBean {
             copyModelObject(newPage, page);
             String pageId = RandomUtil.createRandomId();
             page.setId(pageId);
-            page.setLayoutContainer(PortletAction.DEFAULT_LAYOUT_CONTAINER);
-            page.setLayoutOrder("0");
             String configurePath;
             synchronized (application) {
                 switch (insertPosition) {
@@ -279,22 +279,24 @@ public class PageAdminAction extends AbstractActionBean {
 
     @RequiresAdministrator
     public Resolution deletePage() {
-        return null; //TODO ripristinare
-        /*
         PageInstance parentPageInstance = dispatch.getParentPageInstance();
-        Page page = getPage();
         synchronized (application) {
-            if(page.getParent() == null) {
+            if(parentPageInstance.getParent() == null) {
                 SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.root"));
-            }  else if(PageLogic.isLandingPage(model.getRootPage(), page)) {
-                SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.landing"));
+            /*} else if(PageLogic.isLandingPage(application, page)) { //TODO ripristinare
+                SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.landing"));*/
             } else {
-                parentPageInstance.removeChild(page);
-                saveModel();
+                try {
+                    String pageName = dispatch.getLastPageInstance().getName();
+                    File childPageDirectory = parentPageInstance.getChildPageDirectory(pageName);
+                    FileUtils.deleteDirectory(childPageDirectory);
+                } catch (IOException e) {
+                    logger.error("Error deleting page directory", e);
+                }
                 return new RedirectResolution(dispatch.getParentPathUrl());
             }
         }
-        return new RedirectResolution(dispatch.getOriginalPath());*/
+        return new RedirectResolution(dispatch.getOriginalPath());
     }
 
     public Page getPage() {

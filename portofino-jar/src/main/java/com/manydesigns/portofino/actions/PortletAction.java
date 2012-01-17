@@ -42,6 +42,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -133,10 +136,8 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
     }*/
 
     public void setupReturnToParentTarget() {
-        //TODO!!!
-
-        /*
-        PageInstance[] pageInstancePath =
+        //TODO ripristinare
+        /*PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
         boolean hasPrevious = !getPage().isSubtreeRoot() && pageInstancePath.length > 1;
         returnToParentTarget = null;
@@ -416,8 +417,16 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
         if(!edit.embedInParent && !edit.showInNavigation) {
             SessionMessages.addWarningMessage(getMessage("page.warnNotShowInNavigationNotEmbedded"));
         }
-        page.getLayout().setLayout(edit.layout);
+        page.getLayout().setLayout(edit.layout); //TODO detailLayout
 
+        File pageFile = new File(pageInstance.getDirectory(), "page.xml");
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(Page.class.getPackage().getName());
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.marshal(page, pageFile);
+        } catch (JAXBException e) {
+            throw new Error("Can't instantiate pages jaxb context", e);
+        }
         updateScript();
     }
 
@@ -559,7 +568,7 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
 
     protected void updateScript() {
         File groovyScriptFile =
-                ScriptingUtil.getGroovyScriptFile(application.getAppScriptsDir(), pageInstance.getPage().getId());
+                ScriptingUtil.getGroovyScriptFile(pageInstance.getDirectory(), "action");
         if(!StringUtils.isBlank(script)) {
             FileWriter fw = null;
             try {
