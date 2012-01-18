@@ -49,6 +49,7 @@ import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
+import org.apache.commons.io.IOUtils;
 import org.jfree.chart.JFreeChart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +108,27 @@ public class ChartAction extends PortletAction {
 
     public static final Logger logger =
             LoggerFactory.getLogger(ChartAction.class);
+
+    //--------------------------------------------------------------------------
+    // Scripting
+    //--------------------------------------------------------------------------
+
+    public static final String SCRIPT_TEMPLATE;
+
+    static {
+        String scriptTemplate;
+        try {
+            scriptTemplate = IOUtils.toString(ChartAction.class.getResourceAsStream("script_template.txt"));
+        } catch (Exception e) {
+            throw new Error("Can't load script template", e);
+        }
+        SCRIPT_TEMPLATE = scriptTemplate;
+    }
+
+    @Override
+    public String getScriptTemplate() {
+        return SCRIPT_TEMPLATE;
+    }
 
     //**************************************************************************
     // Action default execute method

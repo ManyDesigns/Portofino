@@ -30,7 +30,9 @@
 package com.manydesigns.portofino.model.pages;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
 
 /**
@@ -43,13 +45,30 @@ public class PageUtils {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
+    protected static final JAXBContext pagesJaxbContext;
+
+    static {
+        try {
+            pagesJaxbContext = JAXBContext.newInstance(Page.class.getPackage().getName());
+        } catch (JAXBException e) {
+            throw new Error("Can't instantiate pages jaxb context", e);
+        }
+    }
+
     public static File savePage(File directory, Page page) throws Exception {
         File pageFile = new File(directory, "page.xml");
-        JAXBContext jaxbContext = JAXBContext.newInstance(Page.class.getPackage().getName());
-        Marshaller marshaller = jaxbContext.createMarshaller();
+        Marshaller marshaller = pagesJaxbContext.createMarshaller();
         marshaller.marshal(page, pageFile);
         return pageFile;
     }
+
+    public static Page loadPage(File directory) throws Exception {
+        File pageFile = new File(directory, "page.xml");
+        Unmarshaller unmarshaller = pagesJaxbContext.createUnmarshaller();
+        Page page = (Page) unmarshaller.unmarshal(pageFile);
+        return page;
+    }
+
 
     public static File saveConfiguration(File directory, Object configuration) throws Exception {
         String configurationPackage = configuration.getClass().getPackage().getName();

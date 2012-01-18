@@ -57,9 +57,9 @@ function confirmDeletePage(pageId, contextPath) {
     return false;
 }
 
-function showMovePageDialog(pageId, contextPath) {
+function showMovePageDialog(pagePath, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/actions/admin/page/dialog?chooseNewLocation&pageId=" + pageId, function() {
+    dialogDiv.load(contextPath + "/actions/admin/page/dialog?chooseNewLocation&pagePath=" + pagePath, function() {
         dialogDiv.find("#dialog-move-page").dialog({
             modal: true,
             width: 500,

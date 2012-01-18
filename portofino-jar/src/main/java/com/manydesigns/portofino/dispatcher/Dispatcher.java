@@ -139,7 +139,7 @@ public class Dispatcher {
         while(fragmentsIterator.hasNext()) {
             String nextFragment = fragmentsIterator.next();
             File childDirectory = new File(currentDirectory, nextFragment);
-            if(childDirectory.isDirectory()) {
+            if(childDirectory.isDirectory() && !PageInstance.DETAIL.equals(childDirectory.getName())) {
                 Page page = application.getPage(childDirectory);
                 PageInstance pageInstance = new PageInstance(parentPageInstance, childDirectory, application, page);
                 pagePath.add(pageInstance);

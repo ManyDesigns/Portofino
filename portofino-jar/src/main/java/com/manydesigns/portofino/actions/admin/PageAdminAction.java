@@ -112,7 +112,7 @@ public class PageAdminAction extends AbstractActionBean {
     protected static final String[][] NEW_PAGE_SETUP_FIELDS = {
             {"actionClassName", "fragment", "title", "description", "insertPositionName"}};
     protected Form newPageForm;
-    protected String destinationPageId;
+    protected String destinationPagePath;
     protected String fragment;
     protected String title;
 
@@ -266,17 +266,31 @@ public class PageAdminAction extends AbstractActionBean {
             String fragment = newPage.getFragment();
             String configurePath;
             File directory;
+            File parentDirectory;
+            Page parentPage;
+            Layout parentLayout;
             switch (insertPosition) {
                 case TOP:
-                    directory = new File(application.getPagesDir(), fragment);
+                    parentDirectory = application.getPagesDir();
+                    directory = new File(parentDirectory, fragment);
+                    parentPage = application.getPage(parentDirectory);
+                    parentLayout = parentPage.getLayout();
                     configurePath = "";
                     break;
                 case CHILD:
-                    directory = dispatch.getLastPageInstance().getChildPageDirectory(fragment);
+                    PageInstance lastPageInstance = dispatch.getLastPageInstance();
+                    parentPage = lastPageInstance.getPage();
+                    parentLayout = lastPageInstance.getLayout();
+                    parentDirectory = lastPageInstance.getDirectory();
+                    directory = lastPageInstance.getChildPageDirectory(fragment);
                     configurePath = dispatch.getOriginalPath();
                     break;
                 case SIBLING:
-                    directory = dispatch.getPageInstance(-2).getChildPageDirectory(fragment);
+                    PageInstance parentPageInstance = dispatch.getPageInstance(-2);
+                    parentPage = parentPageInstance.getPage();
+                    parentLayout = parentPageInstance.getLayout();
+                    parentDirectory = parentPageInstance.getDirectory();
+                    directory = parentPageInstance.getChildPageDirectory(fragment);
                     configurePath = dispatch.getParentPathUrl();
                     break;
                 default:
@@ -290,6 +304,7 @@ public class PageAdminAction extends AbstractActionBean {
             }
             if(directory.mkdir()) {
                 try {
+                    logger.debug("Creating the new child page in directory: {}", directory);
                     PageUtils.savePage(directory, page);
                     PageUtils.saveConfiguration(directory, configuration);
                     File groovyScriptFile =
@@ -301,6 +316,12 @@ public class PageAdminAction extends AbstractActionBean {
                     } finally {
                         IOUtils.closeQuietly(fw);
                     }
+                    logger.debug("Registering the new child page in parent page (directory: {})", parentDirectory);
+                    ChildPage childPage = new ChildPage();
+                    childPage.setName(directory.getName());
+                    childPage.setShowInNavigation(true);
+                    parentLayout.getChildPages().add(childPage);
+                    PageUtils.savePage(parentDirectory, parentPage);
                 } catch (Exception e) {
                     logger.error("Exception saving page configuration");
                     SessionMessages.addErrorMessage(getMessage("page.create.failed"));
@@ -357,48 +378,70 @@ public class PageAdminAction extends AbstractActionBean {
 
     @RequiresAdministrator
     public Resolution movePage() {
-        return null; //TODO ripristinare
-
-        /*
-        if(destinationPageId == null) {
+        if(destinationPagePath == null) {
             SessionMessages.addErrorMessage(getMessage("page.move.noDestination"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
-        Page page = getPage();
-        synchronized (application) {
-            if(page.getParent() == null) {
-                SessionMessages.addErrorMessage(getMessage("page.move.forbidden.root"));
-            } else {
-                boolean detail = destinationPageId.endsWith("-detail");
-                if(detail) {
-                    destinationPageId = destinationPageId.substring(0, destinationPageId.length() - 7);
-                }
-                Page newParent = model.getRootPage().findDescendantPageById(destinationPageId);
-                if(!SecurityLogic.isAdministrator(context.getRequest())) {
-                    List<String> groups =
-                            (List<String>) context.getRequest().getAttribute(RequestAttributes.GROUPS);
-                    if(!SecurityLogic.hasPermissions(newParent.getPermissions(), groups, AccessLevel.EDIT)) {
-                        SessionMessages.addErrorMessage(getMessage("page.move.forbidden.accessLevel"));
-                        return new RedirectResolution(dispatch.getOriginalPath());
-                    }
-                }
-                if(newParent != null) {
-                    page.getParent().removeChild(page);
-                    if(detail) {
-                        ((CrudPage) newParent).addDetailChild(page);
-                    } else {
-                        newParent.addChild(page);
-                    }
-                    saveModel();
-                    return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
-                } else {
-                    String msg = MessageFormat.format(getMessage("page.move.invalidDestination"), destinationPageId);
-                    SessionMessages.addErrorMessage(msg);
-                }
+        PageInstance pageInstance = dispatch.getLastPageInstance();
+        PageInstance oldParent = pageInstance.getParent();
+        if(oldParent == null) {
+            SessionMessages.addErrorMessage(getMessage("page.move.forbidden.root"));
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
+        Dispatcher dispatcher = new Dispatcher(application);
+        Dispatch destinationDispatch =
+                dispatcher.createDispatch(context.getRequest().getContextPath(), destinationPagePath);
+        //TODO gestione eccezioni
+        PageInstance newParent = destinationDispatch.getLastPageInstance();
+        if(!SecurityLogic.isAdministrator(context.getRequest())) {
+            List<String> groups =
+                    (List<String>) context.getRequest().getAttribute(RequestAttributes.GROUPS);
+            if(!SecurityLogic.hasPermissions(newParent, groups, AccessLevel.EDIT)) {
+                SessionMessages.addErrorMessage(getMessage("page.move.forbidden.accessLevel"));
+                return new RedirectResolution(dispatch.getOriginalPath());
             }
         }
+        if(newParent != null) { //TODO vedi sopra
+            File newDirectory = newParent.getChildPageDirectory(pageInstance.getName());
+            File newParentDirectory = newDirectory.getParentFile();
+            logger.debug("Ensuring that new parent directory {} exists", newParentDirectory);
+            newParentDirectory.mkdirs();
+            if(!newDirectory.exists()) {
+                try {
+                    logger.debug("Removing from old parent");
+                    Iterator<ChildPage> it = oldParent.getLayout().getChildPages().iterator();
+                    ChildPage oldChildPage = null;
+                    while (it.hasNext()) {
+                        oldChildPage = it.next();
+                        if(oldChildPage.getName().equals(pageInstance.getName())) {
+                            it.remove();
+                            break;
+                        }
+                    }
+                    PageUtils.savePage(oldParent.getDirectory(), oldParent.getPage());
+                    logger.debug("Moving directory");
+                    FileUtils.moveDirectory(pageInstance.getDirectory(), newDirectory);
+                    logger.debug("Registering the new child page in parent page (directory: {})",
+                            newDirectory);
+                    if(oldChildPage != null) {
+                        newParent.getLayout().getChildPages().add(oldChildPage);
+                    }
+                    PageUtils.savePage(newParent.getDirectory(), newParent.getPage());
+                } catch (Exception e) {
+                    logger.error("Couldn't move page", e);
+                    String msg = MessageFormat.format(getMessage("page.move.failed"), destinationPagePath);
+                    SessionMessages.addErrorMessage(msg);
+                }
+            } else {
+                String msg = MessageFormat.format(getMessage("page.move.destinationExists"), destinationPagePath);
+                SessionMessages.addErrorMessage(msg);
+            }
+            return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
+        } else {
+            String msg = MessageFormat.format(getMessage("page.move.invalidDestination"), destinationPagePath);
+            SessionMessages.addErrorMessage(msg);
+        }
         return new RedirectResolution(dispatch.getOriginalPath());
-        */
     }
 
     @RequiresAdministrator
@@ -406,7 +449,7 @@ public class PageAdminAction extends AbstractActionBean {
         return null; //TODO ripristinare
 
         /*
-        if(destinationPageId == null) {
+        if(destinationPagePath == null) {
             SessionMessages.addErrorMessage(getMessage("page.copy.noDestination"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
@@ -419,12 +462,12 @@ public class PageAdminAction extends AbstractActionBean {
             if(page.getParent() == null) {
                 SessionMessages.addErrorMessage(getMessage("page.copy.forbidden.root"));
             } else {
-                boolean detail = destinationPageId.endsWith("-detail");
+                boolean detail = destinationPagePath.endsWith("-detail");
                 if(detail) {
                     int length = "-detail".length();
-                    destinationPageId = destinationPageId.substring(0, destinationPageId.length() - length);
+                    destinationPagePath = destinationPagePath.substring(0, destinationPagePath.length() - length);
                 }
-                final Page newParent = model.getRootPage().findDescendantPageById(destinationPageId);
+                final Page newParent = model.getRootPage().findDescendantPageById(destinationPagePath);
                 if(!SecurityLogic.isAdministrator(context.getRequest())) {
                     List<String> groups = (List<String>) context.getRequest().getAttribute(RequestAttributes.GROUPS);
                     if(!SecurityLogic.hasPermissions(newParent.getPermissions(), groups, AccessLevel.EDIT)) {
@@ -460,7 +503,7 @@ public class PageAdminAction extends AbstractActionBean {
                     saveModel();
                     return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
                 } else {
-                    String msg = MessageFormat.format(getMessage("page.copy.invalidDestination"), destinationPageId);
+                    String msg = MessageFormat.format(getMessage("page.copy.invalidDestination"), destinationPagePath);
                     SessionMessages.addErrorMessage(msg);
                 }
             }
@@ -705,12 +748,12 @@ public class PageAdminAction extends AbstractActionBean {
         return newPageForm;
     }
 
-    public String getDestinationPageId() {
-        return destinationPageId;
+    public String getDestinationPagePath() {
+        return destinationPagePath;
     }
 
-    public void setDestinationPageId(String destinationPageId) {
-        this.destinationPageId = destinationPageId;
+    public void setDestinationPagePath(String destinationPagePath) {
+        this.destinationPagePath = destinationPagePath;
     }
 
     public String getFragment() {

@@ -46,6 +46,7 @@ import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.Schema;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.model.pages.PageUtils;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
@@ -73,11 +74,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.text.MessageFormat;
@@ -119,7 +118,6 @@ public class HibernateApplicationImpl implements Application {
     protected final File appStorageDir;
     protected final File appWebDir;
 
-    protected final JAXBContext pagesJaxbContext;
     protected final ResourceBundleManager resourceBundleManager;
 
 
@@ -155,11 +153,6 @@ public class HibernateApplicationImpl implements Application {
         this.appTextDir = appTextDir;
         this.appStorageDir = appStorageDir;
         this.appWebDir = appWebDir;
-        try {
-            this.pagesJaxbContext = JAXBContext.newInstance(Page.class.getPackage().getName());
-        } catch (JAXBException e) {
-            throw new Error("Can't instantiate pages jaxb context", e);
-        }
 
         resourceBundleManager = new ResourceBundleManager(appDir);
         File appConfigurationFile = new File(appDir, AppProperties.PROPERTIES_RESOURCE);
@@ -429,19 +422,12 @@ public class HibernateApplicationImpl implements Application {
         try {
             File pageFile = new File(directory, "page.xml");
             Page page = getPageFromCache(pageFile);
-            if(page != null) {
-                return page;
-            }
-            Unmarshaller unmarshaller = pagesJaxbContext.createUnmarshaller();
-            FileInputStream in = new FileInputStream(pageFile);
-            try {
-                page = (Page) unmarshaller.unmarshal(in);
+            if(page == null) {
+                page = PageUtils.loadPage(directory);
                 getModel().init(page);
                 putPageInCache(pageFile, page);
-                return page;
-            } finally {
-                in.close();
             }
+            return page;
         } catch (Exception e) {
             throw new RuntimeException("Error loading page", e);
         }

@@ -18,6 +18,7 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
@@ -244,11 +245,12 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
         for(ChildPage page : layout.getChildPages()) {
             String layoutContainerInParent = page.getContainer();
             if(layoutContainerInParent != null) {
+                String newPath = dispatch.getOriginalPath() + "/" + page.getName();
                 PortletInstance portletInstance =
                         new PortletInstance(
                                 "c" + page.getName(),
                                 page.getActualOrder(),
-                                dispatch.getOriginalPath() + "/" + page.getName());
+                                newPath);
 
                 portlets.put(layoutContainerInParent, portletInstance);
             }
@@ -564,7 +566,11 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
         FileWriter fw = null;
         try {
             GroovyClassLoader loader = new GroovyClassLoader();
-            loader.parseClass(script, groovyScriptFile.getAbsolutePath());
+            Class<?> scriptClass = loader.parseClass(script, groovyScriptFile.getAbsolutePath());
+            if(!Dispatcher.isValidActionClass(scriptClass)) {
+                SessionMessages.addErrorMessage(getMessage("script.class.invalid"));
+                return;
+            }
             fw = new FileWriter(groovyScriptFile);
             fw.write(script);
             if(this instanceof GroovyObject) {

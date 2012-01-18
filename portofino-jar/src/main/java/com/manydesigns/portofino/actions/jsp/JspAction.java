@@ -35,7 +35,6 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.portofino.actions.PortletAction;
-import com.manydesigns.portofino.actions.crud.CrudAction;
 import com.manydesigns.portofino.actions.jsp.configuration.JspConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -78,9 +77,9 @@ public class JspAction extends PortletAction {
     static {
         String scriptTemplate;
         try {
-            scriptTemplate = IOUtils.toString(CrudAction.class.getResourceAsStream("jsp/script_template.txt"));
+            scriptTemplate = IOUtils.toString(JspAction.class.getResourceAsStream("script_template.txt"));
         } catch (Exception e) {
-            scriptTemplate = null;
+            throw new Error("Can't load script template", e);
         }
         SCRIPT_TEMPLATE = scriptTemplate;
     }

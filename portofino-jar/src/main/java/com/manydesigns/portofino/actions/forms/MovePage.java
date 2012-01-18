@@ -44,6 +44,6 @@ public class MovePage {
 
     @Required
     @Label("Move to")
-    public String destinationPageId;
+    public String destinationPagePath;
 
 }

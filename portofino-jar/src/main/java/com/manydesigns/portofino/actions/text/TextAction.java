@@ -96,6 +96,27 @@ public class TextAction extends PortletAction {
     public static final Logger logger =
             LoggerFactory.getLogger(TextAction.class);
 
+    //--------------------------------------------------------------------------
+    // Scripting
+    //--------------------------------------------------------------------------
+
+    public static final String SCRIPT_TEMPLATE;
+
+    static {
+        String scriptTemplate;
+        try {
+            scriptTemplate = IOUtils.toString(TextAction.class.getResourceAsStream("script_template.txt"));
+        } catch (Exception e) {
+            throw new Error("Can't load script template", e);
+        }
+        SCRIPT_TEMPLATE = scriptTemplate;
+    }
+
+    @Override
+    public String getScriptTemplate() {
+        return SCRIPT_TEMPLATE;
+    }
+
     //**************************************************************************
     // Setup
     //**************************************************************************

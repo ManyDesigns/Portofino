@@ -29,6 +29,17 @@
 
 package com.manydesigns.portofino.logic;
 
+import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.util.FileUtils;
+import org.apache.commons.lang.ArrayUtils;
+
+import java.io.File;
+import java.io.FileFilter;
+
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -39,54 +50,66 @@ public class PageLogic {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    //TODO ripristinare
-    /*
-    public static SelectionProvider createPagesSelectionProvider(RootPage rootPage, Page... excludes) {
-        return createPagesSelectionProvider(rootPage, false, false, excludes);
+    public static SelectionProvider createPagesSelectionProvider
+            (Application application, File baseDir, File... excludes) {
+        return createPagesSelectionProvider(application, baseDir, false, false, excludes);
     }
 
     public static SelectionProvider createPagesSelectionProvider
-            (RootPage rootPage, boolean includeRoot, boolean includeDetailChildren, Page... excludes) {
+            (Application application, File baseDir, boolean includeRoot, boolean includeDetailChildren,
+             File... excludes) {
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("pages");
         if(includeRoot) {
-            selectionProvider.appendRow(rootPage.getId(), rootPage.getTitle() + " (top level)", true);
+            Page rootPage = application.getPage(baseDir);
+            selectionProvider.appendRow("/" + baseDir.getName(), rootPage.getTitle() + " (top level)", true);
         }
-        for (Page page : rootPage.getChildPages()) {
-            appendToPagesSelectionProvider(page, null, selectionProvider, includeDetailChildren, excludes);
-        }
-
+        appendToPagesSelectionProvider(application, baseDir, null, selectionProvider, includeDetailChildren, excludes);
         return selectionProvider;
-    }*/
+    }
 
-    //TODO ripristinare
-    /*
-    private static void appendToPagesSelectionProvider(Page page, String breadcrumb,
-                                                       DefaultSelectionProvider selectionProvider,
-                                                       boolean includeDetailChildren, Page... excludes) {
-        if(ArrayUtils.contains(excludes, page)) {
-            return;
-        }
-        String pageBreadcrumb;
-        if (breadcrumb == null) {
-            pageBreadcrumb = page.getTitle();
-        } else {
-            pageBreadcrumb = String.format("%s > %s", breadcrumb, page.getTitle());
-        }
-        selectionProvider.appendRow(page.getId(), pageBreadcrumb, true);
-        List<Page> children = page.getChildPages();
-        for (Page subPage : children) {
-            appendToPagesSelectionProvider(subPage, pageBreadcrumb, selectionProvider, includeDetailChildren, excludes);
-        }
-        if(page instanceof CrudPage && includeDetailChildren) {
-            pageBreadcrumb += " (detail)";
-            selectionProvider.appendRow(page.getId() + "-detail", pageBreadcrumb, true);
-            for (Page subPage : ((CrudPage) page).getDetailChildPages()) {
-               appendToPagesSelectionProvider(subPage, pageBreadcrumb, selectionProvider, includeDetailChildren, excludes);
+    protected static void appendToPagesSelectionProvider
+            (Application application, File baseDir, String breadcrumb,
+             DefaultSelectionProvider selectionProvider, boolean includeDetailChildren, File... excludes) {
+        FileFilter filter = new FileFilter() {
+            public boolean accept(File pathname) {
+                return pathname.isDirectory();
             }
+        };
+        for (File dir : baseDir.listFiles(filter)) {
+            appendToPagesSelectionProvider
+                    (application, baseDir, dir, breadcrumb, selectionProvider, includeDetailChildren, excludes);
         }
     }
 
-    public static String getPagePath(Page page) {
+    private static void appendToPagesSelectionProvider
+            (Application application, File baseDir, File file, String breadcrumb,
+             DefaultSelectionProvider selectionProvider, boolean includeDetailChildren, File... excludes) {
+        if(ArrayUtils.contains(excludes, file)) {
+            return;
+        }
+        if(PageInstance.DETAIL.equals(file.getName())) {
+            if(includeDetailChildren) {
+                breadcrumb += " (detail)"; //TODO I18n
+                selectionProvider.appendRow
+                    ("/" + baseDir.getName() + "/" + FileUtils.getRelativePath(baseDir, file), breadcrumb, true);
+                appendToPagesSelectionProvider
+                        (application, file, breadcrumb, selectionProvider, includeDetailChildren, excludes);
+            }
+        } else {
+            Page page = application.getPage(file);
+            if (breadcrumb == null) {
+                breadcrumb = page.getTitle();
+            } else {
+                breadcrumb = String.format("%s > %s", breadcrumb, page.getTitle());
+            }
+            selectionProvider.appendRow
+                    ("/" + baseDir.getName() + "/" + FileUtils.getRelativePath(baseDir, file), breadcrumb, true);
+            appendToPagesSelectionProvider
+                    (application, file, breadcrumb, selectionProvider, includeDetailChildren, excludes);
+        }
+    }
+
+    /*public static String getPagePath(Page page) {
         if(page instanceof RootPage) {
             return "";
         } else {
