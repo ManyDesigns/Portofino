@@ -91,11 +91,17 @@ public class PkHelper {
     public Serializable parsePkString(String pkString) {
         String[] pkList = StringUtils.split(pkString, ",");
 
+        return getPrimaryKey(pkList);
+    }
+
+    public Serializable getPrimaryKey(String... params) {
         int i = 0;
         Serializable result = (Serializable)classAccessor.newInstance();
-
+        if(params.length != classAccessor.getKeyProperties().length) {
+            throw new RuntimeException("Wrong number of parameters for primary key: expected " + classAccessor.getKeyProperties().length + ", got " + params.length);
+        }
         for(PropertyAccessor property : classAccessor.getKeyProperties()) {
-            String stringValue = pkList[i];
+            String stringValue = params[i];
             Object value = OgnlUtils.convertValue(stringValue, property.getType());
             property.set(result, value);
             i++;
@@ -104,22 +110,17 @@ public class PkHelper {
         return result;
     }
 
-    public String generatePkString(Object object) {
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-
-        for(PropertyAccessor property : classAccessor.getKeyProperties()) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(",");
-            }
+    public String[] generatePkStringArray(Object object) {
+        PropertyAccessor[] keyProperties = classAccessor.getKeyProperties();
+        String[] array = new String[keyProperties.length];
+        for(int i = 0; i < keyProperties.length; i++) {
+            PropertyAccessor property = keyProperties[i];
             Object value = property.get(object);
             String stringValue =
                     (String) OgnlUtils.convertValue(value, String.class);
-            sb.append(stringValue);
+            array[i] = stringValue;
         }
-        return sb.toString();
+        return array;
     }
 
 }

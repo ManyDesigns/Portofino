@@ -11,7 +11,6 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="form"/>
-        <input type="hidden" name="pk" value="<c:out value="${actionBean.pk}"/>"/>
         <c:if test="${not empty actionBean.searchString}">
             <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
         </c:if>

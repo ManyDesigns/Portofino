@@ -131,7 +131,7 @@ public class CrudAction extends PortletAction {
     public PkHelper pkHelper;
     public List<CrudSelectionProvider> crudSelectionProviders;
     public MultiMap availableSelectionProviders; //List<String> -> DatabaseSelectionProvider
-    public String pk;
+    public String[] pk;
     public String propertyName;
 
     public final static String prefix = "";
@@ -335,7 +335,7 @@ public class CrudAction extends PortletAction {
 
     @DefaultHandler
     public Resolution execute() {
-        if (StringUtils.isEmpty(pk)) {
+        if (pk == null) {
             if(isEmbedded()) {
                 return embeddedSearch();
             } else {
@@ -603,8 +603,8 @@ public class CrudAction extends PortletAction {
                     SessionMessages.addErrorMessage(rootCauseMessage);
                     return getCreateView();
                 }
-                pk = pkHelper.generatePkString(object);
-                String url = dispatch.getOriginalPath() + "/" + pk;
+                pk = pkHelper.generatePkStringArray(object);
+                String url = dispatch.getOriginalPath() + "/" + StringUtils.join(pk, "/");
                 return new RedirectResolution(url);
             }
         }
@@ -667,8 +667,8 @@ public class CrudAction extends PortletAction {
         }
 
         if (selection.length == 1) {
-            pk = selection[0];
-            String url = dispatch.getOriginalPath() + "/" + pk;
+            pk = selection[0].split("/");
+            String url = dispatch.getOriginalPath() + "/" + StringUtils.join(pk, "/");
             return new RedirectResolution(url)
                     .addParameter("cancelReturnUrl", cancelReturnUrl)
                     .addParameter("edit");
@@ -686,7 +686,7 @@ public class CrudAction extends PortletAction {
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
             for (String current : selection) {
-                loadObject(current);
+                loadObject(current.split("/"));
                 editSetup(object);
                 form.writeToObject(object);
                 if(editValidate(object)) {
@@ -950,9 +950,9 @@ public class CrudAction extends PortletAction {
     }
 
     protected String generateObjectUrl(String baseUrl, Object o) {
-        String objPk = pkHelper.generatePkString(o);
+        String[] objPk = pkHelper.generatePkStringArray(o);
         return new UrlBuilder(
-                Locale.getDefault(), baseUrl + "/" + objPk, false)
+                Locale.getDefault(), baseUrl + "/" + StringUtils.join(objPk, "/"), false)
                 .addParameter(SEARCH_STRING_PARAM, searchString)
                 .toString();
     }
@@ -1146,22 +1146,38 @@ public class CrudAction extends PortletAction {
             baseTable = crudConfiguration.getActualTable();
             pkHelper = new PkHelper(classAccessor);
             session = application.getSession(crudConfiguration.getDatabase());
-            if(!pageInstance.getParameters().isEmpty()) { //TODO!!!1!!
-                pk = pageInstance.getParameters().get(0);
+            List<String> parameters = pageInstance.getParameters();
+            if(!parameters.isEmpty()) {
+                pk = parameters.toArray(new String[parameters.size()]);
                 OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-                loadObject(pk);
+
+                Serializable pkObject;
+                try {
+                    pkObject = pkHelper.getPrimaryKey(pk);
+                } catch (Exception e) {
+                    logger.warn("Invalid primary key", e);
+                    return notInUseCase(context);
+                }
+                object = QueryUtils.getObjectByPk(
+                    application,
+                    baseTable, pkObject,
+                    crudConfiguration.getQuery(), null);
                 if(object != null) {
                     ognlContext.put(crudConfiguration.getActualVariable(), object);
                 } else {
-                    logger.info("Not in use case: " + crudConfiguration.getName());
-                    Locale locale = context.getLocale();
-                    ResourceBundle resourceBundle = application.getBundle(locale);
-                    SessionMessages.addWarningMessage(resourceBundle.getString("crud.notInUseCase"));
-                    return new ForwardResolution("/layouts/crud/notInUseCase.jsp");
+                    return notInUseCase(context);
                 }
             }
         }
         return null;
+    }
+
+    protected Resolution notInUseCase(ActionBeanContext context) {
+        logger.info("Not in use case: " + crudConfiguration.getName());
+        Locale locale = context.getLocale();
+        ResourceBundle resourceBundle = application.getBundle(locale);
+        SessionMessages.addWarningMessage(resourceBundle.getString("crud.notInUseCase"));
+        return new ForwardResolution("/layouts/crud/notInUseCase.jsp");
     }
 
     public Class<?> getConfigurationClass() {
@@ -1199,8 +1215,8 @@ public class CrudAction extends PortletAction {
         }
     }
 
-    private void loadObject(String pk) {
-        Serializable pkObject = pkHelper.parsePkString(pk);
+    private void loadObject(String... pk) {
+        Serializable pkObject = pkHelper.getPrimaryKey(pk);
         object = QueryUtils.getObjectByPk(
                 application,
                 baseTable, pkObject,
@@ -2032,14 +2048,6 @@ public class CrudAction extends PortletAction {
 
     public void setCrudSelectionProviders(List<CrudSelectionProvider> crudSelectionProviders) {
         this.crudSelectionProviders = crudSelectionProviders;
-    }
-
-    public String getPk() {
-        return pk;
-    }
-
-    public void setPk(String pk) {
-        this.pk = pk;
     }
 
     public String[] getSelection() {

@@ -24,7 +24,6 @@
             <fmt:message key="commons.fields_required"/>
         </c:if>
         <mde:write name="actionBean" property="form"/>
-        <input type="hidden" name="pk" value="<c:out value="${actionBean.pk}"/>"/>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
