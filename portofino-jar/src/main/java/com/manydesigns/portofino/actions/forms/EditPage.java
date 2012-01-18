@@ -50,11 +50,11 @@ public class EditPage {
     @Multiline
     public String description;
 
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.embedInParent")
+    /*@LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.embedInParent")
     public boolean embedInParent;
 
     @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.showInNavigation")
-    public boolean showInNavigation;
+    public boolean showInNavigation;*/
 
     @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.subtreeRoot")
     public boolean subtreeRoot;
@@ -62,5 +62,9 @@ public class EditPage {
     @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.layout")
     @Required
     public String layout;
+
+    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.detailLayout")
+    @Required
+    public String detailLayout;
 
 }

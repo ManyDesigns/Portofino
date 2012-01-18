@@ -85,14 +85,6 @@ public class JspAction extends PortletAction {
         SCRIPT_TEMPLATE = scriptTemplate;
     }
 
-    @Before
-    @Override
-    public void prepare() {
-        super.prepare();
-        jspConfiguration = (JspConfiguration) getPageInstance().getConfiguration();
-        jsp = jspConfiguration.getJsp();
-    }
-
     @DefaultHandler
     public Resolution execute() {
         return forwardToJsp(jsp);
@@ -200,6 +192,9 @@ public class JspAction extends PortletAction {
     }
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
+        super.prepare(pageInstance, context);
+        jspConfiguration = (JspConfiguration) getPageInstance().getConfiguration();
+        jsp = jspConfiguration.getJsp();
         return null;
     }
 }

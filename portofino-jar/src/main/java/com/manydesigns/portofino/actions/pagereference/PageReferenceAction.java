@@ -66,13 +66,6 @@ public class PageReferenceAction extends PortletAction {
     @Inject(RequestAttributes.DISPATCH)
     public Dispatch dispatch;
 
-    @Before
-    @Override
-    public void prepare() {
-        super.prepare();
-        pageReferenceConfiguration = (PageReferenceConfiguration) getPageInstance().getConfiguration();
-    }
-
     /*@Override
     protected void dereferencePageInstance() {
         //Do nothing. I need the raw PageReferenceInstance.
@@ -188,6 +181,8 @@ public class PageReferenceAction extends PortletAction {
     }
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
+        super.prepare(pageInstance, context);
+        pageReferenceConfiguration = (PageReferenceConfiguration) getPageInstance().getConfiguration();
         return null;
     }
 }

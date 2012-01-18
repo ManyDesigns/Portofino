@@ -101,12 +101,12 @@ public class Dispatch {
         for (int i = 0; i < length; i++) {
             PageInstance current = pageInstancePath[i];
             String fragment = current.getUrlFragment();
-            if (first) {
-                first = false;
-                // ignore fragment of root node
-            } else {
+            if (!first) {
                 sb.append("/");
                 sb.append(fragment);
+            } else {
+                first = false;
+                // ignore fragment of root node
             }
         }
         return sb.toString();

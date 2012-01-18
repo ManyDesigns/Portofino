@@ -70,6 +70,7 @@ import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissi
 import com.manydesigns.portofino.system.model.users.annotations.SupportsPermissions;
 import com.manydesigns.portofino.util.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
+import com.manydesigns.portofino.util.ShortNameUtils;
 import jxl.Workbook;
 import jxl.write.DateFormat;
 import jxl.write.*;
@@ -206,9 +207,7 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     @Before
-    @Override
     public void prepare() {
-        super.prepare();
         availableSelectionProviders = new MultiHashMap();
         if(crudConfiguration != null && crudConfiguration.getActualDatabase() != null) {
             crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
@@ -786,6 +785,19 @@ public class CrudAction extends PortletAction {
     // Return to parent
     //**************************************************************************
 
+    @Override
+    public String getDescription() {
+        if(pageInstance.getParameters().isEmpty()) {
+            return crudConfiguration.getSearchTitle();
+        } else {
+            return ShortNameUtils.getName(classAccessor, object);
+        }
+    }
+
+    @Override
+    public boolean supportsParameters() {
+        return true;
+    }
 
     @Override
     public void setupReturnToParentTarget() {
@@ -807,28 +819,19 @@ public class CrudAction extends PortletAction {
                 resolution.addParameter(SEARCH_STRING_PARAM, searchString);
             }
         } else {
-            //TODO
-            return null;
-            /*PageInstance[] pageInstancePath =
+            PageInstance[] pageInstancePath =
                     dispatch.getPageInstancePath();
             int previousPos = pageInstancePath.length - 2;
             if (previousPos >= 0) {
                 PageInstance previousPageInstance = pageInstancePath[previousPos];
-                if (previousPageInstance instanceof CrudPageInstance) {
-                    String url = dispatch.getPathUrl(previousPos + 1);
-                    resolution = new RedirectResolution(url, true);
-                } else {
-                    resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
-                    if(!StringUtils.isEmpty(searchString)) {
-                        resolution.addParameter(SEARCH_STRING_PARAM, searchString);
-                    }
-                }
+                String url = dispatch.getPathUrl(previousPos + 1);
+                resolution = new RedirectResolution(url, true);
             } else {
                 resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
                 if(!StringUtils.isEmpty(searchString)) {
                     resolution.addParameter(SEARCH_STRING_PARAM, searchString);
                 }
-            }*/
+            }
         }
 
         return resolution;
@@ -1133,6 +1136,7 @@ public class CrudAction extends PortletAction {
     //**************************************************************************
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
+        super.prepare(pageInstance, context);
         this.crudConfiguration = (CrudConfiguration) pageInstance.getConfiguration();
 
         if(crudConfiguration != null && crudConfiguration.getActualDatabase() != null) {

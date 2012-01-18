@@ -108,14 +108,6 @@ public class ChartAction extends PortletAction {
     public static final Logger logger =
             LoggerFactory.getLogger(ChartAction.class);
 
-
-    @Before
-    @Override
-    public void prepare() {
-        super.prepare();
-        chartConfiguration = (ChartConfiguration) pageInstance.getConfiguration();
-    }
-
     //**************************************************************************
     // Action default execute method
     //**************************************************************************
@@ -342,6 +334,8 @@ public class ChartAction extends PortletAction {
     }
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
+        super.prepare(pageInstance, context);
+        chartConfiguration = (ChartConfiguration) pageInstance.getConfiguration();
         return null;
     }
 

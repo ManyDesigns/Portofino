@@ -32,7 +32,6 @@ package com.manydesigns.portofino.actions;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
-import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.Resolution;
 
 /**
@@ -48,5 +47,9 @@ public interface PortofinoAction extends ActionBean {
     Class<?> getConfigurationClass();
 
     Resolution prepare(PageInstance pageInstance, ActionBeanContext context);
+
+    String getDescription();
+
+    boolean supportsParameters();
     
 }

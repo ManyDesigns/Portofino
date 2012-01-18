@@ -27,10 +27,7 @@ import com.manydesigns.portofino.stripes.ModelActionResolver;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
-import net.sourceforge.stripes.action.Before;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.StripesConstants;
 import net.sourceforge.stripes.controller.StripesFilter;
 import org.apache.commons.collections.MultiHashMap;
@@ -56,9 +53,9 @@ import java.util.*;
 public abstract class PortletAction extends AbstractActionBean implements PortofinoAction {
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
-            {{"id", "embedInParent", "showInNavigation", "subtreeRoot", "layout", "description"}};
-    public static final String[][] TOP_LEVEL_PAGE_CONFIGURATION_FIELDS =
-            {{"id", "showInNavigation", "subtreeRoot", "layout", "description"}};
+            {{"id", "subtreeRoot", "layout", "detailLayout", "description"}};
+    public static final String[][] PAGE_CONFIGURATION_FIELDS_NO_DETAIL =
+            {{"id", "subtreeRoot", "layout", "description"}};
     public static final String PAGE_PORTLET_NOT_CONFIGURED = "/layouts/portlet-not-configured.jsp";
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
@@ -72,7 +69,6 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
     @Inject(RequestAttributes.DISPATCH)
     public Dispatch dispatch;
 
-    @Inject(RequestAttributes.PAGE_INSTANCE)
     public PageInstance pageInstance;
 
     @Inject(RequestAttributes.APPLICATION)
@@ -124,9 +120,9 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
                 StripesConstants.REQ_ATTR_INCLUDE_PATH) != null;
     }
 
-    @Before
-    protected void prepare() {
-        //dereferencePageInstance();
+    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
+        this.pageInstance = pageInstance;
+        return null;
     }
 
     /*protected void dereferencePageInstance() {
@@ -135,35 +131,34 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
         }
     }*/
 
+    public boolean supportsParameters() {
+        return false;
+    }
+
+    public String getDescription() {
+        return pageInstance.getName();
+    }
+
     public void setupReturnToParentTarget() {
-        //TODO ripristinare
-        /*PageInstance[] pageInstancePath =
+        PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
         boolean hasPrevious = !getPage().isSubtreeRoot() && pageInstancePath.length > 1;
         returnToParentTarget = null;
         if (hasPrevious) {
             int previousPos = pageInstancePath.length - 2;
             PageInstance previousPageInstance = pageInstancePath[previousPos];
-            Page previousPage = previousPageInstance.getPage();
-            if(!previousPage.isShowInNavigation()) {
+            //Page previousPage = previousPageInstance.getPage();
+
+            //TODO ripristinare
+            /*if(!previousPage.isShowInNavigation()) {
                 return;
+            }*/
+
+            PortofinoAction actionBean = previousPageInstance.getActionBean();
+            if(actionBean != null) {
+                returnToParentTarget = actionBean.getDescription();
             }
-            if (previousPageInstance instanceof CrudPageInstance) {
-                CrudPageInstance crudPageInstance =
-                        (CrudPageInstance) previousPageInstance;
-                if(crudPageInstance.getCrudConfiguration() != null) {
-                    if (CrudPage.MODE_SEARCH.equals(crudPageInstance.getMode())) {
-                        returnToParentTarget = crudPageInstance.getCrudConfiguration().getName();
-                    } else if (CrudPage.MODE_DETAIL.equals(crudPageInstance.getMode())) {
-                        Object previousPageObject = crudPageInstance.getObject();
-                        ClassAccessor previousPageClassAccessor =
-                                crudPageInstance.getClassAccessor();
-                        returnToParentTarget = ShortNameUtils.getName(
-                                previousPageClassAccessor, previousPageObject);
-                    }
-                }
-            }
-        }*/
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -314,14 +309,11 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
         Page page = pageInstance.getPage();
 
         PageInstance parent = pageInstance.getParent();
-        if(parent == null) {
-            return; //TODO
-        }
+        assert parent != null;
 
-        boolean isTopLevelPage = parent.getParent() == null; //TODO
         FormBuilder formBuilder = new FormBuilder(EditPage.class)
                 .configPrefix(CONF_FORM_PREFIX)
-                .configFields(isTopLevelPage ? TOP_LEVEL_PAGE_CONFIGURATION_FIELDS : PAGE_CONFIGURATION_FIELDS)
+                .configFields(supportsParameters() ? PAGE_CONFIGURATION_FIELDS : PAGE_CONFIGURATION_FIELDS_NO_DETAIL)
                 .configFieldSetNames("Page");
 
         SelectionProvider layoutSelectionProvider = createLayoutSelectionProvider();
@@ -331,9 +323,6 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
         EditPage edit = new EditPage();
         edit.id = page.getId();
         edit.description = page.getDescription();
-        //TODO ripristinare
-        //edit.embedInParent = page.getLayoutContainerInParent() != null;
-        //edit.showInNavigation = page.isShowInNavigation();
         edit.subtreeRoot = page.isSubtreeRoot();
         edit.layout = getLayout();
         pageConfigurationForm.readFromObject(edit);
@@ -403,21 +392,8 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
         Page page = pageInstance.getPage();
         page.setTitle(title);
         page.setDescription(edit.description);
-        //TODO ripristinare
-        /*if(edit.embedInParent) {
-            if(page.getLayoutContainerInParent() == null) {
-                page.setLayoutContainerInParent(DEFAULT_LAYOUT_CONTAINER);
-            }
-        } else {
-            page.setLayoutContainerInParent(null);
-            page.setLayoutOrderInParent(null);
-        }
-        page.setShowInNavigation(edit.showInNavigation);*/
-        page.setSubtreeRoot(edit.subtreeRoot);
-        if(!edit.embedInParent && !edit.showInNavigation) {
-            SessionMessages.addWarningMessage(getMessage("page.warnNotShowInNavigationNotEmbedded"));
-        }
-        page.getLayout().setLayout(edit.layout); //TODO detailLayout
+        page.getLayout().setLayout(edit.layout);
+        page.getDetailLayout().setLayout(edit.detailLayout);
 
         File pageFile = new File(pageInstance.getDirectory(), "page.xml");
         try {

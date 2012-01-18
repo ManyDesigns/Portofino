@@ -32,7 +32,6 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.PortletAction;
-import com.manydesigns.portofino.actions.pagereference.configuration.PageReferenceConfiguration;
 import com.manydesigns.portofino.actions.text.configuration.Attachment;
 import com.manydesigns.portofino.actions.text.configuration.TextConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
@@ -101,11 +100,10 @@ public class TextAction extends PortletAction {
     // Setup
     //**************************************************************************
 
-    @Before
-    @Override
-    public void prepare() {
-        super.prepare();
+    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
+        super.prepare(pageInstance, context);
         textConfiguration = (TextConfiguration) pageInstance.getConfiguration();
+        return null;
     }
 
     //**************************************************************************
@@ -479,10 +477,6 @@ public class TextAction extends PortletAction {
 
     public Class<?> getConfigurationClass() {
         return TextConfiguration.class;
-    }
-
-    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        return null;
     }
 
     public String getContent() {
