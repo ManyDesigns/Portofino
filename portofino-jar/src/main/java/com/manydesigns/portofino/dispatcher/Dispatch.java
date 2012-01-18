@@ -135,6 +135,6 @@ public class Dispatch {
     }
 
     public Class<? extends ActionBean> getActionBeanClass() {
-        return getLastPageInstance().getActionClass(); //TODO
+        return getLastPageInstance().getActionClass();
     }
 }

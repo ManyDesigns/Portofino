@@ -181,9 +181,9 @@ public class CrudAction extends PortletAction {
     static {
         String scriptTemplate;
         try {
-            scriptTemplate = IOUtils.toString(CrudAction.class.getResourceAsStream("crud/script_template.txt"));
+            scriptTemplate = IOUtils.toString(CrudAction.class.getResourceAsStream("script_template.txt"));
         } catch (Exception e) {
-            scriptTemplate = null;
+            throw new Error("Can't load script template", e);
         }
         SCRIPT_TEMPLATE = scriptTemplate;
     }
@@ -1885,17 +1885,10 @@ public class CrudAction extends PortletAction {
     @Button(list = "configuration", key = "commons.updateConfiguration")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updateConfiguration() {
-        //TODO!!!
-        return null;
-        /*
         synchronized (application) {
             prepareConfigurationForms();
 
-            if(crudPage.getCrud() == null) {
-                crudPage.setCrud(new CrudConfiguration());
-            }
-
-            crudConfigurationForm.readFromObject(crudPage.getCrud());
+            crudConfigurationForm.readFromObject(crudConfiguration);
 
             readPageConfigurationFromRequest();
 
@@ -1917,7 +1910,7 @@ public class CrudAction extends PortletAction {
 
             if (valid) {
                 updatePageConfiguration();
-                crudConfigurationForm.writeToObject(crudPage.getCrud());
+                crudConfigurationForm.writeToObject(crudConfiguration);
 
                 if(propertiesTableForm != null) {
                     updateProperties();
@@ -1927,7 +1920,7 @@ public class CrudAction extends PortletAction {
                     updateSelectionProviders();
                 }
 
-                saveModel();
+                saveConfiguration();
 
                 SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
                 return cancel();
@@ -1935,7 +1928,7 @@ public class CrudAction extends PortletAction {
                 SessionMessages.addErrorMessage(getMessage("commons.configuration.notUpdated"));
                 return new ForwardResolution("/layouts/crud/configure.jsp");
             }
-        }*/
+        }
     }
 
     private void updateSelectionProviders() {

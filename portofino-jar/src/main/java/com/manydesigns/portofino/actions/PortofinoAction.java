@@ -48,6 +48,8 @@ public interface PortofinoAction extends ActionBean {
 
     Resolution prepare(PageInstance pageInstance, ActionBeanContext context);
 
+    String getScriptTemplate();
+
     String getDescription();
 
     boolean supportsParameters();

@@ -110,7 +110,6 @@ public class TextAction extends PortletAction {
     // Handlers
     //**************************************************************************
 
-
     @DefaultHandler
     @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution execute() throws IOException {
@@ -282,7 +281,7 @@ public class TextAction extends PortletAction {
             if (valid) {
                 updatePageConfiguration();
                 saveContent();
-                saveModel();
+                saveConfiguration();
 
                 SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
                 return cancel();
@@ -344,7 +343,7 @@ public class TextAction extends PortletAction {
                     String.format("%s?viewAttachment=&id=%s",
                             dispatch.getAbsoluteOriginalPath(),
                             attachmentId);
-            saveModel();
+            saveConfiguration();
         }
     }
 
@@ -442,7 +441,7 @@ public class TextAction extends PortletAction {
 
                     counter++;
                 }
-                saveModel();
+                saveConfiguration();
                 if (counter == 1) {
                     SessionMessages.addInfoMessage(getMessage("text.attachment.oneDeleted"));
                 } else if (counter > 1) {
@@ -467,7 +466,7 @@ public class TextAction extends PortletAction {
             boolean contained = ArrayUtils.contains(downloadable, attachment.getId());
             attachment.setDownloadable(contained);
         }
-        saveModel();
+        saveConfiguration();
         return cancel();
     }
 

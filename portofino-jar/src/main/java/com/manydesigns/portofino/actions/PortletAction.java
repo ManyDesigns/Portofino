@@ -20,6 +20,7 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
@@ -27,7 +28,10 @@ import com.manydesigns.portofino.stripes.ModelActionResolver;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
-import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.StripesConstants;
 import net.sourceforge.stripes.controller.StripesFilter;
 import org.apache.commons.collections.MultiHashMap;
@@ -39,9 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -165,9 +166,24 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
     // Admin methods
     //--------------------------------------------------------------------------
 
-    protected void saveModel() {
-        model.init();
-        application.saveXmlModel();
+    protected void saveConfiguration() {
+        Object configuration = pageInstance.getConfiguration();
+        if(configuration instanceof ModelObject) {
+            Model model = application.getModel();
+            if(model != null) {
+                model.init((ModelObject) configuration);
+            } else {
+                logger.error("Model is null, cannot init configuration");
+                SessionMessages.addErrorMessage("error saving conf");
+                return;
+            }
+        }
+        try {
+            PageUtils.saveConfiguration(pageInstance.getDirectory(), configuration);
+        } catch (Exception e) {
+            logger.error("Couldn't save configuration", e);
+            SessionMessages.addErrorMessage("error saving conf");
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -248,15 +264,18 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
         setupPortlets(pageInstance, pageJsp);
         HttpServletRequest request = context.getRequest();
         request.setAttribute("cancelReturnUrl", getCancelReturnUrl());
-        return new ForwardResolution(getLayout());
+        return new ForwardResolution(getLayoutJsp(pageInstance.getLayout()));
     }
 
-    protected String getLayout() {
-        String layout = pageInstance.getPage().getLayout().getLayout();
-        if(StringUtils.isBlank(layout)) {
-            layout = DEFAULT_LAYOUT;
+    protected String getLayoutJsp(Layout layout) {
+        if(layout == null) {
+            return DEFAULT_LAYOUT;
         }
-        return layout;
+        String layoutName = layout.getLayout();
+        if(StringUtils.isBlank(layoutName)) {
+            return DEFAULT_LAYOUT;
+        }
+        return layoutName;
     }
 
     @Button(list = "configuration", key = "commons.cancel", order = 99)
@@ -318,13 +337,16 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
 
         SelectionProvider layoutSelectionProvider = createLayoutSelectionProvider();
         formBuilder.configSelectionProvider(layoutSelectionProvider, "layout");
+        SelectionProvider detailLayoutSelectionProvider = createLayoutSelectionProvider();
+        formBuilder.configSelectionProvider(detailLayoutSelectionProvider, "detailLayout");
 
         pageConfigurationForm = formBuilder.build();
         EditPage edit = new EditPage();
         edit.id = page.getId();
         edit.description = page.getDescription();
         edit.subtreeRoot = page.isSubtreeRoot();
-        edit.layout = getLayout();
+        edit.layout = getLayoutJsp(page.getLayout());
+        edit.detailLayout = getLayoutJsp(page.getDetailLayout());
         pageConfigurationForm.readFromObject(edit);
         title = page.getTitle();
 
@@ -386,7 +408,7 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
         return valid;
     }
 
-    protected void updatePageConfiguration() {
+    protected boolean updatePageConfiguration() {
         EditPage edit = new EditPage();
         pageConfigurationForm.writeToObject(edit);
         Page page = pageInstance.getPage();
@@ -394,16 +416,14 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
         page.setDescription(edit.description);
         page.getLayout().setLayout(edit.layout);
         page.getDetailLayout().setLayout(edit.detailLayout);
-
-        File pageFile = new File(pageInstance.getDirectory(), "page.xml");
         try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(Page.class.getPackage().getName());
-            Marshaller marshaller = jaxbContext.createMarshaller();
-            marshaller.marshal(page, pageFile);
-        } catch (JAXBException e) {
-            throw new Error("Can't instantiate pages jaxb context", e);
+            PageUtils.savePage(pageInstance.getDirectory(), page);
+        } catch (Exception e) {
+            logger.error("Couldn't save page", e);
+            return false; //TODO handle + script + session msg
         }
         updateScript();
+        return true;
     }
 
     public String getTitle() {
@@ -513,7 +533,7 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
 
     protected void prepareScript() {
         String pageId = pageInstance.getPage().getId();
-        File file = ScriptingUtil.getGroovyScriptFile(application.getAppScriptsDir(), pageId);
+        File file = ScriptingUtil.getGroovyScriptFile(pageInstance.getDirectory(), "action");
         if(file.exists()) {
             try {
                 FileReader fr = new FileReader(file);
@@ -529,54 +549,45 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
                 className = "_" + className;
             }
             if(template != null) {
-                try {
-                    script = template.replace("__CLASS_NAME__", className);
-                } catch (Exception e) {
-                    logger.warn("Invalid default script template: " + template, e);
-                }
+                script = template.replace("__CLASS_NAME__", className);
             }
         }
     }
 
     public String getScriptTemplate() {
-        return null;
+        throw new UnsupportedOperationException("Unknown script template for " + getClass());
     }
 
     protected void updateScript() {
         File groovyScriptFile =
                 ScriptingUtil.getGroovyScriptFile(pageInstance.getDirectory(), "action");
-        if(!StringUtils.isBlank(script)) {
-            FileWriter fw = null;
-            try {
-                fw = new FileWriter(groovyScriptFile);
-                fw.write(script);
+        FileWriter fw = null;
+        try {
+            GroovyClassLoader loader = new GroovyClassLoader();
+            loader.parseClass(script, groovyScriptFile.getAbsolutePath());
+            fw = new FileWriter(groovyScriptFile);
+            fw.write(script);
+            if(this instanceof GroovyObject) {
+                //Attempt to remove old instance of custom action bean
+                //not guaranteed to work
                 try {
-                    GroovyClassLoader loader = new GroovyClassLoader();
-                    loader.parseClass(script, groovyScriptFile.getAbsolutePath());
-                    if(this instanceof GroovyObject) {
-                        //Attempt to remove old instance of custom action bean
-                        //not guaranteed to work
-                        try {
-                            ModelActionResolver actionResolver =
-                                    (ModelActionResolver) StripesFilter.getConfiguration().getActionResolver();
-                            actionResolver.removeActionBean(getClass());
-                        } catch (Exception e) {
-                            logger.warn("Couldn't remove action bean " + this, e);
-                        }
-                    }
+                    ModelActionResolver actionResolver =
+                            (ModelActionResolver) StripesFilter.getConfiguration().getActionResolver();
+                    actionResolver.removeActionBean(getClass());
                 } catch (Exception e) {
-                    String pageId = pageInstance.getPage().getId();
-                    logger.warn("Couldn't compile script for page " + pageId, e);
-                    String key = "script.compile.failed";
-                    SessionMessages.addErrorMessage(getMessage(key));
+                    logger.warn("Couldn't remove action bean " + this, e);
                 }
-            } catch (IOException e) {
-                logger.error("Error writing script to " + groovyScriptFile, e);
-            } finally {
-                IOUtils.closeQuietly(fw);
             }
-        } else {
-            groovyScriptFile.delete();
+        } catch (IOException e) {
+            logger.error("Error writing script to " + groovyScriptFile, e);
+            String msg = MessageFormat.format(getMessage("script.write.failed"), groovyScriptFile.getAbsolutePath());
+            SessionMessages.addErrorMessage(msg);
+        } catch (Exception e) {
+            String pageId = pageInstance.getPage().getId();
+            logger.warn("Couldn't compile script for page " + pageId, e);
+            SessionMessages.addErrorMessage(getMessage("script.compile.failed"));
+        } finally {
+            IOUtils.closeQuietly(fw);
         }
     }
 

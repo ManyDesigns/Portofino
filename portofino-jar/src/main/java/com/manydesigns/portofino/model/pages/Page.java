@@ -75,6 +75,9 @@ public class Page implements ModelObject {
     //**************************************************************************
 
     public Page() {
+        layout = new Layout();
+        detailLayout = new Layout();
+        permissions = new Permissions();
     }
 
     //**************************************************************************
@@ -90,6 +93,9 @@ public class Page implements ModelObject {
     public void init(Model model) {
         assert title != null;
         assert description != null;
+        assert layout != null;
+        assert detailLayout != null;
+        assert permissions != null;
     }
 
     public void link(Model model) {}

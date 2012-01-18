@@ -124,7 +124,7 @@ public class JspAction extends PortletAction {
             if(valid) {
                 updatePageConfiguration();
                 form.writeToObject(jspConfiguration);
-                saveModel();
+                saveConfiguration();
 
                 SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
             }

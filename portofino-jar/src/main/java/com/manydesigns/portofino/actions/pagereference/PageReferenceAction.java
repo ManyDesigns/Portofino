@@ -144,7 +144,7 @@ public class PageReferenceAction extends PortletAction {
             boolean valid = form.validate();
             if(valid) {
                 form.writeToObject(pageReferenceConfiguration);
-                saveModel();
+                saveConfiguration();
 
                 SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
             }

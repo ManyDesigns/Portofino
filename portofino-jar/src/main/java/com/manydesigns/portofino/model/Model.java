@@ -108,27 +108,16 @@ public class Model {
         }
     }
 
-    protected void reset() {
-        visit(new ResetVisitor());
-    }
-
     public void init() {
-        reset();
-        visit(new InitVisitor());
-        visit(new LinkVisitor());
+        for (Database database : databases) {
+            init(database);
+        }
     }
 
     public void init(ModelObject rootObject) {
         new ResetVisitor().visit(rootObject);
         new InitVisitor().visit(rootObject);
         new LinkVisitor().visit(rootObject);
-    }
-
-    protected void visit(ModelVisitor visitor) {
-        // databases
-        for (Database database : databases) {
-            visitor.visit(database);
-        }
     }
 
     //**************************************************************************

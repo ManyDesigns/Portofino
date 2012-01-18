@@ -27,13 +27,11 @@
 *
 */
 
-package com.manydesigns.portofino.actions.forms;
+package com.manydesigns.portofino.model.pages;
 
-import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.elements.annotations.Select;
-import com.manydesigns.elements.options.DisplayMode;
-import com.manydesigns.portofino.model.pages.Page;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import java.io.File;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,41 +39,24 @@ import com.manydesigns.portofino.model.pages.Page;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class NewPage extends Page {
+public class PageUtils {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    protected String actionClassName;
-    protected String insertPositionName;
-    protected String fragment;
-
-    @Label("Page type")
-    @Required
-    public String getActionClassName() {
-        return actionClassName;
+    public static File savePage(File directory, Page page) throws Exception {
+        File pageFile = new File(directory, "page.xml");
+        JAXBContext jaxbContext = JAXBContext.newInstance(Page.class.getPackage().getName());
+        Marshaller marshaller = jaxbContext.createMarshaller();
+        marshaller.marshal(page, pageFile);
+        return pageFile;
     }
 
-    public void setActionClassName(String actionClassName) {
-        this.actionClassName = actionClassName;
-    }
-
-    @Label("Where")
-    @Select(displayMode = DisplayMode.RADIO)
-    @Required
-    public String getInsertPositionName() {
-        return insertPositionName;
-    }
-
-    public void setInsertPositionName(String insertPositionName) {
-        this.insertPositionName = insertPositionName;
-    }
-
-    @Required
-    public String getFragment() {
-        return fragment;
-    }
-
-    public void setFragment(String fragment) {
-        this.fragment = fragment;
+    public static File saveConfiguration(File directory, Object configuration) throws Exception {
+        String configurationPackage = configuration.getClass().getPackage().getName();
+        JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
+        Marshaller marshaller = jaxbContext.createMarshaller();
+        File configurationFile = new File(directory, "configuration.xml");
+        marshaller.marshal(configuration, configurationFile);
+        return configurationFile;
     }
 }

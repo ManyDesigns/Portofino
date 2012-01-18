@@ -319,7 +319,7 @@ public class ChartAction extends PortletAction {
             if (valid) {
                 updatePageConfiguration();
                 form.writeToObject(chartConfiguration);
-                saveModel();
+                saveConfiguration();
 
                 SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
                 return cancel();

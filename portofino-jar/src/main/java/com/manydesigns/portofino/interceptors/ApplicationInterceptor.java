@@ -154,18 +154,18 @@ public class ApplicationInterceptor implements Interceptor {
     protected void configureActionBean
             (PortofinoAction actionBean, PageInstance pageInstance, Application application)
             throws JAXBException, IOException {
-        //TODO!!!
-        File pageFile = new File(pageInstance.getDirectory(), "configuration.xml");
-        Object configuration = getConfigurationFromCache(pageFile);
+        File configurationFile = new File(pageInstance.getDirectory(), "configuration.xml");
+        Object configuration = getConfigurationFromCache(configurationFile);
         if(configuration != null) {
             pageInstance.setConfiguration(configuration);
         } else {
-            if(pageFile.exists()) {
+            if(configurationFile.exists()) {
+                //TODO spostare in PageUtils
                 Class<?> configurationClass = actionBean.getConfigurationClass();
                 String configurationPackage = configurationClass.getPackage().getName();
                 JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
                 Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-                FileInputStream in = new FileInputStream(pageFile);
+                FileInputStream in = new FileInputStream(configurationFile);
                 try {
                     configuration = unmarshaller.unmarshal(in);
                     if(configuration instanceof ModelObject) {
@@ -180,7 +180,7 @@ public class ApplicationInterceptor implements Interceptor {
                         logger.error("Invalid configuration: expected " + configurationClass + ", got " + configuration);
                         return;
                     }
-                    putConfigurationInCache(pageFile, configuration);
+                    putConfigurationInCache(configurationFile, configuration);
                     pageInstance.setConfiguration(configuration);
                 } finally {
                     in.close();

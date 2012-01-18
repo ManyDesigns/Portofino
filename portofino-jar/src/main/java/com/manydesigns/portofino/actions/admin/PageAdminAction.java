@@ -35,13 +35,15 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.util.RandomUtil;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.actions.AbstractActionBean;
+import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
-import com.manydesigns.portofino.actions.chart.configuration.ChartConfiguration;
-import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
+import com.manydesigns.portofino.actions.chart.ChartAction;
+import com.manydesigns.portofino.actions.crud.CrudAction;
 import com.manydesigns.portofino.actions.forms.NewPage;
-import com.manydesigns.portofino.actions.jsp.configuration.JspConfiguration;
-import com.manydesigns.portofino.actions.text.configuration.TextConfiguration;
+import com.manydesigns.portofino.actions.jsp.JspAction;
+import com.manydesigns.portofino.actions.text.TextAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
@@ -55,6 +57,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.pages.*;
+import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
@@ -63,6 +66,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.converters.ClassConverter;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -72,6 +76,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -105,7 +110,7 @@ public class PageAdminAction extends AbstractActionBean {
     //--------------------------------------------------------------------------
 
     protected static final String[][] NEW_PAGE_SETUP_FIELDS = {
-            {"pageClassName", "fragment", "title", "description", "insertPositionName"}};
+            {"actionClassName", "fragment", "title", "description", "insertPositionName"}};
     protected Form newPageForm;
     protected String destinationPageId;
     protected String fragment;
@@ -226,44 +231,91 @@ public class PageAdminAction extends AbstractActionBean {
     }
 
     private Resolution doCreateNewPage() throws IllegalAccessException, InvocationTargetException {
-        return null; //TODO ripristinare
-        /*prepareNewPageForm();
+        prepareNewPageForm();
         newPageForm.readFromRequest(context.getRequest());
         if(newPageForm.validate()) {
             NewPage newPage = new NewPage();
             newPageForm.writeToObject(newPage);
             InsertPosition insertPosition =
                     InsertPosition.valueOf(newPage.getInsertPositionName());
-            String pageClassName = newPage.getPageClassName();
-            Page page = (Page) ReflectionUtil.newInstance(pageClassName);
-            copyModelObject(newPage, page);
+            String pageClassName = newPage.getActionClassName();
+            PortofinoAction action = (PortofinoAction) ReflectionUtil.newInstance(pageClassName);
             String pageId = RandomUtil.createRandomId();
+
+            String script;
+            //TODO duplicato in PortletAction
+            String template = action.getScriptTemplate();
+            String className = pageId;
+            if(Character.isDigit(className.charAt(0))) {
+                className = "_" + className;
+            }
+            script = template.replace("__CLASS_NAME__", className);
+            //end TODO
+
+            Page page = new Page();
+            copyModelObject(newPage, page);
             page.setId(pageId);
+
+            Object configuration = ReflectionUtil.newInstance(action.getConfigurationClass());
+            Model model = application.getModel();
+            if(configuration instanceof ModelObject) {
+                model.init((ModelObject) configuration);
+            }
+            model.init(page);
+
+            String fragment = newPage.getFragment();
             String configurePath;
-            synchronized (application) {
-                switch (insertPosition) {
-                    case TOP:
-                        model.getRootPage().addChild(page);
-                        configurePath = "";
-                        break;
-                    case CHILD:
-                        dispatch.getLastPageInstance().addChild(page);
-                        configurePath = dispatch.getOriginalPath();
-                        break;
-                    case SIBLING:
-                        dispatch.getPageInstance(-2).addChild(page);
-                        configurePath = dispatch.getParentPathUrl();
-                        break;
-                    default:
-                        throw new IllegalStateException("Don't know how to add page " + page + " at position " + insertPosition);
+            File directory;
+            switch (insertPosition) {
+                case TOP:
+                    directory = new File(application.getPagesDir(), fragment);
+                    configurePath = "";
+                    break;
+                case CHILD:
+                    directory = dispatch.getLastPageInstance().getChildPageDirectory(fragment);
+                    configurePath = dispatch.getOriginalPath();
+                    break;
+                case SIBLING:
+                    directory = dispatch.getPageInstance(-2).getChildPageDirectory(fragment);
+                    configurePath = dispatch.getParentPathUrl();
+                    break;
+                default:
+                    throw new IllegalStateException("Don't know how to add page " + page + " at position " + insertPosition);
+            }
+
+            if(directory.exists()) {
+                logger.error("Can't create page - directory {} exists", directory.getAbsolutePath());
+                SessionMessages.addErrorMessage(getMessage("page.create.failed.directoryExists"));
+                return new ForwardResolution("/layouts/page-crud/new-page.jsp");
+            }
+            if(directory.mkdir()) {
+                try {
+                    PageUtils.savePage(directory, page);
+                    PageUtils.saveConfiguration(directory, configuration);
+                    File groovyScriptFile =
+                        ScriptingUtil.getGroovyScriptFile(directory, "action");
+                    FileWriter fw = null;
+                    try {
+                        fw = new FileWriter(groovyScriptFile);
+                        fw.write(script);
+                    } finally {
+                        IOUtils.closeQuietly(fw);
+                    }
+                } catch (Exception e) {
+                    logger.error("Exception saving page configuration");
+                    SessionMessages.addErrorMessage(getMessage("page.create.failed"));
+                    return new ForwardResolution("/layouts/page-crud/new-page.jsp");
                 }
-                saveModel();
+            } else {
+                logger.error("Can't create directory {}", directory.getAbsolutePath());
+                SessionMessages.addErrorMessage(getMessage("page.create.failed.cantCreateDir"));
+                return new ForwardResolution("/layouts/page-crud/new-page.jsp");
             }
             SessionMessages.addInfoMessage(getMessage("page.create.successful"));
-            return new RedirectResolution(configurePath + "/" + page.getFragment()).addParameter("configure");
+            return new RedirectResolution(configurePath + "/" + fragment).addParameter("configure");
         } else {
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
-        }*/
+        }
     }
 
     protected void saveModel() {
@@ -452,11 +504,11 @@ public class PageAdminAction extends AbstractActionBean {
     }
 
     private void prepareNewPageForm() {
-        DefaultSelectionProvider classSelectionProvider = new DefaultSelectionProvider("pageClassName");
-        classSelectionProvider.appendRow(CrudConfiguration.class.getName(), "Crud", true);
-        classSelectionProvider.appendRow(ChartConfiguration.class.getName(), "Chart", true);
-        classSelectionProvider.appendRow(TextConfiguration.class.getName(), "Text", true);
-        classSelectionProvider.appendRow(JspConfiguration.class.getName(), "JSP", true);
+        DefaultSelectionProvider classSelectionProvider = new DefaultSelectionProvider("actionClassName");
+        classSelectionProvider.appendRow(CrudAction.class.getName(), "Crud", true);
+        classSelectionProvider.appendRow(ChartAction.class.getName(), "Chart", true);
+        classSelectionProvider.appendRow(TextAction.class.getName(), "Text", true);
+        classSelectionProvider.appendRow(JspAction.class.getName(), "JSP", true);
         /*PageReference.class.getName(), "Reference to another page"*/
         //root + at least 1 child
         boolean includeSiblingOption = dispatch.getPageInstancePath().length > 2;
@@ -478,7 +530,7 @@ public class PageAdminAction extends AbstractActionBean {
         newPageForm = new FormBuilder(NewPage.class)
                 .configFields(NEW_PAGE_SETUP_FIELDS)
                 .configFieldSetNames("Page setup")
-                .configSelectionProvider(classSelectionProvider, "pageClassName")
+                .configSelectionProvider(classSelectionProvider, "actionClassName")
                 .configSelectionProvider(insertPositionSelectionProvider, "insertPositionName")
                 .build();
         ((SelectField) newPageForm.findFieldByPropertyName("insertPositionName")).setValue(InsertPosition.CHILD.name());

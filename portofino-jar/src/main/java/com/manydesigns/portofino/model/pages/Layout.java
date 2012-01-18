@@ -83,6 +83,9 @@ public class Layout implements ModelObject {
     }
 
     public void init(Model model) {
+        if(self == null) {
+            self = new Self();
+        }
     }
 
     public void link(Model model) {
