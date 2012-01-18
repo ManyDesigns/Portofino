@@ -61,21 +61,22 @@ public class PageLogic {
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("pages");
         if(includeRoot) {
             Page rootPage = application.getPage(baseDir);
-            selectionProvider.appendRow("/" + baseDir.getName(), rootPage.getTitle() + " (top level)", true);
+            selectionProvider.appendRow("/", rootPage.getTitle() + " (top level)", true);
         }
-        appendToPagesSelectionProvider(application, baseDir, null, selectionProvider, includeDetailChildren, excludes);
+        appendChildrenToPagesSelectionProvider
+                (application, baseDir, baseDir, null, selectionProvider, includeDetailChildren, excludes);
         return selectionProvider;
     }
 
-    protected static void appendToPagesSelectionProvider
-            (Application application, File baseDir, String breadcrumb,
+    protected static void appendChildrenToPagesSelectionProvider
+            (Application application, File baseDir, File parentDir, String breadcrumb,
              DefaultSelectionProvider selectionProvider, boolean includeDetailChildren, File... excludes) {
         FileFilter filter = new FileFilter() {
             public boolean accept(File pathname) {
                 return pathname.isDirectory();
             }
         };
-        for (File dir : baseDir.listFiles(filter)) {
+        for (File dir : parentDir.listFiles(filter)) {
             appendToPagesSelectionProvider
                     (application, baseDir, dir, breadcrumb, selectionProvider, includeDetailChildren, excludes);
         }
@@ -91,9 +92,9 @@ public class PageLogic {
             if(includeDetailChildren) {
                 breadcrumb += " (detail)"; //TODO I18n
                 selectionProvider.appendRow
-                    ("/" + baseDir.getName() + "/" + FileUtils.getRelativePath(baseDir, file), breadcrumb, true);
-                appendToPagesSelectionProvider
-                        (application, file, breadcrumb, selectionProvider, includeDetailChildren, excludes);
+                    ("/" + FileUtils.getRelativePath(baseDir, file), breadcrumb, true);
+                appendChildrenToPagesSelectionProvider
+                        (application, baseDir, file, breadcrumb, selectionProvider, includeDetailChildren, excludes);
             }
         } else {
             Page page = application.getPage(file);
@@ -103,9 +104,9 @@ public class PageLogic {
                 breadcrumb = String.format("%s > %s", breadcrumb, page.getTitle());
             }
             selectionProvider.appendRow
-                    ("/" + baseDir.getName() + "/" + FileUtils.getRelativePath(baseDir, file), breadcrumb, true);
-            appendToPagesSelectionProvider
-                    (application, file, breadcrumb, selectionProvider, includeDetailChildren, excludes);
+                    ("/" + FileUtils.getRelativePath(baseDir, file), breadcrumb, true);
+            appendChildrenToPagesSelectionProvider
+                    (application, baseDir, file, breadcrumb, selectionProvider, includeDetailChildren, excludes);
         }
     }
 
