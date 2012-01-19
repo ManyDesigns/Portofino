@@ -1156,7 +1156,7 @@ public class CrudAction extends PortletAction {
                     pkObject = pkHelper.getPrimaryKey(pk);
                 } catch (Exception e) {
                     logger.warn("Invalid primary key", e);
-                    return notInUseCase(context);
+                    return new ErrorResolution(404);
                 }
                 object = QueryUtils.getObjectByPk(
                     application,

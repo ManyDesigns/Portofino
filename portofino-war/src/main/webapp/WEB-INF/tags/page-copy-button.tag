@@ -2,7 +2,7 @@
 <jsp:useBean id="actionBean" scope="request"
      type="com.manydesigns.portofino.actions.PortletAction"/>
 <button onclick="showCopyPageDialog(
-                    '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
+                    '<%= actionBean.dispatch.getLastPageInstance().getPathFromRoot() %>',
                     '<%= request.getContextPath() %>');
                 return false;"
         type="submit"

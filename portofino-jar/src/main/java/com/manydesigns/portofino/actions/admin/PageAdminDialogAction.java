@@ -34,6 +34,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.actions.forms.CopyPage;
 import com.manydesigns.portofino.actions.forms.MovePage;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
@@ -96,16 +97,14 @@ public class PageAdminDialogAction extends AbstractActionBean {
 
     @RequiresAdministrator
     public Resolution copyPageDialog() {
-        return null; //TODO ripristinare
-
-        /*
         SelectionProvider pagesSelectionProvider =
-                PageLogic.createPagesSelectionProvider(model.getRootPage(), true, true, page);
+                PageLogic.createPagesSelectionProvider
+                        (application, application.getPagesDir(), true, true, pageInstance.getDirectory());
         copyForm = new FormBuilder(CopyPage.class)
                 .configReflectiveFields()
                 .configSelectionProvider(pagesSelectionProvider, "destinationPagePath")
                 .build();
-        return new ForwardResolution("/layouts/admin/copyPageDialog.jsp");*/
+        return new ForwardResolution("/layouts/admin/copyPageDialog.jsp");
     }
 
     public String getPagePath() {

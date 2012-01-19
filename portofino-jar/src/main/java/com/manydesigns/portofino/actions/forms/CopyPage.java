@@ -48,6 +48,6 @@ public class CopyPage {
 
     @Required
     @Label("Copy to")
-    public String destinationPageId;
+    public String destinationPagePath;
 
 }

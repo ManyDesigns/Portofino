@@ -80,9 +80,9 @@ function showMovePageDialog(pagePath, contextPath) {
     return false;
 }
 
-function showCopyPageDialog(pageId, contextPath) {
+function showCopyPageDialog(pagePath, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/actions/admin/page/dialog?copyPageDialog&pageId=" + pageId, function() {
+    dialogDiv.load(contextPath + "/actions/admin/page/dialog?copyPageDialog&pagePath=" + pagePath, function() {
         dialogDiv.find("#dialog-copy-page").dialog({
             modal: true,
             width: 500,
