@@ -41,6 +41,7 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.model.pages.PageUtils;
 import com.manydesigns.portofino.navigation.Navigation;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Resolution;
@@ -53,11 +54,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -159,32 +157,23 @@ public class ApplicationInterceptor implements Interceptor {
         if(configuration != null) {
             pageInstance.setConfiguration(configuration);
         } else {
-            if(configurationFile.exists()) {
-                //TODO spostare in PageUtils
+            try {
                 Class<?> configurationClass = actionBean.getConfigurationClass();
-                String configurationPackage = configurationClass.getPackage().getName();
-                JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
-                Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-                FileInputStream in = new FileInputStream(configurationFile);
-                try {
-                    configuration = unmarshaller.unmarshal(in);
-                    if(configuration instanceof ModelObject) {
-                        Model model = application.getModel();
-                        if(model != null) {
-                            model.init((ModelObject) configuration);
-                        } else {
-                            logger.error("Model is null, cannot init configuration");
-                        }
+                configuration = PageUtils.loadConfiguration(pageInstance, configurationClass);
+                if(configuration instanceof ModelObject) {
+                    Model model = application.getModel();
+                    if(model != null) {
+                        model.init((ModelObject) configuration);
+                    } else {
+                        logger.error("Model is null, cannot init configuration");
                     }
-                    if(!configurationClass.isInstance(configuration)) {
-                        logger.error("Invalid configuration: expected " + configurationClass + ", got " + configuration);
-                        return;
-                    }
+                }
+                if(configuration != null) {
                     putConfigurationInCache(configurationFile, configuration);
                     pageInstance.setConfiguration(configuration);
-                } finally {
-                    in.close();
                 }
+            } catch (Exception e) {
+                logger.error("Couldn't load configuration from " + configurationFile.getAbsolutePath(), e);
             }
         }
     }

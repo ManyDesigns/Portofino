@@ -81,7 +81,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -166,8 +165,6 @@ public class HibernateApplicationImpl implements Application {
     public synchronized void loadXmlModel() {
         logger.info("Loading xml model from file: {}",
                 appModelFile.getAbsolutePath());
-
-        pageCache.clear(); //TODO
 
         try {
             JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
@@ -432,9 +429,6 @@ public class HibernateApplicationImpl implements Application {
             throw new RuntimeException("Error loading page", e);
         }
     }
-
-    //TODO proper page cache
-    private final ConcurrentHashMap<File, Page> pageCache = new ConcurrentHashMap<File, Page>();
 
     private Page getPageFromCache(File pageFile) {
         return null;//pageCache.get(pageFile);

@@ -30,6 +30,8 @@
 package com.manydesigns.portofino.model.pages;
 
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -48,6 +50,8 @@ public class PageUtils {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     protected static final JAXBContext pagesJaxbContext;
+
+    private static final Logger logger = LoggerFactory.getLogger(PageUtils.class);
 
     static {
         try {
@@ -83,5 +87,20 @@ public class PageUtils {
         File configurationFile = new File(directory, "configuration.xml");
         marshaller.marshal(configuration, configurationFile);
         return configurationFile;
+    }
+
+    public static Object loadConfiguration(PageInstance pageInstance, Class<?> configurationClass) throws Exception {
+        Object configuration = null;
+        File configurationFile2 = new File(pageInstance.getDirectory(), "configuration.xml");
+        if(configurationFile2.exists()) {
+            String configurationPackage = configurationClass.getPackage().getName();
+            JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            configuration = unmarshaller.unmarshal(configurationFile2);
+        }
+        if(!configurationClass.isInstance(configuration)) {
+            logger.error("Invalid configuration: expected " + configurationClass + ", got " + configuration);
+        }
+        return configuration;
     }
 }

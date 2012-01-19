@@ -422,7 +422,7 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
             PageUtils.savePage(pageInstance.getDirectory(), page);
         } catch (Exception e) {
             logger.error("Couldn't save page", e);
-            return false; //TODO handle + script + session msg
+            return false; //TODO handle return value + script + session msg
         }
         updateScript();
         return true;
