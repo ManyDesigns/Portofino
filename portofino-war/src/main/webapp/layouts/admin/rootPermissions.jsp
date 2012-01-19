@@ -10,7 +10,7 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.RootPermissionsAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.page.RootPermissionsAction"/>
     <stripes:layout-component name="pageTitle">
         Root permission
     </stripes:layout-component>

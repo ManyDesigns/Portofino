@@ -33,17 +33,13 @@ import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.pages.Layout;
 import com.manydesigns.portofino.model.pages.Page;
-import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -169,11 +165,16 @@ public class PageInstance {
     }
 
     public File getChildPageDirectory(String name) {
+        File baseDir = getChildrenDirectory();
+        return new File(baseDir, name);
+    }
+
+    public File getChildrenDirectory() {
         File baseDir = directory;
         if(!parameters.isEmpty()) {
             baseDir = new File(baseDir, DETAIL);
         }
-        return new File(baseDir, name);
+        return baseDir;
     }
 
     public String getName() {

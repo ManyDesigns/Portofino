@@ -27,9 +27,11 @@
  *
  */
 
-package com.manydesigns.portofino.actions.admin;
+package com.manydesigns.portofino.actions.admin.page;
 
 import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.actions.admin.AdminAction;
+import com.manydesigns.portofino.actions.admin.SettingsAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.Dispatch;
@@ -66,7 +68,6 @@ public class RootPermissionsAction extends PageAdminAction implements AdminActio
     //--------------------------------------------------------------------------
     // Action events
     //--------------------------------------------------------------------------
-
 
     @Override
     @After(stages = LifecycleStage.BindingAndValidation)

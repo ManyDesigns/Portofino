@@ -44,7 +44,6 @@ import com.manydesigns.portofino.application.ServerInfo;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.logic.PageLogic;
-import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
@@ -77,11 +76,7 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
     @Inject(ApplicationAttributes.SERVER_INFO)
     ServerInfo serverInfo;
 
-    @Inject(RequestAttributes.MODEL)
-    Model model;
-
     Form form;
-    //RootPage rootPage;
 
     //--------------------------------------------------------------------------
     // Logging

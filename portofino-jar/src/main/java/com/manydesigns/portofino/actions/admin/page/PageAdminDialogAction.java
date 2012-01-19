@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.actions.admin;
+package com.manydesigns.portofino.actions.admin.page;
 
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;

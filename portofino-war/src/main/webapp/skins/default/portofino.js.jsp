@@ -131,6 +131,7 @@ $(function() {
     decorateIconButton("button.plusthick", "ui-icon-plusthick");
     decorateIconButton("button.minusthick", "ui-icon-minusthick");
     decorateIconButton("button.transferthick-e-w", "ui-icon-transferthick-e-w");
+    decorateIconButton("button.folder-open", "ui-icon-folder-open");
     decorateIconButton(".portletHeaderButtons button[name=configure]", "ui-icon-wrench");
     decorateIconButton(".portletHeaderButtons button[name=manageAttachments]", "ui-icon-link");
 });

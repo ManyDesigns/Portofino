@@ -9,7 +9,7 @@
     taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%@
     taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/${skin}/modal-page.jsp" formActionUrl="/actions/admin/page">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.PageAdminAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="page-create" cssClass="contentButton"/>
     </stripes:layout-component>

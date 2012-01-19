@@ -27,16 +27,19 @@
 *
 */
 
-package com.manydesigns.portofino.actions.admin;
+package com.manydesigns.portofino.actions.admin.page;
 
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.forms.TableForm;
+import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.actions.AbstractActionBean;
+import com.manydesigns.portofino.actions.PortletAction;
 import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.chart.ChartAction;
@@ -76,10 +79,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.*;
@@ -139,6 +139,7 @@ public class PageAdminAction extends AbstractActionBean {
     //--------------------------------------------------------------------------
 
     @Buttons({
+        @Button(list = "page-children-edit", key = "commons.cancel", order = 99),
         @Button(list = "page-permissions-edit", key = "commons.cancel", order = 99),
         @Button(list = "page-create", key = "commons.cancel", order = 99)
     })
@@ -549,6 +550,125 @@ public class PageAdminAction extends AbstractActionBean {
                 .configSelectionProvider(insertPositionSelectionProvider, "insertPositionName")
                 .build();
         ((SelectField) newPageForm.findFieldByPropertyName("insertPositionName")).setValue(InsertPosition.CHILD.name());
+    }
+
+    //--------------------------------------------------------------------------
+    // Page children
+    //--------------------------------------------------------------------------
+
+    protected List<EditChildPage> childPages = new ArrayList<EditChildPage>();
+    protected TableForm childPagesForm;
+
+    @RequiresAdministrator
+    public Resolution pageChildren() {
+        setupChildPages();
+        return forwardToPageChildren();
+    }
+
+    protected void setupChildPages() {
+        FileFilter filter = new FileFilter() {
+            public boolean accept(File pathname) {
+                return pathname.isDirectory();
+            }
+        };
+        File childrenDirectory = getPageInstance().getChildrenDirectory();
+        for (File dir : childrenDirectory.listFiles(filter)) {
+            if(PageInstance.DETAIL.equals(dir.getName())) {
+                continue;
+            }
+            EditChildPage childPage = null;
+            for(ChildPage cp : getPageInstance().getLayout().getChildPages()) {
+                if(cp.getName().equals(dir.getName())) {
+                    childPage = new EditChildPage();
+                    childPage.active = true;
+                    childPage.name = cp.getName();
+                    childPage.showInNavigation = cp.isShowInNavigation();
+                    childPage.title = application.getPage(dir).getTitle();
+                    childPage.embedded = cp.getContainer() != null;
+                    break;
+                }
+            }
+            if(childPage == null) {
+                childPage = new EditChildPage();
+                childPage.active = false;
+                childPage.name = dir.getName();
+            }
+            childPages.add(childPage);
+        }
+
+        childPagesForm = new TableFormBuilder(EditChildPage.class)
+                .configNRows(childPages.size())
+                .configFields("active", "name", "title", "showInNavigation", "embedded")
+                .build();
+        childPagesForm.readFromObject(childPages);
+    }
+
+    @RequiresAdministrator
+    @Button(list = "page-children-edit", key = "commons.update", order = 1)
+    public Resolution updatePageChildren() {
+        setupChildPages();
+        childPagesForm.readFromRequest(context.getRequest());
+        if(!childPagesForm.validate()) {
+            return forwardToPageChildren();
+        }
+        childPagesForm.writeToObject(childPages);
+        Layout layout = getPageInstance().getLayout();
+        List<ChildPage> newChildren = new ArrayList<ChildPage>();
+        for(EditChildPage editChildPage : childPages) {
+            if(!editChildPage.active) {
+                continue;
+            }
+            ChildPage childPage = null;
+            for(ChildPage cp : getPageInstance().getLayout().getChildPages()) {
+                if(cp.getName().equals(editChildPage.name)) {
+                    childPage = cp;
+                    break;
+                }
+            }
+            if(childPage == null) {
+                childPage = new ChildPage();
+                childPage.setName(editChildPage.name);
+            }
+            childPage.setShowInNavigation(editChildPage.showInNavigation);
+            if(editChildPage.embedded) {
+                if(childPage.getContainer() == null) {
+                    childPage.setContainer(PortletAction.DEFAULT_LAYOUT_CONTAINER);
+                    childPage.setOrder("0");
+                }
+            } else {
+                childPage.setContainer(null);
+                childPage.setOrder(null);
+            }
+            newChildren.add(childPage);
+            if(!editChildPage.showInNavigation && !editChildPage.embedded) {
+                String msg = getMessage("page.warnNotShowInNavigationNotEmbedded");
+                msg = MessageFormat.format(msg, editChildPage.name);
+                SessionMessages.addWarningMessage(msg);
+            }
+        }
+        layout.getChildPages().clear();
+        layout.getChildPages().addAll(newChildren);
+        try {
+            PageUtils.savePage(getPageInstance());
+        } catch (Exception e) {
+            logger.error("Couldn't save page", e);
+            String msg = getMessage("page.update.failed");
+            msg = MessageFormat.format(msg, e.getMessage());
+            SessionMessages.addErrorMessage(msg);
+        }
+        return forwardToPageChildren();
+    }
+
+    public List<EditChildPage> getChildPages() {
+        return childPages;
+    }
+
+    public TableForm getChildPagesForm() {
+        return childPagesForm;
+    }
+
+    protected Resolution forwardToPageChildren() {
+        return new ForwardResolution("/layouts/page/children.jsp");
     }
 
     //--------------------------------------------------------------------------
