@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.model.pages;
 
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.FileReader;
+import java.io.Reader;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -74,9 +77,17 @@ public class PageUtils {
 
     public static Page loadPage(File directory) throws Exception {
         File pageFile = new File(directory, "page.xml");
+        FileReader reader = new FileReader(pageFile);
+        try {
+            return loadPage(reader);
+        } finally {
+            IOUtils.closeQuietly(reader);
+        }
+    }
+
+    public static Page loadPage(Reader reader) throws Exception {
         Unmarshaller unmarshaller = pagesJaxbContext.createUnmarshaller();
-        Page page = (Page) unmarshaller.unmarshal(pageFile);
-        return page;
+        return (Page) unmarshaller.unmarshal(reader);
     }
 
 
@@ -89,18 +100,26 @@ public class PageUtils {
         return configurationFile;
     }
 
-    public static Object loadConfiguration(PageInstance pageInstance, Class<?> configurationClass) throws Exception {
-        Object configuration = null;
-        File configurationFile2 = new File(pageInstance.getDirectory(), "configuration.xml");
-        if(configurationFile2.exists()) {
-            String configurationPackage = configurationClass.getPackage().getName();
-            JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
-            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            configuration = unmarshaller.unmarshal(configurationFile2);
+    public static <T> T loadConfiguration(File directory, Class<? extends T> configurationClass) throws Exception {
+        File configurationFile = new File(directory, "configuration.xml");
+        FileReader reader = new FileReader(configurationFile);
+        try {
+            return loadConfiguration(reader, configurationClass);
+        } finally {
+            IOUtils.closeQuietly(reader);
         }
+    }
+
+    public static <T> T loadConfiguration(Reader reader, Class<? extends T> configurationClass) throws Exception {
+        Object configuration;
+        String configurationPackage = configurationClass.getPackage().getName();
+        JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        configuration = unmarshaller.unmarshal(reader);
         if(!configurationClass.isInstance(configuration)) {
             logger.error("Invalid configuration: expected " + configurationClass + ", got " + configuration);
+            return null;
         }
-        return configuration;
+        return (T) configuration;
     }
 }

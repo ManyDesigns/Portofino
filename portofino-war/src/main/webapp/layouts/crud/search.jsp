@@ -31,7 +31,7 @@
 
     <script type="text/javascript">
         $(".search_results button[name=bulkDelete]").click(function() {
-            return confirm ('Are you sure?');
+            return confirm ('<fmt:message key="commons.confirm" />');
         });
         $(".search_form_toggle_link").click(makeToggleFunction());
         function makeToggleFunction() {

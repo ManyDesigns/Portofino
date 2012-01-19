@@ -343,11 +343,6 @@ public class PageAdminAction extends AbstractActionBean {
         }
     }
 
-    protected void saveModel() {
-        model.init();
-        application.saveXmlModel();
-    }
-
     protected void copyModelObject(ModelObject src, ModelObject dest) throws IllegalAccessException, InvocationTargetException {
         //To handle actualActionClass = null, ClassConverter must have a null return value
         BeanUtilsBean.getInstance().getConvertUtils().register(new ClassConverter(null), Class.class);

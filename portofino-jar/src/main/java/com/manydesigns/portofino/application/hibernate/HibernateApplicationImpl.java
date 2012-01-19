@@ -31,12 +31,14 @@ package com.manydesigns.portofino.application.hibernate;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
+import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
@@ -49,9 +51,11 @@ import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.PageUtils;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
+import groovy.lang.GroovyClassLoader;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
@@ -60,6 +64,7 @@ import liquibase.resource.ResourceAccessor;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -77,10 +82,13 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -436,6 +444,48 @@ public class HibernateApplicationImpl implements Application {
 
     private void putPageInCache(File file, Page page) {
         //pageCache.put(file, page);
+    }
+
+    //TODO!!!
+    private static final ConcurrentMap<File, Class<? extends PortofinoAction>> actionClassCache =
+            new ConcurrentHashMap<File, Class<? extends PortofinoAction>>();
+
+    public Class<? extends PortofinoAction> getActionClass(File directory) {
+        Class<? extends PortofinoAction> actionClass = actionClassCache.get(directory);
+        if(actionClass != null) {
+            return actionClass;
+        } else {
+            try {
+                actionClass = (Class<? extends PortofinoAction>) ScriptingUtil.getGroovyClass(directory, "action");
+            } catch (IOException e) {
+                throw new RuntimeException("Couldn't load action class for " + directory.getName(), e); //TODO
+            }
+            if(Dispatcher.isValidActionClass(actionClass)) {
+                actionClassCache.put(directory, actionClass);
+                return actionClass;
+            } else {
+                throw new RuntimeException("Invalid action class for " + directory.getName() + ": " + actionClass); //TODO
+            }
+        }
+    }
+
+    public Class<? extends PortofinoAction> setActionClass(File directory, String source) throws IOException {
+        File groovyScriptFile =
+                ScriptingUtil.getGroovyScriptFile(directory, "action");
+        GroovyClassLoader loader = new GroovyClassLoader();
+        Class<? extends PortofinoAction> scriptClass =
+                loader.parseClass(source, groovyScriptFile.getAbsolutePath());
+        if(!Dispatcher.isValidActionClass(scriptClass)) {
+            return null;
+        }
+        FileWriter fw = new FileWriter(groovyScriptFile);
+        try {
+            fw.write(source);
+            actionClassCache.put(directory, scriptClass);
+        } finally {
+            IOUtils.closeQuietly(fw);
+        }
+        return scriptClass;
     }
 
     //**************************************************************************

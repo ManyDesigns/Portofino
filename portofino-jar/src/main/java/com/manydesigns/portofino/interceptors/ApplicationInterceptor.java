@@ -159,7 +159,7 @@ public class ApplicationInterceptor implements Interceptor {
         } else {
             try {
                 Class<?> configurationClass = actionBean.getConfigurationClass();
-                configuration = PageUtils.loadConfiguration(pageInstance, configurationClass);
+                configuration = PageUtils.loadConfiguration(pageInstance.getDirectory(), configurationClass);
                 if(configuration instanceof ModelObject) {
                     Model model = application.getModel();
                     if(model != null) {

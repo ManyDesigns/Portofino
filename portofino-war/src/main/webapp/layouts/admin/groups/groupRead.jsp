@@ -7,7 +7,7 @@
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request"
-                 type="com.manydesigns.portofino.actions.user.admin.GroupAdminAction"/>
+                 type="com.manydesigns.portofino.actions.admin.groups.GroupAdminAction"/>
     <stripes:layout-component name="contentHeader">
         <div class="breadcrumbs">
             <div class="inner">
@@ -36,7 +36,7 @@
     <stripes:layout-component name="contentFooter" />
     <script type="text/javascript">
         $(".crudReadButtons button[name=delete]").click(function() {
-            return confirm ('Are you sure?');
+            return confirm ('<fmt:message key="commons.confirm" />');
         });
     </script>
 </stripes:layout-render>

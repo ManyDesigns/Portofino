@@ -26,19 +26,33 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.actions.user.admin;
+package com.manydesigns.portofino.actions.admin.groups;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.SessionAttributes;
+import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
+import com.manydesigns.portofino.actions.admin.users.UserAdminAction;
 import com.manydesigns.portofino.actions.crud.CrudAction;
+import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
+import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.model.pages.PageUtils;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.InputStreamReader;
 import java.sql.Timestamp;
 
 /*
@@ -48,12 +62,21 @@ import java.sql.Timestamp;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @RequiresAdministrator
-@UrlBinding(GroupAdminAction.BASE_PATH + "/{pk}")
+@UrlBinding(GroupAdminAction.BASE_PATH + "/{groupId}")
 public class GroupAdminAction extends CrudAction implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public static final String BASE_PATH = "/actions/admin/groups";
+
+    protected String groupId;
+
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(GroupAdminAction.class);
 
     @Button(list = "contentButtons", key = "commons.returnToPages", order = 1)
     public Resolution returnToPages() {
@@ -67,36 +90,31 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
     @Override
     @Before
     public void prepare() {
-        /*Model myModel;
         try {
-            JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
-            Unmarshaller unmarshaller = jc.createUnmarshaller();
-            myModel = (Model) unmarshaller.unmarshal(getClass().getResourceAsStream("users.xml"));
-            myModel.getDatabases().addAll(model.getDatabases());
-            myModel.init(myModel.getRootPage());
-        } catch (JAXBException e) {
+            Page page = PageUtils.loadPage(new InputStreamReader(getClass().getResourceAsStream("page.xml")));
+            model.init(page);
+            crudConfiguration = PageUtils.loadConfiguration
+                    (new InputStreamReader(getClass().getResourceAsStream("configuration.xml")), CrudConfiguration.class);
+            model.init(crudConfiguration);
+            pageInstance = new PageInstance(null, null, application, page);
+            pageInstance.setActionBean(this);
+            pageInstance.setActionClass(getClass());
+            pageInstance.setConfiguration(crudConfiguration);
+            if(!StringUtils.isBlank(groupId)) {
+                pageInstance.getParameters().add(groupId);
+            }
+            HttpServletRequest request = context.getRequest();
+            String originalPath = ServletUtils.getOriginalPath(request);
+            dispatch = new Dispatch(request.getContextPath(), originalPath, pageInstance);
+            Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
+            request.setAttribute(RequestAttributes.DISPATCH, dispatch);
+            request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
+            prepare(pageInstance, context);
+            super.prepare();
+        } catch (Exception e) {
+            logger.error("Internal error", e);
             throw new RuntimeException(e);
         }
-
-        crudPage = (CrudPage) myModel.getRootPage().findDescendantPageById("groups");
-
-        String mode;
-        if (StringUtils.isEmpty(pk)) {
-            mode = CrudPage.MODE_SEARCH;
-        } else {
-            mode = CrudPage.MODE_DETAIL;
-        }
-        pageInstance = new CrudPageInstance(application, crudPage, mode, pk);
-        pageInstance.realize();
-        PageInstance rootPageInstance = new PageInstance(application, model.getRootPage(), null);
-        HttpServletRequest request = context.getRequest();
-        String originalPath = ServletUtils.getOriginalPath(request);
-        dispatch = new Dispatch(request.getContextPath(), originalPath, getClass(), rootPageInstance, pageInstance);
-        Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
-        request.setAttribute(RequestAttributes.DISPATCH, dispatch);
-        request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);*/
-        //TODO ripristinare
-        super.prepare();
     }
 
     @Override
@@ -158,5 +176,13 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
 
     public String getActionPath() {
         return dispatch.getOriginalPath();
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }

@@ -130,32 +130,9 @@ public class PageInstance {
 
     public Class<? extends PortofinoAction> getActionClass() {
         if(actionClass == null) {
-            actionClass = getActionClass(directory);
+            actionClass = application.getActionClass(directory);
         }
         return actionClass;
-    }
-
-    //TODO!!!
-    private static final ConcurrentMap<File, Class<? extends PortofinoAction>> actionClassCache =
-            new ConcurrentHashMap<File, Class<? extends PortofinoAction>>();
-
-    protected Class<? extends PortofinoAction> getActionClass(File file) {
-        Class<? extends PortofinoAction> actionClass = actionClassCache.get(file);
-        if(actionClass != null) {
-            return actionClass;
-        } else {
-            try {
-                actionClass = (Class<? extends PortofinoAction>) ScriptingUtil.getGroovyClass(file, "action");
-            } catch (IOException e) {
-                throw new RuntimeException("Couldn't load action class for " + file.getName(), e); //TODO
-            }
-            if(Dispatcher.isValidActionClass(actionClass)) {
-                actionClassCache.put(file, actionClass);
-                return actionClass;
-            } else {
-                throw new RuntimeException("Invalid action class for " + file.getName() + ": " + actionClass); //TODO
-            }
-        }
     }
 
     public PortofinoAction getActionBean() {

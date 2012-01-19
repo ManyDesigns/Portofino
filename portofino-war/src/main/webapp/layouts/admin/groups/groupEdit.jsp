@@ -8,7 +8,7 @@
 
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request"
-                 type="com.manydesigns.portofino.actions.user.admin.GroupAdminAction"/>
+                 type="com.manydesigns.portofino.actions.admin.groups.GroupAdminAction"/>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="crud-edit" cssClass="contentButton" />
     </stripes:layout-component>

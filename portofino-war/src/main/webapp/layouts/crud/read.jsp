@@ -24,7 +24,7 @@
     </stripes:layout-component>
     <script type="text/javascript">
         $(".crudReadButtons button[name=delete]").click(function() {
-            return confirm ('Are you sure?');
+            return confirm ('<fmt:message key="commons.confirm" />');
         });
     </script>
 </stripes:layout-render>

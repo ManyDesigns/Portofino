@@ -42,6 +42,7 @@ import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.config.Configuration;
+import net.sourceforge.stripes.controller.AnnotatedClassActionResolver;
 import net.sourceforge.stripes.controller.NameBasedActionResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,9 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -64,6 +68,8 @@ public class ModelActionResolver extends NameBasedActionResolver {
 
     protected Dispatcher dispatcher;
     protected ServletContext servletContext;
+
+    protected Map<Class<? extends ActionBean>,Map<String,Method>> eventMappings;
 
     @Override
     public void init(Configuration configuration) throws Exception {
@@ -82,6 +88,10 @@ public class ModelActionResolver extends NameBasedActionResolver {
         } catch (Exception e) {
             throw new ServletException(e);
         }
+
+        Field eventMappingsField = AnnotatedClassActionResolver.class.getDeclaredField("eventMappings");
+        eventMappingsField.setAccessible(true);
+        eventMappings = (Map<Class<? extends ActionBean>, Map<String, Method>>) eventMappingsField.get(this);
     }
 
     @Override
@@ -89,8 +99,9 @@ public class ModelActionResolver extends NameBasedActionResolver {
         Dispatch dispatch = getDispatch(path);
         if(dispatch != null) {
             Class<? extends ActionBean> actionBeanClass = dispatch.getActionBeanClass();
-            if(GroovyObject.class.isAssignableFrom(actionBeanClass)) {
-                synchronized (this) { //TODO aggiungere solo se necessario?
+            if(GroovyObject.class.isAssignableFrom(actionBeanClass) &&
+               !eventMappings.containsKey(actionBeanClass)) {
+                synchronized (this) {
                     addActionBean(actionBeanClass);
                 }
             }

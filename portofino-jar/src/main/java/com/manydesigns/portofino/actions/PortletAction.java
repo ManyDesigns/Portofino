@@ -18,7 +18,6 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
@@ -27,7 +26,6 @@ import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.stripes.ModelActionResolver;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
-import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -46,7 +44,6 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
@@ -561,18 +558,14 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
     }
 
     protected void updateScript() {
-        File groovyScriptFile =
-                ScriptingUtil.getGroovyScriptFile(pageInstance.getDirectory(), "action");
-        FileWriter fw = null;
+        File directory = pageInstance.getDirectory();
+        File groovyScriptFile = ScriptingUtil.getGroovyScriptFile(directory, "action");
         try {
-            GroovyClassLoader loader = new GroovyClassLoader();
-            Class<?> scriptClass = loader.parseClass(script, groovyScriptFile.getAbsolutePath());
-            if(!Dispatcher.isValidActionClass(scriptClass)) {
+            Class<?> scriptClass = application.setActionClass(directory, script);
+            if(scriptClass == null) {
                 SessionMessages.addErrorMessage(getMessage("script.class.invalid"));
                 return;
             }
-            fw = new FileWriter(groovyScriptFile);
-            fw.write(script);
             if(this instanceof GroovyObject) {
                 //Attempt to remove old instance of custom action bean
                 //not guaranteed to work
@@ -592,8 +585,6 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
             String pageId = pageInstance.getPage().getId();
             logger.warn("Couldn't compile script for page " + pageId, e);
             SessionMessages.addErrorMessage(getMessage("script.compile.failed"));
-        } finally {
-            IOUtils.closeQuietly(fw);
         }
     }
 

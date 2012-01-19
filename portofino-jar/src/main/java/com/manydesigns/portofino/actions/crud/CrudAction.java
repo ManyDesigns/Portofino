@@ -192,9 +192,8 @@ public class CrudAction extends PortletAction {
     // Logging
     //**************************************************************************
 
-    public static final Logger logger =
+    private static final Logger logger =
             LoggerFactory.getLogger(CrudAction.class);
-    private static final String CONSTRAINT_VIOLATION = "Constraint violation";
 
     //**************************************************************************
     // Export
@@ -335,7 +334,7 @@ public class CrudAction extends PortletAction {
 
     @DefaultHandler
     public Resolution execute() {
-        if (pk == null) {
+        if (object == null) {
             if(isEmbedded()) {
                 return embeddedSearch();
             } else {

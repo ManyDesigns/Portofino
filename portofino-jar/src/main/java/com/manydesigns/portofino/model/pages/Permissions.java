@@ -90,20 +90,6 @@ public class Permissions implements ModelObject {
             actualLevels.put(group.getName(), group.getActualAccessLevel());
             actualPermissions.put(group.getName(), group.getPermissions());
         }
-
-        //Inherited permissions
-        // TODO: rivedere in ottica locale
-//        WithPermissions ancestor = (parent != null) ? parent.getParent() : null;
-//        if(ancestor != null) {
-//            Map<String, AccessLevel> parentLevels = ancestor.getPermissions().getActualLevels();
-//            for(Map.Entry<String, AccessLevel> entry : parentLevels.entrySet()) {
-//                String key = entry.getKey();
-//                AccessLevel value = entry.getValue();
-//                if(value == AccessLevel.DENY || actualLevels.get(key) == null) {
-//                    actualLevels.put(key, value);
-//                }
-//            }
-//        }
     }
 
     public void visitChildren(ModelVisitor visitor) {

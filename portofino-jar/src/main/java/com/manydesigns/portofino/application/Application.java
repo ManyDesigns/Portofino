@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.application;
 
+import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.Model;
@@ -43,6 +44,7 @@ import org.apache.commons.configuration.Configuration;
 import org.hibernate.Session;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -116,6 +118,8 @@ public interface Application {
     Model getModel();
     void syncDataModel(String databaseName) throws Exception;
     Page getPage(File directory);
+    Class<? extends PortofinoAction> getActionClass(File directory);
+    Class<? extends PortofinoAction> setActionClass(File directory, String source) throws IOException;
 
     //**************************************************************************
     // Persistance
