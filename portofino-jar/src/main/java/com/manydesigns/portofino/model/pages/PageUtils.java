@@ -29,6 +29,8 @@
 
 package com.manydesigns.portofino.model.pages;
 
+import com.manydesigns.portofino.dispatcher.PageInstance;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -53,6 +55,10 @@ public class PageUtils {
         } catch (JAXBException e) {
             throw new Error("Can't instantiate pages jaxb context", e);
         }
+    }
+
+    public static File savePage(PageInstance pageInstance) throws Exception {
+        return savePage(pageInstance.getDirectory(), pageInstance.getPage());
     }
 
     public static File savePage(File directory, Page page) throws Exception {

@@ -30,20 +30,27 @@
 package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.elements.reflection.CommonsConfigurationAccessor;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ServerInfo;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.FileConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,44 +102,50 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
     }
 
     private void setupFormAndBean() {
-        //TODO ripristinare
-        /*
-        rootPage = model.getRootPage();
-
         SelectionProvider skinSelectionProvider =
                 createSkinSelectionProvider();
         SelectionProvider pagesSelectionProvider =
-                PageLogic.createPagesSelectionProvider(model.getRootPage());
+                PageLogic.createPagesSelectionProvider(application, application.getPagesDir());
 
-        form = new FormBuilder(RootPage.class)
-                .configFields("title", "skin", "landingPage")
-                .configSelectionProvider(skinSelectionProvider, "skin")
-                .configSelectionProvider(pagesSelectionProvider, "landingPage")
+        Configuration appConfiguration = application.getAppConfiguration();
+        CommonsConfigurationAccessor accessor = new CommonsConfigurationAccessor(appConfiguration);
+        form = new FormBuilder(accessor)
+                .configFields(AppProperties.APPLICATION_NAME, AppProperties.SKIN, AppProperties.LANDING_PAGE)
+                .configSelectionProvider(skinSelectionProvider, AppProperties.SKIN)
+                .configSelectionProvider(pagesSelectionProvider, AppProperties.LANDING_PAGE)
                 .build();
-        form.findFieldByPropertyName("title").setLabel("Application name");
-        form.readFromObject(rootPage);*/
+        //TODO I18n
+        form.findFieldByPropertyName(AppProperties.APPLICATION_NAME).setLabel("Application name");
+        form.findFieldByPropertyName(AppProperties.LANDING_PAGE).setLabel("Landing page");
+        form.readFromObject(appConfiguration);
     }
 
     @Button(list = "settings", key = "commons.update", order = 1)
     public Resolution update() {
-        synchronized (application) {
-            setupFormAndBean();
-            form.readFromRequest(context.getRequest());
-            if (form.validate()) {
-                logger.debug("Applying settings to model");
-                //form.writeToObject(rootPage);
+        setupFormAndBean();
+        form.readFromRequest(context.getRequest());
+        if (form.validate()) {
+            logger.debug("Applying settings to model");
+            Configuration appConfiguration = application.getAppConfiguration();
+            form.writeToObject(appConfiguration);
 
-                model.init();
-                application.saveXmlModel();
-
-                Locale locale = context.getLocale();
-                ResourceBundle bundle = application.getBundle(locale);
-                SessionMessages.addInfoMessage(bundle.getString("commons.configuration.updated"));
-                return new RedirectResolution(this.getClass());
-            } else {
+            try {
+                ((FileConfiguration) appConfiguration).save();
+            } catch (ConfigurationException e) {
+                SessionMessages.addInfoMessage(getMessage("commons.configuration.notUpdated"));
                 return new ForwardResolution("/layouts/admin/settings.jsp");
             }
+            SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
+            return new RedirectResolution(this.getClass());
+        } else {
+            return new ForwardResolution("/layouts/admin/settings.jsp");
         }
+    }
+
+    private String getMessage(String key) {
+        Locale locale = context.getLocale();
+        ResourceBundle bundle = application.getBundle(locale);
+        return bundle.getString(key);
     }
 
     @Button(list = "settings", key = "commons.returnToPages", order = 2)

@@ -136,25 +136,29 @@ public class SecurityLogic {
 
     public static boolean hasPermissions
             (PageInstance instance, Collection<String> groups, AccessLevel accessLevel, String... permissions) {
-        Permissions configuration = new Permissions();
-        List<PageInstance> path = new LinkedList<PageInstance>();
-        PageInstance current = instance;
-        while (current != null) {
-            path.add(0, current);
-            current = current.getParent();
+        Permissions configuration = calculateActualPermissions(instance);
+        return hasPermissions(configuration, groups, accessLevel, permissions);
+    }
+
+    public static Permissions calculateActualPermissions(PageInstance instance) {
+        Permissions localPerms = instance.getPage().getPermissions();
+        if(instance.getParent() == null) {
+            return localPerms;
         }
-        for(PageInstance p : path) {
-            Permissions localPermissions = p.getPage().getPermissions();
-            Map<String, AccessLevel> parentLevels = localPermissions.getActualLevels();
-            for(Map.Entry<String, AccessLevel> entry : parentLevels.entrySet()) {
-                String key = entry.getKey();
-                AccessLevel value = entry.getValue();
-                if(value == AccessLevel.DENY || configuration.getActualLevels().get(key) == null) {
-                    configuration.getActualLevels().put(key, value);
-                }
+
+        Permissions configuration = new Permissions();
+        configuration.getActualLevels().putAll(localPerms.getActualLevels());
+        configuration.getActualPermissions().putAll(localPerms.getActualPermissions());
+        Permissions parentPermissions = calculateActualPermissions(instance.getParent());
+        Map<String, AccessLevel> parentLevels = parentPermissions.getActualLevels();
+        for(Map.Entry<String, AccessLevel> entry : parentLevels.entrySet()) {
+            String key = entry.getKey();
+            AccessLevel value = entry.getValue();
+            if(value == AccessLevel.DENY || configuration.getActualLevels().get(key) == null) {
+                configuration.getActualLevels().put(key, value);
             }
         }
-        return hasPermissions(configuration, groups, accessLevel, permissions);
+        return configuration;
     }
 
     public static boolean hasPermissions

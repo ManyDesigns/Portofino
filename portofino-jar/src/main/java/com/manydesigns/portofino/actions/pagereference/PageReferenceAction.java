@@ -138,18 +138,16 @@ public class PageReferenceAction extends PortletAction {
     @Button(list = "configuration", key = "commons.updateConfiguration")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updateConfiguration() {
-        synchronized (application) {
-            setupConfigurationForm();
-            form.readFromRequest(context.getRequest());
-            boolean valid = form.validate();
-            if(valid) {
-                form.writeToObject(pageReferenceConfiguration);
-                saveConfiguration();
+        setupConfigurationForm();
+        form.readFromRequest(context.getRequest());
+        boolean valid = form.validate();
+        if(valid) {
+            form.writeToObject(pageReferenceConfiguration);
+            saveConfiguration();
 
-                SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
-            }
-            return cancel();
+            SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
         }
+        return cancel();
     }
 
     protected void setupConfigurationForm() {

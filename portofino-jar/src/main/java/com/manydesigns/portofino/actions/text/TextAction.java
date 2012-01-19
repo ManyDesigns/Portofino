@@ -295,22 +295,19 @@ public class TextAction extends PortletAction {
     @Button(list = "configuration", key = "commons.updateConfiguration")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updateConfiguration() throws IOException {
-        synchronized (application) {
-            prepareConfigurationForms();
-            readPageConfigurationFromRequest();
-            boolean valid = validatePageConfiguration();
-            if (valid) {
-                updatePageConfiguration();
-                saveContent();
-                saveConfiguration();
+        prepareConfigurationForms();
+        readPageConfigurationFromRequest();
+        boolean valid = validatePageConfiguration();
+        if (valid) {
+            updatePageConfiguration();
+            saveContent();
+            saveConfiguration();
 
-                SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
-                return cancel();
-            } else {
-                return new ForwardResolution("/layouts/text/configure.jsp");
-            }
+            SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
+            return cancel();
+        } else {
+            return new ForwardResolution("/layouts/text/configure.jsp");
         }
-
     }
 
     @RequiresPermissions(level = AccessLevel.EDIT)
@@ -347,25 +344,23 @@ public class TextAction extends PortletAction {
 
     protected void commonUploadAttachment() throws IOException {
         viewAttachmentUrl = null;
-        synchronized (application) {
-            logger.info("Uploading attachment");
-            InputStream attachmentStream = upload.getInputStream();
-            String attachmentId = RandomUtil.createRandomId();
-            File dataFile = RandomUtil.getCodeFile(
-                    application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
+        logger.info("Uploading attachment");
+        InputStream attachmentStream = upload.getInputStream();
+        String attachmentId = RandomUtil.createRandomId();
+        File dataFile = RandomUtil.getCodeFile(
+                application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
 
-            // copy the data
-            IOUtils.copyLarge(attachmentStream, new FileOutputStream(dataFile));
-            TextLogic.createAttachment(
-                    textConfiguration, attachmentId,
-                    upload.getFileName(), upload.getContentType(),
-                    upload.getSize());
-            viewAttachmentUrl =
-                    String.format("%s?viewAttachment=&id=%s",
-                            dispatch.getAbsoluteOriginalPath(),
-                            attachmentId);
-            saveConfiguration();
-        }
+        // copy the data
+        IOUtils.copyLarge(attachmentStream, new FileOutputStream(dataFile));
+        TextLogic.createAttachment(
+                textConfiguration, attachmentId,
+                upload.getFileName(), upload.getContentType(),
+                upload.getSize());
+        viewAttachmentUrl =
+                String.format("%s?viewAttachment=&id=%s",
+                        dispatch.getAbsoluteOriginalPath(),
+                        attachmentId);
+        saveConfiguration();
     }
 
     @RequiresPermissions(level = AccessLevel.VIEW)
@@ -446,31 +441,29 @@ public class TextAction extends PortletAction {
         if (selection == null || selection.length == 0) {
             SessionMessages.addWarningMessage(getMessage("text.attachment.noAttachmentSelected"));
         } else {
-            synchronized (application) {
-                int counter = 0;
-                for (String code : selection) {
-                    Attachment attachment =
-                            TextLogic.deleteAttachmentByCode(textConfiguration, code);
-                    if (attachment == null) {
-                        logger.warn("Ignoring non-existing attachment with code: {}", code);
-                        continue;
-                    }
-                    File file = RandomUtil.getCodeFile(application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachment.getId());
-                    if(!FileUtils.deleteQuietly(file)) {
-                        logger.warn("File wasn't deleted: {}", file.getAbsolutePath());
-                    }
+            int counter = 0;
+            for (String code : selection) {
+                Attachment attachment =
+                        TextLogic.deleteAttachmentByCode(textConfiguration, code);
+                if (attachment == null) {
+                    logger.warn("Ignoring non-existing attachment with code: {}", code);
+                    continue;
+                }
+                File file = RandomUtil.getCodeFile(application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachment.getId());
+                if(!FileUtils.deleteQuietly(file)) {
+                    logger.warn("File wasn't deleted: {}", file.getAbsolutePath());
+                }
 
-                    counter++;
-                }
-                saveConfiguration();
-                if (counter == 1) {
-                    SessionMessages.addInfoMessage(getMessage("text.attachment.oneDeleted"));
-                } else if (counter > 1) {
-                    SessionMessages.addInfoMessage(
-                            MessageFormat.format(
-                                    getMessage("text.attachment.nDeleted"),
-                                    counter));
-                }
+                counter++;
+            }
+            saveConfiguration();
+            if (counter == 1) {
+                SessionMessages.addInfoMessage(getMessage("text.attachment.oneDeleted"));
+            } else if (counter > 1) {
+                SessionMessages.addInfoMessage(
+                        MessageFormat.format(
+                                getMessage("text.attachment.nDeleted"),
+                                counter));
             }
         }
         return new RedirectResolution(dispatch.getOriginalPath())

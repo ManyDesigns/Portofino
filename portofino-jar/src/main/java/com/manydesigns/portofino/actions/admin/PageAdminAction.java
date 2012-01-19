@@ -62,6 +62,7 @@ import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.LifecycleStage;
+import net.sourceforge.stripes.util.HttpUtil;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.converters.ClassConverter;
@@ -147,25 +148,27 @@ public class PageAdminAction extends AbstractActionBean {
 
     @RequiresAdministrator
     public Resolution updateLayout() {
-        synchronized (application) {
-            HttpServletRequest request = context.getRequest();
-            Enumeration parameters = request.getParameterNames();
-            while(parameters.hasMoreElements()) {
-                String parameter = (String) parameters.nextElement();
-                if(parameter.startsWith("portletWrapper_")) {
-                    String layoutContainer = parameter.substring("portletWrapper_".length());
-                    String[] portletWrapperIds = request.getParameterValues(parameter);
+        HttpServletRequest request = context.getRequest();
+        Enumeration parameters = request.getParameterNames();
+        while(parameters.hasMoreElements()) {
+            String parameter = (String) parameters.nextElement();
+            if(parameter.startsWith("portletWrapper_")) {
+                String layoutContainer = parameter.substring("portletWrapper_".length());
+                String[] portletWrapperIds = request.getParameterValues(parameter);
+                try {
                     updateLayout(layoutContainer, portletWrapperIds);
+                } catch (Exception e) {
+                    logger.error("Error updating layout", e);
+                    SessionMessages.addErrorMessage(getMessage("layout.update.failed"));
                 }
             }
-            saveModel();
         }
         return new RedirectResolution(dispatch.getOriginalPath());
     }
 
-    protected void updateLayout(String layoutContainer, String[] portletWrapperIds) {
+    protected void updateLayout(String layoutContainer, String[] portletWrapperIds) throws Exception {
         //TODO verificare
-        PageInstance myparent = dispatch.getLastPageInstance().getParent();
+        PageInstance myparent = getPageInstance().getParent();
         Layout parentLayout = myparent.getLayout();
         if(parentLayout == null) {
             parentLayout = new Layout();
@@ -188,6 +191,7 @@ public class PageAdminAction extends AbstractActionBean {
                 logger.debug("Ignoring: {}", current);
             }
         }
+        PageUtils.savePage(myparent);
     }
 
     @RequiresAdministrator
@@ -278,7 +282,7 @@ public class PageAdminAction extends AbstractActionBean {
                     configurePath = "";
                     break;
                 case CHILD:
-                    PageInstance lastPageInstance = dispatch.getLastPageInstance();
+                    PageInstance lastPageInstance = getPageInstance();
                     parentPage = lastPageInstance.getPage();
                     parentLayout = lastPageInstance.getLayout();
                     parentDirectory = lastPageInstance.getDirectory();
@@ -359,7 +363,7 @@ public class PageAdminAction extends AbstractActionBean {
             SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.landing"));*/
         } else {
             try {
-                PageInstance pageInstance = dispatch.getLastPageInstance();
+                PageInstance pageInstance = getPageInstance();
                 String pageName = pageInstance.getName();
                 File childPageDirectory = parentPageInstance.getChildPageDirectory(pageName);
                 Layout parentLayout = parentPageInstance.getLayout();
@@ -381,7 +385,11 @@ public class PageAdminAction extends AbstractActionBean {
     }
 
     public Page getPage() {
-        return dispatch.getLastPageInstance().getPage();
+        return getPageInstance().getPage();
+    }
+
+    public PageInstance getPageInstance() {
+        return dispatch.getLastPageInstance();
     }
 
     @RequiresAdministrator
@@ -399,7 +407,7 @@ public class PageAdminAction extends AbstractActionBean {
             SessionMessages.addErrorMessage(getMessage("page.copyOrMove.noDestination"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
-        PageInstance pageInstance = dispatch.getLastPageInstance();
+        PageInstance pageInstance = getPageInstance();
         PageInstance oldParent = pageInstance.getParent();
         if(oldParent == null) {
             SessionMessages.addErrorMessage(getMessage("page.copyOrMove.forbidden.root"));
@@ -470,7 +478,7 @@ public class PageAdminAction extends AbstractActionBean {
                 SessionMessages.addErrorMessage(msg);
             }
             if(deleteOriginal) {
-                return new RedirectResolution(""); //PageLogic.getPagePath(page)); TODO
+                return new RedirectResolution("");
             } else {
                 return new RedirectResolution(dispatch.getOriginalPath());
             }
@@ -566,12 +574,13 @@ public class PageAdminAction extends AbstractActionBean {
 
     @RequiresAdministrator
     public Resolution pagePermissions() {
-        Page page = getPage();
-
-        setupGroups(page);
+        setupGroups();
 
         Session session = application.getSystemSession();
         users = (List) QueryUtils.runHqlQuery(session, "from users", null);
+        User anonymous = new User();
+        anonymous.setUserName("(anonymous)");
+        users.add(0, anonymous);
 
         return forwardToPagePermissions();
     }
@@ -579,12 +588,9 @@ public class PageAdminAction extends AbstractActionBean {
     @Button(list = "testUserPermissions", key = "user.permissions.test")
     @RequiresAdministrator
     public Resolution testUserPermissions() {
-        if(StringUtils.isBlank(testUserId)) {
-            return new RedirectResolution(dispatch.getOriginalPath());
-        }
+        testUserId = StringUtils.defaultIfEmpty(testUserId, null);
         List<String> groups = SecurityLogic.manageGroups(application, testUserId);
-        Page page = getPage();
-        Permissions permissions = page.getPermissions();
+        Permissions permissions = SecurityLogic.calculateActualPermissions(getPageInstance());
         testedAccessLevel = AccessLevel.NONE;
         testedPermissions = new HashSet<String>();
         for(String group : groups) {
@@ -606,7 +612,7 @@ public class PageAdminAction extends AbstractActionBean {
         return new ForwardResolution("/layouts/page/permissions.jsp");
     }
 
-    public void setupGroups(Page page) {
+    protected void setupGroups() {
         Session session = application.getSystemSession();
         Criteria criteria =
                 session.createCriteria(SecurityLogic.GROUP_ENTITY_NAME)
@@ -617,20 +623,21 @@ public class PageAdminAction extends AbstractActionBean {
     @RequiresAdministrator
     @Button(list = "page-permissions-edit", key = "commons.update", order = 1)
     public Resolution updatePagePermissions() {
-        Page page = getPage();
-        synchronized (application) {
-            updatePagePermissions(page);
-            saveModel();
-
+        try {
+            updatePagePermissions(getPageInstance());
             SessionMessages.addInfoMessage(getMessage("permissions.page.updated"));
+            return new RedirectResolution(HttpUtil.getRequestedPath(context.getRequest()))
+                    .addParameter("pagePermissions").addParameter("originalPath", dispatch.getOriginalPath());
+        } catch (Exception e) {
+            logger.error("Couldn't update page permissions", e);
+            SessionMessages.addInfoMessage(getMessage("permissions.page.notUpdated"));
+            return new RedirectResolution(HttpUtil.getRequestedPath(context.getRequest()))
+                    .addParameter("pagePermissions").addParameter("originalPath", dispatch.getOriginalPath());
         }
-
-        return new RedirectResolution(dispatch.getOriginalPath())
-                .addParameter("pagePermissions");
     }
 
-    public void updatePagePermissions(Page page) {
-        Permissions pagePermissions = page.getPermissions();
+    protected void updatePagePermissions(PageInstance page) throws Exception {
+        Permissions pagePermissions = page.getPage().getPermissions();
 
         pagePermissions.getGroups().clear();
 
@@ -657,6 +664,8 @@ public class PageAdminAction extends AbstractActionBean {
         for(Group group : groups.values()) {
             pagePermissions.getGroups().add(group);
         }
+
+        PageUtils.savePage(page);
     }
 
     public AccessLevel getLocalAccessLevel(Page currentPage, String groupId) {

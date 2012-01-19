@@ -1,5 +1,6 @@
+<%@ page import="com.manydesigns.portofino.dispatcher.PageInstance" %>
 <%@ page import="com.manydesigns.portofino.model.pages.AccessLevel" %>
-<%@ page import="com.manydesigns.portofino.model.pages.RootPage" %>
+<%@ page import="com.manydesigns.portofino.model.pages.Page" %>
 <%@ page import="com.manydesigns.portofino.system.model.users.Group" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
@@ -21,7 +22,8 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <%
-            RootPage rootPage = actionBean.getApplication().getModel().getRootPage();
+            PageInstance currentPageInstance = actionBean.getPageInstance();
+            Page rootPage = currentPageInstance.getPage();
         %>
         <table>
             <tr>

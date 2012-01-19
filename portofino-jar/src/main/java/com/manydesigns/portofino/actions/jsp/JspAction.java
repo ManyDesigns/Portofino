@@ -114,21 +114,19 @@ public class JspAction extends PortletAction {
     @Button(list = "configuration", key = "commons.updateConfiguration")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updateConfiguration() {
-        synchronized (application) {
-            prepareConfigurationForms();
-            readPageConfigurationFromRequest();
-            form.readFromRequest(context.getRequest());
-            boolean valid = validatePageConfiguration();
-            valid = form.validate() && valid;
-            if(valid) {
-                updatePageConfiguration();
-                form.writeToObject(jspConfiguration);
-                saveConfiguration();
+        prepareConfigurationForms();
+        readPageConfigurationFromRequest();
+        form.readFromRequest(context.getRequest());
+        boolean valid = validatePageConfiguration();
+        valid = form.validate() && valid;
+        if(valid) {
+            updatePageConfiguration();
+            form.writeToObject(jspConfiguration);
+            saveConfiguration();
 
-                SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
-            }
-            return cancel();
+            SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
         }
+        return cancel();
     }
 
     @Override

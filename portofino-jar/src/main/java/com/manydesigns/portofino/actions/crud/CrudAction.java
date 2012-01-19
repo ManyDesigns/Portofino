@@ -1901,49 +1901,47 @@ public class CrudAction extends PortletAction {
     @Button(list = "configuration", key = "commons.updateConfiguration")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updateConfiguration() {
-        synchronized (application) {
-            prepareConfigurationForms();
+        prepareConfigurationForms();
 
-            crudConfigurationForm.readFromObject(crudConfiguration);
+        crudConfigurationForm.readFromObject(crudConfiguration);
 
-            readPageConfigurationFromRequest();
+        readPageConfigurationFromRequest();
 
-            crudConfigurationForm.readFromRequest(context.getRequest());
+        crudConfigurationForm.readFromRequest(context.getRequest());
 
-            boolean valid = crudConfigurationForm.validate();
-            valid = validatePageConfiguration() && valid;
+        boolean valid = crudConfigurationForm.validate();
+        valid = validatePageConfiguration() && valid;
+
+        if(propertiesTableForm != null) {
+            propertiesTableForm.readFromObject(edits);
+            propertiesTableForm.readFromRequest(context.getRequest());
+            valid = propertiesTableForm.validate() && valid;
+        }
+
+        if(selectionProvidersForm != null) {
+            selectionProvidersForm.readFromRequest(context.getRequest());
+            valid = selectionProvidersForm.validate() && valid;
+        }
+
+        if (valid) {
+            updatePageConfiguration();
+            crudConfigurationForm.writeToObject(crudConfiguration);
 
             if(propertiesTableForm != null) {
-                propertiesTableForm.readFromObject(edits);
-                propertiesTableForm.readFromRequest(context.getRequest());
-                valid = propertiesTableForm.validate() && valid;
+                updateProperties();
             }
 
-            if(selectionProvidersForm != null) {
-                selectionProvidersForm.readFromRequest(context.getRequest());
-                valid = selectionProvidersForm.validate() && valid;
+            if(!availableSelectionProviders.isEmpty()) {
+                updateSelectionProviders();
             }
 
-            if (valid) {
-                updatePageConfiguration();
-                crudConfigurationForm.writeToObject(crudConfiguration);
+            saveConfiguration();
 
-                if(propertiesTableForm != null) {
-                    updateProperties();
-                }
-
-                if(!availableSelectionProviders.isEmpty()) {
-                    updateSelectionProviders();
-                }
-
-                saveConfiguration();
-
-                SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
-                return cancel();
-            } else {
-                SessionMessages.addErrorMessage(getMessage("commons.configuration.notUpdated"));
-                return new ForwardResolution("/layouts/crud/configure.jsp");
-            }
+            SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
+            return cancel();
+        } else {
+            SessionMessages.addErrorMessage(getMessage("commons.configuration.notUpdated"));
+            return new ForwardResolution("/layouts/crud/configure.jsp");
         }
     }
 

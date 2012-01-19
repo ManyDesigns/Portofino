@@ -29,16 +29,20 @@
 
 package com.manydesigns.portofino.actions.admin;
 
+import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
+import net.sourceforge.stripes.controller.LifecycleStage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -63,26 +67,31 @@ public class RootPermissionsAction extends PageAdminAction implements AdminActio
     // Action events
     //--------------------------------------------------------------------------
 
+
+    @Override
+    @After(stages = LifecycleStage.BindingAndValidation)
+    public void prepare() {
+        originalPath = "/";
+        application = (Application) context.getRequest().getAttribute(RequestAttributes.APPLICATION);
+        File rootDir = application.getPagesDir();
+        Page rootPage = application.getPage(rootDir);
+        PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage);
+        dispatch = new Dispatch(context.getRequest().getContextPath(), originalPath, rootPageInstance);
+    }
+
     @DefaultHandler
     public Resolution execute() {
-        /*Page page = model.getRootPage();
-        setupGroups(page);
-        return new ForwardResolution("/layouts/admin/rootPermissions.jsp");*/
-        return null; //TODO ripristinare
+        return pagePermissions();
+    }
+
+    @Override
+    protected Resolution forwardToPagePermissions() {
+        return new ForwardResolution("/layouts/admin/rootPermissions.jsp");
     }
 
     @Button(list = "root-permissions", key = "commons.update", order = 1)
     public Resolution updatePagePermissions() {
-        /*Page page = model.getRootPage();
-        synchronized (application) {
-            updatePagePermissions(page);
-            saveModel();
-
-            SessionMessages.addInfoMessage(getMessage("permissions.root.updated"));
-        }
-
-        return new RedirectResolution(this.getClass());*/
-        return null; //TODO ripristinare
+        return super.updatePagePermissions();
     }
 
     @Button(list = "root-permissions", key = "commons.returnToPages", order = 2)
@@ -90,16 +99,8 @@ public class RootPermissionsAction extends PageAdminAction implements AdminActio
         return new RedirectResolution("/");
     }
 
-    public void dereferencePageInstance() {
-        /* DO NOTHING */
-    }
-
     public String getActionPath() {
         return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
     }
 
-    @Override
-    public Page getPage() {
-        return null; //TODO ripristinare return model.getRootPage();
-    }
 }
