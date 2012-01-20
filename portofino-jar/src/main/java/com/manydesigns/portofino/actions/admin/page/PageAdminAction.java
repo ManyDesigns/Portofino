@@ -125,6 +125,13 @@ public class PageAdminAction extends AbstractActionBean {
         Dispatcher dispatcher = new Dispatcher(application);
         String contextPath = context.getRequest().getContextPath();
         dispatch = dispatcher.createDispatch(contextPath, originalPath);
+        try {
+            PageInstance pageInstance = dispatch.getLastPageInstance();
+            PortofinoAction actionBean = pageInstance.getActionClass().newInstance();
+            pageInstance.setActionBean(actionBean);
+        } catch (Exception e) {
+            throw new Error("Couldn't instantiate action", e);
+        }
         context.getRequest().setAttribute(RequestAttributes.DISPATCH, dispatch);
     }
 
@@ -557,7 +564,9 @@ public class PageAdminAction extends AbstractActionBean {
     //--------------------------------------------------------------------------
 
     protected List<EditChildPage> childPages = new ArrayList<EditChildPage>();
+    protected List<EditChildPage> detailChildPages = new ArrayList<EditChildPage>();
     protected TableForm childPagesForm;
+    protected TableForm detailChildPagesForm;
 
     @RequiresAdministrator
     public Resolution pageChildren() {
@@ -566,18 +575,30 @@ public class PageAdminAction extends AbstractActionBean {
     }
 
     protected void setupChildPages() {
+        File directory = getPageInstance().getDirectory();
+        childPagesForm = setupChildPagesForm(childPages, directory, getPage().getLayout(), "");
+        if(getPageInstance().getActionBean().supportsParameters()) {
+            File detailDirectory = new File(directory, PageInstance.DETAIL);
+            detailChildPagesForm =
+                    setupChildPagesForm(detailChildPages, detailDirectory, getPage().getDetailLayout(), "detail");
+        }
+    }
+
+    protected TableForm setupChildPagesForm
+            (List<EditChildPage> childPages, File childrenDirectory, Layout layout, String prefix) {
+        TableForm childPagesForm;
         FileFilter filter = new FileFilter() {
             public boolean accept(File pathname) {
                 return pathname.isDirectory();
             }
         };
-        File childrenDirectory = getPageInstance().getChildrenDirectory();
+        List<EditChildPage> unorderedChildPages = new ArrayList<EditChildPage>();
         for (File dir : childrenDirectory.listFiles(filter)) {
             if(PageInstance.DETAIL.equals(dir.getName())) {
                 continue;
             }
             EditChildPage childPage = null;
-            for(ChildPage cp : getPageInstance().getLayout().getChildPages()) {
+            for(ChildPage cp : layout.getChildPages()) {
                 if(cp.getName().equals(dir.getName())) {
                     childPage = new EditChildPage();
                     childPage.active = true;
@@ -593,33 +614,64 @@ public class PageAdminAction extends AbstractActionBean {
                 childPage.active = false;
                 childPage.name = dir.getName();
             }
-            childPages.add(childPage);
+            unorderedChildPages.add(childPage);
+        }
+
+        logger.debug("Adding known pages in order");
+        for(ChildPage cp : layout.getChildPages()) {
+            for(EditChildPage ecp : unorderedChildPages) {
+                if(cp.getName().equals(ecp.name)) {
+                    childPages.add(ecp);
+                    break;
+                }
+            }
+        }
+        logger.debug("Adding unknown pages");
+        for(EditChildPage ecp : unorderedChildPages) {
+            if(!ecp.active) {
+                childPages.add(ecp);
+            }
         }
 
         childPagesForm = new TableFormBuilder(EditChildPage.class)
                 .configNRows(childPages.size())
                 .configFields("active", "name", "title", "showInNavigation", "embedded")
+                .configPrefix(prefix)
                 .build();
         childPagesForm.readFromObject(childPages);
+        return childPagesForm;
     }
 
     @RequiresAdministrator
     @Button(list = "page-children-edit", key = "commons.update", order = 1)
     public Resolution updatePageChildren() {
         setupChildPages();
+        String[] order = context.getRequest().getParameterValues("childrenTable_0");
+        boolean success = updatePageChildren(childPagesForm, childPages, getPage().getLayout(), order);
+        childPages.clear();
+        if(success && detailChildPagesForm != null) {
+            order = context.getRequest().getParameterValues("childrenTable_1");
+            updatePageChildren(detailChildPagesForm, detailChildPages, getPage().getDetailLayout(), order);
+            detailChildPages.clear();
+        }
+        setupChildPages(); //Re-read sorted values
+        return forwardToPageChildren();
+    }
+
+    protected boolean updatePageChildren
+            (TableForm childPagesForm, List<EditChildPage> childPages, Layout layout, String[] order) {
         childPagesForm.readFromRequest(context.getRequest());
         if(!childPagesForm.validate()) {
-            return forwardToPageChildren();
+            return false;
         }
         childPagesForm.writeToObject(childPages);
-        Layout layout = getPageInstance().getLayout();
         List<ChildPage> newChildren = new ArrayList<ChildPage>();
         for(EditChildPage editChildPage : childPages) {
             if(!editChildPage.active) {
                 continue;
             }
             ChildPage childPage = null;
-            for(ChildPage cp : getPageInstance().getLayout().getChildPages()) {
+            for(ChildPage cp : layout.getChildPages()) {
                 if(cp.getName().equals(editChildPage.name)) {
                     childPage = cp;
                     break;
@@ -646,8 +698,17 @@ public class PageAdminAction extends AbstractActionBean {
                 SessionMessages.addWarningMessage(msg);
             }
         }
+        List<ChildPage> sortedChildren = new ArrayList<ChildPage>();
+        for(String name : order) {
+            for(ChildPage p : newChildren) {
+                if(name.equals(p.getName())) {
+                    sortedChildren.add(p);
+                    break;
+                }
+            }
+        }
         layout.getChildPages().clear();
-        layout.getChildPages().addAll(newChildren);
+        layout.getChildPages().addAll(sortedChildren);
         try {
             PageUtils.savePage(getPageInstance());
         } catch (Exception e) {
@@ -655,8 +716,9 @@ public class PageAdminAction extends AbstractActionBean {
             String msg = getMessage("page.update.failed");
             msg = MessageFormat.format(msg, e.getMessage());
             SessionMessages.addErrorMessage(msg);
+            return false;
         }
-        return forwardToPageChildren();
+        return true;
     }
 
     public List<EditChildPage> getChildPages() {
@@ -665,6 +727,14 @@ public class PageAdminAction extends AbstractActionBean {
 
     public TableForm getChildPagesForm() {
         return childPagesForm;
+    }
+
+    public List<EditChildPage> getDetailChildPages() {
+        return detailChildPages;
+    }
+
+    public TableForm getDetailChildPagesForm() {
+        return detailChildPagesForm;
     }
 
     protected Resolution forwardToPageChildren() {

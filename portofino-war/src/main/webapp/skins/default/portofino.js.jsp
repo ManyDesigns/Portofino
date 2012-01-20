@@ -157,7 +157,6 @@ function enablePortletDragAndDrop(button) {
             var wrapper = $(element);
             var templateHiddenField = wrapper.children("input[type=hidden]").first();
             var elements = wrapper.sortable('toArray');
-            console.log(templateHiddenField);
             for(var e in elements) {
                 var id = elements[e];
                 var hiddenField = document.createElement("input");
@@ -165,7 +164,6 @@ function enablePortletDragAndDrop(button) {
                 hiddenField.setAttribute("name", templateHiddenField.val());
                 hiddenField.setAttribute("value", id.substring("portletWrapper_".length));
                 theButton.before(hiddenField);
-                console.log(hiddenField);
             }
         });
         return true;
