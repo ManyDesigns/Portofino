@@ -29,26 +29,33 @@
 
 package com.manydesigns.portofino.chart;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.category.CategoryDataset;
-
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class ChartBar3DGenerator extends Chart2DGenerator {
+public interface ChartDefinition {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    protected JFreeChart createChart(ChartDefinition chartDefinition,
-                                     CategoryDataset dataset, PlotOrientation plotOrientation) {
-        return ChartFactory.createBarChart3D(
-                chartDefinition.getName(), chartDefinition.getXAxisName(), chartDefinition.getYAxisName(), dataset,
-                plotOrientation, true, true, true);
-    }
+    String getQuery();
 
+    String getDatabase();
+
+    String getLegend();
+
+    String getUrlExpression();
+
+    Orientation getActualOrientation();
+
+    String getName();
+
+    String getXAxisName();
+
+    String getYAxisName();
+
+    public static enum Orientation {
+        HORIZONTAL, VERTICAL
+    }
 }

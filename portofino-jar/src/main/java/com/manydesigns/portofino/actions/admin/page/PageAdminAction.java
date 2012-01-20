@@ -613,6 +613,7 @@ public class PageAdminAction extends AbstractActionBean {
                 childPage = new EditChildPage();
                 childPage.active = false;
                 childPage.name = dir.getName();
+                childPage.title = application.getPage(dir).getTitle();
             }
             unorderedChildPages.add(childPage);
         }

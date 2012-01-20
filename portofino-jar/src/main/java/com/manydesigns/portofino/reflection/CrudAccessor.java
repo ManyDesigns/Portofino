@@ -33,7 +33,6 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.actions.crud.configuration.CrudProperty;
-import com.manydesigns.portofino.logic.CrudLogic;
 import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -85,7 +84,7 @@ public class CrudAccessor
         int i = 0;
         for (PropertyAccessor columnAccessor : columnAccessors) {
             CrudProperty crudProperty =
-                    CrudLogic.findCrudPropertyByName(
+                    findCrudPropertyByName(
                             crudConfiguration, columnAccessor.getName());
             boolean inKey = ArrayUtils.contains(keyColumnAccessors, columnAccessor);
             CrudPropertyAccessor propertyAccessor =
@@ -106,6 +105,15 @@ public class CrudAccessor
             }
             i++;
         }
+    }
+
+    public static CrudProperty findCrudPropertyByName(CrudConfiguration crudConfiguration, String propertyName) {
+        for (CrudProperty current : crudConfiguration.getProperties()) {
+            if (current.getName().equalsIgnoreCase(propertyName)) {
+                return current;
+            }
+        }
+        return null;
     }
 
 

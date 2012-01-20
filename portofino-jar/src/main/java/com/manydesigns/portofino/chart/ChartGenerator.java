@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.chart;
 
 
-import com.manydesigns.portofino.actions.chart.configuration.ChartConfiguration;
 import com.manydesigns.portofino.application.Application;
 import org.jfree.chart.JFreeChart;
 
@@ -44,7 +43,7 @@ public interface ChartGenerator {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    JFreeChart generate(ChartConfiguration chartConfiguration, Application application);
+    JFreeChart generate(ChartDefinition chartDefinition, Application application);
 
     boolean isAntiAlias();
     void setAntiAlias(boolean antiAlias);

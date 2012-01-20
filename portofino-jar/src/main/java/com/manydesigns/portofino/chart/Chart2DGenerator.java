@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.chart;
 
-import com.manydesigns.portofino.actions.chart.configuration.ChartConfiguration;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
@@ -72,11 +71,11 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
     private final Font legendItemFont = new Font("SansSerif", Font.PLAIN, 10);
     private final Color transparentColor = new Color(0, true);
 
-    public JFreeChart generate(ChartConfiguration chartConfiguration, Application application) {
+    public JFreeChart generate(ChartDefinition chartDefinition, Application application) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         java.util.List<Object[]> result;
-        String query = chartConfiguration.getQuery();
-        Session session = application.getSession(chartConfiguration.getDatabase());
+        String query = chartDefinition.getQuery();
+        Session session = application.getSession(chartDefinition.getDatabase());
         result = QueryUtils.runSql(session, query);
         for (Object[] current : result) {
             ComparableWrapper x = new ComparableWrapper((Comparable)current[1]);
@@ -91,11 +90,11 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
         }
 
         PlotOrientation plotOrientation = PlotOrientation.HORIZONTAL;
-        if (chartConfiguration.getActualOrientation() == ChartConfiguration.Orientation.VERTICAL) {
+        if (chartDefinition.getActualOrientation() == ChartDefinition.Orientation.VERTICAL) {
                 plotOrientation = PlotOrientation.VERTICAL;
         }
 
-        JFreeChart chart = createChart(chartConfiguration, dataset, plotOrientation);
+        JFreeChart chart = createChart(chartDefinition, dataset, plotOrientation);
 
         chart.setAntiAlias(antiAlias);
 
@@ -112,7 +111,7 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
         CategoryPlot plot = (CategoryPlot) chart.getPlot();
 
         CategoryURLGenerator urlGenerator =
-                new ChartBarUrlGenerator(chartConfiguration.getUrlExpression());
+                new ChartBarUrlGenerator(chartDefinition.getUrlExpression());
         CategoryItemRenderer renderer = plot.getRenderer();
     //        renderer.setItemURLGenerator(urlGenerator);
         renderer.setBaseItemURLGenerator(urlGenerator);
@@ -183,7 +182,7 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
         plot.setDrawingSupplier(supplier);
 
         // impostiamo il titolo della legenda
-        String legendString = chartConfiguration.getLegend();
+        String legendString = chartDefinition.getLegend();
         Title subtitle = new TextTitle(legendString, legendFont, Color.BLACK,
                 RectangleEdge.BOTTOM, HorizontalAlignment.CENTER,
                 VerticalAlignment.CENTER, new RectangleInsets(0, 0, 0, 0));
@@ -206,7 +205,7 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
     }
 
     protected abstract JFreeChart createChart
-            (ChartConfiguration chartConfiguration, CategoryDataset dataset, PlotOrientation plotOrientation);
+            (ChartDefinition chartDefinition, CategoryDataset dataset, PlotOrientation plotOrientation);
 
 
 }

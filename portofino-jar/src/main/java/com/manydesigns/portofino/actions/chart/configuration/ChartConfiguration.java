@@ -53,7 +53,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 */
 @XmlRootElement(name = "configuration")
 @XmlAccessorType(XmlAccessType.NONE)
-public class ChartConfiguration implements ModelObject {
+public class ChartConfiguration implements ModelObject, ChartDefinition {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -79,10 +79,6 @@ public class ChartConfiguration implements ModelObject {
     protected Type actualType;
     protected Class<? extends ChartGenerator> generatorClass;
     protected Orientation actualOrientation;
-
-    public static enum Orientation {
-        HORIZONTAL, VERTICAL
-    }
 
     //**************************************************************************
     // Built-in chart generators

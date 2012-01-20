@@ -534,12 +534,14 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
         String pageId = pageInstance.getPage().getId();
         File file = ScriptingUtil.getGroovyScriptFile(pageInstance.getDirectory(), "action");
         if(file.exists()) {
+            FileReader fr = null;
             try {
-                FileReader fr = new FileReader(file);
+                fr = new FileReader(file);
                 script = IOUtils.toString(fr);
-                IOUtils.closeQuietly(fr);
             } catch (Exception e) {
                 logger.warn("Couldn't load script for page " + pageId, e);
+            } finally {
+                IOUtils.closeQuietly(fr);
             }
         } else {
             String template = getScriptTemplate();

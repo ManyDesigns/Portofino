@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.chart;
 
-import com.manydesigns.portofino.actions.chart.configuration.ChartConfiguration;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
@@ -68,11 +67,11 @@ public abstract class Chart1DGenerator extends AbstractChartGenerator {
     private final Font legendItemFont = new Font("SansSerif", Font.PLAIN, 10);
     private final Color transparentColor = new Color(0, true);
 
-    public JFreeChart generate(ChartConfiguration chartConfiguration, Application application) {
+    public JFreeChart generate(ChartDefinition chartDefinition, Application application) {
         DefaultPieDataset dataset = new DefaultPieDataset();
         java.util.List<Object[]> result;
-        String query = chartConfiguration.getQuery();
-        Session session = application.getSession(chartConfiguration.getDatabase());
+        String query = chartDefinition.getQuery();
+        Session session = application.getSession(chartDefinition.getDatabase());
         result = QueryUtils.runSql(session, query);
         for (Object[] current : result) {
             ComparableWrapper value = new ComparableWrapper((Comparable)current[0]);
@@ -82,7 +81,7 @@ public abstract class Chart1DGenerator extends AbstractChartGenerator {
             }
         }
 
-        JFreeChart chart = createChart(chartConfiguration, dataset);
+        JFreeChart chart = createChart(chartDefinition, dataset);
 
         chart.setAntiAlias(isAntiAlias());
 
@@ -99,7 +98,7 @@ public abstract class Chart1DGenerator extends AbstractChartGenerator {
         PiePlot plot = (PiePlot) chart.getPlot();
 
         PieURLGenerator urlGenerator =
-                new ChartPieUrlGenerator(chartConfiguration.getUrlExpression());
+                new ChartPieUrlGenerator(chartDefinition.getUrlExpression());
         plot.setURLGenerator(urlGenerator);
 
 
@@ -127,7 +126,7 @@ public abstract class Chart1DGenerator extends AbstractChartGenerator {
         plot.setDrawingSupplier(supplier);
 
         // impostiamo il titolo della legenda
-        String legendString = chartConfiguration.getLegend();
+        String legendString = chartDefinition.getLegend();
         Title subtitle = new TextTitle(legendString, legendFont, Color.BLACK,
                 RectangleEdge.BOTTOM, HorizontalAlignment.CENTER,
                 VerticalAlignment.CENTER, new RectangleInsets(0, 0, 0, 0));
@@ -149,7 +148,7 @@ public abstract class Chart1DGenerator extends AbstractChartGenerator {
         return chart;
     }
 
-    protected abstract JFreeChart createChart(ChartConfiguration chartConfiguration, PieDataset dataset);
+    protected abstract JFreeChart createChart(ChartDefinition chartDefinition, PieDataset dataset);
 
 
 }
