@@ -27,11 +27,9 @@
  *
  */
 
-package com.manydesigns.portofino.model;
+package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
-import com.manydesigns.portofino.model.datamodel.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +48,7 @@ import java.util.List;
 public class Model {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
-    public static final String JAXB_MODEL_PACKAGES = "com.manydesigns.portofino.model";
+    public static final String JAXB_MODEL_PACKAGES = "com.manydesigns.portofino.model.datamodel";
 
     //**************************************************************************
     // Fields
@@ -84,30 +82,6 @@ public class Model {
     // Reset / init
     //**************************************************************************
 
-    protected class ResetVisitor extends ModelVisitor {
-
-        @Override
-        public void visitNodeBeforeChildren(ModelObject node) {
-            node.reset();
-        }
-    }
-
-    protected class InitVisitor extends ModelVisitor {
-
-        @Override
-        public void visitNodeBeforeChildren(ModelObject node) {
-            node.init(Model.this);
-        }
-    }
-
-    protected class LinkVisitor extends ModelVisitor {
-
-        @Override
-        public void visitNodeBeforeChildren(ModelObject node) {
-            node.link(Model.this);
-        }
-    }
-
     public void init() {
         for (Database database : databases) {
             init(database);
@@ -116,8 +90,8 @@ public class Model {
 
     public void init(ModelObject rootObject) {
         new ResetVisitor().visit(rootObject);
-        new InitVisitor().visit(rootObject);
-        new LinkVisitor().visit(rootObject);
+        new InitVisitor(this).visit(rootObject);
+        new LinkVisitor(this).visit(rootObject);
     }
 
     //**************************************************************************

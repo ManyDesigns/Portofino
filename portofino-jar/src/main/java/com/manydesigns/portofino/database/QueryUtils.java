@@ -38,7 +38,7 @@ import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.TableCriteria;
 import com.manydesigns.portofino.logic.DataModelLogic;
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.datamodel.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import net.sf.jsqlparser.JSQLParserException;

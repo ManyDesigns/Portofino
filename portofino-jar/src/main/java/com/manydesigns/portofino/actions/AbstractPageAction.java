@@ -19,8 +19,9 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
+import com.manydesigns.portofino.logic.PageLogic;
+import com.manydesigns.portofino.model.datamodel.Model;
+import com.manydesigns.portofino.model.datamodel.ModelObject;
 import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
@@ -49,7 +50,7 @@ import java.text.MessageFormat;
 import java.util.*;
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-public abstract class PortletAction extends AbstractActionBean implements PortofinoAction {
+public abstract class AbstractPageAction extends AbstractActionBean implements PageAction {
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
             {{"id", "subtreeRoot", "layout", "detailLayout", "description"}};
@@ -112,7 +113,7 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
     //**************************************************************************
 
     public static final Logger logger =
-            LoggerFactory.getLogger(PortletAction.class);
+            LoggerFactory.getLogger(AbstractPageAction.class);
 
     public boolean isEmbedded() {
         return getContext().getRequest().getAttribute(
@@ -153,7 +154,7 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
                 return;
             }*/
 
-            PortofinoAction actionBean = previousPageInstance.getActionBean();
+            PageAction actionBean = previousPageInstance.getActionBean();
             if(actionBean != null) {
                 returnToParentTarget = actionBean.getDescription();
             }
@@ -177,7 +178,7 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
             }
         }
         try {
-            PageUtils.saveConfiguration(pageInstance.getDirectory(), configuration);
+            PageLogic.saveConfiguration(pageInstance.getDirectory(), configuration);
         } catch (Exception e) {
             logger.error("Couldn't save configuration", e);
             SessionMessages.addErrorMessage("error saving conf");
@@ -416,7 +417,7 @@ public abstract class PortletAction extends AbstractActionBean implements Portof
         page.getLayout().setLayout(edit.layout);
         page.getDetailLayout().setLayout(edit.detailLayout);
         try {
-            PageUtils.savePage(pageInstance.getDirectory(), page);
+            PageLogic.savePage(pageInstance.getDirectory(), page);
         } catch (Exception e) {
             logger.error("Couldn't save page", e);
             return false; //TODO handle return value + script + session msg

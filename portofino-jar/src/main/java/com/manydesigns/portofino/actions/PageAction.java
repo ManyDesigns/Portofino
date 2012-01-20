@@ -27,15 +27,12 @@
 *
 */
 
-package com.manydesigns.portofino.actions.jsp.configuration;
+package com.manydesigns.portofino.actions;
 
-import com.manydesigns.portofino.actions.PageActionConfiguration;
-import com.manydesigns.portofino.application.Application;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.manydesigns.portofino.dispatcher.PageInstance;
+import net.sourceforge.stripes.action.ActionBean;
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.Resolution;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -43,22 +40,18 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@XmlRootElement(name = "configuration")
-@XmlAccessorType(XmlAccessType.NONE)
-public class JspConfiguration implements PageActionConfiguration {
+public interface PageAction extends ActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    protected String jsp;
+    Class<?> getConfigurationClass();
 
-    @XmlAttribute(required = true)
-    public String getJsp() {
-        return jsp;
-    }
+    Resolution prepare(PageInstance pageInstance, ActionBeanContext context);
 
-    public void setJsp(String jsp) {
-        this.jsp = jsp;
-    }
+    String getScriptTemplate();
 
-    public void init(Application application) {}
+    String getDescription();
+
+    boolean supportsParameters();
+    
 }

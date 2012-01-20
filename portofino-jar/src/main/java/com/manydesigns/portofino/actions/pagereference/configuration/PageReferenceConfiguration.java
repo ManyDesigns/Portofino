@@ -30,7 +30,8 @@
 package com.manydesigns.portofino.actions.pagereference.configuration;
 
 import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.actions.PageActionConfiguration;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.pages.Page;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -44,7 +45,7 @@ import javax.xml.bind.annotation.XmlAttribute;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @XmlAccessorType(XmlAccessType.NONE)
-public class PageReferenceConfiguration {
+public class PageReferenceConfiguration implements PageActionConfiguration {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -64,11 +65,8 @@ public class PageReferenceConfiguration {
     // Overridden Methods
     //**************************************************************************
 
-    public void reset() {
-        toPage = null;
-    }
+    public void init(Application application) {
 
-    public void link(Model model) {
     }
 
     //**************************************************************************

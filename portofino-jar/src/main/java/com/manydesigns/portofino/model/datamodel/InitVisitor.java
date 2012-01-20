@@ -30,22 +30,21 @@
 package com.manydesigns.portofino.model.datamodel;
 
 /**
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
- * @author Angelo Lupo          - angelo.lupo@manydesigns.com
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Alessio Stalla       - alessio.stalla@manydesigns.com
- */
-public interface ModelSelectionProvider extends ModelObject, HasReferences {
-    public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+*/
+public class InitVisitor extends ModelObjectVisitor {
 
-    String getName();
-    void setName(String name);
+    private Model model;
 
-    String getToDatabase();
-    void setToDatabase(String toDatabase);
+    public InitVisitor(Model model) {
+        this.model = model;
+    }
 
-    String getToSchema();
-    void setToSchema(String toSchema);
-
+    @Override
+    public void visitNodeBeforeChildren(ModelObject node) {
+        node.init(model);
+    }
 }

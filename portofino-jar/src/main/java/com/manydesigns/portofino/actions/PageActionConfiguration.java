@@ -27,7 +27,9 @@
 *
 */
 
-package com.manydesigns.portofino.model.pages;
+package com.manydesigns.portofino.actions;
+
+import com.manydesigns.portofino.application.Application;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -35,13 +37,10 @@ package com.manydesigns.portofino.model.pages;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface WithPermissions {
+public interface PageActionConfiguration {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    Permissions getPermissions();
+    public void init(Application application);
 
-    void setPermissions(Permissions permissions);
-
-    WithPermissions getParent();
 }

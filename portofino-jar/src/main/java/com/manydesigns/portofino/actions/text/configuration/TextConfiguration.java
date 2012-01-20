@@ -28,11 +28,9 @@
  */
 package com.manydesigns.portofino.actions.text.configuration;
 
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
+import com.manydesigns.portofino.actions.PageActionConfiguration;
+import com.manydesigns.portofino.application.Application;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +43,7 @@ import java.util.List;
 */
 @XmlRootElement(name = "configuration")
 @XmlAccessorType(XmlAccessType.NONE)
-public class TextConfiguration implements ModelObject {
+public class TextConfiguration implements PageActionConfiguration {
 
     protected final List<Attachment> attachments;
 
@@ -58,27 +56,7 @@ public class TextConfiguration implements ModelObject {
     // ModelObject implementation
     //**************************************************************************
 
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
-    }
-
-    public void visitChildren(ModelVisitor visitor) {
-        for (Attachment attachment : attachments) {
-            visitor.visit(attachment);
-        }
-    }
-
-    public void reset() {
-    }
-
-    public void init(Model model) {
-    }
-
-    public void link(Model model) {
-    }
-
-    public String getQualifiedName() {
-        return null;
-    }
+    public void init(Application application) {}
 
     //**************************************************************************
     // Getters/setters

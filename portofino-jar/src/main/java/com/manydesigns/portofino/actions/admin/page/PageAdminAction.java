@@ -39,8 +39,8 @@ import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.actions.AbstractActionBean;
-import com.manydesigns.portofino.actions.PortletAction;
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.actions.AbstractPageAction;
+import com.manydesigns.portofino.actions.PageAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.chart.ChartAction;
 import com.manydesigns.portofino.actions.crud.CrudAction;
@@ -55,10 +55,11 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
+import com.manydesigns.portofino.model.datamodel.Model;
+import com.manydesigns.portofino.model.datamodel.ModelObject;
+import com.manydesigns.portofino.model.datamodel.ModelObjectVisitor;
 import com.manydesigns.portofino.model.pages.*;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.system.model.users.User;
@@ -127,7 +128,7 @@ public class PageAdminAction extends AbstractActionBean {
         dispatch = dispatcher.createDispatch(contextPath, originalPath);
         try {
             PageInstance pageInstance = dispatch.getLastPageInstance();
-            PortofinoAction actionBean = pageInstance.getActionClass().newInstance();
+            PageAction actionBean = pageInstance.getActionClass().newInstance();
             pageInstance.setActionBean(actionBean);
         } catch (Exception e) {
             throw new Error("Couldn't instantiate action", e);
@@ -199,7 +200,7 @@ public class PageAdminAction extends AbstractActionBean {
                 logger.debug("Ignoring: {}", current);
             }
         }
-        PageUtils.savePage(myparent);
+        PageLogic.savePage(myparent);
     }
 
     @RequiresAdministrator
@@ -251,7 +252,7 @@ public class PageAdminAction extends AbstractActionBean {
             InsertPosition insertPosition =
                     InsertPosition.valueOf(newPage.getInsertPositionName());
             String pageClassName = newPage.getActionClassName();
-            PortofinoAction action = (PortofinoAction) ReflectionUtil.newInstance(pageClassName);
+            PageAction action = (PageAction) ReflectionUtil.newInstance(pageClassName);
             String pageId = RandomUtil.createRandomId();
 
             String script;
@@ -265,7 +266,7 @@ public class PageAdminAction extends AbstractActionBean {
             //end TODO
 
             Page page = new Page();
-            copyModelObject(newPage, page);
+            BeanUtils.copyProperties(newPage, page);
             page.setId(pageId);
 
             Object configuration = ReflectionUtil.newInstance(action.getConfigurationClass());
@@ -273,7 +274,7 @@ public class PageAdminAction extends AbstractActionBean {
             if(configuration instanceof ModelObject) {
                 model.init((ModelObject) configuration);
             }
-            model.init(page);
+            page.init();
 
             String fragment = newPage.getFragment();
             String configurePath;
@@ -285,7 +286,7 @@ public class PageAdminAction extends AbstractActionBean {
                 case TOP:
                     parentDirectory = application.getPagesDir();
                     directory = new File(parentDirectory, fragment);
-                    parentPage = application.getPage(parentDirectory);
+                    parentPage = PageLogic.getPage(parentDirectory);
                     parentLayout = parentPage.getLayout();
                     configurePath = "";
                     break;
@@ -317,8 +318,8 @@ public class PageAdminAction extends AbstractActionBean {
             if(directory.mkdir()) {
                 try {
                     logger.debug("Creating the new child page in directory: {}", directory);
-                    PageUtils.savePage(directory, page);
-                    PageUtils.saveConfiguration(directory, configuration);
+                    PageLogic.savePage(directory, page);
+                    PageLogic.saveConfiguration(directory, configuration);
                     File groovyScriptFile =
                         ScriptingUtil.getGroovyScriptFile(directory, "action");
                     FileWriter fw = null;
@@ -333,7 +334,7 @@ public class PageAdminAction extends AbstractActionBean {
                     childPage.setName(directory.getName());
                     childPage.setShowInNavigation(true);
                     parentLayout.getChildPages().add(childPage);
-                    PageUtils.savePage(parentDirectory, parentPage);
+                    PageLogic.savePage(parentDirectory, parentPage);
                 } catch (Exception e) {
                     logger.error("Exception saving page configuration");
                     SessionMessages.addErrorMessage(getMessage("page.create.failed"));
@@ -374,7 +375,7 @@ public class PageAdminAction extends AbstractActionBean {
                 while(it.hasNext()) {
                     if(pageName.equals(it.next().getName())) {
                         it.remove();
-                        PageUtils.savePage(pageInstance.getDirectory(), pageInstance.getPage());
+                        PageLogic.savePage(pageInstance.getDirectory(), pageInstance.getPage());
                         break;
                     }
                 }
@@ -451,7 +452,7 @@ public class PageAdminAction extends AbstractActionBean {
                     }
                     if(deleteOriginal) {
                         logger.debug("Removing from old parent");
-                        PageUtils.savePage(oldParent.getDirectory(), oldParent.getPage());
+                        PageLogic.savePage(oldParent.getDirectory(), oldParent.getPage());
                         logger.debug("Moving directory");
                         FileUtils.moveDirectory(pageInstance.getDirectory(), newDirectory);
                     } else {
@@ -469,7 +470,7 @@ public class PageAdminAction extends AbstractActionBean {
                         newChildPage.setShowInNavigation(true);
                     }
                     newParent.getLayout().getChildPages().add(newChildPage);
-                    PageUtils.savePage(newParent.getDirectory(), newParent.getPage());
+                    PageLogic.savePage(newParent.getDirectory(), newParent.getPage());
                 } catch (Exception e) {
                     logger.error("Couldn't copy/move page", e);
                     String msg = MessageFormat.format(getMessage("page.copyOrMove.failed"), destinationPagePath);
@@ -492,7 +493,7 @@ public class PageAdminAction extends AbstractActionBean {
         return new RedirectResolution(dispatch.getOriginalPath());
     }
 
-    protected class CopyVisitor extends ModelVisitor {
+    protected class CopyVisitor extends ModelObjectVisitor {
 
         @Override
         public void visitNodeBeforeChildren(ModelObject node) {
@@ -604,7 +605,7 @@ public class PageAdminAction extends AbstractActionBean {
                     childPage.active = true;
                     childPage.name = cp.getName();
                     childPage.showInNavigation = cp.isShowInNavigation();
-                    childPage.title = application.getPage(dir).getTitle();
+                    childPage.title = PageLogic.getPage(dir).getTitle();
                     childPage.embedded = cp.getContainer() != null;
                     break;
                 }
@@ -613,7 +614,7 @@ public class PageAdminAction extends AbstractActionBean {
                 childPage = new EditChildPage();
                 childPage.active = false;
                 childPage.name = dir.getName();
-                childPage.title = application.getPage(dir).getTitle();
+                childPage.title = PageLogic.getPage(dir).getTitle();
             }
             unorderedChildPages.add(childPage);
         }
@@ -685,7 +686,7 @@ public class PageAdminAction extends AbstractActionBean {
             childPage.setShowInNavigation(editChildPage.showInNavigation);
             if(editChildPage.embedded) {
                 if(childPage.getContainer() == null) {
-                    childPage.setContainer(PortletAction.DEFAULT_LAYOUT_CONTAINER);
+                    childPage.setContainer(AbstractPageAction.DEFAULT_LAYOUT_CONTAINER);
                     childPage.setOrder("0");
                 }
             } else {
@@ -711,7 +712,7 @@ public class PageAdminAction extends AbstractActionBean {
         layout.getChildPages().clear();
         layout.getChildPages().addAll(sortedChildren);
         try {
-            PageUtils.savePage(getPageInstance());
+            PageLogic.savePage(getPageInstance());
         } catch (Exception e) {
             logger.error("Couldn't save page", e);
             String msg = getMessage("page.update.failed");
@@ -851,7 +852,7 @@ public class PageAdminAction extends AbstractActionBean {
             pagePermissions.getGroups().add(group);
         }
 
-        PageUtils.savePage(page);
+        PageLogic.savePage(page);
     }
 
     public AccessLevel getLocalAccessLevel(Page currentPage, String groupId) {

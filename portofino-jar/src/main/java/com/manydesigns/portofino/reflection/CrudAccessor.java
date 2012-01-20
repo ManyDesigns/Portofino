@@ -70,7 +70,7 @@ public class CrudAccessor
     //**************************************************************************
 
     public CrudAccessor(@NotNull CrudConfiguration crudConfiguration, @NotNull ClassAccessor tableAccessor) {
-        super(crudConfiguration.getModelAnnotations());
+        super(null);
         this.crudConfiguration = crudConfiguration;
         this.tableAccessor = tableAccessor;
         PropertyAccessor[] columnAccessors = tableAccessor.getProperties();

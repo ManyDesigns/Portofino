@@ -34,6 +34,7 @@ import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.ChildPage;
@@ -131,7 +132,7 @@ public class Navigation implements XhtmlFragment {
                 }
                 assert last != null;
                 File pageDir = last.getChildPageDirectory(p.getName());
-                Page page = application.getPage(pageDir);
+                Page page = PageLogic.getPage(pageDir);
                 PageInstance pageInstance = new PageInstance(last, pageDir, application, page);
                 if (!skipPermissions && !SecurityLogic.hasPermissions(pageInstance, groups, AccessLevel.VIEW)) {
                     continue;
@@ -169,7 +170,7 @@ public class Navigation implements XhtmlFragment {
                     pageInstance = current;
                 } else {
                     File pageDir = current.getParent().getChildPageDirectory(p.getName());
-                    page = application.getPage(pageDir);
+                    page = PageLogic.getPage(pageDir);
                     pageInstance = new PageInstance(current, pageDir, application, page);
                 }
                 if (!skipPermissions && !SecurityLogic.hasPermissions(pageInstance, groups, AccessLevel.VIEW)) {

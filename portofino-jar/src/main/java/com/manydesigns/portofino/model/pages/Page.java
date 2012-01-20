@@ -31,13 +31,9 @@ package com.manydesigns.portofino.model.pages;
 
 import com.manydesigns.elements.annotations.FieldSize;
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 
 /*
@@ -48,7 +44,7 @@ import javax.xml.bind.annotation.*;
 */
 @XmlRootElement
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class Page implements ModelObject {
+public class Page {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -81,57 +77,23 @@ public class Page implements ModelObject {
     }
 
     //**************************************************************************
-    // ModelObject implementation
+    // Reset / init
     //**************************************************************************
 
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
-    }
-
-    public void reset() {
-    }
-
-    public void init(Model model) {
+    public void init() {
         assert title != null;
         assert description != null;
-        assert layout != null;
-        assert detailLayout != null;
-        assert permissions != null;
-    }
 
-    public void link(Model model) {}
-
-    public void visitChildren(ModelVisitor visitor) {
         if(layout != null) {
-            visitor.visit(layout);
+            layout.init();
         }
         if(detailLayout != null) {
-            visitor.visit(detailLayout);
+            detailLayout.init();
         }
         if(permissions != null) {
-            visitor.visit(permissions);
+            permissions.init();
         }
     }
-
-    public String getQualifiedName() {
-        return null;
-    }
-
-    //**************************************************************************
-    // Utility Methods
-    //**************************************************************************
-
-    /*public Page findDescendantPageById(String pageId) {
-        if(pageId.equals(getId())) {
-            return this;
-        }
-        for(Page page : getChildPages()) {
-            Page descendant = page.findDescendantPageById(pageId);
-            if(descendant != null) {
-                return descendant;
-            }
-        }
-        return null;
-    }*/
 
     //**************************************************************************
     // Getters/Setters
@@ -205,33 +167,6 @@ public class Page implements ModelObject {
     public void setPermissions(Permissions permissions) {
         this.permissions = permissions;
     }
-
-    /*protected void addChild(Page page, List<Page> children) {
-        for(Page child : children) {
-            if(child.getFragment().equals(page.getFragment())) {
-                throw new IllegalArgumentException(
-                        String.format("Page %s already has a child page with fragment %s and title %s",
-                                      this.getTitle(), page.getFragment(), child.getTitle()));
-            }
-        }
-        page.setParent(this);
-        children.add(page);
-    }
-
-    public boolean removeChild(Page page) {
-        List<Page> children = getChildPages();
-        return removeChild(page, children);
-    }
-
-    protected boolean removeChild(Page page, List<Page> children) {
-        if(page.getParent() == this) {
-            page.setParent(null);
-            children.remove(page);
-            return true;
-        } else {
-            return false;
-        }
-    }*/
 
     @XmlAttribute
     public boolean isSubtreeRoot() {

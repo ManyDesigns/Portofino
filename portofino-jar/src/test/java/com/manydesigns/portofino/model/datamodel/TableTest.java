@@ -28,7 +28,6 @@
  */
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.portofino.model.Model;
 import junit.framework.TestCase;
 
 /*

@@ -38,7 +38,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.RandomUtil;
-import com.manydesigns.portofino.actions.PortletAction;
+import com.manydesigns.portofino.actions.AbstractPageAction;
 import com.manydesigns.portofino.actions.chart.configuration.ChartConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.chart.ChartGenerator;
@@ -68,7 +68,7 @@ import java.util.Properties;
 */
 @UrlBinding("/actions/chart")
 @RequiresPermissions(level = AccessLevel.VIEW)
-public class ChartAction extends PortletAction {
+public class ChartAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 

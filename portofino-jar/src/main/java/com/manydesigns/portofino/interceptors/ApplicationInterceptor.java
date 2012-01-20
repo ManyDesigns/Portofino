@@ -31,17 +31,16 @@ package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.BlobManager;
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.actions.PageAction;
+import com.manydesigns.portofino.actions.PageActionConfiguration;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.pages.PageUtils;
 import com.manydesigns.portofino.navigation.Navigation;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Resolution;
@@ -119,7 +118,7 @@ public class ApplicationInterceptor implements Interceptor {
                 if(page.getParent() == null) {
                     continue; //Don't instantiate root
                 }
-                PortofinoAction actionBean = instantiateActionBean(page);
+                PageAction actionBean = instantiateActionBean(page);
                 configureActionBean(actionBean, page, application);
                 Resolution resolution = actionBean.prepare(page, actionContext);
                 if(resolution != null) {
@@ -140,8 +139,8 @@ public class ApplicationInterceptor implements Interceptor {
         return context.proceed();
     }
 
-    protected PortofinoAction instantiateActionBean(PageInstance page) throws IllegalAccessException, InstantiationException {
-        PortofinoAction action = page.getActionBean();
+    protected PageAction instantiateActionBean(PageInstance page) throws IllegalAccessException, InstantiationException {
+        PageAction action = page.getActionBean();
         if(action == null) {
             action = page.getActionClass().newInstance();
             page.setActionBean(action);
@@ -150,7 +149,7 @@ public class ApplicationInterceptor implements Interceptor {
     }
 
     protected void configureActionBean
-            (PortofinoAction actionBean, PageInstance pageInstance, Application application)
+            (PageAction actionBean, PageInstance pageInstance, Application application)
             throws JAXBException, IOException {
         File configurationFile = new File(pageInstance.getDirectory(), "configuration.xml");
         Object configuration = getConfigurationFromCache(configurationFile);
@@ -159,14 +158,10 @@ public class ApplicationInterceptor implements Interceptor {
         } else {
             try {
                 Class<?> configurationClass = actionBean.getConfigurationClass();
-                configuration = PageUtils.loadConfiguration(pageInstance.getDirectory(), configurationClass);
-                if(configuration instanceof ModelObject) {
-                    Model model = application.getModel();
-                    if(model != null) {
-                        model.init((ModelObject) configuration);
-                    } else {
-                        logger.error("Model is null, cannot init configuration");
-                    }
+                configuration = PageLogic.loadConfiguration(pageInstance.getDirectory(), configurationClass);
+
+                if(configuration instanceof PageActionConfiguration) {
+                    ((PageActionConfiguration) configuration).init(application);
                 }
                 if(configuration != null) {
                     putConfigurationInCache(configurationFile, configuration);

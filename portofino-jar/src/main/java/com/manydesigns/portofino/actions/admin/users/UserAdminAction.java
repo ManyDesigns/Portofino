@@ -35,16 +35,13 @@ import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.actions.crud.CrudAction;
 import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
-import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.pages.Page;
-import com.manydesigns.portofino.model.pages.PageUtils;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
@@ -112,11 +109,11 @@ public class UserAdminAction extends CrudAction implements AdminAction {
     @Before
     public void prepare() {
         try {
-            Page page = PageUtils.loadPage(new InputStreamReader(getClass().getResourceAsStream("page.xml")));
-            model.init(page);
-            crudConfiguration = PageUtils.loadConfiguration
+            Page page = PageLogic.loadPage(new InputStreamReader(getClass().getResourceAsStream("page.xml")));
+            page.init();
+            crudConfiguration = PageLogic.loadConfiguration
                     (new InputStreamReader(getClass().getResourceAsStream("configuration.xml")), CrudConfiguration.class);
-            model.init(crudConfiguration);
+            crudConfiguration.init(application);
             pageInstance = new PageInstance(null, null, application, page);
             pageInstance.setActionBean(this);
             pageInstance.setActionClass(getClass());

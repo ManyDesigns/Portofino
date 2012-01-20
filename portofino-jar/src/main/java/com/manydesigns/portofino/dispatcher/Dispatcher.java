@@ -30,9 +30,10 @@
 package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.servlet.ServletUtils;
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.actions.PageAction;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.logic.PageLogic;
+import com.manydesigns.portofino.model.datamodel.Model;
 import com.manydesigns.portofino.model.pages.Page;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -94,7 +95,7 @@ public class Dispatcher {
 
         File rootDir = application.getPagesDir();
         try {
-            Page rootPage = application.getPage(rootDir);
+            Page rootPage = PageLogic.getPage(rootDir);
             PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage);
             pagePath.add(rootPageInstance);
             makePageInstancePath(pagePath, fragmentsIterator, rootPageInstance);
@@ -140,7 +141,7 @@ public class Dispatcher {
             String nextFragment = fragmentsIterator.next();
             File childDirectory = new File(currentDirectory, nextFragment);
             if(childDirectory.isDirectory() && !PageInstance.DETAIL.equals(childDirectory.getName())) {
-                Page page = application.getPage(childDirectory);
+                Page page = PageLogic.getPage(childDirectory);
                 PageInstance pageInstance = new PageInstance(parentPageInstance, childDirectory, application, page);
                 pagePath.add(pageInstance);
                 makePageInstancePath(pagePath, fragmentsIterator, pageInstance);
@@ -159,7 +160,7 @@ public class Dispatcher {
         if(actionClass == null) {
             return false;
         }
-        if(!PortofinoAction.class.isAssignableFrom(actionClass)) {
+        if(!PageAction.class.isAssignableFrom(actionClass)) {
             logger.error("Action class must implement PortofinoAction: " + actionClass);
             return false;
         }

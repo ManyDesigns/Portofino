@@ -27,15 +27,12 @@
  *
  */
 
-package com.manydesigns.portofino.model.annotations;
+package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -181,7 +178,7 @@ public class Annotation implements ModelObject {
 
     public void link(Model model) {}
 
-    public void visitChildren(ModelVisitor visitor) {}
+    public void visitChildren(ModelObjectVisitor visitor) {}
 
     public String getQualifiedName() {
         return null;

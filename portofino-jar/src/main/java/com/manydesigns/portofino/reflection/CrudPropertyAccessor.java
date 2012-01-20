@@ -70,7 +70,7 @@ public class CrudPropertyAccessor
     public CrudPropertyAccessor(@Nullable CrudProperty crudProperty,
                                 PropertyAccessor nestedAccessor,
                                 boolean inKey) {
-        super((crudProperty == null) ? null : crudProperty.getAnnotations());
+        super(null);
         this.crudProperty = crudProperty;
         this.nestedAccessor = nestedAccessor;
 

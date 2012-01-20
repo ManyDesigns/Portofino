@@ -32,7 +32,7 @@ import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.datamodel.Model;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;

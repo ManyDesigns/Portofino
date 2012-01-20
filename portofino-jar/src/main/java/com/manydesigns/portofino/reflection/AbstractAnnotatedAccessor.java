@@ -29,7 +29,8 @@
 
 package com.manydesigns.portofino.reflection;
 
-import com.manydesigns.portofino.model.annotations.Annotation;
+import com.manydesigns.portofino.model.datamodel.Annotation;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +64,7 @@ public abstract class AbstractAnnotatedAccessor
     // Constructors
     //**************************************************************************
 
-    public AbstractAnnotatedAccessor(Collection<Annotation> annotations) {
+    public AbstractAnnotatedAccessor(@Nullable Collection<Annotation> annotations) {
         this.annotations = new HashMap<Class, java.lang.annotation.Annotation>();
 
         if (annotations == null) {

@@ -51,7 +51,7 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.logic.DataModelLogic;
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.datamodel.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;

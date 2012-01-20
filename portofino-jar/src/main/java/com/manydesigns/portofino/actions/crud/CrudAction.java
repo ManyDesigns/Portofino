@@ -49,7 +49,7 @@ import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
-import com.manydesigns.portofino.actions.PortletAction;
+import com.manydesigns.portofino.actions.AbstractPageAction;
 import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.actions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.actions.crud.configuration.SelectionProviderReference;
@@ -118,7 +118,7 @@ import java.util.regex.Pattern;
 @UrlBinding("/actions/crud")
 @SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
 @RequiresPermissions(level = AccessLevel.VIEW)
-public class CrudAction extends PortletAction {
+public class CrudAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -229,7 +229,7 @@ public class CrudAction extends PortletAction {
             }
             if(ref.isEnabled() && !added) {
                 logger.warn("Selection provider {} not added; check whether the fields on which it is configured " +
-                        "overlap with some other selection provider", ref.getQualifiedName());
+                        "overlap with some other selection provider", ref);
             }
         }
 
@@ -1986,7 +1986,6 @@ public class CrudAction extends PortletAction {
             crudProperty.setInsertable(edit.insertable);
             crudProperty.setUpdatable(edit.updatable);
 
-            crudProperty.setCrudConfiguration(crudConfiguration);
             crudConfiguration.getProperties().add(crudProperty);
         }
     }
@@ -1998,7 +1997,6 @@ public class CrudAction extends PortletAction {
         } else {
             sel.setSelectionProviderName(dsp.getName());
         }
-        sel.setParent(crudConfiguration);
         crudConfiguration.getSelectionProviders().add(sel);
         return sel;
     }

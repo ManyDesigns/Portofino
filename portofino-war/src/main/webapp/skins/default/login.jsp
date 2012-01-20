@@ -18,7 +18,7 @@
         <jsp:include page="head.jsp"/>
         <stripes:layout-component name="customScripts"/>
         <jsp:useBean id="model" scope="request"
-                     type="com.manydesigns.portofino.model.Model"/>
+                     type="com.manydesigns.portofino.model.datamodel.Model"/>
         <jsp:useBean id="app" scope="request"
                      type="com.manydesigns.portofino.application.Application"/>
         <c:set var="applicationName" value="${app.name}"/>

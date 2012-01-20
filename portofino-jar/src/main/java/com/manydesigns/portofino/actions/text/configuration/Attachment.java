@@ -29,14 +29,10 @@
 
 package com.manydesigns.portofino.actions.text.configuration;
 
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -48,7 +44,7 @@ import javax.xml.bind.annotation.XmlAttribute;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @XmlAccessorType(XmlAccessType.NONE)
-public class Attachment implements ModelObject {
+public class Attachment {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -56,7 +52,6 @@ public class Attachment implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected TextConfiguration textConfiguration;
     protected String id;
     protected String contentType;
     protected String filename;
@@ -75,47 +70,16 @@ public class Attachment implements ModelObject {
     //**************************************************************************
 
     public Attachment() {
-        this(null, null);
+        this(null);
     }
 
-    public Attachment(TextConfiguration textConfiguration, @Nullable String id) {
-        this.textConfiguration = textConfiguration;
+    public Attachment(@Nullable String id) {
         this.id = id;
     }
 
     //**************************************************************************
-    // ModelObject implementation
-    //**************************************************************************
-
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
-        this.textConfiguration = (TextConfiguration) parent;
-    }
-
-    public void reset() {}
-
-    public void init(Model model) {}
-
-    public void link(Model model) {}
-
-    public void visitChildren(ModelVisitor visitor) {}
-
-    public String getQualifiedName() {
-        return null;
-    }
-
-
-    //**************************************************************************
     // Getters and setters
     //**************************************************************************
-
-
-    public TextConfiguration getTextConfiguration() {
-        return textConfiguration;
-    }
-
-    public void setTextConfiguration(TextConfiguration textConfiguration) {
-        this.textConfiguration = textConfiguration;
-    }
 
     @XmlAttribute(required = true)
     public String getId() {

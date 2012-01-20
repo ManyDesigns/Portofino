@@ -31,7 +31,7 @@ package com.manydesigns.portofino.stripes;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.actions.PageAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ApplicationStarter;
@@ -122,7 +122,7 @@ public class ModelActionResolver extends NameBasedActionResolver {
                 } else {
                     if(Dispatcher.isValidActionClass(type)) {
                         ActionBean actionBean = super.makeNewActionBean(type, context);
-                        pageInstance.setActionBean((PortofinoAction) actionBean);
+                        pageInstance.setActionBean((PageAction) actionBean);
                         return actionBean;
                     } else {
                         throw new Exception("Invalid action bean type for dispatch: " + type); //TODO

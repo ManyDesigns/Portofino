@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.model;
+package com.manydesigns.portofino.model.datamodel;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -35,7 +35,7 @@ package com.manydesigns.portofino.model;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public abstract class ModelVisitor {
+public abstract class ModelObjectVisitor {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 

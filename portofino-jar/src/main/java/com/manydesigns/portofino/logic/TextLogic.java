@@ -44,7 +44,7 @@ public class TextLogic {
 
     public static Attachment createAttachment(TextConfiguration textConfiguration, String id, String fileName,
                                               String contentType, long size) {
-        Attachment attachment = new Attachment(textConfiguration, id);
+        Attachment attachment = new Attachment(id);
         attachment.setFilename(fileName);
         attachment.setContentType(contentType);
         attachment.setSize(size);
@@ -68,7 +68,6 @@ public class TextLogic {
             return null;
         } else {
             textConfiguration.getAttachments().remove(attachment);
-            attachment.setTextConfiguration(null);
             return attachment;
         }
     }

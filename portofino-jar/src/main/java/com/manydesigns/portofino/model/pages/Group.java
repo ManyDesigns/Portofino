@@ -29,17 +29,14 @@
 
 package com.manydesigns.portofino.model.pages;
 
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
 import org.apache.commons.lang.StringUtils;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -48,7 +45,7 @@ import java.util.*;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public class Group implements ModelObject {
+public class Group {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -63,35 +60,18 @@ public class Group implements ModelObject {
     protected AccessLevel actualAccessLevel;
 
     //**************************************************************************
-    // Constructors
+    // Construction and initialization
     //**************************************************************************
 
     public Group() {
         permissions = new HashSet<String>();
     }
 
-    //**************************************************************************
-    // ModelObject implementation
-    //**************************************************************************
-
-    public void afterUnmarshal(Unmarshaller u, Object parent) {}
-
-    public void reset() {
+    public void init() {
         actualAccessLevel = null;
-    }
-
-    public void init(Model model) {
         if(!StringUtils.isEmpty(accessLevel)) {
             actualAccessLevel = AccessLevel.valueOf(accessLevel);
         }
-    }
-
-    public void link(Model model) {}
-
-    public void visitChildren(ModelVisitor visitor) {}
-
-    public String getQualifiedName() {
-        return null;
     }
 
     //**************************************************************************

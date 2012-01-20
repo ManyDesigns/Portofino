@@ -1,6 +1,6 @@
 package com.manydesigns.portofino.actions.admin;
 
-import com.manydesigns.portofino.model.annotations.Annotation;
+import com.manydesigns.portofino.model.datamodel.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 
 import java.util.List;

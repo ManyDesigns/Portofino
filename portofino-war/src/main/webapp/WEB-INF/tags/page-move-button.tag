@@ -1,6 +1,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <jsp:useBean id="actionBean" scope="request"
-     type="com.manydesigns.portofino.actions.PortletAction"/>
+     type="com.manydesigns.portofino.actions.AbstractPageAction"/>
 <button onclick="showMovePageDialog(
                     '<%= actionBean.dispatch.getLastPageInstance().getPathFromRoot() %>',
                     '<%= request.getContextPath() %>');

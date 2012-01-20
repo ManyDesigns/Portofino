@@ -34,7 +34,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.portofino.actions.PortletAction;
+import com.manydesigns.portofino.actions.AbstractPageAction;
 import com.manydesigns.portofino.actions.jsp.configuration.JspConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -57,7 +57,7 @@ import java.io.File;
  */
 @UrlBinding("/actions/jsp")
 @RequiresPermissions(level = AccessLevel.VIEW)
-public class JspAction extends PortletAction {
+public class JspAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 

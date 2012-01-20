@@ -31,18 +31,14 @@ package com.manydesigns.portofino.actions.crud.configuration;
 
 import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.annotations.Multiline;
+import com.manydesigns.portofino.actions.PageActionConfiguration;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.logic.DataModelLogic;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
-import com.manydesigns.portofino.model.annotations.Annotation;
 import com.manydesigns.portofino.model.datamodel.Database;
 import com.manydesigns.portofino.model.datamodel.Table;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +51,7 @@ import java.util.List;
 
 @XmlRootElement(name = "configuration")
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class CrudConfiguration implements ModelObject {
+public class CrudConfiguration implements PageActionConfiguration {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
     
@@ -64,9 +60,7 @@ public class CrudConfiguration implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected final CrudConfiguration parentCrudConfiguration;
     protected final List<CrudProperty> properties;
-    protected final List<Annotation> annotations;
     protected final List<SelectionProviderReference> selectionProviders;
 
     protected String name;
@@ -94,21 +88,14 @@ public class CrudConfiguration implements ModelObject {
     //**************************************************************************
 
     public CrudConfiguration() {
-        this(null);
-    }
-
-    public CrudConfiguration(CrudConfiguration parentCrudConfiguration) {
-        this.parentCrudConfiguration = parentCrudConfiguration;
         properties = new ArrayList<CrudProperty>();
-        annotations = new ArrayList<Annotation>();
         selectionProviders = new ArrayList<SelectionProviderReference>();
     }
 
-    public CrudConfiguration(CrudConfiguration parentCrudConfiguration,
-                             String name, String database, String query,
+    public CrudConfiguration(String name, String database, String query,
                              String searchTitle, String createTitle,
                              String readTitle, String editTitle) {
-        this(parentCrudConfiguration);
+        this();
         this.name = name;
         this.database = database;
         this.query = query;
@@ -119,68 +106,31 @@ public class CrudConfiguration implements ModelObject {
     }
 
     //**************************************************************************
-    // ModelObject implementation
+    // Configuration implementation
     //**************************************************************************
 
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
-    }
-
-    public void reset() {
-        actualTable = null;
-        actualDatabase = null;
-    }
-
-    public void init(Model model) {
-        actualDatabase = DataModelLogic.findDatabaseByName(model, database);
+    public void init(Application application) {
+        actualDatabase = DataModelLogic.findDatabaseByName(application.getModel(), database);
         if(actualDatabase != null) {
             actualTable = QueryUtils.getTableFromQueryString(actualDatabase, query);
         }
-    }
-
-    public void link(Model model) {}
-
-    public void visitChildren(ModelVisitor visitor) {
         for (CrudProperty property : properties) {
-            visitor.visit(property);
+            property.init(application);
         }
-
-        for (Annotation annotation : annotations) {
-            visitor.visit(annotation);
-        }
-
+        //TODO gestire table == null
         for(SelectionProviderReference ref : selectionProviders) {
-            visitor.visit(ref);
+            ref.init(getActualTable());
         }
     }
-
-    public String getQualifiedName() {
-        if (parentCrudConfiguration == null) {
-            return name;
-        } else {
-            return MessageFormat.format("{0}.{1}",
-                    parentCrudConfiguration.getQualifiedName(), name);
-        }
-    }
-
 
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
 
-    public CrudConfiguration getParentCrudConfiguration() {
-        return parentCrudConfiguration;
-    }
-
     @XmlElementWrapper(name="properties")
     @XmlElement(name="property",type=CrudProperty.class)
     public List<CrudProperty> getProperties() {
         return properties;
-    }
-
-    @XmlElementWrapper(name="annotations")
-        @XmlElement(name="annotation",type=Annotation.class)
-    public List<Annotation> getModelAnnotations() {
-        return annotations;
     }
 
     @LabelI18N("com.manydesigns.portofino.model.pages.crud.Crud.name")

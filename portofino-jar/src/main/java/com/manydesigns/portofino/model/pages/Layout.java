@@ -29,13 +29,9 @@
 
 package com.manydesigns.portofino.model.pages;
 
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 
@@ -46,7 +42,7 @@ import java.util.ArrayList;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class Layout implements ModelObject {
+public class Layout {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -65,43 +61,21 @@ public class Layout implements ModelObject {
     public static final Logger logger = LoggerFactory.getLogger(Layout.class);
 
     //**************************************************************************
-    // Constructors
+    // Construction and initialization
     //**************************************************************************
 
     public Layout() {
         childPages = new ArrayList<ChildPage>();
     }
 
-    //**************************************************************************
-    // ModelObject implementation
-    //**************************************************************************
-
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
-    }
-
-    public void reset() {
-    }
-
-    public void init(Model model) {
+    public void init() {
         if(self == null) {
             self = new Self();
         }
-    }
-
-    public void link(Model model) {
-    }
-
-    public void visitChildren(ModelVisitor visitor) {
-        if(self != null) {
-            visitor.visit(self);
-        }
+        self.init();
         for (ChildPage current : childPages) {
-            visitor.visit(current);
+            current.init();
         }
-    }
-
-    public String getQualifiedName() {
-        return null;
     }
 
     //**************************************************************************

@@ -29,10 +29,6 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
-
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -107,7 +103,7 @@ public class Reference implements ModelObject {
         }
     }
 
-    public void visitChildren(ModelVisitor visitor) {}
+    public void visitChildren(ModelObjectVisitor visitor) {}
 
     public String getQualifiedName() {
         return null;

@@ -2,11 +2,8 @@ package com.manydesigns.portofino.application;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.logic.DataModelLogic;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.datamodel.Column;
-import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.datamodel.Schema;
-import com.manydesigns.portofino.model.datamodel.Table;
+import com.manydesigns.portofino.model.datamodel.Model;
+import com.manydesigns.portofino.model.datamodel.*;
 
 /**
  * File created on Jul 4, 2010 at 8:45:44 PM

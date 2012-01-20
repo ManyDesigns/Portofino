@@ -31,7 +31,7 @@ package com.manydesigns.portofino.actions.text;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.PortletAction;
+import com.manydesigns.portofino.actions.AbstractPageAction;
 import com.manydesigns.portofino.actions.text.configuration.Attachment;
 import com.manydesigns.portofino.actions.text.configuration.TextConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
@@ -62,7 +62,7 @@ import java.util.regex.Pattern;
 */
 @UrlBinding("/actions/text")
 @RequiresPermissions(level = AccessLevel.VIEW)
-public class TextAction extends PortletAction {
+public class TextAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
     public static final String CONTENT_ENCODING = "UTF-8";

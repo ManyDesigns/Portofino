@@ -29,11 +29,6 @@
 
 package com.manydesigns.portofino.model.pages;
 
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
-
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -46,7 +41,7 @@ import java.util.*;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public class Permissions implements ModelObject {
+public class Permissions {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -61,7 +56,7 @@ public class Permissions implements ModelObject {
     protected final Map<String, Set<String>> actualPermissions;
 
     //**************************************************************************
-    // Constructors
+    // Construction and initialization
     //**************************************************************************
 
     public Permissions() {
@@ -71,35 +66,12 @@ public class Permissions implements ModelObject {
         actualPermissions = new HashMap<String, Set<String>>();
     }
 
-    //**************************************************************************
-    // ModelObject implementation
-    //**************************************************************************
-
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
-    }
-
-    public void reset() {
-        actualLevels.clear();
-        actualPermissions.clear();
-    }
-
-    public void init(Model model) {}
-
-    public void link(Model model) {
+    public void init() {
         for(Group group : groups) {
+            group.init();
             actualLevels.put(group.getName(), group.getActualAccessLevel());
             actualPermissions.put(group.getName(), group.getPermissions());
         }
-    }
-
-    public void visitChildren(ModelVisitor visitor) {
-        for(Group group : groups) {
-            visitor.visit(group);
-        }
-    }
-
-    public String getQualifiedName() {
-        return null;
     }
 
     //**************************************************************************

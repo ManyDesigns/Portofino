@@ -30,8 +30,6 @@
 package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.logic.DataModelLogic;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.util.Pair;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;
@@ -51,7 +49,7 @@ import java.text.MessageFormat;
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
 public class ForeignKey extends DatabaseSelectionProvider
-        implements ModelObject, HasReferences {
+        implements HasReferences {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 

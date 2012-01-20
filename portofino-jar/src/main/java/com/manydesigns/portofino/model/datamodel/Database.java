@@ -29,9 +29,6 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +95,7 @@ public class Database implements ModelObject {
 
     public void link(Model model) {}
 
-    public void visitChildren(ModelVisitor visitor) {
+    public void visitChildren(ModelObjectVisitor visitor) {
         for (Schema schema : schemas) {
             visitor.visit(schema);
         }

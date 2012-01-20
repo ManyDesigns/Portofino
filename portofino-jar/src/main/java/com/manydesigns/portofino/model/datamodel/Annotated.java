@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.model.annotations;
+package com.manydesigns.portofino.model.datamodel;
 
 import java.util.List;
 

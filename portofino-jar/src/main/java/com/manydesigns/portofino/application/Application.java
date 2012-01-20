@@ -29,13 +29,12 @@
 
 package com.manydesigns.portofino.application;
 
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.actions.PageAction;
 import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.datamodel.Model;
 import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
@@ -117,9 +116,8 @@ public interface Application {
 
     Model getModel();
     void syncDataModel(String databaseName) throws Exception;
-    Page getPage(File directory);
-    Class<? extends PortofinoAction> getActionClass(File directory);
-    Class<? extends PortofinoAction> setActionClass(File directory, String source) throws IOException;
+    Class<? extends PageAction> getActionClass(File directory);
+    Class<? extends PageAction> setActionClass(File directory, String source) throws IOException;
 
     //**************************************************************************
     // Persistance

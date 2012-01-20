@@ -30,14 +30,13 @@
 package com.manydesigns.portofino.actions.crud.configuration;
 
 import com.manydesigns.elements.options.DisplayMode;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.datamodel.ForeignKey;
 import com.manydesigns.portofino.model.datamodel.ModelSelectionProvider;
+import com.manydesigns.portofino.model.datamodel.Table;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -49,7 +48,7 @@ import javax.xml.bind.annotation.XmlAttribute;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @XmlAccessorType(XmlAccessType.NONE)
-public class SelectionProviderReference implements ModelObject {
+public class SelectionProviderReference {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -57,7 +56,6 @@ public class SelectionProviderReference implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected CrudConfiguration parent;
     protected String foreignKeyName;
     protected boolean enabled = true;
     protected String displayModeName;
@@ -71,58 +69,27 @@ public class SelectionProviderReference implements ModelObject {
     private DisplayMode displayMode;
     private ModelSelectionProvider selectionProvider;
 
-    //**************************************************************************
-    // ModelObject implementation
-    //**************************************************************************
+    private static final Logger logger = LoggerFactory.getLogger(SelectionProviderReference.class);
 
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
-        this.parent = (CrudConfiguration) parent;
-    }
-
-    public void reset() {
-        foreignKey = null;
-    }
-
-    public void init(Model model) {
+    public void init(Table table) {
         if(displayModeName != null) {
             displayMode = DisplayMode.valueOf(displayModeName);
         } else {
             displayMode = DisplayMode.DROPDOWN;
         }
-    }
 
-    public void link(Model model) {
         if(!StringUtils.isEmpty(foreignKeyName)) {
-            foreignKey = parent.getActualTable().findForeignKeyByName(foreignKeyName);
-        } //else TODO
-
-        if(!StringUtils.isEmpty(selectionProviderName)) {
-            selectionProvider = parent.getActualTable()
-                    .findSelectionProviderByName(selectionProviderName);
-        } //else TODO
-    }
-
-    public void visitChildren(ModelVisitor visitor) {}
-
-    public String getQualifiedName() {
-        if(foreignKey != null) {
-            return foreignKey.getQualifiedName();
+            foreignKey = table.findForeignKeyByName(foreignKeyName);
+        } else if(!StringUtils.isEmpty(selectionProviderName)) {
+            selectionProvider = table.findSelectionProviderByName(selectionProviderName);
         } else {
-            return null;
+            throw new Error("foreignKey and selectionProvider are both null");
         }
     }
 
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
-
-    public CrudConfiguration getParent() {
-        return parent;
-    }
-
-    public void setParent(CrudConfiguration crudConfiguration) {
-        this.parent = crudConfiguration;
-    }
 
     @XmlAttribute(name = "fk")
     public String getForeignKeyName() {

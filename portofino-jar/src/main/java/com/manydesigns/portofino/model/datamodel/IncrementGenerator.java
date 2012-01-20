@@ -28,8 +28,6 @@
  */
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.portofino.model.Model;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 

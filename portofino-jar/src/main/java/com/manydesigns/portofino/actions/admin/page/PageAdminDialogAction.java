@@ -42,7 +42,7 @@ import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.PageLogic;
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.datamodel.Model;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.ForwardResolution;

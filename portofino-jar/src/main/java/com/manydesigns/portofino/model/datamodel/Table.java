@@ -32,11 +32,6 @@ package com.manydesigns.portofino.model.datamodel;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.logic.DataModelLogic;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
-import com.manydesigns.portofino.model.annotations.Annotated;
-import com.manydesigns.portofino.model.annotations.Annotation;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,7 +150,7 @@ public class Table implements ModelObject, Annotated {
 
     public void link(Model model) {}
 
-    public void visitChildren(ModelVisitor visitor) {
+    public void visitChildren(ModelObjectVisitor visitor) {
         for (Column column : columns) {
             visitor.visit(column);
         }
@@ -276,7 +271,7 @@ public class Table implements ModelObject, Annotated {
 
     @XmlElementWrapper(name="annotations")
     @XmlElement(name = "annotation",
-            type = com.manydesigns.portofino.model.annotations.Annotation.class)
+            type = Annotation.class)
     public List<Annotation> getAnnotations() {
         return annotations;
     }

@@ -30,13 +30,9 @@
 package com.manydesigns.portofino.model.pages;
 
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -48,7 +44,7 @@ import javax.xml.bind.annotation.XmlAttribute;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class Self implements ModelObject {
+public class Self {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -78,18 +74,8 @@ public class Self implements ModelObject {
     public Self() {
     }
 
-    //**************************************************************************
-    // ModelObject implementation
-    //**************************************************************************
-
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
-    }
-
-    public void reset() {
+    public void init() {
         actualOrder = 0;
-    }
-
-    public void init(Model model) {
         if(order != null) {
             try {
                 actualOrder = Integer.parseInt(order);
@@ -97,16 +83,6 @@ public class Self implements ModelObject {
                 logger.warn("Cannot parse value of 'order': " + order, e);
             }
         }
-    }
-
-    public void link(Model model) {
-    }
-
-    public void visitChildren(ModelVisitor visitor) {
-    }
-
-    public String getQualifiedName() {
-        return null;
     }
 
     //**************************************************************************

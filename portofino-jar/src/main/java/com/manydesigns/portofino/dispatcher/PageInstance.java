@@ -29,8 +29,9 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.actions.PageAction;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.model.pages.Layout;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.util.FileUtils;
@@ -55,8 +56,8 @@ public class PageInstance {
     protected final List<String> parameters;
     protected final PageInstance parent;
     protected Object configuration;
-    protected Class<? extends PortofinoAction> actionClass;
-    protected PortofinoAction actionBean;
+    protected Class<? extends PageAction> actionClass;
+    protected PageAction actionBean;
 
     public static final String DETAIL = "_detail";
 
@@ -120,22 +121,22 @@ public class PageInstance {
         this.configuration = configuration;
     }
 
-    public void setActionClass(Class<? extends PortofinoAction> actionClass) {
+    public void setActionClass(Class<? extends PageAction> actionClass) {
         this.actionClass = actionClass;
     }
 
-    public Class<? extends PortofinoAction> getActionClass() {
+    public Class<? extends PageAction> getActionClass() {
         if(actionClass == null) {
             actionClass = application.getActionClass(directory);
         }
         return actionClass;
     }
 
-    public PortofinoAction getActionBean() {
+    public PageAction getActionBean() {
         return actionBean;
     }
 
-    public void setActionBean(PortofinoAction actionBean) {
+    public void setActionBean(PageAction actionBean) {
         this.actionBean = actionBean;
     }
 
@@ -161,7 +162,7 @@ public class PageInstance {
 
     public Page getChildPage(String name) {
         File childDirectory = getChildPageDirectory(name);
-        return application.getPage(childDirectory);
+        return PageLogic.getPage(childDirectory);
     }
 
     public File getChildPageDirectory(String name) {

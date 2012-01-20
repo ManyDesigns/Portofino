@@ -30,16 +30,14 @@
 package com.manydesigns.portofino.actions.chart.configuration;
 
 import com.manydesigns.elements.annotations.*;
+import com.manydesigns.portofino.actions.PageActionConfiguration;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.chart.*;
 import com.manydesigns.portofino.logic.DataModelLogic;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
 import com.manydesigns.portofino.model.datamodel.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -53,7 +51,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 */
 @XmlRootElement(name = "configuration")
 @XmlAccessorType(XmlAccessType.NONE)
-public class ChartConfiguration implements ModelObject, ChartDefinition {
+public class ChartConfiguration implements PageActionConfiguration, ChartDefinition {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -124,17 +122,10 @@ public class ChartConfiguration implements ModelObject, ChartDefinition {
     }
 
     //**************************************************************************
-    // ModelObject implementation
+    // Configuration implementation
     //**************************************************************************
 
-    public void reset() {
-        actualDatabase = null;
-        generatorClass = null;
-        actualOrientation = null;
-        actualType = null;
-    }
-
-    public void init(Model model) {
+    public void init(Application application) {
         assert name != null;
         assert type != null;
         assert legend != null;
@@ -156,20 +147,7 @@ public class ChartConfiguration implements ModelObject, ChartDefinition {
                 logger.error("Invalid orientation: " + actualOrientation, e);
             }
         }
-    }
-
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
-    }
-
-    public void visitChildren(ModelVisitor visitor) {
-    }
-
-    public void link(Model model) {
-        actualDatabase = DataModelLogic.findDatabaseByName(model, database);
-    }
-
-    public String getQualifiedName() {
-        return null;
+        actualDatabase = DataModelLogic.findDatabaseByName(application.getModel(), database);
     }
 
     //**************************************************************************

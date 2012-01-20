@@ -29,17 +29,13 @@
 
 package com.manydesigns.portofino.actions.crud.configuration;
 
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
-import com.manydesigns.portofino.model.annotations.Annotation;
+import com.manydesigns.portofino.application.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.*;
-import java.util.ArrayList;
-import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -49,7 +45,7 @@ import java.util.List;
 */
 
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class CrudProperty implements ModelObject {
+public class CrudProperty {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -58,8 +54,6 @@ public class CrudProperty implements ModelObject {
     // Fields
     //**************************************************************************
 
-    protected CrudConfiguration crudConfiguration;
-
     protected String name;
     protected String label;
     protected boolean searchable;
@@ -67,7 +61,6 @@ public class CrudProperty implements ModelObject {
     protected boolean enabled;
     protected boolean insertable;
     protected boolean updatable;
-    protected final List<Annotation> annotations;
 
     //**************************************************************************
     // Logging
@@ -80,49 +73,20 @@ public class CrudProperty implements ModelObject {
     // Constructors
     //**************************************************************************
 
-    public CrudProperty() {
-        annotations = new ArrayList<Annotation>();
-    }
+    public CrudProperty() {}
 
     //**************************************************************************
-    // ModelObject implementation
+    // Configuration implementation
     //**************************************************************************
 
-    public void afterUnmarshal(Unmarshaller u, Object parent) {
-        crudConfiguration = (CrudConfiguration) parent;
-    }
-
-    public void reset() {}
-
-    public void init(Model model) {
-        assert crudConfiguration != null;
+    public void init(Application application) {
         assert name != null;
-    }
-
-    public void link(Model model) {}
-
-    public void visitChildren(ModelVisitor visitor) {
-        for (Annotation annotation : annotations) {
-            visitor.visit(annotation);
-        }
-    }
-
-    public String getQualifiedName() {
-        return String.format("%s.%s", crudConfiguration.getQualifiedName(), name);
     }
 
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
 
-
-    public CrudConfiguration getCrudConfiguration() {
-        return crudConfiguration;
-    }
-
-    public void setCrudConfiguration(CrudConfiguration crudConfiguration) {
-        this.crudConfiguration = crudConfiguration;
-    }
 
     @XmlAttribute(required = true)
     public String getName() {
@@ -185,12 +149,6 @@ public class CrudProperty implements ModelObject {
 
     public void setUpdatable(boolean updatable) {
         this.updatable = updatable;
-    }
-
-    @XmlElementWrapper(name="annotations")
-    @XmlElement(name="annotation",type=Annotation.class)
-    public List<Annotation> getAnnotations() {
-        return annotations;
     }
 
 }

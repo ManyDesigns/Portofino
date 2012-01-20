@@ -36,7 +36,7 @@ import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ApplicationStarter;
 import com.manydesigns.portofino.i18n.PortofinoTextProvider;
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.datamodel.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

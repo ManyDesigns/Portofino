@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.model;
+package com.manydesigns.portofino.model.datamodel;
 
 import javax.xml.bind.Unmarshaller;
 
@@ -47,7 +47,7 @@ public interface ModelObject {
     void init(Model model);
     void link(Model model);
 
-    void visitChildren(ModelVisitor visitor);
+    void visitChildren(ModelObjectVisitor visitor);
 
     String getQualifiedName();
 }

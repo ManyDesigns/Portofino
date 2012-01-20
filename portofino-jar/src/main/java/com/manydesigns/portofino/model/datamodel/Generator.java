@@ -28,10 +28,6 @@
  */
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelVisitor;
-
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -43,7 +39,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(value = XmlAccessType.NONE)
-public abstract class Generator implements ModelObject{
+public abstract class Generator implements ModelObject {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
     //**************************************************************************
@@ -90,5 +86,5 @@ public abstract class Generator implements ModelObject{
 
     public void link(Model model) {}
 
-    public void visitChildren(ModelVisitor visitor) {}
+    public void visitChildren(ModelObjectVisitor visitor) {}
 }

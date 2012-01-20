@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.logic;
 
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.datamodel.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;

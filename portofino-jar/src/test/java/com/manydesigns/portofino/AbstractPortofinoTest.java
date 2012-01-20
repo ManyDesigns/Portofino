@@ -32,7 +32,7 @@ import com.manydesigns.elements.AbstractElementsTest;
 import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ApplicationStarter;
-import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.datamodel.Model;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.lang.exception.ExceptionUtils;

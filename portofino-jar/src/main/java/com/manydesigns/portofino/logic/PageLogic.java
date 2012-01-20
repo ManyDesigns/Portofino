@@ -35,10 +35,19 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.util.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileReader;
+import java.io.Reader;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -50,6 +59,8 @@ public class PageLogic {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
+    private static final Logger logger = LoggerFactory.getLogger(PageLogic.class);
+
     public static SelectionProvider createPagesSelectionProvider
             (Application application, File baseDir, File... excludes) {
         return createPagesSelectionProvider(application, baseDir, false, false, excludes);
@@ -60,7 +71,7 @@ public class PageLogic {
              File... excludes) {
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("pages");
         if(includeRoot) {
-            Page rootPage = application.getPage(baseDir);
+            Page rootPage = PageLogic.getPage(baseDir);
             selectionProvider.appendRow("/", rootPage.getTitle() + " (top level)", true);
         }
         appendChildrenToPagesSelectionProvider
@@ -97,7 +108,7 @@ public class PageLogic {
                         (application, baseDir, file, breadcrumb, selectionProvider, includeDetailChildren, excludes);
             }
         } else {
-            Page page = application.getPage(file);
+            Page page = PageLogic.getPage(file);
             if (breadcrumb == null) {
                 breadcrumb = page.getTitle();
             } else {
@@ -110,24 +121,82 @@ public class PageLogic {
         }
     }
 
-    /*public static String getPagePath(Page page) {
-        if(page instanceof RootPage) {
-            return "";
-        } else {
-            return getPagePath(page.getParent()) + "/" + page.getFragment();
+    protected static final JAXBContext pagesJaxbContext;
+
+    static {
+        try {
+            pagesJaxbContext = JAXBContext.newInstance(Page.class.getPackage().getName());
+        } catch (JAXBException e) {
+            throw new Error("Can't instantiate pages jaxb context", e);
         }
     }
 
-    public static Page getLandingPage(RootPage rootPage) {
-        String landingPageId = rootPage.getLandingPage();
-        if (landingPageId == null) {
-            return rootPage.getChildPages().get(0);
-        } else {
-            return rootPage.findDescendantPageById(landingPageId);
+    public static File savePage(PageInstance pageInstance) throws Exception {
+        return savePage(pageInstance.getDirectory(), pageInstance.getPage());
+    }
+
+    public static File savePage(File directory, Page page) throws Exception {
+        File pageFile = new File(directory, "page.xml");
+        Marshaller marshaller = pagesJaxbContext.createMarshaller();
+        marshaller.marshal(page, pageFile);
+        return pageFile;
+    }
+
+    public static Page loadPage(File directory) throws Exception {
+        File pageFile = new File(directory, "page.xml");
+        FileReader reader = new FileReader(pageFile);
+        try {
+            return loadPage(reader);
+        } finally {
+            IOUtils.closeQuietly(reader);
         }
     }
 
-    public static boolean isLandingPage(RootPage root, Page page) {
-        return page.equals(getLandingPage(root));
-    }*/
+    public static Page loadPage(Reader reader) throws Exception {
+        Unmarshaller unmarshaller = pagesJaxbContext.createUnmarshaller();
+        return (Page) unmarshaller.unmarshal(reader);
+    }
+
+    public static Page getPage(File directory) {
+        try {
+            Page page = loadPage(directory);
+            page.init();
+            return page;
+        } catch (Exception e) {
+            throw new RuntimeException("Error loading page", e);
+        }
+    }
+
+    public static File saveConfiguration(File directory, Object configuration) throws Exception {
+        String configurationPackage = configuration.getClass().getPackage().getName();
+        JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
+        Marshaller marshaller = jaxbContext.createMarshaller();
+        File configurationFile = new File(directory, "configuration.xml");
+        marshaller.marshal(configuration, configurationFile);
+        return configurationFile;
+    }
+
+    public static <T> T loadConfiguration(File directory, Class<? extends T> configurationClass) throws Exception {
+        File configurationFile = new File(directory, "configuration.xml");
+        FileReader reader = new FileReader(configurationFile);
+        try {
+            return loadConfiguration(reader, configurationClass);
+        } finally {
+            IOUtils.closeQuietly(reader);
+        }
+    }
+
+    public static <T> T loadConfiguration(Reader reader, Class<? extends T> configurationClass) throws Exception {
+        Object configuration;
+        String configurationPackage = configurationClass.getPackage().getName();
+        JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        configuration = unmarshaller.unmarshal(reader);
+        if(!configurationClass.isInstance(configuration)) {
+            logger.error("Invalid configuration: expected " + configurationClass + ", got " + configuration);
+            return null;
+        }
+        return (T) configuration;
+    }
+
 }

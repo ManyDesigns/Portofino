@@ -27,31 +27,18 @@
 *
 */
 
-package com.manydesigns.portofino.actions;
-
-import com.manydesigns.portofino.dispatcher.PageInstance;
-import net.sourceforge.stripes.action.ActionBean;
-import net.sourceforge.stripes.action.ActionBeanContext;
-import net.sourceforge.stripes.action.Resolution;
+package com.manydesigns.portofino.model.datamodel;
 
 /**
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
- * @author Angelo Lupo          - angelo.lupo@manydesigns.com
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Alessio Stalla       - alessio.stalla@manydesigns.com
- */
-public interface PortofinoAction extends ActionBean {
-    public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+*/
+public class ResetVisitor extends ModelObjectVisitor {
 
-    Class<?> getConfigurationClass();
-
-    Resolution prepare(PageInstance pageInstance, ActionBeanContext context);
-
-    String getScriptTemplate();
-
-    String getDescription();
-
-    boolean supportsParameters();
-    
+    @Override
+    public void visitNodeBeforeChildren(ModelObject node) {
+        node.reset();
+    }
 }

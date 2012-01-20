@@ -31,7 +31,7 @@ package com.manydesigns.portofino.actions.pagereference;
 
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.actions.PortletAction;
+import com.manydesigns.portofino.actions.AbstractPageAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.pagereference.configuration.PageReferenceConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  */
 @UrlBinding("/actions/ref")
 @RequiresPermissions(level = AccessLevel.VIEW)
-public class PageReferenceAction extends PortletAction {
+public class PageReferenceAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 

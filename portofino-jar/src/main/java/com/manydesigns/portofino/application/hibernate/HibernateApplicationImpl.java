@@ -31,7 +31,7 @@ package com.manydesigns.portofino.application.hibernate;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
-import com.manydesigns.portofino.actions.PortofinoAction;
+import com.manydesigns.portofino.actions.PageAction;
 import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
@@ -42,13 +42,7 @@ import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
-import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.model.datamodel.Schema;
-import com.manydesigns.portofino.model.datamodel.Table;
-import com.manydesigns.portofino.model.pages.Page;
-import com.manydesigns.portofino.model.pages.PageUtils;
+import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
@@ -423,40 +417,17 @@ public class HibernateApplicationImpl implements Application {
         saveXmlModel();
     }
 
-    public Page getPage(File directory) {
-        try {
-            File pageFile = new File(directory, "page.xml");
-            Page page = getPageFromCache(pageFile);
-            if(page == null) {
-                page = PageUtils.loadPage(directory);
-                getModel().init(page);
-                putPageInCache(pageFile, page);
-            }
-            return page;
-        } catch (Exception e) {
-            throw new RuntimeException("Error loading page", e);
-        }
-    }
-
-    private Page getPageFromCache(File pageFile) {
-        return null;//pageCache.get(pageFile);
-    }
-
-    private void putPageInCache(File file, Page page) {
-        //pageCache.put(file, page);
-    }
-
     //TODO!!!
-    private static final ConcurrentMap<File, Class<? extends PortofinoAction>> actionClassCache =
-            new ConcurrentHashMap<File, Class<? extends PortofinoAction>>();
+    private static final ConcurrentMap<File, Class<? extends PageAction>> actionClassCache =
+            new ConcurrentHashMap<File, Class<? extends PageAction>>();
 
-    public Class<? extends PortofinoAction> getActionClass(File directory) {
-        Class<? extends PortofinoAction> actionClass = actionClassCache.get(directory);
+    public Class<? extends PageAction> getActionClass(File directory) {
+        Class<? extends PageAction> actionClass = actionClassCache.get(directory);
         if(actionClass != null) {
             return actionClass;
         } else {
             try {
-                actionClass = (Class<? extends PortofinoAction>) ScriptingUtil.getGroovyClass(directory, "action");
+                actionClass = (Class<? extends PageAction>) ScriptingUtil.getGroovyClass(directory, "action");
             } catch (IOException e) {
                 throw new RuntimeException("Couldn't load action class for " + directory.getName(), e); //TODO
             }
@@ -469,11 +440,11 @@ public class HibernateApplicationImpl implements Application {
         }
     }
 
-    public Class<? extends PortofinoAction> setActionClass(File directory, String source) throws IOException {
+    public Class<? extends PageAction> setActionClass(File directory, String source) throws IOException {
         File groovyScriptFile =
                 ScriptingUtil.getGroovyScriptFile(directory, "action");
         GroovyClassLoader loader = new GroovyClassLoader();
-        Class<? extends PortofinoAction> scriptClass =
+        Class<? extends PageAction> scriptClass =
                 loader.parseClass(source, groovyScriptFile.getAbsolutePath());
         if(!Dispatcher.isValidActionClass(scriptClass)) {
             return null;

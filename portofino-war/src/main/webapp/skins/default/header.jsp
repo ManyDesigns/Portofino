@@ -8,7 +8,7 @@
 <jsp:useBean id="portofinoConfiguration" scope="application"
              type="org.apache.commons.configuration.Configuration"/>
 <jsp:useBean id="model" scope="request"
-             type="com.manydesigns.portofino.model.Model"/>
+             type="com.manydesigns.portofino.model.datamodel.Model"/>
 <jsp:useBean id="app" scope="request"
              type="com.manydesigns.portofino.application.Application"/>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.AbstractActionBean"/>

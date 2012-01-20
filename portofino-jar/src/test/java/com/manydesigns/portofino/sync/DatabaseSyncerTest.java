@@ -33,8 +33,8 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.annotations.Annotation;
+import com.manydesigns.portofino.model.datamodel.Model;
+import com.manydesigns.portofino.model.datamodel.Annotation;
 import com.manydesigns.portofino.model.datamodel.*;
 import liquibase.database.structure.ForeignKeyConstraintType;
 
