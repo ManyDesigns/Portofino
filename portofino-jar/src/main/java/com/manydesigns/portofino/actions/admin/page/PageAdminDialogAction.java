@@ -41,7 +41,7 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.logic.PageLogic;
+import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.model.datamodel.Model;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.Before;
@@ -86,7 +86,7 @@ public class PageAdminDialogAction extends AbstractActionBean {
     @RequiresAdministrator
     public Resolution chooseNewLocation() {
         SelectionProvider pagesSelectionProvider =
-                PageLogic.createPagesSelectionProvider
+                DispatcherLogic.createPagesSelectionProvider
                         (application, application.getPagesDir(), true, true, pageInstance.getDirectory());
         moveForm = new FormBuilder(MovePage.class)
                 .configReflectiveFields()
@@ -98,7 +98,7 @@ public class PageAdminDialogAction extends AbstractActionBean {
     @RequiresAdministrator
     public Resolution copyPageDialog() {
         SelectionProvider pagesSelectionProvider =
-                PageLogic.createPagesSelectionProvider
+                DispatcherLogic.createPagesSelectionProvider
                         (application, application.getPagesDir(), true, true, pageInstance.getDirectory());
         copyForm = new FormBuilder(CopyPage.class)
                 .configReflectiveFields()

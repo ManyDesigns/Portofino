@@ -27,14 +27,15 @@
  *
  */
 
-package com.manydesigns.portofino.logic;
+package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.util.FileUtils;
+import groovy.lang.GroovyClassLoader;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
@@ -44,10 +45,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileReader;
-import java.io.Reader;
+import java.io.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -55,11 +55,11 @@ import java.io.Reader;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class PageLogic {
+public class DispatcherLogic {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    private static final Logger logger = LoggerFactory.getLogger(PageLogic.class);
+    private static final Logger logger = LoggerFactory.getLogger(DispatcherLogic.class);
 
     public static SelectionProvider createPagesSelectionProvider
             (Application application, File baseDir, File... excludes) {
@@ -71,7 +71,7 @@ public class PageLogic {
              File... excludes) {
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("pages");
         if(includeRoot) {
-            Page rootPage = PageLogic.getPage(baseDir);
+            Page rootPage = DispatcherLogic.getPage(baseDir);
             selectionProvider.appendRow("/", rootPage.getTitle() + " (top level)", true);
         }
         appendChildrenToPagesSelectionProvider
@@ -108,7 +108,7 @@ public class PageLogic {
                         (application, baseDir, file, breadcrumb, selectionProvider, includeDetailChildren, excludes);
             }
         } else {
-            Page page = PageLogic.getPage(file);
+            Page page = DispatcherLogic.getPage(file);
             if (breadcrumb == null) {
                 breadcrumb = page.getTitle();
             } else {
@@ -197,6 +197,48 @@ public class PageLogic {
             return null;
         }
         return (T) configuration;
+    }
+
+    //TODO!!!
+    private static final ConcurrentMap<File, Class<? extends PageAction>> actionClassCache =
+            new ConcurrentHashMap<File, Class<? extends PageAction>>();
+
+    public static Class<? extends PageAction> getActionClass(File directory) {
+        Class<? extends PageAction> actionClass = actionClassCache.get(directory);
+        if(actionClass != null) {
+            return actionClass;
+        } else {
+            try {
+                actionClass = (Class<? extends PageAction>) ScriptingUtil.getGroovyClass(directory, "action");
+            } catch (IOException e) {
+                throw new RuntimeException("Couldn't load action class for " + directory.getName(), e); //TODO
+            }
+            if(Dispatcher.isValidActionClass(actionClass)) {
+                actionClassCache.put(directory, actionClass);
+                return actionClass;
+            } else {
+                throw new RuntimeException("Invalid action class for " + directory.getName() + ": " + actionClass); //TODO
+            }
+        }
+    }
+
+    public static Class<? extends PageAction> setActionClass(File directory, String source) throws IOException {
+        File groovyScriptFile =
+                ScriptingUtil.getGroovyScriptFile(directory, "action");
+        GroovyClassLoader loader = new GroovyClassLoader();
+        Class<? extends PageAction> scriptClass =
+                loader.parseClass(source, groovyScriptFile.getAbsolutePath());
+        if(!Dispatcher.isValidActionClass(scriptClass)) {
+            return null;
+        }
+        FileWriter fw = new FileWriter(groovyScriptFile);
+        try {
+            fw.write(source);
+            actionClassCache.put(directory, scriptClass);
+        } finally {
+            IOUtils.closeQuietly(fw);
+        }
+        return scriptClass;
     }
 
 }

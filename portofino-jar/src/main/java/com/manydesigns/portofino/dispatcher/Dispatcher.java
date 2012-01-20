@@ -30,9 +30,7 @@
 package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.servlet.ServletUtils;
-import com.manydesigns.portofino.actions.PageAction;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.model.datamodel.Model;
 import com.manydesigns.portofino.model.pages.Page;
 import org.apache.commons.lang.StringUtils;
@@ -95,7 +93,7 @@ public class Dispatcher {
 
         File rootDir = application.getPagesDir();
         try {
-            Page rootPage = PageLogic.getPage(rootDir);
+            Page rootPage = DispatcherLogic.getPage(rootDir);
             PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage);
             pagePath.add(rootPageInstance);
             makePageInstancePath(pagePath, fragmentsIterator, rootPageInstance);
@@ -141,7 +139,7 @@ public class Dispatcher {
             String nextFragment = fragmentsIterator.next();
             File childDirectory = new File(currentDirectory, nextFragment);
             if(childDirectory.isDirectory() && !PageInstance.DETAIL.equals(childDirectory.getName())) {
-                Page page = PageLogic.getPage(childDirectory);
+                Page page = DispatcherLogic.getPage(childDirectory);
                 PageInstance pageInstance = new PageInstance(parentPageInstance, childDirectory, application, page);
                 pagePath.add(pageInstance);
                 makePageInstancePath(pagePath, fragmentsIterator, pageInstance);

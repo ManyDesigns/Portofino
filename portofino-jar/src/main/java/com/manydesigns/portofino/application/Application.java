@@ -29,13 +29,10 @@
 
 package com.manydesigns.portofino.application;
 
-import com.manydesigns.portofino.actions.PageAction;
-import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.datamodel.Model;
 import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
 import com.manydesigns.portofino.model.datamodel.Database;
-import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
@@ -43,7 +40,6 @@ import org.apache.commons.configuration.Configuration;
 import org.hibernate.Session;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -116,8 +112,6 @@ public interface Application {
 
     Model getModel();
     void syncDataModel(String databaseName) throws Exception;
-    Class<? extends PageAction> getActionClass(File directory);
-    Class<? extends PageAction> setActionClass(File directory, String source) throws IOException;
 
     //**************************************************************************
     // Persistance
@@ -141,7 +135,6 @@ public interface Application {
 
     public TableAccessor getTableAccessor(String qualifiedTableName);
     public TableAccessor getTableAccessor(String database, String entityName);
-    public CrudAccessor getCrudAccessor(CrudConfiguration crudConfiguration);
 
     //**************************************************************************
     // User

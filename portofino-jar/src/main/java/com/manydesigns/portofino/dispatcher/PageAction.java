@@ -27,9 +27,12 @@
 *
 */
 
-package com.manydesigns.portofino.actions;
+package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.dispatcher.PageInstance;
+import net.sourceforge.stripes.action.ActionBean;
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.Resolution;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -37,10 +40,18 @@ import com.manydesigns.portofino.application.Application;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface PageActionConfiguration {
+public interface PageAction extends ActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public void init(Application application);
+    Class<?> getConfigurationClass();
 
+    Resolution prepare(PageInstance pageInstance, ActionBeanContext context);
+
+    String getScriptTemplate();
+
+    String getDescription();
+
+    boolean supportsParameters();
+    
 }

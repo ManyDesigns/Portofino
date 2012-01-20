@@ -27,12 +27,13 @@
  *
  */
 
-package com.manydesigns.portofino.reflection;
+package com.manydesigns.portofino.actions.crud.reflection;
 
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.annotations.impl.*;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.actions.crud.configuration.CrudProperty;
+import com.manydesigns.portofino.reflection.AbstractAnnotatedAccessor;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;

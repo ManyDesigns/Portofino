@@ -31,7 +31,7 @@ package com.manydesigns.portofino.stripes;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.actions.PageAction;
+import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ApplicationStarter;

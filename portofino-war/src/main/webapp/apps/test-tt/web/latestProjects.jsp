@@ -1,4 +1,4 @@
-<%@ page import="com.manydesigns.portofino.application.hibernate.HibernateApplicationImpl" %>
+<%@ page import="com.manydesigns.portofino.application.DefaultApplication" %>
 <%@ page import="org.apache.commons.lang.time.FastDateFormat" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.List" %>
@@ -18,7 +18,7 @@
         <ul>
             <%
                 //TODO esporre maxResults nell'interfaccia e non usare direttamente runHqlQuery
-                HibernateApplicationImpl appl = (HibernateApplicationImpl) request.getAttribute("application");
+                DefaultApplication appl = (DefaultApplication) request.getAttribute("application");
                 List objects = appl.runHqlQuery("FROM projects order by updated_on desc, created_on desc", new Object[0], null, 3);
                 for(Object obj : objects) {
                     Map map = (Map) obj;

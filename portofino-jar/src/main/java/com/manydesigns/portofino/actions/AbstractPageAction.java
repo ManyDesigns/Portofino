@@ -18,8 +18,9 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.logic.PageLogic;
+import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.model.datamodel.Model;
 import com.manydesigns.portofino.model.datamodel.ModelObject;
 import com.manydesigns.portofino.model.pages.*;
@@ -178,7 +179,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             }
         }
         try {
-            PageLogic.saveConfiguration(pageInstance.getDirectory(), configuration);
+            DispatcherLogic.saveConfiguration(pageInstance.getDirectory(), configuration);
         } catch (Exception e) {
             logger.error("Couldn't save configuration", e);
             SessionMessages.addErrorMessage("error saving conf");
@@ -417,7 +418,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         page.getLayout().setLayout(edit.layout);
         page.getDetailLayout().setLayout(edit.detailLayout);
         try {
-            PageLogic.savePage(pageInstance.getDirectory(), page);
+            DispatcherLogic.savePage(pageInstance.getDirectory(), page);
         } catch (Exception e) {
             logger.error("Couldn't save page", e);
             return false; //TODO handle return value + script + session msg
@@ -564,7 +565,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         File directory = pageInstance.getDirectory();
         File groovyScriptFile = ScriptingUtil.getGroovyScriptFile(directory, "action");
         try {
-            Class<?> scriptClass = application.setActionClass(directory, script);
+            Class<?> scriptClass = DispatcherLogic.setActionClass(directory, script);
             if(scriptClass == null) {
                 SessionMessages.addErrorMessage(getMessage("script.class.invalid"));
                 return;

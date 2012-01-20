@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.logic;
+package com.manydesigns.portofino.actions.text;
 
 import com.manydesigns.portofino.actions.text.configuration.Attachment;
 import com.manydesigns.portofino.actions.text.configuration.TextConfiguration;

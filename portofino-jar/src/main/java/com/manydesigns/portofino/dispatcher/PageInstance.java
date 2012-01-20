@@ -29,9 +29,7 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.portofino.actions.PageAction;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.logic.PageLogic;
 import com.manydesigns.portofino.model.pages.Layout;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.util.FileUtils;
@@ -127,7 +125,7 @@ public class PageInstance {
 
     public Class<? extends PageAction> getActionClass() {
         if(actionClass == null) {
-            actionClass = application.getActionClass(directory);
+            actionClass = DispatcherLogic.getActionClass(directory);
         }
         return actionClass;
     }
@@ -162,7 +160,7 @@ public class PageInstance {
 
     public Page getChildPage(String name) {
         File childDirectory = getChildPageDirectory(name);
-        return PageLogic.getPage(childDirectory);
+        return DispatcherLogic.getPage(childDirectory);
     }
 
     public File getChildPageDirectory(String name) {

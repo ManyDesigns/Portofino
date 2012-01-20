@@ -27,29 +27,23 @@
  *
  */
 
-package com.manydesigns.portofino.application.hibernate;
+package com.manydesigns.portofino.application;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
-import com.manydesigns.portofino.actions.PageAction;
-import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
-import com.manydesigns.portofino.application.AppProperties;
-import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.application.hibernate.HibernateConfig;
+import com.manydesigns.portofino.application.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
-import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.datamodel.*;
-import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
-import groovy.lang.GroovyClassLoader;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
@@ -58,7 +52,6 @@ import liquibase.resource.ResourceAccessor;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -76,13 +69,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -90,7 +80,7 @@ import java.util.concurrent.ConcurrentMap;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class HibernateApplicationImpl implements Application {
+public class DefaultApplication implements Application {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -123,24 +113,24 @@ public class HibernateApplicationImpl implements Application {
 
 
     public static final Logger logger =
-            LoggerFactory.getLogger(HibernateApplicationImpl.class);
+            LoggerFactory.getLogger(DefaultApplication.class);
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public HibernateApplicationImpl(String appId,
-                                    org.apache.commons.configuration.Configuration portofinoConfiguration,
-                                    DatabasePlatformsManager databasePlatformsManager,
-                                    File appDir,
-                                    File appBlobsDir,
-                                    File appConnectionsFile,
-                                    File appDbsDir,
-                                    File appModelFile,
-                                    File appScriptsDir,
-                                    File appTextDir,
-                                    File appStorageDir,
-                                    File appWebDir
+    public DefaultApplication(String appId,
+                              org.apache.commons.configuration.Configuration portofinoConfiguration,
+                              DatabasePlatformsManager databasePlatformsManager,
+                              File appDir,
+                              File appBlobsDir,
+                              File appConnectionsFile,
+                              File appDbsDir,
+                              File appModelFile,
+                              File appScriptsDir,
+                              File appTextDir,
+                              File appStorageDir,
+                              File appWebDir
     ) throws ConfigurationException {
         this.appId = appId;
         this.portofinoConfiguration = portofinoConfiguration;
@@ -417,48 +407,6 @@ public class HibernateApplicationImpl implements Application {
         saveXmlModel();
     }
 
-    //TODO!!!
-    private static final ConcurrentMap<File, Class<? extends PageAction>> actionClassCache =
-            new ConcurrentHashMap<File, Class<? extends PageAction>>();
-
-    public Class<? extends PageAction> getActionClass(File directory) {
-        Class<? extends PageAction> actionClass = actionClassCache.get(directory);
-        if(actionClass != null) {
-            return actionClass;
-        } else {
-            try {
-                actionClass = (Class<? extends PageAction>) ScriptingUtil.getGroovyClass(directory, "action");
-            } catch (IOException e) {
-                throw new RuntimeException("Couldn't load action class for " + directory.getName(), e); //TODO
-            }
-            if(Dispatcher.isValidActionClass(actionClass)) {
-                actionClassCache.put(directory, actionClass);
-                return actionClass;
-            } else {
-                throw new RuntimeException("Invalid action class for " + directory.getName() + ": " + actionClass); //TODO
-            }
-        }
-    }
-
-    public Class<? extends PageAction> setActionClass(File directory, String source) throws IOException {
-        File groovyScriptFile =
-                ScriptingUtil.getGroovyScriptFile(directory, "action");
-        GroovyClassLoader loader = new GroovyClassLoader();
-        Class<? extends PageAction> scriptClass =
-                loader.parseClass(source, groovyScriptFile.getAbsolutePath());
-        if(!Dispatcher.isValidActionClass(scriptClass)) {
-            return null;
-        }
-        FileWriter fw = new FileWriter(groovyScriptFile);
-        try {
-            fw.write(source);
-            actionClassCache.put(directory, scriptClass);
-        } finally {
-            IOUtils.closeQuietly(fw);
-        }
-        return scriptClass;
-    }
-
     //**************************************************************************
     // Persistance
     //**************************************************************************
@@ -590,11 +538,6 @@ public class HibernateApplicationImpl implements Application {
         Table table = DataModelLogic.findTableByEntityName(database, entityName);
         assert table != null;
         return new TableAccessor(table);
-    }
-
-    public @NotNull CrudAccessor getCrudAccessor(@NotNull CrudConfiguration crudConfiguration) {
-        TableAccessor tableAccessor = new TableAccessor(crudConfiguration.getActualTable());
-        return new CrudAccessor(crudConfiguration, tableAccessor);
     }
 
     //**************************************************************************

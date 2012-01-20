@@ -43,7 +43,7 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ServerInfo;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.logic.PageLogic;
+import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
@@ -100,7 +100,7 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
         SelectionProvider skinSelectionProvider =
                 createSkinSelectionProvider();
         SelectionProvider pagesSelectionProvider =
-                PageLogic.createPagesSelectionProvider(application, application.getPagesDir());
+                DispatcherLogic.createPagesSelectionProvider(application, application.getPagesDir());
 
         Configuration appConfiguration = application.getAppConfiguration();
         CommonsConfigurationAccessor accessor = new CommonsConfigurationAccessor(appConfiguration);

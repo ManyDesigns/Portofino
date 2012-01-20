@@ -36,7 +36,7 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.logic.PageLogic;
+import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
@@ -76,7 +76,7 @@ public class RootPermissionsAction extends PageAdminAction implements AdminActio
         originalPath = "/";
         application = (Application) context.getRequest().getAttribute(RequestAttributes.APPLICATION);
         File rootDir = application.getPagesDir();
-        Page rootPage = PageLogic.getPage(rootDir);
+        Page rootPage = DispatcherLogic.getPage(rootDir);
         PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage);
         dispatch = new Dispatch(context.getRequest().getContextPath(), originalPath, rootPageInstance);
     }

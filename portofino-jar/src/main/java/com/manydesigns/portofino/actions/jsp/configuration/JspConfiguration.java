@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.actions.jsp.configuration;
 
-import com.manydesigns.portofino.actions.PageActionConfiguration;
+import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import com.manydesigns.portofino.application.Application;
 
 import javax.xml.bind.annotation.XmlAccessType;

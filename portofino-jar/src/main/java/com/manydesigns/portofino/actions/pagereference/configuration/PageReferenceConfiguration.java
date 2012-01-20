@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.actions.pagereference.configuration;
 
 import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.portofino.actions.PageActionConfiguration;
+import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.pages.Page;
 

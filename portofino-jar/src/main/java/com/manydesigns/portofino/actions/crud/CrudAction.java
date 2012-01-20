@@ -53,6 +53,7 @@ import com.manydesigns.portofino.actions.AbstractPageAction;
 import com.manydesigns.portofino.actions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.actions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.actions.crud.configuration.SelectionProviderReference;
+import com.manydesigns.portofino.actions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.actions.forms.CrudPropertyEdit;
 import com.manydesigns.portofino.actions.forms.CrudSelectionProviderEdit;
 import com.manydesigns.portofino.application.TableCriteria;
@@ -1141,7 +1142,9 @@ public class CrudAction extends AbstractPageAction {
         if(crudConfiguration != null && crudConfiguration.getActualDatabase() != null) {
             application = pageInstance.getApplication();
 
-            classAccessor = application.getCrudAccessor(crudConfiguration);
+            TableAccessor tableAccessor = new TableAccessor(crudConfiguration.getActualTable());
+            classAccessor = new CrudAccessor(crudConfiguration, tableAccessor);
+
             baseTable = crudConfiguration.getActualTable();
             pkHelper = new PkHelper(classAccessor);
             session = application.getSession(crudConfiguration.getDatabase());

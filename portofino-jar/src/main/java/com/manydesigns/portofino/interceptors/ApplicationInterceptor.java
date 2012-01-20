@@ -31,15 +31,13 @@ package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.BlobManager;
-import com.manydesigns.portofino.actions.PageAction;
-import com.manydesigns.portofino.actions.PageActionConfiguration;
+import com.manydesigns.portofino.dispatcher.PageAction;
+import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
-import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.logic.PageLogic;
+import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.navigation.Navigation;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -158,7 +156,7 @@ public class ApplicationInterceptor implements Interceptor {
         } else {
             try {
                 Class<?> configurationClass = actionBean.getConfigurationClass();
-                configuration = PageLogic.loadConfiguration(pageInstance.getDirectory(), configurationClass);
+                configuration = DispatcherLogic.loadConfiguration(pageInstance.getDirectory(), configurationClass);
 
                 if(configuration instanceof PageActionConfiguration) {
                     ((PageActionConfiguration) configuration).init(application);

@@ -31,7 +31,7 @@ package com.manydesigns.portofino.actions.crud.configuration;
 
 import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.annotations.Multiline;
-import com.manydesigns.portofino.actions.PageActionConfiguration;
+import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.logic.DataModelLogic;

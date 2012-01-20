@@ -28,7 +28,7 @@
  */
 package com.manydesigns.portofino.actions.text.configuration;
 
-import com.manydesigns.portofino.actions.PageActionConfiguration;
+import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import com.manydesigns.portofino.application.Application;
 
 import javax.xml.bind.annotation.*;

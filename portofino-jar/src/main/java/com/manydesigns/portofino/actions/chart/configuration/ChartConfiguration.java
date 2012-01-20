@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.actions.chart.configuration;
 
 import com.manydesigns.elements.annotations.*;
-import com.manydesigns.portofino.actions.PageActionConfiguration;
+import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.chart.*;
 import com.manydesigns.portofino.logic.DataModelLogic;

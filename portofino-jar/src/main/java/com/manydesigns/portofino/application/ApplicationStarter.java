@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.application;
 
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.application.hibernate.HibernateApplicationImpl;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.email.EmailTask;
 import org.apache.commons.configuration.Configuration;
@@ -288,7 +287,7 @@ public class ApplicationStarter {
     public boolean setupApplication() {
         logger.info("Creating application instance...");
         try {
-            tmpApplication = new HibernateApplicationImpl(appId,
+            tmpApplication = new DefaultApplication(appId,
                     portofinoConfiguration, databasePlatformsManager,
                     appDir, appBlobsDir, appConnectionsFile, appDbsDir,
                     appModelFile, appScriptsDir, appTextDir, appStorageDir, appWebDir);
