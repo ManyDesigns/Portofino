@@ -27,38 +27,18 @@
 *
 */
 
-package com.manydesigns.portofino.actions.forms;
-
-import com.manydesigns.elements.annotations.*;
+package com.manydesigns.elements.options;
 
 /**
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
- * @author Angelo Lupo          - angelo.lupo@manydesigns.com
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Alessio Stalla       - alessio.stalla@manydesigns.com
- */
-public class EditPage {
-    public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
-
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.id")
-    @Updatable(false)
-    public String id;
-
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.description")
-    @Required
-    @Multiline
-    public String description;
-
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.subtreeRoot")
-    public boolean subtreeRoot;
-
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.layout")
-    @Required
-    public String layout;
-
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.detailLayout")
-    @Required
-    public String detailLayout;
-
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+*/
+public enum SearchDisplayMode {
+    DROPDOWN,
+    RADIO,
+    AUTOCOMPLETE,
+    MULTIPLESELECT,
+    CHECKBOX
 }

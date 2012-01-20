@@ -35,7 +35,6 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -45,7 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,24 +124,7 @@ public abstract class AbstractField implements Field {
         Object[] bulkInputNameArgs = {inputName,  "_bulk"};
         bulkCheckboxName = StringUtils.join(bulkInputNameArgs);
 
-        if (accessor.isAnnotationPresent(LabelI18N.class)) {
-            String text = accessor.getAnnotation(LabelI18N.class).value();
-            logger.debug("LabelI18N annotation present with value: {}", text);
-
-            String args = null;
-            String textCompare = MessageFormat.format(text, args);
-            String i18NText = getText(text);
-            label = i18NText;
-            if (textCompare.equals(i18NText) && accessor.isAnnotationPresent(Label.class)) {
-                label = accessor.getAnnotation(Label.class).value();
-            }
-        } else if (accessor.isAnnotationPresent(Label.class)) {
-            label = accessor.getAnnotation(Label.class).value();
-            logger.debug("Label annotation present with value: {}", label);
-        } else {
-            label = Util.guessToWords(accessor.getName());
-            logger.debug("Setting label from property name: {}", label);
-        }
+        label = FieldUtils.getLabel(accessor);
 
         if (accessor.isAnnotationPresent(Help.class)) {
             help = accessor.getAnnotation(Help.class).value();

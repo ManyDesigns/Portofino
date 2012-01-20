@@ -16,7 +16,7 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Page children for: <c:out value="${actionBean.page.title}"/>
+        <fmt:message key="page.children.title"><fmt:param value="${actionBean.page.title}" /></fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
@@ -25,7 +25,7 @@
         </div>
         <c:if test="${not empty actionBean.detailChildPagesForm}">
             <div class="childrenTable">
-                <h2>Detail</h2>
+                <h2><fmt:message key="page.children.detail" /></h2>
                 <mde:write name="actionBean" property="detailChildPagesForm" />
             </div>
         </c:if>
