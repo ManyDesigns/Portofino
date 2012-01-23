@@ -34,6 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Date;
 
@@ -150,9 +152,9 @@ public class Type {
             case Types.DATE:
                 return Date.class;
             case Types.TIME:
-                return Date.class;
+                return Time.class;
             case Types.TIMESTAMP:
-                return Date.class;
+                return Timestamp.class;
             case Types.DECIMAL:
                 return BigDecimal.class;
             case Types.NUMERIC:

@@ -204,4 +204,64 @@ public class Util {
         element.toXhtml(xb);
         return xb.toString();
     }
+
+// confronto fra due strighe che tiene conto dei numeri.
+    // cioè "pippo1" < "pippo2" < "pippo10"
+    // il confronto è case insensitive
+    public static int compare(
+            String one,
+            String two) {
+
+        if(one == null && two == null) {
+            return 0;
+        }
+        if (two == null)
+            return -1;
+        if (one == null)
+            return 1;
+
+        int lenone = one.length();
+        int lentwo = two.length();
+        StringBuilder numberOne = new StringBuilder();
+        StringBuilder numberTwo = new StringBuilder();
+        int i = 0, j = 0;
+
+        for (; i < lenone && j < lentwo; i++, j++) {
+
+            if (Character.isDigit(one.charAt(i))) {
+                if (Character.isDigit(two.charAt(j))) {
+                    numberOne.setLength(0);
+                    numberTwo.setLength(0);
+
+                    while ((i < lenone) && Character.isDigit(one.charAt(i))) {
+                        numberOne.append(one.charAt(i));
+                        i++;
+                    }
+                    while ((j < lentwo) && Character.isDigit(two.charAt(j))) {
+                        numberTwo.append(two.charAt(j));
+                        j++;
+                    }
+                    long diff = Long.parseLong(numberOne.toString()) -
+                            Long.parseLong(numberTwo.toString());
+                    if (diff > 0) {
+                        return 1;
+                    } else if (diff < 0) {
+                        return -1;
+                    }
+                } else {
+                    return -1;
+                }
+            } else if (Character.isDigit(two.charAt(j))) {
+                return 1;
+            } else {
+                int diff = Character.toUpperCase(one.charAt(i)) -
+                        Character.toUpperCase(two.charAt(j));
+                if (diff != 0)
+                    return diff;
+            }
+        }
+
+        return lenone - lentwo;
+    }
+
 }

@@ -326,7 +326,8 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
             ShortName shortNameAnnotation =
                     tableAccessor.getAnnotation(ShortName.class);
             TextFormat[] textFormats = null;
-            if (shortNameAnnotation != null && tableAccessor.getKeyProperties().length == 1) { //???
+            //L'ordinamento è usato solo in caso di chiave singola
+            if (shortNameAnnotation != null && tableAccessor.getKeyProperties().length == 1) {
                 textFormats = new TextFormat[] {
                     OgnlTextFormat.create(shortNameAnnotation.value())
                 };
@@ -334,6 +335,11 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
 
             selectionProvider = createSelectionProvider
                     (name, objects, tableAccessor.getKeyProperties(), textFormats);
+
+            if(current instanceof ForeignKey) {
+                selectionProvider.sortByLabel();
+            }
+
             selectionProvider.setDisplayMode(dm);
         } else {
             logger.warn("ModelSelection provider '{}':" +

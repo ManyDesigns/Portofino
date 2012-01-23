@@ -31,6 +31,7 @@ package com.manydesigns.elements.ognl;
 import ognl.TypeConverter;
 
 import java.lang.reflect.Member;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Map;
@@ -53,8 +54,11 @@ public class CustomTypeConverter implements TypeConverter {
     public Object convertValue(Map context, Object target, Member member,
             String propertyName, Object value, Class toType) {
         if ((toType == Timestamp.class) && (value instanceof Date)) {
-                        Date thisValue = (Date) value;
-                        return new Timestamp(thisValue.getTime());
+            Date thisValue = (Date) value;
+            return new Timestamp(thisValue.getTime());
+        } else if ((toType == Time.class) && (value instanceof Date)) {
+            Date thisValue = (Date) value;
+            return new Time(thisValue.getTime());
         } else if (toType.isEnum() && value instanceof String){
             return Enum.valueOf(toType, (String) value);
         } else if (toType == Class.class && value instanceof String) {
