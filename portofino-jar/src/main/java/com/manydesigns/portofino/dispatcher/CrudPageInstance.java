@@ -121,11 +121,11 @@ public class CrudPageInstance extends PageInstance {
     }
 
     @Override
-    public String getUrlFragment() {
+    public String formatUrlFragment(String baseFragment) {
         if (pk == null) {
-            return super.getUrlFragment();
+            return baseFragment;
         } else {
-            return String.format("%s/%s", super.getUrlFragment(), pk);
+            return String.format("%s/%s", baseFragment, pk);
         }
     }
 

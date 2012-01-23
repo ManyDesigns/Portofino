@@ -14,11 +14,11 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:out value="${actionBean.content}" escapeXml="false"/>
-        <c:if test="${not empty actionBean.textPage.attachments}">
+        <c:if test="${not empty actionBean.downloadableAttachments}">
             <div class="horizontalSeparator"></div>
             <fmt:message key="commons.attachments"/>:
             <div class="attachmentBox">
-                <c:forEach var="attachment" items="${actionBean.textPage.attachments}">
+                <c:forEach var="attachment" items="${actionBean.downloadableAttachments}">
                     <div class="attachment <c:out value="mime-${fn:replace(attachment.contentType,'/','-')}"/>">
                         <div class="attachmentName"><c:out value="${attachment.filename}"/></div>
                         <c:out value="${mde:bytesToHumanString(attachment.size)}"/>

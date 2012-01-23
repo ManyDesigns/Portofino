@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.actions.PortletAction;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
@@ -38,9 +37,6 @@ import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -50,7 +46,7 @@ import java.util.ResourceBundle;
  */
 @RequiresAdministrator
 @UrlBinding("/actions/admin/root-permissions")
-public class RootPermissionsAction extends PortletAction implements AdminAction {
+public class RootPermissionsAction extends PageAdminAction implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -79,9 +75,7 @@ public class RootPermissionsAction extends PortletAction implements AdminAction 
             updatePagePermissions(page);
             saveModel();
 
-            Locale locale = context.getLocale();
-            ResourceBundle bundle = application.getBundle(locale);
-            SessionMessages.addInfoMessage(bundle.getString("permissions.root.updated"));
+            SessionMessages.addInfoMessage(getMessage("permissions.root.updated"));
         }
 
         return new RedirectResolution(this.getClass());

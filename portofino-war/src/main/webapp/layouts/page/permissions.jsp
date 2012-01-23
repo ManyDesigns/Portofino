@@ -6,7 +6,6 @@
 <%@ page import="com.manydesigns.portofino.system.model.users.annotations.SupportsPermissions" %>
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.manydesigns.elements.fields.SelectField" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -14,8 +13,8 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="/skins/${skin}/modal-page.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.PortletAction"/>
+<stripes:layout-render name="/skins/${skin}/modal-page.jsp" formActionUrl="/actions/admin/page">
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.PageAdminAction"/>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="page-permissions-edit" cssClass="contentButton" />
         <div class="breadcrumbs">
@@ -25,14 +24,15 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Page permissions for: <c:out value="${actionBean.pageInstance.page.title}"/>
+        Page permissions for: <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
+        <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
         <div class="yui-gc">
             <div class="yui-u first">
                 <table>
                 <%
-                    Page currentPage = actionBean.getPageInstance().getPage();
+                    Page currentPage = actionBean.getPage();
                     SupportsPermissions supportsPermissions =
                             actionBean.getClass().getAnnotation(SupportsPermissions.class);
                     String[] supportedPermissions = null;

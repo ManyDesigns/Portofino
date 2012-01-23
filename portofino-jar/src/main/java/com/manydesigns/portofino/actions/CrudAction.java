@@ -59,7 +59,6 @@ import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.dispatcher.CrudPageInstance;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.DataModelLogic;
-import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.CrudPage;
@@ -327,7 +326,8 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
             ShortName shortNameAnnotation =
                     tableAccessor.getAnnotation(ShortName.class);
             TextFormat[] textFormats = null;
-            if (shortNameAnnotation != null && tableAccessor.getKeyProperties().length == 1) { //???
+            //L'ordinamento è usato solo in caso di chiave singola
+            if (shortNameAnnotation != null && tableAccessor.getKeyProperties().length == 1) {
                 textFormats = new TextFormat[] {
                     OgnlTextFormat.create(shortNameAnnotation.value())
                 };
@@ -335,6 +335,11 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
 
             selectionProvider = createSelectionProvider
                     (name, objects, tableAccessor.getKeyProperties(), textFormats);
+
+            if(current instanceof ForeignKey) {
+                selectionProvider.sortByLabel();
+            }
+
             selectionProvider.setDisplayMode(dm);
         } else {
             logger.warn("ModelSelection provider '{}':" +
@@ -521,6 +526,33 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
                                 fileBlobField.getPropertyAccessor());
                         field.setHref(url);
                     }
+                }
+            }
+        }
+    }
+
+    protected void refreshTableBlobDownloadHref() {
+        Iterator<?> objIterator = objects.iterator();
+        for (TableForm.Row row : tableForm.getRows()) {
+            Iterator<Field> fieldIterator = row.iterator();
+            Object obj = objIterator.next();
+            String baseUrl = null;
+            while (fieldIterator.hasNext()) {
+                Field field = fieldIterator.next();
+                if (field instanceof FileBlobField) {
+                    if(baseUrl == null) {
+                        String readLinkExpression = getReadLinkExpression();
+                        OgnlTextFormat hrefFormat =
+                                OgnlTextFormat.create(readLinkExpression);
+                        hrefFormat.setUrl(true);
+                        baseUrl = hrefFormat.format(obj);
+                    }
+
+                    UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), baseUrl, false)
+                        .addParameter("downloadBlob","")
+                        .addParameter("propertyName", field.getPropertyAccessor().getName());
+
+                    field.setHref(urlBuilder.toString());
                 }
             }
         }
@@ -775,6 +807,9 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
 
     @Override
     public void setupReturnToParentTarget() {
+        if(!StringUtils.isBlank(searchString)) {
+            returnToParentParams.put(SEARCH_STRING_PARAM, searchString);
+        }
         if (CrudPage.MODE_DETAIL.equals(getPageInstance().getMode())) {
             returnToParentTarget = "search";
         } else {
@@ -820,9 +855,7 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
         @Button(list = "crud-edit", key = "commons.cancel", order = 99),
         @Button(list = "crud-create", key = "commons.cancel", order = 99),
         @Button(list = "crud-bulk-edit", key = "commons.cancel", order = 99),
-        @Button(list = "page-permissions-edit", key = "commons.cancel", order = 99),
-        @Button(list = "configuration", key = "commons.cancel", order = 99),
-        @Button(list = "page-create", key = "commons.cancel", order = 99)
+        @Button(list = "configuration", key = "commons.cancel", order = 99)
     })
     public Resolution cancel() {
         return super.cancel();
@@ -961,6 +994,8 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
             searchString = searchForm.toSearchString();
             if (searchString.length() == 0) {
                 searchString = null;
+            } else {
+                searchVisible = true;
             }
         } else {
             DummyHttpServletRequest dummyRequest =
@@ -979,6 +1014,7 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
                 }
             }
             searchForm.readFromRequest(dummyRequest);
+            searchVisible = true;
         }
     }
 
@@ -1078,12 +1114,10 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
         tableForm = tableFormBuilder.build();
 
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
-        boolean selectable = false;
-        selectable = selectable || SecurityLogic.hasPermissions(context.getRequest(), null, PERMISSION_EDIT);
-        selectable = selectable || SecurityLogic.hasPermissions(context.getRequest(), null, PERMISSION_DELETE);
-        tableForm.setSelectable(selectable);
+        tableForm.setSelectable(true);
         if (objects != null) {
             tableForm.readFromObject(objects);
+            refreshTableBlobDownloadHref();
         }
     }
 

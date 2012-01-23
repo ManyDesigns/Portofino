@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.model.pages;
 
 import com.manydesigns.elements.annotations.FieldSize;
+import com.manydesigns.elements.annotations.RegExp;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
@@ -72,6 +73,7 @@ public abstract class Page implements ModelObject, WithPermissions {
     protected String layoutOrder;
     protected String layout;
     protected boolean showInNavigation = true;
+    protected boolean subtreeRoot = false;
 
     //**************************************************************************
     // Actual fields
@@ -187,6 +189,7 @@ public abstract class Page implements ModelObject, WithPermissions {
 
     @XmlAttribute(required = true)
     @Required
+    @RegExp(value = "[a-zA-Z0-9_\\-]+", errorMessage = "page.invalid.fragment")
     public String getFragment() {
         return fragment;
     }
@@ -357,5 +360,14 @@ public abstract class Page implements ModelObject, WithPermissions {
 
     public void setActualActionClass(Class<?> actualActionClass) {
         this.actualActionClass = actualActionClass;
+    }
+
+    @XmlAttribute
+    public boolean isSubtreeRoot() {
+        return subtreeRoot;
+    }
+
+    public void setSubtreeRoot(boolean subtreeRoot) {
+        this.subtreeRoot = subtreeRoot;
     }
 }

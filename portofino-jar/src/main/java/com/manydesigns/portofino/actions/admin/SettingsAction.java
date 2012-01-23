@@ -52,6 +52,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -123,7 +125,10 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
 
                 model.init();
                 application.saveXmlModel();
-                SessionMessages.addInfoMessage("Settings updated successfully");
+
+                Locale locale = context.getLocale();
+                ResourceBundle bundle = application.getBundle(locale);
+                SessionMessages.addInfoMessage(bundle.getString("commons.configuration.updated"));
                 return new RedirectResolution(this.getClass());
             } else {
                 return new ForwardResolution("/layouts/admin/settings.jsp");

@@ -32,33 +32,30 @@ package com.manydesigns.portofino.application.hibernate;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
-import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
+import com.manydesigns.portofino.model.datamodel.Database;
+import com.manydesigns.portofino.model.datamodel.Schema;
+import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.model.pages.crud.Crud;
 import com.manydesigns.portofino.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
-import com.manydesigns.portofino.util.ConfigurationResourceBundle;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -79,8 +76,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -116,6 +111,8 @@ public class HibernateApplicationImpl implements Application {
     protected final File appStorageDir;
     protected final File appWebDir;
 
+    protected final ResourceBundleManager resourceBundleManager;
+
 
     public static final Logger logger =
             LoggerFactory.getLogger(HibernateApplicationImpl.class);
@@ -149,21 +146,12 @@ public class HibernateApplicationImpl implements Application {
         this.appTextDir = appTextDir;
         this.appStorageDir = appStorageDir;
         this.appWebDir = appWebDir;
+        resourceBundleManager = new ResourceBundleManager(appDir);
     }
 
     //**************************************************************************
     // Model loading
     //**************************************************************************
-
-    private String calculateRelativePath(File ancestor, File changelogFile) {
-        String path = changelogFile.getName();
-        File parent = changelogFile.getParentFile();
-        while (parent != null && !parent.equals(ancestor)) {
-            path = parent.getName() + File.separator + path;
-            parent = parent.getParentFile();
-        }
-        return path;
-    }
 
     public synchronized void loadXmlModel() {
         logger.info("Loading xml model from file: {}",
@@ -225,7 +213,8 @@ public class HibernateApplicationImpl implements Application {
                     liquibase.database.Database lqDatabase =
                             DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
                     lqDatabase.setDefaultSchemaName(schemaName);
-                    String relativeChangelogPath = calculateRelativePath(appsDir, changelogFile);
+                    String relativeChangelogPath =
+                            com.manydesigns.portofino.util.FileUtils.getRelativePath(appsDir, changelogFile);
                     if(new File(relativeChangelogPath).isAbsolute()) {
                         logger.warn("The application dbs dir {} is not inside the apps dir {}; using an absolute path for Liquibase update",
                                 appDbsDir, appsDir);
@@ -424,6 +413,9 @@ public class HibernateApplicationImpl implements Application {
     public Session getSessionByQualifiedTableName(String qualifiedTableName) {
         Table table = DataModelLogic.findTableByQualifiedName(
                 model, qualifiedTableName);
+        if(table == null) {
+            throw new Error("Table not found: " + qualifiedTableName);
+        }
         String databaseName = table.getDatabaseName();
         return getSession(databaseName);
     }
@@ -474,35 +466,6 @@ public class HibernateApplicationImpl implements Application {
                 logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
             }
             current.removeThreadSession();
-        }
-    }
-    
-    public void commit() {
-        for (HibernateDatabaseSetup current : setups.values()) {
-            Session session = current.getThreadSession();
-            if (session != null) {
-                Transaction tx = session.getTransaction();
-                if (null != tx && tx.isActive()) {
-                    try {
-                        tx.commit();
-                    } catch (HibernateException e) {
-                        closeSession(current);
-                        throw e;
-                    }
-                }
-            }
-        }
-    }
-
-    public void rollback() {
-        for (HibernateDatabaseSetup current : setups.values()) {
-            Session session = current.getThreadSession();
-            if (session != null) {
-                Transaction tx = session.getTransaction();
-                if (null != tx && tx.isActive()) {
-                    tx.rollback();
-                }
-            }
         }
     }
 
@@ -723,63 +686,7 @@ public class HibernateApplicationImpl implements Application {
     // I18n
     //**************************************************************************
 
-    private final ConcurrentMap<Locale, ConfigurationResourceBundle> resourceBundles =
-            new ConcurrentHashMap<Locale, ConfigurationResourceBundle>();
-
-    protected String getBundleFileName(String baseName, Locale locale) {
-        return getBundleName(baseName, locale) + ".properties";
-    }
-
-    protected String getBundleName(String baseName, Locale locale) {
-        String language = locale.getLanguage();
-        String country = locale.getCountry();
-        String variant = locale.getVariant();
-
-        if (StringUtils.isBlank(language) && StringUtils.isBlank(country) && StringUtils.isBlank(variant)) {
-            return baseName;
-        }
-
-        String name = baseName + "_";
-        if (!StringUtils.isBlank(variant)) {
-            name += language + "_" + country + "_" + variant;
-        } else if (!StringUtils.isBlank(country)) {
-            name += language + "_" + country;
-        } else {
-            name += language;
-        }
-        return name;
-    }
-
     public ResourceBundle getBundle(Locale locale) {
-        ConfigurationResourceBundle bundle = resourceBundles.get(locale);
-        if(bundle == null) {
-            ResourceBundle parentBundle = ResourceBundle.getBundle("portofino-messages", locale);
-            PropertiesConfiguration configuration;
-            try {
-                File bundleFile = getBundleFile(locale);
-                if(!bundleFile.exists() && !locale.equals(parentBundle.getLocale())) {
-                    bundleFile = getBundleFile(parentBundle.getLocale());
-                }
-                if(!bundleFile.exists()) {
-                    return parentBundle;
-                }
-                configuration = new PropertiesConfiguration(bundleFile);
-                FileChangedReloadingStrategy reloadingStrategy = new FileChangedReloadingStrategy();
-                configuration.setReloadingStrategy(reloadingStrategy);
-                bundle = new ConfigurationResourceBundle(configuration);
-                bundle.setParent(parentBundle);
-                resourceBundles.put(locale, bundle);
-            } catch (ConfigurationException e) {
-                logger.warn("Couldn't load app resource bundle for locale " + locale, e);
-                return parentBundle;
-            }
-        }
-        return bundle;
+        return resourceBundleManager.getBundle(locale);
     }
-
-    protected File getBundleFile(Locale locale) {
-        String resourceName = getBundleFileName("portofino-messages", locale);
-        return new File(appDir, resourceName);
-    }
-
 }

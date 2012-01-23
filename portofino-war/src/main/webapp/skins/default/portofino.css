@@ -161,6 +161,15 @@ div.contentBody {
     margin-left: 1em;
 }
 
+#pageAdminForm {
+    display: inline;
+}
+
+table.noBorder th,
+table.noBorder td {
+    border: none;
+}
+
 /*******************************************************************************
 Portlet
 *******************************************************************************/

@@ -36,7 +36,6 @@ import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.model.pages.RootPage;
 import org.apache.commons.lang.ArrayUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,25 +54,20 @@ public class PageLogic {
 
     public static SelectionProvider createPagesSelectionProvider
             (RootPage rootPage, boolean includeRoot, boolean includeDetailChildren, Page... excludes) {
-        List<String> valuesList = new ArrayList<String>();
-        List<String> labelsList = new ArrayList<String>();
-
-        if(includeRoot) {
-            valuesList.add(rootPage.getId());
-            labelsList.add(rootPage.getTitle() + " (top level)");
-        }
-
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("pages");
+        if(includeRoot) {
+            selectionProvider.appendRow(rootPage.getId(), rootPage.getTitle() + " (top level)", true);
+        }
         for (Page page : rootPage.getChildPages()) {
-            createPagesSelectionProvider(page, null, selectionProvider, includeDetailChildren, excludes);
+            appendToPagesSelectionProvider(page, null, selectionProvider, includeDetailChildren, excludes);
         }
 
         return selectionProvider;
     }
 
-    private static void createPagesSelectionProvider(Page page, String breadcrumb,
-                           DefaultSelectionProvider selectionProvider,
-                           boolean includeDetailChildren, Page... excludes) {
+    private static void appendToPagesSelectionProvider(Page page, String breadcrumb,
+                                                       DefaultSelectionProvider selectionProvider,
+                                                       boolean includeDetailChildren, Page... excludes) {
         if(ArrayUtils.contains(excludes, page)) {
             return;
         }
@@ -86,13 +80,13 @@ public class PageLogic {
         selectionProvider.appendRow(page.getId(), pageBreadcrumb, true);
         List<Page> children = page.getChildPages();
         for (Page subPage : children) {
-            createPagesSelectionProvider(subPage, pageBreadcrumb, selectionProvider, includeDetailChildren, excludes);
+            appendToPagesSelectionProvider(subPage, pageBreadcrumb, selectionProvider, includeDetailChildren, excludes);
         }
         if(page instanceof CrudPage && includeDetailChildren) {
             pageBreadcrumb += " (detail)";
             selectionProvider.appendRow(page.getId() + "-detail", pageBreadcrumb, true);
             for (Page subPage : ((CrudPage) page).getDetailChildPages()) {
-               createPagesSelectionProvider(subPage, pageBreadcrumb, selectionProvider, includeDetailChildren, excludes);
+               appendToPagesSelectionProvider(subPage, pageBreadcrumb, selectionProvider, includeDetailChildren, excludes);
             }
         }
     }

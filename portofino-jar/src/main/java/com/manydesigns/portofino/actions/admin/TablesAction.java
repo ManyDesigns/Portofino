@@ -41,7 +41,6 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertiesAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.actions.AbstractActionBean;
-import com.manydesigns.portofino.actions.PortofinoAction;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.actions.model.AnnModel;
 import com.manydesigns.portofino.actions.model.PrimaryKeyColumnModel;
@@ -103,6 +102,12 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     private static final int COLUMN_STEP = 2;
     private static final int TABLE_STEP = 1;
     private static final int PRIMARYKEY_STEP = 3;
+
+    //**************************************************************************
+    // Ex PortofinoAction
+    //**************************************************************************
+    public final static String CREATE = "create";
+    public final static String CANCEL = "cancel";
 
     //**************************************************************************
     // Web parameters
@@ -272,7 +277,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     //**************************************************************************
 
     public String cancel() {
-        return PortofinoAction.CANCEL;
+        return CANCEL;
     }
 
     //**************************************************************************
@@ -309,7 +314,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         }*/
         setupForms();
         step= TABLE_STEP;
-        return PortofinoAction.CREATE;
+        return CREATE;
     }
 
 
@@ -322,7 +327,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         col.setTable(table);
         columnForm.readFromRequest(context.getRequest());
         if(!columnForm.validate()){
-            return PortofinoAction.CREATE;
+            return CREATE;
         }      
        
         columnForm.writeToObject(col);
@@ -353,14 +358,14 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
         columnTableForm.readFromObject(table.getColumns());
 
-        return PortofinoAction.CREATE;
+        return CREATE;
 }
 
     public String remCol() {
         step= COLUMN_STEP;
         setupForms();
         if(!readFromRequest()){
-            return PortofinoAction.CREATE;
+            return CREATE;
         }
         columnNames.clear();
         for(TableForm.Row row : columnTableForm.getRows()) {
@@ -396,7 +401,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
         columnTableForm.readFromObject(table.getColumns());
 
-        return PortofinoAction.CREATE;
+        return CREATE;
     }
 
 
@@ -426,7 +431,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 OgnlTextFormat.create("%{columnName+\"_\"+annotationName}"));
         colAnnotationTableForm.readFromObject(colAnnotations);
 
-        return PortofinoAction.CREATE;
+        return CREATE;
     }
 
     public String setAnnParameters() throws ClassNotFoundException, NoSuchFieldException {
@@ -437,14 +442,14 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
             SessionMessages.addErrorMessage("SELECT A ANNOTATION");
  
         }
-        return PortofinoAction.CREATE;
+        return CREATE;
     }
 
     public String remColAnnotation() {
         step= ANNOTATION_STEP;
         setupForms();
         if(!readFromRequest()){
-            return PortofinoAction.CREATE;
+            return CREATE;
         }
 
         for(TableForm.Row row : colAnnotationTableForm.getRows()) {
@@ -474,14 +479,14 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         colAnnotationTableForm.readFromObject(colAnnotations);
         nAnnotations=colAnnotations.size();
 
-        return PortofinoAction.CREATE;
+        return CREATE;
     }
 
     public String addPkCol() {
         step= PRIMARYKEY_STEP;
         setupForms();
         if(!readFromRequest()){
-            return PortofinoAction.CREATE;
+            return CREATE;
         }
 
         PrimaryKeyColumnModel colModel = new PrimaryKeyColumnModel();
@@ -500,14 +505,14 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         pkColumnTableForm.setSelectable(true);
         pkColumnTableForm.setKeyGenerator(OgnlTextFormat.create("%{column}"));
         pkColumnTableForm.readFromObject(pkModel);
-        return PortofinoAction.CREATE;
+        return CREATE;
     }
 
     public String remPkCol() {
         step= PRIMARYKEY_STEP;
         setupForms();
         if(!readFromRequest()){
-            return PortofinoAction.CREATE;
+            return CREATE;
         }
         for(TableForm.Row row : pkColumnTableForm.getRows()) {
             try {
@@ -534,7 +539,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         pkColumnTableForm.setKeyGenerator(OgnlTextFormat.create("%{column}"));
         pkColumnTableForm.readFromObject(pkModel);
 
-        return PortofinoAction.CREATE;
+        return CREATE;
     }
 
     //**************************************************************************

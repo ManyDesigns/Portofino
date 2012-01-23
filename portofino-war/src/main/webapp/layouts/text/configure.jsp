@@ -25,7 +25,7 @@
     <stripes:layout-component name="portletBody">
         <fieldset class="mde-form-fieldset" style="padding-top: 1em;">
             <legend><fmt:message key="layouts.text.configure.content"/></legend>
-            <stripes:textarea class="editor" name="content" value="${actionBean.content}"/>
+            <stripes:textarea class="mde-form-rich-text" name="content" value="${actionBean.content}"/>
         </fieldset>
         <div class="horizontalSeparator"></div>
         <fmt:message key="layouts.text.configure.this_document_is_saved"/> <c:out value="${actionBean.textFile.name}"/>
@@ -33,13 +33,28 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
         <script type="text/javascript">
-            $('textarea.editor').ckeditor({
+            var windowWidth = 640, windowHeight = 480;
+            if (window.innerWidth && window.innerHeight) {
+                windowWidth = window.innerWidth;
+                windowHeight = window.innerHeight;
+            } else if (document.compatMode=='CSS1Compat' &&
+                document.documentElement &&
+                document.documentElement.offsetWidth ) {
+                windowWidth = document.documentElement.offsetWidth;
+                windowHeight = document.documentElement.offsetHeight;
+            } else if (document.body && document.body.offsetWidth) {
+                windowWidth = document.body.offsetWidth;
+                windowHeight = document.body.offsetHeight;
+            }
+
+            $('textarea.mde-form-rich-text').data('mdeRichTextConfig', {
                 toolbar: 'Full',
                 toolbarCanCollapse: false,
-                filebrowserWindowWidth : '640',
-                filebrowserWindowHeight : '480',
-                filebrowserBrowseUrl : '<c:out value="${dispatch.absoluteOriginalPath}"/>?browse=',
-                filebrowserUploadUrl : '<c:out value="${dispatch.absoluteOriginalPath}"/>?uploadAttachmentFromCKEditor='
+                filebrowserWindowWidth : windowWidth,
+                filebrowserWindowHeight : windowHeight,
+                filebrowserBrowseUrl : '<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>?browse=',
+                filebrowserImageBrowseUrl : '<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>?browse=&images-only=',
+                filebrowserUploadUrl : '<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>?uploadAttachmentFromCKEditor='
             });
         </script>
     </stripes:layout-component>

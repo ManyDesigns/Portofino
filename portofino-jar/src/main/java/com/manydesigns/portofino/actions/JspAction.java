@@ -38,6 +38,7 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.JspPage;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
+import com.manydesigns.portofino.util.FileUtils;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -45,8 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -132,9 +131,7 @@ public class JspAction extends PortletAction {
                 form.writeToObject(jspPage);
                 saveModel();
 
-                Locale locale = context.getLocale();
-                ResourceBundle bundle = application.getBundle(locale);
-                SessionMessages.addInfoMessage(bundle.getString("commons.configuration.updated"));
+                SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
             }
             return cancel();
         }
@@ -166,22 +163,12 @@ public class JspAction extends PortletAction {
                                DefaultSelectionProvider selectionProvider) {
         for(File file : files) {
             if(file.isFile() && file.getName().endsWith(".jsp")) {
-                String path = getRelativeFilePath(file, root);
+                String path = File.separator + FileUtils.getRelativePath(root, file);
                 selectionProvider.appendRow(path, path, true);
             } else if(file.isDirectory()) {
                 visitJspFiles(root, file.listFiles(), selectionProvider);
             }
         }
-    }
-
-    private String getRelativeFilePath(File file, File root) {
-        String path = "";
-        File parent = file;
-        do {
-            path = "/" + parent.getName() + path;
-            parent = parent.getParentFile();
-        } while(parent != null && !parent.equals(root));
-        return path;
     }
 
     @Override

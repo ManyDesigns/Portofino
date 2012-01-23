@@ -126,10 +126,10 @@
 <column autoincrement="false" columnName="tweek" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
                             </columns>
@@ -210,7 +210,7 @@
 <column autoincrement="false" columnName="value" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
                             </columns>
@@ -306,10 +306,10 @@
 <column autoincrement="false" columnName="last_reply_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="locked" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="true" scale="0">
@@ -419,7 +419,7 @@
 <column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="mail_notification" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
@@ -453,7 +453,7 @@
 <column autoincrement="false" columnName="author_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="comments_count" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
@@ -481,7 +481,7 @@
 <column autoincrement="false" columnName="value" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="40" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
                             </columns>
@@ -518,7 +518,7 @@
 <column autoincrement="false" columnName="status" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="last_login_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
+<column autoincrement="false" columnName="last_login_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="language" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="5" nullable="true" scale="0">
@@ -527,10 +527,10 @@
 <column autoincrement="false" columnName="auth_source_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -567,7 +567,7 @@
 <column autoincrement="false" columnName="comments" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="version" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
@@ -622,10 +622,10 @@
 <column autoincrement="false" columnName="lock_version" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="start_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="8" nullable="true" scale="0">
@@ -696,10 +696,10 @@
 <column autoincrement="false" columnName="effective_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="8" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="wiki_page_title" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -736,7 +736,7 @@
 <column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
                             </columns>
@@ -792,7 +792,7 @@
 <column autoincrement="false" columnName="notes" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
                             </columns>
@@ -911,7 +911,7 @@
 <column autoincrement="false" columnName="redirects_to" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
                             </columns>
@@ -933,7 +933,7 @@
 <column autoincrement="false" columnName="title" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="protected" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
@@ -967,10 +967,10 @@
 <column autoincrement="false" columnName="comments" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
                             </columns>
@@ -1143,7 +1143,7 @@
 <column autoincrement="false" columnName="comments" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="version" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
@@ -1184,7 +1184,7 @@
 <column autoincrement="false" columnName="committer" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="committed_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" scale="10">
+<column autoincrement="false" columnName="committed_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="comments" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
@@ -1339,7 +1339,7 @@
 <column autoincrement="false" columnName="author_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -1417,10 +1417,10 @@
 <column autoincrement="false" columnName="parent_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
+<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" scale="10">
+<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="identifier" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
@@ -1498,7 +1498,7 @@
 <column autoincrement="false" columnName="ID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="id" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="CREATEDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="createDate" scale="10">
+<column autoincrement="false" columnName="CREATEDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="createDate" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="PASSWORD" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="true" propertyName="password" scale="0">
@@ -1538,7 +1538,7 @@
 <column autoincrement="false" columnName="FROM_" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="fromId" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="creationDate" scale="10">
+<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="creationDate" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="STATE" columnType="DECIMAL" javaType="java.lang.Integer" jdbcType="3" length="10" nullable="true" propertyName="stateId" scale="0">
@@ -1573,13 +1573,13 @@
 <column autoincrement="false" columnName="USERID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="userId" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">
+<column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="creationDate" scale="10">
+<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="creationDate" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="MODIFIEDDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="modifiedDate" scale="10">
+<column autoincrement="false" columnName="MODIFIEDDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="modifiedDate" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="DEFAULTUSER" columnType="CHAR" javaType="java.lang.Boolean" jdbcType="1" length="1" nullable="true" propertyName="defaultUser" scale="0">
@@ -1593,7 +1593,7 @@
         <annotation type="com.manydesigns.elements.annotations.Password"/>
     </annotations>
 </column>
-<column autoincrement="false" columnName="LASTPWDMODDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="pwdModDate" scale="10">
+<column autoincrement="false" columnName="LASTPWDMODDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="pwdModDate" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="USERNAME" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="50" nullable="false" propertyName="userName" scale="0">
@@ -1616,10 +1616,10 @@
 <column autoincrement="false" columnName="JOBTITLE" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="50" nullable="true" propertyName="jobTitle" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="LASTLOGINDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="lastLoginDate" scale="10">
+<column autoincrement="false" columnName="LASTLOGINDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="lastLoginDate" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="LASTFAILEDLOGINDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="lastFailedLoginDate" scale="10">
+<column autoincrement="false" columnName="LASTFAILEDLOGINDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="lastFailedLoginDate" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="FAILEDLOGINATTEMPTS" columnType="DECIMAL" javaType="java.lang.Integer" jdbcType="3" length="10" nullable="true" propertyName="failedLoginAttempts" scale="0">
@@ -1699,10 +1699,10 @@
         </annotation>
     </annotations>
 </column>
-<column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">
+<column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="creationDate" scale="10">
+<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="creationDate" scale="10">
     <annotations/>
 </column>
                             </columns>
@@ -1792,10 +1792,10 @@
 <column autoincrement="false" columnName="USERID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="userid" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">
+<column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" propertyName="creationDate" scale="10">
+<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" propertyName="creationDate" scale="10">
     <annotations/>
 </column>
                             </columns>
@@ -1835,15 +1835,15 @@
                         <childPages/>
                         <permissions/>
                     </chartPage>
-                    <chartPage database="redmine" legend="Issues by project/status" name="Issues by project/status" orientation="VERTICAL" query="select count(*), &quot;status_id&quot;, &quot;project_id&quot;, status.&quot;name&quot;, &quot;projects&quot;.&quot;name&quot; from &quot;issues&quot; join &quot;issue_statuses&quot; status on &quot;status_id&quot; = status.&quot;id&quot; join &quot;projects&quot; on &quot;project_id&quot; = &quot;projects&quot;.&quot;id&quot; group by &quot;status_id&quot;, &quot;project_id&quot;" type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?status_id=%{series}" xAxisName="Projects" yAxisName="Number of issues" description="Issues by project/status" fragment="issues-by-status-bar" id="9xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="5" showInNavigation="false" title="Issues by project/status">
+                    <chartPage database="redmine" legend="Issues by project/status" name="Issues by project/status" orientation="VERTICAL" query="select count(*), &quot;status_id&quot;, &quot;project_id&quot;, status.&quot;name&quot;, &quot;projects&quot;.&quot;name&quot; from &quot;issues&quot; join &quot;issue_statuses&quot; status on &quot;status_id&quot; = status.&quot;id&quot; join &quot;projects&quot; on &quot;project_id&quot; = &quot;projects&quot;.&quot;id&quot; group by &quot;status_id&quot;, &quot;project_id&quot;" type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?search_status_id=%{series}" xAxisName="Projects" yAxisName="Number of issues" description="Issues by project/status" fragment="issues-by-status-bar" id="9xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="5" showInNavigation="false" title="Issues by project/status">
                         <childPages/>
                         <permissions/>
                     </chartPage>
-                    <chartPage database="redmine" legend="Issues by project/tracker" name="Issues by project/tracker" orientation="VERTICAL" query="select count(*), &quot;tracker_id&quot;, &quot;project_id&quot;, t.&quot;name&quot;, &quot;projects&quot;.&quot;name&quot; from &quot;issues&quot; join &quot;trackers&quot; t on &quot;tracker_id&quot; = t.&quot;id&quot; join &quot;projects&quot; on &quot;project_id&quot; = &quot;projects&quot;.&quot;id&quot; group by &quot;tracker_id&quot;, &quot;project_id&quot;" type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?tracker_id=%{series}" xAxisName="Projects" yAxisName="Number of issues" description="Issues by project/tracker" fragment="issues-by-tracker-bar" id="6xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="3" showInNavigation="false" title="Issues by project/tracker">
+                    <chartPage database="redmine" legend="Issues by project/tracker" name="Issues by project/tracker" orientation="VERTICAL" query="select count(*), &quot;tracker_id&quot;, &quot;project_id&quot;, t.&quot;name&quot;, &quot;projects&quot;.&quot;name&quot; from &quot;issues&quot; join &quot;trackers&quot; t on &quot;tracker_id&quot; = t.&quot;id&quot; join &quot;projects&quot; on &quot;project_id&quot; = &quot;projects&quot;.&quot;id&quot; group by &quot;tracker_id&quot;, &quot;project_id&quot;" type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?search_tracker_id=%{series}" xAxisName="Projects" yAxisName="Number of issues" description="Issues by project/tracker" fragment="issues-by-tracker-bar" id="6xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="3" showInNavigation="false" title="Issues by project/tracker">
                         <childPages/>
                         <permissions/>
                     </chartPage>
-                    <chartPage database="redmine" legend="Issues by project/priority" name="Issues by project/priority" orientation="VERTICAL" query="select count(*), &quot;priority_id&quot;, &quot;issues&quot;.&quot;project_id&quot;, priority.&quot;name&quot;, &quot;projects&quot;.&quot;name&quot; from &quot;issues&quot; join &quot;enumerations&quot; priority on &quot;priority_id&quot; = priority.&quot;id&quot; join &quot;projects&quot; on &quot;issues&quot;.&quot;project_id&quot; = &quot;projects&quot;.&quot;id&quot; group by &quot;priority_id&quot;, &quot;issues&quot;.&quot;project_id&quot;" type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?priority_id=%{series}" xAxisName="Projects" yAxisName="Number of issues" description="Issues by project/priority" fragment="issues-by-priority-bar" id="7xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="7" showInNavigation="false" title="Issues by project/priority">
+                    <chartPage database="redmine" legend="Issues by project/priority" name="Issues by project/priority" orientation="VERTICAL" query="select count(*), &quot;priority_id&quot;, &quot;issues&quot;.&quot;project_id&quot;, priority.&quot;name&quot;, &quot;projects&quot;.&quot;name&quot; from &quot;issues&quot; join &quot;enumerations&quot; priority on &quot;priority_id&quot; = priority.&quot;id&quot; join &quot;projects&quot; on &quot;issues&quot;.&quot;project_id&quot; = &quot;projects&quot;.&quot;id&quot; group by &quot;priority_id&quot;, &quot;issues&quot;.&quot;project_id&quot;" type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?search_priority_id=%{series}" xAxisName="Projects" yAxisName="Number of issues" description="Issues by project/priority" fragment="issues-by-priority-bar" id="7xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="7" showInNavigation="false" title="Issues by project/priority">
                         <childPages/>
                         <permissions/>
                     </chartPage>
@@ -2007,19 +2007,19 @@
                         <permissions/>
                         <attachments/>
                     </textPage>
-                    <chartPage database="redmine" legend="Issues by priority" name="Issues by priority" orientation="HORIZONTAL" query="select &quot;priority_id&quot;, count(*), priority.&quot;name&quot; from &quot;issues&quot; join &quot;enumerations&quot; priority on &quot;issues&quot;.&quot;priority_id&quot; = priority.&quot;id&quot; where &quot;issues&quot;.&quot;project_id&quot; = %{#project.id} group by priority.&quot;id&quot;" type="PIE3D" urlExpression="/projects/%{#project.id}/issues?priority_id=%{key}" description="Issues by priority" fragment="issues-by-priority" id="i26pvpicb8oyapl6anyqsunaj" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="4" showInNavigation="false" title="Issues by priority">
+                    <chartPage database="redmine" legend="Issues by priority" name="Issues by priority" orientation="HORIZONTAL" query="select &quot;priority_id&quot;, count(*), priority.&quot;name&quot; from &quot;issues&quot; join &quot;enumerations&quot; priority on &quot;issues&quot;.&quot;priority_id&quot; = priority.&quot;id&quot; where &quot;issues&quot;.&quot;project_id&quot; = %{#project.id} group by priority.&quot;id&quot;" type="PIE3D" urlExpression="/projects/%{#project.id}/issues?search_priority_id=%{key}" description="Issues by priority" fragment="issues-by-priority" id="i26pvpicb8oyapl6anyqsunaj" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="4" showInNavigation="false" title="Issues by priority">
                         <childPages/>
                         <permissions/>
                     </chartPage>
-                    <chartPage database="redmine" legend="Issues by status" name="Issues by status" orientation="HORIZONTAL" query="select &quot;status_id&quot;, count(*), status.&quot;name&quot;&#xD;&#xA;from &quot;issues&quot; join &quot;issue_statuses&quot; status on &quot;status_id&quot; = status.&quot;id&quot;&#xD;&#xA;where &quot;project_id&quot; = %{#project.id}&#xD;&#xA;group by &quot;status_id&quot;" type="PIE3D" urlExpression="/projects/%{#project.id}/issues?status_id=%{key}" description="Issues by status" fragment="issues-by-status" id="2xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="6" showInNavigation="false" title="Issues by status">
+                    <chartPage database="redmine" legend="Issues by status" name="Issues by status" orientation="HORIZONTAL" query="select &quot;status_id&quot;, count(*), status.&quot;name&quot;&#xD;&#xA;from &quot;issues&quot; join &quot;issue_statuses&quot; status on &quot;status_id&quot; = status.&quot;id&quot;&#xD;&#xA;where &quot;project_id&quot; = %{#project.id}&#xD;&#xA;group by &quot;status_id&quot;" type="PIE3D" urlExpression="/projects/%{#project.id}/issues?search_status_id=%{key}" description="Issues by status" fragment="issues-by-status" id="2xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutRight" layoutOrder="0" layoutOrderInParent="6" showInNavigation="false" title="Issues by status">
                         <childPages/>
                         <permissions/>
                     </chartPage>
-                    <chartPage database="redmine" legend="Issues by tracker/status" name="Issues by tracker/status" orientation="VERTICAL" query="select count(*), &quot;status_id&quot;, &quot;tracker_id&quot;, status.&quot;name&quot;, tracker.&quot;name&quot;&#xD;&#xA;from &quot;issues&quot; join &quot;issue_statuses&quot; status on &quot;status_id&quot; = status.&quot;id&quot; join &quot;trackers&quot; tracker on &quot;tracker_id&quot; = tracker.&quot;id&quot;&#xD;&#xA;where &quot;project_id&quot; = %{#project.id}&#xD;&#xA;group by &quot;status_id&quot;, &quot;tracker_id&quot;" type="STACKED_BAR_3D" urlExpression="/projects/%{#project.id}/issues?status_id=%{series}&amp;tracker_id=%{category}" xAxisName="Tracker" yAxisName="Number of issues" description="Issues by tracker/status" fragment="issues-by-status-bar" id="3xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="2" showInNavigation="false" title="Issues by tracker/status">
+                    <chartPage database="redmine" legend="Issues by tracker/status" name="Issues by tracker/status" orientation="VERTICAL" query="select count(*), &quot;status_id&quot;, &quot;tracker_id&quot;, status.&quot;name&quot;, tracker.&quot;name&quot;&#xD;&#xA;from &quot;issues&quot; join &quot;issue_statuses&quot; status on &quot;status_id&quot; = status.&quot;id&quot; join &quot;trackers&quot; tracker on &quot;tracker_id&quot; = tracker.&quot;id&quot;&#xD;&#xA;where &quot;project_id&quot; = %{#project.id}&#xD;&#xA;group by &quot;status_id&quot;, &quot;tracker_id&quot;" type="STACKED_BAR_3D" urlExpression="/projects/%{#project.id}/issues?search_status_id=%{series}&amp;tracker_id=%{category}" xAxisName="Tracker" yAxisName="Number of issues" description="Issues by tracker/status" fragment="issues-by-status-bar" id="3xozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="2" showInNavigation="false" title="Issues by tracker/status">
                         <childPages/>
                         <permissions/>
                     </chartPage>
-                    <chartPage database="redmine" legend="Issues by date" name="Issues by date" orientation="VERTICAL" query="select count(*), 'anno-mese', concat(Year(&quot;created_on&quot;),'-',  Month(&quot;created_on&quot;)) data   from &quot;issues&quot; where &quot;project_id&quot; = %{#project.id} group by &quot;created_on&quot; order by &quot;created_on&quot;" type="BAR" urlExpression="/projects/%{#project.id}/issues?status_id=%{series}&amp;tracker_id=%{category}" xAxisName="Tracker" yAxisName="Number of issues" description="Issues by date" fragment="issues-by-date-bar" id="3yozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="4" showInNavigation="false" title="Issues by date">
+                    <chartPage database="redmine" legend="Issues by date" name="Issues by date" orientation="VERTICAL" query="select count(*), 'anno-mese', concat(Year(&quot;created_on&quot;),'-',  Month(&quot;created_on&quot;)) data   from &quot;issues&quot; where &quot;project_id&quot; = %{#project.id} group by &quot;created_on&quot; order by &quot;created_on&quot;" type="BAR" urlExpression="/projects/%{#project.id}/issues?search_status_id=%{series}&amp;tracker_id=%{category}" xAxisName="Tracker" yAxisName="Number of issues" description="Issues by date" fragment="issues-by-date-bar" id="3yozy9lfgmco7rxts05kodp56" layoutContainer="default" layoutContainerInParent="contentLayoutLeft" layoutOrder="0" layoutOrderInParent="4" showInNavigation="false" title="Issues by date">
                         <childPages/>
                         <permissions/>
                     </chartPage>

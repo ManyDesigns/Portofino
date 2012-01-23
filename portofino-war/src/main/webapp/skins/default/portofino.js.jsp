@@ -36,13 +36,13 @@ function copyFormAsHiddenFields(source, form) {
 
 function confirmDeletePage(pageId, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/actions/page?confirmDelete&pageId=" + pageId, function() {
+    dialogDiv.load(contextPath + "/actions/admin/page/dialog?confirmDelete&pageId=" + pageId, function() {
         dialogDiv.find("#dialog-confirm-delete-page").dialog({
             modal: true,
             width: 500,
             buttons: {
                 '<fmt:message key="commons.delete" />': function() {
-                    var form = $("#contentHeaderForm");
+                    var form = $("#pageAdminForm");
                     copyFormAsHiddenFields($(this), form);
                     form.submit();
                     $(this).dialog("close");
@@ -59,13 +59,13 @@ function confirmDeletePage(pageId, contextPath) {
 
 function showMovePageDialog(pageId, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/actions/page?chooseNewLocation&pageId=" + pageId, function() {
+    dialogDiv.load(contextPath + "/actions/admin/page/dialog?chooseNewLocation&pageId=" + pageId, function() {
         dialogDiv.find("#dialog-move-page").dialog({
             modal: true,
             width: 500,
             buttons: {
                 '<fmt:message key="commons.move"/>': function() {
-                    var form = $("#contentHeaderForm");
+                    var form = $("#pageAdminForm");
                     copyFormAsHiddenFields($(this), form);
                     form.submit();
                     $(this).dialog("close");
@@ -82,13 +82,13 @@ function showMovePageDialog(pageId, contextPath) {
 
 function showCopyPageDialog(pageId, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/actions/page?copyPageDialog&pageId=" + pageId, function() {
+    dialogDiv.load(contextPath + "/actions/admin/page/dialog?copyPageDialog&pageId=" + pageId, function() {
         dialogDiv.find("#dialog-copy-page").dialog({
             modal: true,
             width: 500,
             buttons: {
                 '<fmt:message key="commons.copy"/>': function() {
-                    var form = $("#contentHeaderForm");
+                    var form = $("#pageAdminForm");
                     copyFormAsHiddenFields($(this), form);
                     form.submit();
                     $(this).dialog("close");
@@ -152,16 +152,19 @@ function enablePortletDragAndDrop(button) {
     container.children("button[name=updateLayout]").button();
     $("button[name=updateLayout]").click(function() {
         var theButton = $(this);
-        $('div.portletContainer').each( function(index, element) {
+        $('div.portletContainer').each(function(index, element) {
             var wrapper = $(element);
+            var templateHiddenField = wrapper.children("input[type=hidden]").first();
             var elements = wrapper.sortable('toArray');
-            for(var index in elements) {
+            console.log(templateHiddenField);
+            for(var e in elements) {
+                var id = elements[e];
                 var hiddenField = document.createElement("input");
                 hiddenField.setAttribute("type", "hidden");
-                hiddenField.setAttribute("name", "portletWrapper_" + element.id);
-                hiddenField.setAttribute("value", elements[index].substring("portletWrapper_".length));
-                hiddenField.setAttribute("class", "updateLayout");
+                hiddenField.setAttribute("name", templateHiddenField.val());
+                hiddenField.setAttribute("value", id.substring("portletWrapper_".length));
                 theButton.before(hiddenField);
+                console.log(hiddenField);
             }
         });
         return true;
@@ -181,6 +184,9 @@ var HTML_CHARS = {
 };
 
 function htmlEscape (string) {
+    if(string == null) {
+        return string;
+    }
     return (string + '').replace(/[&<>"'\/`]/g, function (match) {
         return HTML_CHARS[match];
     });

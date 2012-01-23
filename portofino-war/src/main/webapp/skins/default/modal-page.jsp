@@ -27,7 +27,10 @@
         <div id="bd">
             <div id="yui-main">
                 <div id="content" class="yui-b">
-                    <stripes:form action="${dispatch.originalPath}" method="post" enctype="multipart/form-data">
+                    <c:if test="${empty formActionUrl}">
+                        <c:set var="formActionUrl" value="${dispatch.originalPath}" />
+                    </c:if>
+                    <stripes:form action="${formActionUrl}" method="post" enctype="multipart/form-data">
                         <div class="contentHeader">
                             <stripes:layout-component name="contentHeader">
                                 Portlet page header

@@ -29,7 +29,6 @@
 package com.manydesigns.portofino.model.pages;
 
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
 
 import javax.xml.bind.Unmarshaller;
@@ -73,7 +72,6 @@ public class RootPage extends Page {
     @Override
     public void init(Model model) {
         super.init(model);
-        //getPermissions().getView().add(SecurityLogic.ANONYMOUS_GROUP_ID);
     }
 
     //**************************************************************************

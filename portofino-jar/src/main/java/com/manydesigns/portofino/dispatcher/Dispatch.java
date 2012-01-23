@@ -54,21 +54,6 @@ public class Dispatch {
         this.originalPath = originalPath;
         this.actionBeanClass = actionBeanClass;
         this.pageInstancePath = pageInstancePath;
-
-        String pathUrl = getPathUrl();
-        assert pathUrl.equals(normalize(originalPath));
-    }
-
-    private static String normalize(String originalPath) {
-        int trimPosition = originalPath.length() - 1;
-        while(trimPosition >= 0 && originalPath.charAt(trimPosition) == '/') {
-            trimPosition--;
-        }
-        String withoutTrailingSlashes = originalPath.substring(0, trimPosition + 1);
-        while (withoutTrailingSlashes.contains("//")) {
-            withoutTrailingSlashes = withoutTrailingSlashes.replace("//", "/");
-        }
-        return withoutTrailingSlashes;
     }
 
     public String getContextPath() {
@@ -138,5 +123,15 @@ public class Dispatch {
 
     public PageInstance getParentPageInstance() {
         return getPageInstance(-2);
+    }
+
+    public int getClosestSubtreeRootIndex() {
+        PageInstance[] path = getPageInstancePath();
+        for(int i = path.length - 1; i > 0; i--) {
+            if(path[i].getPage().isSubtreeRoot()) {
+                return i;
+            }
+        }
+        return 0;
     }
 }

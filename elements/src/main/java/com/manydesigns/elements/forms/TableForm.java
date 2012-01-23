@@ -253,10 +253,10 @@ public class TableForm implements Element {
 
         public void toXhtml(@NotNull XhtmlBuffer xb) {
             xb.openElement("tr");
-            String[] inputNameArgs = {prefix, "selection"};
-            String selection = StringUtils.join(inputNameArgs);
 
             if (selectable) {
+                String[] inputNameArgs = {prefix, "selection"};
+                String selection = StringUtils.join(inputNameArgs);
                 xb.openElement("td");
                 xb.writeInputCheckbox(null, selection, key, false);
                 xb.closeElement("td");

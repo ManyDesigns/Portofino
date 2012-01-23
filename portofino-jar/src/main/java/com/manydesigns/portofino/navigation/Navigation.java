@@ -37,10 +37,12 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.pages.AccessLevel;
 import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.model.pages.RootPage;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.List;
 
 /*
@@ -85,10 +87,16 @@ public class Navigation implements XhtmlFragment {
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         String contextPath = dispatch.getContextPath();
-        PageInstance rootPageInstance = dispatch.getRootPageInstance();
-        List<PageInstance> pageInstances =
-                rootPageInstance.getChildPageInstances();
-        print(contextPath, pageInstances, xb, false);
+        int rootPageIndex = dispatch.getClosestSubtreeRootIndex();
+        PageInstance rootPageInstance = dispatch.getPageInstance(rootPageIndex);
+        List<PageInstance> pageInstances;
+        if(rootPageInstance.getPage() instanceof RootPage) {
+            pageInstances = rootPageInstance.getChildPageInstances();
+        } else {
+            pageInstances = Collections.singletonList(rootPageInstance);
+        }
+        String prefix = contextPath + dispatch.getPathUrl(rootPageIndex);
+        print(prefix, pageInstances, xb, false);
     }
 
     private void print(String path, List<PageInstance> pageInstances,
@@ -103,11 +111,15 @@ public class Navigation implements XhtmlFragment {
             if (!skipPermissions && !SecurityLogic.hasPermissions(page.getPermissions(), groups, AccessLevel.VIEW)) {
                 continue;
             }
+
+            if (isSelected(current) || isInPath(current)) {
+                expand = current;
+            }
+
             if(!page.isShowInNavigation()) {
                 continue;
             }
 
-            // gestire permessi
             if(first) {
                 if(recursive) { xb.writeHr(); }
                 xb.openElement("ul");
@@ -116,10 +128,8 @@ public class Navigation implements XhtmlFragment {
             xb.openElement("li");
             if (isSelected(current)) {
                 xb.addAttribute("class", "selected");
-                expand = current;
             } else if (isInPath(current)) {
                 xb.addAttribute("class", "path");
-                expand = current;
             }
             String url = path + "/" + page.getFragment();
             xb.writeAnchor(url, page.getTitle(), null, page.getDescription());
@@ -130,7 +140,8 @@ public class Navigation implements XhtmlFragment {
         }
         if (expand != null) {
             path = path + "/" + expand.getUrlFragment();
-            print(path, expand.getChildPageInstances(), xb, true);
+            boolean showInNavigation = expand.getPage().isShowInNavigation();
+            print(path, expand.getChildPageInstances(), xb, showInNavigation);
         }
     }
 

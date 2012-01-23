@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.model.pages.crud;
 
+import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.logic.DataModelLogic;
@@ -181,6 +182,7 @@ public class Crud implements ModelObject {
         return annotations;
     }
 
+    @LabelI18N("com.manydesigns.portofino.model.pages.crud.Crud.name")
     @XmlAttribute(required = true)
     public String getName() {
         return name;

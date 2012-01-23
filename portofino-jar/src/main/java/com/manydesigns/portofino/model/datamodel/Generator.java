@@ -33,6 +33,8 @@ import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelVisitor;
 
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -40,6 +42,7 @@ import javax.xml.bind.Unmarshaller;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@XmlAccessorType(value = XmlAccessType.NONE)
 public abstract class Generator implements ModelObject{
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
