@@ -31,13 +31,10 @@ package com.manydesigns.portofino.stripes;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.dispatcher.PageAction;
-import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.dispatcher.*;
+import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.starter.ApplicationStarter;
-import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.Dispatcher;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;

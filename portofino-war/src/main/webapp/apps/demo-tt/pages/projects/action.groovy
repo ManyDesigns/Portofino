@@ -1,4 +1,4 @@
-import com.manydesigns.portofino.actions.crud.CrudAction
+import com.manydesigns.portofino.pageactions.crud.CrudAction
 import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions

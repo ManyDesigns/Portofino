@@ -36,7 +36,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.CommonsConfigurationAccessor;
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.actions.AbstractActionBean;
+import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 import com.manydesigns.portofino.di.Inject;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.SystemConfiguration;

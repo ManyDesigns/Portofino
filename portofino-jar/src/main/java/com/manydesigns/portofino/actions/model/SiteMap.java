@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.actions.model;
 
-import com.manydesigns.portofino.actions.AbstractActionBean;
+import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 
 import java.sql.SQLException;
 

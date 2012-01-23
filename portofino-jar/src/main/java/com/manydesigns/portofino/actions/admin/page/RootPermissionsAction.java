@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.actions.admin.page;
 
-import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.actions.admin.SettingsAction;
 import com.manydesigns.portofino.application.Application;

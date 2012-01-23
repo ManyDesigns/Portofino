@@ -1,11 +1,11 @@
 <%@ page import="org.slf4j.LoggerFactory" %>
-<%@ page import="com.manydesigns.portofino.actions.jsp.JspAction" %>
-<%@ page import="com.manydesigns.portofino.actions.AbstractPageAction" %>
+<%@ page import="com.manydesigns.portofino.pageactions.jsp.JspAction" %>
+<%@ page import="com.manydesigns.portofino.pageactions.AbstractPageAction" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java" pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.jsp.JspAction"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.jsp.JspAction"/>
 <% try { %>
     <jsp:include page="${actionBean.jspPrefix}${actionBean.jsp}" />
 <% } catch (Exception e) {

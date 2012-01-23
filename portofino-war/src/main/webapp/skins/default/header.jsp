@@ -11,7 +11,7 @@
              type="com.manydesigns.portofino.model.datamodel.Model"/>
 <jsp:useBean id="app" scope="request"
              type="com.manydesigns.portofino.application.Application"/>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.AbstractActionBean"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.dispatcher.AbstractActionBean"/>
 <fmt:setLocale value="${pageContext.request.locale}"/>
 
 <div id="globalLinks">

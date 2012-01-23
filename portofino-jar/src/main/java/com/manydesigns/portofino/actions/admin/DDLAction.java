@@ -30,8 +30,8 @@
 package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.actions.AbstractActionBean;
-import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.dispatcher.AbstractActionBean;
+import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ServerInfo;
 import com.manydesigns.portofino.di.Inject;

@@ -1,4 +1,4 @@
-<%@ page import="com.manydesigns.portofino.actions.AbstractPageAction" %>
+<%@ page import="com.manydesigns.portofino.pageactions.AbstractPageAction" %>
 <%@ page import="org.apache.commons.lang.exception.ExceptionUtils" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
@@ -7,7 +7,7 @@
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.AbstractPageAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.pageInstance.page.title}"/>
     </stripes:layout-component>

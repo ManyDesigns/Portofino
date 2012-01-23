@@ -31,8 +31,8 @@ package com.manydesigns.portofino.actions.user;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.AbstractActionBean;
-import com.manydesigns.portofino.actions.RequestAttributes;
+import com.manydesigns.portofino.dispatcher.AbstractActionBean;
+import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.di.Inject;
@@ -53,7 +53,7 @@ import java.text.MessageFormat;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class PwdRecoveryAction extends AbstractActionBean implements LoginUnAware{
+public class PwdRecoveryAction extends AbstractActionBean {
     public static final String copyright
             = "Copyright (c) 2005-2011, ManyDesigns srl";
 

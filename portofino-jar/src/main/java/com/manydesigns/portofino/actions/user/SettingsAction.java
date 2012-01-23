@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.actions.user;
 
-import com.manydesigns.portofino.actions.AbstractActionBean;
+import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

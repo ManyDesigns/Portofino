@@ -20,7 +20,7 @@
         <jsp:include page="head.jsp"/>
         <stripes:layout-component name="customScripts"/>
         <jsp:useBean id="actionBean" scope="request"
-             type="com.manydesigns.portofino.actions.AbstractPageAction"/>
+             type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
         <title><c:out value="${actionBean.dispatch.lastPageInstance.page.description}"/></title>
     </head>
     <body class="yui-skin-sam">

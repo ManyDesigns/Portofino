@@ -1,6 +1,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <jsp:useBean id="actionBean" scope="request"
-     type="com.manydesigns.portofino.actions.AbstractPageAction"/>
+     type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
 <button name="deletePage"
         onclick="confirmDeletePage(
                     '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
