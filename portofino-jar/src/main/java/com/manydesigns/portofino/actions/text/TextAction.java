@@ -36,7 +36,7 @@ import com.manydesigns.portofino.actions.text.configuration.Attachment;
 import com.manydesigns.portofino.actions.text.configuration.TextConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.model.pages.AccessLevel;
+import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.FileUtils;

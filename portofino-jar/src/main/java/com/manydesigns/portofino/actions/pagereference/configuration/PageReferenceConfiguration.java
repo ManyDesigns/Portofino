@@ -32,7 +32,7 @@ package com.manydesigns.portofino.actions.pagereference.configuration;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.pages.Page;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

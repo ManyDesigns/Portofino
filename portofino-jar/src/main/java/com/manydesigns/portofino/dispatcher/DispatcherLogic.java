@@ -32,7 +32,7 @@ package com.manydesigns.portofino.dispatcher;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.util.FileUtils;
 import groovy.lang.GroovyClassLoader;

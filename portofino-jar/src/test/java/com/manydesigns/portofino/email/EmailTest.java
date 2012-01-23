@@ -32,7 +32,7 @@ import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.database.QueryUtils;
+import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.system.model.email.EmailBean;
 import org.hibernate.Session;
 

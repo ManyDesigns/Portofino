@@ -5,7 +5,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="org.hibernate.Session" %>
-<%@ page import="com.manydesigns.portofino.database.QueryUtils" %>
+<%@ page import="com.manydesigns.portofino.application.QueryUtils" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>

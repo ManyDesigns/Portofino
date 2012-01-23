@@ -30,12 +30,13 @@
 package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.i18n.SimpleTextProvider;
 import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.application.ApplicationStarter;
-import com.manydesigns.portofino.i18n.PortofinoTextProvider;
+import com.manydesigns.portofino.starter.ApplicationStarter;
+import com.manydesigns.portofino.i18n.MultipleTextProvider;
 import com.manydesigns.portofino.model.datamodel.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +100,13 @@ public class DispatcherFilter implements Filter {
             request.setAttribute(Config.FMT_LOCALIZATION_CONTEXT + ".request", localizationContext);
 
             //Setup Elements I18n
-            TextProvider textProvider = new PortofinoTextProvider(application, locale);
+            ResourceBundle elementsResourceBundle =
+                    ResourceBundle.getBundle(SimpleTextProvider.DEFAULT_MESSAGE_RESOURCE, locale);
+            ResourceBundle portofinoResourceBundle = application.getBundle(locale);
+
+            TextProvider textProvider =
+                    new MultipleTextProvider(
+                            portofinoResourceBundle, elementsResourceBundle);
             ElementsThreadLocals.setTextProvider(textProvider);
         }
 

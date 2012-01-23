@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.portofino.logic.DataModelLogic;
 import com.manydesigns.portofino.util.Pair;
 import org.apache.commons.lang.ObjectUtils;
 import org.slf4j.Logger;

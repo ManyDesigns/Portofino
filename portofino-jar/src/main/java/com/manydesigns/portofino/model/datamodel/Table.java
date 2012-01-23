@@ -31,7 +31,6 @@ package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.logic.DataModelLogic;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

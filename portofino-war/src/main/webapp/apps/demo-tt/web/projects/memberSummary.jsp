@@ -1,6 +1,6 @@
 <%@ page import="com.manydesigns.portofino.actions.RequestAttributes" %>
 <%@ page import="com.manydesigns.portofino.application.Application" %>
-<%@ page import="com.manydesigns.portofino.database.QueryUtils" %>
+<%@ page import="com.manydesigns.portofino.application.QueryUtils" %>
 <%@ page import="org.apache.commons.collections.MultiHashMap" %>
 <%@ page import="org.apache.commons.collections.MultiMap" %>
 <%@ page import="org.hibernate.Session" %>

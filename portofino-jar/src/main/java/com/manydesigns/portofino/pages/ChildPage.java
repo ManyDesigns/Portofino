@@ -27,13 +27,14 @@
 *
 */
 
-package com.manydesigns.portofino.model.pages;
+package com.manydesigns.portofino.pages;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.*;
-import java.util.ArrayList;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,7 +43,7 @@ import java.util.ArrayList;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class Layout {
+public class ChildPage {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -50,31 +51,38 @@ public class Layout {
     // Fields
     //**************************************************************************
 
-    protected String layout;
-    protected Self self;
-    protected final ArrayList<ChildPage> childPages;
+    protected String name;
+    protected String container;
+    protected String order;
+    protected boolean showInNavigation;
+
+    //**************************************************************************
+    // Actual fields
+    //**************************************************************************
+
+    protected int actualOrder;
 
     //**************************************************************************
     // Logging
     //**************************************************************************
 
-    public static final Logger logger = LoggerFactory.getLogger(Layout.class);
+    public static final Logger logger = LoggerFactory.getLogger(ChildPage.class);
 
     //**************************************************************************
-    // Construction and initialization
+    // Constructors & initialization
     //**************************************************************************
 
-    public Layout() {
-        childPages = new ArrayList<ChildPage>();
+    public ChildPage() {
     }
 
     public void init() {
-        if(self == null) {
-            self = new Self();
-        }
-        self.init();
-        for (ChildPage current : childPages) {
-            current.init();
+        actualOrder = 0;
+        if(order != null) {
+            try {
+                actualOrder = Integer.parseInt(order);
+            } catch (NumberFormatException e) {
+                logger.warn("Cannot parse value of 'order': " + order, e);
+            }
         }
     }
 
@@ -82,27 +90,43 @@ public class Layout {
     // Getters/Setters
     //**************************************************************************
 
-    @XmlAttribute
-    public String getLayout() {
-        return layout;
+    @XmlAttribute(required = true)
+    public String getName() {
+        return name;
     }
 
-    public void setLayout(String layout) {
-        this.layout = layout;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    @XmlElement
-    public Self getSelf() {
-        return self;
+    @XmlAttribute(required = false)
+    public String getContainer() {
+        return container;
     }
 
-    public void setSelf(Self self) {
-        this.self = self;
+    public void setContainer(String container) {
+        this.container = container;
     }
 
-    @XmlElementWrapper(name="childPages")
-    @XmlElement(name="childPage",type=ChildPage.class)
-    public ArrayList<ChildPage> getChildPages() {
-        return childPages;
+    @XmlAttribute(required = false)
+    public String getOrder() {
+        return order;
+    }
+
+    public void setOrder(String order) {
+        this.order = order;
+    }
+
+    @XmlAttribute(required = false)
+    public boolean isShowInNavigation() {
+        return showInNavigation;
+    }
+
+    public void setShowInNavigation(boolean showInNavigation) {
+        this.showInNavigation = showInNavigation;
+    }
+
+    public int getActualOrder() {
+        return actualOrder;
     }
 }

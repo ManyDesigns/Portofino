@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.database;
+package com.manydesigns.portofino.application;
 
 import com.manydesigns.elements.fields.search.Criterion;
 import com.manydesigns.elements.fields.search.TextMatchMode;
@@ -35,9 +35,8 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
-import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.application.TableCriteria;
-import com.manydesigns.portofino.logic.DataModelLogic;
+import com.manydesigns.portofino.database.TableCriteria;
+import com.manydesigns.portofino.model.datamodel.DataModelLogic;
 import com.manydesigns.portofino.model.datamodel.Model;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.reflection.TableAccessor;

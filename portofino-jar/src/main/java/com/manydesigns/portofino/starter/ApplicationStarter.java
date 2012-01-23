@@ -27,9 +27,11 @@
  *
  */
 
-package com.manydesigns.portofino.application;
+package com.manydesigns.portofino.starter;
 
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.application.DefaultApplication;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.email.EmailTask;
 import org.apache.commons.configuration.Configuration;

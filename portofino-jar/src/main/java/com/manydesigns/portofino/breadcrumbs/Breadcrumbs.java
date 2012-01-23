@@ -33,7 +33,7 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.pages.Page;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

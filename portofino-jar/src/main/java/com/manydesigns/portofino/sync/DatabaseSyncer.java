@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.sync;
 
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.logic.DataModelLogic;
+import com.manydesigns.portofino.model.datamodel.DataModelLogic;
 import com.manydesigns.portofino.model.datamodel.Model;
 import com.manydesigns.portofino.model.datamodel.Annotated;
 import com.manydesigns.portofino.model.datamodel.Annotation;

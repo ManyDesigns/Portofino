@@ -36,7 +36,7 @@ import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.model.pages.Permissions;
+import com.manydesigns.portofino.pages.Permissions;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;

@@ -42,7 +42,7 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
-import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;

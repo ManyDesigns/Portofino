@@ -27,7 +27,9 @@
  *
  */
 
-package com.manydesigns.portofino.model.pages;
+package com.manydesigns.portofino.pages;
+
+import com.manydesigns.portofino.security.AccessLevel;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;

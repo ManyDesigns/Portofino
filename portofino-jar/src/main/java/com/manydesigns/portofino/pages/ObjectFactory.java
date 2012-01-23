@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.model.pages;
+package com.manydesigns.portofino.pages;
 
 import javax.xml.bind.annotation.XmlRegistry;
 

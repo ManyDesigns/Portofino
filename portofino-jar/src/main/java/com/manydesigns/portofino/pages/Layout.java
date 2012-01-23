@@ -27,14 +27,13 @@
 *
 */
 
-package com.manydesigns.portofino.model.pages;
+package com.manydesigns.portofino.pages;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.*;
+import java.util.ArrayList;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -43,7 +42,7 @@ import javax.xml.bind.annotation.XmlAttribute;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class ChildPage {
+public class Layout {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -51,38 +50,31 @@ public class ChildPage {
     // Fields
     //**************************************************************************
 
-    protected String name;
-    protected String container;
-    protected String order;
-    protected boolean showInNavigation;
-
-    //**************************************************************************
-    // Actual fields
-    //**************************************************************************
-
-    protected int actualOrder;
+    protected String layout;
+    protected Self self;
+    protected final ArrayList<ChildPage> childPages;
 
     //**************************************************************************
     // Logging
     //**************************************************************************
 
-    public static final Logger logger = LoggerFactory.getLogger(ChildPage.class);
+    public static final Logger logger = LoggerFactory.getLogger(Layout.class);
 
     //**************************************************************************
-    // Constructors & initialization
+    // Construction and initialization
     //**************************************************************************
 
-    public ChildPage() {
+    public Layout() {
+        childPages = new ArrayList<ChildPage>();
     }
 
     public void init() {
-        actualOrder = 0;
-        if(order != null) {
-            try {
-                actualOrder = Integer.parseInt(order);
-            } catch (NumberFormatException e) {
-                logger.warn("Cannot parse value of 'order': " + order, e);
-            }
+        if(self == null) {
+            self = new Self();
+        }
+        self.init();
+        for (ChildPage current : childPages) {
+            current.init();
         }
     }
 
@@ -90,43 +82,27 @@ public class ChildPage {
     // Getters/Setters
     //**************************************************************************
 
-    @XmlAttribute(required = true)
-    public String getName() {
-        return name;
+    @XmlAttribute
+    public String getLayout() {
+        return layout;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setLayout(String layout) {
+        this.layout = layout;
     }
 
-    @XmlAttribute(required = false)
-    public String getContainer() {
-        return container;
+    @XmlElement
+    public Self getSelf() {
+        return self;
     }
 
-    public void setContainer(String container) {
-        this.container = container;
+    public void setSelf(Self self) {
+        this.self = self;
     }
 
-    @XmlAttribute(required = false)
-    public String getOrder() {
-        return order;
-    }
-
-    public void setOrder(String order) {
-        this.order = order;
-    }
-
-    @XmlAttribute(required = false)
-    public boolean isShowInNavigation() {
-        return showInNavigation;
-    }
-
-    public void setShowInNavigation(boolean showInNavigation) {
-        this.showInNavigation = showInNavigation;
-    }
-
-    public int getActualOrder() {
-        return actualOrder;
+    @XmlElementWrapper(name="childPages")
+    @XmlElement(name="childPage",type=ChildPage.class)
+    public ArrayList<ChildPage> getChildPages() {
+        return childPages;
     }
 }

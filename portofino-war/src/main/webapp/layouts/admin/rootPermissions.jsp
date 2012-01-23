@@ -1,6 +1,6 @@
 <%@ page import="com.manydesigns.portofino.dispatcher.PageInstance" %>
-<%@ page import="com.manydesigns.portofino.model.pages.AccessLevel" %>
-<%@ page import="com.manydesigns.portofino.model.pages.Page" %>
+<%@ page import="com.manydesigns.portofino.security.AccessLevel" %>
+<%@ page import="com.manydesigns.portofino.pages.Page" %>
 <%@ page import="com.manydesigns.portofino.system.model.users.Group" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"

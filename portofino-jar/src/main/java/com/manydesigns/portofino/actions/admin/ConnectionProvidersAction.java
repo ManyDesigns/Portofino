@@ -47,7 +47,7 @@ import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.logic.DataModelLogic;
+import com.manydesigns.portofino.model.datamodel.DataModelLogic;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
@@ -266,7 +266,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     @Button(list = "connectionProviders-read", key = "layouts.admin.connectionProviders.list.test", order = 3)
     public Resolution test() {
         connectionProvider = application.getConnectionProvider(databaseName);
-        connectionProvider.init(application);
+        connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
         String status = connectionProvider.getStatus();
         if (ConnectionProvider.STATUS_CONNECTED.equals(status)) {
             SessionMessages.addInfoMessage(getMessage("connectionProviders.test.successful"));
@@ -326,7 +326,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
             database.setConnectionProvider(connectionProvider);
             connectionProvider.setDatabase(database);
             application.addDatabase(database);
-            connectionProvider.init(application);
+            connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
             SessionMessages.addInfoMessage(getMessage("connectionProviders.save.successful"));
             return new RedirectResolution(this.getClass());
         } else {
@@ -396,7 +396,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
             }
             form.writeToObject(connectionProviderForm);
             application.saveXmlModel();
-            connectionProvider.init(application);
+            connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
             SessionMessages.addInfoMessage(getMessage("connectionProviders.update.successful"));
         }
         return new RedirectResolution(this.getClass())

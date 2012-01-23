@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.model.pages;
+package com.manydesigns.portofino.pages;
 
 import com.manydesigns.elements.annotations.Required;
 import org.slf4j.Logger;

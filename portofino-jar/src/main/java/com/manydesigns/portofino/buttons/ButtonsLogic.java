@@ -35,7 +35,7 @@ import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.buttons.annotations.Guards;
 import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import org.jetbrains.annotations.NotNull;
 

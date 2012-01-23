@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.model.pages;
+package com.manydesigns.portofino.security;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

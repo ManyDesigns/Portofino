@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.model.datamodel;
 
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
@@ -40,6 +39,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.text.MessageFormat;
@@ -91,16 +91,15 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     }
 
     @Override
-    public void init(Application application) {
-        DatabasePlatformsManager databasePlatformsManager = application.getDatabasePlatformsManager();
+    public void init(DatabasePlatformsManager databasePlatformsManager, File appDir) {
         Configuration portofinoConfiguration =
                 databasePlatformsManager.getPortofinoConfiguration();
         String warRealPath =
                 portofinoConfiguration.getString(
                         PortofinoProperties.WAR_REAL_PATH);
         actualUrl = StringUtils.replace(url, SERVER_INFO_REAL_PATH, warRealPath);
-        actualUrl = StringUtils.replace(actualUrl, APP_DIR, application.getAppDir().getAbsolutePath());
-        super.init(application);
+        actualUrl = StringUtils.replace(actualUrl, APP_DIR, appDir.getAbsolutePath());
+        super.init(databasePlatformsManager, appDir);
     }
 
 

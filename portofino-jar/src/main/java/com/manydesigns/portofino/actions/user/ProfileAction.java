@@ -40,7 +40,7 @@ import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.database.QueryUtils;
+import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.logic.SecurityLogic;
@@ -197,8 +197,8 @@ public class ProfileAction extends AbstractActionBean {
         userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
         User thisUser =
             (User) QueryUtils.getObjectByPk
-                (application, application.getSystemDatabaseName(),
-                 SecurityLogic.USER_ENTITY_NAME, new User(userId));
+                    (application, application.getSystemDatabaseName(),
+                            SecurityLogic.USER_ENTITY_NAME, new User(userId));
 
         form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
                 .configMode(Mode.EDIT)

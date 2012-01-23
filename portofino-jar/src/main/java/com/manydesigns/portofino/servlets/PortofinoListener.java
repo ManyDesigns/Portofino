@@ -33,7 +33,7 @@ import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.application.ApplicationStarter;
+import com.manydesigns.portofino.starter.ApplicationStarter;
 import com.manydesigns.portofino.application.ServerInfo;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
 import org.apache.commons.configuration.CompositeConfiguration;

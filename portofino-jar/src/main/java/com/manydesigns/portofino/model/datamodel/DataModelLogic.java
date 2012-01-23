@@ -27,10 +27,8 @@
  *
  */
 
-package com.manydesigns.portofino.logic;
+package com.manydesigns.portofino.model.datamodel;
 
-import com.manydesigns.portofino.model.datamodel.Model;
-import com.manydesigns.portofino.model.datamodel.*;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

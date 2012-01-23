@@ -29,12 +29,9 @@
 
 package com.manydesigns.portofino.i18n;
 
-import com.manydesigns.elements.i18n.SimpleTextProvider;
 import com.manydesigns.elements.i18n.TextProvider;
-import com.manydesigns.portofino.application.Application;
 
 import java.text.MessageFormat;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
@@ -43,21 +40,17 @@ import java.util.ResourceBundle;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class PortofinoTextProvider implements TextProvider {
+public class MultipleTextProvider implements TextProvider {
 
     //--------------------------------------------------------------------------
     // Fields
     //--------------------------------------------------------------------------
 
-    protected final ResourceBundle portofinoResourceBundle;
-    protected final ResourceBundle elementsResourceBundle;
+    protected final ResourceBundle[] resourceBundles;
 
-    public PortofinoTextProvider(Application application, Locale locale) {
-        elementsResourceBundle =
-                ResourceBundle.getBundle(SimpleTextProvider.DEFAULT_MESSAGE_RESOURCE, locale);
-        portofinoResourceBundle = application.getBundle(locale);
+    public MultipleTextProvider(ResourceBundle... resourceBundles) {
+        this.resourceBundles = resourceBundles;
     }
-
     //--------------------------------------------------------------------------
     // TextProvider implementation
     //--------------------------------------------------------------------------
@@ -72,14 +65,13 @@ public class PortofinoTextProvider implements TextProvider {
     //--------------------------------------------------------------------------
 
     public String getLocalizedString(String key) {
-        try {
-            return portofinoResourceBundle.getString(key);
-        } catch (Throwable e) {
+        for (ResourceBundle current : resourceBundles) {
             try {
-                return elementsResourceBundle.getString(key);
-            } catch (Throwable e2) {
-                return key;
+                return current.getString(key);
+            } catch (Throwable t) {
+                /* IGNORE */
             }
         }
+        return key;
     }
 }

@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.chart;
 
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.database.QueryUtils;
+import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.util.DesaturatedDrawingSupplier;
 import org.hibernate.Session;
 import org.jfree.chart.JFreeChart;

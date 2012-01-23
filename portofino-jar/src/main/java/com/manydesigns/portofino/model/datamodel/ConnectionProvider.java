@@ -32,7 +32,6 @@ package com.manydesigns.portofino.model.datamodel;
 import com.manydesigns.elements.annotations.DateFormat;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Updatable;
-import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
@@ -43,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -137,8 +137,7 @@ public abstract class ConnectionProvider implements ModelObject {
         lastTested = null;
     }
 
-    public void init(Application application) {
-        DatabasePlatformsManager databasePlatformsManager = application.getDatabasePlatformsManager();
+    public void init(DatabasePlatformsManager databasePlatformsManager, File appDir) {
         Connection conn = null;
         ResultSet typeRs = null;
         String databaseName = getDatabase().getDatabaseName();

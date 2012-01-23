@@ -33,12 +33,12 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.database.QueryUtils;
+import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.model.pages.AccessLevel;
-import com.manydesigns.portofino.model.pages.Page;
-import com.manydesigns.portofino.model.pages.Permissions;
+import com.manydesigns.portofino.pages.Page;
+import com.manydesigns.portofino.pages.Permissions;
+import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
@@ -261,7 +261,7 @@ public class SecurityLogic {
 
     private static Group findGroupById(Application application, String groupId) {
         return (Group) QueryUtils.getObjectByPk(application, application.getSystemDatabaseName(),
-                                                GROUP_ENTITY_NAME, groupId);
+                GROUP_ENTITY_NAME, groupId);
     }
 
     public static User defaultLogin(Application application, String username, String password) {

@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.application;
+package com.manydesigns.portofino.database;
 
 import com.manydesigns.elements.fields.search.BaseCriteria;
 import com.manydesigns.elements.fields.search.TextMatchMode;

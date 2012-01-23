@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.system.model.users.annotations;
 
-import com.manydesigns.portofino.model.pages.AccessLevel;
+import com.manydesigns.portofino.security.AccessLevel;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -30,8 +30,6 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.model.datamodel.ConnectionProvider;
-import com.manydesigns.portofino.model.datamodel.PrimaryKeyColumn;
-import com.manydesigns.portofino.model.datamodel.Reference;
 import org.apache.commons.dbutils.DbUtils;
 import org.hibernate.dialect.Dialect;
 import org.slf4j.Logger;
@@ -128,24 +126,6 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     //**************************************************************************
     // Utility methods
     //**************************************************************************
-
-    protected PrimaryKeyColumn[] ensureMinimumArrayLength(PrimaryKeyColumn[] oldArray, int length) {
-        if (oldArray.length >= length) {
-            return oldArray;
-        }
-        PrimaryKeyColumn[] newArray = new PrimaryKeyColumn[length];
-        System.arraycopy(oldArray, 0, newArray, 0, oldArray.length);
-        return newArray;
-    }
-
-    protected Reference[] ensureMinimumArrayLength(Reference[] oldArray, int length) {
-        if (oldArray.length >= length) {
-            return oldArray;
-        }
-        Reference[] newArray = new Reference[length];
-        System.arraycopy(oldArray, 0, newArray, 0, oldArray.length);
-        return newArray;
-    }
 
     public List<String> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
         ResultSet rs = databaseMetaData.getSchemas();

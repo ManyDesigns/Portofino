@@ -34,7 +34,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.AbstractActionBean;
 import com.manydesigns.portofino.actions.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.database.QueryUtils;
+import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.email.EmailUtils;
 import com.manydesigns.portofino.system.model.email.EmailBean;

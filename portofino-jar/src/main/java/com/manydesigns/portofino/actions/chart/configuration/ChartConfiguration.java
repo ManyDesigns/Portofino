@@ -33,7 +33,7 @@ import com.manydesigns.elements.annotations.*;
 import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.chart.*;
-import com.manydesigns.portofino.logic.DataModelLogic;
+import com.manydesigns.portofino.model.datamodel.DataModelLogic;
 import com.manydesigns.portofino.model.datamodel.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

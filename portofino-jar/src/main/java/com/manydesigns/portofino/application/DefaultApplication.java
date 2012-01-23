@@ -33,11 +33,10 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.application.hibernate.HibernateConfig;
 import com.manydesigns.portofino.application.hibernate.HibernateDatabaseSetup;
-import com.manydesigns.portofino.database.QueryUtils;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
-import com.manydesigns.portofino.logic.DataModelLogic;
+import com.manydesigns.portofino.model.datamodel.DataModelLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.datamodel.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -184,7 +183,7 @@ public class DefaultApplication implements Application {
     }
 
     protected void initConnections(Model loadedModel) {
-        loadedModel.initDatabases(this);
+        loadedModel.initDatabases(getDatabasePlatformsManager(), getAppDir());
         connectionProviders = new ArrayList<ConnectionProvider>();
         for(Database db : loadedModel.getDatabases()) {
             ConnectionProvider connectionProvider = db.getConnectionProvider();

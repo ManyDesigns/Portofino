@@ -32,7 +32,7 @@ package com.manydesigns.portofino.database;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.QueryStringWithParameters;
-import com.manydesigns.portofino.application.TableCriteria;
+import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.model.datamodel.Column;
 import com.manydesigns.portofino.model.datamodel.Table;
 import com.manydesigns.portofino.reflection.ColumnAccessor;

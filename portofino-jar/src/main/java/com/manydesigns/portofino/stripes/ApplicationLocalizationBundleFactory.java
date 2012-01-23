@@ -31,7 +31,7 @@ package com.manydesigns.portofino.stripes;
 
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.application.ApplicationStarter;
+import com.manydesigns.portofino.starter.ApplicationStarter;
 import net.sourceforge.stripes.config.Configuration;
 import net.sourceforge.stripes.localization.LocalizationBundleFactory;
 import org.slf4j.Logger;

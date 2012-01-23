@@ -33,7 +33,7 @@ import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.options.DisplayMode;
-import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.pages.Page;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

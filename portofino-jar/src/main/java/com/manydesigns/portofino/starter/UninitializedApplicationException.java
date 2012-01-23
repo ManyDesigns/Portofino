@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.application;
+package com.manydesigns.portofino.starter;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

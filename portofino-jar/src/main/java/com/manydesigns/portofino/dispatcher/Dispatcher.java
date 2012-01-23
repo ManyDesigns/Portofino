@@ -32,7 +32,7 @@ package com.manydesigns.portofino.dispatcher;
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.datamodel.Model;
-import com.manydesigns.portofino.model.pages.Page;
+import com.manydesigns.portofino.pages.Page;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
