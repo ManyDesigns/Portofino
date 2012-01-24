@@ -179,7 +179,10 @@ public class PageReferenceAction extends AbstractPageAction {
     }
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        super.prepare(pageInstance, context);
+        this.pageInstance = pageInstance;
+        if(!pageInstance.getParameters().isEmpty()) {
+            return new ErrorResolution(404);
+        }
         pageReferenceConfiguration = (PageReferenceConfiguration) getPageInstance().getConfiguration();
         return null;
     }

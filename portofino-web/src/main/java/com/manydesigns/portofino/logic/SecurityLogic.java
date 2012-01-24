@@ -132,24 +132,60 @@ public class SecurityLogic {
     }
 
     public static Permissions calculateActualPermissions(PageInstance instance) {
-        Permissions localPerms = instance.getPage().getPermissions();
-        if(instance.getParent() == null) {
-            return localPerms;
+        List<Page> pages = new ArrayList<Page>();
+        while (instance != null) {
+            pages.add(0, instance.getPage());
+            instance = instance.getParent();
         }
 
-        Permissions configuration = new Permissions();
-        configuration.getActualLevels().putAll(localPerms.getActualLevels());
-        configuration.getActualPermissions().putAll(localPerms.getActualPermissions());
-        Permissions parentPermissions = calculateActualPermissions(instance.getParent());
-        Map<String, AccessLevel> parentLevels = parentPermissions.getActualLevels();
-        for(Map.Entry<String, AccessLevel> entry : parentLevels.entrySet()) {
-            String key = entry.getKey();
-            AccessLevel value = entry.getValue();
-            if(value == AccessLevel.DENY || configuration.getActualLevels().get(key) == null) {
-                configuration.getActualLevels().put(key, value);
+        return calculateActualPermissions(pages);
+
+//        Permissions localPerms = instance.getPage().getPermissions();
+//        if(instance.getParent() == null) {
+//            return localPerms;
+//        }
+//
+//        Permissions configuration = new Permissions();
+//        configuration.getActualLevels().putAll(localPerms.getActualLevels());
+//        configuration.getActualPermissions().putAll(localPerms.getActualPermissions());
+//        Permissions parentPermissions = calculateActualPermissions(instance.getParent());
+//        Map<String, AccessLevel> parentLevels = parentPermissions.getActualLevels();
+//        for(Map.Entry<String, AccessLevel> entry : parentLevels.entrySet()) {
+//            String key = entry.getKey();
+//            AccessLevel value = entry.getValue();
+//            if(value == AccessLevel.DENY || configuration.getActualLevels().get(key) == null) {
+//                configuration.getActualLevels().put(key, value);
+//            }
+//        }
+//        return configuration;
+    }
+
+    public static Permissions calculateActualPermissions(List<Page> pages) {
+        Permissions result = new Permissions();
+        Map<String, AccessLevel> resultLevels = result.getActualLevels();
+        for (Page current : pages) {
+            Permissions currentPerms = current.getPermissions();
+
+            Map<String, AccessLevel> currentLevels = currentPerms.getActualLevels();
+            for(Map.Entry<String, AccessLevel> entry : currentLevels.entrySet()) {
+                String currentGroup = entry.getKey();
+                AccessLevel currentLevel = entry.getValue();
+                AccessLevel resultLevel = resultLevels.get(currentGroup);
+
+                if(resultLevel != AccessLevel.DENY && currentLevel != null) {
+                    resultLevels.put(currentGroup, currentLevel);
+                }
             }
         }
-        return configuration;
+
+        if (pages.size() > 0) {
+            Page lastPage = pages.get(pages.size() - 1);
+            Map<String, Set<String>> lastPermissions =
+                    lastPage.getPermissions().getActualPermissions();
+            result.getActualPermissions().putAll(lastPermissions);
+        }
+
+        return result;
     }
 
     public static boolean hasPermissions

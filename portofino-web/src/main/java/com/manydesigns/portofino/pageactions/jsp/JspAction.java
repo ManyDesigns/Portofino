@@ -189,7 +189,10 @@ public class JspAction extends AbstractPageAction {
     }
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        super.prepare(pageInstance, context);
+        this.pageInstance = pageInstance;
+        if(!pageInstance.getParameters().isEmpty()) {
+            return new ErrorResolution(404);
+        }
         jspConfiguration = (JspConfiguration) getPageInstance().getConfiguration();
         jsp = jspConfiguration.getJsp();
         return null;

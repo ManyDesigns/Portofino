@@ -356,7 +356,10 @@ public class ChartAction extends AbstractPageAction {
     }
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        super.prepare(pageInstance, context);
+        this.pageInstance = pageInstance;
+        if(!pageInstance.getParameters().isEmpty()) {
+            return new ErrorResolution(404);
+        }
         chartConfiguration = (ChartConfiguration) pageInstance.getConfiguration();
         return null;
     }

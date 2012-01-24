@@ -1134,7 +1134,7 @@ public class CrudAction extends AbstractPageAction {
     //**************************************************************************
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        super.prepare(pageInstance, context);
+        this.pageInstance = pageInstance;
         this.crudConfiguration = (CrudConfiguration) pageInstance.getConfiguration();
 
         if(crudConfiguration != null && crudConfiguration.getActualDatabase() != null) {

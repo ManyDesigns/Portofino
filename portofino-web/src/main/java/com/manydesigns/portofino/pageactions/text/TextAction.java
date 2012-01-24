@@ -121,7 +121,10 @@ public class TextAction extends AbstractPageAction {
     //**************************************************************************
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        super.prepare(pageInstance, context);
+        this.pageInstance = pageInstance;
+        if(!pageInstance.getParameters().isEmpty()) {
+            return new ErrorResolution(404);
+        }
         textConfiguration = (TextConfiguration) pageInstance.getConfiguration();
         return null;
     }

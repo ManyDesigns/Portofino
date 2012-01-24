@@ -26,10 +26,7 @@ import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.stripes.ModelActionResolver;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import groovy.lang.GroovyObject;
-import net.sourceforge.stripes.action.ActionBeanContext;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.StripesConstants;
 import net.sourceforge.stripes.controller.StripesFilter;
 import org.apache.commons.collections.MultiHashMap;
@@ -116,11 +113,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     public boolean isEmbedded() {
         return getContext().getRequest().getAttribute(
                 StripesConstants.REQ_ATTR_INCLUDE_PATH) != null;
-    }
-
-    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        this.pageInstance = pageInstance;
-        return null;
     }
 
     /*protected void dereferencePageInstance() {

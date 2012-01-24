@@ -38,13 +38,13 @@ import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Layout;
 import com.manydesigns.portofino.pages.Page;
+import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -83,25 +83,27 @@ public class Navigation {
 
         //TODO gestire deploy sotto ROOT
 
+        buildTree();
+    }
+
+    private void buildTree() {
         String contextPath = dispatch.getContextPath();
         int rootPageIndex = dispatch.getClosestSubtreeRootIndex();
         PageInstance[] pageInstances = dispatch.getPageInstancePath(rootPageIndex);
-        String prefix = contextPath + dispatch.getPathUrl(rootPageIndex);
-        PageInstance rootPageInstance = pageInstances[0];
-        boolean selected = pageInstances.length == 1;
-        boolean ghost = true;
-        rootNavigationItem = new NavigationItem(
-                rootPageInstance.getPage(), prefix, true, selected, ghost);
-        print(pageInstances);
-    }
-
-    private void print(PageInstance[] pageInstances) {
         if (pageInstances == null || pageInstances.length == 0) {
             return;
         }
-        boolean first = true;
-        List<ChildPage> childPages = new ArrayList<ChildPage>();
-        PageInstance last = null;
+        String prefix = contextPath + dispatch.getPathUrl(rootPageIndex);
+        PageInstance rootPageInstance = pageInstances[0];
+        boolean rootSelected = pageInstances.length == 1;
+        boolean rootGhost = true;
+        rootNavigationItem = new NavigationItem(
+                rootPageInstance.getPage(), prefix, true, rootSelected, rootGhost);
+        LinkedList<Page> pages = new LinkedList<Page>();
+        for(PageInstance pageInstance : pageInstances) {
+            pages.add(pageInstance.getPage());
+        }
+        List<ChildPage> childPages;
         NavigationItem currentNavigationItem = rootNavigationItem;
         for (int i = 0, pageInstancesLength = pageInstances.length; i < pageInstancesLength; i++) {
             PageInstance current = pageInstances[i];
@@ -112,17 +114,6 @@ public class Navigation {
                 next = null;
             }
 
-            if (!skipPermissions && !SecurityLogic.hasPermissions(current, groups, AccessLevel.VIEW)) {
-                break;
-            }
-
-//            if(current.getParent() != null) {
-//                //Root doesn't print anything for itself
-//                printNavigationElement(path, xb, current, childPages, first);
-//                path = path + "/" + current.getUrlFragment();
-//                first = false;
-//            }
-
             Layout layout = current.getLayout();
             if (layout != null) {
                 childPages = layout.getChildPages();
@@ -132,12 +123,15 @@ public class Navigation {
 
             List<NavigationItem> currentChildNavigationItems =
                     currentNavigationItem.getChildNavigationItems();
-            String prefix = currentNavigationItem.getPath();
+            prefix = currentNavigationItem.getPath() + "/";
+            for(String param : current.getParameters()) {
+                prefix += param + "/";
+            }
             currentNavigationItem = null;
             for (ChildPage childPage : childPages) {
                 File pageDir = current.getChildPageDirectory(childPage.getName());
                 Page page = DispatcherLogic.getPage(pageDir);
-                String path = prefix + "/" + childPage.getName();
+                String path = prefix + childPage.getName();
                 boolean inPath = false;
                 boolean selected = false;
                 if (next != null) {
@@ -146,12 +140,28 @@ public class Navigation {
                         selected = (i == pageInstancesLength - 2);
                     }
                 }
+                pages.add(page);
+                if (!skipPermissions) {
+                    Permissions permissions = SecurityLogic.calculateActualPermissions(pages);
+                    if(!SecurityLogic.hasPermissions(permissions, groups, AccessLevel.VIEW)) {
+                        pages.removeLast();
+                        continue;
+                    }
+                }
+                pages.removeLast();
+                if(!childPage.isShowInNavigation() && !inPath) {
+                    continue;
+                }
                 NavigationItem childNavigationItem =
                         new NavigationItem(page, path, inPath, selected, false);
                 currentChildNavigationItems.add(childNavigationItem);
                 if (inPath) {
                     currentNavigationItem = childNavigationItem;
                 }
+            }
+
+            if(next != null) {
+                pages.add(next.getPage());
             }
         }
 /*
