@@ -33,8 +33,9 @@
                 <table>
                 <%
                     Page currentPage = actionBean.getPage();
+                    Class<?> actualActionClass = currentPage.getActualActionClass();
                     SupportsPermissions supportsPermissions =
-                            actionBean.getClass().getAnnotation(SupportsPermissions.class);
+                            actualActionClass.getAnnotation(SupportsPermissions.class);
                     String[] supportedPermissions = null;
                     if(supportsPermissions != null && supportsPermissions.value().length > 0) {
                         supportedPermissions = supportsPermissions.value();
