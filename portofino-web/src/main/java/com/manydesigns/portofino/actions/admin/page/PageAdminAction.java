@@ -265,7 +265,7 @@ public class PageAdminAction extends AbstractActionBean {
             //end TODO
 
             Page page = new Page();
-            BeanUtils.copyProperties(newPage, page);
+            BeanUtils.copyProperties(page, newPage);
             page.setId(pageId);
 
             Object configuration = ReflectionUtil.newInstance(action.getConfigurationClass());
