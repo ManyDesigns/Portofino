@@ -18,11 +18,7 @@
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="page-permissions-edit" cssClass="contentButton" />
-        <div class="breadcrumbs">
-            <div class="inner">
-                <mde:write name="breadcrumbs"/>
-            </div>
-        </div>
+        <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         Page permissions for: <c:out value="${actionBean.page.title}"/>

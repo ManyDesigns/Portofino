@@ -1,6 +1,8 @@
-<%@ page import="com.manydesigns.portofino.breadcrumbs.Breadcrumbs" %>
 <%@ page import="com.manydesigns.elements.util.Util" %>
+<%@ page import="com.manydesigns.portofino.breadcrumbs.BreadcrumbItem" %>
+<%@ page import="com.manydesigns.portofino.breadcrumbs.Breadcrumbs" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1" %><%@
     taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%><%@
@@ -46,18 +48,12 @@
 
             var currentPath = "<%= actionBean.dispatch.getPathUrl() %>";
             var currentBreadcrumbs =
-                    "<%= StringEscapeUtils.escapeJavaScript(
-                            Util.elementToString(new Breadcrumbs(actionBean.dispatch, false))) %>" +
-                    "<span class='breadcrumb-separator'> &gt; </span>";
+                    "<%= generateBreadcrumbs(new Breadcrumbs(actionBean.dispatch)) %>";
 
             var parentPath = "<%= actionBean.dispatch.getParentPathUrl() %>";
             var parentBreadcrumbs =
-                    "<%= StringEscapeUtils.escapeJavaScript(
-                            Util.elementToString(
-                                new Breadcrumbs(actionBean.dispatch,
-                                                actionBean.dispatch.getPageInstancePath().length - 1,
-                                                false))) %>" +
-                    "<span class='breadcrumb-separator'> &gt; </span>";
+                    "<%= generateBreadcrumbs(new Breadcrumbs(actionBean.dispatch,
+                                                actionBean.dispatch.getPageInstancePath().length - 1)) %>";
 
             var urlField = $("#url");
             var breadcrumbsField = $("#breadcrumbs");
@@ -79,8 +75,8 @@
                     baseBreadcrumbs = parentBreadcrumbs;
                 }
 
-                urlField.html(basePath + "/" + fragmentField.val());
-                breadcrumbsField.html(baseBreadcrumbs + "<span class='breadcrumb-item'>" + titleField.val() + "</span>");
+                urlField.html(htmlEscape(basePath + "/" + fragmentField.val()));
+                breadcrumbsField.html(htmlEscape(baseBreadcrumbs + titleField.val()));
             }
 
             fragmentField.change(recalculateUrlAndBreadcrumbs);
@@ -95,3 +91,14 @@
         </script>
     </stripes:layout-component>
 </stripes:layout-render>
+<%!
+    private String generateBreadcrumbs(Breadcrumbs breadcrumbs) {
+        List<BreadcrumbItem> items = breadcrumbs.getItems();
+        StringBuilder sb = new StringBuilder();
+        for (BreadcrumbItem current : items) {
+            sb.append(current.getText());
+            sb.append(" > ");
+        }
+        return StringEscapeUtils.escapeJavaScript(sb.toString());
+    }
+%>

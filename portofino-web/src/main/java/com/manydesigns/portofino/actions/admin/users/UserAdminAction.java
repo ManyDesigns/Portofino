@@ -31,16 +31,15 @@ package com.manydesigns.portofino.actions.admin.users;
 
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.util.RandomUtil;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
+import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
-import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
-import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
@@ -124,9 +123,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
             HttpServletRequest request = context.getRequest();
             String originalPath = ServletUtils.getOriginalPath(request);
             dispatch = new Dispatch(request.getContextPath(), originalPath, pageInstance);
-            Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
             request.setAttribute(RequestAttributes.DISPATCH, dispatch);
-            request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
             prepare(pageInstance, context);
             super.prepare();
         } catch (Exception e) {

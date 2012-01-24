@@ -1164,6 +1164,8 @@ public class CrudAction extends AbstractPageAction {
                     crudConfiguration.getQuery(), null);
                 if(object != null) {
                     ognlContext.put(crudConfiguration.getActualVariable(), object);
+                    String description = ShortNameUtils.getName(classAccessor, object);
+                    pageInstance.setDescription(description);
                 } else {
                     return notInUseCase(context);
                 }

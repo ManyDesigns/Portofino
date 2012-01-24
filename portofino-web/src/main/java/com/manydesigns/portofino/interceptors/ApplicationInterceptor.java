@@ -31,15 +31,9 @@ package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.BlobManager;
-import com.manydesigns.portofino.dispatcher.PageAction;
-import com.manydesigns.portofino.dispatcher.*;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
-import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
-import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.navigation.Navigation;
+import com.manydesigns.portofino.dispatcher.*;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
@@ -105,10 +99,6 @@ public class ApplicationInterceptor implements Interceptor {
                     (List<String>) request.getAttribute(RequestAttributes.GROUPS);
 
             logger.debug("Creating navigation");
-            boolean admin = SecurityLogic.isAdministrator(request);
-            Navigation navigation =
-                    new Navigation(application, dispatch, groups, admin);
-            request.setAttribute(RequestAttributes.NAVIGATION, navigation);
 
             int i = 0;
             for(PageInstance page : dispatch.getPageInstancePath()) {
@@ -128,10 +118,6 @@ public class ApplicationInterceptor implements Interceptor {
             }
             PageInstance pageInstance = dispatch.getLastPageInstance();
             request.setAttribute(RequestAttributes.PAGE_INSTANCE, pageInstance);
-
-            logger.debug("Creating breadcrumbs");
-            Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
-            request.setAttribute(RequestAttributes.BREADCRUMBS, breadcrumbs);
         }
 
         return context.proceed();

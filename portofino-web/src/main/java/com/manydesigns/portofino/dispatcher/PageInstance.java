@@ -56,6 +56,7 @@ public class PageInstance {
     protected Object configuration;
     protected Class<? extends PageAction> actionClass;
     protected PageAction actionBean;
+    protected String description;
 
     public static final String DETAIL = "_detail";
 
@@ -84,16 +85,6 @@ public class PageInstance {
     //**************************************************************************
     // Utility Methods
     //**************************************************************************
-
-    /*public PageInstance findChildPageByFragment(String fragment) {
-        for(PageInstance page : getChildPageInstances()) {
-            if(fragment.equals(page.getPage().getFragment())) {
-                return page;
-            }
-        }
-        logger.debug("Child page not found: {}", fragment);
-        return null;
-    }*/
 
     public String getUrlFragment() {
         String fragment = directory.getName();
@@ -182,5 +173,13 @@ public class PageInstance {
 
     public String getPathFromRoot() {
         return FileUtils.getRelativePath(application.getPagesDir(), directory);
+    }
+
+    public String getDescription() {
+        return description != null ? description : getName();
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

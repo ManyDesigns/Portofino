@@ -9,11 +9,7 @@
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.text.TextAction"/>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="manage-attachments" cssClass="contentButton" />
-        <div class="breadcrumbs">
-            <div class="inner">
-                <mde:write name="breadcrumbs"/>
-            </div>
-        </div>
+        <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <fmt:message key="layouts.text.manage-attachments.manage_attachments_for_page"/>

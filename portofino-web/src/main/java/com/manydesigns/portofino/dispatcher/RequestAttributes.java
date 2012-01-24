@@ -41,8 +41,6 @@ public class RequestAttributes {
 
     public final static String DISPATCH = "dispatch";
     public final static String STOP_WATCH = "stopWatch";
-    public final static String NAVIGATION = "navigation";
-    public final static String BREADCRUMBS = "breadcrumbs";
     public static final String MODEL = "model";
     public static final String PAGE_INSTANCE = "pageInstance";
     public final static String APPLICATION = "app";

@@ -9,11 +9,7 @@
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.CrudAction"/>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="crud-edit" cssClass="contentButton" />
-        <div class="breadcrumbs">
-            <div class="inner">
-                <mde:write name="breadcrumbs"/>
-            </div>
-        </div>
+        <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.crudConfiguration.editTitle}"/>

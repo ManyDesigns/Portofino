@@ -30,17 +30,15 @@
 package com.manydesigns.portofino.navigation;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Layout;
 import com.manydesigns.portofino.pages.Page;
-import org.jetbrains.annotations.NotNull;
+import com.manydesigns.portofino.security.AccessLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +52,7 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class Navigation implements XhtmlFragment {
+public class Navigation {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -66,6 +64,7 @@ public class Navigation implements XhtmlFragment {
     protected final Dispatch dispatch;
     protected final List<String> groups;
     protected final boolean skipPermissions;
+    protected NavigationItem rootNavigationItem;
 
     public static final Logger logger =
             LoggerFactory.getLogger(Navigation.class);
@@ -81,52 +80,84 @@ public class Navigation implements XhtmlFragment {
         this.dispatch = dispatch;
         this.groups = groups;
         this.skipPermissions = skipPermissions;
+
         //TODO gestire deploy sotto ROOT
-    }
 
-    //**************************************************************************
-    // XhtmlFragment implementation
-    //**************************************************************************
-
-    public void toXhtml(@NotNull XhtmlBuffer xb) {
         String contextPath = dispatch.getContextPath();
         int rootPageIndex = dispatch.getClosestSubtreeRootIndex();
         PageInstance[] pageInstances = dispatch.getPageInstancePath(rootPageIndex);
         String prefix = contextPath + dispatch.getPathUrl(rootPageIndex);
-        print(prefix, pageInstances, xb);
+        PageInstance rootPageInstance = pageInstances[0];
+        boolean selected = pageInstances.length == 1;
+        boolean ghost = true;
+        rootNavigationItem = new NavigationItem(
+                rootPageInstance.getPage(), prefix, true, selected, ghost);
+        print(pageInstances);
     }
 
-    private void print(String path, PageInstance[] pageInstances, XhtmlBuffer xb) {
+    private void print(PageInstance[] pageInstances) {
         if (pageInstances == null || pageInstances.length == 0) {
             return;
         }
         boolean first = true;
-        List<ChildPage> siblings = new ArrayList<ChildPage>();
+        List<ChildPage> childPages = new ArrayList<ChildPage>();
         PageInstance last = null;
-        for (PageInstance current : pageInstances) {
+        NavigationItem currentNavigationItem = rootNavigationItem;
+        for (int i = 0, pageInstancesLength = pageInstances.length; i < pageInstancesLength; i++) {
+            PageInstance current = pageInstances[i];
+            PageInstance next;
+            if (i < pageInstancesLength -1) {
+                next = pageInstances[i+1];
+            } else {
+                next = null;
+            }
+
             if (!skipPermissions && !SecurityLogic.hasPermissions(current, groups, AccessLevel.VIEW)) {
                 break;
             }
 
-            if(current.getParent() != null) {
-                //Root doesn't print anything for itself
-                printNavigationElement(path, xb, current, siblings, first);
-                path = path + "/" + current.getUrlFragment();
-                first = false;
-            }
+//            if(current.getParent() != null) {
+//                //Root doesn't print anything for itself
+//                printNavigationElement(path, xb, current, childPages, first);
+//                path = path + "/" + current.getUrlFragment();
+//                first = false;
+//            }
 
             Layout layout = current.getLayout();
-            if(layout != null) {
-                siblings = layout.getChildPages();
+            if (layout != null) {
+                childPages = layout.getChildPages();
             } else {
-                siblings = new ArrayList<ChildPage>();
+                childPages = new ArrayList<ChildPage>();
             }
-            last = current;
-        }
 
+            List<NavigationItem> currentChildNavigationItems =
+                    currentNavigationItem.getChildNavigationItems();
+            String prefix = currentNavigationItem.getPath();
+            currentNavigationItem = null;
+            for (ChildPage childPage : childPages) {
+                File pageDir = current.getChildPageDirectory(childPage.getName());
+                Page page = DispatcherLogic.getPage(pageDir);
+                String path = prefix + "/" + childPage.getName();
+                boolean inPath = false;
+                boolean selected = false;
+                if (next != null) {
+                    if (next.getName().equals(childPage.getName())) {
+                        inPath = true;
+                        selected = (i == pageInstancesLength - 2);
+                    }
+                }
+                NavigationItem childNavigationItem =
+                        new NavigationItem(page, path, inPath, selected, false);
+                currentChildNavigationItems.add(childNavigationItem);
+                if (inPath) {
+                    currentNavigationItem = childNavigationItem;
+                }
+            }
+        }
+/*
         boolean firstChild = true;
-        if(!siblings.isEmpty()) {
-            for (ChildPage p : siblings) {
+        if(!childPages.isEmpty()) {
+            for (ChildPage p : childPages) {
                 if(!p.isShowInNavigation()) {
                     continue;
                 }
@@ -152,6 +183,7 @@ public class Navigation implements XhtmlFragment {
         if(!firstChild) {
             xb.closeElement("ul");
         }
+        */
     }
 
     private void printNavigationElement
@@ -225,5 +257,9 @@ public class Navigation implements XhtmlFragment {
 
     public boolean isSkipPermissions() {
         return skipPermissions;
+    }
+
+    public NavigationItem getRootNavigationItem() {
+        return rootNavigationItem;
     }
 }

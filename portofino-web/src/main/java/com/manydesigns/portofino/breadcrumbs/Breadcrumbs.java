@@ -29,12 +29,9 @@
 
 package com.manydesigns.portofino.breadcrumbs;
 
-import com.manydesigns.elements.xml.XhtmlBuffer;
-import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pages.Page;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,33 +42,19 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class Breadcrumbs implements XhtmlFragment {
+public class Breadcrumbs {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
-    public static final String SELECTED_CSS_CLASS = "selected";
-    public static final String ITEM_CSS_CLASS = "breadcrumb-item";
-    public static final String SEPARATOR_CSS_CLASS = "breadcrumb-separator";
 
     protected final Dispatch dispatch;
     protected final List<BreadcrumbItem> items;
-    private String separator = " > ";
-    protected final boolean clickable;
 
     public Breadcrumbs(Dispatch dispatch) {
-        this(dispatch, dispatch.getPageInstancePath().length, true);
+        this(dispatch, dispatch.getPageInstancePath().length);
     }
 
     public Breadcrumbs(Dispatch dispatch, int upto) {
-        this(dispatch, upto, true);
-    }
-
-    public Breadcrumbs(Dispatch dispatch, boolean clickable) {
-        this(dispatch, dispatch.getPageInstancePath().length, clickable);
-    }
-
-    public Breadcrumbs(Dispatch dispatch, int upto, boolean clickable) {
         this.dispatch = dispatch;
-        this.clickable = clickable;
         items = new ArrayList<BreadcrumbItem>();
 
         StringBuilder sb = new StringBuilder();
@@ -86,31 +69,20 @@ public class Breadcrumbs implements XhtmlFragment {
             //TODO current = current.dereference();
             sb.append("/");
             Page page = current.getPage();
-            sb.append(current.getUrlFragment());
-            if(true) { //TODO page.isShowInNavigation()) {
-                BreadcrumbItem item = new BreadcrumbItem(
-                        sb.toString(), page.getTitle(),
-                        page.getDescription());
-                items.add(item);
-            }
-            //TODO ripristinare
-            /*if (current instanceof CrudPageInstance) {
-                CrudPageInstance instance =
-                        (CrudPageInstance) current;
-                if (CrudPage.MODE_DETAIL.equals(instance.getMode())) {
-                    sb.append("/");
-                    sb.append(instance.getPk());
-                    if(page.isShowInNavigation()) {
-                        String name = ShortNameUtils.getName(
-                                instance.getClassAccessor(), instance.getObject());
-                        String title = String.format("%s (%s)",
-                                name, page.getTitle());
-                        BreadcrumbItem item2 = new BreadcrumbItem(
-                                sb.toString(), name, title);
-                        items.add(item2);
-                    }
+            sb.append(current.getName());
+            BreadcrumbItem item = new BreadcrumbItem(
+                    sb.toString(), page.getTitle(),
+                    page.getDescription());
+            items.add(item);
+            if(!current.getParameters().isEmpty()) {
+                for(String param : current.getParameters()) {
+                    sb.append("/").append(param);
                 }
-            }*/
+                String description = current.getDescription();
+                String title = String.format("%s (%s)", description, page.getTitle());
+                BreadcrumbItem item2 = new BreadcrumbItem(sb.toString(), description, title);
+                items.add(item2);
+            }
         }
     }
 
@@ -118,40 +90,4 @@ public class Breadcrumbs implements XhtmlFragment {
         return items;
     }
 
-    public void toXhtml(@NotNull XhtmlBuffer xb) {
-        for (int i = 0; i < items.size(); i++) {
-            BreadcrumbItem current = items.get(i);
-            if (i > 0) {
-                xb.openElement("span");
-                xb.addAttribute("class", SEPARATOR_CSS_CLASS);
-                xb.write(separator);
-                xb.closeElement("span");
-            }
-            boolean last = i == items.size() - 1;
-            String cssClass = ITEM_CSS_CLASS;
-            if(last) {
-                cssClass += " " + SELECTED_CSS_CLASS;
-            }
-            if (!clickable || last) {
-                xb.openElement("span");
-                xb.addAttribute("class", cssClass);
-                xb.addAttribute("title", current.getTitle());
-                xb.write(current.getText());
-                xb.closeElement("span");
-            } else {
-                xb.writeAnchor(current.getHref(),
-                        current.getText(),
-                        cssClass,
-                        current.getTitle());
-            }
-        }
-    }
-
-    public String getSeparator() {
-        return separator;
-    }
-
-    public void setSeparator(String separator) {
-        this.separator = separator;
-    }
 }

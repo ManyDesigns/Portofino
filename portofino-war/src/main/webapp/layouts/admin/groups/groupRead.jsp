@@ -9,11 +9,7 @@
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.admin.groups.GroupAdminAction"/>
     <stripes:layout-component name="contentHeader">
-        <div class="breadcrumbs">
-            <div class="inner">
-                <mde:write name="breadcrumbs"/>
-            </div>
-        </div>
+        <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.crudConfiguration.readTitle}"/>
