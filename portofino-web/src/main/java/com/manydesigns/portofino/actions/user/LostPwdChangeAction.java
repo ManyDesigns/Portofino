@@ -37,7 +37,7 @@ import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.system.model.users.User;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -91,7 +91,7 @@ public class LostPwdChangeAction extends AbstractActionBean {
                 user.setPwd(pwd.pwd);
                 user.setPwdModDate(new Timestamp(new Date().getTime()));
                 Session session = application.getSystemSession();
-                session.update(DataModelLogic.USER_ENTITY_NAME, user);
+                session.update(DatabaseLogic.USER_ENTITY_NAME, user);
                 session.getTransaction().commit();
                 logger.debug("User {} updated", user.getEmail());
                 SessionMessages.addInfoMessage("Password updated");

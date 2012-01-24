@@ -27,9 +27,9 @@
  *
  */
 
-package com.manydesigns.portofino.model;
+package com.manydesigns.portofino.model.database;
 
-import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.model.Model;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,12 +43,12 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class DataModelLogic {
+public class DatabaseLogic {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public static final Logger logger =
-            LoggerFactory.getLogger(DataModelLogic.class);
+            LoggerFactory.getLogger(DatabaseLogic.class);
     
     public static final String USER_ENTITY_NAME = "users";
     public static final String GROUP_ENTITY_NAME = "groups";

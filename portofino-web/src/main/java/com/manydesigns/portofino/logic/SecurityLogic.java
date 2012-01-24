@@ -36,7 +36,7 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
@@ -80,7 +80,7 @@ public class SecurityLogic {
             groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
         } else {
             User u = (User) QueryUtils.getObjectByPk
-                    (application, application.getSystemDatabaseName(), DataModelLogic.USER_ENTITY_NAME,
+                    (application, application.getSystemDatabaseName(), DatabaseLogic.USER_ENTITY_NAME,
                      new User(userId));
             groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
 
@@ -252,14 +252,14 @@ public class SecurityLogic {
 
     private static Group findGroupById(Application application, String groupId) {
         return (Group) QueryUtils.getObjectByPk(application, application.getSystemDatabaseName(),
-                DataModelLogic.GROUP_ENTITY_NAME, groupId);
+                DatabaseLogic.GROUP_ENTITY_NAME, groupId);
     }
 
     public static User defaultLogin(Application application, String username, String password) {
         Session session = application.getSystemSession();
         org.hibernate.Criteria criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
-        criteria.add(Restrictions.eq(DataModelLogic.PASSWORD, password));
+        criteria.add(Restrictions.eq(DatabaseLogic.PASSWORD, password));
 
         @SuppressWarnings({"unchecked"})
         List<Object> result = (List<Object>) criteria.list();

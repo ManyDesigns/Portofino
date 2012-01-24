@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.application;
+package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Memory;

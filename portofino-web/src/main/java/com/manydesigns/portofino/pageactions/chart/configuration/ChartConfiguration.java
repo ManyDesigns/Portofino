@@ -33,7 +33,7 @@ import com.manydesigns.elements.annotations.*;
 import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.chart.*;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,7 +147,7 @@ public class ChartConfiguration implements PageActionConfiguration, ChartDefinit
                 logger.error("Invalid orientation: " + actualOrientation, e);
             }
         }
-        actualDatabase = DataModelLogic.findDatabaseByName(application.getModel(), database);
+        actualDatabase = DatabaseLogic.findDatabaseByName(application.getModel(), database);
     }
 
     //**************************************************************************

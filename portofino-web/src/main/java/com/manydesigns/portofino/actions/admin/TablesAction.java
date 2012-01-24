@@ -50,7 +50,7 @@ import com.manydesigns.portofino.application.ModelObjectNotFoundError;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
@@ -225,7 +225,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     }
 
     public Resolution search() {
-        List<Table> tableList = DataModelLogic.getAllTables(model);
+        List<Table> tableList = DatabaseLogic.getAllTables(model);
         multilineForm = new TableFormBuilder(Table.class)
                 .configFields("databaseName", "schemaName", "tableName")
                 .configNRows(tableList.size())
@@ -259,7 +259,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     //**************************************************************************
 
     public Table setupTable() {
-        Table table = DataModelLogic.findTableByQualifiedName(
+        Table table = DatabaseLogic.findTableByQualifiedName(
                 model, qualifiedTableName);
         if (table == null) {
             throw new ModelObjectNotFoundError(qualifiedTableName);
@@ -651,7 +651,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         //Gestione tabella
         Database database = new Database();
         database.setDatabaseName(
-                DataModelLogic.findDatabaseByName(model, table_databaseName)
+                DatabaseLogic.findDatabaseByName(model, table_databaseName)
                     .getDatabaseName());
         Schema schema = new Schema();
         schema.setDatabase(database);

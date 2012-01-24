@@ -35,7 +35,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.util.DummyHttpServletRequest;
+import com.manydesigns.portofino.servlets.DummyHttpServletRequest;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

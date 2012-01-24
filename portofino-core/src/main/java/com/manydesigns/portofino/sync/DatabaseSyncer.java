@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.sync;
 
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.Annotated;
 import com.manydesigns.portofino.model.Annotation;
@@ -92,7 +92,7 @@ public class DatabaseSyncer {
 
             logger.debug("Retrieving source database");
             Database sourceDatabase =
-                    DataModelLogic.findDatabaseByName(sourceModel, databaseName);
+                    DatabaseLogic.findDatabaseByName(sourceModel, databaseName);
             if (sourceDatabase == null) {
                 logger.debug("Source database not found. Creating an empty one.");
                 sourceDatabase = new Database();
@@ -112,7 +112,7 @@ public class DatabaseSyncer {
             for (String schemaName : schemaNames) {
                 logger.info("Processing schema: {}", schemaName);
                 Schema sourceSchema =
-                        DataModelLogic.findSchemaByName(
+                        DatabaseLogic.findSchemaByName(
                                 sourceDatabase, schemaName);
                 if (sourceSchema == null) {
                     logger.debug("Source schema not found. Creating an empty one.");
@@ -154,10 +154,10 @@ public class DatabaseSyncer {
     protected void syncForeignKeys(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
         for(liquibase.database.structure.ForeignKey liquibaseFK : databaseSnapshot.getForeignKeys()) {
             String fkTableName = liquibaseFK.getForeignKeyTable().getName();
-            Table sourceTable = DataModelLogic.findTableByName(sourceSchema, fkTableName);
+            Table sourceTable = DatabaseLogic.findTableByName(sourceSchema, fkTableName);
             String fkName = liquibaseFK.getName();
 
-            Table targetFromTable = DataModelLogic.findTableByName(targetSchema, fkTableName);
+            Table targetFromTable = DatabaseLogic.findTableByName(targetSchema, fkTableName);
             if (targetFromTable == null) {
                 logger.error("Table '{}' not found in schema '{}'. Skipping foreign key: {}",
                         new Object[] {
@@ -196,14 +196,14 @@ public class DatabaseSyncer {
             }
 
             Database targetDatabase = targetSchema.getDatabase();
-            Schema pkSchema = DataModelLogic.findSchemaByName(
+            Schema pkSchema = DatabaseLogic.findSchemaByName(
                     targetDatabase, pkSchemaName);
             if (pkSchema == null) {
                 logger.error("Cannot find referenced schema: {}. Skipping foreign key.", pkSchemaName);
                 continue;
             }
             Table pkTable =
-                    DataModelLogic.findTableByName(pkSchema, pkTableName);
+                    DatabaseLogic.findTableByName(pkSchema, pkTableName);
             if (pkTable == null) {
                 logger.error("Cannot find referenced table (schema: {}, table: {}). Skipping foreign key.",
                         pkSchemaName, pkTableName);
@@ -241,7 +241,7 @@ public class DatabaseSyncer {
                 String toColumnName = toColumnNames[i].trim();
 
                 Column fromColumn =
-                        DataModelLogic.findColumnByName(
+                        DatabaseLogic.findColumnByName(
                                 targetFromTable, fromColumnName);
                 if (fromColumn == null) {
                     logger.error("Cannot find from column (schema: {}, table: {}, column: {}).",
@@ -254,7 +254,7 @@ public class DatabaseSyncer {
                 }
 
                 Column toColumn =
-                        DataModelLogic.findColumnByName(pkTable, toColumnName);
+                        DatabaseLogic.findColumnByName(pkTable, toColumnName);
                 if (toColumn == null) {
                     logger.error("Cannot find to column (schema: {}, table: {}, column: {}).",
                             new Object[] {
@@ -305,7 +305,7 @@ public class DatabaseSyncer {
         for(liquibase.database.structure.PrimaryKey liquibasePK : databaseSnapshot.getPrimaryKeys()) {
             String pkTableName = liquibasePK.getTable().getName();
 
-            Table sourceTable = DataModelLogic.findTableByName(sourceSchema, pkTableName);
+            Table sourceTable = DatabaseLogic.findTableByName(sourceSchema, pkTableName);
             PrimaryKey sourcePK;
             if (sourceTable == null) {
                 sourcePK = null;
@@ -313,7 +313,7 @@ public class DatabaseSyncer {
                 sourcePK = sourceTable.getPrimaryKey();
             }
 
-            Table targetTable = DataModelLogic.findTableByName(targetSchema, pkTableName);
+            Table targetTable = DatabaseLogic.findTableByName(targetSchema, pkTableName);
             if (targetTable == null) {
                 logger.error("Coud not find table: {}. Skipping PK.",
                         pkTableName
@@ -394,7 +394,7 @@ public class DatabaseSyncer {
         for (liquibase.database.structure.Table liquibaseTable
                 : databaseSnapshot.getTables()) {
             logger.debug("Processing table: {}", liquibaseTable.getName());
-            Table sourceTable = DataModelLogic.findTableByName(sourceSchema, liquibaseTable.getName());
+            Table sourceTable = DatabaseLogic.findTableByName(sourceSchema, liquibaseTable.getName());
             if(sourceTable == null) {
                 sourceTable = new Table();
             }
@@ -456,7 +456,7 @@ public class DatabaseSyncer {
             targetColumn.setScale(liquibaseColumn.getDecimalDigits());
             //TODO liquibaseColumn.getLengthSemantics()
 
-            Column sourceColumn = DataModelLogic.findColumnByName(sourceTable, liquibaseColumn.getName());
+            Column sourceColumn = DatabaseLogic.findColumnByName(sourceTable, liquibaseColumn.getName());
             if(sourceColumn != null) {
                 targetColumn.setPropertyName(sourceColumn.getPropertyName());
                 targetColumn.setJavaType(sourceColumn.getJavaType());

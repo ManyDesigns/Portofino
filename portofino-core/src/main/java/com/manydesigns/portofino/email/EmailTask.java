@@ -33,7 +33,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.database.TableCriteria;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.Table;
@@ -128,7 +128,7 @@ public class EmailTask extends TimerTask {
                     application.getTableAccessor(application.getSystemDatabaseName(), EmailUtils.EMAILQUEUE_ENTITY);
             Model model = application.getModel();
             Database database = application.getSystemDatabase();
-            Table table = DataModelLogic.findTableByEntityName(database, EmailUtils.EMAILQUEUE_ENTITY);
+            Table table = DatabaseLogic.findTableByEntityName(database, EmailUtils.EMAILQUEUE_ENTITY);
             TableCriteria criteria = new TableCriteria(table);
             criteria.eq(accessor.getProperty("state"), EmailUtils.TOBESENT);
             Session session = application.getSystemSession();
@@ -170,11 +170,11 @@ public class EmailTask extends TimerTask {
         try {
             Model model = application.getModel();
             Database database = application.getSystemDatabase();
-            Table table = DataModelLogic.findTableByEntityName(database, EmailUtils.EMAILQUEUE_ENTITY);
+            Table table = DatabaseLogic.findTableByEntityName(database, EmailUtils.EMAILQUEUE_ENTITY);
             TableCriteria criteria = new TableCriteria(table);
 
             ClassAccessor accessor =
-                    application.getTableAccessor(application.getSystemDatabaseName(), DataModelLogic.USER_ENTITY_NAME);
+                    application.getTableAccessor(application.getSystemDatabaseName(), DatabaseLogic.USER_ENTITY_NAME);
             List<Object> users = QueryUtils.getObjects(session,
                     criteria.gt(accessor.getProperty("email"), email), null, null);
             if (users.size() == 0) {
@@ -189,7 +189,7 @@ public class EmailTask extends TimerTask {
                 value++;
             }
             user.setBounced(value);
-            session.save(DataModelLogic.USER_ENTITY_NAME, user);
+            session.save(DatabaseLogic.USER_ENTITY_NAME, user);
         } catch (NoSuchFieldException e) {
             logger.warn("cannot increment bounce for user", e);
         }

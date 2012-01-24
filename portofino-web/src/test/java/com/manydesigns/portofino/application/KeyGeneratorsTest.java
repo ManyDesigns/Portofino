@@ -30,7 +30,7 @@ package com.manydesigns.portofino.application;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.database.TableCriteria;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -74,7 +74,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         Session session = application.getSession("jpetstore");
         session.save(supplierEntity, supplier);
         session.getTransaction().commit();
-        Table table = DataModelLogic.findTableByQualifiedName(
+        Table table = DatabaseLogic.findTableByQualifiedName(
                 model, supplierTable);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
@@ -100,7 +100,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         Session session = application.getSession("hibernatetest");
         session.save(testEntity, supplier);
         session.getTransaction().commit();
-        Table table = DataModelLogic.findTableByQualifiedName(
+        Table table = DatabaseLogic.findTableByQualifiedName(
                 model, testTable);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
@@ -149,7 +149,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         Session session = application.getSession("jpetstore");
         session.save(ordersEntity ,order);
         QueryUtils.commit(application, "jpetstore");
-        Table table = DataModelLogic.findTableByQualifiedName(
+        Table table = DatabaseLogic.findTableByQualifiedName(
                 model, ordersTable);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
@@ -176,8 +176,8 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         session.save("groups", myGroup);
         session.getTransaction().commit();
 
-        Table table = DataModelLogic.findTableByEntityName(
-                application.getSystemDatabase(), DataModelLogic.GROUP_ENTITY_NAME);
+        Table table = DatabaseLogic.findTableByEntityName(
+                application.getSystemDatabase(), DatabaseLogic.GROUP_ENTITY_NAME);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         final long expectedId = 3L;

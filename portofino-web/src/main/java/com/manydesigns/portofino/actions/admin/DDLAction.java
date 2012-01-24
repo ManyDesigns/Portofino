@@ -33,9 +33,9 @@ import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.application.ServerInfo;
+import com.manydesigns.portofino.servlets.ServerInfo;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
@@ -132,28 +132,28 @@ public class DDLAction extends AbstractActionBean {
     //**************************************************************************
     public Resolution getJsonColumns()
     {
-        Table table = DataModelLogic.findTableByQualifiedName(model, tableName);
+        Table table = DatabaseLogic.findTableByQualifiedName(model, tableName);
         return new StreamingResolution("text", new StringReader(DDLJsonUtils
                 .getColumns(table)));
     }
 
     public Resolution getJsonPk()
     {
-        Table table = DataModelLogic.findTableByQualifiedName(model, tableName);
+        Table table = DatabaseLogic.findTableByQualifiedName(model, tableName);
         return new StreamingResolution("text", new StringReader(DDLJsonUtils
                 .getPk(table)));
     }
 
     public Resolution getJsonFk()
     {
-        Table table = DataModelLogic.findTableByQualifiedName(model, tableName);
+        Table table = DatabaseLogic.findTableByQualifiedName(model, tableName);
         return new StreamingResolution("text", new StringReader(DDLJsonUtils
                 .getForeignKey(table)));
     }
 
     public Resolution getJsonAnnotations()
     {
-        Table table = DataModelLogic.findTableByQualifiedName(model, tableName);
+        Table table = DatabaseLogic.findTableByQualifiedName(model, tableName);
         return new StreamingResolution("text", new StringReader(DDLJsonUtils
                 .getAnnotations(table)));
     }

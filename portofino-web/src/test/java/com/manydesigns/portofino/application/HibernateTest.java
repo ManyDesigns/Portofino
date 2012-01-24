@@ -30,7 +30,7 @@ package com.manydesigns.portofino.application;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.database.TableCriteria;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
@@ -73,7 +73,7 @@ public class HibernateTest extends AbstractPortofinoTest {
 
     public void testUsers() {
         Session session = application.getSystemSession();
-        Criteria criteria = session.createCriteria(DataModelLogic.GROUP_ENTITY_NAME);
+        Criteria criteria = session.createCriteria(DatabaseLogic.GROUP_ENTITY_NAME);
         List<Group> groupList = new ArrayList(criteria.list());
         assertEquals( 2, groupList.size());
 
@@ -81,7 +81,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         List<UsersGroups> usergroups = new ArrayList(criteria.list());
         assertEquals( 3, usergroups.size());
 
-        criteria = session.createCriteria(DataModelLogic.USER_ENTITY_NAME);
+        criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
         List<User> users = new ArrayList(criteria.list());
 
         assertEquals("numero utenti", 2, users.size());
@@ -116,7 +116,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         criteria = session.createCriteria("product");
         List resultProd = new ArrayList(criteria.list());
 
-        Table table = DataModelLogic.findTableByQualifiedName(
+        Table table = DatabaseLogic.findTableByQualifiedName(
                 application.getModel(), "jpetstore.PUBLIC.category");
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria tableCriteria = new TableCriteria(table);
@@ -147,7 +147,7 @@ public class HibernateTest extends AbstractPortofinoTest {
     }
 
     public void testSearchAndUpdateCategorie() {
-        Table table = DataModelLogic.findTableByQualifiedName(
+        Table table = DatabaseLogic.findTableByQualifiedName(
                 application.getModel(), "jpetstore.PUBLIC.category");
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria tableCriteria = new TableCriteria(table);
@@ -328,7 +328,7 @@ public class HibernateTest extends AbstractPortofinoTest {
         //Faccio una seconda operazione
         try {
             Session session = application.getSystemSession();
-            Criteria criteria = session.createCriteria(DataModelLogic.USER_ENTITY_NAME);
+            Criteria criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
             List<Object> users = criteria.list();
             assertNotNull(users);
         } catch (Exception e){

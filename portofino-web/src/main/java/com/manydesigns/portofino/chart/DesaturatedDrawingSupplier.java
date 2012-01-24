@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.util;
+package com.manydesigns.portofino.chart;
 
 import org.jfree.chart.plot.DrawingSupplier;
 

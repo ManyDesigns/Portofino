@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.model.database;
 
-import com.manydesigns.portofino.model.DataModelLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.util.Pair;
 import org.apache.commons.lang.ObjectUtils;
@@ -143,7 +142,7 @@ public class ForeignKey extends DatabaseSelectionProvider
         super.link(model);
         String qualifiedToTableName =
                 Table.composeQualifiedName(toDatabase, toSchema, toTableName);
-        toTable = DataModelLogic.findTableByQualifiedName(model, qualifiedToTableName);
+        toTable = DatabaseLogic.findTableByQualifiedName(model, qualifiedToTableName);
         if(toTable != null) {
             // wire up Table.oneToManyRelationships
             toTable.getOneToManyRelationships().add(this);

@@ -44,7 +44,7 @@ import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
@@ -117,9 +117,9 @@ public class ProfileAction extends AbstractActionBean {
         User thisUser =
             (User) QueryUtils.getObjectByPk
                     (application, application.getSystemDatabaseName(),
-                     DataModelLogic.USER_ENTITY_NAME, new User(userId));
+                     DatabaseLogic.USER_ENTITY_NAME, new User(userId));
         ClassAccessor accessor =
-                application.getTableAccessor(application.getSystemDatabaseName(), DataModelLogic.USER_ENTITY_NAME);
+                application.getTableAccessor(application.getSystemDatabaseName(), DatabaseLogic.USER_ENTITY_NAME);
         FormBuilder formBuilder = new FormBuilder(accessor);
         formBuilder.configFields("email", "userName", "firstName",
                 "middleName", "lastName", "creationDate");
@@ -142,10 +142,10 @@ public class ProfileAction extends AbstractActionBean {
         User thisUser =
             (User) QueryUtils.getObjectByPk
                 (application, application.getSystemDatabaseName(),
-                 DataModelLogic.USER_ENTITY_NAME, new User(userId));
+                 DatabaseLogic.USER_ENTITY_NAME, new User(userId));
 
         ClassAccessor accessor =
-                application.getTableAccessor(application.getSystemDatabaseName(), DataModelLogic.USER_ENTITY_NAME);
+                application.getTableAccessor(application.getSystemDatabaseName(), DatabaseLogic.USER_ENTITY_NAME);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
                 .configFields("email", "userName", "firstName",
@@ -161,9 +161,9 @@ public class ProfileAction extends AbstractActionBean {
         User thisUser =
             (User) QueryUtils.getObjectByPk
                 (application, application.getSystemDatabaseName(),
-                 DataModelLogic.USER_ENTITY_NAME, new User(userId));
+                 DatabaseLogic.USER_ENTITY_NAME, new User(userId));
         ClassAccessor accessor =
-                application.getTableAccessor(application.getSystemDatabaseName(), DataModelLogic.USER_ENTITY_NAME);
+                application.getTableAccessor(application.getSystemDatabaseName(), DatabaseLogic.USER_ENTITY_NAME);
         FormBuilder formBuilder = new FormBuilder(accessor);
         form = formBuilder
                 .configFields("email", "userName", "firstName",
@@ -176,7 +176,7 @@ public class ProfileAction extends AbstractActionBean {
         if(form.validate()){
             form.writeToObject(thisUser);
             Session session = application.getSystemSession();
-            session.update(DataModelLogic.USER_ENTITY_NAME, thisUser);
+            session.update(DatabaseLogic.USER_ENTITY_NAME, thisUser);
             session.getTransaction().commit();
             logger.debug("User {} updated", thisUser.getEmail());
             SessionMessages.addInfoMessage("Utente aggiornato correttamente");
@@ -199,7 +199,7 @@ public class ProfileAction extends AbstractActionBean {
         User thisUser =
             (User) QueryUtils.getObjectByPk
                     (application, application.getSystemDatabaseName(),
-                            DataModelLogic.USER_ENTITY_NAME, new User(userId));
+                            DatabaseLogic.USER_ENTITY_NAME, new User(userId));
 
         form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
                 .configMode(Mode.EDIT)
@@ -234,7 +234,7 @@ public class ProfileAction extends AbstractActionBean {
                 thisUser.setPwdModDate(new Timestamp(new Date().getTime()));
 
                 Session session = application.getSystemSession();
-                session.update(DataModelLogic.USER_ENTITY_NAME, thisUser);
+                session.update(DatabaseLogic.USER_ENTITY_NAME, thisUser);
                 session.getTransaction().commit();
                 logger.debug("User {} updated", thisUser.getEmail());
                 SessionMessages.addInfoMessage("Password correctely updated");

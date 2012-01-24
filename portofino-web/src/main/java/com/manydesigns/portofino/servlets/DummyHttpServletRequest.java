@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.util;
+package com.manydesigns.portofino.servlets;
 
 import org.apache.commons.lang.ArrayUtils;
 

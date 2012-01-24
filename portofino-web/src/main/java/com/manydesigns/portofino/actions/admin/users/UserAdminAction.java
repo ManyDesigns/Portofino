@@ -33,7 +33,7 @@ import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
@@ -150,7 +150,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
 
     protected void setupUserGroups() {
         Session session = application.getSystemSession();
-        Criteria criteria = session.createCriteria(DataModelLogic.GROUP_ENTITY_NAME);
+        Criteria criteria = session.createCriteria(DatabaseLogic.GROUP_ENTITY_NAME);
         List<Group> groups = new ArrayList(criteria.list());
         availableUserGroups = new ArrayList<Group>();
 
@@ -206,7 +206,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
         Session session = application.getSystemSession();
         for(String groupName : names) {
             Group group = (Group) session
-                    .createCriteria(DataModelLogic.GROUP_ENTITY_NAME)
+                    .createCriteria(DatabaseLogic.GROUP_ENTITY_NAME)
                     .add(Restrictions.eq("name", groupName))
                     .uniqueResult();
             UsersGroups ug = new UsersGroups();
@@ -217,7 +217,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
             ug.setGroupid(group.getGroupId());
             user.getGroups().add(ug);
             session.save("users_groups", ug);
-            session.update(DataModelLogic.USER_ENTITY_NAME, user);
+            session.update(DatabaseLogic.USER_ENTITY_NAME, user);
         }
 
         return true;

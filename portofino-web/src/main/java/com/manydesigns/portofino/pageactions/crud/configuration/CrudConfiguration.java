@@ -34,7 +34,7 @@ import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.Table;
 
@@ -110,7 +110,7 @@ public class CrudConfiguration implements PageActionConfiguration {
     //**************************************************************************
 
     public void init(Application application) {
-        actualDatabase = DataModelLogic.findDatabaseByName(application.getModel(), database);
+        actualDatabase = DatabaseLogic.findDatabaseByName(application.getModel(), database);
         if(actualDatabase != null) {
             actualTable = QueryUtils.getTableFromQueryString(actualDatabase, query);
         }

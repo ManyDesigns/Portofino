@@ -39,7 +39,7 @@ import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.dispatcher.AbstractActionBean;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.dispatcher.PageAction;
@@ -801,7 +801,7 @@ public class PageAdminAction extends AbstractActionBean {
     protected void setupGroups() {
         Session session = application.getSystemSession();
         Criteria criteria =
-                session.createCriteria(DataModelLogic.GROUP_ENTITY_NAME)
+                session.createCriteria(DatabaseLogic.GROUP_ENTITY_NAME)
                        .addOrder(Order.asc("name"));
         groups = new ArrayList(criteria.list());
     }

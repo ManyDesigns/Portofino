@@ -47,7 +47,7 @@ import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
@@ -317,7 +317,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
             form.writeToObject(connectionProviderForm);
-            if(DataModelLogic.findDatabaseByName
+            if(DatabaseLogic.findDatabaseByName
                     (application.getModel(), connectionProviderForm.getDatabaseName()) != null) {
                 SessionMessages.addErrorMessage(getMessage("connectionProviders.save.duplicateDatabaseName"));
                 return new ForwardResolution("/layouts/admin/connectionProviders/create.jsp");

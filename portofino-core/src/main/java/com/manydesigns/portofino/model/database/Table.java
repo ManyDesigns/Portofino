@@ -140,7 +140,7 @@ public class Table implements ModelObject, Annotated {
 
         int i = 2;
         Database database = schema.getDatabase();
-        while(DataModelLogic.findTableByEntityName(database, calculatedEntityName) != null) {
+        while(DatabaseLogic.findTableByEntityName(database, calculatedEntityName) != null) {
             logger.warn("Entity name {} already taken, generating a new one", calculatedEntityName);
             calculatedEntityName = baseEntityName + "_" + (i++);
         }

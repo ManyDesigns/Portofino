@@ -36,7 +36,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.database.TableCriteria;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -326,7 +326,7 @@ public class QueryUtils {
             return null;
         }
 
-        Table table = DataModelLogic.findTableByEntityName(database, entityName);
+        Table table = DatabaseLogic.findTableByEntityName(database, entityName);
         return table;
     }
 
@@ -528,7 +528,7 @@ public class QueryUtils {
             Object obj, String oneToManyRelationshipName) {
         Model model = application.getModel();
         ForeignKey relationship =
-                DataModelLogic.findOneToManyRelationship(model, databaseName,
+                DatabaseLogic.findOneToManyRelationship(model, databaseName,
                         entityName, oneToManyRelationshipName);
         if(relationship == null) {
             throw new IllegalArgumentException("Relationship not defined: " + oneToManyRelationshipName);

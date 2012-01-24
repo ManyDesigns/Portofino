@@ -40,7 +40,7 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.system.model.users.User;
 import groovy.lang.Binding;
@@ -173,7 +173,7 @@ public class LoginAction extends AbstractActionBean {
             return new ForwardResolution("/layouts/user/login.jsp");
         }
 
-        if (!user.getState().equals(DataModelLogic.ACTIVE)) {
+        if (!user.getState().equals(DatabaseLogic.ACTIVE)) {
             String errMsg = MessageFormat.format(bundle.getString("user.not.active"), userName);
             SessionMessages.addErrorMessage(errMsg);
             logger.warn(errMsg);
@@ -230,12 +230,12 @@ public class LoginAction extends AbstractActionBean {
                 logger.debug("Updating existing user {} (userId: {})",
                         existingUser.getUserName(), existingUser.getUserId());
                 user.setUserId(existingUser.getUserId());
-                session.merge(DataModelLogic.USER_ENTITY_NAME, user);
+                session.merge(DatabaseLogic.USER_ENTITY_NAME, user);
             } else {
                 user.setUserId(RandomUtil.createRandomId(20));
                 logger.debug("Importing user {} (userId: {})",
                         user.getUserName(), user.getUserId());
-                session.save(DataModelLogic.USER_ENTITY_NAME, user);
+                session.save(DatabaseLogic.USER_ENTITY_NAME, user);
             }
             session.flush();
             tx.commit();

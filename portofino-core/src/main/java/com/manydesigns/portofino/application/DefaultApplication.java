@@ -36,7 +36,7 @@ import com.manydesigns.portofino.application.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
-import com.manydesigns.portofino.model.DataModelLogic;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -168,7 +168,7 @@ public class DefaultApplication implements Application {
                         connectionProviders) {
                     String databaseName = connectionProvider.getDatabase().getDatabaseName();
                     Database sourceDatabase =
-                            DataModelLogic.findDatabaseByName(loadedModel, databaseName);
+                            DatabaseLogic.findDatabaseByName(loadedModel, databaseName);
                     DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
                     Database targetDatabase = dbSyncer.syncDatabase(loadedModel);
                     loadedModel.getDatabases().remove(sourceDatabase);
@@ -369,7 +369,7 @@ public class DefaultApplication implements Application {
     }
 
     public Database getSystemDatabase() {
-        return DataModelLogic.findDatabaseByName(model, getSystemDatabaseName());
+        return DatabaseLogic.findDatabaseByName(model, getSystemDatabaseName());
     }
 
     public org.apache.commons.configuration.Configuration getPortofinoProperties() {
@@ -396,7 +396,7 @@ public class DefaultApplication implements Application {
         ConnectionProvider connectionProvider =
                 getConnectionProvider(databaseName);
         Database sourceDatabase =
-                DataModelLogic.findDatabaseByName(model, databaseName);
+                DatabaseLogic.findDatabaseByName(model, databaseName);
         DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
         Database targetDatabase = dbSyncer.syncDatabase(model);
         model.getDatabases().remove(sourceDatabase);
@@ -411,7 +411,7 @@ public class DefaultApplication implements Application {
     //**************************************************************************
 
     public Session getSessionByQualifiedTableName(String qualifiedTableName) {
-        Table table = DataModelLogic.findTableByQualifiedName(
+        Table table = DatabaseLogic.findTableByQualifiedName(
                 model, qualifiedTableName);
         if(table == null) {
             throw new Error("Table not found: " + qualifiedTableName);
@@ -443,7 +443,7 @@ public class DefaultApplication implements Application {
     }
 
     public void closeSessionByQualifiedTableName(String qualifiedTableName) {
-        Table table = DataModelLogic.findTableByQualifiedName(
+        Table table = DatabaseLogic.findTableByQualifiedName(
                 model, qualifiedTableName);
         String databaseName = table.getDatabaseName();
         closeSession(databaseName);
@@ -525,16 +525,16 @@ public class DefaultApplication implements Application {
     }
 
     public @NotNull TableAccessor getTableAccessor(String qualifiedTableName) {
-        Table table = DataModelLogic.findTableByQualifiedName(
+        Table table = DatabaseLogic.findTableByQualifiedName(
                 model, qualifiedTableName);
         assert table != null;
         return new TableAccessor(table);
     }
 
     public @NotNull TableAccessor getTableAccessor(String databaseName, String entityName) {
-        Database database = DataModelLogic.findDatabaseByName(model, databaseName);
+        Database database = DatabaseLogic.findDatabaseByName(model, databaseName);
         assert database != null;
-        Table table = DataModelLogic.findTableByEntityName(database, entityName);
+        Table table = DatabaseLogic.findTableByEntityName(database, entityName);
         assert table != null;
         return new TableAccessor(table);
     }
@@ -545,21 +545,21 @@ public class DefaultApplication implements Application {
 
     public User findUserByEmail(String email) {
         Session session = getSystemSession();
-        org.hibernate.Criteria criteria = session.createCriteria(DataModelLogic.USER_ENTITY_NAME);
+        org.hibernate.Criteria criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("email", email));
         return (User) criteria.uniqueResult();
     }
 
     public User findUserByUserName(String username) {
         Session session = getSystemSession();
-        org.hibernate.Criteria criteria = session.createCriteria(DataModelLogic.USER_ENTITY_NAME);
+        org.hibernate.Criteria criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
         return (User) criteria.uniqueResult();
     }
 
     public User findUserByToken(String token) {
         Session session = getSystemSession();
-        org.hibernate.Criteria criteria = session.createCriteria(DataModelLogic.USER_ENTITY_NAME);
+        org.hibernate.Criteria criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("token", token));
         return (User) criteria.uniqueResult();
     }
@@ -596,7 +596,7 @@ public class DefaultApplication implements Application {
     }
 
     protected Group getGroup(String name) {
-        TableAccessor table = getTableAccessor(getSystemDatabaseName(), DataModelLogic.GROUP_ENTITY_NAME);
+        TableAccessor table = getTableAccessor(getSystemDatabaseName(), DatabaseLogic.GROUP_ENTITY_NAME);
         assert table != null;
 
         String actualEntityName = table.getTable().getActualEntityName();
