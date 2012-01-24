@@ -412,6 +412,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         Page page = pageInstance.getPage();
         page.setTitle(title);
         page.setDescription(edit.description);
+        page.setSubtreeRoot(edit.subtreeRoot);
         page.getLayout().setLayout(edit.layout);
         page.getDetailLayout().setLayout(edit.detailLayout);
         try {
