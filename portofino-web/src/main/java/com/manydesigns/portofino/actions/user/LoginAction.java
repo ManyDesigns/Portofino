@@ -182,6 +182,9 @@ public class LoginAction extends AbstractActionBean {
 
         updateUser(user);
         logger.info("User {} login", user.getUserName());
+        String successMsg = MessageFormat.format(
+                bundle.getString("user.login.success"), userName);
+        SessionMessages.addInfoMessage(successMsg);
         HttpSession session = context.getRequest().getSession(true);
         session.setAttribute(SessionAttributes.USER_ID, user.getUserId());
         session.setAttribute(SessionAttributes.USER_NAME, user.getUserName());
