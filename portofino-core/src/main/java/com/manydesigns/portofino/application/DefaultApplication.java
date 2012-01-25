@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.application;
 
+import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.application.hibernate.HibernateConfig;
@@ -91,7 +92,7 @@ public class DefaultApplication implements Application {
     public static final String APP_DBS_DIR = "dbs";
     public static final String APP_MODEL_FILE = "portofino-model.xml";
     public static final String APP_SCRIPTS_DIR = "scripts";
-    public static final String APP_TEXT_DIR = "text";
+    public static final String APP_PAGES_DIR = "pages";
     public static final String APP_STORAGE_DIR = "storage";
     public static final String APP_WEB_DIR = "web";
 
@@ -116,7 +117,7 @@ public class DefaultApplication implements Application {
     protected final File appDbsDir;
     protected final File appModelFile;
     protected final File appScriptsDir;
-    protected final File appTextDir;
+    protected final File appPagesDir;
     protected final File appStorageDir;
     protected final File appWebDir;
 
@@ -170,10 +171,10 @@ public class DefaultApplication implements Application {
                 appScriptsDir.getAbsolutePath());
         result &= PortofinoFileUtils.ensureDirectoryExistsAndWritable(appScriptsDir);
 
-        appTextDir = new File(appDir, APP_TEXT_DIR);
-        logger.info("Application text dir: {}",
-                appTextDir.getAbsolutePath());
-        result &= PortofinoFileUtils.ensureDirectoryExistsAndWritable(appTextDir);
+        appPagesDir = new File(appDir, APP_PAGES_DIR);
+        logger.info("Application pages dir: {}",
+                appPagesDir.getAbsolutePath());
+        result &= PortofinoFileUtils.ensureDirectoryExistsAndWritable(appPagesDir);
 
         appStorageDir = new File(appDir, APP_STORAGE_DIR);
         logger.info("Application storage dir: {}",
@@ -219,7 +220,9 @@ public class DefaultApplication implements Application {
             loadedModel.init();
             installDataModel(loadedModel);
         } catch (Exception e) {
-            logger.error("Cannot load/parse model: " + appModelFile, e);
+            String msg = "Cannot load/parse model: " + appModelFile;
+            SessionMessages.addErrorMessage(msg);
+            logger.error(msg, e);
         }
     }
 
@@ -264,7 +267,9 @@ public class DefaultApplication implements Application {
                             lqDatabase);
                     lq.update(null);
                 } catch (Exception e) {
-                    logger.error("Couldn't update database: " + schemaName, e);
+                    String msg = "Couldn't update database: " + schemaName;
+                    SessionMessages.addErrorMessage(msg);
+                    logger.error(msg, e);
                 } finally {
                     current.releaseConnection(connection);
                 }
@@ -285,7 +290,9 @@ public class DefaultApplication implements Application {
 
             logger.info("Saved xml model to file: {}", appModelFile);
         } catch (Throwable e) {
-            logger.error("Cannot save xml model to file: " + appModelFile, e);
+            String msg = "Cannot save xml model to file: " + appModelFile;
+            SessionMessages.addErrorMessage(msg);
+            logger.error(msg, e);
         }
     }
 
@@ -664,10 +671,14 @@ public class DefaultApplication implements Application {
             FileUtils.moveFile(tempFile, destination);
         } else {
             File backup = File.createTempFile(destination.getName(), ".backup", destination.getParentFile());
-            backup.delete();
+            if (!backup.delete()) {
+                logger.warn("Cannot delete: {}", backup);
+            }
             FileUtils.moveFile(destination, backup);
             FileUtils.moveFile(tempFile, destination);
-            backup.delete();
+            if (!backup.delete()) {
+                logger.warn("Cannot delete: {}", backup);
+            }
         }
     }
 
@@ -697,8 +708,7 @@ public class DefaultApplication implements Application {
     }
 
     public File getPagesDir() {
-        //TODO!!
-        return new File(getAppDir(), "pages");
+        return appPagesDir;
     }
 
     public File getAppDbsDir() {
@@ -711,10 +721,6 @@ public class DefaultApplication implements Application {
 
     public File getAppScriptsDir() {
         return appScriptsDir;
-    }
-
-    public File getAppTextDir() {
-        return appTextDir;
     }
 
     public File getAppStorageDir() {
