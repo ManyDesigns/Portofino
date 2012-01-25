@@ -35,6 +35,7 @@ import com.manydesigns.portofino.model.pages.Page;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
+import net.sourceforge.stripes.controller.LifecycleStage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +61,12 @@ public class RootPermissionsAction extends PageAdminAction implements AdminActio
     //--------------------------------------------------------------------------
     // Action events
     //--------------------------------------------------------------------------
+
+    @After(stages = LifecycleStage.BindingAndValidation) //Così può influenzare SecurityInterceptor (dispatch)
+    public void prepare() {
+        originalPath = "/";
+        super.prepare();
+    }
 
     @DefaultHandler
     public Resolution execute() {
