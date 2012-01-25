@@ -313,7 +313,7 @@ ul.errorMessages, ul.warningMessages, ul.infoMessages {
 
 ul.errorMessages li, ul.warningMessages li, ul.infoMessages li {
     list-style-type: none;
-    padding-left: 24px;
+    padding-left: 28px;
 }
 
 ul.errorMessages {
@@ -321,7 +321,7 @@ ul.errorMessages {
     background-color: #fff8f0;
     background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-cross-24.png");
     background-repeat: no-repeat;
-    background-position: 4px center;
+    background-position: 5px center;
 }
 
 ul.warningMessages {
@@ -329,7 +329,7 @@ ul.warningMessages {
     background-color: #fffff0;
     background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/warning-24.png");
     background-repeat: no-repeat;
-    background-position: 4px center;
+    background-position: 5px center;
 }
 
 ul.infoMessages {
@@ -337,7 +337,7 @@ ul.infoMessages {
     background-color: #f0fff0;
     background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-check-24.png");
     background-repeat: no-repeat;
-    background-position: 4px center;
+    background-position: 5px center;
 }
 
 /*******************************************************************************
