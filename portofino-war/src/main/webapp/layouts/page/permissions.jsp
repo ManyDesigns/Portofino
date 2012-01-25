@@ -41,9 +41,9 @@
                     if(supportedPermissions != null) {
                 %>
                     <tr>
-                        <th rowspan="2">Group</th>
-                        <th rowspan="2">Access level</th>
-                        <th colspan="<%= supportedPermissions.length %>">Permissions</th>
+                        <th rowspan="2"><fmt:message key="layouts.page.permissions.group" /></th>
+                        <th rowspan="2"><fmt:message key="layouts.page.permissions.access-level" /></th>
+                        <th colspan="<%= supportedPermissions.length %>"><fmt:message key="layouts.page.permissions.permissions" /></th>
                     </tr>
                     <tr>
                         <c:forEach var="perm" items="<%= supportedPermissions %>">
@@ -143,9 +143,9 @@
                 </table>
             </div>
             <div class="yui-u">
-                <h2 style="margin-top: 0;">Test a user</h2>
-                Select a user and view its permissions about this page:
-                <select name="testUserId">
+                <h2 style="margin-top: 0;"><fmt:message key="layouts.page.permissions.test-a-user" /></h2>
+                <label for="testUserIdSelect"><fmt:message key="layouts.page.permissions.select-a-user" /></label>
+                <select name="testUserId" id="testUserIdSelect">
                     <c:forEach var="user" items="${actionBean.users}">
                         <option value="${user.userId}"
                                 <c:if test="${actionBean.testUserId eq user.userId}">selected="selected"</c:if>
@@ -158,13 +158,13 @@
                 <table id="userPermissionTestResults">
                     <c:if test="${not empty actionBean.testedAccessLevel}">
                         <tr>
-                            <th>Access Level:</th>
+                            <th><fmt:message key="layouts.page.permissions.access-level" />:</th>
                             <td><fmt:message key='<%= "permissions.level." + actionBean.getTestedAccessLevel().name().toLowerCase() %>' /></td>
                         </tr>
                     </c:if>
                     <c:if test="${not empty actionBean.testedPermissions}">
                         <tr>
-                            <th>Permissions:</th>
+                            <th><fmt:message key="layouts.page.permissions.permissions" />:</th>
                             <td>
                                 <ul style="margin: 0;">
                                     <c:forEach var="perm" items="${actionBean.testedPermissions}">
