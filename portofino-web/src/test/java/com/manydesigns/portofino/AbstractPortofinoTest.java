@@ -116,7 +116,8 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
                     "elements-struts2".equals(token)||
                     "elements".equals(token)||
                     "elements-extras".equals(token)||
-                    "portofino-jar".equals(token)||
+                    "portofino-core".equals(token)||
+                    "portofino-web".equals(token)||
                     "portofino-war".equals(token)){
                 break;
             }

@@ -37,8 +37,14 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>portofino-jar/pom.xml</source>
-      <outputDirectory>portofino-jar</outputDirectory>
+      <source>portofino-core/pom.xml</source>
+      <outputDirectory>portofino-core</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-web/pom.xml</source>
+      <outputDirectory>portofino-web</outputDirectory>
       <destName>pom.xml</destName>
       <fileMode>0644</fileMode>
     </file>

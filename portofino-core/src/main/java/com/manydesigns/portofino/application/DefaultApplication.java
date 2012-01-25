@@ -233,9 +233,8 @@ public class DefaultApplication implements Application {
             }
         }
         logger.info("Updating database definitions");
-        File appsDir = appDir.getParentFile();
         ResourceAccessor resourceAccessor =
-                new FileSystemResourceAccessor(appsDir.getAbsolutePath());
+                new FileSystemResourceAccessor(appDir.getAbsolutePath());
         for (ConnectionProvider current : connectionProviders) {
             Database database = current.getDatabase();
             String databaseName = database.getDatabaseName();
@@ -244,8 +243,7 @@ public class DefaultApplication implements Application {
                 String changelogFileName =
                         MessageFormat.format(
                                 changelogFileNameTemplate, databaseName + "-" + schemaName);
-                File changelogFile =
-                    new File(appDbsDir, changelogFileName);
+                File changelogFile = new File(appDbsDir, changelogFileName);
                 logger.info("Running changelog file: {}", changelogFile);
                 Connection connection = null;
                 try {
@@ -255,10 +253,10 @@ public class DefaultApplication implements Application {
                             DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
                     lqDatabase.setDefaultSchemaName(schemaName);
                     String relativeChangelogPath =
-                            PortofinoFileUtils.getRelativePath(appsDir, changelogFile);
+                            PortofinoFileUtils.getRelativePath(appDir, changelogFile);
                     if(new File(relativeChangelogPath).isAbsolute()) {
                         logger.warn("The application dbs dir {} is not inside the apps dir {}; using an absolute path for Liquibase update",
-                                appDbsDir, appsDir);
+                                appDbsDir, appDir);
                     }
                     Liquibase lq = new Liquibase(
                             relativeChangelogPath,

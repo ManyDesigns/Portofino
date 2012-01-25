@@ -30,5 +30,5 @@ appenders.add("PORTOFINO-CONSOLE");
 
 logger("org.hibernate", WARN)
 logger("org.hibernate.connection.C3P0ConnectionProvider", INFO)
-//logger("net.sourceforge.stripes.tag.FormTag", OFF)
+
 root(INFO, appenders)

@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.options;
 
+import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
@@ -61,164 +62,6 @@ public class DefaultSelectionProvider implements SelectionProvider {
             LoggerFactory.getLogger(DefaultSelectionProvider.class);
     public static final String NON_WORD_CHARACTERS =
             " \t\n\f\r\\||!\"£$%&/()='?^[]+*@#<>,;.:-_";
-
-    //**************************************************************************
-    // Static builders
-    //**************************************************************************
-
-    /*public static DefaultSelectionProvider create(String name,
-                                                  Object[] values,
-                                                  String[] labels) {
-        Row[] rows = new Row[values.length];
-        for (int i = 0; i < values.length; i++) {
-            Row row = new Row(
-                    new Object[] {values[i]},
-                    new String[] {labels[i]},
-                    true
-            );
-            rows[i] = row;
-        }
-
-        return new DefaultSelectionProvider(name, 1, rows);
-    }
-
-    public static DefaultSelectionProvider create(String name,
-                                               int fieldCount,
-                                               Class[] valueTypes,
-                                               Collection<Object[]> valuesAndLabels) {
-        int size = valuesAndLabels.size();
-        Row[] rows = new Row[size];
-        int i = 0;
-        for (Object[] valueAndLabel : valuesAndLabels) {
-            Object[] values = new Object[fieldCount];
-            String[] labels = new String[fieldCount];
-
-            for (int j = 0; j < fieldCount; j++) {
-                Class valueType = valueTypes[j];
-                values[j] = OgnlUtils.convertValue(valueAndLabel[j*2], valueType);
-                labels[j] = OgnlUtils.convertValueToString(valueAndLabel[j*2+1]);
-            }
-
-            boolean active = true;
-            if(valueAndLabel.length > fieldCount) {
-                active = (Boolean) OgnlUtils.convertValue(valueAndLabel[fieldCount], Boolean.class);
-            }
-
-            rows[i] = new Row(values, labels, active);
-            i++;
-        }
-
-        return new DefaultSelectionProvider(name, fieldCount, rows);
-    }
-
-
-    public static DefaultSelectionProvider create(String name,
-                                               int fieldCount,
-                                               Object[][] valuesArray,
-                                               String[][] labelsArray) {
-        int size = valuesArray.length;
-        Row[] rows = new Row[size];
-        for (int i = 0; i < size; i++) {
-            Object[] values = valuesArray[i];
-            String[] labels = labelsArray[i];
-            rows[i] = new Row(values, labels, true);
-        }
-
-        return new DefaultSelectionProvider(name, fieldCount, rows);
-    }
-
-    public static DefaultSelectionProvider create(String name,
-                                               Collection objects,
-                                               ClassAccessor classAccessor,
-                                               TextFormat textFormat) {
-        return create(name, objects, classAccessor,
-                new TextFormat[] {textFormat});
-    }
-
-    public static DefaultSelectionProvider create(String name,
-                                               Collection objects,
-                                               ClassAccessor classAccessor,
-                                               TextFormat[] textFormats) {
-        PropertyAccessor[] keyProperties = classAccessor.getKeyProperties();
-        return create(name, objects, textFormats, keyProperties);
-    }
-
-    public static DefaultSelectionProvider create(String name,
-                                                  Collection objects,
-                                                  Class objectClass,
-                                                  @Nullable TextFormat textFormat,
-                                                  String propertyName) {
-        return create(name, objects, objectClass,
-                new TextFormat[] {textFormat},
-                new String[] {propertyName});
-    }
-
-    public static DefaultSelectionProvider create(String name,
-                                                  Collection objects,
-                                                  Class objectClass,
-                                                  TextFormat[] textFormats,
-                                                  String[] propertyNames) {
-        ClassAccessor classAccessor =
-                JavaClassAccessor.getClassAccessor(objectClass);
-        PropertyAccessor[] propertyAccessors =
-                new PropertyAccessor[propertyNames.length];
-        for (int i = 0; i < propertyNames.length; i++) {
-            String currentName = propertyNames[i];
-            try {
-                PropertyAccessor propertyAccessor =
-                        classAccessor.getProperty(currentName);
-                propertyAccessors[i] = propertyAccessor;
-            } catch (Throwable e) {
-                String msg = MessageFormat.format(
-                        "Could not access property: {0}", currentName);
-                logger.warn(msg, e);
-                throw new IllegalArgumentException(msg, e);
-            }
-        }
-        return create(name, objects, textFormats, propertyAccessors);
-    }
-
-    public static DefaultSelectionProvider create(
-            String name,
-            Collection objects,
-            TextFormat textFormat,
-            PropertyAccessor propertyAccessor
-    ) {
-        return create(name, objects,
-                new TextFormat[] {textFormat},
-                new PropertyAccessor[] {propertyAccessor});
-    }
-
-    public static DefaultSelectionProvider create(
-            String name,
-            Collection objects,
-            TextFormat[] textFormats,
-            PropertyAccessor[] propertyAccessors
-    ) {
-        int fieldsCount = propertyAccessors.length;
-        Row[] rows = new Row[objects.size()];
-        int i = 0;
-        for (Object current : objects) {
-            Object[] values = new Object[fieldsCount];
-            String[] labels = new String[fieldsCount];
-            int j = 0;
-            for (PropertyAccessor property : propertyAccessors) {
-                Object value = property.get(current);
-                values[j] = value;
-                if (textFormats == null || textFormats[j] == null) {
-                    String label = OgnlUtils.convertValueToString(value);
-                    labels[j] = label;
-                } else {
-                    TextFormat textFormat = textFormats[j];
-                    labels[j] = textFormat.format(current);
-                }
-                j++;
-            }
-            rows[i] = new Row(values, labels, true);
-            i++;
-        }
-        return new DefaultSelectionProvider(name, fieldsCount, rows);
-    }*/
 
     //**************************************************************************
     // Constructor
@@ -311,20 +154,20 @@ public class DefaultSelectionProvider implements SelectionProvider {
         }
     }
 
-    /*public static SelectionProvider create(String name, Class<? extends Enum> enumeration) {
-        try {
-            Method valuesMethod = enumeration.getMethod("values");
-            Enum[] values = (Enum[]) valuesMethod.invoke(null);
-            String[] labels = new String[values.length];
-            for (int i = 0; i < values.length; i++) {
-                labels[i] = values[i].name();
+    public void sortByLabel() {
+        Comparator<Row> comparator = new Comparator<Row>() {
+            public int compare(Row r1, Row r2) {
+                for(int i = 0; i < r1.labels.length; i++) {
+                    int comp = Util.compare(r1.getLabels()[i], r2.getLabels()[i]);
+                    if(comp != 0) {
+                        return comp;
+                    }
+                }
+                return 0;
             }
-            return create(name, values, labels);
-        } catch (Exception e) {
-            logger.error("Cannot create Selection provider from enumeration", e);
-            throw new Error(e);
-        }
-    }*/
+        };
+        Collections.sort(rows, comparator);
+    }
 
     //**************************************************************************
     // inner class

@@ -53,11 +53,15 @@ public class DbUtil {
 
     public static void closeResultSetAndStatement(ResultSet rs) {
         try {
-            DbUtils.closeQuietly(rs);
             Statement st = rs.getStatement();
             DbUtils.closeQuietly(st);
         } catch (Throwable e) {
             logger.debug("Could not close statement", e);
+        }
+        try {
+            DbUtils.closeQuietly(rs);
+        } catch (Throwable e) {
+            logger.debug("Could not close result set", e);
         }
     }
 }

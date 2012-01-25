@@ -79,10 +79,10 @@ public class GroovyTest extends AbstractElementsTest {
 
         GroovyShell shell = new GroovyShell(binding);
 
-        shell.evaluate(new File("/Users/alessio/projects/portofino4/portofino-jar/src/test/java/com/manydesigns/portofino/groovy/Pippo.groovy"));
+        shell.evaluate(new File("/Users/alessio/projects/portofino4/portofino-web/src/test/java/com/manydesigns/portofino/groovy/Pippo.groovy"));
         Object value = shell.evaluate("new com.manydesigns.portofino.groovy.Pippo().foo()");
         assertFalse((Boolean) value);
-        shell.evaluate(new File("/Users/alessio/projects/portofino4/portofino-jar/src/test/java/com/manydesigns/portofino/groovy/Pippo.groovy"));
+        shell.evaluate(new File("/Users/alessio/projects/portofino4/portofino-web/src/test/java/com/manydesigns/portofino/groovy/Pippo.groovy"));
         value = shell.evaluate("new com.manydesigns.portofino.groovy.Pippo().foo()");
         assertFalse((Boolean) value);
     }
