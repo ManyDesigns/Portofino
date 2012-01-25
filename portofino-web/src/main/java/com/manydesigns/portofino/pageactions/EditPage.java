@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.pageactions;
 
 import com.manydesigns.elements.annotations.*;
+import com.manydesigns.portofino.pages.NavigationRoot;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,23 +42,24 @@ public class EditPage {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.id")
+    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.id")
     @Updatable(false)
     public String id;
 
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.description")
+    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.description")
     @Required
     @Multiline
     public String description;
 
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.subtreeRoot")
-    public boolean subtreeRoot;
+    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.navigationRoot")
+    @Required
+    public NavigationRoot navigationRoot;
 
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.layout")
+    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.layout")
     @Required
     public String layout;
 
-    @LabelI18N("com.manydesigns.portofino.actions.forms.EditPage.detailLayout")
+    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.detailLayout")
     @Required
     public String detailLayout;
 

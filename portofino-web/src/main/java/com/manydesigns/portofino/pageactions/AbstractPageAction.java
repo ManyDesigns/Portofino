@@ -48,9 +48,9 @@ import java.util.*;
 public abstract class AbstractPageAction extends AbstractActionBean implements PageAction {
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
-            {{"id", "subtreeRoot", "layout", "detailLayout", "description"}};
+            {{"id", "navigationRoot", "layout", "detailLayout", "description"}};
     public static final String[][] PAGE_CONFIGURATION_FIELDS_NO_DETAIL =
-            {{"id", "subtreeRoot", "layout", "description"}};
+            {{"id", "navigationRoot", "layout", "description"}};
     public static final String PAGE_PORTLET_NOT_CONFIGURED = "/layouts/portlet-not-configured.jsp";
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
@@ -132,7 +132,12 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     public void setupReturnToParentTarget() {
         PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
-        boolean hasPrevious = !getPage().isSubtreeRoot() && pageInstancePath.length > 1;
+        boolean hasPrevious = getPage().getActualNavigationRoot() == NavigationRoot.INHERIT;
+        hasPrevious = hasPrevious && pageInstancePath.length > 1;
+        if(hasPrevious) {
+            Page parentPage = pageInstancePath[pageInstancePath.length - 2].getPage();
+            hasPrevious = parentPage.getActualNavigationRoot() != NavigationRoot.GHOST_ROOT;
+        }
         returnToParentTarget = null;
         if (hasPrevious) {
             int previousPos = pageInstancePath.length - 2;
@@ -330,11 +335,20 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         SelectionProvider detailLayoutSelectionProvider = createLayoutSelectionProvider();
         formBuilder.configSelectionProvider(detailLayoutSelectionProvider, "detailLayout");
 
+        DefaultSelectionProvider navRootSelectionProvider = new DefaultSelectionProvider("navigationRoot");
+        String label = getMessage("com.manydesigns.portofino.pageactions.EditPage.navigationRoot.inherit");
+        navRootSelectionProvider.appendRow(NavigationRoot.INHERIT, label, true);
+        label = getMessage("com.manydesigns.portofino.pageactions.EditPage.navigationRoot.root");
+        navRootSelectionProvider.appendRow(NavigationRoot.ROOT, label, true);
+        label = getMessage("com.manydesigns.portofino.pageactions.EditPage.navigationRoot.ghost_root");
+        navRootSelectionProvider.appendRow(NavigationRoot.GHOST_ROOT, label, true);
+        formBuilder.configSelectionProvider(navRootSelectionProvider, "navigationRoot");
+
         pageConfigurationForm = formBuilder.build();
         EditPage edit = new EditPage();
         edit.id = page.getId();
         edit.description = page.getDescription();
-        edit.subtreeRoot = page.isSubtreeRoot();
+        edit.navigationRoot = page.getActualNavigationRoot();
         edit.layout = getLayoutJsp(page.getLayout());
         edit.detailLayout = getLayoutJsp(page.getDetailLayout());
         pageConfigurationForm.readFromObject(edit);
@@ -404,7 +418,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         Page page = pageInstance.getPage();
         page.setTitle(title);
         page.setDescription(edit.description);
-        page.setSubtreeRoot(edit.subtreeRoot);
+        page.setNavigationRoot(edit.navigationRoot.name());
         page.getLayout().setLayout(edit.layout);
         page.getDetailLayout().setLayout(edit.detailLayout);
         try {

@@ -58,7 +58,13 @@ public class Page {
     protected Layout layout;
     protected Layout detailLayout;
     protected Permissions permissions;
-    protected boolean subtreeRoot = false;
+    protected String navigationRoot;
+
+    //**************************************************************************
+    // Actual fields
+    //**************************************************************************
+
+    protected NavigationRoot actualNavigationRoot;
 
     //**************************************************************************
     // Logging
@@ -83,6 +89,13 @@ public class Page {
     public void init() {
         assert title != null;
         assert description != null;
+
+        if(navigationRoot == null) {
+            actualNavigationRoot = NavigationRoot.INHERIT;
+            navigationRoot = actualNavigationRoot.name();
+        } else {
+            actualNavigationRoot = NavigationRoot.valueOf(navigationRoot);
+        }
 
         if(layout != null) {
             layout.init();
@@ -157,12 +170,16 @@ public class Page {
         this.permissions = permissions;
     }
 
-    @XmlAttribute
-    public boolean isSubtreeRoot() {
-        return subtreeRoot;
+    @XmlAttribute(required = true)
+    public String getNavigationRoot() {
+        return navigationRoot;
     }
 
-    public void setSubtreeRoot(boolean subtreeRoot) {
-        this.subtreeRoot = subtreeRoot;
+    public void setNavigationRoot(String navigationRoot) {
+        this.navigationRoot = navigationRoot;
+    }
+
+    public NavigationRoot getActualNavigationRoot() {
+        return actualNavigationRoot;
     }
 }

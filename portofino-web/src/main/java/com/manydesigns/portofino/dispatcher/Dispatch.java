@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.portofino.pages.NavigationRoot;
 import net.sourceforge.stripes.action.ActionBean;
 
 import java.util.Arrays;
@@ -127,7 +128,7 @@ public class Dispatch {
     public int getClosestSubtreeRootIndex() {
         PageInstance[] path = getPageInstancePath();
         for(int i = path.length - 1; i > 0; i--) {
-            if(path[i].getPage().isSubtreeRoot()) {
+            if(path[i].getPage().getActualNavigationRoot() != NavigationRoot.INHERIT) {
                 return i;
             }
         }

@@ -35,10 +35,7 @@ import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.pages.ChildPage;
-import com.manydesigns.portofino.pages.Layout;
-import com.manydesigns.portofino.pages.Page;
-import com.manydesigns.portofino.pages.Permissions;
+import com.manydesigns.portofino.pages.*;
 import com.manydesigns.portofino.security.AccessLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,12 +90,16 @@ public class Navigation {
         if (pageInstances == null || pageInstances.length == 0) {
             return;
         }
-        String prefix = contextPath + dispatch.getPathUrl(rootPageIndex);
         PageInstance rootPageInstance = pageInstances[0];
+        String prefix = contextPath + dispatch.getPathUrl(rootPageIndex);
+        if(rootPageIndex > 0) {
+            prefix += "/" + rootPageInstance.getName();
+        }
         boolean rootSelected = pageInstances.length == 1;
-        boolean rootGhost = true;
+        Page rootPage = rootPageInstance.getPage();
+        boolean rootGhost = rootPage.getActualNavigationRoot() == NavigationRoot.GHOST_ROOT;
         rootNavigationItem = new NavigationItem(
-                rootPageInstance.getPage(), prefix, true, rootSelected, rootGhost);
+                rootPage, prefix, true, rootSelected, rootGhost);
         LinkedList<Page> pages = new LinkedList<Page>();
         for(PageInstance pageInstance : pageInstances) {
             pages.add(pageInstance.getPage());

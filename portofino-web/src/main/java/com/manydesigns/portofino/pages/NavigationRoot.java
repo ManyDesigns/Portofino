@@ -27,11 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.actions.admin.page;
-
-import com.manydesigns.elements.annotations.Insertable;
-import com.manydesigns.elements.annotations.LabelI18N;
-import com.manydesigns.elements.annotations.Updatable;
+package com.manydesigns.portofino.pages;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -39,20 +35,10 @@ import com.manydesigns.elements.annotations.Updatable;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class EditChildPage {
-    public static final String copyright =
+public enum NavigationRoot {
+
+    INHERIT, ROOT, GHOST_ROOT;
+
+    public static final String copyright=
             "Copyright (c) 2005-2011, ManyDesigns srl";
-
-    @Updatable(false)
-    @Insertable(false)
-    public String name;
-    public boolean active;
-    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.embedInParent")
-    public boolean embedded;
-    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.showInNavigation")
-    public boolean showInNavigation;
-    @Updatable(false)
-    @Insertable(false)
-    public String title;
-
 }
