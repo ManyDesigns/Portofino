@@ -242,7 +242,7 @@ public class PageAdminAction extends AbstractActionBean {
         TOP, CHILD, SIBLING
     }
 
-    private Resolution doCreateNewPage() throws IllegalAccessException, InvocationTargetException {
+    private Resolution doCreateNewPage() throws Exception {
         prepareNewPageForm();
         newPageForm.readFromRequest(context.getRequest());
         if(newPageForm.validate()) {
@@ -600,13 +600,21 @@ public class PageAdminAction extends AbstractActionBean {
                 continue;
             }
             EditChildPage childPage = null;
+            String title;
+            try {
+                Page page = DispatcherLogic.getPage(dir);
+                title = page.getTitle();
+            } catch (Exception e) {
+                logger.error("Couldn't load page for " + dir, e);
+                title = null;
+            }
             for(ChildPage cp : layout.getChildPages()) {
                 if(cp.getName().equals(dir.getName())) {
                     childPage = new EditChildPage();
                     childPage.active = true;
                     childPage.name = cp.getName();
                     childPage.showInNavigation = cp.isShowInNavigation();
-                    childPage.title = DispatcherLogic.getPage(dir).getTitle();
+                    childPage.title = title;
                     childPage.embedded = cp.getContainer() != null;
                     break;
                 }
@@ -615,7 +623,7 @@ public class PageAdminAction extends AbstractActionBean {
                 childPage = new EditChildPage();
                 childPage.active = false;
                 childPage.name = dir.getName();
-                childPage.title = DispatcherLogic.getPage(dir).getTitle();
+                childPage.title = title;
             }
             unorderedChildPages.add(childPage);
         }

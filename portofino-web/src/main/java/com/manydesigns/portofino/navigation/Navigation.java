@@ -131,7 +131,13 @@ public class Navigation {
             currentNavigationItem = null;
             for (ChildPage childPage : childPages) {
                 File pageDir = current.getChildPageDirectory(childPage.getName());
-                Page page = DispatcherLogic.getPage(pageDir);
+                Page page;
+                try {
+                    page = DispatcherLogic.getPage(pageDir);
+                } catch (Exception e) {
+                    logger.warn("Nonexisting child page: " + pageDir, e);
+                    continue;
+                }
                 String path = prefix + childPage.getName();
                 boolean inPath = false;
                 boolean selected = false;
@@ -171,85 +177,6 @@ public class Navigation {
             if(next != null) {
                 pages.add(next.getPage());
             }
-        }
-/*
-        boolean firstChild = true;
-        if(!childPages.isEmpty()) {
-            for (ChildPage p : childPages) {
-                if(!p.isShowInNavigation()) {
-                    continue;
-                }
-                assert last != null;
-                File pageDir = last.getChildPageDirectory(p.getName());
-                Page page = DispatcherLogic.getPage(pageDir);
-                PageInstance pageInstance = new PageInstance(last, pageDir, application, page);
-                if (!skipPermissions && !SecurityLogic.hasPermissions(pageInstance, groups, AccessLevel.VIEW)) {
-                    continue;
-                }
-
-                if(firstChild) {
-                    if(!first) { xb.writeHr(); }
-                    xb.openElement("ul");
-                    firstChild = false;
-                }
-                xb.openElement("li");
-                String url = path + "/" + p.getName();
-                xb.writeAnchor(url, page.getTitle(), null, page.getDescription());
-                xb.closeElement("li");
-            }
-        }
-        if(!firstChild) {
-            xb.closeElement("ul");
-        }
-        */
-    }
-
-    private void printNavigationElement
-            (String path, XhtmlBuffer xb, PageInstance current,
-             List<ChildPage> siblings, boolean first) {
-        boolean firstChild = true;
-        if(!siblings.isEmpty()) {
-            for (ChildPage p : siblings) {
-                if(!p.isShowInNavigation()) {
-                    continue;
-                }
-                Page page;
-                PageInstance pageInstance;
-                if(p.getName().equals(current.getDirectory().getName())) {
-                    page = current.getPage();
-                    pageInstance = current;
-                } else {
-                    File pageDir = current.getParent().getChildPageDirectory(p.getName());
-                    page = DispatcherLogic.getPage(pageDir);
-                    pageInstance = new PageInstance(current, pageDir, application, page);
-                }
-                if (!skipPermissions && !SecurityLogic.hasPermissions(pageInstance, groups, AccessLevel.VIEW)) {
-                    continue;
-                }
-
-                if(firstChild) {
-                    if(!first) { xb.writeHr(); }
-                    xb.openElement("ul");
-                    firstChild = false;
-                }
-                xb.openElement("li");
-                String url;
-                if(page == current.getPage()) {
-                    if (isSelected(current)) {
-                        xb.addAttribute("class", "selected");
-                    } else {
-                        xb.addAttribute("class", "path");
-                    }
-                    url = path + "/" + current.getDirectory().getName();
-                } else {
-                    url = path + "/" + p.getName();
-                }
-                xb.writeAnchor(url, page.getTitle(), null, page.getDescription());
-                xb.closeElement("li");
-            }
-        }
-        if(!firstChild) {
-            xb.closeElement("ul");
         }
     }
 

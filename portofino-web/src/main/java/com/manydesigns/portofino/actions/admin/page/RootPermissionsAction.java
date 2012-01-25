@@ -76,7 +76,12 @@ public class RootPermissionsAction extends PageAdminAction implements AdminActio
         originalPath = "/";
         application = (Application) context.getRequest().getAttribute(RequestAttributes.APPLICATION);
         File rootDir = application.getPagesDir();
-        Page rootPage = DispatcherLogic.getPage(rootDir);
+        Page rootPage;
+        try {
+            rootPage = DispatcherLogic.getPage(rootDir);
+        } catch (Exception e) {
+            throw new Error("Couldn't load root page", e);
+        }
         PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage);
         dispatch = new Dispatch(context.getRequest().getContextPath(), originalPath, rootPageInstance);
     }

@@ -71,7 +71,12 @@ public class DispatcherLogic {
              File... excludes) {
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("pages");
         if(includeRoot) {
-            Page rootPage = DispatcherLogic.getPage(baseDir);
+            Page rootPage;
+            try {
+                rootPage = getPage(baseDir);
+            } catch (Exception e) {
+                throw new RuntimeException("Couldn't load root page", e);
+            }
             selectionProvider.appendRow("/", rootPage.getTitle() + " (top level)", true);
         }
         appendChildrenToPagesSelectionProvider
@@ -108,7 +113,12 @@ public class DispatcherLogic {
                         (application, baseDir, file, breadcrumb, selectionProvider, includeDetailChildren, excludes);
             }
         } else {
-            Page page = DispatcherLogic.getPage(file);
+            Page page;
+            try {
+                page = getPage(file);
+            } catch (Exception e) {
+                throw new RuntimeException("Couldn't load page", e);
+            }
             if (breadcrumb == null) {
                 breadcrumb = page.getTitle();
             } else {
@@ -157,14 +167,10 @@ public class DispatcherLogic {
         return (Page) unmarshaller.unmarshal(reader);
     }
 
-    public static Page getPage(File directory) {
-        try {
-            Page page = loadPage(directory);
-            page.init();
-            return page;
-        } catch (Exception e) {
-            throw new RuntimeException("Error loading page", e);
-        }
+    public static Page getPage(File directory) throws Exception {
+        Page page = loadPage(directory);
+        page.init();
+        return page;
     }
 
     public static File saveConfiguration(File directory, Object configuration) throws Exception {

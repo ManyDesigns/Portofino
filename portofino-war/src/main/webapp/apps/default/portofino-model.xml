@@ -4,106 +4,43 @@ Struttura dell'XML:
 
 -model
  +-databases
- | +-database
- |   +-schemas
- |     +-schema
- |       +-tables
- |         +-table
- |           +-columns
- |           | +-column
- |           |   +-annotations
- |           |     +-annotation
- |           |       +-value
- |           |
- |           +-primaryKey
- |           | +-column
- |           |
- |           +-foreignKeys
- |           | +-foreignKey
- |           | | +-references
- |           | |   +-reference
- |           | +-annotations
- |           |   +-annotation
- |           |     +-value
- |           |
- |           +-annotations
- |             +-annotation
- |               +-value
- |
- +-rootPage
-   +-childPages (accetta i nodi figlio in qualunque ordine)
-   | +-folderPage
-   | | +-childPages (come rootPage)
-   | | +-permissions (come rootPage)
-   | |
-   | +-textPage
-   | | +-childPages (come rootPage)
-   | | +-permissions (come rootPage)
-   | |
-   | +-customPage
-   | | +-childPages (come rootPage)
-   | | +-permissions (come rootPage)
-   | |
-   | +-customFolderPage
-   | | +-childPages (come rootPage)
-   | | +-permissions (come rootPage)
-   | |
-   | +-crudPage
-   | | +-crud
-   | | | +-properties
-   | | | | +-property
-   | | | |   +-annotations
-   | | | |     +-annotation
-   | | | |       +-value
-   | | | |
-   | | | +-selectionProviders
-   | | | | +-selectionProvider
-   | | | |   +-selectionProperties
-   | | | |     +-selectionProperty
-   | | | |
-   | | | +-annotations
-   | | | | +-annotation
-   | | | |   +-value
-   | | | |
-   | | | +-buttons
-   | | |   +-button
-   | | |
-   | | +-childPages (come rootPage)
-   | | +-permissions (come rootPage)
-   | |
-   | +-portletPage
-   |   +-childPages (come rootPage)
-   |   +-permissions (come rootPage)
-   |
-   |
-   +-permissions
-     +-allow
-     | +-group
-     |
-     +-deny
-       +-group
-
-
+   +-database
+     +-jdbcConnection
+     +-jndiConnection
+     +-schemas
+       +-schema
+         +-tables
+           +-table
+             +-columns
+             | +-column
+             |   +-annotations
+             |     +-annotation
+             |       +-value
+             |
+             +-primaryKey
+             | +-column
+             |
+             +-foreignKeys
+             | +-foreignKey
+             | | +-references
+             | |   +-reference
+             | +-annotations
+             |   +-annotation
+             |     +-value
+             |
+             +-annotations
+               +-annotation
+                 +-value
 -->
 <model>
     <databases>
         <database databaseName="portofino">
-            <jdbcConnection
-                    databaseName="portofino"
-                    driver="org.h2.Driver"
-                    url="jdbc:h2:${app}/dbs/portofino"
-                    username="sa"
-                    password=""
-                    />
+            <jdbcConnection driver="org.h2.Driver" password="" url="jdbc:h2:${app}/dbs/portofino" username="sa"/>
             <schemas>
                 <schema schemaName="PUBLIC">
                     <tables>
-                        <table javaClass="com.manydesigns.portofino.system.model.users.UserState" tableName="USERSTATE">
-                            <annotations>
-<annotation type="com.manydesigns.elements.annotations.ShortName">
-    <value>%{name}</value>
-</annotation>
-                            </annotations>
+                        <table javaClass="com.manydesigns.portofino.system.model.users.UserState" shortName="%{name}" tableName="USERSTATE">
+                            <annotations/>
                             <columns>
 <column autoincrement="false" columnName="ID" columnType="DECIMAL" javaType="java.lang.Integer" jdbcType="3" length="10" nullable="false" propertyName="id" scale="0">
     <annotations/>
@@ -127,7 +64,7 @@ Struttura dell'XML:
 <column autoincrement="false" columnName="ID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="id" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="CREATEDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="createDate" scale="10">
+<column autoincrement="false" columnName="CREATEDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="createDate" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="PASSWORD" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="true" propertyName="password" scale="0">
@@ -138,7 +75,7 @@ Struttura dell'XML:
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey manyPropertyName="oldPwds" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="user" hql="from users" name="FK_OLDPWD_1" toDatabase="portofino" toSchema="PUBLIC" toTable="USERS">
+<foreignKey manyPropertyName="oldPwds" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="user" toTable="USERS" hql="from users" name="FK_OLDPWD_1" toDatabase="portofino" toSchema="PUBLIC">
     <references>
         <reference fromColumn="USERID" toColumn="USERID"/>
     </references>
@@ -167,7 +104,7 @@ Struttura dell'XML:
 <column autoincrement="false" columnName="FROM_" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="fromId" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="creationDate" scale="10">
+<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="creationDate" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="STATE" columnType="DECIMAL" javaType="java.lang.Integer" jdbcType="3" length="10" nullable="true" propertyName="stateId" scale="0">
@@ -175,17 +112,17 @@ Struttura dell'XML:
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey manyPropertyName="messageOut" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="to" hql="from users" name="FK_MSG_3" toDatabase="portofino" toSchema="PUBLIC" toTable="USERS">
+<foreignKey manyPropertyName="messageOut" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="to" toTable="USERS" hql="from users" name="FK_MSG_3" toDatabase="portofino" toSchema="PUBLIC">
     <references>
         <reference fromColumn="TO_" toColumn="USERID"/>
     </references>
 </foreignKey>
-<foreignKey manyPropertyName="messages" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="state" hql="from msgstate" name="FK_MSG_1" toDatabase="portofino" toSchema="PUBLIC" toTable="MSGSTATE">
+<foreignKey manyPropertyName="messages" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="state" toTable="MSGSTATE" hql="from msgstate" name="FK_MSG_1" toDatabase="portofino" toSchema="PUBLIC">
     <references>
         <reference fromColumn="STATE" toColumn="ID"/>
     </references>
 </foreignKey>
-<foreignKey manyPropertyName="messageIn" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="from" hql="from users" name="FK_MSG_2" toDatabase="portofino" toSchema="PUBLIC" toTable="USERS">
+<foreignKey manyPropertyName="messageIn" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="from" toTable="USERS" hql="from users" name="FK_MSG_2" toDatabase="portofino" toSchema="PUBLIC">
     <references>
         <reference fromColumn="FROM_" toColumn="USERID"/>
     </references>
@@ -196,23 +133,19 @@ Struttura dell'XML:
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table javaClass="com.manydesigns.portofino.system.model.users.User" tableName="USERS">
-                            <annotations>
-<annotation type="com.manydesigns.elements.annotations.ShortName">
-    <value>%{userName} (%{email})</value>
-</annotation>
-                            </annotations>
+                        <table javaClass="com.manydesigns.portofino.system.model.users.User" shortName="%{userName} (%{email})" tableName="USERS">
+                            <annotations/>
                             <columns>
 <column autoincrement="false" columnName="USERID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="userId" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">
+<column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="creationDate" scale="10">
+<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="creationDate" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="MODIFIEDDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="modifiedDate" scale="10">
+<column autoincrement="false" columnName="MODIFIEDDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="modifiedDate" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="DEFAULTUSER" columnType="CHAR" javaType="java.lang.Boolean" jdbcType="1" length="1" nullable="true" propertyName="defaultUser" scale="0">
@@ -226,7 +159,7 @@ Struttura dell'XML:
         <annotation type="com.manydesigns.elements.annotations.Password"/>
     </annotations>
 </column>
-<column autoincrement="false" columnName="LASTPWDMODDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="pwdModDate" scale="10">
+<column autoincrement="false" columnName="LASTPWDMODDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="pwdModDate" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="USERNAME" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="50" nullable="false" propertyName="userName" scale="0">
@@ -249,10 +182,10 @@ Struttura dell'XML:
 <column autoincrement="false" columnName="JOBTITLE" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="50" nullable="true" propertyName="jobTitle" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="LASTLOGINDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="lastLoginDate" scale="10">
+<column autoincrement="false" columnName="LASTLOGINDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="lastLoginDate" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="LASTFAILEDLOGINDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="lastFailedLoginDate" scale="10">
+<column autoincrement="false" columnName="LASTFAILEDLOGINDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="lastFailedLoginDate" scale="10">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="FAILEDLOGINATTEMPTS" columnType="DECIMAL" javaType="java.lang.Integer" jdbcType="3" length="10" nullable="true" propertyName="failedLoginAttempts" scale="0">
@@ -281,7 +214,7 @@ Struttura dell'XML:
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey manyPropertyName="users" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="state" hql="from userstate" name="FK_USER_1" toDatabase="portofino" toSchema="PUBLIC" toTable="USERSTATE">
+<foreignKey manyPropertyName="users" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="state" toTable="USERSTATE" hql="from userstate" name="FK_USER_1" toDatabase="portofino" toSchema="PUBLIC">
     <references>
         <reference fromColumn="STATE" toColumn="ID"/>
     </references>
@@ -311,12 +244,8 @@ Struttura dell'XML:
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table javaClass="com.manydesigns.portofino.system.model.users.Group" tableName="GROUPS">
-                            <annotations>
-<annotation type="com.manydesigns.elements.annotations.ShortName">
-    <value>%{name} </value>
-</annotation>
-                            </annotations>
+                        <table javaClass="com.manydesigns.portofino.system.model.users.Group" shortName="%{name} " tableName="GROUPS">
+                            <annotations/>
                             <columns>
 <column autoincrement="false" columnName="GROUPID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="groupId" scale="0">
     <annotations/>
@@ -336,15 +265,15 @@ Struttura dell'XML:
         </annotation>
     </annotations>
 </column>
-<column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">
+<column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="creationDate" scale="10">
+<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="creationDate" scale="10">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey manyPropertyName="groupsCreated" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="creatorId" hql="from users" name="FK_GROUP_1" toDatabase="portofino" toSchema="PUBLIC" toTable="USERS">
+<foreignKey manyPropertyName="groupsCreated" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="creatorId" toTable="USERS" hql="from users" name="FK_GROUP_1" toDatabase="portofino" toSchema="PUBLIC">
     <references>
         <reference fromColumn="CREATORID" toColumn="USERID"/>
     </references>
@@ -409,7 +338,7 @@ Struttura dell'XML:
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" hql="from emailstate" name="FK_EMAILQUEUE_1" toDatabase="portofino" toSchema="PUBLIC" toTable="EMAILSTATE">
+<foreignKey onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" toTable="EMAILSTATE" hql="from emailstate" name="FK_EMAILQUEUE_1" toDatabase="portofino" toSchema="PUBLIC">
     <references>
         <reference fromColumn="STATE" toColumn="ID"/>
     </references>
@@ -429,20 +358,20 @@ Struttura dell'XML:
 <column autoincrement="false" columnName="USERID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="userid" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">
+<column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="false" propertyName="creationDate" scale="10">
+<column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" propertyName="creationDate" scale="10">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey manyPropertyName="users" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="group" hql="from groups" name="FK_USERSGROUPS_2" toDatabase="portofino" toSchema="PUBLIC" toTable="GROUPS">
+<foreignKey manyPropertyName="users" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="group" toTable="GROUPS" hql="from groups" name="FK_USERSGROUPS_2" toDatabase="portofino" toSchema="PUBLIC">
     <references>
         <reference fromColumn="GROUPID" toColumn="GROUPID"/>
     </references>
 </foreignKey>
-<foreignKey manyPropertyName="groups" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="user" hql="from users" name="FK_USERSGROUPS_1" toDatabase="portofino" toSchema="PUBLIC" toTable="USERS">
+<foreignKey manyPropertyName="groups" onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" onePropertyName="user" toTable="USERS" hql="from users" name="FK_USERSGROUPS_1" toDatabase="portofino" toSchema="PUBLIC">
     <references>
         <reference fromColumn="USERID" toColumn="USERID"/>
     </references>
@@ -460,13 +389,4 @@ Struttura dell'XML:
             </schemas>
         </database>
     </databases>
-    <rootPage landingPage="zpAUFstfgEUSzsEX9HoO" skin="default" description="portofino 4" fragment="/" showInNavigation="true" title="Portofino4">
-        <childPages>
-            <textPage description="Homepage" fragment="homepage" id="zpAUFstfgEUSzsEX9HoO" layoutContainer="default" showInNavigation="true" title="Homepage">
-            </textPage>
-        </childPages>
-        <permissions>
-            <group level="VIEW" name="all"/>
-        </permissions>
-    </rootPage>
 </model>
