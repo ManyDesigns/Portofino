@@ -29,6 +29,9 @@
 
 package com.manydesigns.portofino.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 
 /**
@@ -37,9 +40,20 @@ import java.io.File;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class FileUtils {
+public class PortofinoFileUtils {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
+
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
+
+    public static final Logger logger =
+            LoggerFactory.getLogger(PortofinoFileUtils.class);
+
+    //**************************************************************************
+    // Methods
+    //**************************************************************************
 
     public static String getRelativePath(File ancestor, File file) {
         String path = file.getName();
@@ -50,4 +64,35 @@ public class FileUtils {
         }
         return path;
     }
+
+    public static boolean ensureDirectoryExistsAndWritable(File file) {
+        logger.debug("Ensure directory exists and writable: {}", file);
+        if (file.exists()) {
+            logger.debug("File esists");
+            if (file.isDirectory()) {
+                logger.debug("File is a directory");
+            } else {
+                logger.warn("Not a directory: {}", file);
+                return false;
+            }
+        } else {
+            logger.debug("File does not exist");
+            if (file.mkdirs()) {
+                logger.info("Directory created successfully: {}", file);
+            } else {
+                logger.warn("Cannot create directory: {}", file);
+                return false;
+            }
+        }
+        if (!file.canWrite()) {
+            logger.warn("Directory not writable: {}", file);
+            return false;
+        } else {
+            logger.debug("Success");
+            return true;
+        }
+    }
+
+
+
 }
