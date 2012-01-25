@@ -40,7 +40,7 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
-import com.manydesigns.portofino.util.FileUtils;
+import com.manydesigns.portofino.util.PortofinoFileUtils;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -155,7 +155,7 @@ public class JspAction extends AbstractPageAction {
                                DefaultSelectionProvider selectionProvider) {
         for(File file : files) {
             if(file.isFile() && file.getName().endsWith(".jsp")) {
-                String path = File.separator + FileUtils.getRelativePath(root, file);
+                String path = File.separator + PortofinoFileUtils.getRelativePath(root, file);
                 selectionProvider.appendRow(path, path, true);
             } else if(file.isDirectory()) {
                 visitJspFiles(root, file.listFiles(), selectionProvider);

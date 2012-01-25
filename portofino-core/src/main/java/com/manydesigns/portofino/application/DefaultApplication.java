@@ -36,19 +36,18 @@ import com.manydesigns.portofino.application.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.util.PortofinoFileUtils;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -83,6 +82,19 @@ public class DefaultApplication implements Application {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
+    //**************************************************************************
+    // Constants
+    //**************************************************************************
+
+    public static final String APP_BLOBS_DIR = "blobs";
+    public static final String APP_CONNECTIONS_FILE = "portofino-connections.xml";
+    public static final String APP_DBS_DIR = "dbs";
+    public static final String APP_MODEL_FILE = "portofino-model.xml";
+    public static final String APP_SCRIPTS_DIR = "scripts";
+    public static final String APP_TEXT_DIR = "text";
+    public static final String APP_STORAGE_DIR = "storage";
+    public static final String APP_WEB_DIR = "web";
+
     public final static String changelogFileNameTemplate = "{0}-changelog.xml";
 
     //**************************************************************************
@@ -110,6 +122,9 @@ public class DefaultApplication implements Application {
 
     protected final ResourceBundleManager resourceBundleManager;
 
+    //**************************************************************************
+    // Logging
+    //**************************************************************************
 
     public static final Logger logger =
             LoggerFactory.getLogger(DefaultApplication.class);
@@ -121,32 +136,58 @@ public class DefaultApplication implements Application {
     public DefaultApplication(String appId,
                               org.apache.commons.configuration.Configuration portofinoConfiguration,
                               DatabasePlatformsManager databasePlatformsManager,
-                              File appDir,
-                              File appBlobsDir,
-                              File appConnectionsFile,
-                              File appDbsDir,
-                              File appModelFile,
-                              File appScriptsDir,
-                              File appTextDir,
-                              File appStorageDir,
-                              File appWebDir
-    ) throws ConfigurationException {
+                              File appDir
+    ) throws Exception {
         this.appId = appId;
         this.portofinoConfiguration = portofinoConfiguration;
         this.databasePlatformsManager = databasePlatformsManager;
         this.appDir = appDir;
-        this.appBlobsDir = appBlobsDir;
-        this.appConnectionsFile = appConnectionsFile;
-        this.appDbsDir = appDbsDir;
-        this.appModelFile = appModelFile;
-        this.appScriptsDir = appScriptsDir;
-        this.appTextDir = appTextDir;
-        this.appStorageDir = appStorageDir;
-        this.appWebDir = appWebDir;
 
         resourceBundleManager = new ResourceBundleManager(appDir);
-        File appConfigurationFile = new File(appDir, AppProperties.PROPERTIES_RESOURCE);
+        File appConfigurationFile =
+                new File(appDir, AppProperties.PROPERTIES_RESOURCE);
         appConfiguration = new PropertiesConfiguration(appConfigurationFile);
+
+        appBlobsDir = new File(appDir, APP_BLOBS_DIR);
+        logger.info("Application blobs dir: {}", appBlobsDir.getAbsolutePath());
+        boolean result = PortofinoFileUtils.ensureDirectoryExistsAndWritable(appBlobsDir);
+
+        appConnectionsFile = new File(appDir, APP_CONNECTIONS_FILE);
+        logger.info("Application connections file: {}",
+                appConnectionsFile.getAbsolutePath());
+
+        appDbsDir = new File(appDir, APP_DBS_DIR);
+        logger.info("Application dbs dir: {}",
+                appDbsDir.getAbsolutePath());
+        result &= PortofinoFileUtils.ensureDirectoryExistsAndWritable(appDbsDir);
+
+        appModelFile = new File(appDir, APP_MODEL_FILE);
+        logger.info("Application model file: {}",
+                appModelFile.getAbsolutePath());
+
+        appScriptsDir = new File(appDir, APP_SCRIPTS_DIR);
+        logger.info("Application scripts dir: {}",
+                appScriptsDir.getAbsolutePath());
+        result &= PortofinoFileUtils.ensureDirectoryExistsAndWritable(appScriptsDir);
+
+        appTextDir = new File(appDir, APP_TEXT_DIR);
+        logger.info("Application text dir: {}",
+                appTextDir.getAbsolutePath());
+        result &= PortofinoFileUtils.ensureDirectoryExistsAndWritable(appTextDir);
+
+        appStorageDir = new File(appDir, APP_STORAGE_DIR);
+        logger.info("Application storage dir: {}",
+                appStorageDir.getAbsolutePath());
+        result &= PortofinoFileUtils.ensureDirectoryExistsAndWritable(appStorageDir);
+
+        appWebDir = new File(appDir, APP_WEB_DIR);
+        logger.info("Application web dir: {}",
+                appWebDir.getAbsolutePath());
+        result &= PortofinoFileUtils.ensureDirectoryExistsAndWritable(appWebDir);
+
+        if (!result) {
+            throw new Exception("Could not initialize application");
+        }
     }
 
     //**************************************************************************
@@ -214,7 +255,7 @@ public class DefaultApplication implements Application {
                             DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
                     lqDatabase.setDefaultSchemaName(schemaName);
                     String relativeChangelogPath =
-                            com.manydesigns.portofino.util.FileUtils.getRelativePath(appsDir, changelogFile);
+                            PortofinoFileUtils.getRelativePath(appsDir, changelogFile);
                     if(new File(relativeChangelogPath).isAbsolute()) {
                         logger.warn("The application dbs dir {} is not inside the apps dir {}; using an absolute path for Liquibase update",
                                 appDbsDir, appsDir);

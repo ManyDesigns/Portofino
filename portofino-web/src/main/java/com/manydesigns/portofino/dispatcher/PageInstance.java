@@ -32,7 +32,7 @@ package com.manydesigns.portofino.dispatcher;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.pages.Layout;
 import com.manydesigns.portofino.pages.Page;
-import com.manydesigns.portofino.util.FileUtils;
+import com.manydesigns.portofino.util.PortofinoFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,7 +172,7 @@ public class PageInstance {
     }
 
     public String getPathFromRoot() {
-        return FileUtils.getRelativePath(application.getPagesDir(), directory);
+        return PortofinoFileUtils.getRelativePath(application.getPagesDir(), directory);
     }
 
     public String getDescription() {
