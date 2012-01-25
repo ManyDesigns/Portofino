@@ -97,10 +97,6 @@ public class PrimaryKeyColumn implements ModelObject {
 
     public void visitChildren(ModelObjectVisitor visitor) {}
 
-    public String getQualifiedName() {
-        return null;
-    }
-
     public void init(Model model) {
         assert primaryKey != null;
         assert columnName != null;

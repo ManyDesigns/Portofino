@@ -49,5 +49,4 @@ public interface ModelObject {
 
     void visitChildren(ModelObjectVisitor visitor);
 
-    String getQualifiedName();
 }

@@ -73,10 +73,6 @@ public class TableGenerator extends Generator{
         assert valueColumn != null;
     }
 
-    public String getQualifiedName() {
-        return table;
-    }
-
     @XmlAttribute(required = true)
     public String getTable() {
         return table;

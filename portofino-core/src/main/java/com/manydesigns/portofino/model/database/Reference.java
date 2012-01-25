@@ -109,14 +109,9 @@ public class Reference implements ModelObject {
 
     public void visitChildren(ModelObjectVisitor visitor) {}
 
-    public String getQualifiedName() {
-        return null;
-    }
-
     //**************************************************************************
     // Getters/setter
     //**************************************************************************
-
 
     public HasReferences getOwner() {
         return owner;

@@ -64,10 +64,6 @@ public class SequenceGenerator extends Generator{
         assert name != null;
     }
 
-    public String getQualifiedName() {
-        return name;
-    }
-
     @XmlAttribute(required = true)
     public String getName() {
         return name;

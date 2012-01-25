@@ -180,11 +180,6 @@ public class Annotation implements ModelObject {
 
     public void visitChildren(ModelObjectVisitor visitor) {}
 
-    public String getQualifiedName() {
-        return null;
-    }
-
-
     //**************************************************************************
     // Getters and setters
     //**************************************************************************

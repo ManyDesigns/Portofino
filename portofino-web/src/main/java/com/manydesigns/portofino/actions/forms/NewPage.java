@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.actions.forms;
 
 import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.RegExp;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.options.DisplayMode;
@@ -70,6 +71,7 @@ public class NewPage extends Page {
         this.insertPositionName = insertPositionName;
     }
 
+    @RegExp(value = "[a-zA-Z0-9][a-zA-Z0-9_\\-]*", errorMessage = "page.invalid.fragment")
     @Required
     public String getFragment() {
         return fragment;

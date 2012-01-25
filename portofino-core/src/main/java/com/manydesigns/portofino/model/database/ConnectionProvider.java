@@ -258,10 +258,6 @@ public abstract class ConnectionProvider implements ModelObject {
 
     public void visitChildren(ModelObjectVisitor visitor) {}
 
-    public String getQualifiedName() {
-        return null;
-    }
-
     //**************************************************************************
     // Getters/setters
     //**************************************************************************

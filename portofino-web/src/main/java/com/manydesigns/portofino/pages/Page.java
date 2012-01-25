@@ -109,17 +109,6 @@ public class Page {
         this.id = id;
     }
 
-//    @XmlAttribute(required = true)
-//    @Required
-//    @RegExp(value = "[a-zA-Z0-9_\\-]+", errorMessage = "page.invalid.fragment")
-//    public String getFragment() {
-//        return fragment;
-//    }
-//
-//    public void setFragment(String fragment) {
-//        this.fragment = fragment;
-//    }
-
     @XmlAttribute(required = true)
     @Required
     @FieldSize(50)
