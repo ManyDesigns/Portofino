@@ -24,10 +24,10 @@
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
         <portofino:buttons list="connectionProviders-search" cssClass="contentButton" />
+        <script type="text/javascript">
+            $("button[name=bulkDelete]").click(function() {
+                return confirm ('<fmt:message key="commons.confirm" />');
+            });
+        </script>
     </stripes:layout-component>
-    <script type="text/javascript">
-        $("button[name=bulkDelete]").click(function() {
-            return confirm ('<fmt:message key="commons.confirm" />');
-        });
-    </script>
 </stripes:layout-render>
