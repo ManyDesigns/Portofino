@@ -339,7 +339,8 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
                 SessionMessages.addInfoMessage(getMessage("connectionProviders.save.successful"));
                 return new RedirectResolution(this.getClass());
             } catch (Exception e) {
-                String msg = "Cannot save model";
+                String msg = "Cannot save model: " +
+                        ExceptionUtils.getRootCauseMessage(e);
                 logger.error(msg, e);
                 SessionMessages.addErrorMessage(msg);
                 return new ForwardResolution("/layouts/admin/connectionProviders/create.jsp");
@@ -416,7 +417,8 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
                 application.saveXmlModel();
                 SessionMessages.addInfoMessage(getMessage("connectionProviders.update.successful"));
             } catch (Exception e) {
-                String msg = "Cannot save model";
+                String msg = "Cannot save model: " +
+                        ExceptionUtils.getRootCauseMessage(e);
                 SessionMessages.addErrorMessage(msg);
                 logger.error(msg, e);
             }
@@ -441,7 +443,8 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
             application.initModel();
             application.saveXmlModel();
         } catch (Exception e) {
-            String msg = "Cannot save model";
+            String msg = "Cannot save model: " +
+                    ExceptionUtils.getRootCauseMessage(e);
             logger.error(msg, e);
             SessionMessages.addErrorMessage(msg);
         }
@@ -456,7 +459,8 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
                 application.initModel();
                 application.saveXmlModel();
             } catch (Exception e) {
-                String msg = "Cannot save model";
+                String msg = "Cannot save model: " +
+                        ExceptionUtils.getRootCauseMessage(e);
                 logger.error(msg, e);
                 SessionMessages.addErrorMessage(msg);
             }
