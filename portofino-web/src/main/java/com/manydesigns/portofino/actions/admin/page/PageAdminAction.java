@@ -38,18 +38,10 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.dispatcher.AbstractActionBean;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
-import com.manydesigns.portofino.application.QueryUtils;
-import com.manydesigns.portofino.dispatcher.PageAction;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
-import com.manydesigns.portofino.pageactions.chart.ChartAction;
-import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.actions.forms.NewPage;
-import com.manydesigns.portofino.pageactions.custom.CustomAction;
-import com.manydesigns.portofino.pageactions.text.TextAction;
+import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.di.Inject;
@@ -58,6 +50,12 @@ import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
+import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.chart.ChartAction;
+import com.manydesigns.portofino.pageactions.crud.CrudAction;
+import com.manydesigns.portofino.pageactions.custom.CustomAction;
+import com.manydesigns.portofino.pageactions.text.TextAction;
 import com.manydesigns.portofino.pages.*;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
@@ -67,8 +65,6 @@ import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.util.HttpUtil;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.BeanUtilsBean;
-import org.apache.commons.beanutils.converters.ClassConverter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -80,7 +76,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -353,22 +348,25 @@ public class PageAdminAction extends AbstractActionBean {
         }
     }
 
-    protected void copyModelObject(ModelObject src, ModelObject dest) throws IllegalAccessException, InvocationTargetException {
-        //To handle actualActionClass = null, ClassConverter must have a null return value
-        BeanUtilsBean.getInstance().getConvertUtils().register(new ClassConverter(null), Class.class);
-        BeanUtils.copyProperties(dest, src);
-    }
-
     @RequiresAdministrator
     public Resolution deletePage() {
-        PageInstance parentPageInstance = dispatch.getParentPageInstance();
-        if(parentPageInstance.getParent() == null) {
+        PageInstance pageInstance = getPageInstance();
+        PageInstance parentPageInstance = pageInstance.getParent();
+        if(parentPageInstance == null) {
             SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.root"));
         /*} else if(PageLogic.isLandingPage(application, page)) { //TODO ripristinare
             SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.landing"));*/
         } else {
+            Dispatcher dispatcher = new Dispatcher(application);
+            String contextPath = context.getRequest().getContextPath();
+            String landingPagePath = application.getAppConfiguration().getString(AppProperties.LANDING_PAGE);
+            Dispatch landingPageDispatch = dispatcher.createDispatch(contextPath, landingPagePath);
+            if(landingPageDispatch != null &&
+               landingPageDispatch.getLastPageInstance().getDirectory().equals(pageInstance.getDirectory())) {
+                SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.landing"));
+                return new RedirectResolution(dispatch.getOriginalPath());
+            }
             try {
-                PageInstance pageInstance = getPageInstance();
                 String pageName = pageInstance.getName();
                 File childPageDirectory = parentPageInstance.getChildPageDirectory(pageName);
                 Layout parentLayout = parentPageInstance.getLayout();
@@ -382,7 +380,7 @@ public class PageAdminAction extends AbstractActionBean {
                 }
                 FileUtils.deleteDirectory(childPageDirectory);
             } catch (Exception e) {
-                logger.error("Error deleting page directory", e);
+                logger.error("Error deleting page", e);
             }
             return new RedirectResolution(dispatch.getParentPathUrl());
         }

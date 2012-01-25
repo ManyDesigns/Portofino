@@ -34,9 +34,9 @@ function copyFormAsHiddenFields(source, form) {
     });
 }
 
-function confirmDeletePage(pageId, contextPath) {
+function confirmDeletePage(pagePath, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/actions/admin/page/dialog?confirmDelete&pageId=" + pageId, function() {
+    dialogDiv.load(contextPath + "/actions/admin/page/dialog?confirmDelete&pagePath=" + pagePath, function() {
         dialogDiv.find("#dialog-confirm-delete-page").dialog({
             modal: true,
             width: 500,

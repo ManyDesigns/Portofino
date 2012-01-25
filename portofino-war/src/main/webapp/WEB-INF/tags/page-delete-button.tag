@@ -3,7 +3,7 @@
      type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
 <button name="deletePage"
         onclick="confirmDeletePage(
-                    '<%= actionBean.dispatch.getLastPageInstance().getPage().getId() %>',
+                    '<%= actionBean.dispatch.getLastPageInstance().getPathFromRoot() %>',
                     '<%= request.getContextPath() %>');
                 return false;"
         type="submit"

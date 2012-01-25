@@ -32,14 +32,13 @@ package com.manydesigns.portofino.actions.admin.page;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.portofino.dispatcher.AbstractActionBean;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.actions.forms.CopyPage;
 import com.manydesigns.portofino.actions.forms.MovePage;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -114,6 +113,10 @@ public class PageAdminDialogAction extends AbstractActionBean {
 
     public PageInstance getPageInstance() {
         return pageInstance;
+    }
+
+    public Page getPage() {
+        return pageInstance.getPage();
     }
 
     public Form getMoveForm() {
