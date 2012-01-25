@@ -136,6 +136,9 @@ public class ChartAction extends AbstractPageAction {
 
     @DefaultHandler
     public Resolution execute() {
+        if(chartConfiguration == null) {
+            return forwardToPortletNotConfigured();
+        }
 
         try {
             // Run/generate the chart
@@ -164,24 +167,14 @@ public class ChartAction extends AbstractPageAction {
                                            width, height, portletUrl);
         } catch (Throwable e) {
             logger.error("Portlet exception", e);
-            return portletError(e);
+            return forwardToPortletError(e);
         }
 
         if (isEmbedded()) {
             return new ForwardResolution("/layouts/chart/chart.jsp");
         } else {
             setupReturnToParentTarget();
-
             return forwardToPortletPage("/layouts/chart/chart.jsp");
-        }
-    }
-
-    protected Resolution portletError(Throwable e) {
-        context.getRequest().setAttribute(PORTOFINO_PORTLET_EXCEPTION, e);
-        if(isEmbedded()) {
-            return new ForwardResolution("/layouts/portlet-error.jsp");
-        } else {
-            return forwardToPortletPage("/layouts/portlet-error.jsp");
         }
     }
 
@@ -340,8 +333,11 @@ public class ChartAction extends AbstractPageAction {
             }
             if (valid) {
                 updatePageConfiguration();
+                if(chartConfiguration == null) {
+                    chartConfiguration = new ChartConfiguration();
+                }
                 form.writeToObject(chartConfiguration);
-                saveConfiguration();
+                saveConfiguration(chartConfiguration);
 
                 SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
                 return cancel();

@@ -1932,6 +1932,9 @@ public class CrudAction extends AbstractPageAction {
 
         if (valid) {
             updatePageConfiguration();
+            if(crudConfiguration == null) {
+                crudConfiguration = new CrudConfiguration();
+            }
             crudConfigurationForm.writeToObject(crudConfiguration);
 
             if(propertiesTableForm != null) {
@@ -1942,7 +1945,7 @@ public class CrudAction extends AbstractPageAction {
                 updateSelectionProviders();
             }
 
-            saveConfiguration();
+            saveConfiguration(crudConfiguration);
 
             SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
             return cancel();

@@ -143,7 +143,7 @@ public class PageReferenceAction extends AbstractPageAction {
         boolean valid = form.validate();
         if(valid) {
             form.writeToObject(pageReferenceConfiguration);
-            saveConfiguration();
+            saveConfiguration(pageReferenceConfiguration);
 
             SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
         }

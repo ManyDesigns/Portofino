@@ -18,16 +18,17 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.pages.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
+import com.manydesigns.portofino.pages.*;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.stripes.ModelActionResolver;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import com.manydesigns.portofino.util.PortofinoFileUtils;
 import groovy.lang.GroovyObject;
-import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.StripesConstants;
 import net.sourceforge.stripes.controller.StripesFilter;
 import org.apache.commons.collections.MultiHashMap;
@@ -161,23 +162,14 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Admin methods
     //--------------------------------------------------------------------------
 
-    protected void saveConfiguration() {
-        Object configuration = pageInstance.getConfiguration();
-        if(configuration instanceof ModelObject) {
-            Model model = application.getModel();
-            if(model != null) {
-                model.init((ModelObject) configuration);
-            } else {
-                logger.error("Model is null, cannot init configuration");
-                SessionMessages.addErrorMessage("error saving conf");
-                return;
-            }
-        }
+    protected boolean saveConfiguration(Object configuration) {
         try {
             DispatcherLogic.saveConfiguration(pageInstance.getDirectory(), configuration);
+            return true;
         } catch (Exception e) {
             logger.error("Couldn't save configuration", e);
             SessionMessages.addErrorMessage("error saving conf");
+            return false;
         }
     }
 
@@ -617,5 +609,27 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     public String getAppJsp(String jsp) {
         return "/apps/" + application.getAppId() + "/web" + jsp;
+    }
+
+    //--------------------------------------------------------------------------
+    // Utitilities
+    //--------------------------------------------------------------------------
+
+    protected Resolution forwardToPortletNotConfigured() {
+        if (isEmbedded()) {
+            return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
+        } else {
+            setupReturnToParentTarget();
+            return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
+        }
+    }
+
+    protected Resolution forwardToPortletError(Throwable e) {
+        context.getRequest().setAttribute(PORTOFINO_PORTLET_EXCEPTION, e);
+        if(isEmbedded()) {
+            return new ForwardResolution("/layouts/portlet-error.jsp");
+        } else {
+            return forwardToPortletPage("/layouts/portlet-error.jsp");
+        }
     }
 }

@@ -152,8 +152,8 @@ public class ApplicationInterceptor implements Interceptor {
                     putConfigurationInCache(configurationFile, configuration);
                     pageInstance.setConfiguration(configuration);
                 }
-            } catch (Exception e) {
-                logger.error("Couldn't load configuration from " + configurationFile.getAbsolutePath(), e);
+            } catch (Throwable t) {
+                logger.error("Couldn't load configuration from " + configurationFile.getAbsolutePath(), t);
             }
         }
     }

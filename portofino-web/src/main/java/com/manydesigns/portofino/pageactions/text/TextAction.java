@@ -303,7 +303,6 @@ public class TextAction extends AbstractPageAction {
         if (valid) {
             updatePageConfiguration();
             saveContent();
-            saveConfiguration();
 
             SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
             return cancel();
@@ -354,6 +353,9 @@ public class TextAction extends AbstractPageAction {
 
         // copy the data
         IOUtils.copyLarge(attachmentStream, new FileOutputStream(dataFile));
+        if(textConfiguration == null) {
+            textConfiguration = new TextConfiguration();
+        }
         TextLogic.createAttachment(
                 textConfiguration, attachmentId,
                 upload.getFileName(), upload.getContentType(),
@@ -362,7 +364,7 @@ public class TextAction extends AbstractPageAction {
                 String.format("%s?viewAttachment=&id=%s",
                         dispatch.getAbsoluteOriginalPath(),
                         attachmentId);
-        saveConfiguration();
+        saveConfiguration(textConfiguration);
     }
 
     @RequiresPermissions(level = AccessLevel.VIEW)
@@ -458,7 +460,7 @@ public class TextAction extends AbstractPageAction {
 
                 counter++;
             }
-            saveConfiguration();
+            saveConfiguration(textConfiguration);
             if (counter == 1) {
                 SessionMessages.addInfoMessage(getMessage("text.attachment.oneDeleted"));
             } else if (counter > 1) {
@@ -478,11 +480,14 @@ public class TextAction extends AbstractPageAction {
         if(downloadable == null) {
             downloadable = new String[0];
         }
+        if(textConfiguration == null) {
+            textConfiguration = new TextConfiguration();
+        }
         for(Attachment attachment : textConfiguration.getAttachments()) {
             boolean contained = ArrayUtils.contains(downloadable, attachment.getId());
             attachment.setDownloadable(contained);
         }
-        saveConfiguration();
+        saveConfiguration(textConfiguration);
         return cancel();
     }
 

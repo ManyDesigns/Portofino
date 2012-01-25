@@ -95,7 +95,6 @@ public class CustomAction extends AbstractPageAction {
         boolean valid = validatePageConfiguration();
         if(valid) {
             updatePageConfiguration();
-            saveConfiguration();
             SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
         }
         return cancel();

@@ -272,9 +272,6 @@ public class PageAdminAction extends AbstractActionBean {
             Class<?> configurationClass = action.getConfigurationClass();
             if(configurationClass != null) {
                 configuration = ReflectionUtil.newInstance(configurationClass);
-                if(configuration instanceof PageActionConfiguration) {
-                    ((PageActionConfiguration) configuration).init(application);
-                }
             }
             page.init();
 

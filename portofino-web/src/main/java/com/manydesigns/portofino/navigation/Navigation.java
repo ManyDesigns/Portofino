@@ -160,6 +160,13 @@ public class Navigation {
                     currentNavigationItem = childNavigationItem;
                 }
             }
+            if(currentNavigationItem == null && next != null) {
+                boolean selected = (i == pageInstancesLength - 2);
+                String path = prefix + next.getName();
+                currentNavigationItem =
+                        new NavigationItem(next.getPage(), path, true, selected, false);
+                currentChildNavigationItems.add(currentNavigationItem);
+            }
 
             if(next != null) {
                 pages.add(next.getPage());
