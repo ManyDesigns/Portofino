@@ -39,8 +39,9 @@ import com.manydesigns.portofino.system.model.users.User;
 import org.apache.commons.configuration.Configuration;
 import org.hibernate.Session;
 
+import javax.xml.bind.JAXBException;
 import java.io.File;
-import java.util.List;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -78,19 +79,15 @@ public interface Application {
     //**************************************************************************
 
     void loadXmlModel();
-    void saveXmlModel();
+    void saveXmlModel() throws IOException, JAXBException;
 
 
     //**************************************************************************
     // Database stuff
     //**************************************************************************
 
-    List<ConnectionProvider> getConnectionProviders();
     ConnectionProvider getConnectionProvider(String databaseName);
-    void addDatabase(Database database);
-    void deleteDatabases(String[] databases);
-    void deleteDatabase(String database);
-    void updateDatabase(Database database);
+
     String getSystemDatabaseName();
     Database getSystemDatabase();
 
@@ -121,10 +118,6 @@ public interface Application {
 
     Session getSystemSession();
 
-    Session getSessionByQualifiedTableName(String qualifiedTableName);
-
-    void closeSessionByQualifiedTableName(String qualifiedTableName);
-
     void closeSession(String databaseName);
 
     void closeSessions();
@@ -133,7 +126,6 @@ public interface Application {
     // ClassAccessors management
     //**************************************************************************
 
-    public TableAccessor getTableAccessor(String qualifiedTableName);
     public TableAccessor getTableAccessor(String database, String entityName);
 
     //**************************************************************************
@@ -163,4 +155,6 @@ public interface Application {
     ResourceBundle getBundle(Locale locale);
 
     Configuration getAppConfiguration();
+
+    void initModel();
 }

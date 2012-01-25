@@ -29,11 +29,11 @@
 package com.manydesigns.portofino.application;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
-import com.manydesigns.portofino.model.database.ConnectionProvider;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.JdbcConnectionProvider;
 import org.apache.commons.io.IOUtils;
 
+import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.util.List;
 
@@ -57,9 +57,9 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
         super.tearDown();    //To change body of overridden methods use File | Settings | File Templates.
     }
 
-    public void testConnectionProvider() throws IOException {
-        List<ConnectionProvider> connectionProviders = application.getConnectionProviders();
-        assertEquals(3, connectionProviders.size());
+    public void testConnectionProvider() throws IOException, JAXBException {
+        List<Database> databases = model.getDatabases();
+        assertEquals(3, databases.size());
 
         JdbcConnectionProvider conn = new JdbcConnectionProvider();
         conn.setDriver("org.h2.Driver");
@@ -71,11 +71,12 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
         database.setConnectionProvider(conn);
         conn.setDatabase(database);
 
-        application.addDatabase(database);
+        databases.add(database);
+        application.saveXmlModel();
 
         File connectionsFile = application.getAppConnectionsFile();
 
-        assertEquals(4, connectionProviders.size());
+        assertEquals(4, databases.size());
         InputStream is = null;
         try {
             is = new FileInputStream(connectionsFile);
@@ -90,13 +91,19 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
         conn.setUrl("jdbc:h2:mem:test2");
         conn.setUsername("manydesigns2");
         conn.setPassword("manydesigns2");
+
+        databases.remove(database);
+        application.saveXmlModel();
+        assertEquals(3, databases.size());
+
         database = new Database();
         database.setDatabaseName("test");
         database.setConnectionProvider(conn);
         conn.setDatabase(database);
 
-        application.updateDatabase(database);
-        assertEquals(4, connectionProviders.size());
+        databases.add(database);
+        application.saveXmlModel();
+        assertEquals(4, databases.size());
         is = null;
         try {
             is = new FileInputStream(connectionsFile);
@@ -106,8 +113,9 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
             IOUtils.closeQuietly(is);
         }
 
-        application.deleteDatabase("test");
-        assertEquals(3, connectionProviders.size());
+        databases.remove(database);
+        application.saveXmlModel();
+        assertEquals(3, databases.size());
         is = null;
         try {
             is = new FileInputStream(connectionsFile);

@@ -29,13 +29,11 @@
 
 package com.manydesigns.portofino.model;
 
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
-import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.model.database.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.annotation.*;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,18 +64,6 @@ public class Model {
 
     public Model() {
         this.databases = new ArrayList<Database>();
-    }
-
-    public void initDatabases(DatabasePlatformsManager databasePlatformsManager, File appDir) {
-        for(Database database : getDatabases()) {
-            ConnectionProvider connectionProvider = database.getConnectionProvider();
-            if(connectionProvider != null) {
-                connectionProvider.reset();
-                connectionProvider.init(databasePlatformsManager, appDir);
-            } else {
-                logger.error("No connection provider specified for {}", database);
-            }
-        }
     }
 
     //**************************************************************************

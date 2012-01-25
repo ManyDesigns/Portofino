@@ -152,7 +152,7 @@ public class DispatcherLogic {
         return pageFile;
     }
 
-    public static Page loadPage(File directory) throws Exception {
+    public static Page loadPage(File directory) throws FileNotFoundException, JAXBException {
         File pageFile = new File(directory, "page.xml");
         FileReader reader = new FileReader(pageFile);
         try {
@@ -162,7 +162,7 @@ public class DispatcherLogic {
         }
     }
 
-    public static Page loadPage(Reader reader) throws Exception {
+    public static Page loadPage(Reader reader) throws JAXBException {
         Unmarshaller unmarshaller = pagesJaxbContext.createUnmarshaller();
         return (Page) unmarshaller.unmarshal(reader);
     }

@@ -36,8 +36,6 @@ import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.text.OgnlTextFormat;
-import com.manydesigns.portofino.dispatcher.AbstractActionBean;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderForm;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderTableForm;
 import com.manydesigns.portofino.actions.forms.SelectableSchema;
@@ -47,7 +45,9 @@ import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
+import com.manydesigns.portofino.dispatcher.AbstractActionBean;
+import com.manydesigns.portofino.dispatcher.RequestAttributes;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
@@ -76,7 +76,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public List<ConnectionProvider> connectionProviders;
+//    public List<ConnectionProvider> connectionProviders;
     public ConnectionProvider connectionProvider;
     public DatabasePlatform[] databasePlatforms;
     public DatabasePlatform databasePlatform;
@@ -101,6 +101,9 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     @Inject(RequestAttributes.APPLICATION)
     public Application application;
 
+    @Inject(RequestAttributes.MODEL)
+    public Model model;
+
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -122,8 +125,6 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     }
 
     public Resolution search() {
-        connectionProviders = application.getConnectionProviders();
-
         OgnlTextFormat hrefFormat =
                 OgnlTextFormat.create(
                         "/actions/admin/connection-providers?" +
@@ -132,7 +133,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
 
         tableForm = new TableFormBuilder(ConnectionProviderTableForm.class)
                 .configFields("databaseName", "description", "status")
-                .configNRows(connectionProviders.size())
+                .configNRows(model.getDatabases().size())
                 .configHrefTextFormat("databaseName", hrefFormat)
                 .configMode(Mode.VIEW)
                 .build();
@@ -140,8 +141,13 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         tableForm.setKeyGenerator(OgnlTextFormat.create("%{databaseName}"));
 
         List<ConnectionProviderTableForm> tableFormObj = new ArrayList<ConnectionProviderTableForm>();
-        for(ConnectionProvider connectionProvider : connectionProviders) {
-            tableFormObj.add(new ConnectionProviderTableForm(connectionProvider.getDatabase().getDatabaseName(), connectionProvider.getDescription(), connectionProvider.getStatus()));
+        for(Database database : model.getDatabases()) {
+            ConnectionProvider connectionProvider =
+                    database.getConnectionProvider();
+            tableFormObj.add(new ConnectionProviderTableForm(
+                    database.getDatabaseName(),
+                    connectionProvider.getDescription(),
+                    connectionProvider.getStatus()));
         }
         tableForm.readFromObject(tableFormObj);
 
@@ -325,10 +331,19 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
             Database database = connectionProvider.getDatabase();
             database.setConnectionProvider(connectionProvider);
             connectionProvider.setDatabase(database);
-            application.addDatabase(database);
-            connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
-            SessionMessages.addInfoMessage(getMessage("connectionProviders.save.successful"));
-            return new RedirectResolution(this.getClass());
+            model.getDatabases().add(database);
+            try {
+                application.initModel();
+                application.saveXmlModel();
+                connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
+                SessionMessages.addInfoMessage(getMessage("connectionProviders.save.successful"));
+                return new RedirectResolution(this.getClass());
+            } catch (Exception e) {
+                String msg = "Cannot save model";
+                logger.error(msg, e);
+                SessionMessages.addErrorMessage(msg);
+                return new ForwardResolution("/layouts/admin/connectionProviders/create.jsp");
+            }
         } else {
             return new ForwardResolution("/layouts/admin/connectionProviders/create.jsp");
         }
@@ -395,9 +410,16 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
                 }
             }
             form.writeToObject(connectionProviderForm);
-            application.saveXmlModel();
-            connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
-            SessionMessages.addInfoMessage(getMessage("connectionProviders.update.successful"));
+            try {
+                connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
+                application.initModel();
+                application.saveXmlModel();
+                SessionMessages.addInfoMessage(getMessage("connectionProviders.update.successful"));
+            } catch (Exception e) {
+                String msg = "Cannot save model";
+                SessionMessages.addErrorMessage(msg);
+                logger.error(msg, e);
+            }
         }
         return new RedirectResolution(this.getClass())
                 .addParameter("databaseName", databaseName);
@@ -412,32 +434,62 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     }
 
     @Button(list = "connectionProviders-read", key = "commons.delete", order = 5)
-    public Resolution delete(){
-        if(null!=databaseName){
-            application.deleteDatabase(databaseName);
-            SessionMessages.addInfoMessage(
-                    "Connection providers deleted successfully");
+    public Resolution delete() {
+        String[] databaseNames = new String[] {databaseName};
+        try {
+            doDelete(databaseNames);
+            application.initModel();
+            application.saveXmlModel();
+        } catch (Exception e) {
+            String msg = "Cannot save model";
+            logger.error(msg, e);
+            SessionMessages.addErrorMessage(msg);
         }
         return new RedirectResolution(this.getClass());
     }
 
     @Button(list = "connectionProviders-search", key = "commons.delete", order = 2)
     public Resolution bulkDelete() {
-
         if(null!=selection && 0!=selection.length){
-            application.deleteDatabases(selection);
-            SessionMessages.addInfoMessage(
-                    "Connection providers deleted successfully");
+            try {
+                doDelete(selection);
+                application.initModel();
+                application.saveXmlModel();
+            } catch (Exception e) {
+                String msg = "Cannot save model";
+                logger.error(msg, e);
+                SessionMessages.addErrorMessage(msg);
+            }
         } else {
             SessionMessages.addInfoMessage(getMessage("connectionProviders.delete.noneSelected"));
         }
         return new RedirectResolution(this.getClass());
     }
 
+    protected void doDelete(String[] databaseNames) {
+        for (String current : databaseNames) {
+            if (current == null) {
+                continue;
+            }
+            Database database =
+                    DatabaseLogic.findDatabaseByName(model, current);
+            if (database == null) {
+                SessionMessages.addWarningMessage(
+                        "Delete failed. Connection provider not found: " + current);
+            } else {
+                model.getDatabases().remove(database);
+                SessionMessages.addInfoMessage(
+                        "Connection provider deleted successfully: " + current);
+            }
+        }
+    }
+
     @Button(list = "connectionProviders-read", key = "layouts.admin.connectionProviders.list.synchronize", order = 4)
     public Resolution sync() {
         try {
             application.syncDataModel(databaseName);
+            application.initModel();
+            application.saveXmlModel();
             SessionMessages.addInfoMessage(
                     "Connection provider synchronized correctly");
         } catch (Exception e) {

@@ -29,15 +29,17 @@
 package com.manydesigns.elements.messages;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.xml.XhtmlFragment;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import com.manydesigns.elements.xml.XhtmlFragment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.List;
-import java.util.ArrayList;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -51,6 +53,9 @@ public class SessionMessages {
     public static final String INFO_MESSAGES_KEY = "info_messages_key";
     public static final String WARNING_MESSAGES_KEY = "warning_messages_key";
     public static final String ERROR_MESSAGES_KEY = "error_messages_key";
+
+    public final static Logger logger =
+            LoggerFactory.getLogger(SessionMessages.class);
 
     public static XhtmlBuffer createStringMessage(String msg) {
         XhtmlBuffer xb = new XhtmlBuffer();
@@ -117,6 +122,10 @@ public class SessionMessages {
 
     protected static BlockingQueue<XhtmlFragment> getQueue(String queueName) {
         HttpServletRequest req = ElementsThreadLocals.getHttpServletRequest();
+        if (req == null) {
+            logger.debug("No request available. Returning dummy queue.");
+            return new LinkedBlockingQueue<XhtmlFragment>();
+        }
         HttpSession session = req.getSession();
         BlockingQueue<XhtmlFragment> infoQueue;
         synchronized (session) {

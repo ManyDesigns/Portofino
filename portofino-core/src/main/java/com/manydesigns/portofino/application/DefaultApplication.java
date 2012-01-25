@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.application;
 
-import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.application.hibernate.HibernateConfig;
@@ -65,6 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
@@ -105,9 +105,9 @@ public class DefaultApplication implements Application {
     protected final org.apache.commons.configuration.Configuration portofinoConfiguration;
     protected final org.apache.commons.configuration.Configuration appConfiguration;
     protected final DatabasePlatformsManager databasePlatformsManager;
-    protected List<ConnectionProvider> connectionProviders;
+//    protected List<ConnectionProvider> connectionProviders;
     protected Model model;
-    protected Map<String, HibernateDatabaseSetup> setups;
+    protected final Map<String, HibernateDatabaseSetup> setups;
 
     protected final String appId;
 
@@ -189,6 +189,8 @@ public class DefaultApplication implements Application {
         if (!result) {
             throw new Exception("Could not initialize application");
         }
+
+        setups = new HashMap<String, HibernateDatabaseSetup>();
     }
 
     //**************************************************************************
@@ -202,44 +204,34 @@ public class DefaultApplication implements Application {
         try {
             JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
             Unmarshaller um = jc.createUnmarshaller();
-            Model loadedModel = (Model) um.unmarshal(appModelFile);
-            initConnections(loadedModel);
+            model = (Model) um.unmarshal(appModelFile);
             boolean syncOnStart = false;
+            initModel();
+            runLiquibaseScripts();
             if (syncOnStart) {
-                for (ConnectionProvider connectionProvider :
-                        connectionProviders) {
-                    String databaseName = connectionProvider.getDatabase().getDatabaseName();
-                    Database sourceDatabase =
-                            DatabaseLogic.findDatabaseByName(loadedModel, databaseName);
-                    DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
-                    Database targetDatabase = dbSyncer.syncDatabase(loadedModel);
-                    loadedModel.getDatabases().remove(sourceDatabase);
-                    loadedModel.getDatabases().add(targetDatabase);
+                List<String> databaseNames = new ArrayList<String>();
+                for (Database sourceDatabase : model.getDatabases()) {
+                    String databaseName = sourceDatabase.getDatabaseName();
+                    databaseNames.add(databaseName);
                 }
+                for (String databaseName : databaseNames) {
+                    syncDataModel(databaseName);
+                }
+                initModel();
             }
-            loadedModel.init();
-            installDataModel(loadedModel);
         } catch (Exception e) {
             String msg = "Cannot load/parse model: " + appModelFile;
-            SessionMessages.addErrorMessage(msg);
             logger.error(msg, e);
         }
     }
 
-    protected void initConnections(Model loadedModel) {
-        loadedModel.initDatabases(getDatabasePlatformsManager(), getAppDir());
-        connectionProviders = new ArrayList<ConnectionProvider>();
-        for(Database db : loadedModel.getDatabases()) {
-            ConnectionProvider connectionProvider = db.getConnectionProvider();
-            if(connectionProvider != null) {
-                connectionProviders.add(connectionProvider);
-            }
-        }
+    protected void runLiquibaseScripts() {
         logger.info("Updating database definitions");
         ResourceAccessor resourceAccessor =
                 new FileSystemResourceAccessor(appDir.getAbsolutePath());
-        for (ConnectionProvider current : connectionProviders) {
-            Database database = current.getDatabase();
+        for (Database database : model.getDatabases()) {
+            ConnectionProvider connectionProvider =
+                    database.getConnectionProvider();
             String databaseName = database.getDatabaseName();
             for(Schema schema : database.getSchemas()) {
                 String schemaName = schema.getSchemaName();
@@ -250,7 +242,7 @@ public class DefaultApplication implements Application {
                 logger.info("Running changelog file: {}", changelogFile);
                 Connection connection = null;
                 try {
-                    connection = current.acquireConnection();
+                    connection = connectionProvider.acquireConnection();
                     JdbcConnection jdbcConnection = new JdbcConnection(connection);
                     liquibase.database.Database lqDatabase =
                             DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
@@ -268,43 +260,51 @@ public class DefaultApplication implements Application {
                     lq.update(null);
                 } catch (Exception e) {
                     String msg = "Couldn't update database: " + schemaName;
-                    SessionMessages.addErrorMessage(msg);
                     logger.error(msg, e);
                 } finally {
-                    current.releaseConnection(connection);
+                    connectionProvider.releaseConnection(connection);
                 }
             }
         }
     }
 
-    public void saveXmlModel() {
-        try {
-            File tempFile = File.createTempFile(appModelFile.getName(), "");
+    public void saveXmlModel() throws IOException, JAXBException {
+        File tempFile = File.createTempFile(appModelFile.getName(), "");
 
-            JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
-            Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            m.marshal(model, tempFile);
+        JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
+        Marshaller m = jc.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        m.marshal(model, tempFile);
 
-            moveFileSafely(tempFile, appModelFile.getAbsolutePath());
+        moveFileSafely(tempFile, appModelFile.getAbsolutePath());
 
-            logger.info("Saved xml model to file: {}", appModelFile);
-        } catch (Throwable e) {
-            String msg = "Cannot save xml model to file: " + appModelFile;
-            SessionMessages.addErrorMessage(msg);
-            logger.error(msg, e);
-        }
+        logger.info("Saved xml model to file: {}", appModelFile);
     }
 
-    private synchronized void installDataModel(Model newModel) {
-        Map<String, HibernateDatabaseSetup> oldSetups = setups;
-        HashMap<String, HibernateDatabaseSetup> newSetups =
-                new HashMap<String, HibernateDatabaseSetup>();
-        for (Database database : newModel.getDatabases()) {
-            String databaseName = database.getDatabaseName();
+    public synchronized void initModel() {
+        if (setups != null) {
+            logger.info("Cleaning up old setups");
+            for (Map.Entry<String, HibernateDatabaseSetup> current : setups.entrySet()) {
+                String databaseName = current.getKey();
+                logger.info("Cleaning up old setup for: {}", databaseName);
+                HibernateDatabaseSetup hibernateDatabaseSetup =
+                        current.getValue();
+                try {
+                    SessionFactory sessionFactory =
+                            hibernateDatabaseSetup.getSessionFactory();
+                    sessionFactory.close();
+                } catch (Throwable t) {
+                    logger.warn("Cannot close session factory for: " + databaseName, t);
+                }
+            }
+        }
 
+        setups.clear();
+        model.init();
+        for (Database database : model.getDatabases()) {
             ConnectionProvider connectionProvider =
-                    getConnectionProvider(databaseName);
+                    database.getConnectionProvider();
+            connectionProvider.init(databasePlatformsManager, appDir);
             if (connectionProvider.getStatus()
                     .equals(ConnectionProvider.STATUS_CONNECTED)) {
                 HibernateConfig builder =
@@ -328,26 +328,8 @@ public class DefaultApplication implements Application {
                 HibernateDatabaseSetup setup =
                         new HibernateDatabaseSetup(
                                 configuration, sessionFactory);
-                newSetups.put(databaseName, setup);
-            }
-        }
-        setups = newSetups;
-        model = newModel;
-
-        if (oldSetups != null) {
-            logger.info("Cleaning up old setups");
-            for (Map.Entry<String, HibernateDatabaseSetup> current : oldSetups.entrySet()) {
-                String databaseName = current.getKey();
-                logger.info("Cleaning up old setup for: {}", databaseName);
-                HibernateDatabaseSetup hibernateDatabaseSetup =
-                        current.getValue();
-                try {
-                    SessionFactory sessionFactory =
-                            hibernateDatabaseSetup.getSessionFactory();
-                    sessionFactory.close();
-                } catch (Throwable t) {
-                    logger.warn("Cannot close session factory for: " + databaseName, t);
-                }
+                String databaseName = database.getDatabaseName();
+                setups.put(databaseName, setup);
             }
         }
     }
@@ -357,57 +339,12 @@ public class DefaultApplication implements Application {
     //**************************************************************************
 
     public ConnectionProvider getConnectionProvider(String databaseName) {
-        for (ConnectionProvider current : connectionProviders) {
-            if (current.getDatabase().getDatabaseName().equals(databaseName)) {
-                return current;
+        for (Database database : model.getDatabases()) {
+            if (database.getDatabaseName().equals(databaseName)) {
+                return database.getConnectionProvider();
             }
         }
         return null;
-    }
-
-    public void addDatabase(Database database) {
-        logger.info("Adding a new database: {}", database);
-        model.getDatabases().add(database);
-        connectionProviders.add(database.getConnectionProvider());
-        saveXmlModel();
-    }
-
-    public void deleteDatabases(String[] databases) {
-        logger.info("Deleting databases: {}", databases);
-        List<Database> toBeRemoved = new ArrayList<Database>();
-        for(String databaseName : databases) {
-            for(Database current : model.getDatabases()){
-                if(current.getDatabaseName().equals(databaseName)){
-                    toBeRemoved.add(current);
-                    connectionProviders.remove(current.getConnectionProvider());
-                }
-            }
-        }
-        model.getDatabases().removeAll(toBeRemoved);
-        saveXmlModel();
-    }
-
-     public void deleteDatabase(String databaseName) {
-        logger.info("Deleting database: {}", databaseName);
-        for(Database current : model.getDatabases()){
-            if(current.getDatabaseName().equals(databaseName)){
-                model.getDatabases().remove(current);
-                connectionProviders.remove(current.getConnectionProvider());
-                saveXmlModel();
-                break;
-            }
-        }
-    }
-
-    public void updateDatabase(Database database) {
-        logger.info("Updating database: {}", database);
-        for (Database db : model.getDatabases()){
-            if (db.getDatabaseName().equals(database.getDatabaseName())){
-                deleteDatabase(database.getDatabaseName());
-                addDatabase(db); //TODO salva il modello 2 volte
-                return;
-            }
-        }
     }
 
     public String getSystemDatabaseName() {
@@ -430,41 +367,24 @@ public class DefaultApplication implements Application {
     // Model access
     //**************************************************************************
 
-    public List<ConnectionProvider> getConnectionProviders() {
-        return connectionProviders;
-    }
-
     public Model getModel() {
         return model;
     }
 
     public void syncDataModel(String databaseName) throws Exception {
-        ConnectionProvider connectionProvider =
-                getConnectionProvider(databaseName);
         Database sourceDatabase =
-                DatabaseLogic.findDatabaseByName(model, databaseName);
+            DatabaseLogic.findDatabaseByName(model, databaseName);
+        ConnectionProvider connectionProvider =
+                sourceDatabase.getConnectionProvider();
         DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
         Database targetDatabase = dbSyncer.syncDatabase(model);
         model.getDatabases().remove(sourceDatabase);
         model.getDatabases().add(targetDatabase);
-        model.init();
-        installDataModel(model);
-        saveXmlModel();
     }
 
     //**************************************************************************
     // Persistance
     //**************************************************************************
-
-    public Session getSessionByQualifiedTableName(String qualifiedTableName) {
-        Table table = DatabaseLogic.findTableByQualifiedName(
-                model, qualifiedTableName);
-        if(table == null) {
-            throw new Error("Table not found: " + qualifiedTableName);
-        }
-        String databaseName = table.getDatabaseName();
-        return getSession(databaseName);
-    }
 
     public Session getSession(String databaseName) {
         return ensureDatabaseSetup(databaseName).getThreadSession();
@@ -486,13 +406,6 @@ public class DefaultApplication implements Application {
         for (HibernateDatabaseSetup current : setups.values()) {
             closeSession(current);
         }
-    }
-
-    public void closeSessionByQualifiedTableName(String qualifiedTableName) {
-        Table table = DatabaseLogic.findTableByQualifiedName(
-                model, qualifiedTableName);
-        String databaseName = table.getDatabaseName();
-        closeSession(databaseName);
     }
 
     public void closeSession(String databaseName) {
@@ -570,13 +483,6 @@ public class DefaultApplication implements Application {
         return result;
     }
 
-    public @NotNull TableAccessor getTableAccessor(String qualifiedTableName) {
-        Table table = DatabaseLogic.findTableByQualifiedName(
-                model, qualifiedTableName);
-        assert table != null;
-        return new TableAccessor(table);
-    }
-
     public @NotNull TableAccessor getTableAccessor(String databaseName, String entityName) {
         Database database = DatabaseLogic.findDatabaseByName(model, databaseName);
         assert database != null;
@@ -636,8 +542,10 @@ public class DefaultApplication implements Application {
             //http://ajava.org/online/hibernate3api/org/hibernate/SessionFactory.html#close%28%29
             setup.getSessionFactory().close();
         }
-        for (ConnectionProvider current : getConnectionProviders()) {
-            current.shutdown();
+        for (Database database : model.getDatabases()) {
+            ConnectionProvider connectionProvider =
+                    database.getConnectionProvider();
+            connectionProvider.shutdown();
         }
     }
 

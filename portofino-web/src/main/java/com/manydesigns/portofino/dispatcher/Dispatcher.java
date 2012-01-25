@@ -38,9 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBException;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -132,7 +130,7 @@ public class Dispatcher {
 
     protected void makePageInstancePath
             (List<PageInstance> pagePath, ListIterator<String> fragmentsIterator, PageInstance parentPageInstance)
-            throws JAXBException, IOException {
+            throws Exception {
         File currentDirectory = parentPageInstance.getDirectory();
         boolean params = false;
         while(fragmentsIterator.hasNext()) {

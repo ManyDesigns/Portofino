@@ -149,7 +149,7 @@ public class PageInstance {
         }
     }
 
-    public Page getChildPage(String name) {
+    public Page getChildPage(String name) throws Exception {
         File childDirectory = getChildPageDirectory(name);
         return DispatcherLogic.getPage(childDirectory);
     }
