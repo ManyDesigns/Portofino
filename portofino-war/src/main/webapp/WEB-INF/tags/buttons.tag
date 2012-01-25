@@ -1,10 +1,10 @@
 <%@ tag import="com.manydesigns.elements.xml.XhtmlBuffer" %>
-<%@ tag import="com.manydesigns.portofino.actions.PortletAction" %>
-<%@ tag import="com.manydesigns.portofino.actions.RequestAttributes" %>
+<%@ tag import="com.manydesigns.portofino.pageactions.AbstractPageAction" %>
+<%@ tag import="com.manydesigns.portofino.dispatcher.RequestAttributes" %>
 <%@ tag import="com.manydesigns.portofino.buttons.ButtonInfo" %>
 <%@ tag import="com.manydesigns.portofino.buttons.ButtonsLogic" %>
 <%@ tag import="com.manydesigns.portofino.logic.SecurityLogic" %>
-<%@ tag import="com.manydesigns.portofino.model.pages.Page" %>
+<%@ tag import="com.manydesigns.portofino.pages.Page" %>
 <%@ tag import="net.sourceforge.stripes.action.ActionBean" %>
 <%@ tag import="org.apache.commons.lang.StringUtils" %>
 <%@ tag import="javax.servlet.jsp.jstl.fmt.LocalizationContext" %>
@@ -25,8 +25,8 @@
     List<String> groups = (List<String>) request.getAttribute(RequestAttributes.GROUPS);
 
     Page currentPage = null;
-    if(actionBean instanceof PortletAction) {
-        currentPage = ((PortletAction) actionBean).getPage();
+    if(actionBean instanceof AbstractPageAction) {
+        currentPage = ((AbstractPageAction) actionBean).getPage();
     }
     List<ButtonInfo> buttons =
             ButtonsLogic.getButtonsForClass(actionBean.getClass(), list, groups, currentPage);

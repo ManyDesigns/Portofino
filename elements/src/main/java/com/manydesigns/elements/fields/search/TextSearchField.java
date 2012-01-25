@@ -122,7 +122,7 @@ public class TextSearchField extends AbstractSearchField {
         if (value != null) {
             appendToSearchString(sb, inputName, value);
         }
-        if(matchMode != null && matchMode != TextMatchMode.CONTAINS) {
+        if(matchMode != null && matchMode != TextMatchMode.CONTAINS && showMatchMode) {
             appendToSearchString(sb, matchModeParam, matchMode.getStringValue());
         }
     }

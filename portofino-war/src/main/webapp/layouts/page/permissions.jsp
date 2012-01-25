@@ -1,11 +1,12 @@
 <%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
-<%@ page import="com.manydesigns.portofino.model.pages.AccessLevel" %>
-<%@ page import="com.manydesigns.portofino.model.pages.Page" %>
-<%@ page import="com.manydesigns.portofino.model.pages.Permissions" %>
+<%@ page import="com.manydesigns.portofino.security.AccessLevel" %>
+<%@ page import="com.manydesigns.portofino.pages.Page" %>
+<%@ page import="com.manydesigns.portofino.pages.Permissions" %>
 <%@ page import="com.manydesigns.portofino.system.model.users.Group" %>
 <%@ page import="com.manydesigns.portofino.system.model.users.annotations.SupportsPermissions" %>
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.PageInstance" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -14,14 +15,10 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/${skin}/modal-page.jsp" formActionUrl="/actions/admin/page">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.PageAdminAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="page-permissions-edit" cssClass="contentButton" />
-        <div class="breadcrumbs">
-            <div class="inner">
-                <mde:write name="breadcrumbs"/>
-            </div>
-        </div>
+        <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         Page permissions for: <c:out value="${actionBean.page.title}"/>
@@ -32,9 +29,10 @@
             <div class="yui-u first">
                 <table>
                 <%
-                    Page currentPage = actionBean.getPage();
+                    PageInstance currentPageInstance = actionBean.getPageInstance();
+                    Page currentPage = currentPageInstance.getPage();
                     SupportsPermissions supportsPermissions =
-                            actionBean.getClass().getAnnotation(SupportsPermissions.class);
+                            actionBean.getDispatch().getActionBeanClass().getAnnotation(SupportsPermissions.class);
                     String[] supportedPermissions = null;
                     if(supportsPermissions != null && supportsPermissions.value().length > 0) {
                         supportedPermissions = supportsPermissions.value();
@@ -64,14 +62,16 @@
                                 String groupId = group.getGroupId();
                                 AccessLevel localAccessLevel = actionBean.getLocalAccessLevel(currentPage, groupId);
                                 AccessLevel parentAccessLevel = null;
-                                Page parentPage = currentPage.getParent();
-                                if(parentPage != null) {
-                                    parentAccessLevel = parentPage.getPermissions().getActualLevels().get(groupId);
+                                PageInstance parentPageInstance = currentPageInstance.getParent();
+                                if(parentPageInstance != null) {
+                                    Permissions parentPermissions =
+                                            SecurityLogic.calculateActualPermissions(parentPageInstance);
+                                    parentAccessLevel = parentPermissions.getActualLevels().get(groupId);
                                 }
                                 if(parentAccessLevel == null) {
                                     parentAccessLevel = AccessLevel.NONE;
                                 }
-                                Permissions permissions = currentPage.getPermissions();
+                                Permissions permissions = SecurityLogic.calculateActualPermissions(currentPageInstance);
                                 List<String> groupIdList = Collections.singletonList(groupId);
                             %>
                             <td>
@@ -151,6 +151,7 @@
                                 ><c:out value="${user.userName}" /></option>
                     </c:forEach>
                 </select>
+                <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
                 <portofino:buttons list="testUserPermissions" cssClass="portletButton" />
                 <br /><br />
                 <table id="userPermissionTestResults">

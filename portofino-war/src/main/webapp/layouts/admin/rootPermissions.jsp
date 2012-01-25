@@ -1,5 +1,6 @@
-<%@ page import="com.manydesigns.portofino.model.pages.AccessLevel" %>
-<%@ page import="com.manydesigns.portofino.model.pages.RootPage" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.PageInstance" %>
+<%@ page import="com.manydesigns.portofino.security.AccessLevel" %>
+<%@ page import="com.manydesigns.portofino.pages.Page" %>
 <%@ page import="com.manydesigns.portofino.system.model.users.Group" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
@@ -9,7 +10,7 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.RootPermissionsAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.page.RootPermissionsAction"/>
     <stripes:layout-component name="pageTitle">
         Root permission
     </stripes:layout-component>
@@ -21,7 +22,8 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <%
-            RootPage rootPage = actionBean.getApplication().getModel().getRootPage();
+            PageInstance currentPageInstance = actionBean.getPageInstance();
+            Page rootPage = currentPageInstance.getPage();
         %>
         <table>
             <tr>

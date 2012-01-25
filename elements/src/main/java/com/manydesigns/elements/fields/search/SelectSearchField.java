@@ -31,6 +31,7 @@ package com.manydesigns.elements.fields.search;
 import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SearchDisplayMode;
 import com.manydesigns.elements.options.SelectionModel;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -53,18 +54,10 @@ public class SelectSearchField extends AbstractSearchField {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public enum DisplayMode {
-        DROPDOWN,
-        RADIO,
-        AUTOCOMPLETE,
-        MULTIPLESELECT,
-        CHECKBOX
-    }
-
     protected SelectionModel selectionModel;
     protected int selectionModelIndex;
     protected String comboLabel;
-    protected DisplayMode displayMode;
+    protected SearchDisplayMode displayMode;
     protected String autocompleteId;
     protected String autocompleteInputName;
     protected SelectSearchField previousSelectField;
@@ -91,7 +84,7 @@ public class SelectSearchField extends AbstractSearchField {
             selectionModel = selectionProvider.createSelectionModel();
             displayMode = annotation.searchDisplayMode();
         } else {
-            displayMode = DisplayMode.DROPDOWN;
+            displayMode = SearchDisplayMode.DROPDOWN;
         }
         selectionModelIndex = 0;
         comboLabel = getText("elements.field.select.select", label);
@@ -418,11 +411,11 @@ public class SelectSearchField extends AbstractSearchField {
         this.comboLabel = comboLabel;
     }
 
-    public DisplayMode getDisplayMode() {
+    public SearchDisplayMode getDisplayMode() {
         return displayMode;
     }
 
-    public void setDisplayMode(DisplayMode displayMode) {
+    public void setDisplayMode(SearchDisplayMode displayMode) {
         this.displayMode = displayMode;
     }
 

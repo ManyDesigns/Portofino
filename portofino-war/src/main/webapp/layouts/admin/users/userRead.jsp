@@ -7,19 +7,15 @@
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request"
-                 type="com.manydesigns.portofino.actions.user.admin.UserAdminAction"/>
+                 type="com.manydesigns.portofino.actions.admin.users.UserAdminAction"/>
     <stripes:layout-component name="contentHeader">
-        <div class="breadcrumbs">
-            <div class="inner">
-                <mde:write name="breadcrumbs"/>
-            </div>
-        </div>
+        <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
-        <c:out value="${actionBean.crud.readTitle}"/>
+        <c:out value="${actionBean.crudConfiguration.readTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.crud.readTitle}"/>
+        <c:out value="${actionBean.crudConfiguration.readTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <div class="yui-gc">
@@ -35,7 +31,6 @@
                 </ul>
             </div>
         </div>
-        <input type="hidden" name="pk" value="<c:out value="${actionBean.pk}"/>"/>
         <c:if test="${not empty actionBean.searchString}">
             <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
         </c:if>
@@ -49,7 +44,7 @@
     <stripes:layout-component name="contentFooter" />
     <script type="text/javascript">
         $(".crudReadButtons button[name=delete]").click(function() {
-            return confirm ('Are you sure?');
+            return confirm ('<fmt:message key="commons.confirm" />');
         });
     </script>
 </stripes:layout-render>

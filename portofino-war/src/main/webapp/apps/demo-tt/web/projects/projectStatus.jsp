@@ -1,28 +1,24 @@
+<%@ page import="com.manydesigns.portofino.dispatcher.RequestAttributes" %>
 <%@ page import="com.manydesigns.portofino.application.Application" %>
-<%@ page import="org.apache.commons.collections.MultiHashMap" %>
-<%@ page import="org.apache.commons.collections.MultiMap" %>
-<%@ page import="java.util.Collection" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="ognl.Ognl" %>
 <%@ page import="org.hibernate.Session" %>
-<%@ page import="com.manydesigns.portofino.database.QueryUtils" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.manydesigns.portofino.application.QueryUtils" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.JspAction"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"/>
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.jspPage.title}"/>
+        <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
 
             <%
-                Application appl = (Application) request.getAttribute("application");
+                Application appl = (Application) request.getAttribute(RequestAttributes.APPLICATION);
                 Session hSession = appl.getSession("redmine");
-                List<?> objects = com.manydesigns.portofino.database.QueryUtils.runSql
+                List<?> objects = QueryUtils.runSql
                         (hSession, "select count(*), \"project_id\", status.\"name\", \"projects\".\"name\" " +
                                 "from \"issues\" join \"issue_statuses\" status on \"status_id\" = status.\"id\" " +
                                 "join \"projects\" on \"project_id\" = \"projects\".\"id\" " +
@@ -66,10 +62,10 @@
                 }
             %>
             </table>
-            <script src="<%= request.getContextPath() %>/jquery-treetable-2.3.0/jquery.treeTable.min.js" >
+            <script type="text/javascript" src="<%= request.getContextPath() %>/jquery-treetable-2.3.0/jquery.treeTable.min.js" >
             </script>
 
-            <script>
+            <script type="text/javascript">
                 $("#projectTree").treeTable({"clickableNodeNames": true, "expandable":true, "treeColumn":0, "indent":20 });
             </script>
 

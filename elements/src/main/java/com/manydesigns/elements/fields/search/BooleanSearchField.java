@@ -71,7 +71,7 @@ public class BooleanSearchField extends AbstractSearchField {
     //**************************************************************************
 
     public void toSearchString(StringBuilder sb) {
-        if (value != null) {
+        if (value != null && value != BooleanSearchValue.ANY) {
             appendToSearchString(sb, inputName, value.getStringValue());
         }
     }

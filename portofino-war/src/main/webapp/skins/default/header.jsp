@@ -9,7 +9,9 @@
              type="org.apache.commons.configuration.Configuration"/>
 <jsp:useBean id="model" scope="request"
              type="com.manydesigns.portofino.model.Model"/>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.AbstractActionBean"/>
+<jsp:useBean id="app" scope="request"
+             type="com.manydesigns.portofino.application.Application"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.dispatcher.AbstractActionBean"/>
 <fmt:setLocale value="${pageContext.request.locale}"/>
 
 <div id="globalLinks">
@@ -42,4 +44,4 @@
     </c:if>
 </div>
 <h1><stripes:link href="/"><c:out
-        value="${model.rootPage.title}"/></stripes:link></h1>
+        value="${app.name}"/></stripes:link></h1>

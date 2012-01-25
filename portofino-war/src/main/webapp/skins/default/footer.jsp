@@ -1,4 +1,4 @@
-<%@ page import="com.manydesigns.portofino.actions.RequestAttributes" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.RequestAttributes" %>
 <%@ page import="com.manydesigns.portofino.application.Application" %>
 <%@ page import="org.hibernate.Session" %>
 <%@ page import="org.hibernate.jdbc.Work" %>

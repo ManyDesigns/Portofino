@@ -34,6 +34,7 @@ import com.manydesigns.elements.annotations.Help;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.FieldUtils;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
@@ -348,11 +349,7 @@ public class TableForm implements Element {
         public Column(PropertyAccessor propertyAccessor) {
             this.propertyAccessor = propertyAccessor;
 
-            if (propertyAccessor.isAnnotationPresent(Label.class)) {
-                label = propertyAccessor.getAnnotation(Label.class).value();
-            } else {
-                label = Util.guessToWords(propertyAccessor.getName());
-            }
+            label = FieldUtils.getLabel(propertyAccessor);
 
             if (propertyAccessor.isAnnotationPresent(Help.class)) {
                 title = propertyAccessor.getAnnotation(Help.class).value();

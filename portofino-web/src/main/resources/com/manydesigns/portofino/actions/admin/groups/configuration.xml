@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration name="Groups" createTitle="Create group" editTitle="Edit group" largeResultSet="false"
+               query="FROM groups ORDER BY name" readTitle="Group" searchTitle="Groups"
+               database="portofino">
+    <buttons/>
+    <annotations/>
+    <properties>
+        <property enabled="true" inSummary="true" insertable="false" label="Id" name="groupId"
+                  searchable="false" updatable="false">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="false" insertable="false" label="Creator" name="creatorId"
+                  searchable="false" updatable="false">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="true" insertable="true" label="Name" name="name"
+                  searchable="true" updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="false" insertable="true" label="Description"
+                  name="description" searchable="true" updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="true" insertable="false" label="Creation date"
+                  name="creationDate" searchable="false" updatable="false">
+            <annotations/>
+        </property>
+        <property enabled="false" inSummary="false" insertable="false" label="Deletion date"
+                  name="deletionDate" searchable="false" updatable="false">
+            <annotations/>
+        </property>
+    </properties>
+    <selectionProviders/>
+</configuration>

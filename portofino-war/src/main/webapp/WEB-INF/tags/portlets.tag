@@ -4,7 +4,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:useBean id="actionBean" scope="request"
-             type="com.manydesigns.portofino.actions.PortletAction"/>
+             type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
 <div class="${cssClass} portletContainer">
     <input type="hidden" name="portletWrapperName_${list}" value="portletWrapper_${list}" />
     <c:forEach var="portletInstance" items="${ actionBean.portlets[list] }">

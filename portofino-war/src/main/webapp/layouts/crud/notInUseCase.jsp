@@ -1,5 +1,3 @@
-<%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
-<%@ page import="com.manydesigns.portofino.actions.RequestAttributes" %>
 <%@
     page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
@@ -18,7 +16,7 @@
     response.addHeader("Cache-Control", "no-store");
     response.setDateHeader("Expires", 0);
 
-    String targetUrl = (String) request.getAttribute("pageRealizationFailed");
+    String targetUrl = (String) request.getAttribute("redirectUrl");
     int lastSlashPos = targetUrl.lastIndexOf("/");
     targetUrl = targetUrl.substring(0, lastSlashPos);
 

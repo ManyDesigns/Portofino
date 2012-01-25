@@ -57,9 +57,9 @@ function confirmDeletePage(pageId, contextPath) {
     return false;
 }
 
-function showMovePageDialog(pageId, contextPath) {
+function showMovePageDialog(pagePath, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/actions/admin/page/dialog?chooseNewLocation&pageId=" + pageId, function() {
+    dialogDiv.load(contextPath + "/actions/admin/page/dialog?chooseNewLocation&pagePath=" + pagePath, function() {
         dialogDiv.find("#dialog-move-page").dialog({
             modal: true,
             width: 500,
@@ -80,9 +80,9 @@ function showMovePageDialog(pageId, contextPath) {
     return false;
 }
 
-function showCopyPageDialog(pageId, contextPath) {
+function showCopyPageDialog(pagePath, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/actions/admin/page/dialog?copyPageDialog&pageId=" + pageId, function() {
+    dialogDiv.load(contextPath + "/actions/admin/page/dialog?copyPageDialog&pagePath=" + pagePath, function() {
         dialogDiv.find("#dialog-copy-page").dialog({
             modal: true,
             width: 500,
@@ -131,6 +131,7 @@ $(function() {
     decorateIconButton("button.plusthick", "ui-icon-plusthick");
     decorateIconButton("button.minusthick", "ui-icon-minusthick");
     decorateIconButton("button.transferthick-e-w", "ui-icon-transferthick-e-w");
+    decorateIconButton("button.folder-open", "ui-icon-folder-open");
     decorateIconButton(".portletHeaderButtons button[name=configure]", "ui-icon-wrench");
     decorateIconButton(".portletHeaderButtons button[name=manageAttachments]", "ui-icon-link");
 });
@@ -156,7 +157,6 @@ function enablePortletDragAndDrop(button) {
             var wrapper = $(element);
             var templateHiddenField = wrapper.children("input[type=hidden]").first();
             var elements = wrapper.sortable('toArray');
-            console.log(templateHiddenField);
             for(var e in elements) {
                 var id = elements[e];
                 var hiddenField = document.createElement("input");
@@ -164,7 +164,6 @@ function enablePortletDragAndDrop(button) {
                 hiddenField.setAttribute("name", templateHiddenField.val());
                 hiddenField.setAttribute("value", id.substring("portletWrapper_".length));
                 theButton.before(hiddenField);
-                console.log(hiddenField);
             }
         });
         return true;

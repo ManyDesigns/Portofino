@@ -29,8 +29,8 @@
 
 package com.manydesigns.elements.annotations;
 
-import com.manydesigns.elements.fields.search.SelectSearchField;
 import com.manydesigns.elements.options.DisplayMode;
+import com.manydesigns.elements.options.SearchDisplayMode;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -51,8 +51,8 @@ public @interface Select {
     
     DisplayMode displayMode()
             default DisplayMode.DROPDOWN;
-    SelectSearchField.DisplayMode searchDisplayMode()
-                default SelectSearchField.DisplayMode.DROPDOWN;
+    SearchDisplayMode searchDisplayMode()
+                default SearchDisplayMode.DROPDOWN;
 
     String[] values() default {};
     String[] labels() default {};
