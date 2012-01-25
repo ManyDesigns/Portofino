@@ -27,27 +27,18 @@
 *
 */
 
-package com.manydesigns.portofino.pageactions.jsp;
+package com.manydesigns.portofino.pageactions.custom;
 
-import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
-import com.manydesigns.portofino.pageactions.jsp.configuration.JspConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
-import com.manydesigns.portofino.util.PortofinoFileUtils;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -55,18 +46,13 @@ import java.io.File;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@UrlBinding("/actions/jsp")
 @RequiresPermissions(level = AccessLevel.VIEW)
-public class JspAction extends AbstractPageAction {
+public class CustomAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    protected JspConfiguration jspConfiguration;
-    protected String jsp;
-    protected Form form;
-
     public static final Logger logger =
-            LoggerFactory.getLogger(JspAction.class);
+            LoggerFactory.getLogger(CustomAction.class);
 
     //--------------------------------------------------------------------------
     // Scripting
@@ -77,7 +63,7 @@ public class JspAction extends AbstractPageAction {
     static {
         String scriptTemplate;
         try {
-            scriptTemplate = IOUtils.toString(JspAction.class.getResourceAsStream("script_template.txt"));
+            scriptTemplate = IOUtils.toString(CustomAction.class.getResourceAsStream("script_template.txt"));
         } catch (Exception e) {
             throw new Error("Can't load script template", e);
         }
@@ -86,17 +72,7 @@ public class JspAction extends AbstractPageAction {
 
     @DefaultHandler
     public Resolution execute() {
-        return forwardToJsp(jsp);
-    }
-
-    protected Resolution forwardToJsp(String jsp) {
-        this.jsp = jsp;
-        String fwd;
-        if(StringUtils.isEmpty(jsp)) {
-            fwd = PAGE_PORTLET_NOT_CONFIGURED;
-        } else {
-            fwd = "/layouts/jsp/view.jsp";
-        }
+        String fwd = "/layouts/jsp/example.jsp";
         if(isEmbedded()) {
             return new ForwardResolution(fwd);
         } else {
@@ -116,51 +92,13 @@ public class JspAction extends AbstractPageAction {
     public Resolution updateConfiguration() {
         prepareConfigurationForms();
         readPageConfigurationFromRequest();
-        form.readFromRequest(context.getRequest());
         boolean valid = validatePageConfiguration();
-        valid = form.validate() && valid;
         if(valid) {
             updatePageConfiguration();
-            form.writeToObject(jspConfiguration);
             saveConfiguration();
-
             SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
         }
         return cancel();
-    }
-
-    @Override
-    protected void prepareConfigurationForms() {
-        super.prepareConfigurationForms();
-
-        SelectionProvider jspSelectionProvider =
-                createJspSelectionProvider();
-
-        form = new FormBuilder(JspConfiguration.class)
-                .configFields("jsp")
-                .configSelectionProvider(jspSelectionProvider, "jsp")
-                .build();
-        form.readFromObject(jspConfiguration);
-    }
-
-    private SelectionProvider createJspSelectionProvider() {
-        File appWebDir = application.getAppWebDir();
-        File[] files = appWebDir.listFiles();
-        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("jsp");
-        visitJspFiles(appWebDir, files, selectionProvider);
-        return selectionProvider;
-    }
-
-    private void visitJspFiles(File root, File[] files,
-                               DefaultSelectionProvider selectionProvider) {
-        for(File file : files) {
-            if(file.isFile() && file.getName().endsWith(".jsp")) {
-                String path = File.separator + PortofinoFileUtils.getRelativePath(root, file);
-                selectionProvider.appendRow(path, path, true);
-            } else if(file.isDirectory()) {
-                visitJspFiles(root, file.listFiles(), selectionProvider);
-            }
-        }
     }
 
     @Override
@@ -168,24 +106,8 @@ public class JspAction extends AbstractPageAction {
         return SCRIPT_TEMPLATE;
     }
 
-    public JspConfiguration getJspConfiguration() {
-        return jspConfiguration;
-    }
-
-    public String getJsp() {
-        return jsp;
-    }
-
-    public Form getForm() {
-        return form;
-    }
-
-    public String getJspPrefix() {
-        return "/apps/" + application.getAppId() + "/web/";
-    }
-
     public Class<?> getConfigurationClass() {
-        return JspConfiguration.class;
+        return null;
     }
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
@@ -193,8 +115,6 @@ public class JspAction extends AbstractPageAction {
         if(!pageInstance.getParameters().isEmpty()) {
             return new ErrorResolution(404);
         }
-        jspConfiguration = (JspConfiguration) getPageInstance().getConfiguration();
-        jsp = jspConfiguration.getJsp();
         return null;
     }
 }

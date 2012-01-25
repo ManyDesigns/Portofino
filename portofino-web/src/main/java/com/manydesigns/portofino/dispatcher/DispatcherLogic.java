@@ -177,6 +177,9 @@ public class DispatcherLogic {
     }
 
     public static <T> T loadConfiguration(File directory, Class<? extends T> configurationClass) throws Exception {
+        if(configurationClass == null) {
+            return null;
+        }
         File configurationFile = new File(directory, "configuration.xml");
         FileReader reader = new FileReader(configurationFile);
         try {
@@ -187,6 +190,9 @@ public class DispatcherLogic {
     }
 
     public static <T> T loadConfiguration(Reader reader, Class<? extends T> configurationClass) throws Exception {
+        if(configurationClass == null) {
+            return null;
+        }
         Object configuration;
         String configurationPackage = configurationClass.getPackage().getName();
         JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);

@@ -114,7 +114,6 @@ import java.util.regex.Pattern;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@UrlBinding("/actions/crud")
 @SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
 @RequiresPermissions(level = AccessLevel.VIEW)
 public class CrudAction extends AbstractPageAction {

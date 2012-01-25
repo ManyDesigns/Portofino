@@ -1,9 +1,9 @@
-import com.manydesigns.portofino.pageactions.jsp.JspAction
+import com.manydesigns.portofino.pageactions.custom.CustomAction
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class __CLASS_NAME__ extends JspAction {
+class __CLASS_NAME__ extends CustomAction {
 
     //Write your code here
 

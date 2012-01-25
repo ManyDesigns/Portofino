@@ -47,7 +47,7 @@ import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.pageactions.chart.ChartAction;
 import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.actions.forms.NewPage;
-import com.manydesigns.portofino.pageactions.jsp.JspAction;
+import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.pageactions.text.TextAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
@@ -268,10 +268,13 @@ public class PageAdminAction extends AbstractActionBean {
             BeanUtils.copyProperties(page, newPage);
             page.setId(pageId);
 
-            Object configuration = ReflectionUtil.newInstance(action.getConfigurationClass());
-            Model model = application.getModel();
-            if(configuration instanceof ModelObject) {
-                model.init((ModelObject) configuration);
+            Object configuration = null;
+            Class<?> configurationClass = action.getConfigurationClass();
+            if(configurationClass != null) {
+                configuration = ReflectionUtil.newInstance(configurationClass);
+                if(configuration instanceof PageActionConfiguration) {
+                    ((PageActionConfiguration) configuration).init(application);
+                }
             }
             page.init();
 
@@ -318,7 +321,9 @@ public class PageAdminAction extends AbstractActionBean {
                 try {
                     logger.debug("Creating the new child page in directory: {}", directory);
                     DispatcherLogic.savePage(directory, page);
-                    DispatcherLogic.saveConfiguration(directory, configuration);
+                    if(configuration != null) {
+                        DispatcherLogic.saveConfiguration(directory, configuration);
+                    }
                     File groovyScriptFile =
                         ScriptingUtil.getGroovyScriptFile(directory, "action");
                     FileWriter fw = null;
@@ -531,7 +536,7 @@ public class PageAdminAction extends AbstractActionBean {
         classSelectionProvider.appendRow(CrudAction.class.getName(), "Crud", true);
         classSelectionProvider.appendRow(ChartAction.class.getName(), "Chart", true);
         classSelectionProvider.appendRow(TextAction.class.getName(), "Text", true);
-        classSelectionProvider.appendRow(JspAction.class.getName(), "JSP", true);
+        classSelectionProvider.appendRow(CustomAction.class.getName(), "JSP", true);
         /*PageReference.class.getName(), "Reference to another page"*/
         //root + at least 1 child
         boolean includeSiblingOption = dispatch.getPageInstancePath().length > 2;

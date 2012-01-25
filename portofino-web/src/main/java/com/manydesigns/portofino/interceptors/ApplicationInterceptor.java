@@ -142,7 +142,8 @@ public class ApplicationInterceptor implements Interceptor {
         } else {
             try {
                 Class<?> configurationClass = actionBean.getConfigurationClass();
-                configuration = DispatcherLogic.loadConfiguration(pageInstance.getDirectory(), configurationClass);
+                configuration = DispatcherLogic.loadConfiguration
+                        (pageInstance.getDirectory(), configurationClass);
 
                 if(configuration instanceof PageActionConfiguration) {
                     ((PageActionConfiguration) configuration).init(application);

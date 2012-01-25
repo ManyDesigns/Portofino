@@ -615,4 +615,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         this.script = script;
     }
 
+    public String getAppJsp(String jsp) {
+        return "/apps/" + application.getAppId() + "/web" + jsp;
+    }
 }
