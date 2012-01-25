@@ -12,13 +12,13 @@
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.page.RootPermissionsAction"/>
     <stripes:layout-component name="pageTitle">
-        Root permission
+        <fmt:message key="layouts.admin.rootPermissions" />
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="root-permissions" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Root permission
+        <fmt:message key="layouts.admin.rootPermissions" />
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <%
@@ -27,8 +27,8 @@
         %>
         <table>
             <tr>
-                <th>Group</th>
-                <th>Access Level</th>
+                <th><fmt:message key="layouts.page.permissions.group" /></th>
+                <th><fmt:message key="layouts.page.permissions.access-level" /></th>
             </tr>
             <c:forEach var="group" items="${actionBean.groups}">
                 <tr>

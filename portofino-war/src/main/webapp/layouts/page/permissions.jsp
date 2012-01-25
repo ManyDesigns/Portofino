@@ -21,7 +21,8 @@
         <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Page permissions for: <c:out value="${actionBean.page.title}"/>
+        <fmt:message key="layouts.page.permissions.page-permissions-for" />
+        <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
@@ -52,8 +53,8 @@
                     </tr>
                 <% } else { %>
                     <tr>
-                        <th>Group</th>
-                        <th>Access level</th>
+                        <th><fmt:message key="layouts.page.permissions.group" /></th>
+                        <th><fmt:message key="layouts.page.permissions.access-level" /></th>
                     </tr>
                 <% } %>
                     <c:forEach var="group" items="${actionBean.groups}">
