@@ -35,7 +35,7 @@ Struttura dell'XML:
 <model>
     <databases>
         <database databaseName="portofino">
-            <jdbcConnection driver="org.h2.Driver" password="" url="jdbc:h2:${app}/dbs/portofino" username="sa"/>
+            <jdbcConnection driver="org.postgresql.Driver" password="manydesigns" url="jdbc:postgresql://localhost/portofino4" username="manydesigns"/>
             <schemas>
                 <schema schemaName="PUBLIC">
                     <tables>
@@ -61,7 +61,7 @@ Struttura dell'XML:
                         <table tableName="OLDPWD">
                             <annotations/>
                             <columns>
-<column autoincrement="false" columnName="ID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="id" scale="0">
+<column autoincrement="false" columnName="ID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="id" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="CREATEDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="createDate" scale="10">
@@ -70,7 +70,7 @@ Struttura dell'XML:
 <column autoincrement="false" columnName="PASSWORD" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="true" propertyName="password" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="USERID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="userId" scale="0">
+<column autoincrement="false" columnName="USERID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="userId" scale="0">
     <annotations/>
 </column>
                             </columns>
@@ -89,7 +89,7 @@ Struttura dell'XML:
                         <table javaClass="com.manydesigns.portofino.system.model.messages.Message" tableName="MSG">
                             <annotations/>
                             <columns>
-<column autoincrement="false" columnName="ID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="id" scale="0">
+<column autoincrement="false" columnName="ID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="id" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="SUBJECT" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" propertyName="subject" scale="0">
@@ -98,10 +98,10 @@ Struttura dell'XML:
 <column autoincrement="false" columnName="BODY" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="4000" nullable="true" propertyName="body" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="TO_" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="toId" scale="0">
+<column autoincrement="false" columnName="TO_" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="toId" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="FROM_" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="fromId" scale="0">
+<column autoincrement="false" columnName="FROM_" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="fromId" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="creationDate" scale="10">
@@ -136,7 +136,7 @@ Struttura dell'XML:
                         <table javaClass="com.manydesigns.portofino.system.model.users.User" shortName="%{userName} (%{email})" tableName="USERS">
                             <annotations/>
                             <columns>
-<column autoincrement="false" columnName="USERID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="userId" scale="0">
+<column autoincrement="false" columnName="USERID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="userId" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">
@@ -247,10 +247,10 @@ Struttura dell'XML:
                         <table javaClass="com.manydesigns.portofino.system.model.users.Group" shortName="%{name} " tableName="GROUPS">
                             <annotations/>
                             <columns>
-<column autoincrement="false" columnName="GROUPID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="groupId" scale="0">
+<column autoincrement="false" columnName="GROUPID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="groupId" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="CREATORID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="creatorId" scale="0">
+<column autoincrement="false" columnName="CREATORID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="creatorId" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="NAME" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="50" nullable="true" propertyName="name" scale="0">
@@ -306,7 +306,7 @@ Struttura dell'XML:
                         <table javaClass="com.manydesigns.portofino.system.model.email.EmailBean" tableName="EMAILQUEUE">
                             <annotations/>
                             <columns>
-<column autoincrement="false" columnName="ID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="id" scale="0">
+<column autoincrement="false" columnName="ID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="id" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="SUBJECT" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="100" nullable="true" propertyName="subject" scale="0">
@@ -352,10 +352,10 @@ Struttura dell'XML:
                         <table javaClass="com.manydesigns.portofino.system.model.users.UsersGroups" manyToMany="true" tableName="USERS_GROUPS">
                             <annotations/>
                             <columns>
-<column autoincrement="false" columnName="GROUPID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="groupid" scale="0">
+<column autoincrement="false" columnName="GROUPID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="groupid" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="USERID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="userid" scale="0">
+<column autoincrement="false" columnName="USERID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="userid" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">

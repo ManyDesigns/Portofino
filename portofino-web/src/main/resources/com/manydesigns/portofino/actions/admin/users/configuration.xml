@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configuration name="Users" createTitle="Create user" editTitle="Edit user" largeResultSet="false"
-               query="FROM users ORDER BY username" readTitle="User" searchTitle="Users"
+               query="FROM users ORDER BY userName" readTitle="User" searchTitle="Users"
                database="portofino">
     <annotations/>
     <properties>

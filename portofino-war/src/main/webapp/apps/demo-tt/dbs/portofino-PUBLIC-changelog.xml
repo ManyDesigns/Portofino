@@ -2,7 +2,7 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
     <changeSet author="manydesigns" id="1313767352015-1">
         <createTable tableName="EMAILQUEUE">
-            <column name="ID" type="CHAR(25)">
+            <column name="ID" type="VARCHAR(25)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="EMAILQUEUE_PKEY"/>
             </column>
             <column name="SUBJECT" type="VARCHAR(100)"/>
@@ -29,10 +29,10 @@
     </changeSet>
     <changeSet author="manydesigns" id="1313767352015-3">
         <createTable tableName="GROUPS">
-            <column name="GROUPID" type="CHAR(25)">
+            <column name="GROUPID" type="VARCHAR(25)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="GROUP_PKEY"/>
             </column>
-            <column name="CREATORID" type="CHAR(25)"/>
+            <column name="CREATORID" type="VARCHAR(25)"/>
             <column name="NAME" type="VARCHAR(50)"/>
             <column name="DESCRIPTION" type="VARCHAR(255)"/>
             <column name="DELETIONDATE" type="TIMESTAMP NULL"/>
@@ -41,13 +41,13 @@
     </changeSet>
     <changeSet author="manydesigns" id="1313767352015-4">
         <createTable tableName="MSG">
-            <column name="ID" type="CHAR(25)">
+            <column name="ID" type="VARCHAR(25)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="MSG_PKEY"/>
             </column>
             <column name="SUBJECT" type="VARCHAR(255)"/>
             <column name="BODY" type="VARCHAR(4000)"/>
-            <column name="TO_" type="CHAR(25)"/>
-            <column name="FROM_" type="CHAR(25)"/>
+            <column name="TO_" type="VARCHAR(25)"/>
+            <column name="FROM_" type="VARCHAR(25)"/>
             <column name="CREATIONDATE" type="TIMESTAMP NULL"/>
             <column name="STATE" type="DECIMAL(10,0)"/>
         </createTable>
@@ -65,17 +65,17 @@
     </changeSet>
     <changeSet author="manydesigns" id="1313767352015-6">
         <createTable tableName="OLDPWD">
-            <column name="ID" type="CHAR(25)">
+            <column name="ID" type="VARCHAR(25)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="OLDPWD_PKEY"/>
             </column>
             <column name="CREATEDATE" type="TIMESTAMP NULL"/>
             <column name="PASSWORD" type="VARCHAR(30)"/>
-            <column name="USERID" type="CHAR(25)"/>
+            <column name="USERID" type="VARCHAR(25)"/>
         </createTable>
     </changeSet>
     <changeSet author="manydesigns" id="1313767352015-7">
         <createTable tableName="USERS">
-            <column name="USERID" type="CHAR(25)">
+            <column name="USERID" type="VARCHAR(25)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="USER_PKEY"/>
             </column>
             <column name="DELETIONDATE" type="TIMESTAMP NULL"/>
@@ -111,10 +111,10 @@
     </changeSet>
     <changeSet author="manydesigns" id="1313767352015-8">
         <createTable tableName="USERS_GROUPS">
-            <column name="GROUPID" type="CHAR(25)">
+            <column name="GROUPID" type="VARCHAR(25)">
                 <constraints nullable="false"/>
             </column>
-            <column name="USERID" type="CHAR(25)">
+            <column name="USERID" type="VARCHAR(25)">
                 <constraints nullable="false"/>
             </column>
             <column name="DELETIONDATE" type="TIMESTAMP NULL"/>

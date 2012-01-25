@@ -476,7 +476,7 @@
                         <table tableName="emailqueue" javaClass="com.manydesigns.portofino.system.model.email.EmailBean">
                             <columns>
                                 <column columnName="ID"
-                                        columnType="CHAR"
+                                        columnType="VARCHAR"
                                         javaType="java.lang.String"
                                         autoincrement="false"
                                         jdbcType="1"
