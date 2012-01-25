@@ -38,6 +38,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMultipart;
+
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -96,9 +99,22 @@ public class EmailSender implements Runnable{
             }
             email.setHostName(server);
             email.setSmtpPort(port);
-            email.setFrom(emailBean.getFrom());
             email.setSubject(emailBean.getSubject());
-            email.setMsg(emailBean.getBody());
+            email.setFrom(emailBean.getFrom());
+            MimeBodyPart messagePart = null;
+            MimeMultipart multipart = null;
+            messagePart = new MimeBodyPart();
+
+            multipart = new MimeMultipart();
+            multipart.addBodyPart(messagePart);  // adding message part
+
+            //Setting the Email Encoding
+            messagePart.setText(emailBean.getBody(),"utf-8");
+            messagePart.setHeader("Content-Type","text/plain; charset=\"utf-8\"");
+            messagePart.setHeader("Content-Transfer-Encoding", "quoted-printable");
+
+            email.setContent(multipart);
+
             email.addTo(emailBean.getTo());
             email.setTLS(ssl);
             email.send();

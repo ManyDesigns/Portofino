@@ -31,8 +31,9 @@
                 <%
                     PageInstance currentPageInstance = actionBean.getPageInstance();
                     Page currentPage = currentPageInstance.getPage();
+                    Class<?> actualActionClass = currentPageInstance.getActionClass();
                     SupportsPermissions supportsPermissions =
-                            actionBean.getDispatch().getActionBeanClass().getAnnotation(SupportsPermissions.class);
+                            actualActionClass.getAnnotation(SupportsPermissions.class);
                     String[] supportedPermissions = null;
                     if(supportsPermissions != null && supportsPermissions.value().length > 0) {
                         supportedPermissions = supportsPermissions.value();
