@@ -129,7 +129,7 @@ public class LoginAction extends AbstractActionBean {
     }
 
     protected void prepareScript() {
-        File file = new File(application.getAppTextDir(), "security.groovy");
+        File file = new File(application.getAppScriptsDir(), "security.groovy");
         if(file.exists()) {
             try {
                 FileReader fr = new FileReader(file);

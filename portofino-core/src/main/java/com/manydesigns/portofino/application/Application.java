@@ -162,7 +162,5 @@ public interface Application {
 
     ResourceBundle getBundle(Locale locale);
 
-    File getAppTextDir();
-
     Configuration getAppConfiguration();
 }
