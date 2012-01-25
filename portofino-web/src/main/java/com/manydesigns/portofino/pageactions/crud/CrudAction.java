@@ -1142,38 +1142,48 @@ public class CrudAction extends AbstractPageAction {
         this.pageInstance = pageInstance;
         this.crudConfiguration = (CrudConfiguration) pageInstance.getConfiguration();
 
-        if(crudConfiguration != null && crudConfiguration.getActualDatabase() != null) {
-            application = pageInstance.getApplication();
+        if (crudConfiguration == null) {
+            return null;
+        }
 
-            TableAccessor tableAccessor = new TableAccessor(crudConfiguration.getActualTable());
-            classAccessor = new CrudAccessor(crudConfiguration, tableAccessor);
+        Database actualDatabase = crudConfiguration.getActualDatabase();
+        if (actualDatabase == null) {
+            return null;
+        }
 
-            baseTable = crudConfiguration.getActualTable();
-            pkHelper = new PkHelper(classAccessor);
-            session = application.getSession(crudConfiguration.getDatabase());
-            List<String> parameters = pageInstance.getParameters();
-            if(!parameters.isEmpty()) {
-                pk = parameters.toArray(new String[parameters.size()]);
-                OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+        baseTable = crudConfiguration.getActualTable();
+        if (baseTable == null) {
+            return null;
+        }
+        TableAccessor tableAccessor = new TableAccessor(baseTable);
 
-                Serializable pkObject;
-                try {
-                    pkObject = pkHelper.getPrimaryKey(pk);
-                } catch (Exception e) {
-                    logger.warn("Invalid primary key", e);
-                    return new ErrorResolution(404);
-                }
-                object = QueryUtils.getObjectByPk(
-                    application,
-                    baseTable, pkObject,
-                    crudConfiguration.getQuery(), null);
-                if(object != null) {
-                    ognlContext.put(crudConfiguration.getActualVariable(), object);
-                    String description = ShortNameUtils.getName(classAccessor, object);
-                    pageInstance.setDescription(description);
-                } else {
-                    return notInUseCase(context);
-                }
+        classAccessor = new CrudAccessor(crudConfiguration, tableAccessor);
+
+        application = pageInstance.getApplication();
+        pkHelper = new PkHelper(classAccessor);
+        session = application.getSession(crudConfiguration.getDatabase());
+        List<String> parameters = pageInstance.getParameters();
+        if(!parameters.isEmpty()) {
+            pk = parameters.toArray(new String[parameters.size()]);
+            OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+
+            Serializable pkObject;
+            try {
+                pkObject = pkHelper.getPrimaryKey(pk);
+            } catch (Exception e) {
+                logger.warn("Invalid primary key", e);
+                return new ErrorResolution(404);
+            }
+            object = QueryUtils.getObjectByPk(
+                application,
+                baseTable, pkObject,
+                crudConfiguration.getQuery(), null);
+            if(object != null) {
+                ognlContext.put(crudConfiguration.getActualVariable(), object);
+                String description = ShortNameUtils.getName(classAccessor, object);
+                pageInstance.setDescription(description);
+            } else {
+                return notInUseCase(context);
             }
         }
         return null;
