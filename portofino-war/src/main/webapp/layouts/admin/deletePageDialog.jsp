@@ -17,7 +17,9 @@
     <input type="hidden" name="deletePage" value="action" />
 </div><%!
     private void displayPageChildrenAsList(Page page, XhtmlBuffer buf) {
-        ArrayList<ChildPage> childPages = page.getLayout().getChildPages();
+        ArrayList<ChildPage> childPages = new ArrayList<ChildPage>(page.getLayout().getChildPages());
+        childPages.addAll(page.getDetailLayout().getChildPages());
+        
         if(!childPages.isEmpty()) {
             buf.openElement("ul");
             for(ChildPage childPage : childPages) {

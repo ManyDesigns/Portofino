@@ -406,7 +406,7 @@ public class PageAdminAction extends AbstractActionBean {
     }
 
     protected Resolution copyPage(String newName, boolean deleteOriginal) {
-        if(destinationPagePath == null) {
+        if(StringUtils.isEmpty(destinationPagePath)) {
             SessionMessages.addErrorMessage(getMessage("page.copyOrMove.noDestination"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
@@ -416,11 +416,21 @@ public class PageAdminAction extends AbstractActionBean {
             SessionMessages.addErrorMessage(getMessage("page.copyOrMove.forbidden.root"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
-        Dispatcher dispatcher = new Dispatcher(application);
-        Dispatch destinationDispatch =
-                dispatcher.createDispatch(context.getRequest().getContextPath(), destinationPagePath);
-        //TODO gestione eccezioni
-        PageInstance newParent = destinationDispatch.getLastPageInstance();
+        PageInstance newParent;
+        if("/".equals(destinationPagePath)) {
+            File dir = application.getPagesDir();
+            try {
+                newParent = new PageInstance(null, dir, application, DispatcherLogic.getPage(dir));
+            } catch (Exception e) {
+                throw new Error("Couldn't load root page", e);
+            }
+        } else {
+            Dispatcher dispatcher = new Dispatcher(application);
+            Dispatch destinationDispatch =
+                    dispatcher.createDispatch(context.getRequest().getContextPath(), destinationPagePath);
+            //TODO gestione eccezioni
+            newParent = destinationDispatch.getLastPageInstance();
+        }
         if(!SecurityLogic.isAdministrator(context.getRequest())) {
             List<String> groups =
                     (List<String>) context.getRequest().getAttribute(RequestAttributes.GROUPS);

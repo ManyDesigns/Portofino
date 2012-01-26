@@ -41,10 +41,11 @@
             <portofino:buttons list="crud-read" cssClass="portletButton" />
         </div>
     </stripes:layout-component>
-    <stripes:layout-component name="contentFooter" />
-    <script type="text/javascript">
-        $(".crudReadButtons button[name=delete]").click(function() {
-            return confirm ('<fmt:message key="commons.confirm" />');
-        });
-    </script>
+    <stripes:layout-component name="contentFooter">
+        <script type="text/javascript">
+            $(".crudReadButtons button[name=delete]").click(function() {
+                return confirm ('<fmt:message key="commons.confirm" />');
+            });
+        </script>
+    </stripes:layout-component>
 </stripes:layout-render>

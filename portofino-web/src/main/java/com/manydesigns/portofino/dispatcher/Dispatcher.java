@@ -31,7 +31,6 @@ package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.pages.Page;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -77,13 +76,6 @@ public class Dispatcher {
 
         List<PageInstance> pagePath = new ArrayList<PageInstance>();
 
-        Model model = application.getModel();
-
-        if (model == null) {
-            logger.error("Model is null");
-            throw new Error("Model is null");
-        }
-
         String[] fragments = StringUtils.split(path, '/');
 
         List<String> fragmentsAsList = Arrays.asList(fragments);
@@ -109,15 +101,6 @@ public class Dispatcher {
         if (pagePath.size() <= 1) {
             return null;
         }
-
-        /*PageInstance pageInstance = pagePath.get(pagePath.size() - 1);
-        Page page = pageInstance.getPage();
-        Class<? extends ActionBean> actionBeanClass = null;
-        try {
-            actionBeanClass = getActionBeanClass(application, page);
-        } catch (ClassNotFoundException e) {
-            logger.error("Couldn't get action bean class for " + page, e);
-        }*/
 
         PageInstance[] pageArray =
                 new PageInstance[pagePath.size()];
