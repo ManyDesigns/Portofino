@@ -133,10 +133,11 @@ public class PageAdminAction extends AbstractActionBean {
         context.getRequest().setAttribute(RequestAttributes.DISPATCH, dispatch);
     }
 
-    protected String getMessage(String key) {
+    protected String getMessage(String key, Object... args) {
         Locale locale = context.getLocale();
         ResourceBundle resourceBundle = application.getBundle(locale);
-        return resourceBundle.getString(key);
+        String msg = resourceBundle.getString(key);
+        return MessageFormat.format(msg, args);
     }
 
     //--------------------------------------------------------------------------
@@ -220,8 +221,7 @@ public class PageAdminAction extends AbstractActionBean {
             return doCreateNewPage();
         } catch (Exception e) {
             logger.error("Error creating page", e);
-            String msg = getMessage("page.create.failed");
-            msg = MessageFormat.format(msg, e.getMessage());
+            String msg = getMessage("page.create.failed", e.getMessage());
             SessionMessages.addErrorMessage(msg);
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
         }
@@ -299,7 +299,7 @@ public class PageAdminAction extends AbstractActionBean {
                     parentLayout = parentPageInstance.getLayout();
                     parentDirectory = parentPageInstance.getDirectory();
                     directory = parentPageInstance.getChildPageDirectory(fragment);
-                    configurePath = dispatch.getParentPathUrl();
+                    configurePath = parentPageInstance.getPath();
                     break;
                 default:
                     throw new IllegalStateException("Don't know how to add page " + page + " at position " + insertPosition);
@@ -381,7 +381,7 @@ public class PageAdminAction extends AbstractActionBean {
             } catch (Exception e) {
                 logger.error("Error deleting page", e);
             }
-            return new RedirectResolution(dispatch.getParentPathUrl());
+            return new RedirectResolution(parentPageInstance.getPath());
         }
         return new RedirectResolution(dispatch.getOriginalPath());
     }
@@ -481,12 +481,11 @@ public class PageAdminAction extends AbstractActionBean {
                     DispatcherLogic.savePage(newParent.getDirectory(), newParent.getPage());
                 } catch (Exception e) {
                     logger.error("Couldn't copy/move page", e);
-                    String msg = MessageFormat.format(getMessage("page.copyOrMove.failed"), destinationPagePath);
+                    String msg = getMessage("page.copyOrMove.failed", destinationPagePath);
                     SessionMessages.addErrorMessage(msg);
                 }
             } else {
-                String msg = MessageFormat.format
-                        (getMessage("page.copyOrMove.destinationExists"), newDirectory.getAbsolutePath());
+                String msg = getMessage("page.copyOrMove.destinationExists", newDirectory.getAbsolutePath());
                 SessionMessages.addErrorMessage(msg);
             }
             if(deleteOriginal) {
@@ -495,7 +494,7 @@ public class PageAdminAction extends AbstractActionBean {
                 return new RedirectResolution(dispatch.getOriginalPath());
             }
         } else {
-            String msg = MessageFormat.format(getMessage("page.copyOrMove.invalidDestination"), destinationPagePath);
+            String msg = getMessage("page.copyOrMove.invalidDestination", destinationPagePath);
             SessionMessages.addErrorMessage(msg);
         }
         return new RedirectResolution(dispatch.getOriginalPath());
@@ -711,8 +710,7 @@ public class PageAdminAction extends AbstractActionBean {
             }
             newChildren.add(childPage);
             if(!editChildPage.showInNavigation && !editChildPage.embedded) {
-                String msg = getMessage("page.warnNotShowInNavigationNotEmbedded");
-                msg = MessageFormat.format(msg, editChildPage.name);
+                String msg = getMessage("page.warnNotShowInNavigationNotEmbedded", editChildPage.name);
                 SessionMessages.addWarningMessage(msg);
             }
         }
@@ -731,8 +729,7 @@ public class PageAdminAction extends AbstractActionBean {
             DispatcherLogic.savePage(getPageInstance());
         } catch (Exception e) {
             logger.error("Couldn't save page", e);
-            String msg = getMessage("page.update.failed");
-            msg = MessageFormat.format(msg, e.getMessage());
+            String msg = getMessage("page.update.failed", e.getMessage());
             SessionMessages.addErrorMessage(msg);
             return false;
         }

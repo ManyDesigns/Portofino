@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.navigation;
 
-import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
@@ -41,7 +40,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -91,9 +92,9 @@ public class Navigation {
             return;
         }
         PageInstance rootPageInstance = pageInstances[0];
-        String prefix = contextPath + dispatch.getPathUrl(rootPageIndex);
+        String prefix = contextPath;
         if(rootPageIndex > 0) {
-            prefix += "/" + rootPageInstance.getName();
+            prefix += rootPageInstance.getParent().getPath() + "/" + rootPageInstance.getName();
         }
         boolean rootSelected = pageInstances.length == 1;
         Page rootPage = rootPageInstance.getPage();

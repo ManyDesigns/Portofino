@@ -48,7 +48,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -63,6 +62,7 @@ public class ApplicationInterceptor implements Interceptor {
 
     public final static Logger logger =
             LoggerFactory.getLogger(ApplicationInterceptor.class);
+    public static final String INVALID_PAGE_INSTANCE = "validDispatchPathLength";
 
     public Resolution intercept(ExecutionContext context) throws Exception {
         logger.debug("Retrieving Stripes objects");
@@ -95,24 +95,19 @@ public class ApplicationInterceptor implements Interceptor {
         Dispatch dispatch =
                 (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
         if (dispatch != null) {
-            List<String> groups =
-                    (List<String>) request.getAttribute(RequestAttributes.GROUPS);
-
-            logger.debug("Creating navigation");
-
-            int i = 0;
+            logger.debug("Preparing PageActions");
             for(PageInstance page : dispatch.getPageInstancePath()) {
-                i++;
                 if(page.getParent() == null) {
-                    continue; //Don't instantiate root
+                    logger.debug("Not preparing root");
+                    continue;
                 }
+                logger.debug("Preparing PageAction {}", page);
                 PageAction actionBean = instantiateActionBean(page);
                 configureActionBean(actionBean, page, application);
                 Resolution resolution = actionBean.prepare(page, actionContext);
                 if(resolution != null) {
-                    String pathUrl = dispatch.getPathUrl(i);
-                    request.setAttribute("redirectUrl", request.getContextPath() + pathUrl);
-                    logger.error("Page realization failed for {}", page);
+                    request.setAttribute(INVALID_PAGE_INSTANCE, page);
+                    logger.error("PageAction prepare failed for {}", page);
                     return resolution;
                 }
             }

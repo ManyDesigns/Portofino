@@ -569,7 +569,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             }
         } catch (IOException e) {
             logger.error("Error writing script to " + groovyScriptFile, e);
-            String msg = MessageFormat.format(getMessage("script.write.failed"), groovyScriptFile.getAbsolutePath());
+            String msg = getMessage("script.write.failed", groovyScriptFile.getAbsolutePath());
             SessionMessages.addErrorMessage(msg);
         } catch (Exception e) {
             String pageId = pageInstance.getPage().getId();
@@ -578,10 +578,11 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
     }
 
-    protected String getMessage(String key) {
+    protected String getMessage(String key, Object... args) {
         Locale locale = context.getLocale();
         ResourceBundle resourceBundle = application.getBundle(locale);
-        return resourceBundle.getString(key);
+        String msg = resourceBundle.getString(key);
+        return MessageFormat.format(msg, args);
     }
 
     public Map getOgnlContext() {

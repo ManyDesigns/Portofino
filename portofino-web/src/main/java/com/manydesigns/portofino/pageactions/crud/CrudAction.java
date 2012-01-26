@@ -705,8 +705,8 @@ public class CrudAction extends AbstractPageAction {
                 SessionMessages.addErrorMessage(rootCauseMessage);
                 return new ForwardResolution("/layouts/crud/bulk-edit.jsp");
             }
-            SessionMessages.addInfoMessage(MessageFormat.format(
-                    "UPDATE di {0} oggetti avvenuto con successo",
+            SessionMessages.addInfoMessage(getMessage(
+                    "commons.bulkUpdate.successful",
                     selection.length));
             return new RedirectResolution(dispatch.getOriginalPath())
                     .addParameter(SEARCH_STRING_PARAM, searchString);
@@ -764,9 +764,7 @@ public class CrudAction extends AbstractPageAction {
         }
         try {
             session.getTransaction().commit();
-            SessionMessages.addInfoMessage(MessageFormat.format(
-            "DELETE di {0} oggetti avvenuto con successo",
-            deleted));
+            SessionMessages.addInfoMessage(getMessage("commons.bulkDelete.successful", deleted));
         } catch (Exception e) {
             logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
             SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
@@ -827,7 +825,7 @@ public class CrudAction extends AbstractPageAction {
             int previousPos = pageInstancePath.length - 2;
             if (previousPos >= 0) {
                 PageInstance previousPageInstance = pageInstancePath[previousPos];
-                String url = dispatch.getPathUrl(previousPos + 1);
+                String url = previousPageInstance.getPath();
                 resolution = new RedirectResolution(url, true);
             } else {
                 resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
@@ -1172,7 +1170,7 @@ public class CrudAction extends AbstractPageAction {
                 pkObject = pkHelper.getPrimaryKey(pk);
             } catch (Exception e) {
                 logger.warn("Invalid primary key", e);
-                return new ErrorResolution(404);
+                return notInUseCase(context, parameters);
             }
             object = QueryUtils.getObjectByPk(
                 application,
@@ -1183,17 +1181,20 @@ public class CrudAction extends AbstractPageAction {
                 String description = ShortNameUtils.getName(classAccessor, object);
                 pageInstance.setDescription(description);
             } else {
-                return notInUseCase(context);
+                return notInUseCase(context, parameters);
             }
         }
         return null;
     }
 
-    protected Resolution notInUseCase(ActionBeanContext context) {
+    protected Resolution notInUseCase(ActionBeanContext context, List<String> parameters) {
         logger.info("Not in use case: " + crudConfiguration.getName());
         Locale locale = context.getLocale();
         ResourceBundle resourceBundle = application.getBundle(locale);
-        SessionMessages.addWarningMessage(resourceBundle.getString("crud.notInUseCase"));
+        //Non getMessage poiché this.context == null durante il prepare
+        String msg = MessageFormat.format(resourceBundle.getString("crud.notInUseCase"),
+                                          StringUtils.join(parameters, "/"));
+        SessionMessages.addWarningMessage(msg);
         return new ForwardResolution("/layouts/crud/notInUseCase.jsp");
     }
 

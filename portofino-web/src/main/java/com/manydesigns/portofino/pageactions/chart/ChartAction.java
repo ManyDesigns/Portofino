@@ -212,7 +212,7 @@ public class ChartAction extends AbstractPageAction {
         RedirectResolution resolution;
         if (previousPos >= 0) {
             PageInstance previousPage = pageInstancePath[previousPos];
-            String url = dispatch.getPathUrl(previousPos + 1);
+            String url = previousPage.getPath();
             return new RedirectResolution(url, true);
         } else {
             throw new Error("No parent for root page");

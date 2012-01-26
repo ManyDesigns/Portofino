@@ -59,9 +59,13 @@ public class Breadcrumbs {
 
         StringBuilder sb = new StringBuilder();
         int start = dispatch.getClosestSubtreeRootIndex();
-        sb.append(dispatch.getContextPath()).append(dispatch.getPathUrl(start));
-        if(dispatch.getPageInstance(start).getParent() == null) {
+        sb.append(dispatch.getContextPath());
+        PageInstance pageInstance = dispatch.getPageInstance(start);
+        PageInstance parentPageInstance = pageInstance.getParent();
+        if(parentPageInstance == null) {
             start++;
+        } else {
+            sb.append(parentPageInstance.getPath());
         }
         for (int i = start; i < upto; i++) {
             PageInstance current = dispatch.getPageInstancePath()[i];

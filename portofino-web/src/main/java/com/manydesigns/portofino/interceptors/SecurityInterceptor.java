@@ -121,7 +121,7 @@ public class
             String resource;
             boolean allowed;
             if(dispatch != null) {
-                resource = dispatch.getPathUrl();
+                resource = dispatch.getLastPageInstance().getPath();
                 allowed = SecurityLogic.hasPermissions(dispatch, groups, handler);
             } else {
                 resource = request.getRequestURI();

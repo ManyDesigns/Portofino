@@ -1,3 +1,7 @@
+<%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.RequestAttributes" %>
+<%@ page import="com.manydesigns.portofino.interceptors.ApplicationInterceptor" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.PageInstance" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -15,10 +19,11 @@
     response.addHeader("Cache-Control", "no-store");
     response.setDateHeader("Expires", 0);
 
-    String targetUrl = (String) request.getAttribute("redirectUrl");
-    int lastSlashPos = targetUrl.lastIndexOf("/");
-    targetUrl = targetUrl.substring(0, lastSlashPos);
+    PageInstance invalidPage =
+            (PageInstance) request.getAttribute(ApplicationInterceptor.INVALID_PAGE_INSTANCE);
+    invalidPage.getParameters().clear();
 
+    String targetUrl = request.getContextPath() + invalidPage.getPath();
     response.setHeader("Refresh", "0; " + targetUrl);
     
     %><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">

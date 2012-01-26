@@ -88,31 +88,6 @@ public class Dispatch {
         }
     }
 
-    public String getPathUrl() {
-        return getPathUrl(pageInstancePath.length);
-    }
-
-    public String getParentPathUrl() {
-        return getPathUrl(pageInstancePath.length - 1);
-    }
-
-    public String getPathUrl(int length) {
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (int i = 0; i < length; i++) {
-            PageInstance current = pageInstancePath[i];
-            String fragment = current.getUrlFragment();
-            if (!first) {
-                sb.append("/");
-                sb.append(fragment);
-            } else {
-                first = false;
-                // ignore fragment of root node
-            }
-        }
-        return sb.toString();
-    }
-
     public PageInstance getPageInstance(int index) {
         if(index >= 0) {
             return getPageInstancePath()[index];

@@ -278,8 +278,8 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
             SessionMessages.addInfoMessage(getMessage("connectionProviders.test.successful"));
         } else {
             SessionMessages.addErrorMessage(
-                    MessageFormat.format(getMessage("connectionProviders.test.failed"),
-                            status, connectionProvider.getErrorMessage()));
+                    getMessage("connectionProviders.test.failed",
+                               status, connectionProvider.getErrorMessage()));
         }
         return new RedirectResolution(this.getClass())
                 .addParameter("databaseName", databaseName);
@@ -523,10 +523,11 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
     }
 
-    protected String getMessage(String key) {
+    protected String getMessage(String key, Object... args) {
         Locale locale = context.getLocale();
         ResourceBundle resourceBundle = application.getBundle(locale);
-        return resourceBundle.getString(key);
+        String msg = resourceBundle.getString(key);
+        return MessageFormat.format(msg, args);
     }
 
     public String getDatabaseName() {

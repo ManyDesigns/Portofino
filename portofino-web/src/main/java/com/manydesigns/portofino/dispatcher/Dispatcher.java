@@ -147,7 +147,7 @@ public class Dispatcher {
     }
 
     protected Dispatch checkDispatch(Dispatch dispatch) {
-        String pathUrl = dispatch.getPathUrl();
+        String pathUrl = dispatch.getLastPageInstance().getPath();
         assert pathUrl.equals(normalizePath(dispatch.getOriginalPath()));
         return dispatch;
     }

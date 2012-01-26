@@ -94,6 +94,14 @@ public class PageInstance {
         return fragment;
     }
 
+    public String getPath() {
+        if(getParent() == null) {
+            return "";
+        } else {
+            return getParent().getPath() + "/" + getUrlFragment();
+        }
+    }
+
     public File getDirectory() {
         return directory;
     }

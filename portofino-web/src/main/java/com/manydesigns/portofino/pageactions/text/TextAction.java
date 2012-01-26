@@ -465,9 +465,7 @@ public class TextAction extends AbstractPageAction {
                 SessionMessages.addInfoMessage(getMessage("text.attachment.oneDeleted"));
             } else if (counter > 1) {
                 SessionMessages.addInfoMessage(
-                        MessageFormat.format(
-                                getMessage("text.attachment.nDeleted"),
-                                counter));
+                                getMessage("text.attachment.nDeleted", counter));
             }
         }
         return new RedirectResolution(dispatch.getOriginalPath())
