@@ -532,25 +532,14 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     protected void prepareScript() {
         String pageId = pageInstance.getPage().getId();
         File file = ScriptingUtil.getGroovyScriptFile(pageInstance.getDirectory(), "action");
-        if(file.exists()) {
-            FileReader fr = null;
-            try {
-                fr = new FileReader(file);
-                script = IOUtils.toString(fr);
-            } catch (Exception e) {
-                logger.warn("Couldn't load script for page " + pageId, e);
-            } finally {
-                IOUtils.closeQuietly(fr);
-            }
-        } else {
-            String template = getScriptTemplate();
-            String className = pageId;
-            if(Character.isDigit(className.charAt(0))) {
-                className = "_" + className;
-            }
-            if(template != null) {
-                script = template.replace("__CLASS_NAME__", className);
-            }
+        FileReader fr = null;
+        try {
+            fr = new FileReader(file);
+            script = IOUtils.toString(fr);
+        } catch (Exception e) {
+            logger.warn("Couldn't load script for page " + pageId, e);
+        } finally {
+            IOUtils.closeQuietly(fr);
         }
     }
 

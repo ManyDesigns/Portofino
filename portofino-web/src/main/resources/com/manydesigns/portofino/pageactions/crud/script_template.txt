@@ -5,8 +5,9 @@ import com.manydesigns.portofino.system.model.users.annotations.SupportsPermissi
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
-class __CLASS_NAME__ extends CrudAction {
+class %{#generatedClassName} extends CrudAction '{'
 
+    //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino
     //Write your code here
 
-}
+'}'

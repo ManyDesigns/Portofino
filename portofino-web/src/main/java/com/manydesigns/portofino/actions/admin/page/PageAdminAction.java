@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.actions.admin.page;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
@@ -36,6 +37,7 @@ import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.actions.forms.NewPage;
@@ -64,6 +66,7 @@ import com.manydesigns.portofino.system.model.users.annotations.RequiresAdminist
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.util.HttpUtil;
+import ognl.OgnlContext;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -170,7 +173,6 @@ public class PageAdminAction extends AbstractActionBean {
     }
 
     protected void updateLayout(String layoutContainer, String[] portletWrapperIds) throws Exception {
-        //TODO verificare
         PageInstance myparent = getPageInstance().getParent();
         Layout parentLayout = myparent.getLayout();
         if(parentLayout == null) {
@@ -249,15 +251,14 @@ public class PageAdminAction extends AbstractActionBean {
             PageAction action = (PageAction) ReflectionUtil.newInstance(pageClassName);
             String pageId = RandomUtil.createRandomId();
 
-            String script;
-            //TODO duplicato in PortletAction
             String template = action.getScriptTemplate();
             String className = pageId;
             if(Character.isDigit(className.charAt(0))) {
                 className = "_" + className;
             }
-            script = template.replace("__CLASS_NAME__", className);
-            //end TODO
+            OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+            ognlContext.put("generatedClassName", className);
+            String script = OgnlTextFormat.format(template, this);
 
             Page page = new Page();
             BeanUtils.copyProperties(page, newPage);
@@ -354,8 +355,6 @@ public class PageAdminAction extends AbstractActionBean {
         PageInstance parentPageInstance = pageInstance.getParent();
         if(parentPageInstance == null) {
             SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.root"));
-        /*} else if(PageLogic.isLandingPage(application, page)) { //TODO ripristinare
-            SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.landing"));*/
         } else {
             Dispatcher dispatcher = new Dispatcher(application);
             String contextPath = context.getRequest().getContextPath();

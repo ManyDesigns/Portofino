@@ -23,8 +23,7 @@
             <legend><fmt:message key="layouts.text.configure.content"/></legend>
             <stripes:textarea class="mde-form-rich-text" name="content" value="${actionBean.content}"/>
         </fieldset>
-        <div class="horizontalSeparator"></div>
-        <fmt:message key="layouts.text.configure.this_document_is_saved"/> <c:out value="${actionBean.textFile.name}"/>
+        <%@include file="../script-configuration.jsp" %>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
