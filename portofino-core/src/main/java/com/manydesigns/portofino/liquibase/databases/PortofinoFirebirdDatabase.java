@@ -31,6 +31,7 @@ package com.manydesigns.portofino.liquibase.databases;
 
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
 import liquibase.database.core.FirebirdDatabase;
+import liquibase.exception.DatabaseException;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,5 +46,14 @@ public class PortofinoFirebirdDatabase extends FirebirdDatabase {
     @Override
     public String escapeDatabaseObject(String objectName) {
         return LiquibaseUtils.escapeDatabaseObject(objectName, "\"");
+    }
+
+    @Override
+    public String convertRequestedSchemaToSchema(String requestedSchema) throws DatabaseException {
+        if (requestedSchema == null) {
+            return getDefaultDatabaseSchemaName();
+        } else {
+            return requestedSchema;
+        }
     }
 }

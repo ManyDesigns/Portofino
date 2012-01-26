@@ -31,6 +31,8 @@ package com.manydesigns.portofino.liquibase.databases;
 
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
 import liquibase.database.core.PostgresDatabase;
+import liquibase.exception.DatabaseException;
+import liquibase.util.StringUtils;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -50,5 +52,18 @@ public class PortofinoPostgresDatabase extends PostgresDatabase {
     @Override
     public String escapeIndexName(String schemaName, String indexName) {
         return escapeDatabaseObject(indexName);
+    }
+
+    @Override
+    public String convertRequestedSchemaToSchema(String requestedSchema) throws DatabaseException {
+        if (requestedSchema == null)
+            requestedSchema = getDefaultSchemaName();
+
+        if (requestedSchema == null) {
+            // Return the catalog name instead..
+            return getDefaultCatalogName();
+        } else {
+            return StringUtils.trimToNull(requestedSchema);
+        }
     }
 }

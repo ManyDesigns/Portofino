@@ -31,6 +31,7 @@ package com.manydesigns.portofino.liquibase.databases;
 
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
 import liquibase.database.core.OracleDatabase;
+import liquibase.exception.DatabaseException;
 import liquibase.util.StringUtils;
 
 /**
@@ -54,6 +55,15 @@ public class PortofinoOracleDatabase extends OracleDatabase {
             return escapeDatabaseObject(indexName);
         } else {
             return escapeDatabaseObject(schemaName) + "." + escapeDatabaseObject(indexName);
+        }
+    }
+
+    @Override
+    public String convertRequestedSchemaToSchema(String requestedSchema) throws DatabaseException {
+        if (requestedSchema == null) {
+            return getDefaultDatabaseSchemaName();
+        } else {
+            return requestedSchema;
         }
     }
 
