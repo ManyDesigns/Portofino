@@ -310,7 +310,7 @@ public class PageAdminAction extends AbstractActionBean {
                 SessionMessages.addErrorMessage(getMessage("page.create.failed.directoryExists"));
                 return new ForwardResolution("/layouts/page-crud/new-page.jsp");
             }
-            if(directory.mkdir()) {
+            if(directory.mkdirs()) {
                 try {
                     logger.debug("Creating the new child page in directory: {}", directory);
                     DispatcherLogic.savePage(directory, page);

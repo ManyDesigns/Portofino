@@ -458,12 +458,12 @@ public class QueryUtils {
         PropertyAccessor[] keyProperties = table.getKeyProperties();
         int size = keyProperties.length;
         if (size > 1) {
-            result = session.load(actualEntityName, pk);
+            result = session.get(actualEntityName, pk);
             return result;
         }
         PropertyAccessor propertyAccessor = keyProperties[0];
         Serializable key = (Serializable) propertyAccessor.get(pk);
-        result = session.load(actualEntityName, key);
+        result = session.get(actualEntityName, key);
         return result;
     }
 
@@ -480,7 +480,7 @@ public class QueryUtils {
     public static Object getObjectByPk(
             Application application, String database, String entityName,
             Serializable pk, String queryString, Object rootObject) {
-        if(queryString.toUpperCase().indexOf("WHERE") == -1) {
+        if(!queryString.toUpperCase().contains("WHERE")) { //TODO
             return getObjectByPk(application, database, entityName, pk);
         }
         TableAccessor table = application.getTableAccessor(database, entityName);
