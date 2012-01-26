@@ -3,6 +3,7 @@
 <%@ page import="com.manydesigns.portofino.breadcrumbs.Breadcrumbs" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.PageInstance" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1" %><%@
     taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%><%@
@@ -42,15 +43,16 @@
     <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">
         <portofino:buttons list="page-create" cssClass="contentButton"/>
+        <% PageInstance pageInstance = actionBean.dispatch.getLastPageInstance(); %>
         <script type="text/javascript">
             var rootPath = "<%= request.getContextPath() %>";
             var rootBreadcrumbs = "";
 
-            var currentPath = "<%= actionBean.dispatch.getPathUrl() %>";
+            var currentPath = "<%= pageInstance.getPath() %>";
             var currentBreadcrumbs =
                     "<%= generateBreadcrumbs(new Breadcrumbs(actionBean.dispatch)) %>";
 
-            var parentPath = "<%= actionBean.dispatch.getParentPathUrl() %>";
+            var parentPath = "<%= pageInstance.getParent().getPath() %>";
             var parentBreadcrumbs =
                     "<%= generateBreadcrumbs(new Breadcrumbs(actionBean.dispatch,
                                                 actionBean.dispatch.getPageInstancePath().length - 1)) %>";
