@@ -47,6 +47,7 @@
         <module>portofino-core</module>
         <module>portofino-web</module>
         <module>portofino-war</module>
+        <module>portofino-pageactions-extras</module>
     </modules>
     
     <build>
