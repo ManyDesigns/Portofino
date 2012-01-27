@@ -8,9 +8,10 @@
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
+        <% int maxEventsPerCell = 4; %>
         <style type="text/css">
             .calendar-container {
-                position: relative; height: 675px; /*TODO*/
+                position: relative; height: <%= maxEventsPerCell * 120 + 120 %>px;
             }
             .days-table td, .days-table th {
                 margin: 0; padding: 0 0 0 10px; border: none; text-align: left;
@@ -39,13 +40,13 @@
                 position: relative; border: none;
             }
             .events-table td {
-                padding: 0; border: none;
+                padding: 1px; border: none;
             }
             .events-table th {
-                padding: 0 0 5px 10px; border: none; text-align: left;
+                padding: 0 0 3px 10px; border: none; text-align: left;
             }
             .event {
-                padding: 0 0 0 9px;
+                padding: 0 0 0 8px;
             }
         </style>
         <div class="calendar-container">
@@ -85,25 +86,18 @@
                                 <th>6</th>
                                 <th>7</th>
                             </tr>
-                            <tr>
-                                <td></td>
-                                <td colspan="2">
-                                    <div class="event" style="background-color: #F0D0CE; border: 1px solid #DB7972;">Uno</div>
-                                </td>
-                                <td></td>
-                                <td><div class="event">Due</div></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td><div class="event">Tre</div></td>
-                                <td><div class="event">Quattro</div></td>
-                                <td></td>
-                                <td></td>
-                                <td><div class="event">Cinque</div></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
+                            <% for(int i = 0; i < maxEventsPerCell; i++) { %>
+                                <tr>
+                                    <td></td>
+                                    <td colspan="2">
+                                        <div class="event" style="background-color: #F0D0CE; border: 1px solid #DB7972;">Uno</div>
+                                    </td>
+                                    <td></td>
+                                    <td><div class="event">Due</div></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            <% } %>
                         </table>
                     </div>
                 </c:forEach>
