@@ -32,6 +32,8 @@ package com.manydesigns.portofino.pageactions.calendar;
 import junit.framework.TestCase;
 import org.joda.time.*;
 
+import java.util.List;
+
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -44,37 +46,65 @@ public class MonthViewTest extends TestCase {
 
     DateTimeZone dtz = DateTimeZone.UTC;
 
+    DateMidnight dec26 = new DateMidnight(
+            2011, DateTimeConstants.DECEMBER, 26,
+            dtz);
+    DateMidnight dec27 = dec26.plusDays(1);
+    DateMidnight dec28 = dec27.plusDays(1);
+    DateMidnight dec29 = dec28.plusDays(1);
+    DateMidnight dec30 = dec29.plusDays(1);
+    DateMidnight dec31 = dec30.plusDays(1);
+    DateMidnight jan1 = dec31.plusDays(1);
+    DateMidnight jan2 = jan1.plusDays(1);
+    DateMidnight jan3 = jan2.plusDays(1);
+    DateMidnight jan4 = jan3.plusDays(1);
+    DateMidnight jan5 = jan4.plusDays(1);
+    DateMidnight jan6 = jan5.plusDays(1);
+    DateMidnight jan7 = jan6.plusDays(1);
+    DateMidnight jan8 = jan7.plusDays(1);
+    DateMidnight jan9 = jan8.plusDays(1);
+    DateMidnight jan10 = jan9.plusDays(1);
+    DateMidnight jan11 = jan10.plusDays(1);
+    DateMidnight jan12 = jan11.plusDays(1);
+    DateMidnight jan13 = jan12.plusDays(1);
+    DateMidnight jan14 = jan13.plusDays(1);
+    DateMidnight jan15 = jan14.plusDays(1);
+    DateMidnight jan16 = jan15.plusDays(1);
+    DateMidnight jan17 = jan16.plusDays(1);
+    DateMidnight jan18 = jan17.plusDays(1);
+    DateMidnight jan19 = jan18.plusDays(1);
+    DateMidnight jan20 = jan19.plusDays(1);
+    DateMidnight jan21 = jan20.plusDays(1);
+    DateMidnight jan22 = jan21.plusDays(1);
+    DateMidnight jan23 = jan22.plusDays(1);
+    DateMidnight jan24 = jan23.plusDays(1);
+    DateMidnight jan25 = jan24.plusDays(1);
+    DateMidnight jan26 = jan25.plusDays(1);
+    DateMidnight jan27 = jan26.plusDays(1);
+    DateMidnight jan28 = jan27.plusDays(1);
+    DateMidnight jan29 = jan28.plusDays(1);
+    DateMidnight jan30 = jan29.plusDays(1);
+    DateMidnight jan31 = jan30.plusDays(1);
+    DateMidnight feb1 = jan31.plusDays(1);
+    DateMidnight feb2 = feb1.plusDays(1);
+    DateMidnight feb3 = feb2.plusDays(1);
+    DateMidnight feb4 = feb3.plusDays(1);
+    DateMidnight feb5 = feb4.plusDays(1);
+    DateMidnight feb6 = feb5.plusDays(1);
+
+    DateTime today = new DateTime(
+            2012, DateTimeConstants.JANUARY, 27,
+            11, 4, 35, 737,
+            dtz);
+
+
+
     MonthView monthView;
 
     public void testConstructor() throws Exception {
-        DateMidnight dec26 = new DateMidnight(
-                2011, DateTimeConstants.DECEMBER, 26,
-                dtz);
-        DateMidnight dec27 = dec26.plusDays(1);
-        DateMidnight dec28 = dec27.plusDays(1);
-        DateMidnight dec29 = dec28.plusDays(1);
-        DateMidnight dec30 = dec29.plusDays(1);
-        DateMidnight dec31 = dec30.plusDays(1);
-        DateMidnight jan1 = dec31.plusDays(1);
-        DateMidnight jan2 = jan1.plusDays(1);
-        DateMidnight jan9 = jan2.plusDays(7);
-
-        DateMidnight feb1 = new DateMidnight(
-                2012, DateTimeConstants.FEBRUARY, 1,
-                dtz);
-
-        DateMidnight feb6 = new DateMidnight(
-                2012, DateTimeConstants.FEBRUARY, 6,
-                dtz);
-
-        DateTime today = new DateTime(
-                2012, DateTimeConstants.JANUARY, 27,
-                11, 4, 35, 737,
-                dtz);
-
         // creating the month view
         monthView = new MonthView(today);
-        assertEquals(today, monthView.getToday());
+        assertEquals(today, monthView.getReferenceDateTime());
         assertEquals(DateTimeConstants.MONDAY, monthView.getFirstDayOfWeek());
 
         // month start/end
@@ -147,5 +177,123 @@ public class MonthViewTest extends TestCase {
                 dtz);
         assertEquals(expectedMonthStart, monthView.getMonthStart());
         assertEquals(expectedMonthStart, monthView.getMonthViewStart());
+    }
+
+    public void testAddOneDayEvent() throws Exception {
+        monthView = new MonthView(today);
+
+        // create the event
+        Calendar calendar = null;
+        Interval eventInterval = new Interval(jan3, jan4);
+        Event event = new Event(
+                calendar, "e1", "Test event", eventInterval, null, null);
+
+        assertTrue(monthView.addEvent(event));
+
+        // first week is empty
+        MonthView.Week week = monthView.getWeek(0);
+        List<EventWeek> eventWeekOverlaps = week.getEventWeekOverlaps();
+        assertEquals(0, eventWeekOverlaps.size());
+
+        // the week containing the event
+        week = monthView.getWeek(1);
+        eventWeekOverlaps = week.getEventWeekOverlaps();
+        assertEquals(1, eventWeekOverlaps.size());
+
+        EventWeek eventWeek = eventWeekOverlaps.get(0);
+        assertEquals(event, eventWeek.getEvent());
+        assertEquals(1, eventWeek.getStartDay());
+        assertEquals(1, eventWeek.getEndDay());
+        assertFalse(eventWeek.isContinues());
+
+        // the rest of the weeks are empty
+        for (int i = 2; i < 6; i++) {
+            week = monthView.getWeek(i);
+            eventWeekOverlaps = week.getEventWeekOverlaps();
+            assertEquals(0, eventWeekOverlaps.size());
+        }
+    }
+
+    public void testAddTwoDaysEvent() throws Exception {
+        monthView = new MonthView(today);
+
+        // create the event
+        Calendar calendar = null;
+        DateTime start = jan3.toDateTime().plus(Hours.hours(15));
+        DateTime end = jan4.toDateTime().plus(Hours.hours(9));
+        Interval eventInterval = new Interval(jan3, jan5);
+        Event event = new Event(
+                calendar, "e1", "Test event", eventInterval, null, null);
+
+        assertTrue(monthView.addEvent(event));
+
+        // first week is empty
+        MonthView.Week week = monthView.getWeek(0);
+        List<EventWeek> eventWeekOverlaps = week.getEventWeekOverlaps();
+        assertEquals(0, eventWeekOverlaps.size());
+
+        // the week containing the event
+        week = monthView.getWeek(1);
+        eventWeekOverlaps = week.getEventWeekOverlaps();
+        assertEquals(1, eventWeekOverlaps.size());
+
+        EventWeek eventWeek = eventWeekOverlaps.get(0);
+        assertEquals(event, eventWeek.getEvent());
+        assertEquals(1, eventWeek.getStartDay());
+        assertEquals(2, eventWeek.getEndDay());
+        assertFalse(eventWeek.isContinues());
+
+        // the rest of the weeks are empty
+        for (int i = 2; i < 6; i++) {
+            week = monthView.getWeek(i);
+            eventWeekOverlaps = week.getEventWeekOverlaps();
+            assertEquals(0, eventWeekOverlaps.size());
+        }
+    }
+
+    public void testAddEventOnTwoWeeks() throws Exception {
+        monthView = new MonthView(today);
+
+        // create the event
+        Calendar calendar = null;
+        Interval eventInterval = new Interval(jan7, jan12);
+        Event event = new Event(
+                calendar, "e1", "Test event", eventInterval, null, null);
+
+        assertTrue(monthView.addEvent(event));
+
+        // first week is empty
+        MonthView.Week week = monthView.getWeek(0);
+        List<EventWeek> eventWeekOverlaps = week.getEventWeekOverlaps();
+        assertEquals(0, eventWeekOverlaps.size());
+
+        // the week containing the first part of the event
+        week = monthView.getWeek(1);
+        eventWeekOverlaps = week.getEventWeekOverlaps();
+        assertEquals(1, eventWeekOverlaps.size());
+
+        EventWeek eventWeek = eventWeekOverlaps.get(0);
+        assertEquals(event, eventWeek.getEvent());
+        assertEquals(5, eventWeek.getStartDay());
+        assertEquals(6, eventWeek.getEndDay());
+        assertTrue(eventWeek.isContinues());
+
+        // the week containing the second part of the event
+        week = monthView.getWeek(2);
+        eventWeekOverlaps = week.getEventWeekOverlaps();
+        assertEquals(1, eventWeekOverlaps.size());
+
+        eventWeek = eventWeekOverlaps.get(0);
+        assertEquals(event, eventWeek.getEvent());
+        assertEquals(0, eventWeek.getStartDay());
+        assertEquals(2, eventWeek.getEndDay());
+        assertFalse(eventWeek.isContinues());
+
+        // the rest of the weeks are empty
+        for (int i = 3; i < 6; i++) {
+            week = monthView.getWeek(i);
+            eventWeekOverlaps = week.getEventWeekOverlaps();
+            assertEquals(0, eventWeekOverlaps.size());
+        }
     }
 }

@@ -30,15 +30,15 @@
 package com.manydesigns.portofino.pageactions.calendar;
 
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.IOUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,7 +49,7 @@ import java.util.List;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresPermissions(level = AccessLevel.VIEW)
-public class CalendarAction extends AbstractPageAction {
+public class CalendarAction extends CustomAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -60,6 +60,8 @@ public class CalendarAction extends AbstractPageAction {
     //**************************************************************************
     // Variables
     //**************************************************************************
+
+    protected MonthView monthView;
 
     //**************************************************************************
     // Injections
@@ -117,7 +119,12 @@ public class CalendarAction extends AbstractPageAction {
 
     @DefaultHandler
     @RequiresPermissions(level = AccessLevel.VIEW)
-    public Resolution execute() throws IOException {
+    public Resolution execute() {
+        monthView = new MonthView(new DateTime());
+        for(Calendar calendar : getCalendars()) {
+            monthView.addEvents(getEvents(calendar));
+        }
+        monthView.sortEvents();
         if (isEmbedded()) {
             return new ForwardResolution("/layouts/calendar/month.jsp");
         } else {
@@ -135,5 +142,9 @@ public class CalendarAction extends AbstractPageAction {
 
     public List<Event> getEvents(Calendar calendar) {
         return Collections.EMPTY_LIST;
+    }
+
+    public MonthView getMonthView() {
+        return monthView;
     }
 }
