@@ -56,6 +56,13 @@ public class EventWeek {
         this.event = event;
     }
 
+    public EventWeek(Event event, int startDay, int endDay, boolean continues) {
+        this.event = event;
+        this.startDay = startDay;
+        this.endDay = endDay;
+        this.continues = continues;
+    }
+
     //--------------------------------------------------------------------------
     // Getters/setters
     //--------------------------------------------------------------------------
