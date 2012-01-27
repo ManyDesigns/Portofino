@@ -59,7 +59,6 @@ import java.util.regex.Pattern;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@UrlBinding("/actions/text")
 @RequiresPermissions(level = AccessLevel.VIEW)
 public class TextAction extends AbstractPageAction {
     public static final String copyright =
