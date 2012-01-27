@@ -5,6 +5,7 @@
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="org.joda.time.format.DateTimeFormatterBuilder" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -29,6 +30,14 @@
                             .appendMonthOfYearShortText()
                             .appendLiteral(" ")
                             .appendDayOfMonth(1)
+                            .toFormatter()
+                            .withLocale(request.getLocale());
+
+            DateTimeFormatter monthFormatter =
+                    new DateTimeFormatterBuilder()
+                            .appendMonthOfYearText()
+                            .appendLiteral(" ")
+                            .appendYear(4, 4)
                             .toFormatter()
                             .withLocale(request.getLocale());
             XhtmlBuffer xhtmlBuffer = new XhtmlBuffer(out);
@@ -59,23 +68,56 @@
             .grid-table {
                 width: 100%; height: 100%; 
                 position: absolute; left: 0px; top: 0px;
+                border: none;
+            }
+            .grid-table td {
+                border-left: 1px solid #DDDDDD;
             }
             .events-table {
                 position: relative; border: none;
             }
             .events-table td {
-                padding: 1px; border: none;
+                padding: 1px 1px 0 2px;; border: none;
             }
             .events-table th {
                 padding: 0 0 3px 10px; border: none; text-align: left;
             }
             .event {
-                padding: 0 0 0 8px;
+                padding: 0 0 0 8px; white-space: nowrap; overflow: hidden;
             }
             .outOfMonth {
                 color: #BBBBBB;
             }
         </style>
+        <div class="yui-g">
+            <div class="yui-u first">
+                <button type="submit" class="contentButton" disabled="true">
+                    <span class="ui-button-text">Oggi</span>
+                </button>
+                <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" type="submit" name="configure" role="button" aria-disabled="false" title="Prev">
+                    <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-w"></span>
+                    <span class="ui-button-text">Prev</span>
+                </button><button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" type="submit" name="configure" role="button" aria-disabled="false" title="Next">
+                    <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-e"></span>
+                    <span class="ui-button-text">Next</span>
+                </button>
+                <span style="margin-left: 1em;">
+                    <%= StringUtils.capitalize(monthFormatter.print(monthView.getReferenceDateTime())) %>
+                </span>
+            </div>
+            <div class="yui-u" style="text-align: right">
+                <div id="calendarViewType">
+                    <input type="radio" id="radio2" name="radio" checked="checked" /><label for="radio2">Mese</label>
+                    <input type="radio" id="radio3" name="radio" /><label for="radio3">Agenda</label>
+                </div>
+                <script>
+                    $(function() {
+                        $( "#calendarViewType" ).buttonset();
+                    });
+                </script>
+            </div>
+        </div>
+        <div class="horizontalSeparator"></div>
         <div class="calendar-container">
             <table class="days-table">
                 <tr>
