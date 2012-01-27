@@ -16,11 +16,19 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <%
-            int maxEventsPerCell = 1;
+            int maxEventsPerCell = 3;
             MonthView monthView = actionBean.getMonthView();
             DateTimeFormatter dayOfWeekFormatter =
                     new DateTimeFormatterBuilder()
                             .appendDayOfWeekShortText()
+                            .toFormatter()
+                            .withLocale(request.getLocale());
+
+            DateTimeFormatter firstDayOfMonthFormatter =
+                    new DateTimeFormatterBuilder()
+                            .appendMonthOfYearShortText()
+                            .appendLiteral(" ")
+                            .appendDayOfMonth(1)
                             .toFormatter()
                             .withLocale(request.getLocale());
             XhtmlBuffer xhtmlBuffer = new XhtmlBuffer(out);
@@ -106,59 +114,69 @@
                                     if(!day.isInReferenceMonth()) {
                                         xhtmlBuffer.addAttribute("class", "outOfMonth");
                                     }
-                                    xhtmlBuffer.write(day.getDayStart().dayOfMonth().get() + "");
+                                    int dayOfMonth = day.getDayStart().dayOfMonth().get();
+                                    if(1 == dayOfMonth) {
+                                        xhtmlBuffer.write(firstDayOfMonthFormatter.print(day.getDayStart()));
+                                    } else {
+                                        xhtmlBuffer.write(dayOfMonth + "");
+                                    }
                                     xhtmlBuffer.closeElement("th");
                                 } %>
                             </tr>
-                            <tr>
-                                <%
-                                for(int row = 0; row < maxEventsPerCell - 1; row++) {
-                                    for(int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
-                                        MonthView.Day day = week.getDay(dayOfWeek);
-                                        List<EventWeek> eventsOfTheDay = day.getSlots();
-
-                                        if(row < eventsOfTheDay.size()) {
-                                            printEvent(day, dayOfWeek, row, xhtmlBuffer);
-                                        } else {
-                                            out.print("<td></td>");
-                                        }
-                                    }
-                                }
-                                //Last row
-                                boolean moreThanOneLeft = false;
+                            <%
+                            for(int row = 0; row < maxEventsPerCell - 1; row++) {
+                                xhtmlBuffer.openElement("tr");
                                 for(int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
                                     MonthView.Day day = week.getDay(dayOfWeek);
                                     List<EventWeek> eventsOfTheDay = day.getSlots();
 
-                                    if(eventsOfTheDay.size() > maxEventsPerCell) {
-                                        moreThanOneLeft = true;
-                                        break;
-                                    }
-                                }
-                                for(int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
-                                    MonthView.Day day = week.getDay(dayOfWeek);
-                                    List<EventWeek> eventsOfTheDay = day.getSlots();
-
-                                    if(moreThanOneLeft) {
-                                        xhtmlBuffer.openElement("td");
-                                        if(!day.isInReferenceMonth()) {
-                                            xhtmlBuffer.addAttribute("class", "outOfMonth");
-                                        }
-                                        xhtmlBuffer.openElement("div");
-                                        xhtmlBuffer.addAttribute("class", "event");
-                                        xhtmlBuffer.write(eventsOfTheDay.size() + 1 - maxEventsPerCell + " more events");
-                                        xhtmlBuffer.closeElement("div");
-                                        xhtmlBuffer.closeElement("td");
+                                    if(row < eventsOfTheDay.size()) {
+                                        printEvent(day, dayOfWeek, row, xhtmlBuffer);
                                     } else {
-                                        if(maxEventsPerCell - 1 < eventsOfTheDay.size()) {
-                                            printEvent(day, dayOfWeek, maxEventsPerCell - 1, xhtmlBuffer);
-                                        } else {
-                                            out.print("<td></td>");
-                                        }
+                                        xhtmlBuffer.openElement("td");
+                                        xhtmlBuffer.closeElement("td");
                                     }
                                 }
-                                %>
-                            </tr>
+                                xhtmlBuffer.closeElement("tr");
+                            }
+
+                            //Last row
+                            xhtmlBuffer.openElement("tr");
+                            boolean moreThanOneLeft = false;
+                            for(int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
+                                MonthView.Day day = week.getDay(dayOfWeek);
+                                List<EventWeek> eventsOfTheDay = day.getSlots();
+
+                                if(eventsOfTheDay.size() > maxEventsPerCell) {
+                                    moreThanOneLeft = true;
+                                    break;
+                                }
+                            }
+                            for(int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
+                                MonthView.Day day = week.getDay(dayOfWeek);
+                                List<EventWeek> eventsOfTheDay = day.getSlots();
+
+                                if(moreThanOneLeft) {
+                                    xhtmlBuffer.openElement("td");
+                                    if(!day.isInReferenceMonth()) {
+                                        xhtmlBuffer.addAttribute("class", "outOfMonth");
+                                    }
+                                    xhtmlBuffer.openElement("div");
+                                    xhtmlBuffer.addAttribute("class", "event");
+                                    xhtmlBuffer.write(eventsOfTheDay.size() + 1 - maxEventsPerCell + " more events");
+                                    xhtmlBuffer.closeElement("div");
+                                    xhtmlBuffer.closeElement("td");
+                                } else {
+                                    if(maxEventsPerCell - 1 < eventsOfTheDay.size()) {
+                                        printEvent(day, dayOfWeek, maxEventsPerCell - 1, xhtmlBuffer);
+                                    } else {
+                                        xhtmlBuffer.openElement("td");
+                                        xhtmlBuffer.closeElement("td");
+                                    }
+                                }
+                            }
+                            xhtmlBuffer.closeElement("tr");
+                            %>
                         </table>
                     </div>
                 <% } %>
@@ -173,7 +191,8 @@
         EventWeek event = eventsOfTheDay.get(index);
 
         if(event == null) {
-            xhtmlBuffer.write("<td></td>");
+            xhtmlBuffer.openElement("td");
+            xhtmlBuffer.closeElement("td");
             return;
         }
         if(event.getStartDay() < dayOfWeek) {

@@ -36,6 +36,7 @@ import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissi
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,10 +121,8 @@ public class CalendarAction extends CustomAction {
     @DefaultHandler
     @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution execute() {
-        monthView = new MonthView(new DateTime());
-        for(Calendar calendar : getCalendars()) {
-            monthView.addEvents(getEvents(calendar));
-        }
+        monthView = new MonthView(new DateTime(DateTimeZone.UTC));
+        populateEvents();
         monthView.sortEvents();
         if (isEmbedded()) {
             return new ForwardResolution("/layouts/calendar/month.jsp");
@@ -140,9 +139,7 @@ public class CalendarAction extends CustomAction {
         return Collections.EMPTY_LIST;
     }
 
-    public List<Event> getEvents(Calendar calendar) {
-        return Collections.EMPTY_LIST;
-    }
+    public void populateEvents() {}
 
     public MonthView getMonthView() {
         return monthView;

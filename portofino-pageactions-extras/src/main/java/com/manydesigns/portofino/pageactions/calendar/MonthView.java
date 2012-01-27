@@ -327,9 +327,13 @@ public class MonthView {
         }
 
         public void sortEvents() {
+            logger.debug("Querying days for busy slots");
             for (Day day : days) {
                 day.clearSlots();
             }
+
+            logger.debug("Sorting event weeks");
+            Collections.sort(eventWeekOverlaps, new EventWeekComparator());
 
             for (EventWeek current : eventWeekOverlaps) {
                 Set<Integer> busySlots = new HashSet<Integer>();

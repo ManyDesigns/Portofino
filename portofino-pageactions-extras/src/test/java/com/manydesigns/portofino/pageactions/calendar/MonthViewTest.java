@@ -296,4 +296,69 @@ public class MonthViewTest extends TestCase {
             assertEquals(0, eventWeekOverlaps.size());
         }
     }
+
+    public void testSort() throws Exception {
+        monthView = new MonthView(today);
+
+        // create the event
+        Calendar calendar = null;
+
+        Interval eventInterval1 = new Interval(jan18, jan22);
+        Event event1 = new Event(
+                calendar, "e1", "Test event 1", eventInterval1, null, null);
+        assertTrue(monthView.addEvent(event1));
+
+        Interval eventInterval2 = new Interval(jan20, jan21);
+        Event event2 = new Event(
+                calendar, "e2", "Test event 2", eventInterval2, null, null);
+        assertTrue(monthView.addEvent(event2));
+
+        Interval eventInterval3 = new Interval(jan16, jan19);
+        Event event3 = new Event(
+                calendar, "e3", "Test event 3", eventInterval3, null, null);
+        assertTrue(monthView.addEvent(event3));
+
+        monthView.sortEvents();
+
+        MonthView.Week week = monthView.getWeek(3);
+
+        MonthView.Day day = week.getDay(0);
+        List<EventWeek> slots = day.slots;
+        assertEquals(1, slots.size());
+        assertEquals(event3, slots.get(0).getEvent());
+
+        day = week.getDay(1);
+        slots = day.slots;
+        assertEquals(1, slots.size());
+        assertEquals(event3, slots.get(0).getEvent());
+
+        day = week.getDay(2);
+        slots = day.slots;
+        assertEquals(2, slots.size());
+        assertEquals(event3, slots.get(0).getEvent());
+        assertEquals(event1, slots.get(1).getEvent());
+
+        day = week.getDay(3);
+        slots = day.slots;
+        assertEquals(2, slots.size());
+        assertNull(slots.get(0));
+        assertEquals(event1, slots.get(1).getEvent());
+
+        day = week.getDay(4);
+        slots = day.slots;
+        assertEquals(2, slots.size());
+        assertEquals(event2, slots.get(0).getEvent());
+        assertEquals(event1, slots.get(1).getEvent());
+
+        day = week.getDay(5);
+        slots = day.slots;
+        assertEquals(2, slots.size());
+        assertNull(slots.get(0));
+        assertEquals(event1, slots.get(1).getEvent());
+
+        day = week.getDay(6);
+        slots = day.slots;
+        assertEquals(0, slots.size());
+
+    }
 }
