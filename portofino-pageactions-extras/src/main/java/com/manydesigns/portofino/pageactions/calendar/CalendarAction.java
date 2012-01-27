@@ -119,9 +119,9 @@ public class CalendarAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution execute() throws IOException {
         if (isEmbedded()) {
-            return new ForwardResolution("/layouts/text/read.jsp");
+            return new ForwardResolution("/layouts/calendar/calendar.jsp");
         } else {
-            return forwardToPortletPage("/layouts/text/read.jsp");
+            return forwardToPortletPage("/layouts/calendar/calendar.jsp");
         }
     }
 
