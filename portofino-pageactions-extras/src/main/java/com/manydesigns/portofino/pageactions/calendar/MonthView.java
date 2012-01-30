@@ -187,6 +187,10 @@ public class MonthView {
         return monthEnd;
     }
 
+    public Interval getMonthInterval() {
+        return monthInterval;
+    }
+
     public Interval getMonthViewInterval() {
         return monthViewInterval;
     }
@@ -426,6 +430,10 @@ public class MonthView {
 
         public List<EventWeek> getSlots() {
             return slots;
+        }
+
+        public MonthView getMonthView() {
+            return MonthView.this;
         }
     }
 }

@@ -37,10 +37,11 @@ import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -63,6 +64,9 @@ public class CalendarAction extends CustomAction {
     //**************************************************************************
 
     protected MonthView monthView;
+    protected DateTime referenceDateTime = new DateTime(DateTimeZone.UTC);
+    protected final List<Calendar> calendars = new ArrayList<Calendar>();
+    protected final List<Event> events = new ArrayList<Event>();
 
     //**************************************************************************
     // Injections
@@ -121,8 +125,11 @@ public class CalendarAction extends CustomAction {
     @DefaultHandler
     @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution execute() {
-        monthView = new MonthView(new DateTime(DateTimeZone.UTC));
-        populateEvents();
+        monthView = new MonthView(referenceDateTime);
+        loadObjects(monthView.getMonthViewInterval());
+        for(Event event : events) {
+            monthView.addEvent(event);
+        }
         monthView.sortEvents();
         if (isEmbedded()) {
             return new ForwardResolution("/layouts/calendar/month.jsp");
@@ -131,17 +138,41 @@ public class CalendarAction extends CustomAction {
         }
     }
 
+    public Resolution nextMonth() {
+        referenceDateTime = referenceDateTime.plusMonths(1);
+        return execute();
+    }
+
+    public Resolution prevMonth() {
+        referenceDateTime = referenceDateTime.minusMonths(1);
+        return execute();
+    }
+
+    public Resolution today() {
+        referenceDateTime = new DateTime(DateTimeZone.UTC);
+        return execute();
+    }
+
     //--------------------------------------------------------------------------
     // Data provider
     //--------------------------------------------------------------------------
 
-    public List<Calendar> getCalendars() {
-        return Collections.EMPTY_LIST;
-    }
-
-    public void populateEvents() {}
+    public void loadObjects(Interval interval) {}
 
     public MonthView getMonthView() {
         return monthView;
+    }
+
+    //**************************************************************************
+    // Getters/setters
+    //**************************************************************************
+
+
+    public long getReferenceDateTimeLong() {
+        return referenceDateTime.getMillis();
+    }
+
+    public void setReferenceDateTimeLong(long millis) {
+        this.referenceDateTime = new DateTime(millis, DateTimeZone.UTC);
     }
 }

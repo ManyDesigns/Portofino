@@ -1,11 +1,16 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
+<%@ page import="com.manydesigns.portofino.pageactions.calendar.Event" %>
 <%@ page import="com.manydesigns.portofino.pageactions.calendar.EventWeek" %>
 <%@ page import="com.manydesigns.portofino.pageactions.calendar.MonthView" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.joda.time.DateMidnight" %>
+<%@ page import="org.joda.time.DateTime" %>
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="org.joda.time.format.DateTimeFormatterBuilder" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="java.util.Locale" %>
+<%@ page import="org.joda.time.Interval" %>
+<%@ page import="org.joda.time.Duration" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -73,6 +78,9 @@
             .grid-table td {
                 border-left: 1px solid #DDDDDD;
             }
+            .grid-table td.today {
+                border: solid 1px black;
+            }
             .events-table {
                 position: relative; border: none;
             }
@@ -85,19 +93,37 @@
             .event {
                 padding: 0 0 0 8px; white-space: nowrap; overflow: hidden;
             }
+            .event a {
+                color: #222222;
+            }
             .outOfMonth {
                 color: #BBBBBB;
             }
+            .event-dialog {
+                display: none;
+            }
         </style>
+        <script type="text/javascript">
+            $(function() {
+                $( ".event-dialog" ).dialog({ autoOpen: false });
+            });
+        </script>
+        <input type="hidden" name="referenceDateTimeLong" value="${actionBean.referenceDateTimeLong}" />
         <div class="yui-g">
             <div class="yui-u first">
-                <button type="submit" class="contentButton" disabled="true">
+                <%
+                    boolean todayDisabled = monthView.getMonthInterval().contains(new DateTime());
+                %>
+                <button type="submit" name="today" <%= todayDisabled ? "disabled='true'" : "" %>
+                        class="ui-button ui-widget <%= todayDisabled ? "ui-state-disabled" : "ui-state-default" %> ui-corner-all ui-button-text-only ui-button">
                     <span class="ui-button-text">Oggi</span>
                 </button>
-                <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" type="submit" name="configure" role="button" aria-disabled="false" title="Prev">
+                <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
+                        type="submit" name="prevMonth" role="button" aria-disabled="false" title="Prev">
                     <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-w"></span>
                     <span class="ui-button-text">Prev</span>
-                </button><button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" type="submit" name="configure" role="button" aria-disabled="false" title="Next">
+                </button><button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
+                                 type="submit" name="nextMonth" role="button" aria-disabled="false" title="Next">
                     <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-e"></span>
                     <span class="ui-button-text">Next</span>
                 </button>
@@ -138,13 +164,16 @@
                     <div class="calendar-row" style="top: <%= index * 100.0 / 6.0 %>%;">
                         <table class="grid-table">
                             <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <%
+                                for(int i = 0; i < 7; i++) {
+                                    MonthView.Day day = week.getDay(i);
+                                    xhtmlBuffer.openElement("td");
+                                    if(day.getDayInterval().contains(new DateTime())) {
+                                        xhtmlBuffer.addAttribute("class", "today");
+                                    }
+                                    xhtmlBuffer.closeElement("td");
+                                }
+                                %>
                             </tr>
                         </table>
                         <table class="events-table">
@@ -170,14 +199,7 @@
                                 xhtmlBuffer.openElement("tr");
                                 for(int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
                                     MonthView.Day day = week.getDay(dayOfWeek);
-                                    List<EventWeek> eventsOfTheDay = day.getSlots();
-
-                                    if(row < eventsOfTheDay.size()) {
-                                        printEvent(day, dayOfWeek, row, xhtmlBuffer);
-                                    } else {
-                                        xhtmlBuffer.openElement("td");
-                                        xhtmlBuffer.closeElement("td");
-                                    }
+                                    printEvent(day, dayOfWeek, row, xhtmlBuffer, request.getLocale());
                                 }
                                 xhtmlBuffer.closeElement("tr");
                             }
@@ -205,16 +227,14 @@
                                     }
                                     xhtmlBuffer.openElement("div");
                                     xhtmlBuffer.addAttribute("class", "event");
-                                    xhtmlBuffer.write(eventsOfTheDay.size() + 1 - maxEventsPerCell + " more events");
+                                    int more = eventsOfTheDay.size() + 1 - maxEventsPerCell;
+                                    if(more > 0) {
+                                        xhtmlBuffer.write(more + " more events");
+                                    }
                                     xhtmlBuffer.closeElement("div");
                                     xhtmlBuffer.closeElement("td");
                                 } else {
-                                    if(maxEventsPerCell - 1 < eventsOfTheDay.size()) {
-                                        printEvent(day, dayOfWeek, maxEventsPerCell - 1, xhtmlBuffer);
-                                    } else {
-                                        xhtmlBuffer.openElement("td");
-                                        xhtmlBuffer.closeElement("td");
-                                    }
+                                    printEvent(day, dayOfWeek, maxEventsPerCell - 1, xhtmlBuffer, request.getLocale());
                                 }
                             }
                             xhtmlBuffer.closeElement("tr");
@@ -228,27 +248,108 @@
     <stripes:layout-component name="portletFooter">
     </stripes:layout-component>
 </stripes:layout-render><%!
-    private void printEvent(MonthView.Day day, int dayOfWeek, int index, XhtmlBuffer xhtmlBuffer) {
-        List<EventWeek> eventsOfTheDay = day.getSlots();
-        EventWeek event = eventsOfTheDay.get(index);
+    private DateTimeFormatter makeEventDateTimeFormatter(DateTime start, Interval monthInterval, Locale locale) {
+        DateTimeFormatterBuilder builder =
+            new DateTimeFormatterBuilder()
+                    .appendDayOfWeekShortText()
+                    .appendLiteral(", ")
+                    .appendDayOfMonth(1)
+                    .appendLiteral(" ")
+                    .appendMonthOfYearText();
+        if(start.getYear() != monthInterval.getStart().getYear()) {
+            builder.appendLiteral(" ").appendYear(4, 4);
+        }
+        if(start.getSecondOfDay() > 0) {
+            builder
+                .appendLiteral(", ")
+                .appendHourOfDay(2)
+                .appendLiteral(":")
+                .appendMinuteOfHour(2);
+        }
+        return builder.toFormatter().withLocale(locale);
+    }
 
-        if(event == null) {
+    private void printEvent(MonthView.Day day, int dayOfWeek, int index, XhtmlBuffer xhtmlBuffer, Locale locale) {
+        List<EventWeek> eventsOfTheDay = day.getSlots();
+        if(index >= eventsOfTheDay.size()) {
             xhtmlBuffer.openElement("td");
             xhtmlBuffer.closeElement("td");
             return;
         }
-        if(event.getStartDay() < dayOfWeek) {
+
+        EventWeek eventWeek = eventsOfTheDay.get(index);
+        if(eventWeek == null) {
+            xhtmlBuffer.openElement("td");
+            xhtmlBuffer.closeElement("td");
+            return;
+        }
+        if(eventWeek.getStartDay() < dayOfWeek) {
             return;
         }
         xhtmlBuffer.openElement("td");
-        xhtmlBuffer.addAttribute("colspan", (event.getEndDay() + 1 - dayOfWeek) + "");
+        if(day.getDayInterval().contains(new DateTime())) {
+            xhtmlBuffer.addAttribute("class", "today");
+        }
+        xhtmlBuffer.addAttribute("colspan", (eventWeek.getEndDay() + 1 - dayOfWeek) + "");
         if(!day.isInReferenceMonth()) {
             xhtmlBuffer.addAttribute("class", "outOfMonth");
         }
+
+        Event event = eventWeek.getEvent();
+        String dialogId = "event-dialog-" + event.getId();
+
+        xhtmlBuffer.openElement("div");
+        xhtmlBuffer.addAttribute("id", dialogId);
+        xhtmlBuffer.addAttribute("class", "event-dialog");
+        if(event.getReadUrl() != null) {
+            xhtmlBuffer.writeAnchor(event.getReadUrl(), event.getDescription());
+        } else {
+            xhtmlBuffer.write(event.getDescription());
+        }
+        DateTime start = event.getInterval().getStart();
+        DateTime end = event.getInterval().getEnd();
+        
+        xhtmlBuffer.openElement("p");
+        String timeDescription;
+        DateTimeFormatter startFormatter =
+                makeEventDateTimeFormatter
+                        (start, day.getMonthView().getMonthInterval(), locale);
+        timeDescription = startFormatter.print(start);
+        if(end.minus(1).getDayOfYear() != start.getDayOfYear()) {
+            DateTime formatEnd = end;
+            if(formatEnd.getMillisOfDay() == 0) {
+                formatEnd = formatEnd.minusDays(1);
+            }
+            DateTimeFormatter endFormatter =
+                makeEventDateTimeFormatter
+                        (formatEnd, day.getMonthView().getMonthInterval(), locale);
+            timeDescription += " - " + endFormatter.print(formatEnd);
+        } else {
+            //TODO
+        }
+        xhtmlBuffer.write(timeDescription);
+        xhtmlBuffer.closeElement("p");
+
+        xhtmlBuffer.closeElement("div");
+
         xhtmlBuffer.openElement("div");
         xhtmlBuffer.addAttribute("class", "event");
-        xhtmlBuffer.addAttribute("style", "background-color: " + event.getEvent().getCalendar().getColor());
-        xhtmlBuffer.write(event.getEvent().getDescription());
+        xhtmlBuffer.addAttribute("style", "background-color: " + event.getCalendar().getColor());
+        xhtmlBuffer.openElement("a");
+        xhtmlBuffer.addAttribute("href", "#");
+        xhtmlBuffer.addAttribute("onclick", "$('#" + dialogId + "').dialog('open'); return false;");
+        if(start.getMillisOfDay() > 0) {
+            DateTimeFormatter hhmmFormatter =
+                new DateTimeFormatterBuilder()
+                        .appendHourOfDay(2)
+                        .appendLiteral(":")
+                        .appendMinuteOfHour(2)
+                        .toFormatter()
+                        .withLocale(locale);
+            xhtmlBuffer.write(hhmmFormatter.print(start) + " ");
+        }
+        xhtmlBuffer.write(event.getDescription());
+        xhtmlBuffer.closeElement("a");
         xhtmlBuffer.closeElement("div");
         xhtmlBuffer.closeElement("td");
     }
