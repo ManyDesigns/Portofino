@@ -174,20 +174,20 @@ public class PageAdminAction extends AbstractActionBean {
     }
 
     protected void updateLayout(String layoutContainer, String[] portletWrapperIds) throws Exception {
-        PageInstance myparent = getPageInstance().getParent();
-        Layout parentLayout = myparent.getLayout();
-        if(parentLayout == null) {
-            parentLayout = new Layout();
-            myparent.setLayout(parentLayout);
+        PageInstance instance = getPageInstance();
+        Layout layout = instance.getLayout();
+        if(layout == null) {
+            layout = new Layout();
+            instance.setLayout(layout);
         }
         for(int i = 0; i < portletWrapperIds.length; i++) {
             String current = portletWrapperIds[i];
             if("p".equals(current)) {
-                parentLayout.getSelf().setContainer(layoutContainer);
-                parentLayout.getSelf().setOrder(i + "");
+                layout.getSelf().setContainer(layoutContainer);
+                layout.getSelf().setOrder(i + "");
             } else if (current.startsWith("c")) {
                 String pageFragment = current.substring(1); //current = c...
-                for(ChildPage p : parentLayout.getChildPages()) {
+                for(ChildPage p : layout.getChildPages()) {
                     if(pageFragment.equals(p.getName())) {
                         p.setContainer(layoutContainer);
                         p.setOrder(i + "");
@@ -197,7 +197,7 @@ public class PageAdminAction extends AbstractActionBean {
                 logger.debug("Ignoring: {}", current);
             }
         }
-        DispatcherLogic.savePage(myparent);
+        DispatcherLogic.savePage(instance);
     }
 
     @RequiresAdministrator

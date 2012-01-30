@@ -64,9 +64,12 @@ public class CalendarAction extends CustomAction {
     //**************************************************************************
 
     protected MonthView monthView;
+    protected AgendaView agendaView;
     protected DateTime referenceDateTime = new DateTime(DateTimeZone.UTC);
     protected final List<Calendar> calendars = new ArrayList<Calendar>();
     protected final List<Event> events = new ArrayList<Event>();
+
+    protected String calendarViewType;
 
     //**************************************************************************
     // Injections
@@ -114,7 +117,6 @@ public class CalendarAction extends CustomAction {
         if(!pageInstance.getParameters().isEmpty()) {
             return new ErrorResolution(404);
         }
-//        textConfiguration = (TextConfiguration) pageInstance.getConfiguration();
         return null;
     }
 
@@ -125,16 +127,26 @@ public class CalendarAction extends CustomAction {
     @DefaultHandler
     @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution execute() {
-        monthView = new MonthView(referenceDateTime);
-        loadObjects(monthView.getMonthViewInterval());
-        for(Event event : events) {
-            monthView.addEvent(event);
-        }
-        monthView.sortEvents();
-        if (isEmbedded()) {
-            return new ForwardResolution("/layouts/calendar/month.jsp");
+        if("agenda".equals(calendarViewType)) {
+            agendaView = new AgendaView(referenceDateTime);
+            loadObjects(agendaView.getFirstDay().toDateTime(), 20);
+            for(Event event : events) {
+                agendaView.addEvent(event);
+            }
+            agendaView.sortEvents();
         } else {
-            return forwardToPortletPage("/layouts/calendar/month.jsp");
+            calendarViewType = "month";
+            monthView = new MonthView(referenceDateTime);
+            loadObjects(monthView.getMonthViewInterval());
+            for(Event event : events) {
+                monthView.addEvent(event);
+            }
+            monthView.sortEvents();
+        }
+        if (isEmbedded()) {
+            return new ForwardResolution("/layouts/calendar/calendar.jsp");
+        } else {
+            return forwardToPortletPage("/layouts/calendar/calendar.jsp");
         }
     }
 
@@ -159,8 +171,14 @@ public class CalendarAction extends CustomAction {
 
     public void loadObjects(Interval interval) {}
 
+    public void loadObjects(DateTime instant, int maxEvents) {}
+
     public MonthView getMonthView() {
         return monthView;
+    }
+
+    public AgendaView getAgendaView() {
+        return agendaView;
     }
 
     //**************************************************************************
@@ -174,5 +192,25 @@ public class CalendarAction extends CustomAction {
 
     public void setReferenceDateTimeLong(long millis) {
         this.referenceDateTime = new DateTime(millis, DateTimeZone.UTC);
+    }
+
+    public List<Calendar> getCalendars() {
+        return calendars;
+    }
+
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public String getCalendarViewType() {
+        return calendarViewType;
+    }
+
+    public void setCalendarViewType(String calendarViewType) {
+        this.calendarViewType = calendarViewType;
+    }
+
+    public DateTime getReferenceDateTime() {
+        return referenceDateTime;
     }
 }
