@@ -47,10 +47,7 @@
         display: none;
     }
     .event {
-        padding: 0.25em;
-    }
-    .event a {
-        color: #222222;
+        padding: 0.25em; font-weight: bold;
     }
 </style>
 <div class="yui-g" style="width: 100%;">
@@ -140,11 +137,11 @@
         xhtmlBuffer.openElement("td");
         xhtmlBuffer.openElement("span");
         xhtmlBuffer.addAttribute("class", "event");
-        xhtmlBuffer.addAttribute("style", "background-color: " + event.getCalendar().getColor() + ";");
 
         String dialogId = writeEventDialog(hhmmFormatter, xhtmlBuffer, day, event, start, end);
 
         xhtmlBuffer.openElement("a");
+        xhtmlBuffer.addAttribute("style", "color: " + event.getCalendar().getColor() + ";");
         xhtmlBuffer.addAttribute("href", "#");
         xhtmlBuffer.addAttribute("onclick", "$('#" + dialogId + "').dialog('open'); return false;");
         xhtmlBuffer.write(event.getDescription());

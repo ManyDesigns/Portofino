@@ -156,12 +156,12 @@ public class CalendarAction extends CustomAction {
     }
 
     public Resolution nextMonth() {
-        referenceDateTime = referenceDateTime.plusMonths(1);
+        referenceDateTime = referenceDateTime.plusMonths(1).withDayOfMonth(1).withTime(0, 0, 0, 0);
         return execute();
     }
 
     public Resolution prevMonth() {
-        referenceDateTime = referenceDateTime.minusMonths(1);
+        referenceDateTime = referenceDateTime.minusMonths(1).withDayOfMonth(1).withTime(0, 0, 0, 0);;
         return execute();
     }
 

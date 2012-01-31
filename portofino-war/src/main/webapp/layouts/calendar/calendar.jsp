@@ -9,9 +9,20 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
     <input type="hidden" name="referenceDateTimeLong" value="${actionBean.referenceDateTimeLong}" />
+    <style type="text/css">
+        .calendar-view {
+            position: relative; margin-left: 10em;
+        }
+        .calendar-legend-area {
+            position: absolute; overflow: hidden; top: 3.5em; left: 0;
+        }
+        a.calendar-legend-hide-link, .calendar-legend-show-link a {
+            border: none;
+        }
+    </style>
     <div style="width: 100%; position: relative;">
-        <div style="width: 10em; position: absolute; overflow: hidden;">
-            <h3 style="margin: 0;">Calendars</h3>
+        <div class="calendar-legend-area calendar-legend" style="width: 9.5em; margin-right: 0.5em;">
+            <h3 style="margin: 0;">Calendars <a class="calendar-legend-hide-link" href="#">&lt;&lt;</a></h3>
             <ul style="margin-left: 0;">
                 <c:forEach var="calendar" items="${actionBean.calendars}">
                     <li style="margin: 0.5em 0; list-style: none;">
@@ -22,10 +33,33 @@
                 </c:forEach>
             </ul>
         </div>
-        <div style="position: relative; margin-left: 10em;">
+        <div class="calendar-legend-area calendar-legend-show-link" style="display: none;">
+            <h3 style="margin: 0;"><a href="#">&gt;&gt;</a></h3>
+        </div>
+        <div class="calendar-view">
             <jsp:include page="${actionBean.calendarViewType}.jsp" />
         </div>
     </div>
+    <script type="text/javascript">
+        $(function() {
+            $(".calendar-legend-hide-link").click(function() {
+                var legendDiv = $(this).parent().parent();
+                legendDiv.hide();
+                var container = legendDiv.parent();
+                container.find(".calendar-view").attr("style", "margin-left: 2em;");
+                container.find(".calendar-legend-show-link").show();
+                return false;
+            });
+            $(".calendar-legend-show-link a").click(function() {
+                var showLinkDiv = $(this).parent().parent();
+                showLinkDiv.hide();
+                var container = showLinkDiv.parent();
+                container.find(".calendar-view").attr("style", "margin-left: 10em;");
+                container.find(".calendar-legend").show();
+                return false;
+            });
+        });
+    </script>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
     </stripes:layout-component>
