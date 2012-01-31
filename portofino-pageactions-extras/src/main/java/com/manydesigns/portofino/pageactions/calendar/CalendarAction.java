@@ -29,11 +29,13 @@
 
 package com.manydesigns.portofino.pageactions.calendar;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.i18n.MultipleTextProvider;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
@@ -131,10 +133,15 @@ public class CalendarAction extends CustomAction {
         if(pageInstance.getConfiguration() == null) {
             pageInstance.setConfiguration(new CalendarConfiguration());
         }
-        resourceBundleManager =
-                new ResourceBundleManager
-                        (pageInstance.getApplication().getAppDir(), "pageactions-extras-messages");
         return null;
+    }
+
+    @Before
+    public void prepare() {
+        resourceBundleManager =
+                new ResourceBundleManager(application.getAppDir(), "pageactions-extras-messages");
+        MultipleTextProvider textProvider = (MultipleTextProvider) ElementsThreadLocals.getTextProvider();
+        textProvider.getResourceBundles().add(0, resourceBundleManager.getBundle(context.getLocale()));
     }
 
     @Override
@@ -158,8 +165,11 @@ public class CalendarAction extends CustomAction {
             configurationForm.writeToObject(pageInstance.getConfiguration());
             saveConfiguration(pageInstance.getConfiguration());
             SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
+            return cancel();
+        } else {
+            SessionMessages.addErrorMessage(getMessage("commons.configuration.notUpdated"));
+            return new ForwardResolution("/layouts/calendar/configure.jsp");
         }
-        return cancel();
     }
 
     @Override

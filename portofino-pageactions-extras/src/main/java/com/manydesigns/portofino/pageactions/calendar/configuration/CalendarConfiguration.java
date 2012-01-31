@@ -30,6 +30,8 @@
 package com.manydesigns.portofino.pageactions.calendar.configuration;
 
 import com.manydesigns.elements.annotations.FieldSet;
+import com.manydesigns.elements.annotations.LabelI18N;
+import com.manydesigns.elements.annotations.MinIntValue;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
@@ -92,7 +94,9 @@ public class CalendarConfiguration implements PageActionConfiguration {
 
     @XmlAttribute
     @Required
-    @FieldSet("Month View")
+    @FieldSet("calendar.configuration.monthView")
+    @LabelI18N("calendar.maxEventsPerCellInMonthView")
+    @MinIntValue(1)
     public int getMaxEventsPerCellInMonthView() {
         return maxEventsPerCellInMonthView;
     }
@@ -103,7 +107,9 @@ public class CalendarConfiguration implements PageActionConfiguration {
 
     @XmlAttribute
     @Required
-    @FieldSet("Agenda View")
+    @FieldSet("calendar.configuration.agendaView")
+    @LabelI18N("calendar.estimateEventsPerPageInAgendaView")
+    @MinIntValue(1)
     public int getEstimateEventsPerPageInAgendaView() {
         return estimateEventsPerPageInAgendaView;
     }

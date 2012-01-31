@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.forms;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Enabled;
 import com.manydesigns.elements.annotations.FieldSet;
@@ -171,7 +172,7 @@ public class FormBuilder extends AbstractFormBuilder {
             String groupName = null;
             if (current.isAnnotationPresent(
                     com.manydesigns.elements.annotations.FieldSet.class)) {
-                groupName = current.getAnnotation(FieldSet.class).value();
+                groupName = getText(current.getAnnotation(FieldSet.class).value());
             }
 
             if ((currentGroup == null)
@@ -293,5 +294,9 @@ public class FormBuilder extends AbstractFormBuilder {
                     propertyAccessor);
         }
         return field;
+    }
+
+    public String getText(String key, Object... args) {
+        return ElementsThreadLocals.getTextProvider().getText(key, args);
     }
 }
