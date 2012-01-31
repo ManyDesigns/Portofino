@@ -6,10 +6,13 @@
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="org.joda.time.format.DateTimeFormatterBuilder" %>
 <%@ page import="java.util.Locale" %>
+<%@ page import="java.util.ResourceBundle" %>
+<%@ page import="java.text.MessageFormat" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.calendar.CalendarAction"/>
 <%
     DateTime referenceDateTime = actionBean.getReferenceDateTime();
@@ -33,6 +36,7 @@
                     .toFormatter()
                     .withLocale(request.getLocale());
     XhtmlBuffer xhtmlBuffer = new XhtmlBuffer(out);
+    ResourceBundle resourceBundle = actionBean.getLocalizationContext().getResourceBundle();
 %>
 <style type="text/css">
     .agenda-table {
@@ -49,6 +53,12 @@
     .event {
         padding: 0.25em; font-weight: bold;
     }
+    .date-cell {
+        width: 15%; white-space: nowrap; text-align: left;
+    }
+    .hour-cell {
+        width: 15%; white-space: nowrap;
+    }
 </style>
 <div class="yui-g" style="width: 100%;">
     <div class="yui-u first">
@@ -59,24 +69,26 @@
         %>
         <button type="submit" name="today" <%= todayDisabled ? "disabled='true'" : "" %>
                 class="ui-button ui-widget <%= todayDisabled ? "ui-state-disabled" : "ui-state-default" %> ui-corner-all ui-button-text-only ui-button">
-            <span class="ui-button-text">Oggi</span>
+            <span class="ui-button-text"><fmt:message key="calendar.today" bundle="${actionBean.localizationContext}" /></span>
         </button>
         <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
-                type="submit" name="prevDay" role="button" aria-disabled="false" title="Prev">
+                type="submit" name="prevDay" role="button" aria-disabled="false"
+                title='<fmt:message key="calendar.previous" bundle="${actionBean.localizationContext}" />'>
             <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-w"></span>
-            <span class="ui-button-text">Prev</span>
+            <span class="ui-button-text">&nbsp;</span>
         </button><button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
-                         type="submit" name="nextDay" role="button" aria-disabled="false" title="Next">
+                         type="submit" name="nextDay" role="button" aria-disabled="false"
+                         title='<fmt:message key="calendar.next" bundle="${actionBean.localizationContext}" />'>
             <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-e"></span>
-            <span class="ui-button-text">Next</span>
+            <span class="ui-button-text">&nbsp;</span>
         </button>
     </div>
     <div class="yui-u" style="text-align: right">
         <div id="calendarViewType">
             <input type="radio" id="calendarViewType-month" name="calendarViewType" value="month"
-                   /><label for="calendarViewType-month">Mese</label>
+                   /><label for="calendarViewType-month"><fmt:message key="calendar.monthView" bundle="${actionBean.localizationContext}" /></label>
             <input type="radio" id="calendarViewType-agenda" name="calendarViewType" checked="checked" value="agenda"
-                   /><label for="calendarViewType-agenda">Agenda</label>
+                   /><label for="calendarViewType-agenda"><fmt:message key="calendar.agendaView" bundle="${actionBean.localizationContext}" /></label>
         </div>
         <script>
             $(function() {
@@ -120,8 +132,8 @@
                 DateTime start = event.getInterval().getStart();
                 DateTime end = event.getInterval().getEnd();
 
-                writeEventSpanCell(hhmmFormatter, xhtmlBuffer, day, start, end);
-                writeEventCell(hhmmFormatter, xhtmlBuffer, day, event, start, end);
+                writeEventSpanCell(hhmmFormatter, xhtmlBuffer, day, start, end, resourceBundle);
+                writeEventCell(hhmmFormatter, xhtmlBuffer, day, event, start, end, resourceBundle);
                 
                 if(!first) {
                     xhtmlBuffer.closeElement("tr");
@@ -133,12 +145,15 @@
     %>
     </table>
 </div><%!
-    private void writeEventCell(DateTimeFormatter hhmmFormatter, XhtmlBuffer xhtmlBuffer, EventDay day, Event event, DateTime start, DateTime end) {
+    private void writeEventCell
+            (DateTimeFormatter hhmmFormatter, XhtmlBuffer xhtmlBuffer, EventDay day, Event event,
+             DateTime start, DateTime end, ResourceBundle resourceBundle) {
         xhtmlBuffer.openElement("td");
         xhtmlBuffer.openElement("span");
         xhtmlBuffer.addAttribute("class", "event");
 
-        String dialogId = writeEventDialog(hhmmFormatter, xhtmlBuffer, day, event, start, end);
+        String dialogId =
+                writeEventDialog(hhmmFormatter, xhtmlBuffer, day, event, start, end, resourceBundle);
 
         xhtmlBuffer.openElement("a");
         xhtmlBuffer.addAttribute("style", "color: " + event.getCalendar().getColor() + ";");
@@ -150,7 +165,9 @@
         xhtmlBuffer.closeElement("td");
     }
 
-    private String writeEventDialog(DateTimeFormatter hhmmFormatter, XhtmlBuffer xhtmlBuffer, EventDay day, Event event, DateTime start, DateTime end) {
+    private String writeEventDialog
+            (DateTimeFormatter hhmmFormatter, XhtmlBuffer xhtmlBuffer, EventDay day, Event event,
+             DateTime start, DateTime end, ResourceBundle resourceBundle) {
         String dialogId = "event-dialog-" + event.getId() + "-" + day.getDay().getMillis();
 
         xhtmlBuffer.openElement("div");
@@ -184,16 +201,19 @@
         xhtmlBuffer.closeElement("p");
         if(event.getEditUrl() != null) {
             xhtmlBuffer.openElement("p");
-            xhtmlBuffer.writeAnchor(event.getEditUrl(), "Edit"); //TODO i18n
+            String editText = resourceBundle.getString("calendar.event.edit");
+            xhtmlBuffer.writeAnchor(event.getEditUrl(), editText);
             xhtmlBuffer.closeElement("p");
         }
         xhtmlBuffer.closeElement("div");
         return dialogId;
     }
 
-    private void writeEventSpanCell(DateTimeFormatter hhmmFormatter, XhtmlBuffer xhtmlBuffer, EventDay day, DateTime start, DateTime end) {
+    private void writeEventSpanCell
+            (DateTimeFormatter hhmmFormatter, XhtmlBuffer xhtmlBuffer,
+             EventDay day, DateTime start, DateTime end, ResourceBundle resourceBundle) {
         xhtmlBuffer.openElement("td");
-        xhtmlBuffer.addAttribute("style", "width: 15%; white-space: nowrap;");
+        xhtmlBuffer.addAttribute("class", "hour-cell");
         boolean startPrinted = false;
         boolean endPrinted = false;
         if(start.isAfter(day.getDay())) {
@@ -202,15 +222,16 @@
         }
         if(end.isBefore(day.getDay().plusDays(1))) {
             if(startPrinted) {
-                xhtmlBuffer.write(" - ");
+                xhtmlBuffer.write(" - " + hhmmFormatter.print(end));
             } else {
-                xhtmlBuffer.write("fino alle "); //TODO
+                String msg = MessageFormat.format
+                        (resourceBundle.getString("calendar.agenda.until"), hhmmFormatter.print(end));
+                xhtmlBuffer.write(msg);
             }
-            xhtmlBuffer.write(hhmmFormatter.print(end));
             endPrinted = true;
         }
         if(!startPrinted && !endPrinted) {
-            xhtmlBuffer.write("tutto il giorno"); //TODO
+            xhtmlBuffer.write(resourceBundle.getString("calendar.agenda.wholeday"));
         }
         xhtmlBuffer.closeElement("td");
     }
@@ -218,7 +239,7 @@
     private void writeDayCell(DateTimeFormatter dayFormatter, XhtmlBuffer xhtmlBuffer, EventDay day) {
         xhtmlBuffer.openElement("th");
         xhtmlBuffer.addAttribute("rowspan", day.getEvents().size() + "");
-        xhtmlBuffer.addAttribute("style", "width: 15%; white-space: nowrap;");
+        xhtmlBuffer.addAttribute("class", "date-cell");
         xhtmlBuffer.write(dayFormatter.print(day.getDay()));
         xhtmlBuffer.closeElement("th");
     }

@@ -34,6 +34,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.security.AccessLevel;
@@ -46,8 +47,10 @@ import org.joda.time.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.jsp.jstl.fmt.LocalizationContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -77,10 +80,11 @@ public class CalendarAction extends CustomAction {
     protected String calendarViewType;
 
     //**************************************************************************
-    // Forms
+    // Support objects
     //**************************************************************************
 
     protected Form configurationForm;
+    protected ResourceBundleManager resourceBundleManager;
 
     //**************************************************************************
     // Logging
@@ -127,6 +131,9 @@ public class CalendarAction extends CustomAction {
         if(pageInstance.getConfiguration() == null) {
             pageInstance.setConfiguration(new CalendarConfiguration());
         }
+        resourceBundleManager =
+                new ResourceBundleManager
+                        (pageInstance.getApplication().getAppDir(), "pageactions-extras-messages");
         return null;
     }
 
@@ -242,6 +249,12 @@ public class CalendarAction extends CustomAction {
     // Getters/setters
     //**************************************************************************
 
+    public LocalizationContext getLocalizationContext() {
+        Locale locale = context.getLocale();
+        LocalizationContext localizationContext =
+                    new LocalizationContext(resourceBundleManager.getBundle(locale), locale);
+        return localizationContext;
+    }
 
     public long getReferenceDateTimeLong() {
         return referenceDateTime.getMillis();

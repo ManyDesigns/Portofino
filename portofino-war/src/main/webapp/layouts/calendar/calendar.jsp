@@ -2,6 +2,7 @@
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.calendar.CalendarAction"/>
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <stripes:layout-component name="portletTitle">
@@ -22,7 +23,10 @@
     </style>
     <div style="width: 100%; position: relative;">
         <div class="calendar-legend-area calendar-legend" style="width: 9.5em; margin-right: 0.5em;">
-            <h3 style="margin: 0;">Calendars <a class="calendar-legend-hide-link" href="#">&lt;&lt;</a></h3>
+            <h3 style="margin: 0;">
+                <fmt:message key="calendar.calendars.legend" bundle="${actionBean.localizationContext}" />
+                <a class="calendar-legend-hide-link" href="#">&lt;&lt;</a>
+            </h3>
             <ul style="margin-left: 0;">
                 <c:forEach var="calendar" items="${actionBean.calendars}">
                     <li style="margin: 0.5em 0; list-style: none;">

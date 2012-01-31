@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.application;
 
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.ConnectionProvider;
 import com.manydesigns.portofino.model.database.Database;
@@ -153,6 +154,8 @@ public interface Application {
     //**************************************************************************
 
     ResourceBundle getBundle(Locale locale);
+
+    ResourceBundleManager getResourceBundleManager();
 
     Configuration getAppConfiguration();
 

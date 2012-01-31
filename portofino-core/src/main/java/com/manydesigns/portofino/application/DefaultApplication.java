@@ -650,4 +650,8 @@ public class DefaultApplication implements Application {
     public ResourceBundle getBundle(Locale locale) {
         return resourceBundleManager.getBundle(locale);
     }
+
+    public ResourceBundleManager getResourceBundleManager() {
+        return resourceBundleManager;
+    }
 }

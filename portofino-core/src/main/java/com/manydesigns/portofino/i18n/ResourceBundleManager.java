@@ -51,15 +51,22 @@ import java.util.concurrent.ConcurrentMap;
 public class ResourceBundleManager {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
+    public static final String DEFAULT_BUNDLE_NAME = "portofino-messages";
 
     protected final File directory;
     protected final ConcurrentMap<Locale, ConfigurationResourceBundle> resourceBundles =
             new ConcurrentHashMap<Locale, ConfigurationResourceBundle>();
 
     private static final Logger logger = LoggerFactory.getLogger(ResourceBundleManager.class);
+    protected final String resourceBundleName;
 
     public ResourceBundleManager(File dir) {
+        this(dir, DEFAULT_BUNDLE_NAME);
+    }
+
+    public ResourceBundleManager(File dir, String resourceBundleName) {
         this.directory = dir;
+        this.resourceBundleName = resourceBundleName;
     }
 
     protected String getBundleFileName(String baseName, Locale locale) {
@@ -89,7 +96,7 @@ public class ResourceBundleManager {
     public ResourceBundle getBundle(Locale locale) {
         ConfigurationResourceBundle bundle = resourceBundles.get(locale);
         if(bundle == null) {
-            ResourceBundle parentBundle = ResourceBundle.getBundle("portofino-messages", locale);
+            ResourceBundle parentBundle = ResourceBundle.getBundle(resourceBundleName, locale);
             PropertiesConfiguration configuration;
             try {
                 File bundleFile = getBundleFile(locale);
@@ -114,7 +121,7 @@ public class ResourceBundleManager {
     }
 
     protected File getBundleFile(Locale locale) {
-        String resourceName = getBundleFileName("portofino-messages", locale);
+        String resourceName = getBundleFileName(resourceBundleName, locale);
         return new File(directory, resourceName);
     }
 }

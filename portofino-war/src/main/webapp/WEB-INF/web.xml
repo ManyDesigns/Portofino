@@ -115,7 +115,7 @@
         </init-param>
         <init-param>
             <param-name>LocalePicker.Locales</param-name>
-            <param-value>it_IT</param-value>
+            <param-value>it,en</param-value>
         </init-param>
     </filter>
 
