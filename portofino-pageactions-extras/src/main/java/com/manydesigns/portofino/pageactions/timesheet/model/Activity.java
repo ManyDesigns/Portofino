@@ -46,11 +46,27 @@ public class Activity {
     String group2;
     String title;
     String description;
+    ActivityType activityType;
     DateTime start;
     DateTime end;
+    String readUrl;
 
     public Activity(String id) {
         this.id = id;
+    }
+
+    public Activity(String id, String group1, String group2, String title, String description,
+                    ActivityType activityType, DateTime start, DateTime end,
+                    String readUrl) {
+        this.id = id;
+        this.group1 = group1;
+        this.group2 = group2;
+        this.title = title;
+        this.description = description;
+        this.activityType = activityType;
+        this.start = start;
+        this.end = end;
+        this.readUrl = readUrl;
     }
 
     public String getId() {
@@ -103,5 +119,21 @@ public class Activity {
 
     public void setEnd(DateTime end) {
         this.end = end;
+    }
+
+    public ActivityType getActivityType() {
+        return activityType;
+    }
+
+    public void setActivityType(ActivityType activityType) {
+        this.activityType = activityType;
+    }
+
+    public String getReadUrl() {
+        return readUrl;
+    }
+
+    public void setReadUrl(String readUrl) {
+        this.readUrl = readUrl;
     }
 }
