@@ -29,7 +29,10 @@
 
 package com.manydesigns.portofino.pageactions.timesheet.model;
 
-import org.joda.time.Period;
+import org.joda.time.DateMidnight;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -37,41 +40,44 @@ import org.joda.time.Period;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class Entry {
+public class PersonDay {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    final Activity activity;
-    Period period;
-    String note;
+    final Person person;
+    final DateMidnight date;
+    boolean locked;
 
-    public Entry(Activity activity) {
-        this.activity = activity;
+    final List<Entry> entries;
+
+    public PersonDay(Person person, DateMidnight date) {
+        this(person, date, false);
     }
 
-    public Entry(Activity activity, Period period, String note) {
-        this.activity = activity;
-        this.period = period;
-        this.note = note;
+    public PersonDay(Person person, DateMidnight date, boolean locked) {
+        this.person = person;
+        this.date = date;
+        this.locked = locked;
+        entries = new ArrayList<Entry>();
     }
 
-    public Activity getActivity() {
-        return activity;
+    public Person getPerson() {
+        return person;
     }
 
-    public String getNote() {
-        return note;
+    public DateMidnight getDate() {
+        return date;
     }
 
-    public void setNote(String note) {
-        this.note = note;
+    public List<Entry> getEntries() {
+        return entries;
     }
 
-    public Period getPeriod() {
-        return period;
+    public boolean isLocked() {
+        return locked;
     }
 
-    public void setPeriod(Period period) {
-        this.period = period;
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 }

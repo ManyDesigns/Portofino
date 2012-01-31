@@ -253,9 +253,9 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
         closeElement("input");
     }
 
-    public void writeInputText(String id, String name, String value,
-                               String htmlClass, Integer size,
-                               Integer maxLength) {
+    public void writeInputText(@Nullable String id, @Nullable String name, String value,
+                               String htmlClass, @Nullable Integer size,
+                               @Nullable Integer maxLength) {
         openElement("input");
         addAttribute("id", id);
         addAttribute("type", "text");
