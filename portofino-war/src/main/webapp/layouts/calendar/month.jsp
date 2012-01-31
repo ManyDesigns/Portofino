@@ -16,7 +16,7 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.calendar.CalendarAction"/>
 <%
-    int maxEventsPerCell = 3;
+    int maxEventsPerCell = actionBean.getConfiguration().getMaxEventsPerCellInMonthView();
     MonthView monthView = actionBean.getMonthView();
     DateTimeFormatter dayOfWeekFormatter =
             new DateTimeFormatterBuilder()

@@ -29,7 +29,12 @@
 
 package com.manydesigns.portofino.pageactions.calendar;
 
+import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
@@ -72,8 +77,10 @@ public class CalendarAction extends CustomAction {
     protected String calendarViewType;
 
     //**************************************************************************
-    // Injections
+    // Forms
     //**************************************************************************
+
+    protected Form configurationForm;
 
     //**************************************************************************
     // Logging
@@ -105,11 +112,11 @@ public class CalendarAction extends CustomAction {
     }
 
     //**************************************************************************
-    // Setup
+    // Setup and configuration
     //**************************************************************************
 
     public Class<?> getConfigurationClass() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return CalendarConfiguration.class;
     }
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
@@ -117,7 +124,42 @@ public class CalendarAction extends CustomAction {
         if(!pageInstance.getParameters().isEmpty()) {
             return new ErrorResolution(404);
         }
+        if(pageInstance.getConfiguration() == null) {
+            pageInstance.setConfiguration(new CalendarConfiguration());
+        }
         return null;
+    }
+
+    @Override
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
+    @RequiresPermissions(level = AccessLevel.EDIT)
+    public Resolution configure() {
+        prepareConfigurationForms();
+        return new ForwardResolution("/layouts/calendar/configure.jsp");
+    }
+
+    @Button(list = "configuration", key = "commons.updateConfiguration")
+    @RequiresPermissions(level = AccessLevel.EDIT)
+    public Resolution updateConfiguration() {
+        prepareConfigurationForms();
+        readPageConfigurationFromRequest();
+        configurationForm.readFromRequest(context.getRequest());
+        boolean valid = validatePageConfiguration();
+        valid = valid && configurationForm.validate();
+        if(valid) {
+            updatePageConfiguration();
+            configurationForm.writeToObject(pageInstance.getConfiguration());
+            saveConfiguration(pageInstance.getConfiguration());
+            SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
+        }
+        return cancel();
+    }
+
+    @Override
+    protected void prepareConfigurationForms() {
+        super.prepareConfigurationForms();
+        configurationForm = new FormBuilder(CalendarConfiguration.class).build();
+        configurationForm.readFromObject(pageInstance.getConfiguration());
     }
 
     //**************************************************************************
@@ -129,7 +171,7 @@ public class CalendarAction extends CustomAction {
     public Resolution execute() {
         if("agenda".equals(calendarViewType)) {
             agendaView = new AgendaView(referenceDateTime);
-            int maxEvents = 15;
+            int maxEvents = getConfiguration().getEstimateEventsPerPageInAgendaView();
             loadObjects(agendaView.getFirstDay().toDateTime(), maxEvents);
             int added = 0;
             for(Event event : events) {
@@ -227,5 +269,13 @@ public class CalendarAction extends CustomAction {
 
     public DateTime getReferenceDateTime() {
         return referenceDateTime;
+    }
+
+    public Form getConfigurationForm() {
+        return configurationForm;
+    }
+
+    public CalendarConfiguration getConfiguration() {
+        return (CalendarConfiguration) pageInstance.getConfiguration();
     }
 }

@@ -72,7 +72,7 @@ public class CustomAction extends AbstractPageAction {
 
     @DefaultHandler
     public Resolution execute() {
-        String fwd = "/layouts/jsp/example.jsp";
+        String fwd = "/layouts/custom/example.jsp";
         if(isEmbedded()) {
             return new ForwardResolution(fwd);
         } else {
@@ -84,7 +84,7 @@ public class CustomAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configure() {
         prepareConfigurationForms();
-        return new ForwardResolution("/layouts/jsp/configure.jsp");
+        return new ForwardResolution("/layouts/custom/configure.jsp");
     }
 
     @Button(list = "configuration", key = "commons.updateConfiguration")
