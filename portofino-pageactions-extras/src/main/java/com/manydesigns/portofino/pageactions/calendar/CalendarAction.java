@@ -129,9 +129,14 @@ public class CalendarAction extends CustomAction {
     public Resolution execute() {
         if("agenda".equals(calendarViewType)) {
             agendaView = new AgendaView(referenceDateTime);
-            loadObjects(agendaView.getFirstDay().toDateTime(), 20);
+            int maxEvents = 15;
+            loadObjects(agendaView.getFirstDay().toDateTime(), maxEvents);
+            int added = 0;
             for(Event event : events) {
-                agendaView.addEvent(event);
+                added += agendaView.addEvent(event);
+                if(added >= maxEvents) {
+                    break;
+                }
             }
             agendaView.sortEvents();
         } else {
@@ -157,6 +162,16 @@ public class CalendarAction extends CustomAction {
 
     public Resolution prevMonth() {
         referenceDateTime = referenceDateTime.minusMonths(1);
+        return execute();
+    }
+
+    public Resolution nextDay() {
+        referenceDateTime = referenceDateTime.plusDays(1);
+        return execute();
+    }
+
+    public Resolution prevDay() {
+        referenceDateTime = referenceDateTime.minusDays(1);
         return execute();
     }
 

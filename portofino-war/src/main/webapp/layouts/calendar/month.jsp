@@ -79,7 +79,7 @@
         position: relative; border: none;
     }
     .events-table td {
-        padding: 1px 1px 0 2px;; border: none;
+        padding: 1px 1px 0 2px; border: none;
     }
     .events-table th {
         padding: 0 0 3px 10px; border: none; text-align: left;

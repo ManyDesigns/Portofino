@@ -54,15 +54,17 @@ public class AgendaView {
         firstDay = new DateMidnight(referenceDateTime);
     }
 
-    public void addEvent(Event event) {
+    public int addEvent(Event event) {
         DateMidnight day = new DateMidnight(event.getInterval().getStart());
         DateTime end = event.getInterval().getEnd();
-        while(addEvent(day, event)) {
-            day = day.plusDays(1);
-            if(end.minus(1).compareTo(day) < 0) {
-                return;
+        int added = 0;
+        while(end.minus(1).compareTo(day) >= 0) {
+            if(addEvent(day, event)) {
+                added++;
             }
+            day = day.plusDays(1);
         }
+        return added;
     }
 
     protected boolean addEvent(DateMidnight date, Event event) {

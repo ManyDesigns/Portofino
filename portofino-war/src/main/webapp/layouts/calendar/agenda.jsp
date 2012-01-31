@@ -1,14 +1,11 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="com.manydesigns.portofino.pageactions.calendar.Event" %>
-<%@ page import="com.manydesigns.portofino.pageactions.calendar.EventWeek" %>
-<%@ page import="com.manydesigns.portofino.pageactions.calendar.MonthView" %>
+<%@ page import="com.manydesigns.portofino.pageactions.calendar.EventDay" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.joda.time.DateTime" %>
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="org.joda.time.format.DateTimeFormatterBuilder" %>
-<%@ page import="java.util.List" %>
 <%@ page import="java.util.Locale" %>
-<%@ page import="com.manydesigns.portofino.pageactions.calendar.EventDay" %>
-<%@ page import="org.joda.time.*" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -16,21 +13,15 @@
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.calendar.CalendarAction"/>
 <%
     DateTime referenceDateTime = actionBean.getReferenceDateTime();
-    DateTimeFormatter monthFormatter =
+    DateTimeFormatter dateFormatter =
             new DateTimeFormatterBuilder()
+                    .appendDayOfWeekText()
+                    .appendLiteral(" ")
+                    .appendDayOfMonth(1)
+                    .appendLiteral(" ")
                     .appendMonthOfYearText()
                     .appendLiteral(" ")
                     .appendYear(4, 4)
-                    .toFormatter()
-                    .withLocale(request.getLocale());
-
-    DateTimeFormatter dayFormatter =
-            new DateTimeFormatterBuilder()
-                    .appendDayOfWeekShortText()
-                    .appendLiteral(" ")
-                    .appendDayOfMonth(2)
-                    .appendLiteral(" ")
-                    .appendMonthOfYearText()
                     .toFormatter()
                     .withLocale(request.getLocale());
 
@@ -43,7 +34,26 @@
                     .withLocale(request.getLocale());
     XhtmlBuffer xhtmlBuffer = new XhtmlBuffer(out);
 %>
-<div class="yui-gc" style="width: 100%;">
+<style type="text/css">
+    .agenda-table {
+        width: 100%;
+        border: none;
+    }
+    .agenda-table td, .agenda-table th {
+        border-style: none;
+        border-top: 1px solid #DDDDDD;
+    }
+    .event-dialog {
+        display: none;
+    }
+    .event {
+        padding: 0.25em;
+    }
+    .event a {
+        color: #222222;
+    }
+</style>
+<div class="yui-g" style="width: 100%;">
     <div class="yui-u first">
         <%
             DateTime today = new DateTime();
@@ -63,9 +73,6 @@
             <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-e"></span>
             <span class="ui-button-text">Next</span>
         </button>
-        <span style="margin-left: 1em;">
-            <%= StringUtils.capitalize(monthFormatter.print(referenceDateTime)) %>
-        </span>
     </div>
     <div class="yui-u" style="text-align: right">
         <div id="calendarViewType">
@@ -84,34 +91,41 @@
         </script>
     </div>
 </div>
-<div class="horizontalSeparator"></div>
+<div style="white-space: nowrap; clear: both; margin-bottom: 1em;">
+        <%= StringUtils.capitalize(dateFormatter.print(referenceDateTime)) %>
+</div>
+<script type="text/javascript">
+    $(function() {
+        $( ".event-dialog" ).dialog({ autoOpen: false });
+    });
+</script>
 <div class="calendar-container">
-    <table style="width: 100%; border: none;">
+    <table class="agenda-table">
     <%
         for(EventDay day : actionBean.getAgendaView().getEvents()) {
             xhtmlBuffer.openElement("tr");
-            xhtmlBuffer.openElement("td");
-            xhtmlBuffer.addAttribute("rowspan", day.getEvents().size() + "");
-            xhtmlBuffer.write(dayFormatter.print(day.getDay()));
-            xhtmlBuffer.closeElement("td");
+            DateTimeFormatter dayFormatter =
+            new DateTimeFormatterBuilder()
+                    .appendDayOfWeekShortText()
+                    .appendLiteral(" ")
+                    .appendDayOfMonth(2)
+                    .appendLiteral(" ")
+                    .appendMonthOfYearShortText()
+                    .toFormatter()
+                    .withLocale(request.getLocale());
+            writeDayCell(dayFormatter, xhtmlBuffer, day);
             boolean first = true;
             for(Event event : day.getEvents()) {
                 if(!first) {
                     xhtmlBuffer.openElement("tr");
                 }
-                xhtmlBuffer.openElement("td");
+
                 DateTime start = event.getInterval().getStart();
                 DateTime end = event.getInterval().getEnd();
-                if(start.isAfter(day.getDay())) {
-                    xhtmlBuffer.write(hhmmFormatter.print(start));
-                }
-                if(end.isBefore(day.getDay().plusDays(1))) { //TODO
-                    xhtmlBuffer.write(" - " + hhmmFormatter.print(end));
-                }
-                xhtmlBuffer.closeElement("td");
-                xhtmlBuffer.openElement("td");
-                xhtmlBuffer.write(event.getDescription());
-                xhtmlBuffer.closeElement("td");
+
+                writeEventSpanCell(hhmmFormatter, xhtmlBuffer, day, start, end);
+                writeEventCell(hhmmFormatter, xhtmlBuffer, day, event, start, end);
+                
                 if(!first) {
                     xhtmlBuffer.closeElement("tr");
                 }
@@ -121,4 +135,112 @@
         }
     %>
     </table>
-</div>
+</div><%!
+    private void writeEventCell(DateTimeFormatter hhmmFormatter, XhtmlBuffer xhtmlBuffer, EventDay day, Event event, DateTime start, DateTime end) {
+        xhtmlBuffer.openElement("td");
+        xhtmlBuffer.openElement("span");
+        xhtmlBuffer.addAttribute("class", "event");
+        xhtmlBuffer.addAttribute("style", "background-color: " + event.getCalendar().getColor() + ";");
+
+        String dialogId = writeEventDialog(hhmmFormatter, xhtmlBuffer, day, event, start, end);
+
+        xhtmlBuffer.openElement("a");
+        xhtmlBuffer.addAttribute("href", "#");
+        xhtmlBuffer.addAttribute("onclick", "$('#" + dialogId + "').dialog('open'); return false;");
+        xhtmlBuffer.write(event.getDescription());
+        xhtmlBuffer.closeElement("a");
+        xhtmlBuffer.closeElement("span");
+        xhtmlBuffer.closeElement("td");
+    }
+
+    private String writeEventDialog(DateTimeFormatter hhmmFormatter, XhtmlBuffer xhtmlBuffer, EventDay day, Event event, DateTime start, DateTime end) {
+        String dialogId = "event-dialog-" + event.getId() + "-" + day.getDay().getMillis();
+
+        xhtmlBuffer.openElement("div");
+        xhtmlBuffer.addAttribute("id", dialogId);
+        xhtmlBuffer.addAttribute("class", "event-dialog");
+        xhtmlBuffer.openElement("h3");
+        if(event.getReadUrl() != null) {
+            xhtmlBuffer.writeAnchor(event.getReadUrl(), event.getDescription());
+        } else {
+            xhtmlBuffer.write(event.getDescription());
+        }
+        xhtmlBuffer.closeElement("h3");
+
+        xhtmlBuffer.openElement("p");
+        String timeDescription;
+        DateTimeFormatter startFormatter =
+                makeEventDateTimeFormatter(start, hhmmFormatter.getLocale());
+        timeDescription = startFormatter.print(start);
+        if(end.minus(1).getDayOfYear() != start.getDayOfYear()) {
+            DateTime formatEnd = end;
+            if(formatEnd.getMillisOfDay() == 0) {
+                formatEnd = formatEnd.minusDays(1);
+            }
+            DateTimeFormatter endFormatter =
+                makeEventDateTimeFormatter(formatEnd, hhmmFormatter.getLocale());
+            timeDescription += " - " + endFormatter.print(formatEnd);
+        } else if(end.getMillisOfDay() != start.getMillisOfDay()) {
+            timeDescription += " - " + hhmmFormatter.print(end);
+        }
+        xhtmlBuffer.write(timeDescription);
+        xhtmlBuffer.closeElement("p");
+        if(event.getEditUrl() != null) {
+            xhtmlBuffer.openElement("p");
+            xhtmlBuffer.writeAnchor(event.getEditUrl(), "Edit"); //TODO i18n
+            xhtmlBuffer.closeElement("p");
+        }
+        xhtmlBuffer.closeElement("div");
+        return dialogId;
+    }
+
+    private void writeEventSpanCell(DateTimeFormatter hhmmFormatter, XhtmlBuffer xhtmlBuffer, EventDay day, DateTime start, DateTime end) {
+        xhtmlBuffer.openElement("td");
+        xhtmlBuffer.addAttribute("style", "width: 15%; white-space: nowrap;");
+        boolean startPrinted = false;
+        boolean endPrinted = false;
+        if(start.isAfter(day.getDay())) {
+            xhtmlBuffer.write(hhmmFormatter.print(start));
+            startPrinted = true;
+        }
+        if(end.isBefore(day.getDay().plusDays(1))) {
+            if(startPrinted) {
+                xhtmlBuffer.write(" - ");
+            } else {
+                xhtmlBuffer.write("fino alle "); //TODO
+            }
+            xhtmlBuffer.write(hhmmFormatter.print(end));
+            endPrinted = true;
+        }
+        if(!startPrinted && !endPrinted) {
+            xhtmlBuffer.write("tutto il giorno"); //TODO
+        }
+        xhtmlBuffer.closeElement("td");
+    }
+
+    private void writeDayCell(DateTimeFormatter dayFormatter, XhtmlBuffer xhtmlBuffer, EventDay day) {
+        xhtmlBuffer.openElement("th");
+        xhtmlBuffer.addAttribute("rowspan", day.getEvents().size() + "");
+        xhtmlBuffer.addAttribute("style", "width: 15%; white-space: nowrap;");
+        xhtmlBuffer.write(dayFormatter.print(day.getDay()));
+        xhtmlBuffer.closeElement("th");
+    }
+
+    private DateTimeFormatter makeEventDateTimeFormatter(DateTime start, Locale locale) {
+        DateTimeFormatterBuilder builder =
+            new DateTimeFormatterBuilder()
+                    .appendDayOfWeekShortText()
+                    .appendLiteral(", ")
+                    .appendDayOfMonth(1)
+                    .appendLiteral(" ")
+                    .appendMonthOfYearText();
+        if(start.getSecondOfDay() > 0) {
+            builder
+                .appendLiteral(", ")
+                .appendHourOfDay(2)
+                .appendLiteral(":")
+                .appendMinuteOfHour(2);
+        }
+        return builder.toFormatter().withLocale(locale);
+    }
+%>
