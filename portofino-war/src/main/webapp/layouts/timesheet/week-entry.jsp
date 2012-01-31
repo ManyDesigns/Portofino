@@ -68,6 +68,7 @@
                 background-color: #F0F8E5;
             }
             td.twe-hours input.twe-input {
+                display: block;
                 width: 30px;
                 text-align: right;
             }
@@ -86,7 +87,6 @@
                 display: block;
                 width: 32px;
                 text-align: right;
-                margin-top: 2px;
             }
             .display-none {
                 display: none;
@@ -189,10 +189,10 @@
                         xb.addAttribute("onclick", "$( '#" + acInfoId + "' ).dialog(); return false;");
                         xb.addAttribute("href", "#");
 
-                        xb.openElement("span");
+                        xb.openElement("div");
                         xb.addAttribute("class", "ui-icon ui-icon-info");
                         xb.addAttribute("style", "float: right");
-                        xb.closeElement("span");
+                        xb.closeElement("div");
 
                         xb.closeElement("a");
 
@@ -226,7 +226,7 @@
 
                         PersonDay personDay = personDays.get(day);
                         if (personDay == null) {
-                            xb.write("--");
+                            //xb.write("--");
                         } else {
                             String hours = null;
                             Entry entry = null;
@@ -250,11 +250,11 @@
                                     xb.closeElement("span");
                                 } else {
                                     if (StringUtils.isNotBlank(note)) {
-                                        xb.openElement("span");
+                                        xb.openElement("div");
                                         xb.addAttribute("class", "ui-icon ui-icon-comment");
                                         xb.addAttribute("style", "float: right");
                                         xb.addAttribute("title", note);
-                                        xb.closeElement("span");
+                                        xb.closeElement("div");
                                     }
                                     xb.openElement("span");
                                     xb.addAttribute("class", "twe-ro-hours");
@@ -262,19 +262,21 @@
                                     xb.closeElement("span");
                                 }
                             } else {
-                                xb.writeInputText(null, null, hours, "twe-input", null, null);
                                 if (StringUtils.isBlank(note)) {
-                                    xb.openElement("span");
+                                    xb.openElement("div");
                                     xb.addAttribute("class", "ui-icon ui-icon-document");
                                     xb.addAttribute("style", "float: right");
-                                    xb.closeElement("span");
+                                    xb.closeElement("div");
                                 } else {
-                                    xb.openElement("span");
+                                    xb.openElement("div");
                                     xb.addAttribute("class", "ui-icon ui-icon-comment");
                                     xb.addAttribute("style", "float: right");
                                     xb.addAttribute("title", note);
-                                    xb.closeElement("span");
+                                    xb.closeElement("div");
                                 }
+                                xb.openElement("span");
+                                xb.writeInputText(null, null, hours, "twe-input", null, null);
+                                xb.closeElement("span");
                             }
                         }
 
