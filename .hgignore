@@ -8,6 +8,7 @@
 ^elements-struts1/target
 ^elements-struts2/target
 ^elements-extras/target
+^mail/target
 ^out/
 derby.log
 syntax: glob
