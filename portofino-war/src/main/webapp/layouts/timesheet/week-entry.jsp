@@ -13,7 +13,7 @@
 <%@ page import="org.joda.time.format.PeriodFormatterBuilder" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="java.util.Set" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -111,6 +111,8 @@
                 <th class="twe-activity">Attività</th>
                 <%
                     XhtmlBuffer xb = new XhtmlBuffer(out);
+                    Set<DateMidnight> nonWorkingDays =
+                            actionBean.getNonWorkingDays();
 
                     DateMidnight day = actionBean.getMonday();
                     DateTimeFormatter dayOfWeekFormatter =
@@ -123,7 +125,7 @@
                         PersonDay personDay = personDays.get(day);
                         xb.openElement("th");
                         String htmlClass = "twe-day";
-                        if (i >=5) {
+                        if (nonWorkingDays.contains(day)) {
                             htmlClass += " twe-non-working";
                         }
 
@@ -214,7 +216,7 @@
                     for (int i = 0; i < 7; i++) {
                         xb.openElement("td");
                         String htmlClass = "twe-hours";
-                        if (i >=5) {
+                        if (nonWorkingDays.contains(day)) {
                             htmlClass += " twe-non-working";
                         }
 
@@ -296,7 +298,7 @@
                     for (int i = 0; i < 7; i++) {
                         xb.openElement("td");
                         String htmlClass = "twe-summary";
-                        if (i >=5) {
+                        if (nonWorkingDays.contains(day)) {
                             htmlClass += " twe-non-working";
                         }
 
