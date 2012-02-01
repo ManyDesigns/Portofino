@@ -362,10 +362,8 @@
             return;
         }
         xhtmlBuffer.openElement(enclosingTag);
-        if(day.getDayInterval().contains(new DateTime())) {
-            xhtmlBuffer.addAttribute("class", "today");
-        }
-        xhtmlBuffer.addAttribute("colspan", (eventWeek.getEndDay() + 1 - dayOfWeek) + "");
+        int days = eventWeek.getEndDay() + 1 - dayOfWeek;
+        xhtmlBuffer.addAttribute("colspan", days + "");
 
         //Event content
         Event event = eventWeek.getEvent();
@@ -387,9 +385,20 @@
         //Cell contents
         xhtmlBuffer.openElement("div");
         xhtmlBuffer.addAttribute("class", "event");
-        xhtmlBuffer.addAttribute("style", "background-color: " + event.getCalendar().getColor());
+        boolean eventLastsLessThanOneDay =
+                days == 1 &&
+                (event.getInterval().getStart().getMillisOfDay() != 0 ||
+                 event.getInterval().getEnd().getMillisOfDay() != 0);
+        if(!eventLastsLessThanOneDay) {
+            xhtmlBuffer.addAttribute("style", "background-color: " + event.getCalendar().getColor());
+        }
         xhtmlBuffer.openElement("a");
-        xhtmlBuffer.addAttribute("style", "float: left;");
+        if(eventLastsLessThanOneDay) {
+            xhtmlBuffer.addAttribute
+                    ("style", "float: left; color: " + event.getCalendar().getColor());
+        } else {
+            xhtmlBuffer.addAttribute("style", "float: left;");
+        }
         xhtmlBuffer.addAttribute("href", "#");
         xhtmlBuffer.addAttribute("onclick", "$('#" + dialogId + "').dialog('open'); return false;");
         if(start.getMillisOfDay() > 0) {

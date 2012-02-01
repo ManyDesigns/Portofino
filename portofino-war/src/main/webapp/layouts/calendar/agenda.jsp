@@ -114,7 +114,7 @@
         for(EventDay day : actionBean.getAgendaView().getEvents()) {
             xhtmlBuffer.openElement("tr");
             DateTimeFormatter dayFormatter =
-            new DateTimeFormatterBuilder()
+                new DateTimeFormatterBuilder()
                     .appendDayOfWeekShortText()
                     .appendLiteral(" ")
                     .appendDayOfMonth(2)
