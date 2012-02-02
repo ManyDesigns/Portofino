@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.application;
 
+import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.application.hibernate.HibernateConfig;
@@ -42,7 +43,6 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
-import com.manydesigns.portofino.util.PortofinoFileUtils;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
@@ -151,7 +151,7 @@ public class DefaultApplication implements Application {
 
         appBlobsDir = new File(appDir, APP_BLOBS_DIR);
         logger.info("Application blobs dir: {}", appBlobsDir.getAbsolutePath());
-        boolean result = PortofinoFileUtils.ensureDirectoryExistsAndWritable(appBlobsDir);
+        boolean result = ElementsFileUtils.ensureDirectoryExistsAndWritable(appBlobsDir);
 
         appConnectionsFile = new File(appDir, APP_CONNECTIONS_FILE);
         logger.info("Application connections file: {}",
@@ -160,7 +160,7 @@ public class DefaultApplication implements Application {
         appDbsDir = new File(appDir, APP_DBS_DIR);
         logger.info("Application dbs dir: {}",
                 appDbsDir.getAbsolutePath());
-        result &= PortofinoFileUtils.ensureDirectoryExistsAndWritable(appDbsDir);
+        result &= ElementsFileUtils.ensureDirectoryExistsAndWritable(appDbsDir);
 
         appModelFile = new File(appDir, APP_MODEL_FILE);
         logger.info("Application model file: {}",
@@ -169,22 +169,22 @@ public class DefaultApplication implements Application {
         appScriptsDir = new File(appDir, APP_SCRIPTS_DIR);
         logger.info("Application scripts dir: {}",
                 appScriptsDir.getAbsolutePath());
-        result &= PortofinoFileUtils.ensureDirectoryExistsAndWritable(appScriptsDir);
+        result &= ElementsFileUtils.ensureDirectoryExistsAndWritable(appScriptsDir);
 
         appPagesDir = new File(appDir, APP_PAGES_DIR);
         logger.info("Application pages dir: {}",
                 appPagesDir.getAbsolutePath());
-        result &= PortofinoFileUtils.ensureDirectoryExistsAndWritable(appPagesDir);
+        result &= ElementsFileUtils.ensureDirectoryExistsAndWritable(appPagesDir);
 
         appStorageDir = new File(appDir, APP_STORAGE_DIR);
         logger.info("Application storage dir: {}",
                 appStorageDir.getAbsolutePath());
-        result &= PortofinoFileUtils.ensureDirectoryExistsAndWritable(appStorageDir);
+        result &= ElementsFileUtils.ensureDirectoryExistsAndWritable(appStorageDir);
 
         appWebDir = new File(appDir, APP_WEB_DIR);
         logger.info("Application web dir: {}",
                 appWebDir.getAbsolutePath());
-        result &= PortofinoFileUtils.ensureDirectoryExistsAndWritable(appWebDir);
+        result &= ElementsFileUtils.ensureDirectoryExistsAndWritable(appWebDir);
 
         if (!result) {
             throw new Exception("Could not initialize application");
@@ -248,7 +248,7 @@ public class DefaultApplication implements Application {
                             DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
                     lqDatabase.setDefaultSchemaName(schemaName);
                     String relativeChangelogPath =
-                            PortofinoFileUtils.getRelativePath(appDir, changelogFile);
+                            ElementsFileUtils.getRelativePath(appDir, changelogFile);
                     if(new File(relativeChangelogPath).isAbsolute()) {
                         logger.warn("The application dbs dir {} is not inside the apps dir {}; using an absolute path for Liquibase update",
                                 appDbsDir, appDir);

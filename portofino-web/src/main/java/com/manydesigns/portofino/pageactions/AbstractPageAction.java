@@ -11,6 +11,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
+import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
@@ -24,7 +25,6 @@ import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.stripes.ModelActionResolver;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
-import com.manydesigns.portofino.util.PortofinoFileUtils;
 import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
@@ -375,7 +375,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
                                DefaultSelectionProvider selectionProvider) {
         for(File file : files) {
             if(file.isFile() && file.getName().endsWith(".jsp")) {
-                String path = File.separator + PortofinoFileUtils.getRelativePath(root, file);
+                String path = File.separator + ElementsFileUtils.getRelativePath(root, file);
                 String name = file.getName();
                 if(DEFAULT_LAYOUT.equals(path)) {
                     name += " (default)";

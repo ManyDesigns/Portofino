@@ -31,10 +31,10 @@ package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
-import com.manydesigns.portofino.util.PortofinoFileUtils;
 import groovy.lang.GroovyClassLoader;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -108,7 +108,7 @@ public class DispatcherLogic {
             if(includeDetailChildren) {
                 breadcrumb += " (detail)"; //TODO I18n
                 selectionProvider.appendRow
-                    ("/" + PortofinoFileUtils.getRelativePath(baseDir, file), breadcrumb, true);
+                    ("/" + ElementsFileUtils.getRelativePath(baseDir, file), breadcrumb, true);
                 appendChildrenToPagesSelectionProvider
                         (application, baseDir, file, breadcrumb, selectionProvider, includeDetailChildren, excludes);
             }
@@ -125,7 +125,7 @@ public class DispatcherLogic {
                 breadcrumb = String.format("%s > %s", breadcrumb, page.getTitle());
             }
             selectionProvider.appendRow
-                    ("/" + PortofinoFileUtils.getRelativePath(baseDir, file), breadcrumb, true);
+                    ("/" + ElementsFileUtils.getRelativePath(baseDir, file), breadcrumb, true);
             appendChildrenToPagesSelectionProvider
                     (application, baseDir, file, breadcrumb, selectionProvider, includeDetailChildren, excludes);
         }

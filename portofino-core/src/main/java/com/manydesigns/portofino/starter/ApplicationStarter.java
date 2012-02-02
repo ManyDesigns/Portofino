@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.starter;
 
+import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.mail.queue.FileSystemMailQueue;
 import com.manydesigns.mail.queue.LockingMailQueue;
 import com.manydesigns.mail.queue.MailQueue;
@@ -38,7 +39,6 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.DefaultApplication;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
-import com.manydesigns.portofino.util.PortofinoFileUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -185,11 +185,11 @@ public class ApplicationStarter {
                 PortofinoProperties.APPS_DIR_PATH);
         File appsDir = new File(appsDirPath);
         logger.info("Apps dir: {}", appsDir.getAbsolutePath());
-        boolean success = PortofinoFileUtils.ensureDirectoryExistsAndWritable(appsDir);
+        boolean success = ElementsFileUtils.ensureDirectoryExistsAndWritable(appsDir);
 
         appDir = new File(appsDir, appId);
         logger.info("Application dir: {}", appDir.getAbsolutePath());
-        success &= PortofinoFileUtils.ensureDirectoryExistsAndWritable(appsDir);
+        success &= ElementsFileUtils.ensureDirectoryExistsAndWritable(appsDir);
 
 
         if (success) {

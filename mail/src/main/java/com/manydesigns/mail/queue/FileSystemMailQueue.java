@@ -29,6 +29,7 @@
 
 package com.manydesigns.mail.queue;
 
+import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
@@ -63,37 +64,50 @@ public class FileSystemMailQueue implements MailQueue {
 
     protected static final Logger logger = LoggerFactory.getLogger(FileSystemMailQueue.class);
 
-    public FileSystemMailQueue(File directory) {
+    public FileSystemMailQueue(File directory) throws QueueError {
         this.queuedDirectory = new File(directory, "queue");
         this.sentDirectory = new File(directory, "sent");
         this.failedDirectory = new File(directory, "failed");
 
-        initDirectory(this.queuedDirectory);
-        initDirectory(this.sentDirectory);
-        initDirectory(this.failedDirectory);
+        if(!ElementsFileUtils.ensureDirectoryExistsAndWritable(this.queuedDirectory)) {
+            logger.warn("Directory does not exist or is not writable: {}", this.queuedDirectory);
+        }
+        if(!ElementsFileUtils.ensureDirectoryExistsAndWritable(this.sentDirectory)) {
+            logger.warn("Directory does not exist or is not writable: {}", this.sentDirectory);
+        }
+        if(!ElementsFileUtils.ensureDirectoryExistsAndWritable(this.failedDirectory)) {
+            logger.warn("Directory does not exist or is not writable: {}", this.failedDirectory);
+        }
         try {
             jaxbContext = JAXBContext.newInstance(Email.class, Recipient.class);
         } catch (JAXBException e) {
-            throw new Error("Couldn't create jaxb context", e);
+            throw new QueueError("Couldn't create jaxb context", e);
         }
     }
 
-    private void initDirectory(File file) {
-        if(!file.mkdirs()) {
-            throw new Error("Couldn't create directory " + file.getAbsolutePath());
+    protected void checkDirectory(File file) throws QueueError {
+        if(!ElementsFileUtils.ensureDirectoryExistsAndWritable(file)) {
+            throw new QueueError("Invalid directory " + file.getAbsolutePath());
         }
     }
 
-    public String enqueue(Email email) {
+    protected void checkDirectories() {
+        checkDirectory(queuedDirectory);
+        checkDirectory(sentDirectory);
+        checkDirectory(failedDirectory);
+    }
+
+    public String enqueue(Email email) throws QueueError {
         try {
             Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             String emailId = RandomUtil.createRandomId(20);
             File destinationFile = getEmailFile(emailId);
+            checkDirectory(queuedDirectory);
             marshaller.marshal(email, destinationFile);
             return emailId;
         } catch (Exception e) {
-            throw new Error("Couldn't create jaxb context", e);
+            throw new QueueError("Couldn't enqueue mail", e);
         }
     }
 
@@ -101,7 +115,8 @@ public class FileSystemMailQueue implements MailQueue {
         return RandomUtil.getCodeFile(queuedDirectory, "email-{0}.xml", emailId);
     }
 
-    public List<String> getEnqueuedEmailIds() {
+    public List<String> getEnqueuedEmailIds() throws QueueError {
+        checkDirectories();
         List<String> ids = new ArrayList<String>();
         Pattern pattern = Pattern.compile("^email-(.*)\\.xml$");
         for(String filename : queuedDirectory.list()) {
@@ -114,7 +129,7 @@ public class FileSystemMailQueue implements MailQueue {
         return ids;
     }
 
-    public Email loadEmail(String id) {
+    public Email loadEmail(String id) throws QueueError {
         try {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             File emailFile = getEmailFile(id);
@@ -127,11 +142,12 @@ public class FileSystemMailQueue implements MailQueue {
                 return null;
             }
         } catch (Exception e) {
-            throw new Error("Couldn't create jaxb context", e);
+            throw new QueueError("Couldn't load email", e);
         }
     }
 
-    public void markSent(String id) {
+    public void markSent(String id) throws QueueError {
+        checkDirectories();
         try {
             File emailFile = getEmailFile(id);
             if(emailFile.exists()) {
@@ -141,7 +157,7 @@ public class FileSystemMailQueue implements MailQueue {
                 } else {
                     logger.debug("Deleting sent email with id {}", id);
                     if(!emailFile.delete()) {
-                        throw new Error("Couldn't mark mail as sent");
+                        throw new QueueError("Couldn't mark mail as sent");
                     }
                 }
             } else {
@@ -152,7 +168,8 @@ public class FileSystemMailQueue implements MailQueue {
         }
     }
 
-    public void markFailed(String id) {
+    public void markFailed(String id) throws QueueError {
+        checkDirectories();
         try {
             File emailFile = getEmailFile(id);
             if(emailFile.exists()) {
@@ -162,7 +179,7 @@ public class FileSystemMailQueue implements MailQueue {
                 logger.debug("Not marking email with id {} as sent", id);
             }
         } catch (IOException e) {
-            throw new Error("Couldn't mark mail as sent", e);
+            throw new QueueError("Couldn't mark mail as sent", e);
         }
     }
 

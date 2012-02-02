@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.util;
+package com.manydesigns.elements.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ import java.io.File;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class PortofinoFileUtils {
+public class ElementsFileUtils {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -49,7 +49,7 @@ public class PortofinoFileUtils {
     //**************************************************************************
 
     public static final Logger logger =
-            LoggerFactory.getLogger(PortofinoFileUtils.class);
+            LoggerFactory.getLogger(ElementsFileUtils.class);
 
     //**************************************************************************
     // Methods
