@@ -1,9 +1,12 @@
 <%@ tag import="com.manydesigns.elements.xml.XhtmlBuffer" %>
-<%@ tag import="com.manydesigns.portofino.pageactions.AbstractPageAction" %>
-<%@ tag import="com.manydesigns.portofino.dispatcher.RequestAttributes" %>
 <%@ tag import="com.manydesigns.portofino.buttons.ButtonInfo" %>
 <%@ tag import="com.manydesigns.portofino.buttons.ButtonsLogic" %>
+<%@ tag import="com.manydesigns.portofino.buttons.GuardType" %>
+<%@ tag import="com.manydesigns.portofino.buttons.annotations.Button" %>
+<%@ tag import="com.manydesigns.portofino.dispatcher.PageAction" %>
+<%@ tag import="com.manydesigns.portofino.dispatcher.RequestAttributes" %>
 <%@ tag import="com.manydesigns.portofino.logic.SecurityLogic" %>
+<%@ tag import="com.manydesigns.portofino.pageactions.AbstractPageAction" %>
 <%@ tag import="com.manydesigns.portofino.pages.Page" %>
 <%@ tag import="net.sourceforge.stripes.action.ActionBean" %>
 <%@ tag import="org.apache.commons.lang.StringUtils" %>
@@ -11,9 +14,7 @@
 <%@ tag import="java.lang.reflect.Method" %>
 <%@ tag import="java.util.List" %>
 <%@ tag import="java.util.MissingResourceException" %>
-<%@ tag import="com.manydesigns.portofino.buttons.GuardType" %>
-<%@ tag import="org.apache.taglibs.standard.tag.common.fmt.BundleSupport" %>
-<%@ tag import="com.manydesigns.portofino.buttons.annotations.Button" %>
+<%@ tag import="com.manydesigns.portofino.dispatcher.PageInstance" %>
 
 <%@ attribute name="list" required="true" %>
 <%@ attribute name="cssClass" required="false" %>
@@ -24,9 +25,11 @@
     ActionBean actionBean = (ActionBean) request.getAttribute("actionBean");
     List<String> groups = (List<String>) request.getAttribute(RequestAttributes.GROUPS);
 
+    PageInstance currentPageInstance = null;
     Page currentPage = null;
-    if(actionBean instanceof AbstractPageAction) {
-        currentPage = ((AbstractPageAction) actionBean).getPage();
+    if(actionBean instanceof PageAction) {
+        currentPageInstance = ((PageAction) actionBean).getPageInstance();
+        currentPage = currentPageInstance.getPage();
     }
     List<ButtonInfo> buttons =
             ButtonsLogic.getButtonsForClass(actionBean.getClass(), list, groups, currentPage);
@@ -35,7 +38,7 @@
             Method handler = button.getMethod();
             boolean isAdmin = SecurityLogic.isAdministrator(request);
             if(!isAdmin &&
-               ((currentPage != null && !ButtonsLogic.hasPermissions(button, currentPage, groups)) ||
+               ((currentPageInstance != null && !ButtonsLogic.hasPermissions(button, currentPageInstance, groups)) ||
                 !SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler))) {
                 continue;
             }

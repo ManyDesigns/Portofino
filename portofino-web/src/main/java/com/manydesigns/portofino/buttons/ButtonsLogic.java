@@ -34,8 +34,10 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.buttons.annotations.Guards;
+import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pages.Page;
+import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import org.jetbrains.annotations.NotNull;
 
@@ -90,11 +92,12 @@ public class ButtonsLogic {
     }
 
     public static boolean hasPermissions
-            (@NotNull ButtonInfo button, @NotNull Page page, @NotNull Collection<String> groupIds) {
+            (@NotNull ButtonInfo button, @NotNull PageInstance pageInstance, @NotNull Collection<String> groupIds) {
         RequiresPermissions requiresPermissions =
                     SecurityLogic.getRequiresPermissionsAnnotation(button.getMethod(), button.getFallbackClass());
         if(requiresPermissions != null) {
-            return SecurityLogic.hasPermissions(page.getPermissions(), groupIds, requiresPermissions);
+            Permissions permissions = SecurityLogic.calculateActualPermissions(pageInstance);
+            return SecurityLogic.hasPermissions(permissions, groupIds, requiresPermissions);
         } else {
             return true;
         }
