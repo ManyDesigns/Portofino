@@ -34,6 +34,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.calendar.MonthView;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
@@ -88,7 +89,10 @@ public class TimesheetAction extends CustomAction {
 
     protected MonthView monthView;
 
-    protected Integer nonWorkingDay;
+    protected Integer day;
+    protected Integer month;
+    protected Integer year;
+    protected boolean nonWorking;
 
     //**************************************************************************
     // Injections
@@ -140,7 +144,7 @@ public class TimesheetAction extends CustomAction {
     }
 
     //**************************************************************************
-    // Handlers
+    // Default view
     //**************************************************************************
 
     @DefaultHandler
@@ -189,6 +193,10 @@ public class TimesheetAction extends CustomAction {
         }
     }
 
+    //**************************************************************************
+    // Week data entry
+    //**************************************************************************
+
     @Button(list = "timesheet-selection", key = "Go to timesheet", order = 1)
     public Resolution weekEntry() {
         assert weeksAgo >= 0;
@@ -199,9 +207,15 @@ public class TimesheetAction extends CustomAction {
         return new ForwardResolution("/layouts/timesheet/week-entry.jsp");
     }
 
+    //**************************************************************************
+    // Non working days view
+    //**************************************************************************
+
     @Button(list = "timesheet-admin", key = "Manage non-working days", order = 1)
     public Resolution nonWorkingDays() {
         today = new DateMidnight(dtz);
+        year = today.getYear();
+        month = today.getMonthOfYear();
         loadNonWorkingDays();
         monthView = new MonthView(new DateTime(dtz));
         return new ForwardResolution("/layouts/timesheet/non-working-days.jsp");
@@ -214,6 +228,10 @@ public class TimesheetAction extends CustomAction {
     }
 
     public Resolution configureNonWorkingDay() throws JSONException {
+        logger.info("Configuring non working day. Year/month/day: {}/{}/{}. Non-working: {}",
+                new Object[] {year, month, day, nonWorking});
+        today = new DateMidnight(year, month, day, dtz);
+        saveNonWorkingDay(today, nonWorking);
         JSONStringer js = new JSONStringer();
         js.object()
                 .key("result")
@@ -223,8 +241,16 @@ public class TimesheetAction extends CustomAction {
         return new NoCacheStreamingResolution("application/json", jsonText);
     }
 
+    //**************************************************************************
+    // Other action handlers
+    //**************************************************************************
+
     @Override
-    @Button(list = "timesheet-week-entry", key = "commons.cancel", order = 99)
+    @Buttons({
+            @Button(list = "timesheet-week-entry", key = "commons.cancel", order = 99),
+            @Button(list = "timesheet-non-working-days", key = "commons.ok", order = 99)
+    })
+    @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution cancel() {
         return super.cancel();
     }
@@ -311,6 +337,9 @@ public class TimesheetAction extends CustomAction {
     static Map<DateMidnight, PersonDay> personDayDb
             = new HashMap<DateMidnight, PersonDay>();
 
+    static Set<DateMidnight> nonWorkingDaysDb
+            = new HashSet<DateMidnight>();
+
     static {
         personDayDb.put(paoloJan30.getDate(), paoloJan30);
         personDayDb.put(paoloJan31.getDate(), paoloJan31);
@@ -318,6 +347,11 @@ public class TimesheetAction extends CustomAction {
         paoloJan30.getEntries().add(entry1);
         paoloJan30.getEntries().add(entry2);
         paoloJan31.getEntries().add(entry3);
+
+        nonWorkingDaysDb.add(jan28);
+        nonWorkingDaysDb.add(jan29);
+        nonWorkingDaysDb.add(feb4);
+        nonWorkingDaysDb.add(feb5);
     }
 
     public void loadExecuteModel() {
@@ -341,10 +375,15 @@ public class TimesheetAction extends CustomAction {
     }
 
     public void loadNonWorkingDays() {
-        nonWorkingDays.add(jan28);
-        nonWorkingDays.add(jan29);
-        nonWorkingDays.add(feb4);
-//        nonWorkingDays.add(feb5);
+        nonWorkingDays.addAll(nonWorkingDaysDb);
+    }
+
+    public void saveNonWorkingDay(DateMidnight date, boolean nonWorking) {
+        if (nonWorking) {
+            nonWorkingDaysDb.add(date);
+        } else {
+            nonWorkingDaysDb.remove(date);
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -400,5 +439,35 @@ public class TimesheetAction extends CustomAction {
         return monthView;
     }
 
-    
+    public Integer getDay() {
+        return day;
+    }
+
+    public void setDay(Integer day) {
+        this.day = day;
+    }
+
+    public Integer getMonth() {
+        return month;
+    }
+
+    public void setMonth(Integer month) {
+        this.month = month;
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
+    }
+
+    public boolean getNonWorking() {
+        return nonWorking;
+    }
+
+    public void setNonWorking(boolean nonWorking) {
+        this.nonWorking = nonWorking;
+    }
 }

@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Resolution;
@@ -53,5 +52,7 @@ public interface PageAction extends ActionBean {
     String getDescription();
 
     boolean supportsParameters();
+
+    PageInstance getPageInstance();
     
 }

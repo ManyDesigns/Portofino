@@ -1,18 +1,11 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
-<%@ page import="com.manydesigns.portofino.pageactions.timesheet.model.Activity" %>
-<%@ page import="com.manydesigns.portofino.pageactions.timesheet.model.Entry" %>
-<%@ page import="com.manydesigns.portofino.pageactions.timesheet.model.PersonDay" %>
-<%@ page
-        import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="com.manydesigns.portofino.pageactions.calendar.MonthView" %>
 <%@ page import="org.joda.time.DateMidnight" %>
-<%@ page
-        import="org.joda.time.Period" %>
-<%@ page import="org.joda.time.format.DateTimeFormat" %>
+<%@ page import="org.joda.time.DateTimeConstants" %>
+<%@ page import="org.joda.time.Interval" %>
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
-<%@ page import="org.joda.time.format.PeriodFormatter" %>
-<%@ page import="org.joda.time.format.PeriodFormatterBuilder" %>
+<%@ page import="org.joda.time.format.DateTimeFormatterBuilder" %>
 <%@ page import="java.util.Locale" %>
-<%@ page import="java.util.Map" %>
 <%@ page import="java.util.Set" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
@@ -24,7 +17,7 @@
 <stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.timesheet.TimesheetAction"/>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="timesheet-week-entry" cssClass="contentButton" />
+        <portofino:buttons list="timesheet-non-working-days" cssClass="contentButton" />
         <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
@@ -52,9 +45,11 @@
             table.tnwd-table tbody td {
                 padding: 1px;
             }
+            div.tnws-day, div.tnws-blank-day {
+                padding: 0.5em 0 ;
+            }
             div.tnws-day {
                 text-align: center;
-                padding: 0.5em 0 ;
                 cursor: pointer;
             }
             div.tnws-day.tnws-non-working {
@@ -70,43 +65,93 @@
             <table class="tnwd-table">
                 <thead>
                 <tr>
-                    <th class="tndw-day-of-week">lun</th>
-                    <th class="tndw-day-of-week">mar</th>
-                    <th class="tndw-day-of-week">mer</th>
-                    <th class="tndw-day-of-week">gio</th>
-                    <th class="tndw-day-of-week">ven</th>
-                    <th class="tndw-day-of-week tndw-saturday">sab</th>
-                    <th class="tndw-day-of-week tndw-sunday">dom</th>
+                <%
+                    XhtmlBuffer xb = new XhtmlBuffer(out);
+
+                    DateTimeFormatterBuilder dayOfWeekFormatterBuilder =
+                            new DateTimeFormatterBuilder()
+                            .appendDayOfWeekShortText();
+                    DateTimeFormatter dayOfWeekFormatter =
+                            dayOfWeekFormatterBuilder
+                                    .toFormatter()
+                                    .withLocale(Locale.ITALY);
+                    MonthView monthView = actionBean.getMonthView();
+                    MonthView.Week week = monthView.getWeek(0);
+                    for (int i = 0; i < 7; i++) {
+                        xb.openElement("th");
+                        MonthView.Day day = week.getDay(i);
+                        String htmlClass = "tndw-day-of-week";
+                        DateMidnight dayStart = day.getDayStart();
+                        int dayOfWeek = dayStart.getDayOfWeek();
+                        if (dayOfWeek == DateTimeConstants.SATURDAY) {
+                            htmlClass += " tndw-saturday";
+                        } else if (dayOfWeek == DateTimeConstants.SUNDAY) {
+                            htmlClass += " tndw-sunday";
+                        }
+                        xb.addAttribute("class", htmlClass);
+
+                        xb.write(dayOfWeekFormatter.print(dayStart));
+
+                        xb.closeElement("th");
+                    }
+                %>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td><div class="tnws-day">1</div></td>
-                    <td><div class="tnws-day">2</div></td>
-                    <td><div class="tnws-day">3</div></td>
-                    <td><div class="tnws-day">4</div></td>
-                    <td><div class="tnws-day">5</div></td>
-                    <td><div class="tnws-day tnws-non-working">6</div></td>
-                    <td><div class="tnws-day tnws-non-working">7</div></td>
-                </tr>
-                <tr>
-                    <td><div class="tnws-day">8</div></td>
-                    <td><div class="tnws-day">9</div></td>
-                    <td><div class="tnws-day">10</div></td>
-                    <td><div class="tnws-day">11</div></td>
-                    <td><div class="tnws-day">12</div></td>
-                    <td><div class="tnws-day tnws-non-working">13</div></td>
-                    <td><div class="tnws-day tnws-non-working">14</div></td>
-                </tr>
+                <%
+                    DateTimeFormatterBuilder dayOfMonthFormatterBuilder =
+                            new DateTimeFormatterBuilder()
+                            .appendDayOfMonth(1);
+                    DateTimeFormatter dayOfMonthFormatter =
+                            dayOfMonthFormatterBuilder
+                                    .toFormatter()
+                                    .withLocale(Locale.ITALY);
+                    Set<DateMidnight> nonWorkingDays =
+                            actionBean.getNonWorkingDays();
+                    Interval monthInterval = monthView.getMonthInterval();
+                    for (int i = 0; i < 6; i++) {
+                        week = monthView.getWeek(i);
+                        xb.openElement("tr");
+                        for (int j = 0; j < 7; j++) {
+                            MonthView.Day day = week.getDay(j);
+                            DateMidnight dayStart = day.getDayStart();
+                            xb.openElement("td");
+                            if (monthInterval.contains(dayStart)) {
+                                xb.openElement("div");
+                                String htmlClass = "tnws-day";
+                                if (nonWorkingDays.contains(dayStart)) {
+                                    htmlClass += " tnws-non-working";
+                                }
+                                xb.addAttribute("class", htmlClass);
+                                xb.write(dayOfMonthFormatter.print(dayStart));
+                                xb.closeElement("div");
+                            } else {
+                                xb.openElement("div");
+                                xb.addAttribute("class", "tnws-blank-day");
+                                xb.writeNbsp();
+                                xb.closeElement("div");
+                            }
+                            xb.closeElement("td");
+                        }
+                        xb.closeElement("tr");
+                    }
+                %>
                 </tbody>
             </table>
         </div>
+        <input type="hidden" name="month" value="<c:out value="${actionBean.month}"/>"/>
+        <input type="hidden" name="year" value="<c:out value="${actionBean.year}"/>"/>
         <script type="text/javascript">
             function setNotWorkingDay(cell, nonWorking) {
                 var day = cell.text();
+                var month = $('input[name$="month"]').val();
+                var year = $('input[name$="year"]').val();
                 cell.html("saving");
                 var data = {
-                    nonWorkingDay : day,
+                    day : day,
+                    month : month,
+                    year : year,
+                    nonWorking : nonWorking,
                     configureNonWorkingDay : ""
                 };
 
