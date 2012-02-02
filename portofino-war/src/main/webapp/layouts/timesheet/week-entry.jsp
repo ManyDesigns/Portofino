@@ -35,13 +35,13 @@
             div.twe-container {
                 overflow-x: auto;
             }
-            table.timesheet-table {
+            table.twe-table {
                 width: 100%;
             }
-            table.timesheet-table col.day-column {
+            table.twe-table col.day-column {
                 width: 60px;
             }
-            table.timesheet-table th, table.timesheet-table td {
+            table.twe-table th, table.twe-table td {
                 border-color: #dddddd;
             }
             th.twe-activity {
@@ -58,7 +58,7 @@
             th.twe-day.twe-non-working {
                 background-color: #74936C;
             }
-            table.timesheet-table tr.even {
+            table.twe-table tr.even {
                 background-color: #FCFAF3
             }
             td.twe-hours.twe-today {
@@ -72,7 +72,7 @@
                 width: 30px;
                 text-align: right;
             }
-            table.timesheet-table tfoot tr {
+            table.twe-table tfoot tr {
                 background-color: #F0EAD7;
                 color: #625644;
                 font-weight: bold;
@@ -93,7 +93,7 @@
             }
         </style>
         <div class="twe-container">
-        <table class="timesheet-table">
+        <table class="twe-table">
             <col/>
             <col/>
             <col/>
@@ -148,6 +148,16 @@
                         xb.closeElement("div");
 
                         xb.write(dateFormatter.print(day));
+
+                        if (personDay != null) {
+                            String id = "swm-" + i;
+                            Integer standardWorkingMinutes =
+                                    personDay.getStandardWorkingMinutes();
+                            String value = (standardWorkingMinutes == null)
+                                    ? "-"
+                                    : Integer.toString(standardWorkingMinutes);
+                            xb.writeInputHidden(id, id, value);
+                        }
 
                         xb.closeElement("th");
                         day = day.plusDays(1);
@@ -310,7 +320,6 @@
 
                         xb.openElement("span");
                         xb.addAttribute("class", "twe-ro-hours");
-                        xb.write("0:00");
                         xb.closeElement("span");
 
                         xb.closeElement("td");
@@ -321,6 +330,60 @@
             </tfoot>
         </table>
         </div>
+    <script type="text/javascript">
+        var re = /^(\d+):(\d+)$/;
+
+        function parseHours(text) {
+            var match = re.exec(text);
+            if (match) {
+                return parseInt(match[1]) * 60 + parseInt(match[2]);
+            } else {
+                return 0;
+            }
+        }
+        function tweUpdateColumn(index) {
+            var totalMinutes = 0;
+            $("table.twe-table tbody td:nth-child(" + (4 + index) + ")").each( function(tdIndex, currentTd) {
+                $(currentTd).find("span.twe-ro-hours").each(
+                        function (spanIndex, currentSpan) {
+                            var text = $(currentSpan).html();
+                            totalMinutes += parseHours(text);
+                        }
+                );
+                $(currentTd).find("input.twe-input").each(
+                        function (inputIndex, currentInput) {
+                            var text = $(currentInput).val();
+                            totalMinutes += parseHours(text);
+                        }
+                );
+            });
+
+            var hours = Math.floor(totalMinutes / 60);
+            var minutes = totalMinutes % 60;
+            var totalTime = "" + hours + ":";
+            if (minutes < 10) {
+                totalTime += "0";
+            }
+            totalTime += minutes;
+            $("table.twe-table tfoot tr:first-child td:nth-child(" +
+                    (2 + index) +
+                    ") span").html(totalTime);
+        }
+
+        for (var i = 0; i < 7; i++) {
+            tweUpdateColumn(i);
+            $("table.twe-table tbody td:nth-child(" + (4 + i) + ")").each( function(tdIndex, currentTd) {
+                $(currentTd).find("input.twe-input").each(
+                    function(inputIndex, currentInput) {
+                        var j = i;
+                        $(currentInput).blur(function() {
+                            tweUpdateColumn(j);
+                        });
+                    }
+                );
+            });
+        }
+    </script>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">
