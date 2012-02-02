@@ -152,10 +152,10 @@ public class FileSystemMailQueue implements MailQueue {
             File emailFile = getEmailFile(id);
             if(emailFile.exists()) {
                 if(keepSent) {
-                    logger.debug("Moving email with id {} to sent directory", id);
+                    logger.info("Moving email with id {} to sent directory", id);
                     FileUtils.moveToDirectory(emailFile, sentDirectory, false);
                 } else {
-                    logger.debug("Deleting sent email with id {}", id);
+                    logger.info("Deleting sent email with id {}", id);
                     if(!emailFile.delete()) {
                         throw new QueueError("Couldn't mark mail as sent");
                     }
@@ -173,7 +173,7 @@ public class FileSystemMailQueue implements MailQueue {
         try {
             File emailFile = getEmailFile(id);
             if(emailFile.exists()) {
-                logger.debug("Marking email with id {} as sent", id);
+                logger.info("Marking email with id {} as failed", id);
                 FileUtils.moveToDirectory(emailFile, failedDirectory, false);
             } else {
                 logger.debug("Not marking email with id {} as sent", id);

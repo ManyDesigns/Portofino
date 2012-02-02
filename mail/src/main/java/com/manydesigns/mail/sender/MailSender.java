@@ -35,9 +35,11 @@ package com.manydesigns.mail.sender;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface MailSender {
+public interface MailSender extends Runnable {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
+
+    void run();
 
     void stop();
 
@@ -64,4 +66,6 @@ public interface MailSender {
     String getPassword();
 
     void setPassword(String password);
+
+    boolean isAlive();
 }

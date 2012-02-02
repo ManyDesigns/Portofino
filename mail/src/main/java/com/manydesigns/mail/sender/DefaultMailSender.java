@@ -47,7 +47,7 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class DefaultMailSender implements MailSender, Runnable {
+public class DefaultMailSender implements MailSender {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -86,6 +86,7 @@ public class DefaultMailSender implements MailSender, Runnable {
                         send(email);
                         queue.markSent(id);
                     } catch (EmailException e) {
+                        logger.error("Error while sending mail, marking as failed", e);
                         queue.markFailed(id);
                     }
                 }
@@ -96,14 +97,18 @@ public class DefaultMailSender implements MailSender, Runnable {
 
     protected void send(Email emailBean) throws EmailException {
         org.apache.commons.mail.Email email;
-        if(null == emailBean.getHtmlBody()) {
+        String textBody = emailBean.getTextBody();
+        String htmlBody = emailBean.getHtmlBody();
+        if(null == htmlBody) {
             SimpleEmail simpleEmail = new SimpleEmail();
-            simpleEmail.setMsg(emailBean.getTextBody());
+            simpleEmail.setMsg(textBody);
             email = simpleEmail;
         } else {
             HtmlEmail htmlEmail =  new HtmlEmail();
-            htmlEmail.setHtmlMsg(emailBean.getHtmlBody());
-            htmlEmail.setTextMsg(emailBean.getTextBody());
+            htmlEmail.setHtmlMsg(htmlBody);
+            if(textBody != null) {
+                htmlEmail.setTextMsg(textBody);
+            }
             email = htmlEmail;
         }
 
@@ -182,5 +187,9 @@ public class DefaultMailSender implements MailSender, Runnable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isAlive() {
+        return alive;
     }
 }

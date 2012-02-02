@@ -210,12 +210,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>dumbster</groupId>
-            <artifactId>dumbster</artifactId>
-            <version>1.5</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>rhino</groupId>
             <artifactId>js</artifactId>
             <version>1.7R2</version>
