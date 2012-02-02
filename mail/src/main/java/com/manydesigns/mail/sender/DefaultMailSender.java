@@ -39,6 +39,8 @@ import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.mail.AuthenticationFailedException;
+import javax.mail.MessagingException;
 import java.util.List;
 
 /**
@@ -86,8 +88,14 @@ public class DefaultMailSender implements MailSender {
                         send(email);
                         queue.markSent(id);
                     } catch (EmailException e) {
-                        logger.error("Error while sending mail, marking as failed", e);
-                        queue.markFailed(id);
+                        Throwable cause = e.getCause();
+                        if(cause instanceof AuthenticationFailedException ||
+                           cause instanceof MessagingException) {
+                            logger.warn("Mail not sent due to server error, NOT marking as failed", e);
+                        } else {
+                            logger.error("Unrecognized error while sending mail, marking as failed", e);
+                            queue.markFailed(id);
+                        }
                     }
                 }
             }
@@ -133,7 +141,8 @@ public class DefaultMailSender implements MailSender {
                     break;
             }
         }
-        email.setTLS(ssl);
+        email.setSSL(ssl);
+        email.setSslSmtpPort(port + "");
         email.send();
     }
 

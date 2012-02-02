@@ -169,6 +169,24 @@ public class SenderTest extends TestCase {
         }
     }
 
+    public void testServerDown() {
+        sender.setPort(SMTP_PORT + 1);
+        Email myEmail = new Email();
+        myEmail.setFrom("granatella@gmail.com");
+        myEmail.getRecipients().add(new Recipient(Recipient.Type.TO, "giampiero.granatella@manydesigns.com"));
+        myEmail.setSubject("subj");
+        myEmail.setTextBody("body");
+        queue.enqueue(myEmail);
+        try {
+            Thread.sleep(sender.getPollInterval() * 2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertFalse(queue.getEnqueuedEmailIds().isEmpty());
+
+        assertEquals(0, server.getReceivedEmailSize());
+    }
+
     public void testBrutalTermination() throws InterruptedException {
         senderThread.interrupt();
         senderThread.join();
