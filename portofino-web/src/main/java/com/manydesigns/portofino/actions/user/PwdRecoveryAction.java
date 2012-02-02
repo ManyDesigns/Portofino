@@ -31,13 +31,11 @@ package com.manydesigns.portofino.actions.user;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.dispatcher.AbstractActionBean;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.email.EmailUtils;
-import com.manydesigns.portofino.system.model.email.EmailBean;
+import com.manydesigns.portofino.dispatcher.AbstractActionBean;
+import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.system.model.users.User;
 import org.apache.commons.configuration.Configuration;
 import org.hibernate.Session;
@@ -108,8 +106,9 @@ public class PwdRecoveryAction extends AbstractActionBean {
                     .append(url)
                     .append(" to insert a new one. \n\n")
                     .append("Thank you.").toString();
-            EmailBean emailBean = new EmailBean(subject, body, email , from);
-            session.save(EmailUtils.EMAILQUEUE_ENTITY, emailBean);
+            //TODO ripristinare
+            //EmailBean emailBean = new EmailBean(subject, body, email , from);
+            //session.save(EmailUtils.EMAILQUEUE_ENTITY, emailBean);
             session.getTransaction().commit();
             SessionMessages.addInfoMessage("An email was sent to your address. " +
                     "Please check your email.");

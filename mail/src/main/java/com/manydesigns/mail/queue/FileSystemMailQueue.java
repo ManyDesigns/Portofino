@@ -29,13 +29,23 @@
 
 package com.manydesigns.mail.queue;
 
+import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -47,13 +57,20 @@ public class FileSystemMailQueue implements MailQueue {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    protected final File queued, sent, failed;
+    protected final File queuedDirectory, sentDirectory, failedDirectory;
     protected final JAXBContext jaxbContext;
+    protected boolean keepSent;
+
+    protected static final Logger logger = LoggerFactory.getLogger(FileSystemMailQueue.class);
 
     public FileSystemMailQueue(File directory) {
-        this.queued = new File(directory, "queue");
-        this.sent = new File(directory, "sent");
-        this.failed = new File(directory, "failed");
+        this.queuedDirectory = new File(directory, "queue");
+        this.sentDirectory = new File(directory, "sent");
+        this.failedDirectory = new File(directory, "failed");
+
+        initDirectory(this.queuedDirectory);
+        initDirectory(this.sentDirectory);
+        initDirectory(this.failedDirectory);
         try {
             jaxbContext = JAXBContext.newInstance(Email.class, Recipient.class);
         } catch (JAXBException e) {
@@ -61,43 +78,111 @@ public class FileSystemMailQueue implements MailQueue {
         }
     }
 
+    private void initDirectory(File file) {
+        if(!file.mkdirs()) {
+            throw new Error("Couldn't create directory " + file.getAbsolutePath());
+        }
+    }
+
     public String enqueue(Email email) {
         try {
-            javax.xml.bind.Marshaller marshaller = jaxbContext.createMarshaller();
+            Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            //String
-            marshaller.marshal(email, new java.io.FileOutputStream(""));
-            return null; //TODO
+            String emailId = RandomUtil.createRandomId(20);
+            File destinationFile = getEmailFile(emailId);
+            marshaller.marshal(email, destinationFile);
+            return emailId;
         } catch (Exception e) {
             throw new Error("Couldn't create jaxb context", e);
         }
     }
 
+    protected File getEmailFile(String emailId) {
+        return RandomUtil.getCodeFile(queuedDirectory, "email-{0}.xml", emailId);
+    }
+
     public List<String> getEnqueuedEmailIds() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        List<String> ids = new ArrayList<String>();
+        Pattern pattern = Pattern.compile("^email-(.*)\\.xml$");
+        for(String filename : queuedDirectory.list()) {
+            Matcher matcher = pattern.matcher(filename);
+            if(matcher.matches()) {
+                logger.debug("Path matched: {}", filename);
+                ids.add(matcher.group(1));
+            }
+        }
+        return ids;
     }
 
     public Email loadEmail(String id) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        try {
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            File emailFile = getEmailFile(id);
+            if(emailFile.exists()) {
+                logger.debug("Found email with id: {}", id);
+                Email email = (Email) unmarshaller.unmarshal(emailFile);
+                return email;
+            } else {
+                logger.debug("Email with id {} not found", id);
+                return null;
+            }
+        } catch (Exception e) {
+            throw new Error("Couldn't create jaxb context", e);
+        }
     }
 
     public void markSent(String id) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        try {
+            File emailFile = getEmailFile(id);
+            if(emailFile.exists()) {
+                if(keepSent) {
+                    logger.debug("Moving email with id {} to sent directory", id);
+                    FileUtils.moveToDirectory(emailFile, sentDirectory, false);
+                } else {
+                    logger.debug("Deleting sent email with id {}", id);
+                    if(!emailFile.delete()) {
+                        throw new Error("Couldn't mark mail as sent");
+                    }
+                }
+            } else {
+                logger.debug("Not marking email with id {} as sent", id);
+            }
+        } catch (IOException e) {
+            throw new Error("Couldn't mark mail as sent", e);
+        }
     }
 
     public void markFailed(String id) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        try {
+            File emailFile = getEmailFile(id);
+            if(emailFile.exists()) {
+                logger.debug("Marking email with id {} as sent", id);
+                FileUtils.moveToDirectory(emailFile, failedDirectory, false);
+            } else {
+                logger.debug("Not marking email with id {} as sent", id);
+            }
+        } catch (IOException e) {
+            throw new Error("Couldn't mark mail as sent", e);
+        }
     }
 
-    public File getQueued() {
-        return queued;
+    public File getQueuedDirectory() {
+        return queuedDirectory;
     }
 
-    public File getSent() {
-        return sent;
+    public File getSentDirectory() {
+        return sentDirectory;
     }
 
-    public File getFailed() {
-        return failed;
+    public File getFailedDirectory() {
+        return failedDirectory;
+    }
+
+    public boolean isKeepSent() {
+        return keepSent;
+    }
+
+    public void setKeepSent(boolean keepSent) {
+        this.keepSent = keepSent;
     }
 }

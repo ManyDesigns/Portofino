@@ -29,11 +29,15 @@
 
 package com.manydesigns.portofino.starter;
 
+import com.manydesigns.mail.queue.FileSystemMailQueue;
+import com.manydesigns.mail.queue.LockingMailQueue;
+import com.manydesigns.mail.queue.MailQueue;
+import com.manydesigns.mail.sender.DefaultMailSender;
+import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.DefaultApplication;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
-import com.manydesigns.portofino.email.EmailTask;
 import com.manydesigns.portofino.util.PortofinoFileUtils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -41,7 +45,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Timer;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -79,7 +82,8 @@ public class ApplicationStarter {
     private DatabasePlatformsManager databasePlatformsManager;
     private Application tmpApplication;
     private Application application;
-    private Timer scheduler;
+    private MailSender mailSender;
+    private Thread mailSenderThread;
     private String appId;
 
     private File appDir;
@@ -139,10 +143,14 @@ public class ApplicationStarter {
             application.shutdown();
         }
 
-        if (scheduler!=null) {
+        if (mailSender != null) {
             logger.info("Terminating the scheduler...");
-            scheduler.cancel();
-            EmailTask.stop();
+            mailSender.stop();
+            try {
+                mailSenderThread.join();
+            } catch (InterruptedException e) {
+                logger.debug("Mail sender thread interrupted, not waiting", e);
+            }
         }
 
         status = Status.DESTROYED;
@@ -235,22 +243,35 @@ public class ApplicationStarter {
         if ("application".equals(securityType) && mailEnabled) {
             String mailHost = portofinoConfiguration
                     .getString(PortofinoProperties.MAIL_SMTP_HOST);
-            String mailSender = portofinoConfiguration
+            String smtpSender = portofinoConfiguration
                     .getString(PortofinoProperties.MAIL_SMTP_SENDER);
-            if (null == mailSender || null == mailHost ) {
+            if (null == smtpSender || null == mailHost ) {
                 logger.info("User admin email or smtp server not set in" +
                         " portofino-custom.properties");
             } else {
-                scheduler = new Timer(true);
-                try {
+                int port = portofinoConfiguration.getInt(
+                        PortofinoProperties.MAIL_SMTP_PORT, 25);
+                boolean ssl = portofinoConfiguration.getBoolean(
+                        PortofinoProperties.MAIL_SMTP_SSL_ENABLED, false);
+                String login = portofinoConfiguration.getString(
+                        PortofinoProperties.MAIL_SMTP_LOGIN);
+                String password = portofinoConfiguration.getString(
+                        PortofinoProperties.MAIL_SMTP_PASSWORD);
+                boolean keepSent = portofinoConfiguration.getBoolean(
+                        PortofinoProperties.KEEP_SENT, false);
 
-                    //Invio mail
-                    scheduler.schedule(new EmailTask(tmpApplication),
-                            DELAY2, PERIOD);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.error("Problems in starting schedulers", e);
-                }
+                MailQueue mailQueue =
+                        new LockingMailQueue(new FileSystemMailQueue(new File(appDir, "mailQueue"))); //TODO
+                mailQueue.setKeepSent(keepSent);
+                mailSender = new DefaultMailSender(mailQueue);
+                mailSender.setServer(mailHost);
+                mailSender.setLogin(login);
+                mailSender.setPassword(password);
+                mailSender.setPort(port);
+                mailSender.setSsl(ssl);
+                mailSenderThread = new Thread(smtpSender);
+                mailSenderThread.setDaemon(true);
+                mailSenderThread.start();
             }
         }
         return true;

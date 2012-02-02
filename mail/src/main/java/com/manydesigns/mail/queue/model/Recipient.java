@@ -51,6 +51,12 @@ public class Recipient {
     protected Type type;
     protected String address;
 
+    public Recipient() {}
+
+    public Recipient(Type type, String address) {
+        this.type = type;
+        this.address = address;
+    }
 
     public Type getType() {
         return type;

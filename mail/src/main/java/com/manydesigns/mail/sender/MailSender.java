@@ -27,11 +27,7 @@
 *
 */
 
-package com.manydesigns.mail.queue;
-
-import com.manydesigns.mail.queue.model.Email;
-
-import java.util.List;
+package com.manydesigns.mail.sender;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -39,21 +35,33 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface MailQueue {
+public interface MailSender {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    String enqueue(Email email);
+    void stop();
 
-    List<String> getEnqueuedEmailIds();
+    int getPollInterval();
 
-    Email loadEmail(String id);
+    void setPollInterval(int pollInterval);
 
-    void markSent(String id);
-    void markFailed(String id);
+    String getServer();
 
+    void setServer(String server);
 
-    boolean isKeepSent();
+    int getPort();
 
-    void setKeepSent(boolean keepSent);
+    void setPort(int port);
+
+    boolean isSsl();
+
+    void setSsl(boolean ssl);
+
+    String getLogin();
+
+    void setLogin(String login);
+
+    String getPassword();
+
+    void setPassword(String password);
 }

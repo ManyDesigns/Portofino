@@ -26,9 +26,7 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.email;
-
-import com.sun.mail.pop3.POP3SSLStore;
+package com.manydesigns.mail.pop3;
 
 import javax.mail.*;
 import java.util.Set;
@@ -39,27 +37,24 @@ import java.util.Set;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class POP3SSLClient extends POP3Client {
+public class POP3SimpleClient extends POP3Client {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
 
-    public POP3SSLClient(String host, String protocol, int port,
-                         String username, String password) {
-        super(host, protocol, port, username, password);
+    public POP3SimpleClient(String host, String provider, int port, String username, String password) {
+        super(host, provider, port, username, password);
     }
 
 
     public Set<String> read() {
         emails.clear();
-        URLName url = new URLName(protocol, host, port, "",
-                username, password);
         Folder inbox = null;
         Store store = null;
         try {
-            Session session = Session.getInstance(pop3Props, null);
-            store = new POP3SSLStore(session, url);
-            store.connect();
+            Session session = Session.getDefaultInstance(pop3Props, null);
+            store = session.getStore(protocol);
+            store.connect(host, username, password);
 
             inbox = store.getFolder("INBOX");
             if (inbox == null) {
@@ -70,10 +65,7 @@ public class POP3SSLClient extends POP3Client {
 
             Message[] messages = inbox.getMessages();
             for (Message message : messages) {
-                if (message.getSubject().toLowerCase().contains(DELIVERY_STATUS_NOTIFICATION))
-                {
-                    extractEmail(message);
-                }
+                extractEmail(message);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,14 +74,16 @@ public class POP3SSLClient extends POP3Client {
                 try {
                     inbox.close(false);
                 } catch (MessagingException e) {
-                     logger.warn("cannot close INBOX",e);
+                    logger.warn("Cannot close INBOX", e);
                 }
             }
             if (store != null) {
                 try {
+
                     store.close();
+
                 } catch (MessagingException e) {
-                    logger.warn("cannot close Store",e);
+                     logger.warn("Cannot close Store", e);
                 }
             }
         }

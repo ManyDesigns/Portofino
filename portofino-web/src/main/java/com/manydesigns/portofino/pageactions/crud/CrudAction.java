@@ -98,6 +98,7 @@ import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
@@ -1248,12 +1249,16 @@ public class CrudAction extends AbstractPageAction {
     @Button(list = "crud-search", key = "commons.exportExcel", order = 5)
     public Resolution exportSearchExcel() {
         try {
-            File tmpFile = File.createTempFile(crudConfiguration.getName(), ".search.xls");
+            final File tmpFile = File.createTempFile(crudConfiguration.getName(), ".search.xls");
             exportSearchExcel(tmpFile);
             FileInputStream fileInputStream = new FileInputStream(tmpFile);
-            tmpFile.deleteOnExit();
-            return new StreamingResolution("application/vnd.ms-excel", fileInputStream)
-                    .setFilename(crudConfiguration.getSearchTitle() + ".xls");
+            return new StreamingResolution("application/vnd.ms-excel", fileInputStream) {
+                @Override
+                protected void stream(HttpServletResponse response) throws Exception {
+                    super.stream(response);
+                    tmpFile.delete();
+                }
+            }.setFilename(crudConfiguration.getSearchTitle() + ".xls");
         } catch (Exception e) {
             logger.error("Excel export failed", e);
             SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
@@ -1313,12 +1318,16 @@ public class CrudAction extends AbstractPageAction {
     @Button(list = "crud-read", key = "commons.exportExcel", order = 4)
     public Resolution exportReadExcel() {
         try {
-            File tmpFile = File.createTempFile(crudConfiguration.getName(), ".read.xls");
+            final File tmpFile = File.createTempFile(crudConfiguration.getName(), ".read.xls");
             exportReadExcel(tmpFile);
             FileInputStream fileInputStream = new FileInputStream(tmpFile);
-            tmpFile.deleteOnExit();
-            return new StreamingResolution("application/vnd.ms-excel", fileInputStream)
-                    .setFilename(crudConfiguration.getReadTitle() + ".xls");
+            return new StreamingResolution("application/vnd.ms-excel", fileInputStream) {
+                @Override
+                protected void stream(HttpServletResponse response) throws Exception {
+                    super.stream(response);
+                    tmpFile.delete();
+                }
+            }.setFilename(crudConfiguration.getReadTitle() + ".xls");
         } catch (Exception e) {
             logger.error("Excel export failed", e);
             SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
@@ -1506,12 +1515,16 @@ public class CrudAction extends AbstractPageAction {
     @Button(list = "crud-search", key = "commons.exportPdf", order = 4)
     public Resolution exportSearchPdf() {
         try {
-            File tmpFile = File.createTempFile(crudConfiguration.getName(), ".search.pdf");
+            final File tmpFile = File.createTempFile(crudConfiguration.getName(), ".search.pdf");
             exportSearchPdf(tmpFile);
             FileInputStream fileInputStream = new FileInputStream(tmpFile);
-            tmpFile.deleteOnExit();
-            return new StreamingResolution("application/pdf", fileInputStream)
-                    .setFilename(crudConfiguration.getSearchTitle() + ".pdf");
+            return new StreamingResolution("application/pdf", fileInputStream) {
+                @Override
+                protected void stream(HttpServletResponse response) throws Exception {
+                    super.stream(response);
+                    tmpFile.delete();
+                }
+            }.setFilename(crudConfiguration.getSearchTitle() + ".pdf");
         } catch (Exception e) {
             logger.error("PDF export failed", e);
             SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
@@ -1714,12 +1727,16 @@ public class CrudAction extends AbstractPageAction {
     @Button(list = "crud-read", key = "commons.exportPdf", order = 3)
     public Resolution exportReadPdf() {
         try {
-            File tmpFile = File.createTempFile(crudConfiguration.getName(), ".read.pdf");
+            final File tmpFile = File.createTempFile(crudConfiguration.getName(), ".read.pdf");
             exportReadPdf(tmpFile);
             FileInputStream fileInputStream = new FileInputStream(tmpFile);
-            tmpFile.deleteOnExit();
-            return new StreamingResolution("application/pdf", fileInputStream)
-                    .setFilename(crudConfiguration.getReadTitle() + ".pdf");
+            return new StreamingResolution("application/pdf", fileInputStream) {
+                @Override
+                protected void stream(HttpServletResponse response) throws Exception {
+                    super.stream(response);
+                    tmpFile.delete();
+                }
+            }.setFilename(crudConfiguration.getReadTitle() + ".pdf");
         } catch (Exception e) {
             logger.error("PDF export failed", e);
             SessionMessages.addErrorMessage(getMessage("commons.export.failed"));

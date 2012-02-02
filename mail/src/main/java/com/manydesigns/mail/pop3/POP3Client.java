@@ -26,7 +26,7 @@
  * Boston, MA  02111-1307  USA
  *
  */
-package com.manydesigns.portofino.email;
+package com.manydesigns.mail.pop3;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

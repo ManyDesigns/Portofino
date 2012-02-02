@@ -30,8 +30,11 @@
 package com.manydesigns.mail.queue;
 
 import com.manydesigns.mail.queue.model.Email;
+import com.manydesigns.mail.queue.model.Recipient;
+import junit.framework.TestCase;
 
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -39,21 +42,36 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface MailQueue {
+public class FileSystemMailQueueTest extends TestCase {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    String enqueue(Email email);
+    public void testFSMQ() throws IOException {
+        File file = File.createTempFile("mail", ".queue");
+        file.deleteOnExit();
+        file = new File(file.getAbsolutePath() + ".d");
+        if(!file.mkdir()) {
+            fail("Couldn't create directory " + file.getAbsolutePath());
+        }
+        file.deleteOnExit();
 
-    List<String> getEnqueuedEmailIds();
+        MailQueue mq = new LockingMailQueue(new FileSystemMailQueue(file));
 
-    Email loadEmail(String id);
+        assertTrue(mq.getEnqueuedEmailIds().isEmpty());
+        assertEquals(null, mq.loadEmail("aaa"));
 
-    void markSent(String id);
-    void markFailed(String id);
+        Email email = new Email();
+        email.setSubject("pippo");
+        email.getRecipients().add(new Recipient(Recipient.Type.TO, "mario"));
+        String id = mq.enqueue(email);
 
+        assertEquals(1, mq.getEnqueuedEmailIds().size());
 
-    boolean isKeepSent();
+        email = mq.loadEmail(id);
+        assertEquals("pippo", email.getSubject());
+        assertEquals(1, email.getRecipients().size());
+        assertEquals(Recipient.Type.TO, email.getRecipients().get(0).getType());
+        assertEquals("mario", email.getRecipients().get(0).getAddress());
+    }
 
-    void setKeepSent(boolean keepSent);
 }

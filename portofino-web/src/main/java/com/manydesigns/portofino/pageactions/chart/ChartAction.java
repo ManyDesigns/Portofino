@@ -54,6 +54,7 @@ import org.jfree.chart.JFreeChart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -103,7 +104,7 @@ public class ChartAction extends AbstractPageAction {
     public Form displayForm;
     public JFreeChart chart;
     public JFreeChartInstance jfreeChartInstance;
-    public String fileName;
+    public File file;
     public InputStream inputStream;
 
     public static final Logger logger =
@@ -158,9 +159,7 @@ public class ChartAction extends AbstractPageAction {
                             .addParameter("chart", "");
             String portletUrl = chartResolution.toString();
 
-            File file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
-            file.deleteOnExit();
-            fileName = file.getName();
+            file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
 
             jfreeChartInstance =
                     new JFreeChartInstance(chart, file, chartId, "alt", //TODO
@@ -198,10 +197,16 @@ public class ChartAction extends AbstractPageAction {
     }
 
     public Resolution chart() throws FileNotFoundException {
-        File file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
+        final File file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
 
         inputStream = new FileInputStream(file);
-        return new NoCacheStreamingResolution("image/png", inputStream);
+        return new NoCacheStreamingResolution("image/png", inputStream) {
+            @Override
+            protected void stream(HttpServletResponse response) throws Exception {
+                super.stream(response);
+                file.delete();
+            }
+        };
     }
 
 
@@ -443,14 +448,6 @@ public class ChartAction extends AbstractPageAction {
 
     public void setJfreeChartInstance(JFreeChartInstance jfreeChartInstance) {
         this.jfreeChartInstance = jfreeChartInstance;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
     }
 
     public InputStream getInputStream() {
