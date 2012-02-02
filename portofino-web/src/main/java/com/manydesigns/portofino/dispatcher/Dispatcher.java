@@ -31,6 +31,7 @@ package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Page;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -82,13 +83,23 @@ public class Dispatcher {
         ListIterator<String> fragmentsIterator = fragmentsAsList.listIterator();
 
         File rootDir = application.getPagesDir();
+        Page rootPage;
         try {
-            Page rootPage = DispatcherLogic.getPage(rootDir);
-            PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage);
-            pagePath.add(rootPageInstance);
-            makePageInstancePath(pagePath, fragmentsIterator, rootPageInstance);
+            rootPage = DispatcherLogic.getPage(rootDir);
         } catch (Exception e) {
             logger.error("Cannot load root page", e);
+            return null;
+        }
+
+        PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage);
+        pagePath.add(rootPageInstance);
+        try {
+            makePageInstancePath(pagePath, fragmentsIterator, rootPageInstance);
+        } catch (PageNotActiveException e) {
+            logger.debug("Page not active, not creating dispatch");
+            return null;
+        } catch (Exception e) {
+            logger.error("Couldn't create dispatch", e);
             return null;
         }
 
@@ -120,6 +131,17 @@ public class Dispatcher {
             String nextFragment = fragmentsIterator.next();
             File childDirectory = new File(currentDirectory, nextFragment);
             if(childDirectory.isDirectory() && !PageInstance.DETAIL.equals(childDirectory.getName())) {
+                ChildPage childPage = null;
+                for(ChildPage candidate : parentPageInstance.getLayout().getChildPages()) {
+                    if(candidate.getName().equals(childDirectory.getName())) {
+                        childPage = candidate;
+                        break;
+                    }
+                }
+                if(childPage == null) {
+                    throw new PageNotActiveException();
+                }
+
                 Page page = DispatcherLogic.getPage(childDirectory);
                 PageInstance pageInstance = new PageInstance(parentPageInstance, childDirectory, application, page);
                 pagePath.add(pageInstance);
@@ -164,4 +186,5 @@ public class Dispatcher {
         return withoutTrailingSlashes;
     }
 
+    protected static class PageNotActiveException extends Exception {}
 }
