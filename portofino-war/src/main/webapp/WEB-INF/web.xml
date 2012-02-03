@@ -98,7 +98,7 @@
 		</init-param>
         <init-param>
 			<param-name>ActionResolver.Packages</param-name>
-			<param-value>com.manydesigns.portofino.actions</param-value>
+			<param-value>com.manydesigns.portofino.actions,com.manydesigns.portofino.pageactions.safemode</param-value>
 		</init-param>
         <init-param>
             <param-name>Extension.Packages</param-name>

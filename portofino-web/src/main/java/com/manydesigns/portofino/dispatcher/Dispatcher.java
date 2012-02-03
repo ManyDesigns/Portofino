@@ -157,17 +157,6 @@ public class Dispatcher {
         }
     }
 
-    public static boolean isValidActionClass(Class<?> actionClass) {
-        if(actionClass == null) {
-            return false;
-        }
-        if(!PageAction.class.isAssignableFrom(actionClass)) {
-            logger.error("Action class must implement PortofinoAction: " + actionClass);
-            return false;
-        }
-        return true;
-    }
-
     protected Dispatch checkDispatch(Dispatch dispatch) {
         String pathUrl = dispatch.getLastPageInstance().getPath();
         assert pathUrl.equals(normalizePath(dispatch.getOriginalPath()));

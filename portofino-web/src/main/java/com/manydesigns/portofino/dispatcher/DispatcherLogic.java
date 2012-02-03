@@ -33,6 +33,7 @@ import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.pageactions.safemode.SafeModeAction;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import groovy.lang.GroovyClassLoader;
@@ -222,14 +223,16 @@ public class DispatcherLogic {
         } else {
             try {
                 actionClass = (Class<? extends PageAction>) ScriptingUtil.getGroovyClass(directory, "action");
-            } catch (IOException e) {
-                throw new RuntimeException("Couldn't load action class for " + directory.getName(), e); //TODO
+            } catch (Exception e) {
+                logger.error("Couldn't load action class for " + directory + ", returning safe-mode action", e);
+                return SafeModeAction.class;
             }
-            if(Dispatcher.isValidActionClass(actionClass)) {
+            if(isValidActionClass(actionClass)) {
                 actionClassCache.put(directory, actionClass);
                 return actionClass;
             } else {
-                throw new RuntimeException("Invalid action class for " + directory.getName() + ": " + actionClass); //TODO
+                logger.error("Invalid action class for " + directory + ": " + actionClass);
+                return SafeModeAction.class;
             }
         }
     }
@@ -240,7 +243,7 @@ public class DispatcherLogic {
         GroovyClassLoader loader = new GroovyClassLoader();
         Class<? extends PageAction> scriptClass =
                 loader.parseClass(source, groovyScriptFile.getAbsolutePath());
-        if(!Dispatcher.isValidActionClass(scriptClass)) {
+        if(!isValidActionClass(scriptClass)) {
             return null;
         }
         FileWriter fw = new FileWriter(groovyScriptFile);
@@ -253,4 +256,14 @@ public class DispatcherLogic {
         return scriptClass;
     }
 
+    public static boolean isValidActionClass(Class<?> actionClass) {
+        if(actionClass == null) {
+            return false;
+        }
+        if(!PageAction.class.isAssignableFrom(actionClass)) {
+            logger.error("Action class must implement PortofinoAction: " + actionClass);
+            return false;
+        }
+        return true;
+    }
 }

@@ -117,7 +117,7 @@ public class ModelActionResolver extends NameBasedActionResolver {
                 if(pageInstance.getActionBean() != null) {
                     return pageInstance.getActionBean();
                 } else {
-                    if(Dispatcher.isValidActionClass(type)) {
+                    if(DispatcherLogic.isValidActionClass(type)) {
                         ActionBean actionBean = super.makeNewActionBean(type, context);
                         pageInstance.setActionBean((PageAction) actionBean);
                         return actionBean;
