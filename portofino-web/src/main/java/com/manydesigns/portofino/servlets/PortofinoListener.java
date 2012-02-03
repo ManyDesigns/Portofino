@@ -31,10 +31,15 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.configuration.BeanLookup;
+import com.manydesigns.mail.queue.FileSystemMailQueue;
+import com.manydesigns.mail.queue.LockingMailQueue;
+import com.manydesigns.mail.queue.MailQueue;
+import com.manydesigns.mail.sender.DefaultMailSender;
+import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.starter.ApplicationStarter;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
+import com.manydesigns.portofino.starter.ApplicationStarter;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -51,6 +56,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
+import java.io.File;
 
 
 /*
@@ -89,6 +95,8 @@ public class PortofinoListener
 
     protected ApplicationStarter applicationStarter;
 
+    protected MailSender mailSender;
+    protected Thread mailSenderThread;
 
     //**************************************************************************
     // Logging
@@ -141,6 +149,8 @@ public class PortofinoListener
         servletContext.setAttribute(
                 ApplicationAttributes.APPLICATION_STARTER, applicationStarter);
 
+        setupEmailScheduler();
+
         String lineSeparator = System.getProperty("line.separator", "\n");
         logger.info(lineSeparator + SEPARATOR +
                 lineSeparator + "--- ManyDesigns Portofino {} started successfully" +
@@ -160,7 +170,66 @@ public class PortofinoListener
         MDC.clear();
         logger.info("ManyDesigns Portofino stopping...");
         applicationStarter.destroy();
+        if (mailSender != null) {
+            logger.info("Terminating the mail sender...");
+            mailSender.stop();
+            try {
+                mailSenderThread.join();
+            } catch (InterruptedException e) {
+                logger.debug("Mail sender thread interrupted, not waiting", e);
+            }
+            logger.info("Mail sender terminated");
+        }
         logger.info("ManyDesigns Portofino stopped.");
+    }
+
+    //**************************************************************************
+    // Mail
+    //**************************************************************************
+
+    public void setupEmailScheduler() {
+        String securityType = portofinoConfiguration
+                .getString(PortofinoProperties.SECURITY_TYPE, "application");
+        boolean mailEnabled = portofinoConfiguration.getBoolean(
+                PortofinoProperties.MAIL_ENABLED, false);
+        if ("application".equals(securityType) && mailEnabled) {
+            String mailHost = portofinoConfiguration
+                    .getString(PortofinoProperties.MAIL_SMTP_HOST);
+            if (null == mailHost) {
+                logger.error("Mail is enabled but smtp server not set in portofino-custom.properties");
+            } else {
+                logger.info("Mail is enabled, starting sender");
+                int port = portofinoConfiguration.getInt(
+                        PortofinoProperties.MAIL_SMTP_PORT, 25);
+                boolean ssl = portofinoConfiguration.getBoolean(
+                        PortofinoProperties.MAIL_SMTP_SSL_ENABLED, false);
+                String login = portofinoConfiguration.getString(
+                        PortofinoProperties.MAIL_SMTP_LOGIN);
+                String password = portofinoConfiguration.getString(
+                        PortofinoProperties.MAIL_SMTP_PASSWORD);
+                boolean keepSent = portofinoConfiguration.getBoolean(
+                        PortofinoProperties.KEEP_SENT, false);
+
+                String mailQueueLocation =
+                        portofinoConfiguration.getString(PortofinoProperties.MAIL_QUEUE_LOCATION);
+                MailQueue mailQueue =
+                        new LockingMailQueue(new FileSystemMailQueue(new File(mailQueueLocation)));
+                logger.info("Mail queue location: {}", mailQueueLocation);
+                mailQueue.setKeepSent(keepSent);
+                mailSender = new DefaultMailSender(mailQueue);
+                mailSender.setServer(mailHost);
+                mailSender.setLogin(login);
+                mailSender.setPassword(password);
+                mailSender.setPort(port);
+                mailSender.setSsl(ssl);
+                mailSenderThread = new Thread(mailSender);
+                mailSenderThread.setDaemon(true);
+                mailSenderThread.start();
+                servletContext.setAttribute(
+                    ApplicationAttributes.MAIL_QUEUE, mailQueue);
+                logger.info("Mail sender started");
+            }
+        }
     }
 
     //**************************************************************************

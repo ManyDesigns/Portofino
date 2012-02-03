@@ -85,6 +85,7 @@ public final class PortofinoProperties {
     public static final String MAIL_BOUNCE_ENABLED = "mail.bounce.enabled";
     public static final String MAIL_POP3_SSL_ENABLED = "mail.pop3.ssl.enabled";
     public static final String KEEP_SENT = "mail.keep.sent";
+    public static final String MAIL_QUEUE_LOCATION = "mail.queue.location";
 
     //Password properties
     public static final String PWD_ENCRYPTED = "pwd.encrypted";

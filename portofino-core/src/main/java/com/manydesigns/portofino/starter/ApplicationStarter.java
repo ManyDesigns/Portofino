@@ -30,11 +30,6 @@
 package com.manydesigns.portofino.starter;
 
 import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.mail.queue.FileSystemMailQueue;
-import com.manydesigns.mail.queue.LockingMailQueue;
-import com.manydesigns.mail.queue.MailQueue;
-import com.manydesigns.mail.sender.DefaultMailSender;
-import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.DefaultApplication;
@@ -82,8 +77,6 @@ public class ApplicationStarter {
     private DatabasePlatformsManager databasePlatformsManager;
     private Application tmpApplication;
     private Application application;
-    private MailSender mailSender;
-    private Thread mailSenderThread;
     private String appId;
 
     private File appDir;
@@ -143,16 +136,6 @@ public class ApplicationStarter {
             application.shutdown();
         }
 
-        if (mailSender != null) {
-            logger.info("Terminating the scheduler...");
-            mailSender.stop();
-            try {
-                mailSenderThread.join();
-            } catch (InterruptedException e) {
-                logger.debug("Mail sender thread interrupted, not waiting", e);
-            }
-        }
-
         status = Status.DESTROYED;
     }
 
@@ -201,10 +184,6 @@ public class ApplicationStarter {
         }
 
         if (success) {
-            success = setupEmailScheduler();
-        }
-
-        if (success) {
             application = tmpApplication;
             status = Status.INITIALIZED;
             logger.info("Application initialized successfully");
@@ -233,48 +212,6 @@ public class ApplicationStarter {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
             return false;
         }
-    }
-
-    public boolean setupEmailScheduler() {
-        String securityType = portofinoConfiguration
-                .getString(PortofinoProperties.SECURITY_TYPE, "application");
-        boolean mailEnabled = portofinoConfiguration.getBoolean(
-                PortofinoProperties.MAIL_ENABLED, false);
-        if ("application".equals(securityType) && mailEnabled) {
-            String mailHost = portofinoConfiguration
-                    .getString(PortofinoProperties.MAIL_SMTP_HOST);
-            String smtpSender = portofinoConfiguration
-                    .getString(PortofinoProperties.MAIL_SMTP_SENDER);
-            if (null == smtpSender || null == mailHost ) {
-                logger.info("User admin email or smtp server not set in" +
-                        " portofino-custom.properties");
-            } else {
-                int port = portofinoConfiguration.getInt(
-                        PortofinoProperties.MAIL_SMTP_PORT, 25);
-                boolean ssl = portofinoConfiguration.getBoolean(
-                        PortofinoProperties.MAIL_SMTP_SSL_ENABLED, false);
-                String login = portofinoConfiguration.getString(
-                        PortofinoProperties.MAIL_SMTP_LOGIN);
-                String password = portofinoConfiguration.getString(
-                        PortofinoProperties.MAIL_SMTP_PASSWORD);
-                boolean keepSent = portofinoConfiguration.getBoolean(
-                        PortofinoProperties.KEEP_SENT, false);
-
-                MailQueue mailQueue =
-                        new LockingMailQueue(new FileSystemMailQueue(new File(appDir, "mailQueue"))); //TODO
-                mailQueue.setKeepSent(keepSent);
-                mailSender = new DefaultMailSender(mailQueue);
-                mailSender.setServer(mailHost);
-                mailSender.setLogin(login);
-                mailSender.setPassword(password);
-                mailSender.setPort(port);
-                mailSender.setSsl(ssl);
-                mailSenderThread = new Thread(smtpSender);
-                mailSenderThread.setDaemon(true);
-                mailSenderThread.start();
-            }
-        }
-        return true;
     }
 
 

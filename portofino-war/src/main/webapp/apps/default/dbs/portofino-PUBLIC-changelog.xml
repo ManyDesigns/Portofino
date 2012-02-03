@@ -1,32 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
-    <changeSet author="manydesigns" id="1313767352015-1">
-        <createTable tableName="EMAILQUEUE">
-            <column name="ID" type="VARCHAR(25)">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="EMAILQUEUE_PKEY"/>
-            </column>
-            <column name="SUBJECT" type="VARCHAR(100)"/>
-            <column name="BODY" type="VARCHAR(4000)"/>
-            <column name="TO_" type="VARCHAR(100)"/>
-            <column name="FROM_" type="VARCHAR(100)"/>
-            <column name="CREATEDATE" type="DATE"/>
-            <column name="STATE" type="DECIMAL(10,0)"/>
-            <column name="ATTACHMENTPATH" type="VARCHAR(255)"/>
-            <column name="ATTACHMENTDESCRIPTION" type="VARCHAR(255)"/>
-            <column name="ATTACHMENTNAME" type="VARCHAR(255)"/>
-        </createTable>
-    </changeSet>
-    <changeSet author="manydesigns" id="1313767352015-2">
-        <createTable tableName="EMAILSTATE">
-            <column name="ID" type="DECIMAL(10,0)">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="EMAILSTATE_PKEY"/>
-            </column>
-            <column name="NAME" type="VARCHAR(75)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="DESCRIPTION" type="VARCHAR(255)"/>
-        </createTable>
-    </changeSet>
     <changeSet author="manydesigns" id="1313767352015-3">
         <createTable tableName="GROUPS">
             <column name="GROUPID" type="VARCHAR(25)">
