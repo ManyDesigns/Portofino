@@ -339,7 +339,7 @@ public class TimesheetAction extends CustomAction {
     static Activity ac2 = new Activity("ac2", "#0100", "Acme System", "Progettazione", null, at0, null, null, null);
     static Activity ac3 = new Activity("ac3", "#0100", "Acme System", "Sviluppo", null, at0, null, null, null);
 
-    static Activity ac4 = new Activity("ac4", "#0101", "Bunga website", "Supporto e gestione", null, at0, null, null, null);
+    static Activity ac4 = new Activity("ac4", "#0101", "Kinetic website", "Supporto e gestione", null, at0, null, null, null);
 
     static Activity ac5 = new Activity("ac5", "#0001", "Processi interni", "Marketing", null, at1, null, null, "http://www.manydesigns.com/");
     static Activity ac6 = new Activity("ac6", "#0001", "Processi interni", "Formazione", null, at1, null, null, null);
@@ -353,13 +353,26 @@ public class TimesheetAction extends CustomAction {
 
     static PersonDay paoloJan30 = new PersonDay(paolo, jan30, null, true);
     static PersonDay paoloJan31 = new PersonDay(paolo, jan31, null, false);
+    static PersonDay paoloFeb1 = new PersonDay(paolo, feb1, null, false);
+    static PersonDay paoloFeb2 = new PersonDay(paolo, feb2, null, false);
+    static PersonDay paoloFeb3 = new PersonDay(paolo, feb3, null, false);
 
     static Entry entry1 = new Entry(ac1, new Period(1, 30, 0, 0), "Intervista con Pippo");
-    static Entry entry2 = new Entry(ac5, new Period(3, 0, 0, 0), null);
-    static Entry entry3 = new Entry(ac1, new Period(4, 0, 0, 0), "Formalizzazione requisiti");
-    static Entry entry4 = new Entry(ac3, new Period(4, 0, 0, 0), null);
-    static Entry entry5 = new Entry(ac5, new Period(4, 0, 0, 0), null);
-    static Entry entry6 = new Entry(ac7, new Period(4, 0, 0, 0), null);
+    static Entry entry2 = new Entry(ac4, new Period(3, 30, 0, 0), null);
+    static Entry entry3 = new Entry(ac5, new Period(3, 0, 0, 0), null);
+
+    static Entry entry4 = new Entry(ac1, new Period(8, 0, 0, 0), null);
+
+    static Entry entry5 = new Entry(ac1, new Period(3, 30, 0, 0), null);
+    static Entry entry6 = new Entry(ac2, new Period(4, 30, 0, 0), null);
+
+    static Entry entry7 = new Entry(ac1, new Period(1, 0, 0, 0), null);
+    static Entry entry8 = new Entry(ac2, new Period(3, 0, 0, 0), null);
+    static Entry entry9 = new Entry(ac6, new Period(3, 0, 0, 0), null);
+    static Entry entry10 = new Entry(ac9, new Period(1, 0, 0, 0), null);
+
+    static Entry entry11 = new Entry(ac2, new Period(2, 30, 0, 0), null);
+    static Entry entry12 = new Entry(ac4, new Period(1, 0, 0, 0), null);
 
     static Map<DateMidnight, PersonDay> personDayDb
             = new HashMap<DateMidnight, PersonDay>();
@@ -370,13 +383,26 @@ public class TimesheetAction extends CustomAction {
     static {
         personDayDb.put(paoloJan30.getDate(), paoloJan30);
         personDayDb.put(paoloJan31.getDate(), paoloJan31);
+        personDayDb.put(paoloFeb1.getDate(), paoloFeb1);
+        personDayDb.put(paoloFeb2.getDate(), paoloFeb2);
+        personDayDb.put(paoloFeb3.getDate(), paoloFeb3);
 
         paoloJan30.getEntries().add(entry1);
         paoloJan30.getEntries().add(entry2);
-        paoloJan31.getEntries().add(entry3);
+        paoloJan30.getEntries().add(entry3);
+
         paoloJan31.getEntries().add(entry4);
-        paoloJan31.getEntries().add(entry5);
-        paoloJan31.getEntries().add(entry6);
+
+        paoloFeb1.getEntries().add(entry5);
+        paoloFeb1.getEntries().add(entry6);
+
+        paoloFeb2.getEntries().add(entry7);
+        paoloFeb2.getEntries().add(entry8);
+        paoloFeb2.getEntries().add(entry9);
+        paoloFeb2.getEntries().add(entry10);
+
+        paoloFeb3.getEntries().add(entry11);
+        paoloFeb3.getEntries().add(entry12);
 
         nonWorkingDaysDb.add(jan28);
         nonWorkingDaysDb.add(jan29);
