@@ -14,6 +14,7 @@
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -83,10 +84,13 @@
             td.twe-summary.twe-today {
                 background-color: #F9EFBE;
             }
-            span.twe-ro-hours {
+            span.twe-ro-hours, span.twe-day-total {
                 display: block;
                 width: 32px;
                 text-align: right;
+            }
+            span.twe-week-total {
+                color: black;
             }
             .display-none {
                 display: none;
@@ -175,7 +179,10 @@
                         .appendMinutes()
                         .toFormatter();
                 boolean even = false;
-                for (Activity activity : actionBean.getWeekActivities()) {
+                List<Activity> weekActivities = actionBean.getWeekActivities();
+                int weekActivitiesSize = weekActivities.size();
+                for (int activityIndex = 0; activityIndex < weekActivitiesSize; activityIndex++) {
+                    Activity activity = weekActivities.get(activityIndex);
                     xb.openElement("tr");
                     if (even) {
                         xb.addAttribute("class", "even");
@@ -223,7 +230,7 @@
                     xb.closeElement("td");
 
                     day = actionBean.getMonday();
-                    for (int i = 0; i < 7; i++) {
+                    for (int dayIndex = 0; dayIndex < 7; dayIndex++) {
                         xb.openElement("td");
                         String htmlClass = "twe-hours";
                         if (nonWorkingDays.contains(day)) {
@@ -286,8 +293,18 @@
                                     xb.addAttribute("title", note);
                                     xb.closeElement("div");
                                 }
+                                String name = String.format("cell-%d-%s",
+                                        dayIndex, activity.getId());
+                                int tabIndex = activityIndex +
+                                        dayIndex * weekActivitiesSize;
                                 xb.openElement("span");
-                                xb.writeInputText(null, null, hours, "twe-input", null, null);
+                                xb.openElement("input");
+                                xb.addAttribute("type", "text");
+                                xb.addAttribute("name", name);
+                                xb.addAttribute("class", "twe-input");
+                                xb.addAttribute("value", hours);
+                                xb.addAttribute("tabindex", Integer.toString(tabIndex));
+                                xb.closeElement("input");
                                 xb.closeElement("span");
                             }
                         }
@@ -302,7 +319,7 @@
             </tbody>
             <tfoot>
             <tr>
-                <td class="twe-total" colspan="3">Totale ore lavorate: <span style="color: black;">40:00</span></td>
+                <td class="twe-total" colspan="3">Totale ore settimanali: <span id="twe-week-total" class="twe-week-total"></span></td>
                 <%
                     day = actionBean.getMonday();
                     for (int i = 0; i < 7; i++) {
@@ -319,7 +336,7 @@
                         xb.addAttribute("class", htmlClass);
 
                         xb.openElement("span");
-                        xb.addAttribute("class", "twe-ro-hours");
+                        xb.addAttribute("class", "twe-day-total");
                         xb.closeElement("span");
 
                         xb.closeElement("td");
@@ -329,19 +346,29 @@
             </tr>
             </tfoot>
         </table>
-        </div>
+    </div>
+    <input type="hidden" name="weeksAgo" value="<c:out value="${actionBean.weeksAgo}"/>"/>
     <script type="text/javascript">
-        var re = /^(\d+):(\d+)$/;
+        var hoursRe = /^(\d+):(\d+)$/;
+        var hoursRe2 = /^(\d+):?$/;
 
         function parseHours(text) {
-            var match = re.exec(text);
+            var match = hoursRe.exec(text);
             if (match) {
                 return parseInt(match[1]) * 60 + parseInt(match[2]);
             } else {
                 return 0;
             }
         }
-        function tweUpdateColumn(index) {
+        function formatHoursMinutes(hours, minutes) {
+            var totalTime = "" + hours + ":";
+            if (minutes < 10) {
+                totalTime += "0";
+            }
+            totalTime += minutes;
+            return totalTime;
+        }
+        function updateDayTotal(index) {
             var totalMinutes = 0;
             $("table.twe-table tbody td:nth-child(" + (4 + index) + ")").each( function(tdIndex, currentTd) {
                 $(currentTd).find("span.twe-ro-hours").each(
@@ -360,29 +387,66 @@
 
             var hours = Math.floor(totalMinutes / 60);
             var minutes = totalMinutes % 60;
-            var totalTime = "" + hours + ":";
-            if (minutes < 10) {
-                totalTime += "0";
-            }
-            totalTime += minutes;
+            var totalTime = formatHoursMinutes(hours, minutes);
             $("table.twe-table tfoot tr:first-child td:nth-child(" +
                     (2 + index) +
                     ") span").html(totalTime);
         }
 
+        function updateWeekTotal() {
+            var totalMinutes = 0;
+            $("span.twe-day-total").each(function(spanIndex, currentSpan) {
+                    var text = $(currentSpan).html();
+                    totalMinutes += parseHours(text);
+            });
+            var hours = Math.floor(totalMinutes / 60);
+            var minutes = totalMinutes % 60;
+            var totalTime = formatHoursMinutes(hours, minutes);
+            $("span.twe-week-total").html(totalTime);
+        }
+
+        function cellUpdated(wrappedInput, columnIndex) {
+            // normalize the input
+            var text = wrappedInput.val();
+            var match = hoursRe.exec(text);
+            var hours = 0;
+            var minutes = 0;
+            var valid = false;
+            if (match) {
+                hours = parseInt(match[1]);
+                minutes = parseInt(match[2]);
+                valid = true;
+            } else {
+                match = hoursRe2.exec(text);
+                if (match) {
+                    hours = parseInt(match[1]);
+                    valid = true;
+                }
+            }
+            if (valid) {
+                // reformat hours/minutes
+                var totalTime = formatHoursMinutes(hours, minutes);
+                wrappedInput.val(totalTime);
+            }
+            updateDayTotal(columnIndex);
+            updateWeekTotal();
+        }
+
         for (var i = 0; i < 7; i++) {
-            tweUpdateColumn(i);
+            updateDayTotal(i);
             $("table.twe-table tbody td:nth-child(" + (4 + i) + ")").each( function(tdIndex, currentTd) {
                 $(currentTd).find("input.twe-input").each(
                     function(inputIndex, currentInput) {
                         var j = i;
-                        $(currentInput).blur(function() {
-                            tweUpdateColumn(j);
+                        var wrappedInput = $(currentInput);
+                        wrappedInput.blur(function() {
+                            cellUpdated(wrappedInput, j);
                         });
                     }
                 );
             });
         }
+        updateWeekTotal();
     </script>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>

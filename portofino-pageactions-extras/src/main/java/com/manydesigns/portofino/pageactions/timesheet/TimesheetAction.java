@@ -52,6 +52,7 @@ import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -207,6 +208,35 @@ public class TimesheetAction extends CustomAction {
         return new ForwardResolution("/layouts/timesheet/week-entry.jsp");
     }
 
+    @Button(list = "timesheet-week-entry", key = "commons.save", order = 1)
+    public Resolution saveWeekEntry() {
+        assert weeksAgo >= 0;
+        today = new DateMidnight(dtz);
+        monday = today.withDayOfWeek(DateTimeConstants.MONDAY).minusWeeks(weeksAgo);
+        loadNonWorkingDays();
+        loadWeekEntryModel();
+
+        HttpServletRequest request = getContext().getRequest();
+
+        DateMidnight day = monday;
+        for (int dayIndex = 0; dayIndex < 7; dayIndex++) {
+            PersonDay personDay = personDays.get(day);
+            if (personDay.isLocked()) {
+                continue;
+            }
+            for (Activity activity : weekActivities) {
+                String name = String.format("cell-%d-%s",
+                        dayIndex, activity.getId());
+                String value = request.getParameter(name);
+                logger.info("{}: {}", name, value);
+            }
+            day = day.plusDays(1);
+        }
+
+        SessionMessages.addInfoMessage("Timesheet salvato con successo");
+        return new RedirectResolution(dispatch.getOriginalPath());
+    }
+
     //**************************************************************************
     // Non working days view
     //**************************************************************************
@@ -219,12 +249,6 @@ public class TimesheetAction extends CustomAction {
         loadNonWorkingDays();
         monthView = new MonthView(new DateTime(dtz));
         return new ForwardResolution("/layouts/timesheet/non-working-days.jsp");
-    }
-
-    @Button(list = "timesheet-week-entry", key = "commons.save", order = 1)
-    public Resolution saveWeekEntry() {
-        SessionMessages.addInfoMessage("Timesheet salvato con successo");
-        return new RedirectResolution(dispatch.getOriginalPath());
     }
 
     public Resolution configureNonWorkingDay() throws JSONException {
