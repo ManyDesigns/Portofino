@@ -64,7 +64,7 @@ public class FileSystemMailQueue implements MailQueue {
 
     protected static final Logger logger = LoggerFactory.getLogger(FileSystemMailQueue.class);
 
-    public FileSystemMailQueue(File directory) throws QueueException {
+    public FileSystemMailQueue(File directory) {
         this.queuedDirectory = new File(directory, "queue");
         this.sentDirectory = new File(directory, "sent");
         this.failedDirectory = new File(directory, "failed");
@@ -81,7 +81,7 @@ public class FileSystemMailQueue implements MailQueue {
         try {
             jaxbContext = JAXBContext.newInstance(Email.class, Recipient.class);
         } catch (JAXBException e) {
-            throw new QueueException("Couldn't create jaxb context", e);
+            throw new Error("Couldn't create jaxb context", e);
         }
     }
 
