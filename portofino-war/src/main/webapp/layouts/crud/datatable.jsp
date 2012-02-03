@@ -29,13 +29,15 @@
 <script type="text/javascript">
     var initDatatable_<c:out value="${pageId}" /> = function() {
         var elementsFormatter = function(elCell, oRecord, oColumn, sData) {
-            var href = sData.href;
-            if (href) {
-                elCell.innerHTML = '<a href="' + htmlEscape(href) + '">' +
-                        htmlEscape(sData.displayValue) +
-                        '</a>';
-            } else {
-                elCell.innerHTML = htmlEscape(sData.displayValue);
+            if(sData.displayValue) { //Handle null value
+                var href = sData.href;
+                if (href) {
+                    elCell.innerHTML = '<a href="' + htmlEscape(href) + '">' +
+                            htmlEscape(sData.displayValue) +
+                            '</a>';
+                } else {
+                    elCell.innerHTML = htmlEscape(sData.displayValue);
+                }
             }
         };
 
