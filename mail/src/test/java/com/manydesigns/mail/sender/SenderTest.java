@@ -72,6 +72,7 @@ public class SenderTest extends TestCase {
         super.tearDown();
         sender.stop();
         server.stop();
+        senderThread.join();
     }
 
     public void testSimple() {
@@ -185,6 +186,16 @@ public class SenderTest extends TestCase {
         assertFalse(queue.getEnqueuedEmailIds().isEmpty());
 
         assertEquals(0, server.getReceivedEmailSize());
+
+        sender.setPort(SMTP_PORT);
+        try {
+            Thread.sleep(sender.getPollInterval() * 3);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertTrue(queue.getEnqueuedEmailIds().isEmpty());
+
+        assertEquals(1, server.getReceivedEmailSize());
     }
 
     public void testBrutalTermination() throws InterruptedException {

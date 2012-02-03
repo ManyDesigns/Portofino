@@ -79,19 +79,25 @@ public class DefaultMailSender implements MailSender {
     }
 
     protected void mainLoop() throws InterruptedException {
+        int pollIntervalMultiplier = 1;
         while (alive) {
+            long now = System.currentTimeMillis();
             List<String> ids = queue.getEnqueuedEmailIds();
+            int serverErrors = 0;
             for(String id : ids) {
                 Email email = queue.loadEmail(id);
                 if(email != null) {
                     try {
+                        logger.info("Sending email with id {}", id);
                         send(email);
+                        logger.info("Email with id {} sent, marking", id);
                         queue.markSent(id);
                     } catch (EmailException e) {
                         Throwable cause = e.getCause();
                         if(cause instanceof AuthenticationFailedException ||
                            cause instanceof MessagingException) {
-                            logger.warn("Mail not sent due to server error, NOT marking as failed", e);
+                            logger.warn("Mail not sent due to known server error, NOT marking as failed", e);
+                            serverErrors++;
                         } else {
                             logger.error("Unrecognized error while sending mail, marking as failed", e);
                             queue.markFailed(id);
@@ -99,7 +105,21 @@ public class DefaultMailSender implements MailSender {
                     }
                 }
             }
-            Thread.sleep(pollInterval);
+            if(serverErrors > 0) {
+                if(pollIntervalMultiplier < 10) {
+                    pollIntervalMultiplier++;
+                    logger.debug("{} server errors, increased poll interval multiplier to {}",
+                            serverErrors, pollIntervalMultiplier);
+                }
+            } else {
+                pollIntervalMultiplier = 1;
+                logger.debug("No server errors, poll interval multiplier reset");
+            }
+            long sleep = pollInterval * pollIntervalMultiplier - (System.currentTimeMillis() - now);
+            if(sleep > 0) {
+                logger.debug("Sleeping for {}ms", sleep);
+                Thread.sleep(sleep);
+            }
         }
     }
 
