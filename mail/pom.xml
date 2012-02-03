@@ -69,7 +69,7 @@
         <dependency>
             <groupId>dumbster</groupId>
             <artifactId>dumbster</artifactId>
-            <version>1.6</version>
+            <version>1.5</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

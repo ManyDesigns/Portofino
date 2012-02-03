@@ -52,7 +52,7 @@ public class LockingMailQueue implements MailQueue {
         this.mailQueue = mailQueue;
     }
 
-    public String enqueue(Email email) {
+    public String enqueue(Email email) throws QueueException {
         lock.writeLock().lock();
         try {
             return mailQueue.enqueue(email);
@@ -61,7 +61,7 @@ public class LockingMailQueue implements MailQueue {
         }
     }
 
-    public List<String> getEnqueuedEmailIds() {
+    public List<String> getEnqueuedEmailIds() throws QueueException {
         lock.readLock().lock();
         try {
             return mailQueue.getEnqueuedEmailIds();
@@ -70,7 +70,7 @@ public class LockingMailQueue implements MailQueue {
         }
     }
 
-    public Email loadEmail(String id) {
+    public Email loadEmail(String id) throws QueueException {
         lock.readLock().lock();
         try {
             return mailQueue.loadEmail(id);
@@ -79,7 +79,7 @@ public class LockingMailQueue implements MailQueue {
         }
     }
 
-    public void markSent(String id) {
+    public void markSent(String id) throws QueueException {
         lock.writeLock().lock();
         try {
             mailQueue.markSent(id);
@@ -88,7 +88,7 @@ public class LockingMailQueue implements MailQueue {
         }
     }
 
-    public void markFailed(String id) {
+    public void markFailed(String id) throws QueueException {
         lock.writeLock().lock();
         try {
             mailQueue.markFailed(id);

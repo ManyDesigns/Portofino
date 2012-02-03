@@ -64,7 +64,7 @@ public class FileSystemMailQueue implements MailQueue {
 
     protected static final Logger logger = LoggerFactory.getLogger(FileSystemMailQueue.class);
 
-    public FileSystemMailQueue(File directory) throws QueueError {
+    public FileSystemMailQueue(File directory) throws QueueException {
         this.queuedDirectory = new File(directory, "queue");
         this.sentDirectory = new File(directory, "sent");
         this.failedDirectory = new File(directory, "failed");
@@ -81,23 +81,23 @@ public class FileSystemMailQueue implements MailQueue {
         try {
             jaxbContext = JAXBContext.newInstance(Email.class, Recipient.class);
         } catch (JAXBException e) {
-            throw new QueueError("Couldn't create jaxb context", e);
+            throw new QueueException("Couldn't create jaxb context", e);
         }
     }
 
-    protected void checkDirectory(File file) throws QueueError {
+    protected void checkDirectory(File file) throws QueueException {
         if(!ElementsFileUtils.ensureDirectoryExistsAndWritable(file)) {
-            throw new QueueError("Invalid directory " + file.getAbsolutePath());
+            throw new QueueException("Invalid directory " + file.getAbsolutePath());
         }
     }
 
-    protected void checkDirectories() {
+    protected void checkDirectories() throws QueueException {
         checkDirectory(queuedDirectory);
         checkDirectory(sentDirectory);
         checkDirectory(failedDirectory);
     }
 
-    public String enqueue(Email email) throws QueueError {
+    public String enqueue(Email email) throws QueueException {
         try {
             Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
@@ -107,7 +107,7 @@ public class FileSystemMailQueue implements MailQueue {
             marshaller.marshal(email, destinationFile);
             return emailId;
         } catch (Exception e) {
-            throw new QueueError("Couldn't enqueue mail", e);
+            throw new QueueException("Couldn't enqueue mail", e);
         }
     }
 
@@ -115,8 +115,8 @@ public class FileSystemMailQueue implements MailQueue {
         return RandomUtil.getCodeFile(queuedDirectory, "email-{0}.xml", emailId);
     }
 
-    public List<String> getEnqueuedEmailIds() throws QueueError {
-        checkDirectories();
+    public List<String> getEnqueuedEmailIds() throws QueueException {
+        checkDirectory(queuedDirectory);
         List<String> ids = new ArrayList<String>();
         Pattern pattern = Pattern.compile("^email-(.*)\\.xml$");
         for(String filename : queuedDirectory.list()) {
@@ -129,7 +129,7 @@ public class FileSystemMailQueue implements MailQueue {
         return ids;
     }
 
-    public Email loadEmail(String id) throws QueueError {
+    public Email loadEmail(String id) throws QueueException {
         try {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             File emailFile = getEmailFile(id);
@@ -141,12 +141,14 @@ public class FileSystemMailQueue implements MailQueue {
                 logger.debug("Email with id {} not found", id);
                 return null;
             }
+        } catch (JAXBException e) {
+            throw new MailParseException("Couldn't parse email", e);
         } catch (Exception e) {
-            throw new QueueError("Couldn't load email", e);
+            throw new QueueException("Couldn't load email", e);
         }
     }
 
-    public void markSent(String id) throws QueueError {
+    public void markSent(String id) throws QueueException {
         checkDirectories();
         try {
             File emailFile = getEmailFile(id);
@@ -157,7 +159,7 @@ public class FileSystemMailQueue implements MailQueue {
                 } else {
                     logger.info("Deleting sent email with id {}", id);
                     if(!emailFile.delete()) {
-                        throw new QueueError("Couldn't mark mail as sent");
+                        throw new QueueException("Couldn't mark mail as sent");
                     }
                 }
             } else {
@@ -168,7 +170,7 @@ public class FileSystemMailQueue implements MailQueue {
         }
     }
 
-    public void markFailed(String id) throws QueueError {
+    public void markFailed(String id) throws QueueException {
         checkDirectories();
         try {
             File emailFile = getEmailFile(id);
@@ -179,7 +181,7 @@ public class FileSystemMailQueue implements MailQueue {
                 logger.debug("Not marking email with id {} as sent", id);
             }
         } catch (IOException e) {
-            throw new QueueError("Couldn't mark mail as sent", e);
+            throw new QueueException("Couldn't mark mail as sent", e);
         }
     }
 

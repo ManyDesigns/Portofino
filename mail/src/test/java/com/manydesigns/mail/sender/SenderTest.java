@@ -33,11 +33,14 @@ import com.dumbster.smtp.SmtpMessage;
 import com.manydesigns.mail.queue.FileSystemMailQueue;
 import com.manydesigns.mail.queue.LockingMailQueue;
 import com.manydesigns.mail.queue.MailQueue;
+import com.manydesigns.mail.queue.QueueException;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
 import junit.framework.TestCase;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Iterator;
 
 /*
@@ -51,6 +54,7 @@ public class SenderTest extends TestCase {
     private SimpleSmtpServer server;
     MailSender sender;
     MailQueue queue;
+    FileSystemMailQueue fsQueue;
     protected Thread senderThread;
 
     @Override
@@ -60,7 +64,8 @@ public class SenderTest extends TestCase {
         File file = File.createTempFile("mail", ".queue");
         file.deleteOnExit();
         file = new File(file.getAbsolutePath() + ".d");
-        queue = new LockingMailQueue(new FileSystemMailQueue(file));
+        fsQueue = new FileSystemMailQueue(file);
+        queue = new LockingMailQueue(fsQueue);
         sender = new DefaultMailSender(queue);
         sender.setPort(SMTP_PORT);
         senderThread = new Thread(sender);
@@ -75,7 +80,7 @@ public class SenderTest extends TestCase {
         senderThread.join();
     }
 
-    public void testSimple() {
+    public void testSimple() throws QueueException {
         Email myEmail = new Email();
         myEmail.setFrom("granatella@gmail.com");
         myEmail.getRecipients().add(new Recipient(Recipient.Type.TO, "giampiero.granatella@manydesigns.com"));
@@ -99,7 +104,7 @@ public class SenderTest extends TestCase {
         }
     }
 
-    public void testSimpleMultiRecipient() {
+    public void testSimpleMultiRecipient() throws QueueException {
         Email myEmail = new Email();
         myEmail.setFrom("granatella@gmail.com");
         myEmail.getRecipients().add(new Recipient(Recipient.Type.TO, "giampiero.granatella@manydesigns.com"));
@@ -124,7 +129,7 @@ public class SenderTest extends TestCase {
         }
     }
 
-    public void testHtml() {
+    public void testHtml() throws QueueException {
         Email myEmail = new Email();
         myEmail.setFrom("granatella@gmail.com");
         myEmail.getRecipients().add(new Recipient(Recipient.Type.TO, "giampiero.granatella@manydesigns.com"));
@@ -170,7 +175,7 @@ public class SenderTest extends TestCase {
         }
     }
 
-    public void testServerDown() {
+    public void testServerDown() throws QueueException {
         sender.setPort(SMTP_PORT + 1);
         Email myEmail = new Email();
         myEmail.setFrom("granatella@gmail.com");
@@ -197,6 +202,106 @@ public class SenderTest extends TestCase {
 
         assertEquals(1, server.getReceivedEmailSize());
     }
+
+    public void testFailedAuth() throws QueueException {
+        sender.setPort(465);
+        sender.setServer("smtp.gmail.com");
+        sender.setSsl(true);
+        Email myEmail = new Email();
+        myEmail.setFrom("ginopino@example.com");
+        myEmail.getRecipients().add(new Recipient(Recipient.Type.TO, "pulcinella@example.com"));
+        myEmail.setSubject("subj");
+        myEmail.setTextBody("body");
+        queue.enqueue(myEmail);
+        try {
+            Thread.sleep(sender.getPollInterval() * 2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertFalse(queue.getEnqueuedEmailIds().isEmpty());
+
+        sender.setLogin("fake");
+        sender.setPassword("login");
+        try {
+            Thread.sleep(sender.getPollInterval() * 2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertFalse(queue.getEnqueuedEmailIds().isEmpty());
+    }
+
+    public void testWrongAddress() throws QueueException {
+        Email myEmail = new Email();
+        myEmail.setFrom("ginopino");
+        myEmail.getRecipients().add(new Recipient(Recipient.Type.TO, "pulcinella"));
+        myEmail.setSubject("subj");
+        myEmail.setTextBody("body");
+        queue.enqueue(myEmail);
+        try {
+            Thread.sleep(sender.getPollInterval() * 2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertTrue(queue.getEnqueuedEmailIds().isEmpty());
+        assertEquals(0, server.getReceivedEmailSize());
+    }
+
+    public void testMalformedMail() throws IOException, QueueException {
+        File malformedFile = new File(fsQueue.getQueuedDirectory(), "email-wrong.xml");
+        FileWriter fw = new FileWriter(malformedFile);
+        fw.write("malformed");
+        fw.close();
+        assertFalse(queue.getEnqueuedEmailIds().isEmpty());
+        try {
+            Thread.sleep(sender.getPollInterval() * 2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertTrue(queue.getEnqueuedEmailIds().isEmpty());
+        assertEquals(0, server.getReceivedEmailSize());
+    }
+
+    public void testMarkSentFailed() throws QueueException {
+        Email myEmail = new Email();
+        myEmail.setFrom("granatella@gmail.com");
+        myEmail.getRecipients().add(new Recipient(Recipient.Type.TO, "giampiero.granatella@manydesigns.com"));
+        myEmail.setSubject("subj");
+        myEmail.setTextBody("body");
+        if(!fsQueue.getSentDirectory().setWritable(false)) {
+            fail("Couldn't make sent directory not writable");
+        }
+
+        queue.enqueue(myEmail);
+        try {
+            Thread.sleep(sender.getPollInterval() * 2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertFalse(queue.getEnqueuedEmailIds().isEmpty());
+        assertEquals(1, server.getReceivedEmailSize());
+
+        try {
+            Thread.sleep(sender.getPollInterval() * 2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertFalse(queue.getEnqueuedEmailIds().isEmpty());
+        assertEquals(1, server.getReceivedEmailSize());
+
+        if(!fsQueue.getSentDirectory().setWritable(true)) {
+            fail("Couldn't make sent directory writable");
+        }
+
+        try {
+            Thread.sleep(sender.getPollInterval() * 2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertTrue(queue.getEnqueuedEmailIds().isEmpty());
+        assertEquals(1, server.getReceivedEmailSize());
+    }
+
+
 
     public void testBrutalTermination() throws InterruptedException {
         senderThread.interrupt();

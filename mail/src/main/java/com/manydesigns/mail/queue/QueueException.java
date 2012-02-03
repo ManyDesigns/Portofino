@@ -29,31 +29,28 @@
 
 package com.manydesigns.mail.queue;
 
-import com.manydesigns.mail.queue.model.Email;
-
-import java.util.List;
-
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface MailQueue {
+public class QueueException extends Exception {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    String enqueue(Email email) throws QueueException;
+    public QueueException() {
+    }
 
-    List<String> getEnqueuedEmailIds() throws QueueException;
+    public QueueException(String message) {
+        super(message);
+    }
 
-    Email loadEmail(String id) throws QueueException;
+    public QueueException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-    void markSent(String id) throws QueueException;
-    void markFailed(String id) throws QueueException;
-
-
-    boolean isKeepSent();
-
-    void setKeepSent(boolean keepSent);
+    public QueueException(Throwable cause) {
+        super(cause);
+    }
 }

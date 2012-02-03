@@ -35,22 +35,22 @@ package com.manydesigns.mail.queue;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class QueueError extends Error {
+public class MailParseException extends QueueException {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public QueueError() {
+    public MailParseException() {
     }
 
-    public QueueError(String message) {
+    public MailParseException(String message) {
         super(message);
     }
 
-    public QueueError(String message, Throwable cause) {
+    public MailParseException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public QueueError(Throwable cause) {
+    public MailParseException(Throwable cause) {
         super(cause);
     }
 }

@@ -29,6 +29,7 @@
 
 package com.manydesigns.mail.sender;
 
+import com.manydesigns.mail.queue.MailParseException;
 import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
@@ -39,8 +40,11 @@ import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.mail.AuthenticationFailedException;
+import javax.mail.IllegalWriteException;
 import javax.mail.MessagingException;
+import javax.mail.MethodNotSupportedException;
+import javax.mail.internet.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -79,13 +83,40 @@ public class DefaultMailSender implements MailSender {
     }
 
     protected void mainLoop() throws InterruptedException {
+        List<String> idsToMarkAsSent = new ArrayList<String>();
         int pollIntervalMultiplier = 1;
         while (alive) {
             long now = System.currentTimeMillis();
-            List<String> ids = queue.getEnqueuedEmailIds();
+            List<String> ids;
+            try {
+                ids = queue.getEnqueuedEmailIds();
+            } catch (Throwable e) {
+                logger.error("Couldn't read email queue", e);
+                continue;
+            }
             int serverErrors = 0;
             for(String id : ids) {
-                Email email = queue.loadEmail(id);
+                if(idsToMarkAsSent.contains(id)) {
+                    logger.info("Mail with id {} already sent but mark failed, retrying", id);
+                    try {
+                        queue.markSent(id);
+                        idsToMarkAsSent.remove(id);
+                    } catch (Throwable e) {
+                        logger.error("Couldn't mark mail as sent", e);
+                    }
+                    continue;
+                }
+                Email email;
+                try {
+                    email = queue.loadEmail(id);
+                } catch (MailParseException e) {
+                    logger.error("Mail with id " + id + " is corrupted, marking as failed", e);
+                    markFailed(id, e);
+                    continue;
+                } catch (Throwable e) {
+                    logger.error("Unexpected error loading mail with id " + id + ", skipping", e);
+                    continue;
+                }
                 if(email != null) {
                     try {
                         logger.info("Sending email with id {}", id);
@@ -94,14 +125,19 @@ public class DefaultMailSender implements MailSender {
                         queue.markSent(id);
                     } catch (EmailException e) {
                         Throwable cause = e.getCause();
-                        if(cause instanceof AuthenticationFailedException ||
-                           cause instanceof MessagingException) {
+                        if(cause instanceof ParseException ||
+                           cause instanceof IllegalWriteException ||
+                           cause instanceof MethodNotSupportedException) {
+                            markFailed(id, cause);
+                        } else if(cause instanceof MessagingException) {
                             logger.warn("Mail not sent due to known server error, NOT marking as failed", e);
                             serverErrors++;
                         } else {
-                            logger.error("Unrecognized error while sending mail, marking as failed", e);
-                            queue.markFailed(id);
+                            markFailed(id, e);
                         }
+                    } catch (Throwable e) {
+                        logger.error("Couldn't mark mail as sent", e);
+                        idsToMarkAsSent.add(id);
                     }
                 }
             }
@@ -123,7 +159,18 @@ public class DefaultMailSender implements MailSender {
         }
     }
 
+    protected void markFailed(String id, Throwable e) {
+        logger.error("Unrecognized error while sending mail, marking as failed", e);
+        try {
+            queue.markFailed(id);
+        } catch (Throwable error) {
+            logger.warn("Couldn't mark mail with id " + id +
+                        " as failed; it will probably fail again", error);
+        }
+    }
+
     protected void send(Email emailBean) throws EmailException {
+        logger.debug("Entering send(Email)");
         org.apache.commons.mail.Email email;
         String textBody = emailBean.getTextBody();
         String htmlBody = emailBean.getHtmlBody();
@@ -164,6 +211,7 @@ public class DefaultMailSender implements MailSender {
         email.setSSL(ssl);
         email.setSslSmtpPort(port + "");
         email.send();
+        logger.debug("Exiting send(Email)");
     }
 
     public void stop() {

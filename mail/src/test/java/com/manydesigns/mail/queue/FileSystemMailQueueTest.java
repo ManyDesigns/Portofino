@@ -47,7 +47,7 @@ public class FileSystemMailQueueTest extends TestCase {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public void testExistingDirectory() throws IOException {
+    public void testExistingDirectory() throws IOException, QueueException {
         File file = File.createTempFile("mail", ".queue");
         file.deleteOnExit();
         file = new File(file.getAbsolutePath() + ".d");
@@ -59,7 +59,7 @@ public class FileSystemMailQueueTest extends TestCase {
         basicTest(file);
     }
 
-    public void testNonExistingDirectory() throws IOException {
+    public void testNonExistingDirectory() throws IOException, QueueException {
         File file = File.createTempFile("mail", ".queue");
         file.deleteOnExit();
         file = new File(file.getAbsolutePath() + ".d");
@@ -74,10 +74,10 @@ public class FileSystemMailQueueTest extends TestCase {
         try {
             basicTest(file);
             fail();
-        } catch (QueueError e) {}
+        } catch (QueueException e) {}
     }
 
-    public void testInaccessibleQueueAfterCreation() throws IOException {
+    public void testInaccessibleQueueAfterCreation() throws IOException, QueueException {
         File file = File.createTempFile("mail", ".queue");
         file.deleteOnExit();
         file = new File(file.getAbsolutePath() + ".d");
@@ -94,7 +94,7 @@ public class FileSystemMailQueueTest extends TestCase {
             try {
                 mq.enqueue(email);
                 fail();
-            } catch (QueueError e) {}
+            } catch (QueueException e) {}
         } else {
             fail("Couldn't make queue directory not writable");
         }
@@ -111,7 +111,7 @@ public class FileSystemMailQueueTest extends TestCase {
         mq.enqueue(email);
     }
 
-    public void testInaccessibleFileInQueue() throws IOException {
+    public void testInaccessibleFileInQueue() throws IOException, QueueException {
         File file = File.createTempFile("mail", ".queue");
         file.deleteOnExit();
         file = new File(file.getAbsolutePath() + ".d");
@@ -143,10 +143,10 @@ public class FileSystemMailQueueTest extends TestCase {
         try {
             mq.enqueue(email);
             fail();
-        } catch (QueueError e) {}
+        } catch (QueueException e) {}
     }
 
-    public void testLoadMailError() throws IOException {
+    public void testLoadMailError() throws IOException, QueueException {
         File file = File.createTempFile("mail", ".queue");
         file.deleteOnExit();
         file = new File(file.getAbsolutePath() + ".d");
@@ -167,7 +167,7 @@ public class FileSystemMailQueueTest extends TestCase {
             try {
                 mq.loadEmail(id);
                 fail();
-            } catch (QueueError e) {}
+            } catch (QueueException e) {}
         } else {
             fail("Could not make file unreadable");
         }
@@ -179,12 +179,12 @@ public class FileSystemMailQueueTest extends TestCase {
         }
     }
 
-    public void testMarkSent() throws IOException {
+    public void testMarkSent() throws Exception {
         testMarkSent(false);
         testMarkSent(true);
     }
 
-    private void testMarkSent(boolean keepSent) throws IOException {
+    private void testMarkSent(boolean keepSent) throws IOException, QueueException {
         File file = File.createTempFile("mail", ".queue");
         file.deleteOnExit();
         file = new File(file.getAbsolutePath() + ".d");
@@ -210,7 +210,7 @@ public class FileSystemMailQueueTest extends TestCase {
             try {
                 mq.markSent(id);
                 fail();
-            } catch (QueueError e) {}
+            } catch (QueueException e) {}
         } else {
             fail("Couldn't make sent directory not writable");
         }
@@ -230,7 +230,7 @@ public class FileSystemMailQueueTest extends TestCase {
         mq.markSent(id);
     }
 
-    public void testMarkFailed() throws IOException {
+    public void testMarkFailed() throws IOException, QueueException {
         File file = File.createTempFile("mail", ".queue");
         file.deleteOnExit();
         file = new File(file.getAbsolutePath() + ".d");
@@ -255,7 +255,7 @@ public class FileSystemMailQueueTest extends TestCase {
             try {
                 mq.markFailed(id);
                 fail();
-            } catch (QueueError e) {}
+            } catch (QueueException e) {}
         } else {
             fail("Couldn't make failed directory not writable");
         }
@@ -275,7 +275,7 @@ public class FileSystemMailQueueTest extends TestCase {
         mq.markFailed(id);
     }
 
-    public void basicTest(File file) {
+    public void basicTest(File file) throws QueueException {
         MailQueue mq = new LockingMailQueue(new FileSystemMailQueue(file));
 
         assertTrue(mq.getEnqueuedEmailIds().isEmpty());
