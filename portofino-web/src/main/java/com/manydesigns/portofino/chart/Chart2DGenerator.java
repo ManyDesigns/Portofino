@@ -31,6 +31,7 @@ package com.manydesigns.portofino.chart;
 
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.QueryUtils;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.*;
@@ -77,15 +78,15 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
         Session session = application.getSession(chartDefinition.getDatabase());
         result = QueryUtils.runSql(session, query);
         for (Object[] current : result) {
-            ComparableWrapper x = new ComparableWrapper((Comparable)current[1]);
-            ComparableWrapper y = new ComparableWrapper((Comparable)current[2]);
+            ComparableWrapper x = new ComparableWrapper((Comparable)current[0]);
+            ComparableWrapper y = new ComparableWrapper((Comparable)current[1]);
             if(current.length > 3) {
                 x.setLabel(current[3].toString());
             }
             if(current.length > 4) {
                 y.setLabel(current[4].toString());
             }
-            dataset.setValue((Number)current[0], x, y);
+            dataset.setValue((Number)current[2], x, y);
         }
 
         PlotOrientation plotOrientation = PlotOrientation.HORIZONTAL;
@@ -109,11 +110,15 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
         // ottieni il Plot
         CategoryPlot plot = (CategoryPlot) chart.getPlot();
 
-        CategoryURLGenerator urlGenerator =
-                new ChartBarUrlGenerator(chartDefinition.getUrlExpression());
         CategoryItemRenderer renderer = plot.getRenderer();
-    //        renderer.setItemURLGenerator(urlGenerator);
-        renderer.setBaseItemURLGenerator(urlGenerator);
+        String urlExpression = chartDefinition.getUrlExpression();
+        if(!StringUtils.isBlank(urlExpression)) {
+            CategoryURLGenerator urlGenerator =
+                    new ChartBarUrlGenerator(chartDefinition.getUrlExpression());
+            renderer.setBaseItemURLGenerator(urlGenerator);
+        } else {
+            renderer.setBaseItemURLGenerator(null);
+        }
         renderer.setBaseOutlinePaint(Color.BLACK);
 
         /////////////////

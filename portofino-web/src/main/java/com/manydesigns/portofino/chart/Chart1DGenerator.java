@@ -31,6 +31,7 @@ package com.manydesigns.portofino.chart;
 
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.QueryUtils;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.DrawingSupplier;
@@ -73,10 +74,10 @@ public abstract class Chart1DGenerator extends AbstractChartGenerator {
         Session session = application.getSession(chartDefinition.getDatabase());
         result = QueryUtils.runSql(session, query);
         for (Object[] current : result) {
-            ComparableWrapper value = new ComparableWrapper((Comparable)current[0]);
-            dataset.setValue(value, (Number)current[1]);
+            ComparableWrapper key = new ComparableWrapper((Comparable)current[0]);
+            dataset.setValue(key, (Number)current[1]);
             if(current.length > 2) {
-                value.setLabel(current[2].toString());
+                key.setLabel(current[2].toString());
             }
         }
 
@@ -96,9 +97,14 @@ public abstract class Chart1DGenerator extends AbstractChartGenerator {
         // ottieni il Plot
         PiePlot plot = (PiePlot) chart.getPlot();
 
-        PieURLGenerator urlGenerator =
-                new ChartPieUrlGenerator(chartDefinition.getUrlExpression());
-        plot.setURLGenerator(urlGenerator);
+        String urlExpression = chartDefinition.getUrlExpression();
+        if(!StringUtils.isBlank(urlExpression)) {
+            PieURLGenerator urlGenerator =
+                    new ChartPieUrlGenerator(urlExpression);
+            plot.setURLGenerator(urlGenerator);
+        } else {
+            plot.setURLGenerator(null);
+        }
 
 
         // il plot ha sfondo e bordo trasparente

@@ -204,7 +204,7 @@ public class ChartAction extends AbstractPageAction {
             @Override
             protected void stream(HttpServletResponse response) throws Exception {
                 super.stream(response);
-                file.delete();
+                //file.delete(); //TODO delete (temporizzato?) + dicitura chart scaduto, ricaricare
             }
         };
     }

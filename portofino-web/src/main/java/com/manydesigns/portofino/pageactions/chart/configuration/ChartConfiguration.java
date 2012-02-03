@@ -131,7 +131,6 @@ public class ChartConfiguration implements PageActionConfiguration, ChartDefinit
         assert legend != null;
         assert database != null;
         assert query != null;
-        assert urlExpression != null;
 
         try {
             actualType = Type.valueOf(type);

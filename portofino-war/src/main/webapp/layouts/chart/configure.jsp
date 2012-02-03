@@ -21,7 +21,7 @@
             <li><strong>1D Charts:</strong>
                 key, value, (optional) label</li>
             <li><strong>2D Charts:</strong>
-                value, x axis key, y axis key, (optional) x axis label, (optional) y axis label</li>
+                x axis key, y axis key, value, (optional) x axis label, (optional) y axis label</li>
         </ul>
         <%@include file="../script-configuration.jsp" %>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
