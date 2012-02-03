@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.pageactions.timesheet.model;
 
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateMidnight;
 
 import java.util.ArrayList;
@@ -46,17 +47,19 @@ public class PersonDay {
 
     final Person person;
     final DateMidnight date;
+    Integer standardWorkingMinutes;
     boolean locked;
 
     final List<Entry> entries;
 
     public PersonDay(Person person, DateMidnight date) {
-        this(person, date, false);
+        this(person, date, null, false);
     }
 
-    public PersonDay(Person person, DateMidnight date, boolean locked) {
+    public PersonDay(Person person, DateMidnight date, @Nullable Integer standardWorkingMinutes, boolean locked) {
         this.person = person;
         this.date = date;
+        this.standardWorkingMinutes = standardWorkingMinutes;
         this.locked = locked;
         entries = new ArrayList<Entry>();
     }
@@ -79,5 +82,13 @@ public class PersonDay {
 
     public void setLocked(boolean locked) {
         this.locked = locked;
+    }
+
+    public Integer getStandardWorkingMinutes() {
+        return standardWorkingMinutes;
+    }
+
+    public void setStandardWorkingMinutes(Integer standardWorkingMinutes) {
+        this.standardWorkingMinutes = standardWorkingMinutes;
     }
 }

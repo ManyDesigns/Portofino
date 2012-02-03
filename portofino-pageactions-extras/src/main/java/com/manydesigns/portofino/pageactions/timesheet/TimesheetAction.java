@@ -327,12 +327,15 @@ public class TimesheetAction extends CustomAction {
     static Person paolo = new Person("paolo", "Paolo Predonzani", null, null, true);
     static Person angelo = new Person("angelo", "Angelo Lupo", null, null, false);
 
-    static PersonDay paoloJan30 = new PersonDay(paolo, jan30, true);
-    static PersonDay paoloJan31 = new PersonDay(paolo, jan31, false);
+    static PersonDay paoloJan30 = new PersonDay(paolo, jan30, null, true);
+    static PersonDay paoloJan31 = new PersonDay(paolo, jan31, null, false);
 
     static Entry entry1 = new Entry(ac1, new Period(1, 30, 0, 0), "Intervista con Pippo");
     static Entry entry2 = new Entry(ac5, new Period(3, 0, 0, 0), null);
     static Entry entry3 = new Entry(ac1, new Period(4, 0, 0, 0), "Formalizzazione requisiti");
+    static Entry entry4 = new Entry(ac3, new Period(4, 0, 0, 0), null);
+    static Entry entry5 = new Entry(ac5, new Period(4, 0, 0, 0), null);
+    static Entry entry6 = new Entry(ac7, new Period(4, 0, 0, 0), null);
 
     static Map<DateMidnight, PersonDay> personDayDb
             = new HashMap<DateMidnight, PersonDay>();
@@ -347,6 +350,9 @@ public class TimesheetAction extends CustomAction {
         paoloJan30.getEntries().add(entry1);
         paoloJan30.getEntries().add(entry2);
         paoloJan31.getEntries().add(entry3);
+        paoloJan31.getEntries().add(entry4);
+        paoloJan31.getEntries().add(entry5);
+        paoloJan31.getEntries().add(entry6);
 
         nonWorkingDaysDb.add(jan28);
         nonWorkingDaysDb.add(jan29);
@@ -370,8 +376,16 @@ public class TimesheetAction extends CustomAction {
         weekActivities.add(ac8);
         weekActivities.add(ac9);
 
-        personDays.putAll(personDayDb);
-
+        for (Map.Entry<DateMidnight, PersonDay> current : personDayDb.entrySet()) {
+            DateMidnight dateMidnight = current.getKey();
+            PersonDay personDay = current.getValue();
+            if (nonWorkingDays.contains(dateMidnight)) {
+                personDay.setStandardWorkingMinutes(0);
+            } else {
+                personDay.setStandardWorkingMinutes(8);
+            }
+            personDays.put(dateMidnight, personDay);
+        }
     }
 
     public void loadNonWorkingDays() {
