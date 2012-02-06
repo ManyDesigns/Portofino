@@ -103,7 +103,7 @@ public class ApplicationInterceptor implements Interceptor {
                     continue;
                 }
                 logger.debug("Preparing PageAction {}", page);
-                PageAction actionBean = instantiateActionBean(page);
+                PageAction actionBean = ensureActionBean(page);
                 configureActionBean(actionBean, page, application);
                 Resolution resolution = actionBean.prepare(page, actionContext);
                 if(resolution != null) {
@@ -119,7 +119,7 @@ public class ApplicationInterceptor implements Interceptor {
         return context.proceed();
     }
 
-    protected PageAction instantiateActionBean(PageInstance page) throws IllegalAccessException, InstantiationException {
+    protected PageAction ensureActionBean(PageInstance page) throws IllegalAccessException, InstantiationException {
         PageAction action = page.getActionBean();
         if(action == null) {
             action = page.getActionClass().newInstance();

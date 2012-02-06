@@ -33,7 +33,6 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
-import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
@@ -49,7 +48,7 @@ import org.slf4j.LoggerFactory;
 @RequiresPermissions(level = AccessLevel.VIEW)
 public class CustomAction extends AbstractPageAction {
     public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+            "Copyright (c) 2005-2012, ManyDesigns srl";
 
     public static final Logger logger =
             LoggerFactory.getLogger(CustomAction.class);
