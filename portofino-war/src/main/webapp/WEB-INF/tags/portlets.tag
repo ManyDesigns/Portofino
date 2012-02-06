@@ -1,3 +1,4 @@
+<%@ tag import="org.slf4j.LoggerFactory" %>
 <%@ attribute name="list" required="true" %>
 <%@ attribute name="cssClass" required="false" %>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld" %>
@@ -9,7 +10,15 @@
     <input type="hidden" name="portletWrapperName_${list}" value="portletWrapper_${list}" />
     <c:forEach var="portletInstance" items="${ actionBean.portlets[list] }">
         <div class="portletWrapper" id="portletWrapper_<c:out value='${portletInstance.id}' />">
-            <jsp:include page="${portletInstance.jsp}" />
+            <% try {%>
+                <jsp:include page="${portletInstance.jsp}" />
+            <%} catch (Throwable t) {
+                LoggerFactory.getLogger(actionBean.getClass()).error("Error in included page", t);
+            %>
+               <fmt:message key="child.include.error">
+                   <fmt:param value="${portletInstance.jsp}" />
+               </fmt:message>
+            <%}%>
         </div>
     </c:forEach>
 </div>

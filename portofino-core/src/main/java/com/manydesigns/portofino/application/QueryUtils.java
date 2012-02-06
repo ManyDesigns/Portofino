@@ -36,7 +36,6 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.database.TableCriteria;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -88,39 +87,36 @@ public class QueryUtils {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
         final String formatString = sqlFormat.getFormatString();
         final Object[] parameters = sqlFormat.evaluateOgnlExpressions(null);
-
-        /*SQLQuery query = session.createSQLQuery(formatString);
-        for (int i = 0; i < parameters.length; i++) {
-            query.setParameter(i, parameters[i]);
-        }*/
-
-        //noinspection unchecked
-        //List<Object[]> result = query.list();
-
         final List<Object[]> result = new ArrayList<Object[]>();
 
-        session.doWork(new Work() {
-            public void execute(Connection connection) throws SQLException {
-                PreparedStatement stmt = connection.prepareStatement(formatString);
-                try {
-                    for (int i = 0; i < parameters.length; i++) {
-                        stmt.setObject(i + 1, parameters[i]);
-                    }
-                    ResultSet rs = stmt.executeQuery();
-                    ResultSetMetaData md = rs.getMetaData();
-                    int cc = md.getColumnCount();
-                    while(rs.next()) {
-                        Object[] current = new Object[cc];
-                        for(int i = 0; i < cc; i++) {
-                            current[i] = rs.getObject(i + 1);
+        try {
+            session.doWork(new Work() {
+                public void execute(Connection connection) throws SQLException {
+                    PreparedStatement stmt = connection.prepareStatement(formatString);
+                    try {
+                        for (int i = 0; i < parameters.length; i++) {
+                            stmt.setObject(i + 1, parameters[i]);
                         }
-                        result.add(current);
+                        ResultSet rs = stmt.executeQuery();
+                        ResultSetMetaData md = rs.getMetaData();
+                        int cc = md.getColumnCount();
+                        while(rs.next()) {
+                            Object[] current = new Object[cc];
+                            for(int i = 0; i < cc; i++) {
+                                current[i] = rs.getObject(i + 1);
+                            }
+                            result.add(current);
+                        }
+                    } finally {
+                        stmt.close(); //Chiude anche il result set
                     }
-                } finally {
-                    stmt.close(); //Chiude anche il result set
                 }
-            }
-        });
+            });
+        } catch (HibernateException e) {
+            session.getTransaction().rollback();
+            session.beginTransaction();
+            throw e;
+        }
 
         return result;
     }
@@ -445,8 +441,15 @@ public class QueryUtils {
         }
 
         //noinspection unchecked
-        List<Object> result = query.list();
-        return result;
+        try {
+            List<Object> result = query.list();
+            return result;
+        } catch (HibernateException e) {
+            logger.error("Error running query", e);
+            session.getTransaction().rollback();
+            session.beginTransaction();
+            throw e;
+        }
     }
 
     public static Object getObjectByPk(

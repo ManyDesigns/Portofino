@@ -48,7 +48,7 @@
                     </tr>
                     <tr>
                         <c:forEach var="perm" items="<%= supportedPermissions %>">
-                            <th><fmt:message key="permissions.${perm}" /></th>
+                            <th><fmt:message key="${perm}" /></th>
                         </c:forEach>
                     </tr>
                 <% } else { %>
@@ -169,7 +169,7 @@
                             <td>
                                 <ul style="margin: 0;">
                                     <c:forEach var="perm" items="${actionBean.testedPermissions}">
-                                        <li><fmt:message key="permissions.${perm}" /></li>
+                                        <li><fmt:message key="${perm}" /></li>
                                     </c:forEach>
                                 </ul>
                             </td>
