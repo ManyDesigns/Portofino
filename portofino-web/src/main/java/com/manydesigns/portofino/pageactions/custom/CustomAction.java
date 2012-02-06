@@ -33,10 +33,10 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,22 +53,6 @@ public class CustomAction extends AbstractPageAction {
 
     public static final Logger logger =
             LoggerFactory.getLogger(CustomAction.class);
-
-    //--------------------------------------------------------------------------
-    // Scripting
-    //--------------------------------------------------------------------------
-
-    public static final String SCRIPT_TEMPLATE;
-
-    static {
-        String scriptTemplate;
-        try {
-            scriptTemplate = IOUtils.toString(CustomAction.class.getResourceAsStream("script_template.txt"));
-        } catch (Exception e) {
-            throw new Error("Can't load script template", e);
-        }
-        SCRIPT_TEMPLATE = scriptTemplate;
-    }
 
     @DefaultHandler
     public Resolution execute() {
@@ -98,15 +82,6 @@ public class CustomAction extends AbstractPageAction {
             SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
         }
         return cancel();
-    }
-
-    @Override
-    public String getScriptTemplate() {
-        return SCRIPT_TEMPLATE;
-    }
-
-    public Class<?> getConfigurationClass() {
-        return null;
     }
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {

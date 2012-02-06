@@ -54,9 +54,12 @@ import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.PageActionLogic;
 import com.manydesigns.portofino.pageactions.chart.ChartAction;
 import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
+import com.manydesigns.portofino.pageactions.registry.PageActionInfo;
+import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import com.manydesigns.portofino.pageactions.text.TextAction;
 import com.manydesigns.portofino.pages.*;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
@@ -248,26 +251,26 @@ public class PageAdminAction extends AbstractActionBean {
             InsertPosition insertPosition =
                     InsertPosition.valueOf(newPage.getInsertPositionName());
             String pageClassName = newPage.getActionClassName();
-            PageAction action = (PageAction) ReflectionUtil.newInstance(pageClassName);
+            Class actionClass = Class.forName(pageClassName);
+            PageActionInfo info = registry.getInfo(actionClass);
             String pageId = RandomUtil.createRandomId();
 
-            String template = action.getScriptTemplate();
             String className = pageId;
             if(Character.isDigit(className.charAt(0))) {
                 className = "_" + className;
             }
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
             ognlContext.put("generatedClassName", className);
-            String script = OgnlTextFormat.format(template, this);
+            ognlContext.put("pageClassName", pageClassName);
+            String script = OgnlTextFormat.format(info.scriptTemplate, this);
 
             Page page = new Page();
             BeanUtils.copyProperties(page, newPage);
             page.setId(pageId);
 
             Object configuration = null;
-            Class<?> configurationClass = action.getConfigurationClass();
-            if(configurationClass != null) {
-                configuration = ReflectionUtil.newInstance(configurationClass);
+            if(info.configurationClass != null) {
+                configuration = ReflectionUtil.newInstance(info.configurationClass);
             }
             page.init();
 
@@ -331,6 +334,15 @@ public class PageAdminAction extends AbstractActionBean {
                     childPage.setName(directory.getName());
                     childPage.setShowInNavigation(true);
                     parentLayout.getChildPages().add(childPage);
+
+                    if(info.supportsDetail) {
+                        File detailDir = new File(directory, PageInstance.DETAIL);
+                        logger.debug("Creating _detail directory: {}", detailDir);
+                        if(!detailDir.mkdir()) {
+                            logger.warn("Couldn't create detail directory {}", detailDir);
+                        }
+                    }
+
                     DispatcherLogic.savePage(parentDirectory, parentPage);
                 } catch (Exception e) {
                     logger.error("Exception saving page configuration");
@@ -342,6 +354,7 @@ public class PageAdminAction extends AbstractActionBean {
                 SessionMessages.addErrorMessage(getMessage("page.create.failed.cantCreateDir"));
                 return new ForwardResolution("/layouts/page-crud/new-page.jsp");
             }
+            logger.info("Page " + pageId + " created. Path: " + directory.getAbsolutePath());
             SessionMessages.addInfoMessage(getMessage("page.create.successful"));
             return new RedirectResolution(configurePath + "/" + fragment).addParameter("configure");
         } else {
@@ -373,7 +386,7 @@ public class PageAdminAction extends AbstractActionBean {
                 while(it.hasNext()) {
                     if(pageName.equals(it.next().getName())) {
                         it.remove();
-                        DispatcherLogic.savePage(pageInstance.getDirectory(), pageInstance.getPage());
+                        DispatcherLogic.savePage(parentPageInstance.getDirectory(), parentPageInstance.getPage());
                         break;
                     }
                 }
@@ -534,13 +547,25 @@ public class PageAdminAction extends AbstractActionBean {
 
     }
 
+    protected static final PageActionRegistry registry = new PageActionRegistry();
+
+    static {
+        registry.register(CrudAction.class, "Crud");
+        registry.register(ChartAction.class, "Chart");
+        registry.register(TextAction.class, "Text");
+        registry.register(CustomAction.class, "Custom");
+        try {
+            registry.register(Class.forName("com.manydesigns.portofino.pageactions.calendar.CalendarAction"), "Calendar");
+        } catch (Exception e) {
+            logger.warn("Calendar class not found, page not available");
+        }
+    }
+
     private void prepareNewPageForm() {
         DefaultSelectionProvider classSelectionProvider = new DefaultSelectionProvider("actionClassName");
-        classSelectionProvider.appendRow(CrudAction.class.getName(), "Crud", true);
-        classSelectionProvider.appendRow(ChartAction.class.getName(), "Chart", true);
-        classSelectionProvider.appendRow(TextAction.class.getName(), "Text", true);
-        classSelectionProvider.appendRow(CustomAction.class.getName(), "JSP", true);
-        /*PageReference.class.getName(), "Reference to another page"*/
+        for(PageActionInfo info : registry) {
+            classSelectionProvider.appendRow(info.actionClass.getName(), info.description, true);
+        }
         //root + at least 1 child
         boolean includeSiblingOption = dispatch.getPageInstancePath().length > 2;
         int fieldCount = includeSiblingOption ? 3 : 2;
@@ -585,7 +610,7 @@ public class PageAdminAction extends AbstractActionBean {
     protected void setupChildPages() {
         File directory = getPageInstance().getDirectory();
         childPagesForm = setupChildPagesForm(childPages, directory, getPage().getLayout(), "");
-        if(getPageInstance().getActionBean().supportsParameters()) {
+        if(PageActionLogic.supportsDetail(getPageInstance().getActionClass())) {
             File detailDirectory = new File(directory, PageInstance.DETAIL);
             detailChildPagesForm =
                     setupChildPagesForm(detailChildPages, detailDirectory, getPage().getDetailLayout(), "detail");

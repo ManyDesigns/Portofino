@@ -34,6 +34,7 @@ import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.*;
+import com.manydesigns.portofino.pageactions.PageActionLogic;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
@@ -136,7 +137,7 @@ public class ApplicationInterceptor implements Interceptor {
             pageInstance.setConfiguration(configuration);
         } else {
             try {
-                Class<?> configurationClass = actionBean.getConfigurationClass();
+                Class<?> configurationClass = PageActionLogic.getConfigurationClass(actionBean.getClass());
                 configuration = DispatcherLogic.loadConfiguration
                         (pageInstance.getDirectory(), configurationClass);
 

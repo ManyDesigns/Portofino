@@ -116,9 +116,6 @@
     <changeSet author="manydesigns" id="1313767352015-12">
         <addUniqueConstraint columnNames="USERNAME" constraintName="USERS_USERNAME_KEY" disabled="false" tableName="USERS"/>
     </changeSet>
-    <changeSet author="manydesigns" id="1313767352015-13">
-        <addForeignKeyConstraint baseColumnNames="STATE" baseTableName="EMAILQUEUE" constraintName="FK_EMAILQUEUE_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="EMAILSTATE" referencesUniqueColumn="false"/>
-    </changeSet>
     <changeSet author="manydesigns" id="1313767352015-14">
         <addForeignKeyConstraint baseColumnNames="CREATORID" baseTableName="GROUPS" constraintName="FK_GROUP_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="USERID" referencedTableName="USERS" referencesUniqueColumn="false"/>
     </changeSet>
@@ -163,34 +160,6 @@
         <insert tableName="USERSTATE">
             <column name="ID" valueNumeric="4" />
             <column name="NAME" value="selfregistred" />
-            <column name="DESCRIPTION" />
-        </insert>
-    </changeSet>
-
-    <changeSet author="portofino" id="insert-emailstates">
-        <insert tableName="EMAILSTATE">
-            <column name="ID" valueNumeric="0" />
-            <column name="NAME" value="sending" />
-            <column name="DESCRIPTION" />
-        </insert>
-        <insert tableName="EMAILSTATE">
-            <column name="ID" valueNumeric="1" />
-            <column name="NAME" value="to be sent" />
-            <column name="DESCRIPTION" />
-        </insert>
-        <insert tableName="EMAILSTATE">
-            <column name="ID" valueNumeric="2" />
-            <column name="NAME" value="sent" />
-            <column name="DESCRIPTION" />
-        </insert>
-        <insert tableName="EMAILSTATE">
-            <column name="ID" valueNumeric="3" />
-            <column name="NAME" value="rejected" />
-            <column name="DESCRIPTION" />
-        </insert>
-        <insert tableName="EMAILSTATE">
-            <column name="ID" valueNumeric="4" />
-            <column name="NAME" value="bounced" />
             <column name="DESCRIPTION" />
         </insert>
     </changeSet>

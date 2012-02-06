@@ -31,11 +31,13 @@ package com.manydesigns.portofino.pageactions.text;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
-import com.manydesigns.portofino.pageactions.text.configuration.Attachment;
-import com.manydesigns.portofino.pageactions.text.configuration.TextConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
+import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
+import com.manydesigns.portofino.pageactions.text.configuration.Attachment;
+import com.manydesigns.portofino.pageactions.text.configuration.TextConfiguration;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
@@ -47,7 +49,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -60,6 +61,8 @@ import java.util.regex.Pattern;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @RequiresPermissions(level = AccessLevel.VIEW)
+@ScriptTemplate("script_template.txt")
+@ConfigurationClass(TextConfiguration.class)
 public class TextAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
@@ -93,27 +96,6 @@ public class TextAction extends AbstractPageAction {
 
     public static final Logger logger =
             LoggerFactory.getLogger(TextAction.class);
-
-    //--------------------------------------------------------------------------
-    // Scripting
-    //--------------------------------------------------------------------------
-
-    public static final String SCRIPT_TEMPLATE;
-
-    static {
-        String scriptTemplate;
-        try {
-            scriptTemplate = IOUtils.toString(TextAction.class.getResourceAsStream("script_template.txt"));
-        } catch (Exception e) {
-            throw new Error("Can't load script template", e);
-        }
-        SCRIPT_TEMPLATE = scriptTemplate;
-    }
-
-    @Override
-    public String getScriptTemplate() {
-        return SCRIPT_TEMPLATE;
-    }
 
     //**************************************************************************
     // Setup
@@ -491,10 +473,6 @@ public class TextAction extends AbstractPageAction {
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
-
-    public Class<?> getConfigurationClass() {
-        return TextConfiguration.class;
-    }
 
     public String getContent() {
         return content;

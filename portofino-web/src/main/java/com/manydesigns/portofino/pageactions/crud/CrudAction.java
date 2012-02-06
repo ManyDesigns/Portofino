@@ -49,21 +49,23 @@ import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
+import com.manydesigns.portofino.application.QueryUtils;
+import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.buttons.annotations.Buttons;
+import com.manydesigns.portofino.database.TableCriteria;
+import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
+import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
+import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.configuration.SelectionProviderReference;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
-import com.manydesigns.portofino.application.QueryUtils;
-import com.manydesigns.portofino.database.TableCriteria;
-import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.buttons.annotations.Buttons;
-import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.security.AccessLevel;
-import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.servlets.DummyHttpServletRequest;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
@@ -84,7 +86,6 @@ import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlContext;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.fop.apps.FOPException;
@@ -117,6 +118,9 @@ import java.util.regex.Pattern;
 */
 @SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
 @RequiresPermissions(level = AccessLevel.VIEW)
+@ScriptTemplate("script_template.txt")
+@ConfigurationClass(CrudConfiguration.class)
+@SupportsDetail
 public class CrudAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
@@ -170,22 +174,6 @@ public class CrudAction extends AbstractPageAction {
     public List objects;
     public Object object;
     public Session session;
-
-    //--------------------------------------------------------------------------
-    // Scripting
-    //--------------------------------------------------------------------------
-
-    public static final String SCRIPT_TEMPLATE;
-
-    static {
-        String scriptTemplate;
-        try {
-            scriptTemplate = IOUtils.toString(CrudAction.class.getResourceAsStream("script_template.txt"));
-        } catch (Exception e) {
-            throw new Error("Can't load script template", e);
-        }
-        SCRIPT_TEMPLATE = scriptTemplate;
-    }
 
     //**************************************************************************
     // Logging
@@ -797,11 +785,6 @@ public class CrudAction extends AbstractPageAction {
     }
 
     @Override
-    public boolean supportsParameters() {
-        return true;
-    }
-
-    @Override
     public void setupReturnToParentTarget() {
         if(!StringUtils.isBlank(searchString)) {
             returnToParentParams.put(SEARCH_STRING_PARAM, searchString);
@@ -1197,10 +1180,6 @@ public class CrudAction extends AbstractPageAction {
                                           StringUtils.join(parameters, "/"));
         SessionMessages.addWarningMessage(msg);
         return new ForwardResolution("/layouts/crud/notInUseCase.jsp");
-    }
-
-    public Class<?> getConfigurationClass() {
-        return CrudConfiguration.class;
     }
 
     //**************************************************************************
@@ -1747,11 +1726,6 @@ public class CrudAction extends AbstractPageAction {
     //**************************************************************************
     // Hooks/scripting
     //**************************************************************************
-
-    @Override
-    public String getScriptTemplate() {
-        return SCRIPT_TEMPLATE;
-    }
 
     protected void createSetup(Object object) {}
 

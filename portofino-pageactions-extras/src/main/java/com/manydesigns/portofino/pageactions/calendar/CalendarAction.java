@@ -37,12 +37,12 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.i18n.MultipleTextProvider;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
+import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
-import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
@@ -61,6 +61,7 @@ import java.util.Locale;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresPermissions(level = AccessLevel.VIEW)
+@ConfigurationClass(CalendarConfiguration.class)
 public class CalendarAction extends CustomAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
@@ -95,35 +96,9 @@ public class CalendarAction extends CustomAction {
     public static final Logger logger =
             LoggerFactory.getLogger(CalendarAction.class);
 
-    //--------------------------------------------------------------------------
-    // Scripting
-    //--------------------------------------------------------------------------
-
-    public static final String SCRIPT_TEMPLATE;
-
-    static {
-        String scriptTemplate;
-        try {
-            scriptTemplate = IOUtils.toString(
-                    CalendarAction.class.getResourceAsStream("script_template.txt"));
-        } catch (Exception e) {
-            throw new Error("Can't load script template", e);
-        }
-        SCRIPT_TEMPLATE = scriptTemplate;
-    }
-
-    @Override
-    public String getScriptTemplate() {
-        return SCRIPT_TEMPLATE;
-    }
-
     //**************************************************************************
     // Setup and configuration
     //**************************************************************************
-
-    public Class<?> getConfigurationClass() {
-        return CalendarConfiguration.class;
-    }
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
         this.pageInstance = pageInstance;

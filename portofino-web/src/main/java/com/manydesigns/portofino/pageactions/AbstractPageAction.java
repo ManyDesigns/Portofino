@@ -123,10 +123,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
     }*/
 
-    public boolean supportsParameters() {
-        return false;
-    }
-
     public String getDescription() {
         return pageInstance.getName();
     }
@@ -312,6 +308,10 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Page configuration
     //--------------------------------------------------------------------------
 
+    public boolean supportsDetail() {
+        return PageActionLogic.supportsDetail(getClass());
+    }
+
     protected void prepareConfigurationForms() {
         Page page = pageInstance.getPage();
 
@@ -320,7 +320,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
         FormBuilder formBuilder = new FormBuilder(EditPage.class)
                 .configPrefix(CONF_FORM_PREFIX)
-                .configFields(supportsParameters() ? PAGE_CONFIGURATION_FIELDS : PAGE_CONFIGURATION_FIELDS_NO_DETAIL)
+                .configFields(supportsDetail() ? PAGE_CONFIGURATION_FIELDS : PAGE_CONFIGURATION_FIELDS_NO_DETAIL)
                 .configFieldSetNames("Page");
 
         SelectionProvider layoutSelectionProvider = createLayoutSelectionProvider();
@@ -541,10 +541,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         } finally {
             IOUtils.closeQuietly(fr);
         }
-    }
-
-    public String getScriptTemplate() {
-        throw new UnsupportedOperationException("Unknown script template for " + getClass());
     }
 
     protected void updateScript() {

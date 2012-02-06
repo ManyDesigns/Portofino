@@ -27,13 +27,12 @@
 *
 */
 
-package com.manydesigns.portofino.pageactions.safemode;
+package com.manydesigns.portofino.pageactions.annotations;
 
-import com.manydesigns.portofino.pageactions.custom.CustomAction;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,19 +40,11 @@ import net.sourceforge.stripes.action.UrlBinding;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@UrlBinding("/actions/safemode.action")
-public class SafeModeAction extends CustomAction {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
+public @interface ScriptTemplate {
     public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+            "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    @DefaultHandler
-    public Resolution execute() {
-        String fwd = "/layouts/safemode/safemode.jsp";
-        if(isEmbedded()) {
-            return new ForwardResolution(fwd);
-        } else {
-            return forwardToPortletPage(fwd);
-        }
-    }
-
+    String value();
 }

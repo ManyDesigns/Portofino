@@ -27,13 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.pageactions.safemode;
-
-import com.manydesigns.portofino.pageactions.custom.CustomAction;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
+package com.manydesigns.portofino.pageactions.registry;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,19 +35,23 @@ import net.sourceforge.stripes.action.UrlBinding;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@UrlBinding("/actions/safemode.action")
-public class SafeModeAction extends CustomAction {
+public class PageActionInfo {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    @DefaultHandler
-    public Resolution execute() {
-        String fwd = "/layouts/safemode/safemode.jsp";
-        if(isEmbedded()) {
-            return new ForwardResolution(fwd);
-        } else {
-            return forwardToPortletPage(fwd);
-        }
-    }
+    public final Class<?> actionClass;
+    public final Class<?> configurationClass;
+    public final String scriptTemplate;
+    public final boolean supportsDetail;
+    public final String description;
 
+    public PageActionInfo
+            (Class<?> actionClass, Class<?> configurationClass, String scriptTemplate,
+             boolean supportsDetail, String description) {
+        this.actionClass = actionClass;
+        this.configurationClass = configurationClass;
+        this.scriptTemplate = scriptTemplate;
+        this.supportsDetail = supportsDetail;
+        this.description = description;
+    }
 }

@@ -38,18 +38,19 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.RandomUtil;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
-import com.manydesigns.portofino.pageactions.chart.configuration.ChartConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.chart.ChartGenerator;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.database.Database;
+import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
+import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
+import com.manydesigns.portofino.pageactions.chart.configuration.ChartConfiguration;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
-import org.apache.commons.io.IOUtils;
 import org.jfree.chart.JFreeChart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +70,8 @@ import java.util.Properties;
 */
 @UrlBinding("/actions/chart")
 @RequiresPermissions(level = AccessLevel.VIEW)
+@ScriptTemplate("script_template.txt")
+@ConfigurationClass(ChartConfiguration.class)
 public class ChartAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
@@ -109,27 +112,6 @@ public class ChartAction extends AbstractPageAction {
 
     public static final Logger logger =
             LoggerFactory.getLogger(ChartAction.class);
-
-    //--------------------------------------------------------------------------
-    // Scripting
-    //--------------------------------------------------------------------------
-
-    public static final String SCRIPT_TEMPLATE;
-
-    static {
-        String scriptTemplate;
-        try {
-            scriptTemplate = IOUtils.toString(ChartAction.class.getResourceAsStream("script_template.txt"));
-        } catch (Exception e) {
-            throw new Error("Can't load script template", e);
-        }
-        SCRIPT_TEMPLATE = scriptTemplate;
-    }
-
-    @Override
-    public String getScriptTemplate() {
-        return SCRIPT_TEMPLATE;
-    }
 
     //**************************************************************************
     // Action default execute method
@@ -350,10 +332,6 @@ public class ChartAction extends AbstractPageAction {
                 return new ForwardResolution("/layouts/chart/configure.jsp");
             }
         }
-    }
-
-    public Class<?> getConfigurationClass() {
-        return ChartConfiguration.class;
     }
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {

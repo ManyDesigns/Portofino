@@ -1,32 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
-    <changeSet author="manydesigns" id="1313767352015-1">
-        <createTable tableName="EMAILQUEUE">
-            <column name="ID" type="VARCHAR(25)">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="EMAILQUEUE_PKEY"/>
-            </column>
-            <column name="SUBJECT" type="VARCHAR(100)"/>
-            <column name="BODY" type="VARCHAR(4000)"/>
-            <column name="TO_" type="VARCHAR(100)"/>
-            <column name="FROM_" type="VARCHAR(100)"/>
-            <column name="CREATEDATE" type="DATE"/>
-            <column name="STATE" type="DECIMAL(10,0)"/>
-            <column name="ATTACHMENTPATH" type="VARCHAR(255)"/>
-            <column name="ATTACHMENTDESCRIPTION" type="VARCHAR(255)"/>
-            <column name="ATTACHMENTNAME" type="VARCHAR(255)"/>
-        </createTable>
-    </changeSet>
-    <changeSet author="manydesigns" id="1313767352015-2">
-        <createTable tableName="EMAILSTATE">
-            <column name="ID" type="DECIMAL(10,0)">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="EMAILSTATE_PKEY"/>
-            </column>
-            <column name="NAME" type="VARCHAR(75)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="DESCRIPTION" type="VARCHAR(255)"/>
-        </createTable>
-    </changeSet>
     <changeSet author="manydesigns" id="1313767352015-3">
         <createTable tableName="GROUPS">
             <column name="GROUPID" type="VARCHAR(25)">
@@ -143,9 +116,6 @@
     <changeSet author="manydesigns" id="1313767352015-12">
         <addUniqueConstraint columnNames="USERNAME" constraintName="USERS_USERNAME_KEY" disabled="false" tableName="USERS"/>
     </changeSet>
-    <changeSet author="manydesigns" id="1313767352015-13">
-        <addForeignKeyConstraint baseColumnNames="STATE" baseTableName="EMAILQUEUE" constraintName="FK_EMAILQUEUE_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="EMAILSTATE" referencesUniqueColumn="false"/>
-    </changeSet>
     <changeSet author="manydesigns" id="1313767352015-14">
         <addForeignKeyConstraint baseColumnNames="CREATORID" baseTableName="GROUPS" constraintName="FK_GROUP_1" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="USERID" referencedTableName="USERS" referencesUniqueColumn="false"/>
     </changeSet>
@@ -190,34 +160,6 @@
         <insert tableName="USERSTATE">
             <column name="ID" valueNumeric="4" />
             <column name="NAME" value="selfregistred" />
-            <column name="DESCRIPTION" />
-        </insert>
-    </changeSet>
-
-    <changeSet author="portofino" id="insert-emailstates">
-        <insert tableName="EMAILSTATE">
-            <column name="ID" valueNumeric="0" />
-            <column name="NAME" value="sending" />
-            <column name="DESCRIPTION" />
-        </insert>
-        <insert tableName="EMAILSTATE">
-            <column name="ID" valueNumeric="1" />
-            <column name="NAME" value="to be sent" />
-            <column name="DESCRIPTION" />
-        </insert>
-        <insert tableName="EMAILSTATE">
-            <column name="ID" valueNumeric="2" />
-            <column name="NAME" value="sent" />
-            <column name="DESCRIPTION" />
-        </insert>
-        <insert tableName="EMAILSTATE">
-            <column name="ID" valueNumeric="3" />
-            <column name="NAME" value="rejected" />
-            <column name="DESCRIPTION" />
-        </insert>
-        <insert tableName="EMAILSTATE">
-            <column name="ID" valueNumeric="4" />
-            <column name="NAME" value="bounced" />
             <column name="DESCRIPTION" />
         </insert>
     </changeSet>

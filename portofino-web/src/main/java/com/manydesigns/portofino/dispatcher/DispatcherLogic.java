@@ -261,7 +261,7 @@ public class DispatcherLogic {
             return false;
         }
         if(!PageAction.class.isAssignableFrom(actionClass)) {
-            logger.error("Action class must implement PortofinoAction: " + actionClass);
+            logger.error("Action " + actionClass + " must implement " + PageAction.class);
             return false;
         }
         return true;

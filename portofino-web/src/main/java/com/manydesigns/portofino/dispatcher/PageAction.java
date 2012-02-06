@@ -43,15 +43,9 @@ public interface PageAction extends ActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    Class<?> getConfigurationClass();
-
     Resolution prepare(PageInstance pageInstance, ActionBeanContext context);
 
-    String getScriptTemplate();
-
     String getDescription();
-
-    boolean supportsParameters();
 
     PageInstance getPageInstance();
     
