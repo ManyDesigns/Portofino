@@ -1,4 +1,5 @@
 <%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
+<%@ page import="org.apache.shiro.SecurityUtils" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java" pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
@@ -16,7 +17,7 @@
 
 <div id="globalLinks">
     <c:if test="${mde:getBoolean(portofinoConfiguration, 'user.enabled')}">
-        <c:if test="${not empty userId}">
+        <c:if test="<%= SecurityUtils.getSubject().isAuthenticated() %>">
             <!--<stripes:link href="/actions/profile"><c:out
                     value="${userName}"/></stripes:link> -
             <stripes:link
@@ -30,7 +31,7 @@
                 <stripes:param name="logout"/>
                 <fmt:message key="skins.default.header.log_out"/>
             </stripes:link>
-        </c:if><c:if test="${empty userId}">
+        </c:if><c:if test="<%= !SecurityUtils.getSubject().isAuthenticated() %>">
             <!-- <stripes:link href="/actions/user/help"><fmt:message key="skins.default.header.help" /></stripes:link> - -->
             <stripes:link beanclass="com.manydesigns.portofino.actions.user.LoginAction">
                 <stripes:param name="returnUrl" value="${actionBean.originalPath}"/>

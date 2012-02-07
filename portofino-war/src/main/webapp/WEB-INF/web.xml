@@ -9,6 +9,9 @@
     <display-name>ManyDesigns Portofino</display-name>
     <description>ManyDesigns Portofino</description>
 
+    <!--<listener>
+        <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+    </listener>-->
     <listener>
         <description>Application context and session listener</description>
         <listener-class>
@@ -26,6 +29,16 @@
         <filter-name>elements-filter</filter-name>
         <url-pattern>/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>ShiroFilter</filter-name>
+        <filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>ShiroFilter</filter-name>
+        <url-pattern>/*</url-pattern>
     </filter-mapping>
 
     <filter>

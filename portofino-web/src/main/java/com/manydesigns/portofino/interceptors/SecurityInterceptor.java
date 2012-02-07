@@ -30,11 +30,10 @@
 package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.servlet.ServletUtils;
-import com.manydesigns.portofino.SessionAttributes;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pages.Permissions;
 import net.sourceforge.stripes.action.*;
@@ -44,13 +43,13 @@ import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;
@@ -81,7 +80,6 @@ public class
 
         logger.debug("Retrieving Servlet API objects");
         HttpServletRequest request = actionContext.getRequest();
-        HttpSession session = request.getSession(false);
 
         logger.debug("Retrieving Portofino application");
         Application application =
@@ -90,22 +88,21 @@ public class
 
         logger.debug("Retrieving user");
         String userId = null;
-        String userName = null;
-        if (session == null) {
-            logger.debug("No session found");
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
+            userId = (String) subject.getPrincipal();
+            logger.debug("Retrieved userId={}", userId);
         } else {
-            userId = (String) session.getAttribute(SessionAttributes.USER_ID);
-            userName = (String) session.getAttribute(SessionAttributes.USER_NAME);
-            logger.debug("Retrieved userId={} userName={}", userId, userName);
+            logger.debug("No user found");
         }
 
         logger.debug("Setting up logging MDC");
         MDC.clear();
-        MDC.put(SessionAttributes.USER_ID, ObjectUtils.toString(userId));
-        MDC.put(SessionAttributes.USER_NAME, userName);
+        MDC.put("userId", userId);
+        //MDC.put(SessionAttributes.USER_NAME, userName); TODO
 
         logger.debug("Retrieving groups");
-        List<String> groups = SecurityLogic.manageGroups(application, userId);
+        List<String> groups = SecurityLogic.getUserGroups(application, userId);
         request.setAttribute(RequestAttributes.GROUPS, groups);
 
         if (!SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler)) {
@@ -122,11 +119,11 @@ public class
             boolean allowed;
             if(dispatch != null) {
                 resource = dispatch.getLastPageInstance().getPath();
-                allowed = SecurityLogic.hasPermissions(dispatch, groups, handler);
+                allowed = SecurityLogic.hasPermissions(dispatch, subject, handler);
             } else {
                 resource = request.getRequestURI();
                 permissions = new Permissions();
-                allowed = SecurityLogic.hasPermissions(permissions, groups, handler, actionBean.getClass());
+                allowed = SecurityLogic.hasPermissions(permissions, subject, handler, actionBean.getClass());
             }
             if(!allowed) {
                 logger.info("User is not allowed for {}. User's groups: {}",

@@ -36,6 +36,7 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pages.*;
 import com.manydesigns.portofino.security.AccessLevel;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,7 @@ public class Navigation {
 
     protected final Application application;
     protected final Dispatch dispatch;
-    protected final List<String> groups;
+    protected final Subject subject;
     protected final boolean skipPermissions;
     protected NavigationItem rootNavigationItem;
 
@@ -72,11 +73,11 @@ public class Navigation {
     //**************************************************************************
 
     public Navigation(
-            Application application, Dispatch dispatch, List<String> groups,
+            Application application, Dispatch dispatch, Subject subject,
             boolean skipPermissions) {
         this.application = application;
         this.dispatch = dispatch;
-        this.groups = groups;
+        this.subject = subject;
         this.skipPermissions = skipPermissions;
 
         //TODO gestire deploy sotto ROOT
@@ -151,7 +152,7 @@ public class Navigation {
                 pages.add(page);
                 if (!skipPermissions) {
                     Permissions permissions = SecurityLogic.calculateActualPermissions(pages);
-                    if(!SecurityLogic.hasPermissions(permissions, groups, AccessLevel.VIEW)) {
+                    if(!SecurityLogic.hasPermissions(permissions, subject, AccessLevel.VIEW)) {
                         pages.removeLast();
                         continue;
                     }
@@ -197,8 +198,8 @@ public class Navigation {
         return dispatch;
     }
 
-    public List<String> getGroups() {
-        return groups;
+    public Subject getSubject() {
+        return subject;
     }
 
     public boolean isSkipPermissions() {
