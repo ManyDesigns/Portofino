@@ -27,7 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino.pageactions.timesheet.model;
+package com.manydesigns.portofino.calendar;
+
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -35,41 +38,48 @@ package com.manydesigns.portofino.pageactions.timesheet.model;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class Entry {
+public class DefaultMonth extends AbstractMonth<DefaultMonth.DefaultWeek> {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    final Activity activity;
-    int minutes;
-    String note;
-
-    public Entry(Activity activity) {
-        this.activity = activity;
+    public DefaultMonth(DateTime referenceDateTime) {
+        super(referenceDateTime);
     }
 
-    public Entry(Activity activity, int minutes, String note) {
-        this.activity = activity;
-        this.minutes = minutes;
-        this.note = note;
+    public DefaultMonth(DateTime referenceDateTime, int firstDayOfWeek) {
+        super(referenceDateTime, firstDayOfWeek);
     }
 
-    public Activity getActivity() {
-        return activity;
+    @Override
+    protected DefaultWeek[] createWeeksArray(int size) {
+        return new DefaultWeek[size];
     }
 
-    public String getNote() {
-        return note;
+    @Override
+    protected DefaultWeek createWeek(DateMidnight weekStart, DateMidnight weekEnd) {
+        return new DefaultWeek(weekStart, weekEnd);
     }
 
-    public void setNote(String note) {
-        this.note = note;
+    public class DefaultWeek extends Week<DefaultMonth.Day> {
+
+        public DefaultWeek(DateMidnight weekStart, DateMidnight weekEnd) {
+            super(weekStart, weekEnd);
+        }
+
+        @Override
+        protected AbstractMonth.Day[] createDaysArray(int size) {
+            return new AbstractMonth.Day[size];
+        }
+
+        @Override
+        protected AbstractMonth.Day createDay(DateMidnight dayStart, DateMidnight dayEnd) {
+            return new AbstractMonth.Day(dayStart, dayEnd);
+        }
     }
 
-    public int getMinutes() {
-        return minutes;
-    }
-
-    public void setMinutes(int minutes) {
-        this.minutes = minutes;
+    public class DefaultDay extends Day {
+        public DefaultDay(DateMidnight dayStart, DateMidnight dayEnd) {
+            super(dayStart, dayEnd);
+        }
     }
 }
