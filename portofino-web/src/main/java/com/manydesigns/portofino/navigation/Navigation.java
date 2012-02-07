@@ -152,7 +152,7 @@ public class Navigation {
                 pages.add(page);
                 if (!skipPermissions) {
                     Permissions permissions = SecurityLogic.calculateActualPermissions(pages);
-                    if(!SecurityLogic.hasPermissions(permissions, subject, AccessLevel.VIEW)) {
+                    if(!SecurityLogic.hasPermissions(application, permissions, subject, AccessLevel.VIEW)) {
                         pages.removeLast();
                         continue;
                     }

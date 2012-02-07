@@ -29,7 +29,6 @@
 package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
@@ -37,8 +36,6 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 import com.manydesigns.portofino.dispatcher.RequestAttributes;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
-import com.manydesigns.portofino.system.model.users.User;
 import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.configuration.Configuration;
@@ -47,15 +44,11 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpSession;
-import java.sql.Timestamp;
 import java.text.MessageFormat;
-import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -154,8 +147,7 @@ public class LoginAction extends AbstractActionBean {
         } catch (AuthenticationException e) {
             String errMsg = MessageFormat.format(bundle.getString("user.login.failed"), userName);
             SessionMessages.addErrorMessage(errMsg);
-            logger.warn(errMsg);
-            updateFailedUser(userName);
+            logger.warn(errMsg, e);
             return new ForwardResolution("/layouts/user/login.jsp");
         }
 
@@ -177,47 +169,6 @@ public class LoginAction extends AbstractActionBean {
             url = returnUrl;
         }
         return new RedirectResolution(url);
-    }
-
-    private void updateFailedUser(String username) {
-        User user;
-        user = application.findUserByUserName(username);
-        if (user == null) {
-            return;
-        }
-        user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
-        int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
-        user.setFailedLoginAttempts(failedAttempts+1);
-        Session session = application.getSystemSession();
-        session.update(user);
-        session.getTransaction().commit();
-    }
-
-    private void updateUser(User user) {
-        user.setFailedLoginAttempts(0);
-        user.setLastLoginDate(new Timestamp(new Date().getTime()));
-        user.setToken(null);
-        Session session = application.getSystemSession();
-        Transaction tx = session.getTransaction();
-        try {
-            User existingUser = application.findUserByUserName(user.getUserName());
-            if(existingUser != null) {
-                logger.debug("Updating existing user {} (userId: {})",
-                        existingUser.getUserName(), existingUser.getUserId());
-                user.setUserId(existingUser.getUserId());
-                session.merge(DatabaseLogic.USER_ENTITY_NAME, user);
-            } else {
-                user.setUserId(RandomUtil.createRandomId(20));
-                logger.debug("Importing user {} (userId: {})",
-                        user.getUserName(), user.getUserId());
-                session.save(DatabaseLogic.USER_ENTITY_NAME, user);
-            }
-            session.flush();
-            tx.commit();
-        } catch (RuntimeException e) {
-            //Session will be closed by the filter
-            throw e;
-        }
     }
 
     public Resolution logout() {

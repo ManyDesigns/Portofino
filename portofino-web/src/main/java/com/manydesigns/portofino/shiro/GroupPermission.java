@@ -32,6 +32,7 @@ package com.manydesigns.portofino.shiro;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import org.apache.shiro.authz.Permission;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -46,9 +47,9 @@ public class GroupPermission implements Permission {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    protected final Set<String> groups;
+    protected final Collection<String> groups;
 
-    public GroupPermission(Set<String> groups) {
+    public GroupPermission(Collection<String> groups) {
         this.groups = groups;
     }
 

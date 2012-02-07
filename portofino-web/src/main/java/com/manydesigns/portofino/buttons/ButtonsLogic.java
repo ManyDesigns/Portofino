@@ -97,7 +97,8 @@ public class ButtonsLogic {
                     SecurityLogic.getRequiresPermissionsAnnotation(button.getMethod(), button.getFallbackClass());
         if(requiresPermissions != null) {
             Permissions permissions = SecurityLogic.calculateActualPermissions(pageInstance);
-            return SecurityLogic.hasPermissions(permissions, subject, requiresPermissions);
+            return SecurityLogic.hasPermissions
+                    (pageInstance.getApplication(), permissions, subject, requiresPermissions);
         } else {
             return true;
         }

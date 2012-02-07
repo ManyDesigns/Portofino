@@ -75,6 +75,25 @@ public class ApplicationRealm extends AuthorizingRealm {
         return ensureDelegate().getAuthorizationInfo(this, username);
     }
 
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+        Application application = getApplication();
+        Configuration portofinoConfiguration = application.getPortofinoProperties();
+
+        boolean enc = portofinoConfiguration.getBoolean(
+                PortofinoProperties.PWD_ENCRYPTED, true);
+
+        UsernamePasswordToken upToken = (UsernamePasswordToken) token;
+        String username = upToken.getUsername();
+        String password = new String(upToken.getPassword());
+
+        if (enc) {
+            password = SecurityLogic.encryptPassword(password);
+        }
+
+        return ensureDelegate().getAuthenticationInfo(this, username, password);
+    }
+
     private ApplicationRealmDelegate ensureDelegate() {
         if(delegate == null) {
             Application application = getApplication();
@@ -99,25 +118,6 @@ public class ApplicationRealm extends AuthorizingRealm {
             }
         }
         return delegate;
-    }
-
-    @Override
-    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-        Application application = getApplication();
-        Configuration portofinoConfiguration = application.getPortofinoProperties();
-
-        boolean enc = portofinoConfiguration.getBoolean(
-                PortofinoProperties.PWD_ENCRYPTED, true);
-
-        UsernamePasswordToken upToken = (UsernamePasswordToken) token;
-        String username = upToken.getUsername();
-        String password = new String(upToken.getPassword());
-
-        if (enc) {
-            password = SecurityLogic.encryptPassword(password);
-        }
-
-        return ensureDelegate().getAuthenticationInfo(this, username, password);
     }
 
     public Application getApplication() {

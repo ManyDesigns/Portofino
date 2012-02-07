@@ -123,7 +123,8 @@ public class
             } else {
                 resource = request.getRequestURI();
                 permissions = new Permissions();
-                allowed = SecurityLogic.hasPermissions(permissions, subject, handler, actionBean.getClass());
+                allowed = SecurityLogic.hasPermissions
+                        (application, permissions, subject, handler, actionBean.getClass());
             }
             if(!allowed) {
                 logger.info("User is not allowed for {}. User's groups: {}",
