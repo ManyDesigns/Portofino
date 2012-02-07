@@ -451,9 +451,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
             boolean active = true;
             if(valueAndLabel.length > 2 * fieldCount) {
-                active =
-                        valueAndLabel[2 * fieldCount] instanceof Boolean &&
-                        (Boolean) valueAndLabel[2 * fieldCount];
+                Object booleanValue = OgnlUtils.convertValue(valueAndLabel[fieldCount * 2], Boolean.class);
+                active = booleanValue instanceof Boolean && (Boolean) booleanValue;
             }
 
             selectionProvider.appendRow(values, labels, active);
