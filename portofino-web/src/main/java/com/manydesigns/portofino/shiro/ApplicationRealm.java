@@ -72,11 +72,6 @@ public class ApplicationRealm extends AuthorizingRealm {
         }
 
         String username = (String) getAvailablePrincipal(principals);
-
-        //Set<String> roleNames = new HashSet<String>(SecurityLogic.getUserGroups(application, username));
-        //SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(roleNames);
-
-        //info.setStringPermissions(permissions);
         return ensureDelegate().getAuthorizationInfo(this, username);
     }
 

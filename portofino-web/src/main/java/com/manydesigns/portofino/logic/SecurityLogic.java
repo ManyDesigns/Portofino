@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.logic;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.QueryUtils;
@@ -40,6 +39,7 @@ import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
+import com.manydesigns.portofino.shiro.PagePermission;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
@@ -140,25 +140,6 @@ public class SecurityLogic {
         }
 
         return calculateActualPermissions(pages);
-
-//        Permissions localPerms = instance.getPage().getPermissions();
-//        if(instance.getParent() == null) {
-//            return localPerms;
-//        }
-//
-//        Permissions configuration = new Permissions();
-//        configuration.getActualLevels().putAll(localPerms.getActualLevels());
-//        configuration.getActualPermissions().putAll(localPerms.getActualPermissions());
-//        Permissions parentPermissions = calculateActualPermissions(instance.getParent());
-//        Map<String, AccessLevel> parentLevels = parentPermissions.getActualLevels();
-//        for(Map.Entry<String, AccessLevel> entry : parentLevels.entrySet()) {
-//            String key = entry.getKey();
-//            AccessLevel value = entry.getValue();
-//            if(value == AccessLevel.DENY || configuration.getActualLevels().get(key) == null) {
-//                configuration.getActualLevels().put(key, value);
-//            }
-//        }
-//        return configuration;
     }
 
     public static Permissions calculateActualPermissions(List<Page> pages) {
@@ -221,22 +202,16 @@ public class SecurityLogic {
 
     public static boolean hasPermissions
             (Permissions configuration, Subject subject, AccessLevel level, String... permissions) {
+        PagePermission pagePermission = new PagePermission(configuration, level, permissions);
+        return subject.isPermitted(pagePermission);
+    }
+
+    public static boolean hasPermissions
+            (Permissions configuration, Set<String> groups, AccessLevel level, String... permissions) {
         boolean hasLevel = level == null;
         boolean hasPermissions = true;
         Map<String, Boolean> permMap = new HashMap<String, Boolean>(permissions.length);
-        Set<String> actualGroups = new HashSet<String>(configuration.getActualLevels().keySet());
-        actualGroups.addAll(configuration.getActualPermissions().keySet());
-
-        //TODO
-        HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-        Application application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
-        Configuration conf = application.getPortofinoProperties();
-        String groupAll = conf.getString(PortofinoProperties.GROUP_ALL);
-
-        for(String groupId : actualGroups) {
-            if(!groupAll.equals(groupId) && !subject.hasRole(groupId)) {
-                continue;
-            }
+        for(String groupId : groups) {
             AccessLevel actualLevel = configuration.getActualLevels().get(groupId);
             if(actualLevel == AccessLevel.DENY) {
                 return false;
@@ -262,7 +237,7 @@ public class SecurityLogic {
 
         hasPermissions = hasLevel && hasPermissions;
         if(!hasPermissions) {
-            logger.debug("User {} does not have permissions.", subject);
+            logger.debug("User does not have permissions. User's groups: {}", groups);
         }
         return hasPermissions;
     }

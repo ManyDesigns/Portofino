@@ -10,6 +10,8 @@
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.apache.shiro.SecurityUtils" %>
+<%@ page import="com.manydesigns.portofino.shiro.GroupPermission" %>
+<%@ page import="com.manydesigns.portofino.shiro.PagePermission" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -65,12 +67,7 @@
                             <%
                                 Group group = (Group) pageContext.getAttribute("group");
                                 final String groupId = group.getGroupId();
-                                Subject testSubject = new DelegatingSubject(SecurityUtils.getSecurityManager()) {
-                                    @Override
-                                    public boolean hasRole(String roleIdentifier) {
-                                        return groupId.equals(roleIdentifier);
-                                    }
-                                };
+                                GroupPermission groupPermission = new GroupPermission(Collections.singleton(groupId));
 
                                 AccessLevel localAccessLevel = actionBean.getLocalAccessLevel(currentPage, groupId);
                                 AccessLevel parentAccessLevel = null;
@@ -141,8 +138,15 @@
                                     <input type="checkbox" name="permissions[<%= groupId %>]"
                                            value="${perm}"
                                            <%
-                                               if(SecurityLogic.hasPermissions(permissions, testSubject, null,
-                                                       (String) pageContext.getAttribute("perm"))) {
+                                               String testedPermission = (String) pageContext.getAttribute("perm");
+                                               Permissions testConf = new Permissions();
+                                               testConf.getActualPermissions()
+                                                       .put(groupId, permissions.getActualPermissions().get(groupId));
+                                               testConf.getActualLevels().put(groupId, AccessLevel.EDIT);
+                                               PagePermission pagePermission =
+                                                       new PagePermission
+                                                               (testConf, AccessLevel.NONE, testedPermission);
+                                               if(groupPermission.implies(pagePermission)) {
                                                    out.print("checked='checked'");
                                                }
                                            %>/>

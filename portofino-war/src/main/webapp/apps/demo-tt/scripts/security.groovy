@@ -7,6 +7,8 @@ import org.apache.shiro.authc.AuthenticationInfo
 import org.apache.shiro.authc.SimpleAuthenticationInfo
 import org.apache.shiro.authz.AuthorizationInfo
 import org.apache.shiro.authz.SimpleAuthorizationInfo
+import com.manydesigns.portofino.shiro.GroupPermission
+import org.apache.shiro.authz.Permission
 
 class Security implements ApplicationRealmDelegate {
 
@@ -15,6 +17,8 @@ class Security implements ApplicationRealmDelegate {
         Application application = realm.getApplication();
         Set<String> roleNames = new HashSet<String>(SecurityLogic.getUserGroups(application, userName));
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(roleNames);
+        Permission permission = new GroupPermission(roleNames);
+        info.setObjectPermissions(Collections.singleton(permission));
         return info;
     }
 
