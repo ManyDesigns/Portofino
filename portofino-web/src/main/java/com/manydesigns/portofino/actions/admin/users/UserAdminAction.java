@@ -39,15 +39,15 @@ import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.dispatcher.RequestAttributes;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.system.model.users.UserConstants;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -150,7 +150,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
 
     protected void setupUserGroups() {
         Session session = application.getSystemSession();
-        Criteria criteria = session.createCriteria(DatabaseLogic.GROUP_ENTITY_NAME);
+        Criteria criteria = session.createCriteria(UserConstants.GROUP_ENTITY_NAME);
         List<Group> groups = new ArrayList(criteria.list());
         availableUserGroups = new ArrayList<Group>();
 
@@ -194,7 +194,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
 
     protected Group getGroup(String name) {
         TableAccessor table =
-                application.getTableAccessor(application.getSystemDatabaseName(), DatabaseLogic.GROUP_ENTITY_NAME);
+                application.getTableAccessor(application.getSystemDatabaseName(), UserConstants.GROUP_ENTITY_NAME);
         assert table != null;
 
         String actualEntityName = table.getTable().getActualEntityName();
@@ -246,7 +246,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
         Session session = application.getSystemSession();
         for(String groupName : names) {
             Group group = (Group) session
-                    .createCriteria(DatabaseLogic.GROUP_ENTITY_NAME)
+                    .createCriteria(UserConstants.GROUP_ENTITY_NAME)
                     .add(Restrictions.eq("name", groupName))
                     .uniqueResult();
             UsersGroups ug = new UsersGroups();
@@ -257,7 +257,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
             ug.setGroupid(group.getGroupId());
             user.getGroups().add(ug);
             session.save("users_groups", ug);
-            session.update(DatabaseLogic.USER_ENTITY_NAME, user);
+            session.update(UserConstants.USER_ENTITY_NAME, user);
         }
 
         return true;

@@ -24,7 +24,7 @@ import com.manydesigns.portofino.pages.*;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.stripes.ModelActionResolver;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
+import com.manydesigns.portofino.security.RequiresPermissions;
 import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;

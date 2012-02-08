@@ -49,15 +49,6 @@ public class DatabaseLogic {
 
     public static final Logger logger =
             LoggerFactory.getLogger(DatabaseLogic.class);
-    
-    public static final String USER_ENTITY_NAME = "users";
-    public static final String GROUP_ENTITY_NAME = "groups";
-    public static final String PASSWORD = "pwd";
-    public static final String GROUPS = "groups";
-    public static final int ACTIVE = 1;
-    public static final int SUSPENDED = 2;
-    public static final int BANNED = 3;
-    public static final int SELFREGISTERED = 4;
 
     //**************************************************************************
     // Get all objects of a certain kind

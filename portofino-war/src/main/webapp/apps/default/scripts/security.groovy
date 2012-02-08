@@ -22,6 +22,7 @@ import org.hibernate.Transaction
 import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.apache.shiro.authc.ExpiredCredentialsException
 
 class Security implements ApplicationRealmDelegate {
 
@@ -36,7 +37,7 @@ class Security implements ApplicationRealmDelegate {
             groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
         } else {
             User u = (User) QueryUtils.getObjectByPk(
-                    application, application.getSystemDatabaseName(), DatabaseLogic.USER_ENTITY_NAME,
+                    application, application.getSystemDatabaseName(), USER_ENTITY_NAME,
                     new User((String) userId));
             groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
 
@@ -57,13 +58,16 @@ class Security implements ApplicationRealmDelegate {
         Session session = application.getSystemSession();
         org.hibernate.Criteria criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq("userName", userName));
-        criteria.add(Restrictions.eq(DatabaseLogic.PASSWORD, password));
+        criteria.add(Restrictions.eq(PASSWORD, password));
 
         List<Object> result = (List<Object>) criteria.list();
 
         User user;
         if (result.size() == 1) {
             user = (User) result.get(0);
+            if(!user.getState().equals(ACTIVE)) {
+                throw new ExpiredCredentialsException("User " + user.userId + " is not active");
+            }
             SimpleAuthenticationInfo info =
                     new SimpleAuthenticationInfo(user.userId, password.toCharArray(), realm.name);
             updateUser(application, user);
@@ -115,12 +119,12 @@ class Security implements ApplicationRealmDelegate {
                 logger.debug("Updating existing user {} (userId: {})",
                         existingUser.getUserName(), existingUser.getUserId());
                 user.setUserId(existingUser.getUserId());
-                session.merge(DatabaseLogic.USER_ENTITY_NAME, user);
+                session.merge(USER_ENTITY_NAME, user);
             } else {
                 user.setUserId(RandomUtil.createRandomId(20));
                 logger.debug("Importing user {} (userId: {})",
                         user.getUserName(), user.getUserId());
-                session.save(DatabaseLogic.USER_ENTITY_NAME, user);
+                session.save(USER_ENTITY_NAME, user);
             }
             session.flush();
             tx.commit();
@@ -131,7 +135,7 @@ class Security implements ApplicationRealmDelegate {
     }
 
     private User findUserByUserName(Session session, String username) {
-        org.hibernate.Criteria criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
+        org.hibernate.Criteria criteria = session.createCriteria(USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("userName", username));
         return (User) criteria.uniqueResult();
     }

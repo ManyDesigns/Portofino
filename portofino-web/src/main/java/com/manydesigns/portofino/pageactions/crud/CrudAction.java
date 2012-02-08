@@ -66,10 +66,10 @@ import com.manydesigns.portofino.pageactions.crud.configuration.SelectionProvide
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
+import com.manydesigns.portofino.security.RequiresPermissions;
+import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.servlets.DummyHttpServletRequest;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
-import com.manydesigns.portofino.system.model.users.annotations.SupportsPermissions;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import jxl.Workbook;

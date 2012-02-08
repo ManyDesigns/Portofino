@@ -37,10 +37,10 @@ import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
+import com.manydesigns.portofino.security.RequiresAdministrator;
+import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.shiro.GroupPermission;
 import com.manydesigns.portofino.shiro.PagePermission;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.ActionBean;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.SecurityUtils;
@@ -48,13 +48,14 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.BASE64Encoder;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.security.MessageDigest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -207,53 +208,6 @@ public class SecurityLogic {
         groups.add(portofinoConfiguration.getString(PortofinoProperties.GROUP_ALL));
         groups.add(portofinoConfiguration.getString(PortofinoProperties.GROUP_ANONYMOUS));
         return new GroupPermission(groups).implies(pagePermission);
-    }
-
-    public static boolean hasPermissions
-            (Permissions configuration, Collection<String> groups, AccessLevel level, String... permissions) {
-        boolean hasLevel = level == null;
-        boolean hasPermissions = true;
-        Map<String, Boolean> permMap = new HashMap<String, Boolean>(permissions.length);
-        for(String groupId : groups) {
-            AccessLevel actualLevel = configuration.getActualLevels().get(groupId);
-            if(actualLevel == AccessLevel.DENY) {
-                return false;
-            } else if(!hasLevel &&
-                      actualLevel != null &&
-                      actualLevel.isGreaterThanOrEqual(level)) {
-                hasLevel = true;
-            }
-
-            Set<String> perms = configuration.getActualPermissions().get(groupId);
-            if(perms != null) {
-                for(String permission : permissions) {
-                    if(perms.contains(permission)) {
-                        permMap.put(permission, true);
-                    }
-                }
-            }
-        }
-
-        for(String permission : permissions) {
-            hasPermissions &= permMap.containsKey(permission);
-        }
-
-        hasPermissions = hasLevel && hasPermissions;
-        if(!hasPermissions) {
-            logger.debug("User does not have permissions. User's groups: {}", groups);
-        }
-        return hasPermissions;
-    }
-
-    public static String encryptPassword(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
-            md.update(password.getBytes("UTF-8"));
-            byte raw[] = md.digest();
-            return (new BASE64Encoder()).encode(raw);
-        } catch (Exception e) {
-            throw new Error(e);
-        }
     }
 
     public static boolean isUserInGroup(ServletRequest request, String groupId) {

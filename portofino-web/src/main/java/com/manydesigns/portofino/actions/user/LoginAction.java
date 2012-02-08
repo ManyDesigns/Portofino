@@ -42,6 +42,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.ExpiredCredentialsException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -103,7 +104,8 @@ public class LoginAction extends AbstractActionBean {
 
     @DefaultHandler
     public Resolution execute () {
-        if (SecurityUtils.getSubject().isAuthenticated()) {
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
             return new ForwardResolution("/layouts/user/alreadyLoggedIn.jsp");
         }
 
@@ -115,19 +117,6 @@ public class LoginAction extends AbstractActionBean {
 
     @Button(list = "login-buttons", key = "commons.login", order = 1)
     public Resolution login() {
-        /*boolean enc = portofinoConfiguration.getBoolean(
-                PortofinoProperties.PWD_ENCRYPTED, true);
-
-        User user;
-        prepareScript();
-        if(groovyObject != null) {
-            user = (User) groovyObject.invokeMethod("login", new Object[] { userName, pwd });
-        } else {
-            if (enc) {
-                pwd = SecurityLogic.encryptPassword(pwd);
-            }
-            user = SecurityLogic.defaultLogin(application, userName, pwd);
-        }*/
         Subject subject = SecurityUtils.getSubject();
         Locale locale = context.getLocale();
         ResourceBundle bundle = application.getBundle(locale);
@@ -137,27 +126,22 @@ public class LoginAction extends AbstractActionBean {
             String successMsg = MessageFormat.format(
                     bundle.getString("user.login.success"), userName);
             SessionMessages.addInfoMessage(successMsg);
-            HttpSession session = context.getRequest().getSession(true);
-
             if (StringUtils.isEmpty(returnUrl)) {
                 returnUrl = "/";
             }
             logger.debug("Redirecting to: {}", returnUrl);
             return new RedirectResolution(returnUrl);
+        } catch (ExpiredCredentialsException e) {
+            String errMsg = MessageFormat.format(bundle.getString("user.not.active"), userName);
+            SessionMessages.addErrorMessage(errMsg);
+            logger.warn(errMsg, e);
+            return new ForwardResolution("/layouts/user/login.jsp");
         } catch (AuthenticationException e) {
             String errMsg = MessageFormat.format(bundle.getString("user.login.failed"), userName);
             SessionMessages.addErrorMessage(errMsg);
             logger.warn(errMsg, e);
             return new ForwardResolution("/layouts/user/login.jsp");
         }
-
-        /*
-        if (!user.getState().equals(DatabaseLogic.ACTIVE)) {
-            String errMsg = MessageFormat.format(bundle.getString("user.not.active"), userName);
-            SessionMessages.addErrorMessage(errMsg);
-            logger.warn(errMsg);
-            return new ForwardResolution("/layouts/user/login.jsp");
-        }*/ //TODO
     }
 
     @Button(list = "login-buttons", key = "commons.cancel", order = 2)
@@ -191,6 +175,10 @@ public class LoginAction extends AbstractActionBean {
         return context.getRequest().getSession(false);
     }
 
+    //**************************************************************************
+    // Getters/setters
+    //**************************************************************************
+
     public String getReturnUrl() {
         return returnUrl;
     }
@@ -206,11 +194,6 @@ public class LoginAction extends AbstractActionBean {
     public void setCancelReturnUrl(String cancelReturnUrl) {
         this.cancelReturnUrl = cancelReturnUrl;
     }
-
-    //**************************************************************************
-    // Getters/setters
-    //**************************************************************************
-
 
     public Application getApplication() {
         return application;

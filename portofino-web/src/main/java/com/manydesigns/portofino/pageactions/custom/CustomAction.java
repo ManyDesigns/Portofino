@@ -34,7 +34,7 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.security.AccessLevel;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
+import com.manydesigns.portofino.security.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

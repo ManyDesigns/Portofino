@@ -42,7 +42,7 @@ import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.system.model.users.Group;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
+import com.manydesigns.portofino.security.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;

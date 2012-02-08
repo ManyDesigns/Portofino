@@ -1,8 +1,8 @@
 import com.manydesigns.portofino.pageactions.crud.CrudAction
 import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.security.AccessLevel
-import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions
-import com.manydesigns.portofino.system.model.users.annotations.SupportsPermissions
+import com.manydesigns.portofino.security.RequiresPermissions
+import com.manydesigns.portofino.security.SupportsPermissions
 import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
 

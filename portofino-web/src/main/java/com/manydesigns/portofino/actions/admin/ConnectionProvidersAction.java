@@ -49,7 +49,7 @@ import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
+import com.manydesigns.portofino.security.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
 import org.apache.commons.lang.exception.ExceptionUtils;

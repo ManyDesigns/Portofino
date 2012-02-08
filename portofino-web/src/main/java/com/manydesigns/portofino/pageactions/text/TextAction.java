@@ -39,7 +39,7 @@ import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.text.configuration.Attachment;
 import com.manydesigns.portofino.pageactions.text.configuration.TextConfiguration;
 import com.manydesigns.portofino.security.AccessLevel;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
+import com.manydesigns.portofino.security.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;

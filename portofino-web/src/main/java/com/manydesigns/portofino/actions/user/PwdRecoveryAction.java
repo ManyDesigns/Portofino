@@ -36,8 +36,8 @@ import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 import com.manydesigns.portofino.dispatcher.RequestAttributes;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.system.model.users.UserConstants;
 import org.apache.commons.configuration.Configuration;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -128,7 +128,7 @@ public class PwdRecoveryAction extends AbstractActionBean {
 
     public User findUserByEmail(String email) {
         Session session = application.getSystemSession();
-        org.hibernate.Criteria criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
+        org.hibernate.Criteria criteria = session.createCriteria(UserConstants.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("email", email));
         return (User) criteria.uniqueResult();
     }

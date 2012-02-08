@@ -27,12 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.system.model.users.annotations;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package com.manydesigns.portofino.system.model.users;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -40,9 +35,15 @@ import java.lang.annotation.Target;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@Target({ElementType.METHOD, ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface RequiresAdministrator {
+public class UserConstants {
     public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+            "Copyright (c) 2005-2012, ManyDesigns srl";
+    public static final String USER_ENTITY_NAME = "users";
+    public static final String GROUP_ENTITY_NAME = "groups";
+    public static final String PASSWORD = "pwd";
+    public static final String GROUPS = "groups";
+    public static final int ACTIVE = 1;
+    public static final int SUSPENDED = 2;
+    public static final int BANNED = 3;
+    public static final int SELFREGISTERED = 4;
 }

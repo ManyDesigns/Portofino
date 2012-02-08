@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.system.model.users.annotations;
+package com.manydesigns.portofino.security;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -40,12 +40,9 @@ import java.lang.annotation.Target;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@Target(ElementType.TYPE)
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface SupportsPermissions {
+public @interface RequiresAdministrator {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
-
-    String[] value() default {};
-
 }

@@ -39,7 +39,7 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.pages.Page;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
+import com.manydesigns.portofino.security.RequiresAdministrator;
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;

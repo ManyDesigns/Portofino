@@ -33,25 +33,23 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.misc.BASE64Encoder;
 
 import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.FileReader;
+import java.security.MessageDigest;
 import java.util.List;
 
 /**
@@ -79,18 +77,23 @@ public class ApplicationRealm extends AuthorizingRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+        UsernamePasswordToken upToken = (UsernamePasswordToken) token;
+
+        if(upToken.getUsername() == null || upToken.getPassword() == null) {
+            throw new IncorrectCredentialsException("Username or password is null");
+        }
+
+        String username = upToken.getUsername();
+        String password = new String(upToken.getPassword());
+
         Application application = getApplication();
         Configuration portofinoConfiguration = application.getPortofinoProperties();
 
         boolean enc = portofinoConfiguration.getBoolean(
                 PortofinoProperties.PWD_ENCRYPTED, true);
 
-        UsernamePasswordToken upToken = (UsernamePasswordToken) token;
-        String username = upToken.getUsername();
-        String password = new String(upToken.getPassword());
-
         if (enc) {
-            password = SecurityLogic.encryptPassword(password);
+            password = encryptPassword(password);
         }
 
         return ensureDelegate().getAuthenticationInfo(this, username, password);
@@ -143,4 +146,16 @@ public class ApplicationRealm extends AuthorizingRealm {
         }
         return application;
     }
+
+    public static String encryptPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-1");
+            md.update(password.getBytes("UTF-8"));
+            byte raw[] = md.digest();
+            return (new BASE64Encoder()).encode(raw);
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+    }
+
 }

@@ -41,7 +41,7 @@ import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.security.AccessLevel;
-import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
+import com.manydesigns.portofino.security.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

@@ -27,9 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.system.model.users.annotations;
-
-import com.manydesigns.portofino.security.AccessLevel;
+package com.manydesigns.portofino.security;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -42,12 +40,12 @@ import java.lang.annotation.Target;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RequiresPermissions {
+public @interface SupportsPermissions {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    AccessLevel level() default AccessLevel.VIEW;
-    String[] permissions() default {};
+    String[] value() default {};
+
 }

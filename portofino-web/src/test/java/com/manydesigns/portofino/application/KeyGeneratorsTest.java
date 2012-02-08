@@ -35,6 +35,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
+import com.manydesigns.portofino.system.model.users.UserConstants;
 import org.hibernate.Session;
 
 import java.math.BigDecimal;
@@ -177,7 +178,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         session.getTransaction().commit();
 
         Table table = DatabaseLogic.findTableByEntityName(
-                application.getSystemDatabase(), DatabaseLogic.GROUP_ENTITY_NAME);
+                application.getSystemDatabase(), UserConstants.GROUP_ENTITY_NAME);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         final long expectedId = 3L;

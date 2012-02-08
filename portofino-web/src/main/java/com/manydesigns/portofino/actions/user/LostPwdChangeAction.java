@@ -37,8 +37,8 @@ import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.system.model.users.User;
+import com.manydesigns.portofino.system.model.users.UserConstants;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -92,7 +92,7 @@ public class LostPwdChangeAction extends AbstractActionBean {
                 user.setPwd(pwd.pwd);
                 user.setPwdModDate(new Timestamp(new Date().getTime()));
                 Session session = application.getSystemSession();
-                session.update(DatabaseLogic.USER_ENTITY_NAME, user);
+                session.update(UserConstants.USER_ENTITY_NAME, user);
                 session.getTransaction().commit();
                 logger.debug("User {} updated", user.getEmail());
                 SessionMessages.addInfoMessage("Password updated");
@@ -104,7 +104,7 @@ public class LostPwdChangeAction extends AbstractActionBean {
 
     public User findUserByToken(String token) {
         Session session = application.getSystemSession();
-        org.hibernate.Criteria criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
+        org.hibernate.Criteria criteria = session.createCriteria(UserConstants.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("token", token));
         return (User) criteria.uniqueResult();
     }
