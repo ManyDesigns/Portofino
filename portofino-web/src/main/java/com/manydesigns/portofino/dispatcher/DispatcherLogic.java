@@ -32,11 +32,12 @@ package com.manydesigns.portofino.dispatcher;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.ElementsFileUtils;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.pageactions.safemode.SafeModeAction;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import groovy.lang.GroovyClassLoader;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
@@ -216,7 +217,7 @@ public class DispatcherLogic {
     private static final ConcurrentMap<File, Class<? extends PageAction>> actionClassCache =
             new ConcurrentHashMap<File, Class<? extends PageAction>>();
 
-    public static Class<? extends PageAction> getActionClass(File directory) {
+    public static Class<? extends PageAction> getActionClass(Application application, File directory) {
         Class<? extends PageAction> actionClass = actionClassCache.get(directory);
         if(actionClass != null) {
             return actionClass;
@@ -225,15 +226,30 @@ public class DispatcherLogic {
                 actionClass = (Class<? extends PageAction>) ScriptingUtil.getGroovyClass(directory, "action");
             } catch (Exception e) {
                 logger.error("Couldn't load action class for " + directory + ", returning safe-mode action", e);
-                return SafeModeAction.class;
+                return getFallbackActionClass(application);
             }
             if(isValidActionClass(actionClass)) {
                 actionClassCache.put(directory, actionClass);
                 return actionClass;
             } else {
                 logger.error("Invalid action class for " + directory + ": " + actionClass);
-                return SafeModeAction.class;
+                return getFallbackActionClass(application);
             }
+        }
+    }
+
+    protected static Class<? extends PageAction> getFallbackActionClass(Application application) {
+        Configuration configuration = application.getPortofinoProperties();
+        String className = configuration.getString(PortofinoProperties.FALLBACK_ACTION_CLASS);
+        try {
+            Class<?> aClass = Class.forName(className);
+            if(isValidActionClass(aClass)) {
+                return (Class<? extends PageAction>) aClass;
+            } else {
+                throw new Error("Configuration error, invalid fallback action class: " + className);
+            }
+        } catch (Throwable e) {
+            throw new Error("Configuration error, fallback action class not found: " + className, e);
         }
     }
 

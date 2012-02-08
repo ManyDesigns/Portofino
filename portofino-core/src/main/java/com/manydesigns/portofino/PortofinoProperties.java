@@ -68,6 +68,7 @@ public final class PortofinoProperties {
     public static final String APP_ID =
             "app.id";
     public static final String HOSTNAMES = "portofino.hostnames";
+    public static final String FALLBACK_ACTION_CLASS = "fallback.action.class";
 
     //Email properties
     public static final String MAIL_ENABLED = "mail.enabled";

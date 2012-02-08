@@ -124,7 +124,7 @@ public class PageInstance {
 
     public Class<? extends PageAction> getActionClass() {
         if(actionClass == null) {
-            actionClass = DispatcherLogic.getActionClass(directory);
+            actionClass = DispatcherLogic.getActionClass(application, directory);
         }
         return actionClass;
     }
