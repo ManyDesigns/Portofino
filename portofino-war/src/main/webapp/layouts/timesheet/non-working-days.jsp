@@ -76,10 +76,10 @@
                                     .toFormatter()
                                     .withLocale(Locale.ITALY);
                     MonthView monthView = actionBean.getMonthView();
-                    MonthView.Week week = monthView.getWeek(0);
+                    MonthView.MonthViewWeek week = monthView.getWeek(0);
                     for (int i = 0; i < 7; i++) {
                         xb.openElement("th");
-                        MonthView.Day day = week.getDay(i);
+                        MonthView.MonthViewDay day = week.getDay(i);
                         String htmlClass = "tndw-day-of-week";
                         DateMidnight dayStart = day.getDayStart();
                         int dayOfWeek = dayStart.getDayOfWeek();
@@ -113,7 +113,7 @@
                         week = monthView.getWeek(i);
                         xb.openElement("tr");
                         for (int j = 0; j < 7; j++) {
-                            MonthView.Day day = week.getDay(j);
+                            MonthView.MonthViewDay day = week.getDay(j);
                             DateMidnight dayStart = day.getDayStart();
                             xb.openElement("td");
                             if (monthInterval.contains(dayStart)) {

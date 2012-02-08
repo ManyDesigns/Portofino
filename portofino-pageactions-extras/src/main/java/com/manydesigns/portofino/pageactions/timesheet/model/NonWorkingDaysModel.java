@@ -29,47 +29,68 @@
 
 package com.manydesigns.portofino.pageactions.timesheet.model;
 
+import com.manydesigns.portofino.calendar.AbstractMonth;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
+
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class Entry {
+public class NonWorkingDaysModel extends AbstractMonth<NonWorkingDaysModel.NWDWeek> {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    final Activity activity;
-    int minutes;
-    String note;
-
-    public Entry(Activity activity) {
-        this.activity = activity;
+    public NonWorkingDaysModel(DateTime referenceDateTime) {
+        super(referenceDateTime);
     }
 
-    public Entry(Activity activity, int minutes, String note) {
-        this.activity = activity;
-        this.minutes = minutes;
-        this.note = note;
+    public NonWorkingDaysModel(DateTime referenceDateTime, int firstDayOfWeek) {
+        super(referenceDateTime, firstDayOfWeek);
     }
 
-    public Activity getActivity() {
-        return activity;
+    @Override
+    protected NWDWeek[] createWeeksArray(int size) {
+        return new NWDWeek[size];
     }
 
-    public String getNote() {
-        return note;
+    @Override
+    protected NWDWeek createWeek(DateMidnight weekStart, DateMidnight weekEnd) {
+        return new NWDWeek(weekStart, weekEnd);
     }
 
-    public void setNote(String note) {
-        this.note = note;
+    public class NWDWeek extends Week<NWDDay> {
+        public NWDWeek(DateMidnight weekStart, DateMidnight weekEnd) {
+            super(weekStart, weekEnd);
+        }
+
+        @Override
+        protected NWDDay[] createDaysArray(int size) {
+            return new NWDDay[size];
+        }
+
+        @Override
+        protected NWDDay createDay(DateMidnight dayStart, DateMidnight dayEnd) {
+            return new NWDDay(dayStart, dayEnd);
+        }
+
     }
 
-    public int getMinutes() {
-        return minutes;
-    }
+    public class NWDDay extends Day {
+        protected boolean nonWorking;
 
-    public void setMinutes(int minutes) {
-        this.minutes = minutes;
+        public NWDDay(DateMidnight dayStart, DateMidnight dayEnd) {
+            super(dayStart, dayEnd);
+        }
+
+        public boolean isNonWorking() {
+            return nonWorking;
+        }
+
+        public void setNonWorking(boolean nonWorking) {
+            this.nonWorking = nonWorking;
+        }
     }
 }
