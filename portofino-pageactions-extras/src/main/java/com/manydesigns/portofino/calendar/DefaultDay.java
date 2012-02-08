@@ -30,34 +30,15 @@
 package com.manydesigns.portofino.calendar;
 
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
 
 /**
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
- * @author Angelo Lupo          - angelo.lupo@manydesigns.com
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Alessio Stalla       - alessio.stalla@manydesigns.com
- */
-public class DefaultMonth extends AbstractMonth<DefaultWeek> {
-    public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
-
-    public DefaultMonth(DateTime referenceDateTime) {
-        super(referenceDateTime);
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+*/
+public class DefaultDay extends AbstractDay {
+    public DefaultDay(DateMidnight dayStart, DateMidnight dayEnd) {
+        super(dayStart, dayEnd);
     }
-
-    public DefaultMonth(DateTime referenceDateTime, int firstDayOfWeek) {
-        super(referenceDateTime, firstDayOfWeek);
-    }
-
-    @Override
-    protected DefaultWeek[] createWeeksArray(int size) {
-        return new DefaultWeek[size];
-    }
-
-    @Override
-    protected DefaultWeek createWeek(DateMidnight weekStart, DateMidnight weekEnd) {
-        return new DefaultWeek(weekStart, weekEnd);
-    }
-
 }

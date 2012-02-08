@@ -30,34 +30,36 @@
 package com.manydesigns.portofino.calendar;
 
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
+import org.joda.time.Interval;
 
 /**
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
- * @author Angelo Lupo          - angelo.lupo@manydesigns.com
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Alessio Stalla       - alessio.stalla@manydesigns.com
- */
-public class DefaultMonth extends AbstractMonth<DefaultWeek> {
-    public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+*/
+public class AbstractDay {
+    final DateMidnight dayStart;
+    final DateMidnight dayEnd;
+    final Interval dayInterval;
 
-    public DefaultMonth(DateTime referenceDateTime) {
-        super(referenceDateTime);
+    public AbstractDay(DateMidnight dayStart, DateMidnight dayEnd) {
+        this.dayStart = dayStart;
+        this.dayEnd = dayEnd;
+        dayInterval = new Interval(dayStart, dayEnd);
+        AbstractMonth.logger.debug("Day interval: {}", dayInterval);
     }
 
-    public DefaultMonth(DateTime referenceDateTime, int firstDayOfWeek) {
-        super(referenceDateTime, firstDayOfWeek);
+    public DateMidnight getDayStart() {
+        return dayStart;
     }
 
-    @Override
-    protected DefaultWeek[] createWeeksArray(int size) {
-        return new DefaultWeek[size];
+    public DateMidnight getDayEnd() {
+        return dayEnd;
     }
 
-    @Override
-    protected DefaultWeek createWeek(DateMidnight weekStart, DateMidnight weekEnd) {
-        return new DefaultWeek(weekStart, weekEnd);
+    public Interval getDayInterval() {
+        return dayInterval;
     }
 
 }

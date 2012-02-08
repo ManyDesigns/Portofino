@@ -30,6 +30,8 @@
 package com.manydesigns.portofino.pageactions.calendar;
 
 import com.manydesigns.portofino.calendar.AbstractMonth;
+import com.manydesigns.portofino.calendar.AbstractDay;
+import com.manydesigns.portofino.calendar.AbstractWeek;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -129,7 +131,7 @@ public class MonthView extends AbstractMonth<MonthView.MonthViewWeek> {
     // Accessory classes
     //--------------------------------------------------------------------------
 
-    public class MonthViewWeek extends AbstractMonth<MonthView.MonthViewWeek>.Week<MonthView.MonthViewDay> {
+    public class MonthViewWeek extends AbstractWeek<MonthViewDay> {
         final List<EventWeek> eventWeekOverlaps;
 
         public MonthViewWeek(DateMidnight weekStart, DateMidnight weekEnd) {
@@ -260,7 +262,7 @@ public class MonthView extends AbstractMonth<MonthView.MonthViewWeek> {
         }
     }
 
-    public class MonthViewDay extends AbstractMonth.Day {
+    public class MonthViewDay extends AbstractDay {
         final List<EventWeek> slots;
 
         public MonthViewDay(DateMidnight dayStart, DateMidnight dayEnd) {
@@ -298,8 +300,5 @@ public class MonthView extends AbstractMonth<MonthView.MonthViewWeek> {
             return slots;
         }
 
-        public MonthView getMonthView() {
-            return MonthView.this;
-        }
     }
 }

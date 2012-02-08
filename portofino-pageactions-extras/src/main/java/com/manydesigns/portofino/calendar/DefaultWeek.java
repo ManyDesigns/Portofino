@@ -30,34 +30,26 @@
 package com.manydesigns.portofino.calendar;
 
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
 
 /**
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
- * @author Angelo Lupo          - angelo.lupo@manydesigns.com
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Alessio Stalla       - alessio.stalla@manydesigns.com
- */
-public class DefaultMonth extends AbstractMonth<DefaultWeek> {
-    public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+*/
+public class DefaultWeek extends AbstractWeek<DefaultDay> {
 
-    public DefaultMonth(DateTime referenceDateTime) {
-        super(referenceDateTime);
-    }
-
-    public DefaultMonth(DateTime referenceDateTime, int firstDayOfWeek) {
-        super(referenceDateTime, firstDayOfWeek);
+    public DefaultWeek(DateMidnight weekStart, DateMidnight weekEnd) {
+        super(weekStart, weekEnd);
     }
 
     @Override
-    protected DefaultWeek[] createWeeksArray(int size) {
-        return new DefaultWeek[size];
+    protected DefaultDay[] createDaysArray(int size) {
+        return new DefaultDay[size];
     }
 
     @Override
-    protected DefaultWeek createWeek(DateMidnight weekStart, DateMidnight weekEnd) {
-        return new DefaultWeek(weekStart, weekEnd);
+    protected DefaultDay createDay(DateMidnight dayStart, DateMidnight dayEnd) {
+        return new DefaultDay(dayStart, dayEnd);
     }
-
 }

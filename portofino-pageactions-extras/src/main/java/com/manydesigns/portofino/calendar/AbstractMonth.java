@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public abstract class AbstractMonth<T extends AbstractMonth.Week> {
+public abstract class AbstractMonth<T extends AbstractWeek> {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -82,7 +82,7 @@ public abstract class AbstractMonth<T extends AbstractMonth.Week> {
     }
 
     public AbstractMonth(DateTime referenceDateTime, int firstDayOfWeek) {
-        logger.debug("Initializing MonthView");
+        logger.debug("Initializing month");
         this.referenceDateTime = referenceDateTime;
         logger.debug("Reference date time: {}", referenceDateTime);
         this.firstDayOfWeek = firstDayOfWeek;
@@ -163,83 +163,4 @@ public abstract class AbstractMonth<T extends AbstractMonth.Week> {
         return firstDayOfWeek;
     }
 
-    //--------------------------------------------------------------------------
-    // Accessory classes
-    //--------------------------------------------------------------------------
-
-    public abstract class Week<U extends AbstractMonth.Day> {
-        final DateMidnight weekStart;
-        protected final DateMidnight weekEnd;
-        protected final Interval weekInterval;
-        protected final U[] days;
-
-        public Week(DateMidnight weekStart, DateMidnight weekEnd) {
-            this.weekStart = weekStart;
-            this.weekEnd = weekEnd;
-            weekInterval = new Interval(weekStart, weekEnd);
-            logger.debug("Week interval: {}", weekInterval);
-
-            logger.debug("Initializing days");
-            days = createDaysArray(7);
-            DateMidnight dayStart = weekStart;
-            for (int i = 0; i < 7; i++) {
-                DateMidnight dayEnd = dayStart.plusDays(1);
-                days[i] = createDay(dayStart, dayEnd);
-
-                dayStart = dayEnd;
-            }
-        }
-
-        protected abstract U[] createDaysArray(int size);
-
-        protected abstract U createDay(DateMidnight dayStart, DateMidnight dayEnd);
-
-        public DateMidnight getWeekStart() {
-            return weekStart;
-        }
-
-        public DateMidnight getWeekEnd() {
-            return weekEnd;
-        }
-
-        public Interval getWeekInterval() {
-            return weekInterval;
-        }
-
-        public U getDay(int index) {
-            return days[index];
-        }
-    }
-
-    public class Day {
-        final DateMidnight dayStart;
-        final DateMidnight dayEnd;
-        final Interval dayInterval;
-        final boolean inReferenceMonth;
-
-        public Day(DateMidnight dayStart, DateMidnight dayEnd) {
-            this.dayStart = dayStart;
-            this.dayEnd = dayEnd;
-            dayInterval = new Interval(dayStart, dayEnd);
-            inReferenceMonth = monthInterval.contains(dayStart);
-            logger.debug("Day interval: {}", dayInterval);
-        }
-
-        public DateMidnight getDayStart() {
-            return dayStart;
-        }
-
-        public DateMidnight getDayEnd() {
-            return dayEnd;
-        }
-
-        public Interval getDayInterval() {
-            return dayInterval;
-        }
-
-        public boolean isInReferenceMonth() {
-            return inReferenceMonth;
-        }
-
-    }
 }
