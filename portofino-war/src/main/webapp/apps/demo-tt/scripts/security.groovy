@@ -1,14 +1,11 @@
-import com.manydesigns.elements.util.RandomUtil
 import com.manydesigns.portofino.PortofinoProperties
 import com.manydesigns.portofino.application.Application
 import com.manydesigns.portofino.application.QueryUtils
-import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.shiro.ApplicationRealm
 import com.manydesigns.portofino.shiro.ApplicationRealmDelegate
 import com.manydesigns.portofino.shiro.GroupPermission
 import com.manydesigns.portofino.system.model.users.User
-import com.manydesigns.portofino.system.model.users.UsersGroups
-import java.sql.Timestamp
+import java.security.MessageDigest
 import org.apache.commons.configuration.Configuration
 import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.AuthenticationInfo
@@ -17,32 +14,29 @@ import org.apache.shiro.authz.AuthorizationInfo
 import org.apache.shiro.authz.Permission
 import org.apache.shiro.authz.SimpleAuthorizationInfo
 import org.hibernate.Session
-import org.hibernate.Transaction
 import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.apache.commons.lang.StringUtils
 
 class Security implements ApplicationRealmDelegate {
 
     private static final Logger logger = LoggerFactory.getLogger(Security.class);
 
-    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, String userName) {
+    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, Object userId) {
         Application application = realm.getApplication();
         Set<String> groups = new HashSet<String>();
         Configuration conf = application.getPortofinoProperties();
         groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
-        if (userName == null) {
+        if (userId == null) {
             groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
         } else {
-            User u = (User) QueryUtils.getObjectByPk(
-                    application, application.getSystemDatabaseName(), DatabaseLogic.USER_ENTITY_NAME,
-                    new User(userName));
             groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
-
-            for (UsersGroups ug : u.getGroups()) {
-                if (ug.getDeletionDate() == null) {
-                    groups.add(ug.getGroup().getGroupId());
-                }
+            //TODO
+            Session session = application.getSession("redmine");
+            def user = session.get("users", userId);
+            if("admin".equals(user.login)) {
+                groups.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS));
             }
         }
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(groups);
@@ -52,72 +46,40 @@ class Security implements ApplicationRealmDelegate {
     }
 
     AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, String userName, String password) {
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        md.update(password.getBytes("UTF-8"));
+        byte[] raw = md.digest();
+        StringBuilder sb = new StringBuilder();
+        for (byte b : raw) {
+            sb.append(String.format("%02X", b));
+        }
+        String hashedPassword = sb.toString().toLowerCase();
+        logger.error("HASHED PWD: " + hashedPassword)
+
         Application application = realm.application;
-        Session session = application.getSystemSession();
+        Session session = application.getSession("redmine");
         org.hibernate.Criteria criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("userName", userName));
-        criteria.add(Restrictions.eq(DatabaseLogic.PASSWORD, password));
+        criteria.add(Restrictions.eq("login", userName));
+        criteria.add(Restrictions.eq("hashed_password", hashedPassword));
 
         List<Object> result = (List<Object>) criteria.list();
 
-        User user;
+        def user;
         if (result.size() == 1) {
-            user = (User) result.get(0);
+            user = result.get(0);
             SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(user.userId, password.toCharArray(), realm.name);
-            updateUser(application, user);
+                    new SimpleAuthenticationInfo(user.id, password.toCharArray(), realm.name);
             return info;
         } else {
-            updateFailedUser(application, userName);
             throw new AuthenticationException("Login failed");
         }
     }
 
-    //From LoginAction
-    private void updateFailedUser(Application application, String username) {
-        User user;
-        user = findUserByUserName(username);
-        if (user == null) {
-            return;
-        }
-        user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
-        int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
-        user.setFailedLoginAttempts(failedAttempts+1);
-        Session session = application.getSystemSession();
-        session.update(user);
-        session.getTransaction().commit();
-    }
 
-    private void updateUser(Application application, User user) {
-        user.setFailedLoginAttempts(0);
-        user.setLastLoginDate(new Timestamp(new Date().getTime()));
-        user.setToken(null);
-        Session session = application.getSystemSession();
-        Transaction tx = session.getTransaction();
-        try {
-            User existingUser = findUserByUserName(session, user.getUserName());
-            if(existingUser != null) {
-                logger.debug("Updating existing user {} (userId: {})",
-                        existingUser.getUserName(), existingUser.getUserId());
-                user.setUserId(existingUser.getUserId());
-                session.merge(DatabaseLogic.USER_ENTITY_NAME, user);
-            } else {
-                user.setUserId(RandomUtil.createRandomId(20));
-                logger.debug("Importing user {} (userId: {})",
-                        user.getUserName(), user.getUserId());
-                session.save(DatabaseLogic.USER_ENTITY_NAME, user);
-            }
-            session.flush();
-            tx.commit();
-        } catch (RuntimeException e) {
-            //Session will be closed by the filter
-            throw e;
-        }
-    }
 
     private User findUserByUserName(Session session, String username) {
-        org.hibernate.Criteria criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
-        criteria.add(Restrictions.eq("userName", username));
+        org.hibernate.Criteria criteria = session.createCriteria("users");
+        criteria.add(Restrictions.eq("login", username));
         return (User) criteria.uniqueResult();
     }
 

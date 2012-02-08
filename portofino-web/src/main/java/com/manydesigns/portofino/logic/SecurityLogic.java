@@ -264,7 +264,7 @@ public class SecurityLogic {
     public static boolean isAdministrator(ServletRequest request) {
         Application appl = (Application) request.getAttribute(RequestAttributes.APPLICATION);
         Configuration portofinoConfiguration = appl.getPortofinoProperties();
-        String administratorsGroup = portofinoConfiguration.getString(PortofinoProperties.GROUP_REGISTERED);
+        String administratorsGroup = portofinoConfiguration.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
         return isUserInGroup(request, administratorsGroup);
     }
 

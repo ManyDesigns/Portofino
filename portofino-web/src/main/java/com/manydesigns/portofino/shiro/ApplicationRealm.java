@@ -60,8 +60,6 @@ public class ApplicationRealm extends AuthorizingRealm {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    protected ApplicationRealmDelegate delegate;
-
     private static final Logger logger = LoggerFactory.getLogger(ApplicationRealm.class);
 
     @Override
@@ -71,8 +69,8 @@ public class ApplicationRealm extends AuthorizingRealm {
             throw new AuthorizationException("PrincipalCollection method argument cannot be null.");
         }
 
-        String username = (String) getAvailablePrincipal(principals);
-        return ensureDelegate().getAuthorizationInfo(this, username);
+        Object userId = getAvailablePrincipal(principals);
+        return ensureDelegate().getAuthorizationInfo(this, userId);
     }
 
     @Override
@@ -95,6 +93,7 @@ public class ApplicationRealm extends AuthorizingRealm {
     }
 
     private ApplicationRealmDelegate ensureDelegate() {
+        ApplicationRealmDelegate delegate = null; //TODO gestire reload
         if(delegate == null) {
             Application application = getApplication();
             File file = new File(application.getAppScriptsDir(), "security.groovy");

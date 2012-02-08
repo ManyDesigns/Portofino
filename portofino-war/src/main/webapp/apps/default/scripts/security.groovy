@@ -26,17 +26,17 @@ class Security implements ApplicationRealmDelegate {
 
     private static final Logger logger = LoggerFactory.getLogger(Security.class);
 
-    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, String userName) {
+    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, Object userId) {
         Application application = realm.getApplication();
         Set<String> groups = new HashSet<String>();
         Configuration conf = application.getPortofinoProperties();
         groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
-        if (userName == null) {
+        if (userId == null) {
             groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
         } else {
             User u = (User) QueryUtils.getObjectByPk(
                     application, application.getSystemDatabaseName(), DatabaseLogic.USER_ENTITY_NAME,
-                    new User(userName));
+                    new User((String) userId));
             groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
 
             for (UsersGroups ug : u.getGroups()) {

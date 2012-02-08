@@ -88,7 +88,7 @@ public class
         String userId = null;
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
-            userId = (String) subject.getPrincipal();
+            userId = subject.getPrincipal().toString();
             logger.debug("Retrieved userId={}", userId);
         } else {
             logger.debug("No user found");

@@ -42,7 +42,7 @@ public interface ApplicationRealmDelegate {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, String userName);
+    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, Object userId);
 
     AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, String userName, String password);
 
