@@ -31,7 +31,9 @@ package com.manydesigns.portofino.actions.admin.users;
 
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.util.RandomUtil;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.AdminAction;
+import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
@@ -41,6 +43,7 @@ import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pages.Page;
+import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
@@ -151,8 +154,8 @@ public class UserAdminAction extends CrudAction implements AdminAction {
         List<Group> groups = new ArrayList(criteria.list());
         availableUserGroups = new ArrayList<Group>();
 
-        Group anonymous = application.getAnonymousGroup();
-        Group registered = application.getRegisteredGroup();
+        Group anonymous = getAnonymousGroup();
+        Group registered = getRegisteredGroup();
 
         userGroups = new ArrayList<Group>();
         User user = (User) object;
@@ -166,6 +169,46 @@ public class UserAdminAction extends CrudAction implements AdminAction {
             if (!userGroups.contains(group) && !anonymous.equals(group) && !registered.equals(group)) {
                 availableUserGroups.add(group);
             }
+        }
+    }
+
+    public Group getAllGroup() {
+        String name = portofinoConfiguration.getString(PortofinoProperties.GROUP_ALL);
+        return getGroup(name);
+    }
+
+    public Group getAnonymousGroup() {
+        String name = portofinoConfiguration.getString(PortofinoProperties.GROUP_ANONYMOUS);
+        return getGroup(name);
+    }
+
+    public Group getRegisteredGroup() {
+        String name = portofinoConfiguration.getString(PortofinoProperties.GROUP_REGISTERED);
+        return getGroup(name);
+    }
+
+    public Group getAdministratorsGroup() {
+        String name = portofinoConfiguration.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
+        return getGroup(name);
+    }
+
+    protected Group getGroup(String name) {
+        TableAccessor table =
+                application.getTableAccessor(application.getSystemDatabaseName(), DatabaseLogic.GROUP_ENTITY_NAME);
+        assert table != null;
+
+        String actualEntityName = table.getTable().getActualEntityName();
+        Session session = application.getSystemSession();
+        List result = QueryUtils.runHqlQuery
+                (session,
+                        "FROM " + actualEntityName + " WHERE name = ?",
+                        new Object[]{name});
+        if(result.isEmpty()) {
+            throw new IllegalStateException("Group " + name + " not found");
+        } else if(result.size() == 1) {
+            return (Group) result.get(0);
+        } else {
+            throw new IllegalStateException("Multiple groups named " + name + " found");
         }
     }
 

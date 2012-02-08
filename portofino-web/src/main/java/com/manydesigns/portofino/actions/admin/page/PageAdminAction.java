@@ -66,6 +66,7 @@ import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
+import com.manydesigns.portofino.system.model.users.annotations.SupportsPermissions;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.util.HttpUtil;
@@ -75,6 +76,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -815,23 +819,49 @@ public class PageAdminAction extends AbstractActionBean {
     @RequiresAdministrator
     public Resolution testUserPermissions() {
         testUserId = StringUtils.defaultIfEmpty(testUserId, null);
-        List<String> groups = SecurityLogic.getUserGroups(application, testUserId);
+        PrincipalCollection principalCollection;
+        if(!StringUtils.isEmpty(testUserId)) {
+            principalCollection = new SimplePrincipalCollection(testUserId, "realm"); //TODO
+        } else {
+            principalCollection = null;
+        }
         Permissions permissions = SecurityLogic.calculateActualPermissions(getPageInstance());
         testedAccessLevel = AccessLevel.NONE;
         testedPermissions = new HashSet<String>();
-        for(String group : groups) {
-            AccessLevel accessLevel = permissions.getActualLevels().get(group);
-            if(accessLevel != null &&
-               accessLevel.isGreaterThanOrEqual(testedAccessLevel)) {
-                testedAccessLevel = accessLevel;
+
+        SecurityManager securityManager = SecurityUtils.getSecurityManager();
+
+        for(AccessLevel level : AccessLevel.values()) {
+            if(level.isGreaterThanOrEqual(testedAccessLevel) &&
+                SecurityLogic.hasPermissions(application, permissions, securityManager, principalCollection, level)) {
+                testedAccessLevel = level;
             }
-            Set<String> perms = permissions.getActualPermissions().get(group);
-            if(perms != null) {
-                testedPermissions.addAll(perms);
+        }
+        String[] supportedPermissions = getSupportedPermissions();
+        if(supportedPermissions != null) {
+            for(String permission : supportedPermissions) {
+                boolean permitted =
+                        SecurityLogic.hasPermissions
+                                (application, permissions, securityManager,
+                                 principalCollection, testedAccessLevel, permission);
+                if(permitted) {
+                    testedPermissions.add(permission);
+                }
             }
         }
 
         return pagePermissions();
+    }
+
+    public String[] getSupportedPermissions() {
+        Class<?> actualActionClass = getPageInstance().getActionClass();
+        SupportsPermissions supportsPermissions =
+                actualActionClass.getAnnotation(SupportsPermissions.class);
+        if(supportsPermissions != null && supportsPermissions.value().length > 0) {
+            return supportsPermissions.value();
+        } else {
+            return null;
+        }
     }
 
     protected Resolution forwardToPagePermissions() {

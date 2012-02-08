@@ -40,7 +40,6 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
-import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
@@ -494,47 +493,6 @@ public class DefaultApplication implements Application {
     // User
     //**************************************************************************
 
-    public User findUserByEmail(String email) {
-        Session session = getSystemSession();
-        org.hibernate.Criteria criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
-        criteria.add(Restrictions.eq("email", email));
-        return (User) criteria.uniqueResult();
-    }
-
-    public User findUserByUserName(String username) {
-        Session session = getSystemSession();
-        org.hibernate.Criteria criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
-        criteria.add(Restrictions.eq("userName", username));
-        return (User) criteria.uniqueResult();
-    }
-
-    public User findUserByToken(String token) {
-        Session session = getSystemSession();
-        org.hibernate.Criteria criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
-        criteria.add(Restrictions.eq("token", token));
-        return (User) criteria.uniqueResult();
-    }
-
-    public Group getAllGroup() {
-        String name = portofinoConfiguration.getString(PortofinoProperties.GROUP_ALL);
-        return getGroup(name);
-    }
-
-    public Group getAnonymousGroup() {
-        String name = portofinoConfiguration.getString(PortofinoProperties.GROUP_ANONYMOUS);
-        return getGroup(name);
-    }
-
-    public Group getRegisteredGroup() {
-        String name = portofinoConfiguration.getString(PortofinoProperties.GROUP_REGISTERED);
-        return getGroup(name);
-    }
-
-    public Group getAdministratorsGroup() {
-        String name = portofinoConfiguration.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
-        return getGroup(name);
-    }
-
     public void shutdown() {
         for(HibernateDatabaseSetup setup : setups.values()) {
             //TODO It is the responsibility of the application to ensure that there are no open Sessions before calling close().
@@ -545,25 +503,6 @@ public class DefaultApplication implements Application {
             ConnectionProvider connectionProvider =
                     database.getConnectionProvider();
             connectionProvider.shutdown();
-        }
-    }
-
-    protected Group getGroup(String name) {
-        TableAccessor table = getTableAccessor(getSystemDatabaseName(), DatabaseLogic.GROUP_ENTITY_NAME);
-        assert table != null;
-
-        String actualEntityName = table.getTable().getActualEntityName();
-        Session session = getSystemSession();
-        List result = QueryUtils.runHqlQuery
-                (session,
-                        "FROM " + actualEntityName + " WHERE name = ?",
-                        new Object[]{name});
-        if(result.isEmpty()) {
-            throw new IllegalStateException("Group " + name + " not found");
-        } else if(result.size() == 1) {
-            return (Group) result.get(0);
-        } else {
-            throw new IllegalStateException("Multiple groups named " + name + " found");
         }
     }
 

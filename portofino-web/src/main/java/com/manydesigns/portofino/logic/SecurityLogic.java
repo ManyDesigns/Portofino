@@ -31,24 +31,20 @@ package com.manydesigns.portofino.logic;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.dispatcher.RequestAttributes;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.shiro.GroupPermission;
 import com.manydesigns.portofino.shiro.PagePermission;
-import com.manydesigns.portofino.system.model.users.Group;
-import com.manydesigns.portofino.system.model.users.User;
-import com.manydesigns.portofino.system.model.users.UsersGroups;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.ActionBean;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,27 +67,6 @@ public class SecurityLogic {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(SecurityLogic.class);
-
-    public static List<String> getUserGroups(Application application, String userId) {
-        List<String> groups = new ArrayList<String>();
-        Configuration conf = application.getPortofinoProperties();
-        groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
-        if (userId == null) {
-            groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
-        } else {
-            User u = (User) QueryUtils.getObjectByPk
-                    (application, application.getSystemDatabaseName(), DatabaseLogic.USER_ENTITY_NAME,
-                     new User(userId));
-            groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
-
-            for (UsersGroups ug : u.getGroups()) {
-                if (ug.getDeletionDate() == null) {
-                    groups.add(ug.getGroup().getGroupId());
-                }
-            }
-        }
-        return groups;
-    }
 
     public static boolean hasPermissions
             (ServletRequest request, AccessLevel level, String... permissions) {
@@ -203,17 +178,35 @@ public class SecurityLogic {
 
     public static boolean hasPermissions
             (Application application, Permissions configuration, Subject subject, AccessLevel level, String... permissions) {
-        PagePermission pagePermission = new PagePermission(configuration, level, permissions);
         if(subject.isAuthenticated()) {
+            PagePermission pagePermission = new PagePermission(configuration, level, permissions);
             return subject.isPermitted(pagePermission);
         } else {
             //Shiro does not check permissions for non authenticated users
-            Configuration portofinoConfiguration = application.getPortofinoProperties();
-            List<String> groups = new ArrayList<String>();
-            groups.add(portofinoConfiguration.getString(PortofinoProperties.GROUP_ALL));
-            groups.add(portofinoConfiguration.getString(PortofinoProperties.GROUP_ANONYMOUS));
-            return new GroupPermission(groups).implies(pagePermission);
+            return hasAnonymousPermissions(application, configuration, level, permissions);
         }
+    }
+
+    public static boolean hasPermissions
+            (Application application, Permissions configuration, org.apache.shiro.mgt.SecurityManager securityManager,
+             PrincipalCollection principals, AccessLevel level, String... permissions) {
+        if(principals != null) {
+            PagePermission pagePermission = new PagePermission(configuration, level, permissions);
+            return securityManager.isPermitted(principals, pagePermission);
+        } else {
+            //Shiro does not check permissions for non authenticated users
+            return hasAnonymousPermissions(application, configuration, level, permissions);
+        }
+    }
+
+    public static boolean hasAnonymousPermissions
+            (Application application, Permissions configuration, AccessLevel level, String... permissions) {
+        PagePermission pagePermission = new PagePermission(configuration, level, permissions);
+        Configuration portofinoConfiguration = application.getPortofinoProperties();
+        List<String> groups = new ArrayList<String>();
+        groups.add(portofinoConfiguration.getString(PortofinoProperties.GROUP_ALL));
+        groups.add(portofinoConfiguration.getString(PortofinoProperties.GROUP_ANONYMOUS));
+        return new GroupPermission(groups).implies(pagePermission);
     }
 
     public static boolean hasPermissions
@@ -263,32 +256,16 @@ public class SecurityLogic {
         }
     }
 
-    public static boolean isUserInGroup(ServletRequest request, Group group) {
-        return isUserInGroup(request, group.getGroupId());
-    }
-
     public static boolean isUserInGroup(ServletRequest request, String groupId) {
         Subject subject = SecurityUtils.getSubject();
         return subject.hasRole(groupId);
-        /*List<String> groups = (List<String>) request.getAttribute(RequestAttributes.GROUPS);
-        return groups.contains(groupId);*/
-    }
-
-    public static boolean isRegisteredUser(ServletRequest request) {
-        Application appl = (Application) request.getAttribute(RequestAttributes.APPLICATION);
-        Group registeredGroup = appl.getRegisteredGroup();
-        return isUserInGroup(request, registeredGroup);
     }
 
     public static boolean isAdministrator(ServletRequest request) {
         Application appl = (Application) request.getAttribute(RequestAttributes.APPLICATION);
-        Group administratorsGroup = appl.getAdministratorsGroup();
+        Configuration portofinoConfiguration = appl.getPortofinoProperties();
+        String administratorsGroup = portofinoConfiguration.getString(PortofinoProperties.GROUP_REGISTERED);
         return isUserInGroup(request, administratorsGroup);
-    }
-
-    private static Group findGroupById(Application application, String groupId) {
-        return (Group) QueryUtils.getObjectByPk(application, application.getSystemDatabaseName(),
-                DatabaseLogic.GROUP_ENTITY_NAME, groupId);
     }
 
     public static boolean satisfiesRequiresAdministrator(HttpServletRequest request, ActionBean actionBean, Method handler) {

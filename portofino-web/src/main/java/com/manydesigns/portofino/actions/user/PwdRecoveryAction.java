@@ -36,9 +36,11 @@ import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 import com.manydesigns.portofino.dispatcher.RequestAttributes;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.system.model.users.User;
 import org.apache.commons.configuration.Configuration;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +81,7 @@ public class PwdRecoveryAction extends AbstractActionBean {
         Session session = application.getSystemSession();
         try {
 
-            user = application.findUserByEmail(email);
+            user = findUserByEmail(email);
             if (user==null){
                 SessionMessages.addErrorMessage("email non esistente");
                 return INPUT;
@@ -122,5 +124,12 @@ public class PwdRecoveryAction extends AbstractActionBean {
             logger.warn(errore, e);
             return INPUT;
         }
+    }
+
+    public User findUserByEmail(String email) {
+        Session session = application.getSystemSession();
+        org.hibernate.Criteria criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
+        criteria.add(Restrictions.eq("email", email));
+        return (User) criteria.uniqueResult();
     }
 }

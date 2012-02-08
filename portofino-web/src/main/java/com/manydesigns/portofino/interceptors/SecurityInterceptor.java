@@ -42,7 +42,6 @@ import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.util.UrlBuilder;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -51,7 +50,6 @@ import org.slf4j.MDC;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -101,10 +99,6 @@ public class
         MDC.put("userId", userId);
         //MDC.put(SessionAttributes.USER_NAME, userName); TODO
 
-        logger.debug("Retrieving groups");
-        List<String> groups = SecurityLogic.getUserGroups(application, userId);
-        request.setAttribute(RequestAttributes.GROUPS, groups);
-
         if (!SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler)) {
             return handleAnonymousOrUnauthorized(userId, request);
         }
@@ -127,8 +121,7 @@ public class
                         (application, permissions, subject, handler, actionBean.getClass());
             }
             if(!allowed) {
-                logger.info("User is not allowed for {}. User's groups: {}",
-                        resource, ArrayUtils.toString(groups));
+                logger.info("User {} is not allowed for {}", userId, resource);
                 return handleAnonymousOrUnauthorized(userId, request);
             }
         }

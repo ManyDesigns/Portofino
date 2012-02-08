@@ -35,8 +35,6 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.ConnectionProvider;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.system.model.users.Group;
-import com.manydesigns.portofino.system.model.users.User;
 import org.apache.commons.configuration.Configuration;
 import org.hibernate.Session;
 
@@ -130,26 +128,6 @@ public interface Application {
     public TableAccessor getTableAccessor(String database, String entityName);
 
     //**************************************************************************
-    // User
-    //**************************************************************************
-
-    public User findUserByEmail(String email);
-
-    public User findUserByUserName(String username);
-
-    public User findUserByToken(String token);
-
-    Group getAllGroup();
-
-    Group getAnonymousGroup();
-
-    Group getRegisteredGroup();
-
-    Group getAdministratorsGroup();
-
-    void shutdown();
-
-    //**************************************************************************
     // I18n
     //**************************************************************************
 
@@ -157,7 +135,13 @@ public interface Application {
 
     ResourceBundleManager getResourceBundleManager();
 
+    //**************************************************************************
+    // Misc
+    //**************************************************************************
+
     Configuration getAppConfiguration();
 
     void initModel();
+
+    void shutdown();
 }

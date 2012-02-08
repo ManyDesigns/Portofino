@@ -40,6 +40,7 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.system.model.users.User;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +88,7 @@ public class LostPwdChangeAction extends AbstractActionBean {
             form.writeToObject(pwd);
 
             if(form.validate()){
-                User user = application.findUserByToken(token);
+                User user = findUserByToken(token);
                 user.setPwd(pwd.pwd);
                 user.setPwdModDate(new Timestamp(new Date().getTime()));
                 Session session = application.getSystemSession();
@@ -99,5 +100,12 @@ public class LostPwdChangeAction extends AbstractActionBean {
             } else {
                 return INPUT;
             }
+    }
+
+    public User findUserByToken(String token) {
+        Session session = application.getSystemSession();
+        org.hibernate.Criteria criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
+        criteria.add(Restrictions.eq("token", token));
+        return (User) criteria.uniqueResult();
     }
 }

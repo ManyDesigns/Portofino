@@ -1,12 +1,15 @@
 import com.manydesigns.elements.util.RandomUtil
+import com.manydesigns.portofino.PortofinoProperties
 import com.manydesigns.portofino.application.Application
-import com.manydesigns.portofino.logic.SecurityLogic
+import com.manydesigns.portofino.application.QueryUtils
 import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.shiro.ApplicationRealm
 import com.manydesigns.portofino.shiro.ApplicationRealmDelegate
 import com.manydesigns.portofino.shiro.GroupPermission
 import com.manydesigns.portofino.system.model.users.User
+import com.manydesigns.portofino.system.model.users.UsersGroups
 import java.sql.Timestamp
+import org.apache.commons.configuration.Configuration
 import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.AuthenticationInfo
 import org.apache.shiro.authc.SimpleAuthenticationInfo
@@ -25,9 +28,25 @@ class Security implements ApplicationRealmDelegate {
 
     AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, String userName) {
         Application application = realm.getApplication();
-        Set<String> roleNames = new HashSet<String>(SecurityLogic.getUserGroups(application, userName));
-        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(roleNames);
-        Permission permission = new GroupPermission(roleNames);
+        Set<String> groups = new HashSet<String>();
+        Configuration conf = application.getPortofinoProperties();
+        groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
+        if (userName == null) {
+            groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
+        } else {
+            User u = (User) QueryUtils.getObjectByPk(
+                    application, application.getSystemDatabaseName(), DatabaseLogic.USER_ENTITY_NAME,
+                    new User(userName));
+            groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
+
+            for (UsersGroups ug : u.getGroups()) {
+                if (ug.getDeletionDate() == null) {
+                    groups.add(ug.getGroup().getGroupId());
+                }
+            }
+        }
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(groups);
+        Permission permission = new GroupPermission(groups);
         info.setObjectPermissions(Collections.singleton(permission));
         return info;
     }
@@ -57,7 +76,7 @@ class Security implements ApplicationRealmDelegate {
     //From LoginAction
     private void updateFailedUser(Application application, String username) {
         User user;
-        user = application.findUserByUserName(username);
+        user = findUserByUserName(username);
         if (user == null) {
             return;
         }
@@ -76,7 +95,7 @@ class Security implements ApplicationRealmDelegate {
         Session session = application.getSystemSession();
         Transaction tx = session.getTransaction();
         try {
-            User existingUser = application.findUserByUserName(user.getUserName());
+            User existingUser = findUserByUserName(session, user.getUserName());
             if(existingUser != null) {
                 logger.debug("Updating existing user {} (userId: {})",
                         existingUser.getUserName(), existingUser.getUserId());
@@ -94,6 +113,12 @@ class Security implements ApplicationRealmDelegate {
             //Session will be closed by the filter
             throw e;
         }
+    }
+
+    private User findUserByUserName(Session session, String username) {
+        org.hibernate.Criteria criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
+        criteria.add(Restrictions.eq("userName", username));
+        return (User) criteria.uniqueResult();
     }
 
 }

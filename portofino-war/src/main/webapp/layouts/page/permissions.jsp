@@ -3,15 +3,10 @@
 <%@ page import="com.manydesigns.portofino.pages.Page" %>
 <%@ page import="com.manydesigns.portofino.pages.Permissions" %>
 <%@ page import="com.manydesigns.portofino.security.AccessLevel" %>
-<%@ page import="com.manydesigns.portofino.system.model.users.Group" %>
-<%@ page import="com.manydesigns.portofino.system.model.users.annotations.SupportsPermissions" %>
-<%@ page import="org.apache.shiro.subject.Subject" %>
-<%@ page import="org.apache.shiro.subject.support.DelegatingSubject" %>
-<%@ page import="java.util.Collections" %>
-<%@ page import="java.util.List" %>
-<%@ page import="org.apache.shiro.SecurityUtils" %>
 <%@ page import="com.manydesigns.portofino.shiro.GroupPermission" %>
 <%@ page import="com.manydesigns.portofino.shiro.PagePermission" %>
+<%@ page import="com.manydesigns.portofino.system.model.users.Group" %>
+<%@ page import="java.util.Collections" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -37,13 +32,7 @@
                 <%
                     PageInstance currentPageInstance = actionBean.getPageInstance();
                     Page currentPage = currentPageInstance.getPage();
-                    Class<?> actualActionClass = currentPageInstance.getActionClass();
-                    SupportsPermissions supportsPermissions =
-                            actualActionClass.getAnnotation(SupportsPermissions.class);
-                    String[] supportedPermissions = null;
-                    if(supportsPermissions != null && supportsPermissions.value().length > 0) {
-                        supportedPermissions = supportsPermissions.value();
-                    }
+                    String[] supportedPermissions = actionBean.getSupportedPermissions();
                     if(supportedPermissions != null) {
                 %>
                     <tr>
