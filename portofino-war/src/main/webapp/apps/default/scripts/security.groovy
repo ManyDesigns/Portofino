@@ -2,16 +2,17 @@ import com.manydesigns.elements.util.RandomUtil
 import com.manydesigns.portofino.PortofinoProperties
 import com.manydesigns.portofino.application.Application
 import com.manydesigns.portofino.application.QueryUtils
-import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.shiro.ApplicationRealm
 import com.manydesigns.portofino.shiro.ApplicationRealmDelegate
 import com.manydesigns.portofino.shiro.GroupPermission
 import com.manydesigns.portofino.system.model.users.User
+import com.manydesigns.portofino.system.model.users.UserConstants
 import com.manydesigns.portofino.system.model.users.UsersGroups
 import java.sql.Timestamp
 import org.apache.commons.configuration.Configuration
 import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.AuthenticationInfo
+import org.apache.shiro.authc.DisabledAccountException
 import org.apache.shiro.authc.SimpleAuthenticationInfo
 import org.apache.shiro.authz.AuthorizationInfo
 import org.apache.shiro.authz.Permission
@@ -22,7 +23,6 @@ import org.hibernate.Transaction
 import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.apache.shiro.authc.ExpiredCredentialsException
 
 class Security implements ApplicationRealmDelegate {
 
@@ -37,7 +37,7 @@ class Security implements ApplicationRealmDelegate {
             groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
         } else {
             User u = (User) QueryUtils.getObjectByPk(
-                    application, application.getSystemDatabaseName(), USER_ENTITY_NAME,
+                    application, application.getSystemDatabaseName(), UserConstants.USER_ENTITY_NAME,
                     new User((String) userId));
             groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
 
@@ -58,15 +58,15 @@ class Security implements ApplicationRealmDelegate {
         Session session = application.getSystemSession();
         org.hibernate.Criteria criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq("userName", userName));
-        criteria.add(Restrictions.eq(PASSWORD, password));
+        criteria.add(Restrictions.eq(UserConstants.PASSWORD, password));
 
         List<Object> result = (List<Object>) criteria.list();
 
         User user;
         if (result.size() == 1) {
             user = (User) result.get(0);
-            if(!user.getState().equals(ACTIVE)) {
-                throw new ExpiredCredentialsException("User " + user.userId + " is not active");
+            if(!user.getState().equals(UserConstants.ACTIVE)) {
+                throw new DisabledAccountException("User " + user.userId + " is not active");
             }
             SimpleAuthenticationInfo info =
                     new SimpleAuthenticationInfo(user.userId, password.toCharArray(), realm.name);
@@ -119,12 +119,12 @@ class Security implements ApplicationRealmDelegate {
                 logger.debug("Updating existing user {} (userId: {})",
                         existingUser.getUserName(), existingUser.getUserId());
                 user.setUserId(existingUser.getUserId());
-                session.merge(USER_ENTITY_NAME, user);
+                session.merge(UserConstants.USER_ENTITY_NAME, user);
             } else {
                 user.setUserId(RandomUtil.createRandomId(20));
                 logger.debug("Importing user {} (userId: {})",
                         user.getUserName(), user.getUserId());
-                session.save(USER_ENTITY_NAME, user);
+                session.save(UserConstants.USER_ENTITY_NAME, user);
             }
             session.flush();
             tx.commit();
@@ -135,7 +135,7 @@ class Security implements ApplicationRealmDelegate {
     }
 
     private User findUserByUserName(Session session, String username) {
-        org.hibernate.Criteria criteria = session.createCriteria(USER_ENTITY_NAME);
+        org.hibernate.Criteria criteria = session.createCriteria(UserConstants.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("userName", username));
         return (User) criteria.uniqueResult();
     }

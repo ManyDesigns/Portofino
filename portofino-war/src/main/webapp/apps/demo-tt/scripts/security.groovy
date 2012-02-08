@@ -56,7 +56,6 @@ class Security implements ApplicationRealmDelegate {
             sb.append(String.format("%02X", b));
         }
         String hashedPassword = sb.toString().toLowerCase();
-        logger.error("HASHED PWD: " + hashedPassword)
 
         Application application = realm.application;
         Session session = application.getSession("redmine");

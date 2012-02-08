@@ -108,30 +108,28 @@ public class ApplicationRealm extends AuthorizingRealm {
     }
 
     private ApplicationRealmDelegate ensureDelegate() {
-        ApplicationRealmDelegate delegate = null; //TODO gestire reload
-        if(delegate == null) {
-            Application application = getApplication();
-            File file = new File(application.getAppScriptsDir(), "security.groovy");
-            Object groovyObject;
-            if(file.exists()) {
-                try {
-                    FileReader fr = new FileReader(file);
-                    String script = IOUtils.toString(fr);
-                    IOUtils.closeQuietly(fr);
-                    groovyObject = ScriptingUtil.getGroovyObject(script, file.getAbsolutePath());
-                } catch (Exception e) {
-                    logger.error("Couldn't load security script", e);
-                    throw new Error("Security script missing or invalid: " + file.getAbsolutePath());
-                }
-                if(groovyObject instanceof ApplicationRealmDelegate) {
-                    delegate = (ApplicationRealmDelegate) groovyObject;
-                } else {
-                    throw new Error("Security object is not an instance of " + ApplicationRealmDelegate.class +
-                                    ": " + groovyObject);
-                }
+        Application application = getApplication();
+        File file = new File(application.getAppScriptsDir(), "security.groovy");
+        Object groovyObject;
+        if(file.exists()) {
+            try {
+                FileReader fr = new FileReader(file);
+                String script = IOUtils.toString(fr);
+                IOUtils.closeQuietly(fr);
+                groovyObject = ScriptingUtil.getGroovyObject(script, file.getAbsolutePath());
+            } catch (Exception e) {
+                logger.error("Couldn't load security script", e);
+                throw new Error("Security script missing or invalid: " + file.getAbsolutePath());
             }
+            if(groovyObject instanceof ApplicationRealmDelegate) {
+                return (ApplicationRealmDelegate) groovyObject;
+            } else {
+                throw new Error("Security object is not an instance of " + ApplicationRealmDelegate.class +
+                                ": " + groovyObject);
+            }
+        } else {
+            throw new Error("Security object file not found: " + file.getAbsolutePath());
         }
-        return delegate;
     }
 
     public Application getApplication() {

@@ -42,7 +42,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.ExpiredCredentialsException;
+import org.apache.shiro.authc.DisabledAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -131,7 +131,7 @@ public class LoginAction extends AbstractActionBean {
             }
             logger.debug("Redirecting to: {}", returnUrl);
             return new RedirectResolution(returnUrl);
-        } catch (ExpiredCredentialsException e) {
+        } catch (DisabledAccountException e) {
             String errMsg = MessageFormat.format(bundle.getString("user.not.active"), userName);
             SessionMessages.addErrorMessage(errMsg);
             logger.warn(errMsg, e);
