@@ -60,24 +60,24 @@ public class DefaultMonth extends AbstractMonth<DefaultMonth.DefaultWeek> {
         return new DefaultWeek(weekStart, weekEnd);
     }
 
-    public class DefaultWeek extends Week<DefaultMonth.Day> {
+    public class DefaultWeek extends AbstractMonth<DefaultMonth.DefaultWeek>.Week<DefaultMonth.DefaultDay> {
 
         public DefaultWeek(DateMidnight weekStart, DateMidnight weekEnd) {
             super(weekStart, weekEnd);
         }
 
         @Override
-        protected AbstractMonth.Day[] createDaysArray(int size) {
-            return new AbstractMonth.Day[size];
+        protected DefaultMonth.DefaultDay[] createDaysArray(int size) {
+            return new DefaultMonth.DefaultDay[size];
         }
 
         @Override
-        protected AbstractMonth.Day createDay(DateMidnight dayStart, DateMidnight dayEnd) {
-            return new AbstractMonth.Day(dayStart, dayEnd);
+        protected DefaultMonth.DefaultDay createDay(DateMidnight dayStart, DateMidnight dayEnd) {
+            return new DefaultMonth.DefaultDay(dayStart, dayEnd);
         }
     }
 
-    public class DefaultDay extends Day {
+    public class DefaultDay extends AbstractMonth.Day {
         public DefaultDay(DateMidnight dayStart, DateMidnight dayEnd) {
             super(dayStart, dayEnd);
         }

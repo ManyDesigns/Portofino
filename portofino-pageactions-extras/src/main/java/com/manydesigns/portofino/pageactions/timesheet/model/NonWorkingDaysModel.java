@@ -61,7 +61,7 @@ public class NonWorkingDaysModel extends AbstractMonth<NonWorkingDaysModel.NWDWe
         return new NWDWeek(weekStart, weekEnd);
     }
 
-    public class NWDWeek extends Week<NWDDay> {
+    public class NWDWeek extends AbstractMonth<NonWorkingDaysModel.NWDWeek>.Week<NWDDay> {
         public NWDWeek(DateMidnight weekStart, DateMidnight weekEnd) {
             super(weekStart, weekEnd);
         }
@@ -78,7 +78,7 @@ public class NonWorkingDaysModel extends AbstractMonth<NonWorkingDaysModel.NWDWe
 
     }
 
-    public class NWDDay extends Day {
+    public class NWDDay extends AbstractMonth.Day {
         protected boolean nonWorking;
 
         public NWDDay(DateMidnight dayStart, DateMidnight dayEnd) {

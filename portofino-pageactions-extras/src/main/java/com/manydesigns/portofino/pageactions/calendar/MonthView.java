@@ -129,7 +129,7 @@ public class MonthView extends AbstractMonth<MonthView.MonthViewWeek> {
     // Accessory classes
     //--------------------------------------------------------------------------
 
-    public class MonthViewWeek extends Week<MonthView.MonthViewDay> {
+    public class MonthViewWeek extends AbstractMonth<MonthView.MonthViewWeek>.Week<MonthView.MonthViewDay> {
         final List<EventWeek> eventWeekOverlaps;
 
         public MonthViewWeek(DateMidnight weekStart, DateMidnight weekEnd) {
@@ -260,7 +260,7 @@ public class MonthView extends AbstractMonth<MonthView.MonthViewWeek> {
         }
     }
 
-    public class MonthViewDay extends Day {
+    public class MonthViewDay extends AbstractMonth.Day {
         final List<EventWeek> slots;
 
         public MonthViewDay(DateMidnight dayStart, DateMidnight dayEnd) {
