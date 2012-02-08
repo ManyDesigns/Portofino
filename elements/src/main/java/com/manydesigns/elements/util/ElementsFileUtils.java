@@ -94,5 +94,31 @@ public class ElementsFileUtils {
     }
 
 
+    public static boolean setReadable(File file, boolean readable) {
+        String perms = readable ? "u+rx" : "a-rx";
+        return chmod(file, perms);
+    }
+
+    public static boolean setWritable(File file, boolean writable) {
+        String perms = writable ? "u+w" : "a-w";
+        return chmod(file, perms);
+    }
+
+    public static boolean chmod(File file, String perms) {
+        logger.debug("chmod {} {}", perms, file.getAbsolutePath());
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Process process = runtime.exec(new String[]{
+                    "chmod",
+                    perms,
+                    file.getAbsolutePath()
+            });
+            int result = process.waitFor();
+            return result == 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 
 }
