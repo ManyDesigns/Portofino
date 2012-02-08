@@ -39,6 +39,7 @@ import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
+import com.manydesigns.portofino.shiro.ApplicationRealm;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -46,7 +47,10 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.env.EnvironmentLoader;
+import org.apache.shiro.web.env.WebEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -153,7 +157,12 @@ public class PortofinoListener
                 ApplicationAttributes.APPLICATION_STARTER, applicationStarter);
 
         logger.info("Initializing Shiro environment");
-        environmentLoader.initEnvironment(servletContext);
+        WebEnvironment environment = environmentLoader.initEnvironment(servletContext);
+        logger.debug("Publishing the Application Realm in the servlet context");
+        RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
+        Realm realm = rsm.getRealms().iterator().next();
+        assert realm instanceof ApplicationRealm;
+        servletContext.setAttribute(ApplicationAttributes.SECURITY_REALM, realm);
 
         setupEmailScheduler();
 

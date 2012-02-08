@@ -33,7 +33,6 @@ import com.manydesigns.portofino.logic.SecurityLogic;
 import org.apache.shiro.authz.Permission;
 
 import java.util.Collection;
-import java.util.Set;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

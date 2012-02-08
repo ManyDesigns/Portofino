@@ -54,8 +54,8 @@
                     <c:forEach var="group" items="${actionBean.groups}">
                         <tr>
                             <%
-                                Group group = (Group) pageContext.getAttribute("group");
-                                final String groupId = group.getGroupId();
+                                Object[] group = (Object[]) pageContext.getAttribute("group");
+                                final String groupId = group[0].toString();
                                 GroupPermission groupPermission = new GroupPermission(Collections.singleton(groupId));
 
                                 AccessLevel localAccessLevel = actionBean.getLocalAccessLevel(currentPage, groupId);
@@ -72,10 +72,10 @@
                                 Permissions permissions = SecurityLogic.calculateActualPermissions(currentPageInstance);
                             %>
                             <td>
-                                <c:out value="${group.name}"/>
+                                <c:out value="${group[1]}"/>
                             </td>
                             <td>
-                                <select name="accessLevels[${group.groupId}]"
+                                <select name="accessLevels[${group[0]}]"
                                         <%
                                             if(AccessLevel.DENY.equals(parentAccessLevel)) {
                                                 out.print("disabled='disabled'");
@@ -150,9 +150,9 @@
                 <label for="testUserIdSelect"><fmt:message key="layouts.page.permissions.select-a-user" /></label>
                 <select name="testUserId" id="testUserIdSelect">
                     <c:forEach var="user" items="${actionBean.users}">
-                        <option value="${user.userId}"
-                                <c:if test="${actionBean.testUserId eq user.userId}">selected="selected"</c:if>
-                                ><c:out value="${user.userName}" /></option>
+                        <option value="${user[0]}"
+                                <c:if test="${actionBean.testUserId eq user[0]}">selected="selected"</c:if>
+                                ><c:out value="${user[1]}" /></option>
                     </c:forEach>
                 </select>
                 <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />

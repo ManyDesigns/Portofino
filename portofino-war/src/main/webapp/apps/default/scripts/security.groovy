@@ -16,6 +16,7 @@ import org.apache.shiro.authc.SimpleAuthenticationInfo
 import org.apache.shiro.authz.AuthorizationInfo
 import org.apache.shiro.authz.Permission
 import org.apache.shiro.authz.SimpleAuthorizationInfo
+import org.hibernate.SQLQuery
 import org.hibernate.Session
 import org.hibernate.Transaction
 import org.hibernate.criterion.Restrictions
@@ -71,6 +72,20 @@ class Security implements ApplicationRealmDelegate {
             updateFailedUser(application, userName);
             throw new AuthenticationException("Login failed");
         }
+    }
+
+    List<Object[]> getUsers(ApplicationRealm realm) {
+        Application application = realm.application;
+        Session session = application.getSystemSession();
+        SQLQuery query = session.createSQLQuery("select userId, userName from \"USERS\"");
+        return query.list();
+    }
+
+    List<Object[]> getGroups(ApplicationRealm realm) {
+        Application application = realm.application;
+        Session session = application.getSystemSession();
+        SQLQuery query = session.createSQLQuery("select id, name from \"GROUPS\"");
+        return query.list(); //TODO verificare
     }
 
     //From LoginAction

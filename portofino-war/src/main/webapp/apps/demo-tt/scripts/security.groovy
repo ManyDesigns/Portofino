@@ -1,6 +1,5 @@
 import com.manydesigns.portofino.PortofinoProperties
 import com.manydesigns.portofino.application.Application
-import com.manydesigns.portofino.application.QueryUtils
 import com.manydesigns.portofino.shiro.ApplicationRealm
 import com.manydesigns.portofino.shiro.ApplicationRealmDelegate
 import com.manydesigns.portofino.shiro.GroupPermission
@@ -17,7 +16,7 @@ import org.hibernate.Session
 import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.apache.commons.lang.StringUtils
+import org.hibernate.SQLQuery
 
 class Security implements ApplicationRealmDelegate {
 
@@ -34,7 +33,10 @@ class Security implements ApplicationRealmDelegate {
             groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
             //TODO
             Session session = application.getSession("redmine");
-            def user = session.get("users", userId);
+            if(!(userId instanceof Integer)) {
+                userId = Integer.parseInt(userId.toString());
+            }
+            def user = session.get("users", (Integer) userId);
             if("admin".equals(user.login)) {
                 groups.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS));
             }
@@ -75,7 +77,27 @@ class Security implements ApplicationRealmDelegate {
         }
     }
 
+    List<Object[]> getUsers(ApplicationRealm realm) {
+        Application application = realm.application;
+        Session session = application.getSession("redmine");
+        SQLQuery query = session.createSQLQuery("select \"id\", \"login\" from \"users\"");
+        return query.list();
+    }
 
+    List<Object[]> getGroups(ApplicationRealm realm) {
+        Application application = realm.application;
+        List<Object[]> groups = new ArrayList<Object[]>();
+        Configuration conf = application.getPortofinoProperties();
+        def group = conf.getString(PortofinoProperties.GROUP_ALL);
+        groups.add([group, group] as Object[]);
+        group = conf.getString(PortofinoProperties.GROUP_ANONYMOUS);
+        groups.add([group, group] as Object[]);
+        group = conf.getString(PortofinoProperties.GROUP_REGISTERED);
+        groups.add([group, group] as Object[]);
+        group = conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
+        groups.add([group, group] as Object[]);
+        return groups;
+    }
 
     private User findUserByUserName(Session session, String username) {
         org.hibernate.Criteria criteria = session.createCriteria("users");

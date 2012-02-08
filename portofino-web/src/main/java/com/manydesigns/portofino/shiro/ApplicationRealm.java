@@ -38,7 +38,10 @@ import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
-import org.apache.shiro.authc.*;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -49,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.FileReader;
+import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -90,6 +94,14 @@ public class ApplicationRealm extends AuthorizingRealm {
         }
 
         return ensureDelegate().getAuthenticationInfo(this, username, password);
+    }
+
+    public List<Object[]> getUsers() {
+        return ensureDelegate().getUsers(this);
+    }
+
+    public List<Object[]> getGroups() {
+        return ensureDelegate().getGroups(this);
     }
 
     private ApplicationRealmDelegate ensureDelegate() {
