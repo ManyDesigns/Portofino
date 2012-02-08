@@ -29,10 +29,9 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.pages.NavigationRoot;
 import net.sourceforge.stripes.action.ActionBean;
-
-import java.util.Arrays;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -65,7 +64,7 @@ public class Dispatch {
     }
 
     public PageInstance[] getPageInstancePath(int startIndex) {
-        return Arrays.copyOfRange(pageInstancePath, startIndex, pageInstancePath.length);
+        return Util.copyOfRange(pageInstancePath, startIndex, pageInstancePath.length);
     }
 
     public PageInstance getRootPageInstance() {

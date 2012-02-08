@@ -109,7 +109,8 @@
 <div class="yui-gc" style="width: 100%;">
     <div class="yui-u first">
         <%
-            boolean todayDisabled = monthView.getMonthInterval().contains(new DateTime());
+            Interval monthInterval = monthView.getMonthInterval();
+            boolean todayDisabled = monthInterval.contains(new DateTime());
         %>
         <button type="submit" name="today" <%= todayDisabled ? "disabled='true'" : "" %>
                 class="ui-button ui-widget <%= todayDisabled ? "ui-state-disabled" : "ui-state-default" %> ui-corner-all ui-button-text-only ui-button">
@@ -163,14 +164,14 @@
     </table>
     <div class="calendar-table">
         <% for(int index = 0; index < 6; index++) {
-            MonthView.Week week = monthView.getWeek(index);
+            MonthView.MonthViewWeek week = monthView.getWeek(index);
         %>
             <div class="calendar-row" style="top: <%= index * 100.0 / 6.0 %>%;">
                 <table class="grid-table">
                     <tr>
                         <%
                         for(int i = 0; i < 7; i++) {
-                            MonthView.Day day = week.getDay(i);
+                            MonthView.MonthViewDay day = week.getDay(i);
                             xhtmlBuffer.openElement("td");
                             if(day.getDayInterval().contains(new DateTime())) {
                                 xhtmlBuffer.addAttribute("class", "today");
@@ -184,9 +185,9 @@
                     <tr>
                         <%
                         for(int i = 0; i < 7; i++) {
-                            MonthView.Day day = week.getDay(i);
+                            MonthView.MonthViewDay day = week.getDay(i);
                             xhtmlBuffer.openElement("th");
-                            if(!day.isInReferenceMonth()) {
+                            if(!monthInterval.contains(day.getDayStart())) {
                                 xhtmlBuffer.addAttribute("class", "outOfMonth");
                             }
                             int dayOfMonth = day.getDayStart().dayOfMonth().get();
@@ -202,8 +203,8 @@
                     for(int row = 0; row < maxEventsPerCell - 1; row++) {
                         xhtmlBuffer.openElement("tr");
                         for(int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
-                            MonthView.Day day = week.getDay(dayOfWeek);
-                            writeEventCell(day, dayOfWeek, row, xhtmlBuffer, resourceBundle);
+                            MonthView.MonthViewDay day = week.getDay(dayOfWeek);
+                            writeEventCell(monthView, day, dayOfWeek, row, xhtmlBuffer, resourceBundle);
                         }
                         xhtmlBuffer.closeElement("tr");
                     }
@@ -212,7 +213,7 @@
                     xhtmlBuffer.openElement("tr");
                     boolean moreThanOneLeft = false;
                     for(int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
-                        MonthView.Day day = week.getDay(dayOfWeek);
+                        MonthView.MonthViewDay day = week.getDay(dayOfWeek);
                         List<EventWeek> eventsOfTheDay = day.getSlots();
 
                         int numberOfEvents = 0;
@@ -227,11 +228,11 @@
                         }
                     }
                     for(int dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
-                        MonthView.Day day = week.getDay(dayOfWeek);
+                        MonthView.MonthViewDay day = week.getDay(dayOfWeek);
                         if(moreThanOneLeft) {
-                            writeMoreEventsLink(maxEventsPerCell, xhtmlBuffer, day, dayOfWeek, resourceBundle);
+                            writeMoreEventsLink(monthView, maxEventsPerCell, xhtmlBuffer, day, dayOfWeek, resourceBundle);
                         } else {
-                            writeEventCell(day, dayOfWeek, maxEventsPerCell - 1, xhtmlBuffer, resourceBundle);
+                            writeEventCell(monthView, day, dayOfWeek, maxEventsPerCell - 1, xhtmlBuffer, resourceBundle);
                         }
                     }
                     xhtmlBuffer.closeElement("tr");
@@ -242,7 +243,7 @@
     </div>
 </div><%!
     private void writeMoreEventsLink
-            (int maxEventsPerCell, XhtmlBuffer xhtmlBuffer, MonthView.Day day, int dayOfWeek,
+            (MonthView monthView, int maxEventsPerCell, XhtmlBuffer xhtmlBuffer, MonthView.MonthViewDay day, int dayOfWeek,
              ResourceBundle resourceBundle) {
         List<EventWeek> eventsOfTheDay = day.getSlots();
         xhtmlBuffer.openElement("td");
@@ -260,7 +261,7 @@
             xhtmlBuffer.addAttribute("id", dialogId);
             xhtmlBuffer.addAttribute("class", "event-dialog");
             for(int i = maxEventsPerCell - 1; i < eventsOfTheDay.size(); i++) {
-                writeEventDiv(day, dayOfWeek, i, xhtmlBuffer, resourceBundle);
+                writeEventDiv(monthView, day, dayOfWeek, i, xhtmlBuffer, resourceBundle);
             }
             xhtmlBuffer.closeElement("div");
             xhtmlBuffer.openElement("a");
@@ -274,7 +275,7 @@
     }
 
     private String writeEventDialog
-            (MonthView.Day day, XhtmlBuffer xhtmlBuffer, ResourceBundle resourceBundle,
+            (MonthView monthView, MonthView.MonthViewDay day, XhtmlBuffer xhtmlBuffer, ResourceBundle resourceBundle,
              EventWeek eventWeek, DateTime start, DateTime end, DateTimeFormatter hhmmFormatter) {
         Event event = eventWeek.getEvent();
         Locale locale = resourceBundle.getLocale();
@@ -295,7 +296,7 @@
         String timeDescription;
         DateTimeFormatter startFormatter =
                 makeEventDateTimeFormatter
-                        (start, day.getMonthView().getMonthInterval(), locale);
+                        (start, monthView.getMonthInterval(), locale);
         timeDescription = startFormatter.print(start);
         if(end.minus(1).getDayOfYear() != start.getDayOfYear()) {
             DateTime formatEnd = end;
@@ -304,7 +305,7 @@
             }
             DateTimeFormatter endFormatter =
                 makeEventDateTimeFormatter
-                        (formatEnd, day.getMonthView().getMonthInterval(), locale);
+                        (formatEnd, monthView.getMonthInterval(), locale);
             timeDescription += " - " + endFormatter.print(formatEnd);
         } else if(end.getMillisOfDay() != start.getMillisOfDay()) {
             timeDescription += " - " + hhmmFormatter.print(end);
@@ -343,7 +344,7 @@
     }
 
     private void writeEventCell
-            (MonthView.Day day, int dayOfWeek, int index, XhtmlBuffer xhtmlBuffer, ResourceBundle resourceBundle) {
+            (MonthView monthView, MonthView.MonthViewDay day, int dayOfWeek, int index, XhtmlBuffer xhtmlBuffer, ResourceBundle resourceBundle) {
         String enclosingTag = "td";
         List<EventWeek> eventsOfTheDay = day.getSlots();
         if(index >= eventsOfTheDay.size()) {
@@ -380,7 +381,7 @@
 
         //Dialog
         String dialogId = writeEventDialog
-                (day, xhtmlBuffer, resourceBundle, eventWeek, start, end, hhmmFormatter);
+                (monthView, day, xhtmlBuffer, resourceBundle, eventWeek, start, end, hhmmFormatter);
 
         //Cell contents
         xhtmlBuffer.openElement("div");
@@ -418,7 +419,7 @@
     }
 
     private void writeEventDiv
-            (MonthView.Day day, int dayOfWeek, int index, XhtmlBuffer xhtmlBuffer, ResourceBundle resourceBundle) {
+            (MonthView monthView, MonthView.MonthViewDay day, int dayOfWeek, int index, XhtmlBuffer xhtmlBuffer, ResourceBundle resourceBundle) {
         String enclosingTag = "div";
         List<EventWeek> eventsOfTheDay = day.getSlots();
         if(index >= eventsOfTheDay.size()) {
@@ -449,7 +450,7 @@
 
         //Dialog
         String dialogId = writeEventDialog
-                (day, xhtmlBuffer, resourceBundle, eventWeek, start, end, hhmmFormatter);
+                (monthView, day, xhtmlBuffer, resourceBundle, eventWeek, start, end, hhmmFormatter);
 
         //Cell contents
         xhtmlBuffer.openElement("div");

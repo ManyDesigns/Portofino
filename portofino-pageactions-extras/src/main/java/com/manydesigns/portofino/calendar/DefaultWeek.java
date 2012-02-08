@@ -27,49 +27,29 @@
  *
  */
 
-package com.manydesigns.portofino.pageactions.timesheet.model;
+package com.manydesigns.portofino.calendar;
+
+import org.joda.time.DateMidnight;
 
 /**
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
- * @author Angelo Lupo          - angelo.lupo@manydesigns.com
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Alessio Stalla       - alessio.stalla@manydesigns.com
- */
-public class Entry {
-    public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+*/
+public class DefaultWeek extends AbstractWeek<DefaultDay> {
 
-    final Activity activity;
-    int minutes;
-    String note;
-
-    public Entry(Activity activity) {
-        this.activity = activity;
+    public DefaultWeek(DateMidnight weekStart, DateMidnight weekEnd) {
+        super(weekStart, weekEnd);
     }
 
-    public Entry(Activity activity, int minutes, String note) {
-        this.activity = activity;
-        this.minutes = minutes;
-        this.note = note;
+    @Override
+    protected DefaultDay[] createDaysArray(int size) {
+        return new DefaultDay[size];
     }
 
-    public Activity getActivity() {
-        return activity;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public int getMinutes() {
-        return minutes;
-    }
-
-    public void setMinutes(int minutes) {
-        this.minutes = minutes;
+    @Override
+    protected DefaultDay createDay(DateMidnight dayStart, DateMidnight dayEnd) {
+        return new DefaultDay(dayStart, dayEnd);
     }
 }

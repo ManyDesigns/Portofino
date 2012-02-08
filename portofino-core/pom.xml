@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.0.rc8</version>
+        <version>4.0.rc9</version>
     </parent>
     <artifactId>portofino-core</artifactId>
     <packaging>jar</packaging>
@@ -22,12 +22,12 @@
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-            <version>2.1</version>
+            <version>${jaxb-api.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>2.1.13</version>
+            <version>${jaxb-impl.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>

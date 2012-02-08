@@ -27,49 +27,39 @@
  *
  */
 
-package com.manydesigns.portofino.pageactions.timesheet.model;
+package com.manydesigns.portofino.calendar;
+
+import org.joda.time.DateMidnight;
+import org.joda.time.Interval;
 
 /**
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
- * @author Angelo Lupo          - angelo.lupo@manydesigns.com
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Alessio Stalla       - alessio.stalla@manydesigns.com
- */
-public class Entry {
-    public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+*/
+public class AbstractDay {
+    final DateMidnight dayStart;
+    final DateMidnight dayEnd;
+    final Interval dayInterval;
 
-    final Activity activity;
-    int minutes;
-    String note;
-
-    public Entry(Activity activity) {
-        this.activity = activity;
+    public AbstractDay(DateMidnight dayStart, DateMidnight dayEnd) {
+        this.dayStart = dayStart;
+        this.dayEnd = dayEnd;
+        dayInterval = new Interval(dayStart, dayEnd);
+        AbstractMonth.logger.debug("Day interval: {}", dayInterval);
     }
 
-    public Entry(Activity activity, int minutes, String note) {
-        this.activity = activity;
-        this.minutes = minutes;
-        this.note = note;
+    public DateMidnight getDayStart() {
+        return dayStart;
     }
 
-    public Activity getActivity() {
-        return activity;
+    public DateMidnight getDayEnd() {
+        return dayEnd;
     }
 
-    public String getNote() {
-        return note;
+    public Interval getDayInterval() {
+        return dayInterval;
     }
 
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public int getMinutes() {
-        return minutes;
-    }
-
-    public void setMinutes(int minutes) {
-        this.minutes = minutes;
-    }
 }

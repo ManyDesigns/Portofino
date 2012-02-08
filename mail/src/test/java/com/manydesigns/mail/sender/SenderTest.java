@@ -30,6 +30,7 @@ package com.manydesigns.mail.sender;
 
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
+import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.mail.queue.FileSystemMailQueue;
 import com.manydesigns.mail.queue.LockingMailQueue;
 import com.manydesigns.mail.queue.MailQueue;
@@ -267,7 +268,7 @@ public class SenderTest extends TestCase {
         myEmail.getRecipients().add(new Recipient(Recipient.Type.TO, "giampiero.granatella@manydesigns.com"));
         myEmail.setSubject("subj");
         myEmail.setTextBody("body");
-        if(!fsQueue.getSentDirectory().setWritable(false)) {
+        if(!ElementsFileUtils.setWritable(fsQueue.getSentDirectory(), false)) {
             fail("Couldn't make sent directory not writable");
         }
 
@@ -288,7 +289,7 @@ public class SenderTest extends TestCase {
         assertFalse(queue.getEnqueuedEmailIds().isEmpty());
         assertEquals(1, server.getReceivedEmailSize());
 
-        if(!fsQueue.getSentDirectory().setWritable(true)) {
+        if(!ElementsFileUtils.setWritable(fsQueue.getSentDirectory(), true)) {
             fail("Couldn't make sent directory writable");
         }
 

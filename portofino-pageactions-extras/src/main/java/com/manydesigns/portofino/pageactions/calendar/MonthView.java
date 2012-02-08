@@ -29,12 +29,12 @@
 
 package com.manydesigns.portofino.pageactions.calendar;
 
+import com.manydesigns.portofino.calendar.AbstractMonth;
+import com.manydesigns.portofino.calendar.AbstractDay;
+import com.manydesigns.portofino.calendar.AbstractWeek;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -44,7 +44,7 @@ import java.util.*;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class MonthView {
+public class MonthView extends AbstractMonth<MonthView.MonthViewWeek> {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -53,72 +53,28 @@ public class MonthView {
     }
 
     //--------------------------------------------------------------------------
-    // Fields
-    //--------------------------------------------------------------------------
-
-    final DateTime referenceDateTime;
-    final int firstDayOfWeek;
-    final DateMidnight referenceDateMidnight;
-    final int referenceYear;
-    final int referenceMonth;
-
-    final DateMidnight monthStart;
-    final DateMidnight monthEnd;
-    final Interval monthInterval;
-
-    final DateMidnight monthViewStart;
-    final DateMidnight monthViewEnd;
-    final Interval monthViewInterval;
-
-    final Week[] weeks;
-
-    //--------------------------------------------------------------------------
-    // Logging
-    //--------------------------------------------------------------------------
-
-    public static final Logger logger =
-            LoggerFactory.getLogger(MonthView.class);
-
-    //--------------------------------------------------------------------------
-    // Constructors
+    // Constructors and builder overrides
     //--------------------------------------------------------------------------
 
     public MonthView(DateTime referenceDateTime) {
-        this(referenceDateTime, DateTimeConstants.MONDAY);
+        super(referenceDateTime);
     }
 
     public MonthView(DateTime referenceDateTime, int firstDayOfWeek) {
-        logger.debug("Initializing MonthView");
-        this.referenceDateTime = referenceDateTime;
-        logger.debug("Today: {}", referenceDateTime);
-        this.firstDayOfWeek = firstDayOfWeek;
-        logger.debug("First day of week: {}", firstDayOfWeek);
-
-        referenceDateMidnight = new DateMidnight(referenceDateTime);
-        referenceYear = referenceDateTime.getYear();
-        referenceMonth = referenceDateTime.getMonthOfYear();
-
-        monthStart = referenceDateMidnight.withDayOfMonth(1);
-        monthEnd = monthStart.plusMonths(1);
-        monthInterval = new Interval(monthStart, monthEnd);
-
-        monthViewStart = monthStart.withDayOfWeek(firstDayOfWeek);
-        monthViewEnd = monthViewStart.plusWeeks(6);
-        monthViewInterval = new Interval(monthViewStart, monthViewEnd);
-        logger.debug("Month view start: {}", monthViewStart);
-
-
-
-        logger.debug("Initializing weeks");
-        weeks = new Week[6];
-        DateMidnight weekStart = monthViewStart;
-        for (int i = 0; i < weeks.length; i++) {
-            DateMidnight weekEnd = weekStart.plusWeeks(1);
-            weeks[i] = new Week(weekStart, weekEnd);
-
-            weekStart = weekEnd;
-        }
+        super(referenceDateTime, firstDayOfWeek);
     }
+
+    @Override
+    protected MonthViewWeek[] createWeeksArray(int size) {
+        return new MonthViewWeek[size];
+    }
+
+    @Override
+    protected MonthViewWeek createWeek(DateMidnight weekStart, DateMidnight weekEnd) {
+        return new MonthViewWeek(weekStart, weekEnd);
+    }
+
+
 
     //--------------------------------------------------------------------------
     // Events
@@ -145,7 +101,7 @@ public class MonthView {
         } else {
             logger.debug("Event overlapping with month view");
             boolean weekSanityCheck = false;
-            for (Week week : weeks) {
+            for (MonthViewWeek week : weeks) {
                 weekSanityCheck = week.addEvent(event) || weekSanityCheck;
             }
             if (!weekSanityCheck) {
@@ -157,107 +113,40 @@ public class MonthView {
 
     public void clearEvents() {
         logger.debug("Clearing events");
-        for (Week week : weeks) {
+        for (MonthViewWeek week : weeks) {
             week.clearEvents();
         }
     }
 
     public void sortEvents() {
         logger.debug("Sorting events");
-        for (Week week : weeks) {
+        for (MonthViewWeek week : weeks) {
             week.sortEvents();
         }
     }
 
 
-    //--------------------------------------------------------------------------
-    // Getters/setters
-    //--------------------------------------------------------------------------
-
-
-    public DateMidnight getReferenceDateMidnight() {
-        return referenceDateMidnight;
-    }
-
-    public DateMidnight getMonthStart() {
-        return monthStart;
-    }
-
-    public DateMidnight getMonthEnd() {
-        return monthEnd;
-    }
-
-    public Interval getMonthInterval() {
-        return monthInterval;
-    }
-
-    public Interval getMonthViewInterval() {
-        return monthViewInterval;
-    }
-
-    public DateMidnight getMonthViewStart() {
-        return monthViewStart;
-    }
-
-    public DateMidnight getMonthViewEnd() {
-        return monthViewEnd;
-    }
-
-    public Week getWeek(int index) {
-        return weeks[index];
-    }
-
-    public DateTime getReferenceDateTime() {
-        return referenceDateTime;
-    }
-
-    public int getFirstDayOfWeek() {
-        return firstDayOfWeek;
-    }
 
     //--------------------------------------------------------------------------
     // Accessory classes
     //--------------------------------------------------------------------------
 
-    public class Week {
-        final DateMidnight weekStart;
-        final DateMidnight weekEnd;
-        final Interval weekInterval;
-        final Day[] days;
+    public class MonthViewWeek extends AbstractWeek<MonthViewDay> {
         final List<EventWeek> eventWeekOverlaps;
 
-        public Week(DateMidnight weekStart, DateMidnight weekEnd) {
+        public MonthViewWeek(DateMidnight weekStart, DateMidnight weekEnd) {
+            super(weekStart, weekEnd);
             eventWeekOverlaps = new ArrayList<EventWeek>();
-            this.weekStart = weekStart;
-            this.weekEnd = weekEnd;
-            weekInterval = new Interval(weekStart, weekEnd);
-            logger.debug("Week interval: {}", weekInterval);
-
-            logger.debug("Initializing days");
-            days = new Day[7];
-            DateMidnight dayStart = weekStart;
-            for (int i = 0; i < 7; i++) {
-                DateMidnight dayEnd = dayStart.plusDays(1);
-                days[i] = new Day(dayStart, dayEnd);
-
-                dayStart = dayEnd;
-            }
         }
 
-        public DateMidnight getWeekStart() {
-            return weekStart;
+        @Override
+        protected MonthViewDay[] createDaysArray(int size) {
+            return new MonthViewDay[size];
         }
 
-        public DateMidnight getWeekEnd() {
-            return weekEnd;
-        }
-
-        public Interval getWeekInterval() {
-            return weekInterval;
-        }
-
-        public Day getDay(int index) {
-            return days[index];
+        @Override
+        protected MonthViewDay createDay(DateMidnight dayStart, DateMidnight dayEnd) {
+            return new MonthViewDay(dayStart, dayEnd);
         }
 
         public void clearEvents() {
@@ -277,7 +166,7 @@ public class MonthView {
                 Integer endDay = null;
                 Search search = Search.BEFORE;
                 for (int i = 0; i < 7; i++) {
-                    Day day = days[i];
+                    MonthViewDay day = getDay(i);
                     Interval dayInterval = day.getDayInterval();
                     Interval dayOverlap = dayInterval.overlap(eventInterval);
                     if (dayOverlap == null) {
@@ -332,7 +221,8 @@ public class MonthView {
 
         public void sortEvents() {
             logger.debug("Querying days for busy slots");
-            for (Day day : days) {
+            for (int i1 = 0, daysLength = days.length; i1 < daysLength; i1++) {
+                MonthViewDay day = getDay(i1);
                 day.clearSlots();
             }
 
@@ -346,7 +236,8 @@ public class MonthView {
 
                 logger.debug("Querying days for busy slots");
                 for (int i = startDay; i <= endDay; i++) {
-                    days[i].fillBusySlots(busySlots);
+                    MonthViewDay day = getDay(i);
+                    day.fillBusySlots(busySlots);
                 }
 
                 logger.debug("Looking for first empty slot");
@@ -364,46 +255,23 @@ public class MonthView {
 
                 logger.debug("Allocating slot");
                 for (int i = startDay; i <= endDay; i++) {
-                    days[i].allocateSlot(index, current);
+                    MonthViewDay day = getDay(i);
+                    day.allocateSlot(index, current);
                 }
             }
         }
     }
 
-    public class Day {
-        final DateMidnight dayStart;
-        final DateMidnight dayEnd;
-        final Interval dayInterval;
-        final boolean inReferenceMonth;
+    public class MonthViewDay extends AbstractDay {
         final List<EventWeek> slots;
 
-        public Day(DateMidnight dayStart, DateMidnight dayEnd) {
-            this.dayStart = dayStart;
-            this.dayEnd = dayEnd;
-            dayInterval = new Interval(dayStart, dayEnd);
-            inReferenceMonth = monthInterval.contains(dayStart);
-            logger.debug("Day interval: {}", dayInterval);
+        public MonthViewDay(DateMidnight dayStart, DateMidnight dayEnd) {
+            super(dayStart, dayEnd);
             slots = new ArrayList<EventWeek>();
         }
 
         public void clearSlots() {
             slots.clear();
-        }
-
-        public DateMidnight getDayStart() {
-            return dayStart;
-        }
-
-        public DateMidnight getDayEnd() {
-            return dayEnd;
-        }
-
-        public Interval getDayInterval() {
-            return dayInterval;
-        }
-
-        public boolean isInReferenceMonth() {
-            return inReferenceMonth;
         }
 
         public void fillBusySlots(Set<Integer> busySlots) {
@@ -432,8 +300,5 @@ public class MonthView {
             return slots;
         }
 
-        public MonthView getMonthView() {
-            return MonthView.this;
-        }
     }
 }

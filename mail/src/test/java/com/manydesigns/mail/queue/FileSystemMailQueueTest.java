@@ -29,6 +29,7 @@
 
 package com.manydesigns.mail.queue;
 
+import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
 import junit.framework.TestCase;
@@ -89,7 +90,7 @@ public class FileSystemMailQueueTest extends TestCase {
         assertTrue(mq.getEnqueuedEmailIds().isEmpty());
         assertEquals(null, mq.loadEmail("aaa"));
 
-        if(fsmq.getQueuedDirectory().setWritable(false)) {
+        if(ElementsFileUtils.setWritable(fsmq.getQueuedDirectory(), false)) {
             Email email = new Email();
             try {
                 mq.enqueue(email);
@@ -99,7 +100,7 @@ public class FileSystemMailQueueTest extends TestCase {
             fail("Couldn't make queue directory not writable");
         }
 
-        if(fsmq.getQueuedDirectory().setWritable(true)) {
+        if(ElementsFileUtils.setWritable(fsmq.getQueuedDirectory(), true)) {
             Email email = new Email();
             mq.enqueue(email);
         } else {
@@ -127,7 +128,7 @@ public class FileSystemMailQueueTest extends TestCase {
                 } catch (IOException e) {
                     fail("Couldn't create file");
                 }
-                if(created && file.setWritable(false)) {
+                if(created && ElementsFileUtils.setWritable(file, false)) {
                     return file;
                 } else {
                     fail("Couldn't make file not writable");
@@ -163,7 +164,7 @@ public class FileSystemMailQueueTest extends TestCase {
 
         File emailFile = fsmq.getEmailFile(id);
 
-        if(emailFile.setReadable(false)) {
+        if(ElementsFileUtils.setReadable(emailFile, false)) {
             try {
                 mq.loadEmail(id);
                 fail();
@@ -172,7 +173,7 @@ public class FileSystemMailQueueTest extends TestCase {
             fail("Could not make file unreadable");
         }
 
-        if(emailFile.setReadable(true)) {
+        if(ElementsFileUtils.setReadable(emailFile, true)) {
             assertNotNull(mq.loadEmail(id));
         } else {
             fail("Could not make file unreadable");
@@ -206,7 +207,7 @@ public class FileSystemMailQueueTest extends TestCase {
         email = new Email();
         id = mq.enqueue(email);
 
-        if(fsmq.getSentDirectory().setWritable(false)) {
+        if(ElementsFileUtils.setWritable(fsmq.getSentDirectory(), false)) {
             try {
                 mq.markSent(id);
                 fail();
@@ -215,7 +216,7 @@ public class FileSystemMailQueueTest extends TestCase {
             fail("Couldn't make sent directory not writable");
         }
 
-        if(fsmq.getSentDirectory().setWritable(true)) {
+        if(ElementsFileUtils.setWritable(fsmq.getSentDirectory(), true)) {
             mq.markSent(id);
             assertEquals(null, mq.loadEmail(id));
         } else {
@@ -251,7 +252,7 @@ public class FileSystemMailQueueTest extends TestCase {
         email = new Email();
         id = mq.enqueue(email);
 
-        if(fsmq.getFailedDirectory().setWritable(false)) {
+        if(ElementsFileUtils.setWritable(fsmq.getFailedDirectory(), false)) {
             try {
                 mq.markFailed(id);
                 fail();
@@ -260,7 +261,7 @@ public class FileSystemMailQueueTest extends TestCase {
             fail("Couldn't make failed directory not writable");
         }
 
-        if(fsmq.getFailedDirectory().setWritable(true)) {
+        if(ElementsFileUtils.setWritable(fsmq.getFailedDirectory(), true)) {
             mq.markFailed(id);
             assertEquals(null, mq.loadEmail(id));
         } else {

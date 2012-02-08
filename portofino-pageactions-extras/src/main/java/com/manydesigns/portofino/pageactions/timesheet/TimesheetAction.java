@@ -36,15 +36,15 @@ import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
-import com.manydesigns.portofino.pageactions.calendar.MonthView;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.pageactions.timesheet.model.*;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
-import org.joda.time.*;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONException;
@@ -77,18 +77,13 @@ public class TimesheetAction extends CustomAction {
     protected Form form;
 
     protected String personId;
-    protected int weeksAgo;
     protected DateMidnight today;
-    protected DateMidnight monday;
+    protected int weeksAgo;
 
     protected final List<Person> availablePersons = new ArrayList<Person>();
-    protected final List<Activity> weekActivities = new ArrayList<Activity>();
-    protected final Map<DateMidnight, PersonDay> personDays =
-            new HashMap<DateMidnight, PersonDay>();
-    protected final Set<DateMidnight> nonWorkingDays =
-            new HashSet<DateMidnight>();
 
-    protected MonthView monthView;
+    protected WeekEntryModel weekEntryModel;
+    protected NonWorkingDaysModel nonWorkingDaysModel;
 
     protected Integer day;
     protected Integer month;
@@ -152,8 +147,8 @@ public class TimesheetAction extends CustomAction {
         DefaultSelectionProvider weeksAgoSelectionProvider =
                 new DefaultSelectionProvider("weeksAgo");
 
-        today = new DateMidnight(dtz);
-        monday = today.withDayOfWeek(DateTimeConstants.MONDAY);
+        DateMidnight today = new DateMidnight(dtz);
+        DateMidnight monday = today.withDayOfWeek(DateTimeConstants.MONDAY);
         DateTimeFormatter formatter = DateTimeFormat.shortDate().withLocale(Locale.ITALY);
         for (int i = 0; i < 10; i++) {
             DateMidnight sunday = monday.plusDays(6);
@@ -172,6 +167,12 @@ public class TimesheetAction extends CustomAction {
         }
     }
 
+    public void loadExecuteModel() {
+        availablePersons.add(paolo);
+        availablePersons.add(angelo);
+    }
+
+
     //**************************************************************************
     // Week data entry
     //**************************************************************************
@@ -180,9 +181,11 @@ public class TimesheetAction extends CustomAction {
     public Resolution weekEntry() {
         assert weeksAgo >= 0;
         today = new DateMidnight(dtz);
-        monday = today.withDayOfWeek(DateTimeConstants.MONDAY).minusWeeks(weeksAgo);
-        loadNonWorkingDays();
+        DateMidnight referenceDateMidnight = today.minusWeeks(weeksAgo);
+        weekEntryModel = new WeekEntryModel(referenceDateMidnight);
+
         loadWeekEntryModel();
+
         return new ForwardResolution("/layouts/timesheet/week-entry.jsp");
     }
 
@@ -190,30 +193,88 @@ public class TimesheetAction extends CustomAction {
     public Resolution saveWeekEntry() {
         assert weeksAgo >= 0;
         today = new DateMidnight(dtz);
-        monday = today.withDayOfWeek(DateTimeConstants.MONDAY).minusWeeks(weeksAgo);
-        loadNonWorkingDays();
+        DateMidnight referenceDateMidnight = today.minusWeeks(weeksAgo);
+
+        weekEntryModel = new WeekEntryModel(referenceDateMidnight);
+
         loadWeekEntryModel();
 
         HttpServletRequest request = getContext().getRequest();
 
-        DateMidnight day = monday;
         for (int dayIndex = 0; dayIndex < 7; dayIndex++) {
-            PersonDay personDay = personDays.get(day);
-            if (personDay.isLocked()) {
+            WeekEntryModel.Day day = weekEntryModel.getDay(dayIndex);
+
+            WeekEntryModel.DayStatus dayStatus =
+                    day.getStatus();
+            if (dayStatus == null || dayStatus == WeekEntryModel.DayStatus.LOCKED) {
                 continue;
             }
-            for (Activity activity : weekActivities) {
+            for (Activity activity : weekEntryModel.getActivities()) {
                 String name = String.format("cell-%d-%s",
                         dayIndex, activity.getId());
                 String value = request.getParameter(name);
                 logger.info("{}: {}", name, value);
             }
-            day = day.plusDays(1);
         }
 
         SessionMessages.addInfoMessage("Timesheet salvato con successo");
         return new RedirectResolution(dispatch.getOriginalPath());
     }
+
+    public void loadWeekEntryModel() {
+        List<Activity> weekActivities =
+                weekEntryModel.getActivities();
+        weekActivities.add(ac1);
+        weekActivities.add(ac2);
+        weekActivities.add(ac3);
+        weekActivities.add(ac4);
+        weekActivities.add(ac5);
+        weekActivities.add(ac6);
+        weekActivities.add(ac7);
+        weekActivities.add(ac8);
+        weekActivities.add(ac9);
+
+        for (int i = 0; i < 7; i++) {
+            logger.debug("Setting day standard working minutes");
+            WeekEntryModel.Day day = weekEntryModel.getDay(i);
+            if (day.isNonWorking()) {
+                day.setStandardWorkingMinutes(0);
+            } else {
+                day.setStandardWorkingMinutes(8*60);
+            }
+
+            logger.debug("Setting today flag");
+            DateMidnight dayDate = day.getDate();
+            if (dayDate.equals(today)) {
+                day.setToday(true);
+            }
+            if (nonWorkingDaysDb.contains(dayDate)) {
+                day.setNonWorking(true);
+            }
+
+            logger.debug("Setting day status and entries");
+            PersonDay personDay = personDayDb.get(dayDate);
+            if (personDay == null) {
+                day.setStatus(null);
+            } else {
+                if (personDay.isLocked()) {
+                    day.setStatus(WeekEntryModel.DayStatus.LOCKED);
+                } else {
+                    day.setStatus(WeekEntryModel.DayStatus.OPEN);
+                }
+
+                for (Entry entry : personDay.getEntries()) {
+                    day.addEntry(
+                            entry.getActivity(),
+                            entry.getMinutes(),
+                            entry.getNote()
+                    );
+                }
+            }
+
+        }
+    }
+
 
     //**************************************************************************
     // Non working days view
@@ -224,15 +285,15 @@ public class TimesheetAction extends CustomAction {
         today = new DateMidnight(dtz);
         year = today.getYear();
         month = today.getMonthOfYear();
+        nonWorkingDaysModel = new NonWorkingDaysModel(today.toDateTime());
         loadNonWorkingDays();
-        monthView = new MonthView(new DateTime(dtz));
         return new ForwardResolution("/layouts/timesheet/non-working-days.jsp");
     }
 
     public Resolution configureNonWorkingDay() throws JSONException {
         logger.info("Configuring non working day. Year/month/day: {}/{}/{}. Non-working: {}",
                 new Object[] {year, month, day, nonWorking});
-        today = new DateMidnight(year, month, day, dtz);
+        DateMidnight today = new DateMidnight(year, month, day, dtz);
         saveNonWorkingDay(today, nonWorking);
         JSONStringer js = new JSONStringer();
         js.object()
@@ -241,6 +302,21 @@ public class TimesheetAction extends CustomAction {
                 .endObject();
         String jsonText = js.toString();
         return new NoCacheStreamingResolution("application/json", jsonText);
+    }
+
+    public void loadNonWorkingDays() {
+        for (DateMidnight current : nonWorkingDaysDb) {
+
+        }
+        //nonWorkingDays.addAll(nonWorkingDaysDb);
+    }
+
+    public void saveNonWorkingDay(DateMidnight date, boolean nonWorking) {
+        if (nonWorking) {
+            nonWorkingDaysDb.add(date);
+        } else {
+            nonWorkingDaysDb.remove(date);
+        }
     }
 
     //**************************************************************************
@@ -335,22 +411,22 @@ public class TimesheetAction extends CustomAction {
     static PersonDay paoloFeb2 = new PersonDay(paolo, feb2, null, false);
     static PersonDay paoloFeb3 = new PersonDay(paolo, feb3, null, false);
 
-    static Entry entry1 = new Entry(ac1, new Period(1, 30, 0, 0), "Intervista con Pippo");
-    static Entry entry2 = new Entry(ac4, new Period(3, 30, 0, 0), null);
-    static Entry entry3 = new Entry(ac5, new Period(3, 0, 0, 0), null);
+    static Entry entry1 = new Entry(ac1, 90, "Intervista con Pippo");
+    static Entry entry2 = new Entry(ac4, 210, null);
+    static Entry entry3 = new Entry(ac5, 180, null);
 
-    static Entry entry4 = new Entry(ac1, new Period(8, 0, 0, 0), null);
+    static Entry entry4 = new Entry(ac1, 480, null);
 
-    static Entry entry5 = new Entry(ac1, new Period(3, 30, 0, 0), null);
-    static Entry entry6 = new Entry(ac2, new Period(4, 30, 0, 0), null);
+    static Entry entry5 = new Entry(ac1, 210, null);
+    static Entry entry6 = new Entry(ac2, 270, null);
 
-    static Entry entry7 = new Entry(ac1, new Period(1, 0, 0, 0), null);
-    static Entry entry8 = new Entry(ac2, new Period(3, 0, 0, 0), null);
-    static Entry entry9 = new Entry(ac6, new Period(3, 0, 0, 0), null);
-    static Entry entry10 = new Entry(ac9, new Period(1, 0, 0, 0), null);
+    static Entry entry7 = new Entry(ac1, 60, null);
+    static Entry entry8 = new Entry(ac2, 180, null);
+    static Entry entry9 = new Entry(ac6, 180, null);
+    static Entry entry10 = new Entry(ac9, 60, null);
 
-    static Entry entry11 = new Entry(ac2, new Period(2, 30, 0, 0), null);
-    static Entry entry12 = new Entry(ac4, new Period(1, 0, 0, 0), null);
+    static Entry entry11 = new Entry(ac2, 150, null);
+    static Entry entry12 = new Entry(ac4, 60, null);
 
     static Map<DateMidnight, PersonDay> personDayDb
             = new HashMap<DateMidnight, PersonDay>();
@@ -388,46 +464,6 @@ public class TimesheetAction extends CustomAction {
         nonWorkingDaysDb.add(feb5);
     }
 
-    public void loadExecuteModel() {
-        availablePersons.add(paolo);
-        availablePersons.add(angelo);
-    }
-
-    public void loadWeekEntryModel() {
-        weekActivities.add(ac1);
-        weekActivities.add(ac2);
-        weekActivities.add(ac3);
-        weekActivities.add(ac4);
-        weekActivities.add(ac5);
-        weekActivities.add(ac6);
-        weekActivities.add(ac7);
-        weekActivities.add(ac8);
-        weekActivities.add(ac9);
-
-        for (Map.Entry<DateMidnight, PersonDay> current : personDayDb.entrySet()) {
-            DateMidnight dateMidnight = current.getKey();
-            PersonDay personDay = current.getValue();
-            if (nonWorkingDays.contains(dateMidnight)) {
-                personDay.setStandardWorkingMinutes(0);
-            } else {
-                personDay.setStandardWorkingMinutes(8);
-            }
-            personDays.put(dateMidnight, personDay);
-        }
-    }
-
-    public void loadNonWorkingDays() {
-        nonWorkingDays.addAll(nonWorkingDaysDb);
-    }
-
-    public void saveNonWorkingDay(DateMidnight date, boolean nonWorking) {
-        if (nonWorking) {
-            nonWorkingDaysDb.add(date);
-        } else {
-            nonWorkingDaysDb.remove(date);
-        }
-    }
-
     //--------------------------------------------------------------------------
     // Getters/setters
     //--------------------------------------------------------------------------
@@ -453,32 +489,8 @@ public class TimesheetAction extends CustomAction {
         this.weeksAgo = weeksAgo;
     }
 
-    public DateMidnight getToday() {
-        return today;
-    }
-
-    public DateMidnight getMonday() {
-        return monday;
-    }
-
     public List<Person> getAvailablePersons() {
         return availablePersons;
-    }
-
-    public List<Activity> getWeekActivities() {
-        return weekActivities;
-    }
-
-    public Map<DateMidnight, PersonDay> getPersonDays() {
-        return personDays;
-    }
-
-    public Set<DateMidnight> getNonWorkingDays() {
-        return nonWorkingDays;
-    }
-
-    public MonthView getMonthView() {
-        return monthView;
     }
 
     public Integer getDay() {
@@ -511,5 +523,17 @@ public class TimesheetAction extends CustomAction {
 
     public void setNonWorking(boolean nonWorking) {
         this.nonWorking = nonWorking;
+    }
+
+    public WeekEntryModel getWeekEntryModel() {
+        return weekEntryModel;
+    }
+
+    public NonWorkingDaysModel getNonWorkingDaysModel() {
+        return nonWorkingDaysModel;
+    }
+
+    public DateMidnight getToday() {
+        return today;
     }
 }

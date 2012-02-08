@@ -27,49 +27,18 @@
  *
  */
 
-package com.manydesigns.portofino.pageactions.timesheet.model;
+package com.manydesigns.portofino.calendar;
+
+import org.joda.time.DateMidnight;
 
 /**
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
- * @author Angelo Lupo          - angelo.lupo@manydesigns.com
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Alessio Stalla       - alessio.stalla@manydesigns.com
- */
-public class Entry {
-    public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
-
-    final Activity activity;
-    int minutes;
-    String note;
-
-    public Entry(Activity activity) {
-        this.activity = activity;
-    }
-
-    public Entry(Activity activity, int minutes, String note) {
-        this.activity = activity;
-        this.minutes = minutes;
-        this.note = note;
-    }
-
-    public Activity getActivity() {
-        return activity;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public int getMinutes() {
-        return minutes;
-    }
-
-    public void setMinutes(int minutes) {
-        this.minutes = minutes;
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+*/
+public class DefaultDay extends AbstractDay {
+    public DefaultDay(DateMidnight dayStart, DateMidnight dayEnd) {
+        super(dayStart, dayEnd);
     }
 }

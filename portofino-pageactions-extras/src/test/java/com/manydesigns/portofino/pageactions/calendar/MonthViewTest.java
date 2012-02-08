@@ -121,11 +121,11 @@ public class MonthViewTest extends TestCase {
         assertEquals(feb6.getMillis(), monthViewInterval.getEndMillis());
 
 
-        MonthView.Week week = monthView.getWeek(0);
+        MonthView.MonthViewWeek week = monthView.getWeek(0);
         assertEquals(dec26, week.getWeekStart());
         assertEquals(jan2, week.getWeekEnd());
 
-        MonthView.Day day = week.getDay(0);
+        MonthView.MonthViewDay day = week.getDay(0);
         assertEquals(dec26, day.getDayStart());
         assertEquals(dec27, day.getDayEnd());
 
@@ -191,7 +191,7 @@ public class MonthViewTest extends TestCase {
         assertTrue(monthView.addEvent(event));
 
         // first week is empty
-        MonthView.Week week = monthView.getWeek(0);
+        MonthView.MonthViewWeek week = monthView.getWeek(0);
         List<EventWeek> eventWeekOverlaps = week.getEventWeekOverlaps();
         assertEquals(0, eventWeekOverlaps.size());
 
@@ -228,7 +228,7 @@ public class MonthViewTest extends TestCase {
         assertTrue(monthView.addEvent(event));
 
         // first week is empty
-        MonthView.Week week = monthView.getWeek(0);
+        MonthView.MonthViewWeek week = monthView.getWeek(0);
         List<EventWeek> eventWeekOverlaps = week.getEventWeekOverlaps();
         assertEquals(0, eventWeekOverlaps.size());
 
@@ -263,7 +263,7 @@ public class MonthViewTest extends TestCase {
         assertTrue(monthView.addEvent(event));
 
         // first week is empty
-        MonthView.Week week = monthView.getWeek(0);
+        MonthView.MonthViewWeek week = monthView.getWeek(0);
         List<EventWeek> eventWeekOverlaps = week.getEventWeekOverlaps();
         assertEquals(0, eventWeekOverlaps.size());
 
@@ -320,9 +320,9 @@ public class MonthViewTest extends TestCase {
 
         monthView.sortEvents();
 
-        MonthView.Week week = monthView.getWeek(3);
+        MonthView.MonthViewWeek week = monthView.getWeek(3);
 
-        MonthView.Day day = week.getDay(0);
+        MonthView.MonthViewDay day = week.getDay(0);
         List<EventWeek> slots = day.slots;
         assertEquals(1, slots.size());
         assertEquals(event3, slots.get(0).getEvent());
