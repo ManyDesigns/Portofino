@@ -27,7 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino;
+package com.manydesigns.portofino.calendar;
+
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -35,8 +38,48 @@ package com.manydesigns.portofino;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class SessionAttributes {
+public class DefaultMonth extends AbstractMonth<DefaultMonth.DefaultWeek> {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
+    public DefaultMonth(DateTime referenceDateTime) {
+        super(referenceDateTime);
+    }
+
+    public DefaultMonth(DateTime referenceDateTime, int firstDayOfWeek) {
+        super(referenceDateTime, firstDayOfWeek);
+    }
+
+    @Override
+    protected DefaultWeek[] createWeeksArray(int size) {
+        return new DefaultWeek[size];
+    }
+
+    @Override
+    protected DefaultWeek createWeek(DateMidnight weekStart, DateMidnight weekEnd) {
+        return new DefaultWeek(weekStart, weekEnd);
+    }
+
+    public class DefaultWeek extends Week<DefaultMonth.Day> {
+
+        public DefaultWeek(DateMidnight weekStart, DateMidnight weekEnd) {
+            super(weekStart, weekEnd);
+        }
+
+        @Override
+        protected AbstractMonth.Day[] createDaysArray(int size) {
+            return new AbstractMonth.Day[size];
+        }
+
+        @Override
+        protected AbstractMonth.Day createDay(DateMidnight dayStart, DateMidnight dayEnd) {
+            return new AbstractMonth.Day(dayStart, dayEnd);
+        }
+    }
+
+    public class DefaultDay extends Day {
+        public DefaultDay(DateMidnight dayStart, DateMidnight dayEnd) {
+            super(dayStart, dayEnd);
+        }
+    }
 }

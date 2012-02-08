@@ -1,12 +1,17 @@
+<%@ page import="com.manydesigns.portofino.dispatcher.PageInstance" %>
 <%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
-<%@ page import="com.manydesigns.portofino.security.AccessLevel" %>
 <%@ page import="com.manydesigns.portofino.pages.Page" %>
 <%@ page import="com.manydesigns.portofino.pages.Permissions" %>
+<%@ page import="com.manydesigns.portofino.security.AccessLevel" %>
 <%@ page import="com.manydesigns.portofino.system.model.users.Group" %>
 <%@ page import="com.manydesigns.portofino.system.model.users.annotations.SupportsPermissions" %>
+<%@ page import="org.apache.shiro.subject.Subject" %>
+<%@ page import="org.apache.shiro.subject.support.DelegatingSubject" %>
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.PageInstance" %>
+<%@ page import="org.apache.shiro.SecurityUtils" %>
+<%@ page import="com.manydesigns.portofino.shiro.GroupPermission" %>
+<%@ page import="com.manydesigns.portofino.shiro.PagePermission" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -61,7 +66,9 @@
                         <tr>
                             <%
                                 Group group = (Group) pageContext.getAttribute("group");
-                                String groupId = group.getGroupId();
+                                final String groupId = group.getGroupId();
+                                GroupPermission groupPermission = new GroupPermission(Collections.singleton(groupId));
+
                                 AccessLevel localAccessLevel = actionBean.getLocalAccessLevel(currentPage, groupId);
                                 AccessLevel parentAccessLevel = null;
                                 PageInstance parentPageInstance = currentPageInstance.getParent();
@@ -74,7 +81,6 @@
                                     parentAccessLevel = AccessLevel.NONE;
                                 }
                                 Permissions permissions = SecurityLogic.calculateActualPermissions(currentPageInstance);
-                                List<String> groupIdList = Collections.singletonList(groupId);
                             %>
                             <td>
                                 <c:out value="${group.name}"/>
@@ -132,8 +138,15 @@
                                     <input type="checkbox" name="permissions[<%= groupId %>]"
                                            value="${perm}"
                                            <%
-                                               if(SecurityLogic.hasPermissions(permissions, groupIdList, null,
-                                                       (String) pageContext.getAttribute("perm"))) {
+                                               String testedPermission = (String) pageContext.getAttribute("perm");
+                                               Permissions testConf = new Permissions();
+                                               testConf.getActualPermissions()
+                                                       .put(groupId, permissions.getActualPermissions().get(groupId));
+                                               testConf.getActualLevels().put(groupId, AccessLevel.EDIT);
+                                               PagePermission pagePermission =
+                                                       new PagePermission
+                                                               (testConf, AccessLevel.NONE, testedPermission);
+                                               if(groupPermission.implies(pagePermission)) {
                                                    out.print("checked='checked'");
                                                }
                                            %>/>

@@ -74,6 +74,8 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
@@ -444,9 +446,8 @@ public class PageAdminAction extends AbstractActionBean {
             newParent = destinationDispatch.getLastPageInstance();
         }
         if(!SecurityLogic.isAdministrator(context.getRequest())) {
-            List<String> groups =
-                    (List<String>) context.getRequest().getAttribute(RequestAttributes.GROUPS);
-            if(!SecurityLogic.hasPermissions(newParent, groups, AccessLevel.EDIT)) {
+            Subject subject = SecurityUtils.getSubject();
+            if(!SecurityLogic.hasPermissions(newParent, subject, AccessLevel.EDIT)) {
                 SessionMessages.addErrorMessage(getMessage("page.copyOrMove.forbidden.accessLevel"));
                 return new RedirectResolution(dispatch.getOriginalPath());
             }
@@ -814,7 +815,7 @@ public class PageAdminAction extends AbstractActionBean {
     @RequiresAdministrator
     public Resolution testUserPermissions() {
         testUserId = StringUtils.defaultIfEmpty(testUserId, null);
-        List<String> groups = SecurityLogic.manageGroups(application, testUserId);
+        List<String> groups = SecurityLogic.getUserGroups(application, testUserId);
         Permissions permissions = SecurityLogic.calculateActualPermissions(getPageInstance());
         testedAccessLevel = AccessLevel.NONE;
         testedPermissions = new HashSet<String>();

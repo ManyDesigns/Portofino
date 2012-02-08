@@ -46,6 +46,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.shiro.web.env.EnvironmentLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -98,6 +99,8 @@ public class PortofinoListener
     protected MailSender mailSender;
     protected Thread mailSenderThread;
 
+    protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
+
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -149,6 +152,9 @@ public class PortofinoListener
         servletContext.setAttribute(
                 ApplicationAttributes.APPLICATION_STARTER, applicationStarter);
 
+        logger.info("Initializing Shiro environment");
+        environmentLoader.initEnvironment(servletContext);
+
         setupEmailScheduler();
 
         String lineSeparator = System.getProperty("line.separator", "\n");
@@ -180,6 +186,9 @@ public class PortofinoListener
             }
             logger.info("Mail sender terminated");
         }
+
+        logger.info("Destroying Shiro environment");
+        environmentLoader.destroyEnvironment(servletContext);
         logger.info("ManyDesigns Portofino stopped.");
     }
 

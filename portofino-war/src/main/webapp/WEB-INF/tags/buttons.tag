@@ -15,6 +15,8 @@
 <%@ tag import="java.util.List" %>
 <%@ tag import="java.util.MissingResourceException" %>
 <%@ tag import="com.manydesigns.portofino.dispatcher.PageInstance" %>
+<%@ tag import="org.apache.shiro.subject.Subject" %>
+<%@ tag import="org.apache.shiro.SecurityUtils" %>
 
 <%@ attribute name="list" required="true" %>
 <%@ attribute name="cssClass" required="false" %>
@@ -23,22 +25,20 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%
     ActionBean actionBean = (ActionBean) request.getAttribute("actionBean");
-    List<String> groups = (List<String>) request.getAttribute(RequestAttributes.GROUPS);
+    Subject subject = SecurityUtils.getSubject();
 
     PageInstance currentPageInstance = null;
-    Page currentPage = null;
     if(actionBean instanceof PageAction) {
         currentPageInstance = ((PageAction) actionBean).getPageInstance();
-        currentPage = currentPageInstance.getPage();
     }
     List<ButtonInfo> buttons =
-            ButtonsLogic.getButtonsForClass(actionBean.getClass(), list, groups, currentPage);
+            ButtonsLogic.getButtonsForClass(actionBean.getClass(), list);
     if(buttons != null) {
         for(ButtonInfo button : buttons) {
             Method handler = button.getMethod();
             boolean isAdmin = SecurityLogic.isAdministrator(request);
             if(!isAdmin &&
-               ((currentPageInstance != null && !ButtonsLogic.hasPermissions(button, currentPageInstance, groups)) ||
+               ((currentPageInstance != null && !ButtonsLogic.hasPermissions(button, currentPageInstance, subject)) ||
                 !SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler))) {
                 continue;
             }

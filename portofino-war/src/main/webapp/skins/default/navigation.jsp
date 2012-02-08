@@ -6,14 +6,14 @@
 <%@ page import="java.util.Collections" %>
 <%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
+<%@ page import="org.apache.shiro.SecurityUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <jsp:useBean id="dispatch" scope="request" type="com.manydesigns.portofino.dispatcher.Dispatch" />
 <jsp:useBean id="app" scope="request" type="com.manydesigns.portofino.application.Application" />
-<jsp:useBean id="groups" scope="request" type="java.util.List" />
 <%
     boolean admin = SecurityLogic.isAdministrator(request);
 
-    Navigation navigation = new Navigation(app, dispatch, groups, admin);
+    Navigation navigation = new Navigation(app, dispatch, SecurityUtils.getSubject(), admin);
     List<NavigationItem> navigationItems;
     NavigationItem rootNavigationItem = navigation.getRootNavigationItem();
     if (rootNavigationItem.isGhost() && !rootNavigationItem.isSelected()) {

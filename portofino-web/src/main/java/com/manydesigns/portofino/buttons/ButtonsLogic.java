@@ -36,9 +36,9 @@ import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.buttons.annotations.Guards;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
@@ -61,7 +61,7 @@ public class ButtonsLogic {
     }
 
     public static List<ButtonInfo> getButtonsForClass
-            (Class<?> someClass, String list, List<String> groups, Page page) {
+            (Class<?> someClass, String list) {
         List<ButtonInfo> buttons = new ArrayList<ButtonInfo>();
         for(Method method : someClass.getMethods()) {
             Button button = getButtonForMethod(method, list);
@@ -92,12 +92,13 @@ public class ButtonsLogic {
     }
 
     public static boolean hasPermissions
-            (@NotNull ButtonInfo button, @NotNull PageInstance pageInstance, @NotNull Collection<String> groupIds) {
+            (@NotNull ButtonInfo button, @NotNull PageInstance pageInstance, @NotNull Subject subject) {
         RequiresPermissions requiresPermissions =
                     SecurityLogic.getRequiresPermissionsAnnotation(button.getMethod(), button.getFallbackClass());
         if(requiresPermissions != null) {
             Permissions permissions = SecurityLogic.calculateActualPermissions(pageInstance);
-            return SecurityLogic.hasPermissions(permissions, groupIds, requiresPermissions);
+            return SecurityLogic.hasPermissions
+                    (pageInstance.getApplication(), permissions, subject, requiresPermissions);
         } else {
             return true;
         }

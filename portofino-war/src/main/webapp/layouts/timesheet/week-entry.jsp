@@ -3,18 +3,17 @@
 <%@ page import="com.manydesigns.portofino.pageactions.timesheet.model.Entry" %>
 <%@ page import="com.manydesigns.portofino.pageactions.timesheet.model.PersonDay" %>
 <%@ page
-        import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="org.joda.time.DateMidnight" %>
+        import="com.manydesigns.portofino.pageactions.timesheet.model.WeekEntryModel" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page
-        import="org.joda.time.Period" %>
+        import="org.joda.time.DateMidnight" %>
+<%@ page import="org.joda.time.Period" %>
 <%@ page import="org.joda.time.format.DateTimeFormat" %>
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="org.joda.time.format.PeriodFormatter" %>
 <%@ page import="org.joda.time.format.PeriodFormatterBuilder" %>
-<%@ page import="java.util.Locale" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.Set" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Locale" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -114,26 +113,27 @@
                 <th class="twe-activity">Progetto</th>
                 <th class="twe-activity">Attività</th>
                 <%
+                    WeekEntryModel weekEntryModel =
+                            actionBean.getWeekEntryModel();
                     XhtmlBuffer xb = new XhtmlBuffer(out);
-                    Set<DateMidnight> nonWorkingDays =
-                            actionBean.getNonWorkingDays();
 
-                    DateMidnight day = actionBean.getMonday();
                     DateTimeFormatter dayOfWeekFormatter =
                     DateTimeFormat.forPattern("E").withLocale(Locale.ITALY);
                     DateTimeFormatter dateFormatter =
                     DateTimeFormat.shortDate().withLocale(Locale.ITALY);
-                    Map<DateMidnight,PersonDay> personDays =
-                            actionBean.getPersonDays();
+
                     for (int i = 0; i < 7; i++) {
-                        PersonDay personDay = personDays.get(day);
+                        WeekEntryModel.Day day = weekEntryModel.getDay(i);
+                        DateMidnight dayDate = day.getDate();
+                        WeekEntryModel.DayStatus dayStatus = day.getStatus();
+
                         xb.openElement("th");
                         String htmlClass = "twe-day";
-                        if (nonWorkingDays.contains(day)) {
+                        if (day.isNonWorking()) {
                             htmlClass += " twe-non-working";
                         }
 
-                        if (day.equals(actionBean.getToday())) {
+                        if (day.isToday()) {
                             htmlClass += " twe-today";
                         }
 
@@ -141,8 +141,8 @@
 
 
                         xb.openElement("div");
-                        xb.write(dayOfWeekFormatter.print(day));
-                        if (personDay != null && personDay.isLocked()) {
+                        xb.write(dayOfWeekFormatter.print(dayDate));
+                        if (dayStatus == WeekEntryModel.DayStatus.LOCKED) {
                             xb.openElement("span");
                             xb.addAttribute("class", "ui-icon ui-icon-locked");
                             xb.addAttribute("style", "float: right");
@@ -151,12 +151,12 @@
                         }
                         xb.closeElement("div");
 
-                        xb.write(dateFormatter.print(day));
+                        xb.write(dateFormatter.print(dayDate));
 
-                        if (personDay != null) {
+                        if (dayStatus != null) {
                             String id = "swm-" + i;
                             Integer standardWorkingMinutes =
-                                    personDay.getStandardWorkingMinutes();
+                                    day.getStandardWorkingMinutes();
                             String value = (standardWorkingMinutes == null)
                                     ? "-"
                                     : Integer.toString(standardWorkingMinutes);
@@ -164,22 +164,14 @@
                         }
 
                         xb.closeElement("th");
-                        day = day.plusDays(1);
                     }
                 %>
             </tr>
             </thead>
             <tbody>
             <%
-                PeriodFormatter periodFormatter = new PeriodFormatterBuilder()
-                        .printZeroAlways()
-                        .appendHours()
-                        .appendLiteral(":")
-                        .minimumPrintedDigits(2)
-                        .appendMinutes()
-                        .toFormatter();
                 boolean even = false;
-                List<Activity> weekActivities = actionBean.getWeekActivities();
+                List<Activity> weekActivities = weekEntryModel.getActivities();
                 int weekActivitiesSize = weekActivities.size();
                 for (int activityIndex = 0; activityIndex < weekActivitiesSize; activityIndex++) {
                     Activity activity = weekActivities.get(activityIndex);
@@ -229,39 +221,38 @@
                     }
                     xb.closeElement("td");
 
-                    day = actionBean.getMonday();
                     for (int dayIndex = 0; dayIndex < 7; dayIndex++) {
+                        WeekEntryModel.Day day = weekEntryModel.getDay(dayIndex);
+                        DateMidnight dayDate = day.getDate();
+                        WeekEntryModel.DayStatus dayStatus = day.getStatus();
+
                         xb.openElement("td");
                         String htmlClass = "twe-hours";
-                        if (nonWorkingDays.contains(day)) {
+                        if (day.isNonWorking()) {
                             htmlClass += " twe-non-working";
                         }
 
-                        if (day.equals(actionBean.getToday())) {
+                        if (day.isToday()) {
                             htmlClass += " twe-today";
                         }
 
                         xb.addAttribute("class", htmlClass);
 
-                        PersonDay personDay = personDays.get(day);
-                        if (personDay == null) {
+                        if (dayStatus == null) {
                             //xb.write("--");
                         } else {
                             String hours = null;
-                            Entry entry = null;
-                            for (Entry current : personDay.getEntries()) {
-                                if (activity == current.getActivity()) {
-                                    entry = current;
-                                    break;
-                                }
-                            }
+                            WeekEntryModel.Entry entry =
+                                    day.findEntryByActivity(activity);
                             String note = null;
                             if (entry != null) {
-                                Period period = entry.getPeriod();
-                                hours = periodFormatter.print(period);
+                                int minutes = entry.getMinutes();
+                                hours = String.format("%d:%02d",
+                                        minutes / 60,
+                                        minutes % 60);
                                 note = entry.getNote();
                             }
-                            if (personDay.isLocked()) {
+                            if (dayStatus == WeekEntryModel.DayStatus.LOCKED) {
                                 if (hours == null) {
                                     xb.openElement("span");
                                     xb.addAttribute("class", "twe-ro-hours");
@@ -310,7 +301,6 @@
                         }
 
                         xb.closeElement("td");
-                        day = day.plusDays(1);
                     }
 
                     xb.closeElement("tr");
@@ -321,15 +311,18 @@
             <tr>
                 <td class="twe-total" colspan="3">Totale ore settimanali: <span id="twe-week-total" class="twe-week-total"></span></td>
                 <%
-                    day = actionBean.getMonday();
                     for (int i = 0; i < 7; i++) {
+                        WeekEntryModel.Day day = weekEntryModel.getDay(i);
+                        DateMidnight dayDate = day.getDate();
+                        WeekEntryModel.DayStatus dayStatus = day.getStatus();
+
                         xb.openElement("td");
                         String htmlClass = "twe-summary";
-                        if (nonWorkingDays.contains(day)) {
+                        if (day.isNonWorking()) {
                             htmlClass += " twe-non-working";
                         }
 
-                        if (day.equals(actionBean.getToday())) {
+                        if (day.isToday()) {
                             htmlClass += " twe-today";
                         }
 
@@ -340,7 +333,6 @@
                         xb.closeElement("span");
 
                         xb.closeElement("td");
-                        day = day.plusDays(1);
                     }
                 %>
             </tr>
