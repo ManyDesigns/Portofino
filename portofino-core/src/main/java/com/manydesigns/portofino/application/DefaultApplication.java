@@ -31,7 +31,6 @@ package com.manydesigns.portofino.application;
 
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.SessionAttributes;
 import com.manydesigns.portofino.application.hibernate.HibernateConfig;
 import com.manydesigns.portofino.application.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
@@ -505,7 +504,7 @@ public class DefaultApplication implements Application {
     public User findUserByUserName(String username) {
         Session session = getSystemSession();
         org.hibernate.Criteria criteria = session.createCriteria(DatabaseLogic.USER_ENTITY_NAME);
-        criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
+        criteria.add(Restrictions.eq("userName", username));
         return (User) criteria.uniqueResult();
     }
 

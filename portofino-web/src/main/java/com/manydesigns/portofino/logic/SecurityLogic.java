@@ -30,16 +30,17 @@
 package com.manydesigns.portofino.logic;
 
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.SessionAttributes;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
+import com.manydesigns.portofino.shiro.GroupPermission;
+import com.manydesigns.portofino.shiro.PagePermission;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.User;
 import com.manydesigns.portofino.system.model.users.UsersGroups;
@@ -47,9 +48,8 @@ import com.manydesigns.portofino.system.model.users.annotations.RequiresAdminist
 import com.manydesigns.portofino.system.model.users.annotations.RequiresPermissions;
 import net.sourceforge.stripes.action.ActionBean;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang.ArrayUtils;
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.BASE64Encoder;
@@ -72,7 +72,7 @@ public class SecurityLogic {
 
     public static final Logger logger = LoggerFactory.getLogger(SecurityLogic.class);
 
-    public static List<String> manageGroups(Application application, String userId) {
+    public static List<String> getUserGroups(Application application, String userId) {
         List<String> groups = new ArrayList<String>();
         Configuration conf = application.getPortofinoProperties();
         groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
@@ -99,36 +99,38 @@ public class SecurityLogic {
         Dispatch dispatch =
                 (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
         if (isNotAdmin && dispatch != null) {
-            List<String> groups = (List<String>) request.getAttribute(RequestAttributes.GROUPS);
+            Subject subject = SecurityUtils.getSubject();
             PageInstance pageInstance = dispatch.getLastPageInstance();
             Page page = pageInstance.getPage();
-            return hasPermissions(page.getPermissions(), groups, level, permissions);
+            return hasPermissions
+                    (dispatch.getLastPageInstance().getApplication(), page.getPermissions(),
+                     subject, level, permissions);
         } else {
             return true;
         }
     }
 
-    public static boolean hasPermissions(Dispatch dispatch, Collection<String> groups, Method handler) {
+    public static boolean hasPermissions(Dispatch dispatch, Subject subject, Method handler) {
         logger.debug("Checking action permissions");
-        return hasPermissions(dispatch.getLastPageInstance(), groups, handler);
+        return hasPermissions(dispatch.getLastPageInstance(), subject, handler);
     }
 
-    public static boolean hasPermissions(PageInstance instance, Collection<String> groups, Method handler) {
+    public static boolean hasPermissions(PageInstance instance, Subject subject, Method handler) {
         logger.debug("Checking action permissions");
         Class<?> theClass = instance.getActionClass();
         RequiresPermissions requiresPermissions = getRequiresPermissionsAnnotation(handler, theClass);
         if(requiresPermissions != null) {
             AccessLevel accessLevel = requiresPermissions.level();
             String[] permissions = requiresPermissions.permissions();
-            return hasPermissions(instance, groups, accessLevel, permissions);
+            return hasPermissions(instance, subject, accessLevel, permissions);
         }
         return true;
     }
 
     public static boolean hasPermissions
-            (PageInstance instance, Collection<String> groups, AccessLevel accessLevel, String... permissions) {
+            (PageInstance instance, Subject subject, AccessLevel accessLevel, String... permissions) {
         Permissions configuration = calculateActualPermissions(instance);
-        return hasPermissions(configuration, groups, accessLevel, permissions);
+        return hasPermissions(instance.getApplication(), configuration, subject, accessLevel, permissions);
     }
 
     public static Permissions calculateActualPermissions(PageInstance instance) {
@@ -139,25 +141,6 @@ public class SecurityLogic {
         }
 
         return calculateActualPermissions(pages);
-
-//        Permissions localPerms = instance.getPage().getPermissions();
-//        if(instance.getParent() == null) {
-//            return localPerms;
-//        }
-//
-//        Permissions configuration = new Permissions();
-//        configuration.getActualLevels().putAll(localPerms.getActualLevels());
-//        configuration.getActualPermissions().putAll(localPerms.getActualPermissions());
-//        Permissions parentPermissions = calculateActualPermissions(instance.getParent());
-//        Map<String, AccessLevel> parentLevels = parentPermissions.getActualLevels();
-//        for(Map.Entry<String, AccessLevel> entry : parentLevels.entrySet()) {
-//            String key = entry.getKey();
-//            AccessLevel value = entry.getValue();
-//            if(value == AccessLevel.DENY || configuration.getActualLevels().get(key) == null) {
-//                configuration.getActualLevels().put(key, value);
-//            }
-//        }
-//        return configuration;
     }
 
     public static Permissions calculateActualPermissions(List<Page> pages) {
@@ -189,19 +172,19 @@ public class SecurityLogic {
     }
 
     public static boolean hasPermissions
-            (Permissions configuration, Collection<String> groups, Method handler, Class<?> theClass) {
+            (Application application, Permissions configuration, Subject subject, Method handler, Class<?> theClass) {
         logger.debug("Checking action permissions");
         RequiresPermissions requiresPermissions = getRequiresPermissionsAnnotation(handler, theClass);
         if(requiresPermissions != null) {
-            return hasPermissions(configuration, groups, requiresPermissions);
+            return hasPermissions(application, configuration, subject, requiresPermissions);
         } else {
             return true;
         }
     }
 
     public static boolean hasPermissions
-            (Permissions configuration, Collection<String> groups, RequiresPermissions thing) {
-        return hasPermissions(configuration, groups, thing.level(), thing.permissions());
+            (Application application, Permissions configuration, Subject subject, RequiresPermissions thing) {
+        return hasPermissions(application, configuration, subject, thing.level(), thing.permissions());
     }
 
     public static RequiresPermissions getRequiresPermissionsAnnotation(Method handler, Class<?> theClass) {
@@ -219,12 +202,27 @@ public class SecurityLogic {
     }
 
     public static boolean hasPermissions
+            (Application application, Permissions configuration, Subject subject, AccessLevel level, String... permissions) {
+        PagePermission pagePermission = new PagePermission(configuration, level, permissions);
+        if(subject.isAuthenticated()) {
+            return subject.isPermitted(pagePermission);
+        } else {
+            //Shiro does not check permissions for non authenticated users
+            Configuration portofinoConfiguration = application.getPortofinoProperties();
+            List<String> groups = new ArrayList<String>();
+            groups.add(portofinoConfiguration.getString(PortofinoProperties.GROUP_ALL));
+            groups.add(portofinoConfiguration.getString(PortofinoProperties.GROUP_ANONYMOUS));
+            return new GroupPermission(groups).implies(pagePermission);
+        }
+    }
+
+    public static boolean hasPermissions
             (Permissions configuration, Collection<String> groups, AccessLevel level, String... permissions) {
         boolean hasLevel = level == null;
         boolean hasPermissions = true;
         Map<String, Boolean> permMap = new HashMap<String, Boolean>(permissions.length);
-        for(String group : groups) {
-            AccessLevel actualLevel = configuration.getActualLevels().get(group);
+        for(String groupId : groups) {
+            AccessLevel actualLevel = configuration.getActualLevels().get(groupId);
             if(actualLevel == AccessLevel.DENY) {
                 return false;
             } else if(!hasLevel &&
@@ -233,7 +231,7 @@ public class SecurityLogic {
                 hasLevel = true;
             }
 
-            Set<String> perms = configuration.getActualPermissions().get(group);
+            Set<String> perms = configuration.getActualPermissions().get(groupId);
             if(perms != null) {
                 for(String permission : permissions) {
                     if(perms.contains(permission)) {
@@ -249,7 +247,7 @@ public class SecurityLogic {
 
         hasPermissions = hasLevel && hasPermissions;
         if(!hasPermissions) {
-            logger.debug("User does not have permissions. User's groups: {}", ArrayUtils.toString(groups));
+            logger.debug("User does not have permissions. User's groups: {}", groups);
         }
         return hasPermissions;
     }
@@ -270,8 +268,10 @@ public class SecurityLogic {
     }
 
     public static boolean isUserInGroup(ServletRequest request, String groupId) {
-        List<String> groups = (List<String>) request.getAttribute(RequestAttributes.GROUPS);
-        return groups.contains(groupId);
+        Subject subject = SecurityUtils.getSubject();
+        return subject.hasRole(groupId);
+        /*List<String> groups = (List<String>) request.getAttribute(RequestAttributes.GROUPS);
+        return groups.contains(groupId);*/
     }
 
     public static boolean isRegisteredUser(ServletRequest request) {
@@ -289,22 +289,6 @@ public class SecurityLogic {
     private static Group findGroupById(Application application, String groupId) {
         return (Group) QueryUtils.getObjectByPk(application, application.getSystemDatabaseName(),
                 DatabaseLogic.GROUP_ENTITY_NAME, groupId);
-    }
-
-    public static User defaultLogin(Application application, String username, String password) {
-        Session session = application.getSystemSession();
-        org.hibernate.Criteria criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq(SessionAttributes.USER_NAME, username));
-        criteria.add(Restrictions.eq(DatabaseLogic.PASSWORD, password));
-
-        @SuppressWarnings({"unchecked"})
-        List<Object> result = (List<Object>) criteria.list();
-
-        if (result.size() == 1) {
-            return (User) result.get(0);
-        } else {
-            return null;
-        }
     }
 
     public static boolean satisfiesRequiresAdministrator(HttpServletRequest request, ActionBean actionBean, Method handler) {

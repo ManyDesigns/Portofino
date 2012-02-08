@@ -31,27 +31,25 @@ package com.manydesigns.portofino.actions.admin.groups;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.util.RandomUtil;
-import com.manydesigns.portofino.SessionAttributes;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.actions.admin.users.UserAdminAction;
-import com.manydesigns.portofino.pageactions.crud.CrudAction;
-import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
-import com.manydesigns.portofino.breadcrumbs.Breadcrumbs;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.dispatcher.RequestAttributes;
+import com.manydesigns.portofino.pageactions.crud.CrudAction;
+import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.system.model.users.annotations.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.InputStreamReader;
 import java.sql.Timestamp;
 
@@ -120,8 +118,7 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
         Group group = (Group) object;
         group.setCreationDate(new Timestamp(System.currentTimeMillis()));
         group.setGroupId(RandomUtil.createRandomId(20));
-        HttpSession session = context.getRequest().getSession();
-        group.setCreatorId((String) session.getAttribute(SessionAttributes.USER_ID));
+        group.setCreatorId((String) SecurityUtils.getSubject().getPrincipal());
         return true;
     }
 
