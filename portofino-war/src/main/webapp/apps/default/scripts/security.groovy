@@ -69,7 +69,7 @@ class Security implements ApplicationRealmDelegate {
                 throw new DisabledAccountException("User " + user.userId + " is not active");
             }
             SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(user.userId, password.toCharArray(), realm.name);
+                    new SimpleAuthenticationInfo(user.userName, password.toCharArray(), realm.name);
             updateUser(application, user);
             return info;
         } else {
@@ -78,17 +78,17 @@ class Security implements ApplicationRealmDelegate {
         }
     }
 
-    List<Object[]> getUsers(ApplicationRealm realm) {
+    List<String> getUsers(ApplicationRealm realm) {
         Application application = realm.application;
         Session session = application.getSystemSession();
-        SQLQuery query = session.createSQLQuery("select userId, userName from \"USERS\"");
+        SQLQuery query = session.createSQLQuery("select userName from \"USERS\"");
         return query.list();
     }
 
-    List<Object[]> getGroups(ApplicationRealm realm) {
+    List<String> getGroups(ApplicationRealm realm) {
         Application application = realm.application;
         Session session = application.getSystemSession();
-        SQLQuery query = session.createSQLQuery("select id, name from \"GROUPS\"");
+        SQLQuery query = session.createSQLQuery("select name from \"GROUPS\"");
         return query.list(); //TODO verificare
     }
 

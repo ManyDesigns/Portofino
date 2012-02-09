@@ -41,6 +41,7 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.forms.NewPage;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
@@ -63,14 +64,15 @@ import com.manydesigns.portofino.pageactions.text.TextAction;
 import com.manydesigns.portofino.pages.*;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
-import com.manydesigns.portofino.security.SupportsPermissions;
-import com.manydesigns.portofino.shiro.ApplicationRealm;
 import com.manydesigns.portofino.security.RequiresAdministrator;
+import com.manydesigns.portofino.security.SupportsPermissions;
+import com.manydesigns.portofino.shiro.UsersGroupsDAO;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.util.HttpUtil;
 import ognl.OgnlContext;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -786,7 +788,7 @@ public class PageAdminAction extends AbstractActionBean {
     // Page permisssions
     //--------------------------------------------------------------------------
 
-    protected List<Object[]> groups;
+    protected List<String> groups;
 
     //<group, level>
     protected Map<String, String> accessLevels = new HashMap<String, String>();
@@ -794,7 +796,7 @@ public class PageAdminAction extends AbstractActionBean {
     protected Map<String, List<String>> permissions = new HashMap<String, List<String>>();
 
     protected String testUserId;
-    protected List<Object[]> users;
+    protected List<String> users;
     protected AccessLevel testedAccessLevel;
     protected Set<String> testedPermissions;
 
@@ -802,11 +804,13 @@ public class PageAdminAction extends AbstractActionBean {
     public Resolution pagePermissions() {
         setupGroups();
 
-        ApplicationRealm realm =
-                (ApplicationRealm) context.getServletContext().getAttribute(ApplicationAttributes.SECURITY_REALM);
+        UsersGroupsDAO dao =
+                (UsersGroupsDAO) context.getServletContext().getAttribute(ApplicationAttributes.USERS_GROUPS_DAO);
 
-        users = new ArrayList<Object[]>(realm.getUsers());
-        users.add(0, new Object[] { null, "(anonymous)" });
+        if(dao != null) {
+            users = new ArrayList<String>(dao.getUsers());
+            users.add(0, null);
+        }
 
         return forwardToPagePermissions();
     }
@@ -817,7 +821,7 @@ public class PageAdminAction extends AbstractActionBean {
         testUserId = StringUtils.defaultIfEmpty(testUserId, null);
         PrincipalCollection principalCollection;
         if(!StringUtils.isEmpty(testUserId)) {
-            principalCollection = new SimplePrincipalCollection(testUserId, "realm"); //TODO
+            principalCollection = new SimplePrincipalCollection(testUserId, "realm");
         } else {
             principalCollection = null;
         }
@@ -865,10 +869,29 @@ public class PageAdminAction extends AbstractActionBean {
     }
 
     protected void setupGroups() {
-        ApplicationRealm realm =
-                (ApplicationRealm) context.getServletContext().getAttribute(ApplicationAttributes.SECURITY_REALM);
-
-        groups = realm.getGroups();
+        UsersGroupsDAO dao =
+                (UsersGroupsDAO) context.getServletContext().getAttribute(ApplicationAttributes.USERS_GROUPS_DAO);
+        if(dao != null) {
+            groups = dao.getGroups();
+        } else {
+            groups = new ArrayList<String>();
+            Configuration conf = application.getPortofinoProperties();
+            groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
+            groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
+            groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
+            groups.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS));
+            Permissions permissions = SecurityLogic.calculateActualPermissions(getPageInstance());
+            for(String group : permissions.getActualLevels().keySet()) {
+                if(!groups.contains(group)) {
+                    groups.add(group);
+                }
+            }
+            for(String group : permissions.getActualPermissions().keySet()) {
+                if(!groups.contains(group)) {
+                    groups.add(group);
+                }
+            }
+        }
     }
 
     @RequiresAdministrator
@@ -933,7 +956,7 @@ public class PageAdminAction extends AbstractActionBean {
     // Getters/Setters
     //--------------------------------------------------------------------------
 
-    public List<Object[]> getGroups() {
+    public List<String> getGroups() {
         return groups;
     }
 
@@ -961,7 +984,7 @@ public class PageAdminAction extends AbstractActionBean {
         this.testUserId = testUserId;
     }
 
-    public List<Object[]> getUsers() {
+    public List<String> getUsers() {
         return users;
     }
 

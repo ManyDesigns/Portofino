@@ -58,7 +58,7 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class ApplicationRealm extends AuthorizingRealm {
+public class ApplicationRealm extends AuthorizingRealm implements UsersGroupsDAO {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
@@ -99,11 +99,11 @@ public class ApplicationRealm extends AuthorizingRealm {
         return ensureDelegate().getAuthenticationInfo(this, username, password);
     }
 
-    public List<Object[]> getUsers() {
+    public List<String> getUsers() {
         return ensureDelegate().getUsers(this);
     }
 
-    public List<Object[]> getGroups() {
+    public List<String> getGroups() {
         return ensureDelegate().getGroups(this);
     }
 

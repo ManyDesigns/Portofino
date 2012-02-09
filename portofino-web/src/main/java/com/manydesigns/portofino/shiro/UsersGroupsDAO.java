@@ -29,9 +29,6 @@
 
 package com.manydesigns.portofino.shiro;
 
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authz.AuthorizationInfo;
-
 import java.util.List;
 
 /**
@@ -40,15 +37,11 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface ApplicationRealmDelegate {
+public interface UsersGroupsDAO {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, Object userId);
+    List<String> getUsers();
 
-    AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, String userName, String password);
-
-    List<String> getUsers(ApplicationRealm realm);
-
-    List<String> getGroups(ApplicationRealm realm);
+    List<String> getGroups();
 }

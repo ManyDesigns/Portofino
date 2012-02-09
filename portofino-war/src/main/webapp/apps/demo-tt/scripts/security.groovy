@@ -22,21 +22,20 @@ class Security implements ApplicationRealmDelegate {
 
     private static final Logger logger = LoggerFactory.getLogger(Security.class);
 
-    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, Object userId) {
+    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, Object userName) {
         Application application = realm.getApplication();
         Set<String> groups = new HashSet<String>();
         Configuration conf = application.getPortofinoProperties();
         groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
-        if (userId == null) {
+        if (userName == null) {
             groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
         } else {
             groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
-            //TODO
             Session session = application.getSession("redmine");
-            if(!(userId instanceof Integer)) {
-                userId = Integer.parseInt(userId.toString());
-            }
-            def user = session.get("users", (Integer) userId);
+            org.hibernate.Criteria criteria = session.createCriteria("users");
+            criteria.add(Restrictions.eq("login", userName));
+            def user = criteria.uniqueResult();
+            //TODO
             if("admin".equals(user.login)) {
                 groups.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS));
             }
@@ -65,36 +64,34 @@ class Security implements ApplicationRealmDelegate {
 
         List<Object> result = (List<Object>) criteria.list();
 
-        def user;
         if (result.size() == 1) {
-            user = result.get(0);
             SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(user.id, password.toCharArray(), realm.name);
+                    new SimpleAuthenticationInfo(userName, password.toCharArray(), realm.name);
             return info;
         } else {
             throw new AuthenticationException("Login failed");
         }
     }
 
-    List<Object[]> getUsers(ApplicationRealm realm) {
+    List<String> getUsers(ApplicationRealm realm) {
         Application application = realm.application;
         Session session = application.getSession("redmine");
-        SQLQuery query = session.createSQLQuery("select \"id\", \"login\" from \"users\"");
+        SQLQuery query = session.createSQLQuery("select \"login\" from \"users\"");
         return query.list();
     }
 
-    List<Object[]> getGroups(ApplicationRealm realm) {
+    List<String> getGroups(ApplicationRealm realm) {
         Application application = realm.application;
-        List<Object[]> groups = new ArrayList<Object[]>();
+        def groups = new ArrayList<String>();
         Configuration conf = application.getPortofinoProperties();
         def group = conf.getString(PortofinoProperties.GROUP_ALL);
-        groups.add([group, group] as Object[]);
+        groups.add(group);
         group = conf.getString(PortofinoProperties.GROUP_ANONYMOUS);
-        groups.add([group, group] as Object[]);
+        groups.add(group);
         group = conf.getString(PortofinoProperties.GROUP_REGISTERED);
-        groups.add([group, group] as Object[]);
+        groups.add(group);
         group = conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
-        groups.add([group, group] as Object[]);
+        groups.add(group);
         return groups;
     }
 

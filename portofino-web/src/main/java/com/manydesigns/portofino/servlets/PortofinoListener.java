@@ -39,7 +39,7 @@ import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
-import com.manydesigns.portofino.shiro.ApplicationRealm;
+import com.manydesigns.portofino.shiro.UsersGroupsDAO;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -49,6 +49,7 @@ import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.WebEnvironment;
 import org.slf4j.Logger;
@@ -62,6 +63,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.io.File;
+import java.util.List;
 
 
 /*
@@ -160,9 +162,20 @@ public class PortofinoListener
         WebEnvironment environment = environmentLoader.initEnvironment(servletContext);
         logger.debug("Publishing the Application Realm in the servlet context");
         RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
-        Realm realm = rsm.getRealms().iterator().next();
-        assert realm instanceof ApplicationRealm;
-        servletContext.setAttribute(ApplicationAttributes.SECURITY_REALM, realm);
+        List classNames = portofinoConfiguration.getList(PortofinoProperties.SECURITY_REALM_CLASSES);
+        for(Object className : classNames) {
+            try {
+                Class c = Class.forName(className.toString());
+                Realm realm = (Realm) c.newInstance();
+                LifecycleUtils.init(realm);
+                rsm.setRealm(realm);
+                if(realm instanceof UsersGroupsDAO) {
+                    servletContext.setAttribute(ApplicationAttributes.USERS_GROUPS_DAO, realm);
+                }
+            } catch (Throwable t) {
+                logger.error("Couldn't create security realm " + className, t);
+            }
+        }
 
         setupEmailScheduler();
 

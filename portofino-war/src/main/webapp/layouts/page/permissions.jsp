@@ -5,7 +5,6 @@
 <%@ page import="com.manydesigns.portofino.security.AccessLevel" %>
 <%@ page import="com.manydesigns.portofino.shiro.GroupPermission" %>
 <%@ page import="com.manydesigns.portofino.shiro.PagePermission" %>
-<%@ page import="com.manydesigns.portofino.system.model.users.Group" %>
 <%@ page import="java.util.Collections" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
@@ -54,8 +53,7 @@
                     <c:forEach var="group" items="${actionBean.groups}">
                         <tr>
                             <%
-                                Object[] group = (Object[]) pageContext.getAttribute("group");
-                                final String groupId = group[0].toString();
+                                final String groupId = (String) pageContext.getAttribute("group");
                                 GroupPermission groupPermission = new GroupPermission(Collections.singleton(groupId));
 
                                 AccessLevel localAccessLevel = actionBean.getLocalAccessLevel(currentPage, groupId);
@@ -72,10 +70,10 @@
                                 Permissions permissions = SecurityLogic.calculateActualPermissions(currentPageInstance);
                             %>
                             <td>
-                                <c:out value="${group[1]}"/>
+                                <c:out value="${group}"/>
                             </td>
                             <td>
-                                <select name="accessLevels[${group[0]}]"
+                                <select name="accessLevels[${group}]"
                                         <%
                                             if(AccessLevel.DENY.equals(parentAccessLevel)) {
                                                 out.print("disabled='disabled'");
@@ -148,13 +146,18 @@
             <div class="yui-u">
                 <h2 style="margin-top: 0;"><fmt:message key="layouts.page.permissions.test-a-user" /></h2>
                 <label for="testUserIdSelect"><fmt:message key="layouts.page.permissions.select-a-user" /></label>
-                <select name="testUserId" id="testUserIdSelect">
-                    <c:forEach var="user" items="${actionBean.users}">
-                        <option value="${user[0]}"
-                                <c:if test="${actionBean.testUserId eq user[0]}">selected="selected"</c:if>
-                                ><c:out value="${user[1]}" /></option>
-                    </c:forEach>
-                </select>
+                <c:if test="${actionBean.users != null}">
+                    <select name="testUserId" id="testUserIdSelect">
+                        <c:forEach var="user" items="${actionBean.users}">
+                            <option value="${user}"
+                                    <c:if test="${actionBean.testUserId eq user}">selected="selected"</c:if>
+                                    ><c:out value="${empty user ? '(anonymous)' : user}" /></option>
+                        </c:forEach>
+                    </select>
+                </c:if>
+                <c:if test="${actionBean.users == null}">
+                    <input name="testUserId" id="testUserIdSelect" type="text" value="${actionBean.testUserId}" />
+                </c:if>
                 <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
                 <portofino:buttons list="testUserPermissions" cssClass="portletButton" />
                 <br /><br />

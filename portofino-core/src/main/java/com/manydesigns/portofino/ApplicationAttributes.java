@@ -44,5 +44,5 @@ public class ApplicationAttributes {
     public final static String SERVER_INFO = "serverInfo";
     public final static String APPLICATION_STARTER = "applicationStarter";
     public final static String MAIL_QUEUE = "mailQueue";
-    public static final String SECURITY_REALM = "securityRealm";
+    public static final String USERS_GROUPS_DAO = "securityRealm";
 }
