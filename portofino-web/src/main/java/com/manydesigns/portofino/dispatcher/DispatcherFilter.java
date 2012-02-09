@@ -33,6 +33,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.i18n.SimpleTextProvider;
 import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.starter.ApplicationStarter;

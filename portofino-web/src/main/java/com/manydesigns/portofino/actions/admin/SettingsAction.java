@@ -37,7 +37,7 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.CommonsConfigurationAccessor;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.dispatcher.AbstractActionBean;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
+import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.security.RequiresAdministrator;

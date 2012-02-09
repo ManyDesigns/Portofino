@@ -29,8 +29,8 @@
 
 package com.manydesigns.portofino.actions.model;
 
+import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.dispatcher.AbstractActionBean;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.model.Model;

@@ -35,7 +35,7 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.AbstractActionBean;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
+import com.manydesigns.portofino.RequestAttributes;
 import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.configuration.Configuration;

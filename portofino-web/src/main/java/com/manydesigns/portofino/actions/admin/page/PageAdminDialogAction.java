@@ -32,6 +32,7 @@ package com.manydesigns.portofino.actions.admin.page;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.forms.CopyPage;
 import com.manydesigns.portofino.actions.forms.MovePage;
 import com.manydesigns.portofino.application.Application;

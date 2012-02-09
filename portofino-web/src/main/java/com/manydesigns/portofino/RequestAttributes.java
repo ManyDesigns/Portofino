@@ -27,7 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.dispatcher;
+package com.manydesigns.portofino;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

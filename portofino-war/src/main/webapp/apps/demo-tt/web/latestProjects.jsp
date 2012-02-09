@@ -6,7 +6,7 @@
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="com.manydesigns.portofino.application.QueryUtils" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.RequestAttributes" %>
+<%@ page import="com.manydesigns.portofino.RequestAttributes" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>

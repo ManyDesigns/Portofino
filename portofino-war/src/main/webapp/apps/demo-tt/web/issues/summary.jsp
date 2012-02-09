@@ -1,5 +1,5 @@
 <%@ page import="com.manydesigns.elements.ElementsThreadLocals" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.RequestAttributes" %>
+<%@ page import="com.manydesigns.portofino.RequestAttributes" %>
 <%@ page import="com.manydesigns.portofino.application.Application" %>
 <%@ page import="com.manydesigns.portofino.application.QueryUtils" %>
 <%@ page import="ognl.Ognl" %>

@@ -41,7 +41,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertiesAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.dispatcher.AbstractActionBean;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
+import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.model.AnnModel;
 import com.manydesigns.portofino.actions.model.PrimaryKeyColumnModel;
 import com.manydesigns.portofino.actions.model.PrimaryKeyModel;

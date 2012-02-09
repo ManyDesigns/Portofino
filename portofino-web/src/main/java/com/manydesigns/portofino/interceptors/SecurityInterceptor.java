@@ -30,10 +30,10 @@
 package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.servlet.ServletUtils;
+import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pages.Permissions;
 import net.sourceforge.stripes.action.*;

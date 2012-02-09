@@ -31,8 +31,8 @@ package com.manydesigns.portofino.stripes;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.dispatcher.*;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import groovy.lang.GroovyObject;

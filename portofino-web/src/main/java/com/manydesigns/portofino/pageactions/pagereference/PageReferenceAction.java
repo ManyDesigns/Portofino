@@ -32,7 +32,7 @@ package com.manydesigns.portofino.pageactions.pagereference;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
+import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.pageactions.pagereference.configuration.PageReferenceConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;

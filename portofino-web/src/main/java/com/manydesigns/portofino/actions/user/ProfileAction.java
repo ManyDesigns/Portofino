@@ -38,7 +38,7 @@
 //import com.manydesigns.portofino.PortofinoProperties;
 //import com.manydesigns.portofino.SessionAttributes;
 //import com.manydesigns.portofino.dispatcher.AbstractActionBean;
-//import com.manydesigns.portofino.dispatcher.RequestAttributes;
+//import com.manydesigns.portofino.RequestAttributes;
 //import com.manydesigns.portofino.application.Application;
 //import com.manydesigns.portofino.application.QueryUtils;
 //import com.manydesigns.portofino.di.Inject;

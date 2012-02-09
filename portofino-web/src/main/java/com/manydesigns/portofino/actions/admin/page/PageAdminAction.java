@@ -42,6 +42,7 @@ import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.forms.NewPage;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;

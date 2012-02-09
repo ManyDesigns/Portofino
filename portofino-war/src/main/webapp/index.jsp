@@ -1,4 +1,4 @@
-<%@ page import="com.manydesigns.portofino.dispatcher.RequestAttributes" %>
+<%@ page import="com.manydesigns.portofino.RequestAttributes" %>
 <%@ page import="com.manydesigns.portofino.application.Application" %>
 <%@ page import="com.manydesigns.portofino.application.AppProperties" %>
 <%

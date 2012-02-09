@@ -1,5 +1,5 @@
 <%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.RequestAttributes" %>
+<%@ page import="com.manydesigns.portofino.RequestAttributes" %>
 <%@ page import="com.manydesigns.portofino.interceptors.ApplicationInterceptor" %>
 <%@ page import="com.manydesigns.portofino.dispatcher.PageInstance" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
