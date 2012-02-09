@@ -17,6 +17,18 @@
     </listener>
 
     <filter>
+        <filter-name>encoding-filter</filter-name>
+        <filter-class>
+            com.manydesigns.portofino.servlets.CharacterEncodingFilter
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>encoding-filter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
+    <filter>
         <filter-name>elements-filter</filter-name>
         <filter-class>
             com.manydesigns.elements.servlet.ElementsFilter
@@ -107,6 +119,7 @@
         <init-param>
             <param-name>Interceptor.Classes</param-name>
             <param-value>
+                com.manydesigns.portofino.interceptors.NoCacheInterceptor,
                 com.manydesigns.portofino.interceptors.SecurityInterceptor,
                 com.manydesigns.portofino.interceptors.ApplicationInterceptor,
                 com.manydesigns.portofino.interceptors.InjectionInterceptor,

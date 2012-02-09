@@ -599,4 +599,12 @@ public class PortletAction extends AbstractActionBean {
         this.script = script;
     }
 
+    protected Resolution portletError(Throwable e) {
+        context.getRequest().setAttribute(PORTOFINO_PORTLET_EXCEPTION, e);
+        if(isEmbedded()) {
+            return new ForwardResolution("/layouts/portlet-error.jsp");
+        } else {
+            return forwardToPortletPage("/layouts/portlet-error.jsp");
+        }
+    }
 }

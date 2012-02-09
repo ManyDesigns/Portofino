@@ -2,7 +2,8 @@
 <model>
     <databases>
         <database databaseName="redmine">
-            <jdbcConnection driver="org.h2.Driver" password="" url="jdbc:h2:${app}/dbs/redmine" username="sa"/>
+            <!--<jdbcConnection driver="org.h2.Driver" password="" url="jdbc:h2:${app}/dbs/redmine" username="sa"/>-->
+            <jdbcConnection driver="com.mysql.jdbc.Driver" password="" url="jdbc:mysql://localhost/redmine?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI,character_set_database=utf8" username="root"/>
             <schemas>
                 <schema schemaName="PUBLIC">
                     <tables>
@@ -666,7 +667,7 @@
         <reference fromColumn="tracker_id"/>
     </references>
 </query>
-<query hql="from issue_statuses" name="sp_issue_status" toDatabase="redmine" toSchema="PUBLIC">
+<query sql="select s.id, s.name, true from issue_statuses s" name="sp_issue_status" toDatabase="redmine" toSchema="PUBLIC">
     <references>
         <reference fromColumn="status_id"/>
     </references>
@@ -1406,7 +1407,7 @@
     <annotations/>
 </column>
 <column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
+    <annotations />
 </column>
 <column autoincrement="false" columnName="homepage" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>

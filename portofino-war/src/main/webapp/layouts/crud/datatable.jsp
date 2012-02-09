@@ -48,6 +48,7 @@
 
         var myDataSource = new YAHOO.util.DataSource("<c:out value="${actionBean.dispatch.absoluteOriginalPath}?jsonSearchData="/>");
         myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+        myDataSource.connMethodPost = true;
         myDataSource.connXhrMode = "queueRequests";
         myDataSource.responseSchema = {
             resultsList: "Result",

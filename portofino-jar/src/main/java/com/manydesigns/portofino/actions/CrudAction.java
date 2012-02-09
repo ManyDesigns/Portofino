@@ -47,7 +47,6 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.actions.forms.CrudPropertyEdit;
 import com.manydesigns.portofino.actions.forms.CrudSelectionProviderEdit;
@@ -104,6 +103,7 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -208,8 +208,7 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
     //**************************************************************************
 
     @Before
-    @Override
-    public void prepare() {
+    public Resolution prepareCrud() {
         super.prepare();
         CrudPageInstance crudPageInstance = getPageInstance();
         pk = crudPageInstance.getPk();
@@ -219,13 +218,18 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
         if(crud != null && crud.getActualDatabase() != null) {
             classAccessor = crudPageInstance.getClassAccessor();
             baseTable = crudPageInstance.getBaseTable();
-            session = application.getSession(crud.getDatabase());
+            try {
+                session = application.getSession(crud.getDatabase());
+            } catch (Throwable t) {
+                return portletError(t);
+            }
             pkHelper = crudPageInstance.getPkHelper();
             crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
             object = crudPageInstance.getObject();
 
             setupSelectionProviders();
         }
+        return null;
     }
 
     private void setupSelectionProviders() {
@@ -473,7 +477,7 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
         js.endArray();
         js.endObject();
         String jsonText = js.toString();
-        return new NoCacheStreamingResolution("application/json", jsonText);
+        return new NoCacheStreamingResolution("application/json;charset=UTF-8", jsonText);
     }
 
     protected String generateCountQuery(String queryString) throws JSQLParserException {
@@ -803,7 +807,6 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
     //**************************************************************************
     // Return to parent
     //**************************************************************************
-
 
     @Override
     public void setupReturnToParentTarget() {
@@ -1139,7 +1142,13 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
         }
         if (searchString != null) {
             sb.append("?searchString=");
-            sb.append(Util.urlencode(searchString));
+            String encodedSearchString;
+            try {
+                encodedSearchString = URLEncoder.encode(searchString, "ISO-8859-1");
+            } catch (UnsupportedEncodingException e) {
+                throw new Error(e);
+            }
+            sb.append(encodedSearchString);
         }
         return sb.toString();
     }
