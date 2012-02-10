@@ -12,11 +12,7 @@ class prjstatus extends CustomAction {
     @Override
     public Resolution execute() {
         String fwd = getAppJsp("/projects/projectStatus.jsp");
-        if(isEmbedded()) {
-            return new ForwardResolution(fwd);
-        } else {
-            return forwardToPortletPage(fwd);
-        }
+        return forwardTo(fwd);
     }
 
 }

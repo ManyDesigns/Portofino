@@ -56,11 +56,7 @@ public class CustomAction extends AbstractPageAction {
     @DefaultHandler
     public Resolution execute() {
         String fwd = "/layouts/custom/example.jsp";
-        if(isEmbedded()) {
-            return new ForwardResolution(fwd);
-        } else {
-            return forwardToPortletPage(fwd);
-        }
+        return forwardTo(fwd);
     }
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")

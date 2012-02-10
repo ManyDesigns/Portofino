@@ -593,13 +593,21 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         this.script = script;
     }
 
+    //--------------------------------------------------------------------------
+    // Utitilities
+    //--------------------------------------------------------------------------
+
     public String getAppJsp(String jsp) {
         return "/apps/" + application.getAppId() + "/web" + jsp;
     }
 
-    //--------------------------------------------------------------------------
-    // Utitilities
-    //--------------------------------------------------------------------------
+    public Resolution forwardTo(String page) {
+        if(isEmbedded()) {
+            return new ForwardResolution(page);
+        } else {
+            return forwardToPortletPage(page);
+        }
+    }
 
     protected Resolution forwardToPortletNotConfigured() {
         if (isEmbedded()) {
@@ -612,10 +620,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     protected Resolution forwardToPortletError(Throwable e) {
         context.getRequest().setAttribute(PORTOFINO_PORTLET_EXCEPTION, e);
-        if(isEmbedded()) {
-            return new ForwardResolution("/layouts/portlet-error.jsp");
-        } else {
-            return forwardToPortletPage("/layouts/portlet-error.jsp");
-        }
+        return forwardTo("/layouts/portlet-error.jsp");
     }
 }

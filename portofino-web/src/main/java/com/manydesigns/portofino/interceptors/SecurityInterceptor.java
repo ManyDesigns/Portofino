@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.interceptors;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.user.LoginAction;
@@ -36,12 +37,14 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pages.Permissions;
+import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.util.UrlBuilder;
+import ognl.OgnlContext;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -94,10 +97,13 @@ public class
             logger.debug("No user found");
         }
 
+        logger.debug("Publishing securityUtils in OGNL context");
+        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+        ognlContext.put("securityUtils", new SecurityUtilsBean());
+
         logger.debug("Setting up logging MDC");
         MDC.clear();
         MDC.put("userId", userId);
-        //MDC.put(SessionAttributes.USER_NAME, userName); TODO
 
         if (!SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler)) {
             return handleAnonymousOrUnauthorized(userId, request);

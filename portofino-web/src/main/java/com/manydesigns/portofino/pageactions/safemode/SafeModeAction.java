@@ -31,7 +31,6 @@ package com.manydesigns.portofino.pageactions.safemode;
 
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
 
@@ -49,11 +48,7 @@ public class SafeModeAction extends CustomAction {
     @DefaultHandler
     public Resolution execute() {
         String fwd = "/layouts/safemode/safemode.jsp";
-        if(isEmbedded()) {
-            return new ForwardResolution(fwd);
-        } else {
-            return forwardToPortletPage(fwd);
-        }
+        return forwardTo(fwd);
     }
 
 }

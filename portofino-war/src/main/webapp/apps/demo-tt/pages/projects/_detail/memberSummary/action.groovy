@@ -12,11 +12,7 @@ class memberSummary extends CustomAction {
     @Override
     public Resolution execute() {
         String fwd = getAppJsp("/projects/memberSummary.jsp");
-        if(isEmbedded()) {
-            return new ForwardResolution(fwd);
-        } else {
-            return forwardToPortletPage(fwd);
-        }
+        return forwardTo(fwd);
     }
 
 }
