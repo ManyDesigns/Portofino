@@ -123,10 +123,10 @@ public class PageAdminAction extends AbstractActionBean {
     protected String fragment;
     protected String title;
 
-    @After(stages = LifecycleStage.BindingAndValidation) //Così può influenzare SecurityInterceptor (dispatch)
+    @After(stages = LifecycleStage.BindingAndValidation) //Cosi' puo' influenzare SecurityInterceptor (dispatch)
     public void prepare() {
         Application application =
-                //l'injection interceptor non è ancora stato chiamato
+                //l'injection interceptor non e' ancora stato chiamato
                 (Application) context.getRequest().getAttribute(RequestAttributes.APPLICATION);
         Dispatcher dispatcher = new Dispatcher(application);
         String contextPath = context.getRequest().getContextPath();

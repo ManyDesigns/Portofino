@@ -47,19 +47,19 @@ public class DesaturatedDrawingSupplier implements DrawingSupplier {
 
     // desaturated
     private final Paint[] paintArray = {
-        new Color(0xcc5252), // saturazione 60, luminosità 80
+        new Color(0xcc5252), // saturazione 60, luminosita' 80
         new Color(0x52cc52),
         new Color(0x5252cc),
 
-        new Color(0xd9d957), // saturazione 60, luminosità 85
+        new Color(0xd9d957), // saturazione 60, luminosita' 85
         new Color(0x57d9d9),
         new Color(0xd957d9),
 
-        new Color(0xd49455), // saturazione 60, luminosità 83
+        new Color(0xd49455), // saturazione 60, luminosita' 83
         new Color(0x94d455),
         new Color(0x55d494),
 
-        new Color(0x5594d4), // saturazione 60, luminosità 83
+        new Color(0x5594d4), // saturazione 60, luminosita' 83
         new Color(0x9455d4),
         new Color(0xd45594)
     };

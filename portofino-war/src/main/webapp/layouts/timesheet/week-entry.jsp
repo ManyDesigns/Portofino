@@ -111,7 +111,7 @@
             <tr>
                 <th class="twe-activity">Commessa</th>
                 <th class="twe-activity">Progetto</th>
-                <th class="twe-activity">Attività</th>
+                <th class="twe-activity">Attivit&agrave;</th>
                 <%
                     WeekEntryModel weekEntryModel =
                             actionBean.getWeekEntryModel();

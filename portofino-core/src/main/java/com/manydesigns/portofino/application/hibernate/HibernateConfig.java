@@ -360,7 +360,7 @@ public class HibernateConfig {
             mappings.addColumnBinding(column.getColumnName(), col, tab);
         }
         if (hasErrors) {
-            // TODO PAOLO: se la PK non è buona, tutta la tabella dovrebbe saltare
+            // TODO PAOLO: se la PK non e' buona, tutta la tabella dovrebbe saltare
             logger.error("Skipping foreign key");
             return;
         }
@@ -406,7 +406,7 @@ public class HibernateConfig {
         col.setSqlTypeCode(jdbcType);
         col.setSqlType(columnType);
         if (!setHibernateType(id, column, column.getActualJavaType(), jdbcType)) {
-            // TODO PAOLO: se la PK non è buona, tutta la tabella dovrebbe saltare
+            // TODO PAOLO: se la PK non e' buona, tutta la tabella dovrebbe saltare
             logger.error("Skipping foreign key");
             return;
         }
@@ -530,8 +530,8 @@ public class HibernateConfig {
         com.manydesigns.portofino.model.database.Table oneMDTable =
                 relationship.getToTable();
 
-        //Se la classe One non è dinamica e
-        // non ha la proprietà non inserisco la relazione
+        //Se la classe One non e' dinamica e
+        // non ha la proprieta' non inserisco la relazione
         if (oneMDTable.getJavaClass()!=null){
             try {
                 Class oneClass = oneMDTable.getActualJavaClass();
@@ -549,7 +549,7 @@ public class HibernateConfig {
                     return;
                 }
             } catch (Exception e) {
-                //se non c'è non inserisco la relazione
+                //se non c'e' non inserisco la relazione
                 return;
             }
         }
@@ -577,7 +577,7 @@ public class HibernateConfig {
             return;
         }
 
-        //Uso i Bag perché i set non funzionano con i componenti dinamici
+        //Uso i Bag perche' i set non funzionano con i componenti dinamici
         Bag set = new Bag(mappings, clazzOne);
         // Mettere Lazy in debug a false per ottenere subito eventuali errori
         // nelle relazioni

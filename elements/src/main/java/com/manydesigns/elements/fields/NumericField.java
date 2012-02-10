@@ -160,7 +160,7 @@ public class NumericField extends AbstractTextField {
             tmpValue = (BigDecimal) OgnlUtils.convertValue(
                     stringValue, BigDecimal.class);
         } catch (Throwable e) {
-            //Se il testo non è un BigDecimal provo a parserizzarlo
+            //Se il testo non e' un BigDecimal provo a parserizzarlo
             // con il pattern specificato nel format
             if (decimalFormat == null) {
                 decimalFormatError = true;

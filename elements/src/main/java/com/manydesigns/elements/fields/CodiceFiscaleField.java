@@ -46,7 +46,7 @@ public class CodiceFiscaleField extends RegExpTextField {
     public final static String codiceFiscaleRegExp =
             "[A-Z]{6}[0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{2}[A-Z][0-9LMNPQRSTUV]{3}[A-Z]";
 
-    /* Regex più semplice che non gestisce le omocodie è:
+    /* Regex piu' semplice che non gestisce le omocodie e':
      * [A-Z]{6}[\\d]{2}[A-Z][\\d]{2}[A-Z][\\d]{3}[A-Z]
      */
     //**************************************************************************

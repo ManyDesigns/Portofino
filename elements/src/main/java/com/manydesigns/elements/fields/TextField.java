@@ -214,7 +214,7 @@ public class TextField extends AbstractTextField {
             char ch = str.charAt(i);
             if (ch == '\n') {
                 buf.append("<br />");
-// commentate le due righe successive perché creavano troppe righe che
+// commentate le due righe successive perche' creavano troppe righe che
 // eccedevano in lunghezza dal lato destro della pagina.
 //            } else if ( ch == ' ' ){
 //                buf.append("&nbsp;");

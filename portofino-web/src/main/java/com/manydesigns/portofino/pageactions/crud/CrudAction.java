@@ -301,7 +301,7 @@ public class CrudAction extends AbstractPageAction {
             ShortName shortNameAnnotation =
                     tableAccessor.getAnnotation(ShortName.class);
             TextFormat[] textFormats = null;
-            //L'ordinamento è usato solo in caso di chiave singola
+            //L'ordinamento e' usato solo in caso di chiave singola
             if (shortNameAnnotation != null && tableAccessor.getKeyProperties().length == 1) {
                 textFormats = new TextFormat[] {
                     OgnlTextFormat.create(shortNameAnnotation.value())
@@ -924,7 +924,7 @@ public class CrudAction extends AbstractPageAction {
     }
 
     protected String calculateBaseSearchUrl() {
-        assert pk != null; //Ha senso solo in modalità read/detail
+        assert pk != null; //Ha senso solo in modalita' read/detail
         String baseUrl = dispatch.getAbsoluteOriginalPath();
         int lastSlashIndex = baseUrl.lastIndexOf('/');
         baseUrl = baseUrl.substring(0, lastSlashIndex);
@@ -1184,7 +1184,7 @@ public class CrudAction extends AbstractPageAction {
         logger.info("Not in use case: " + crudConfiguration.getName());
         Locale locale = context.getLocale();
         ResourceBundle resourceBundle = application.getBundle(locale);
-        //Non getMessage poiché this.context == null durante il prepare
+        //Non getMessage poiche' this.context == null durante il prepare
         String msg = MessageFormat.format(resourceBundle.getString("crud.notInUseCase"),
                                           StringUtils.join(parameters, "/"));
         SessionMessages.addWarningMessage(msg);

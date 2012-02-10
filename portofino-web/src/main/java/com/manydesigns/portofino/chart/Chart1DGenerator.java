@@ -86,7 +86,8 @@ public abstract class Chart1DGenerator extends AbstractChartGenerator {
         chart.setAntiAlias(isAntiAlias());
 
         // impostiamo il bordo invisibile
-        // eventualmente è il css a fornirne uno
+        // eventualmente e' il css a fornirne uno
+        // eventualmente e' il css a fornirne uno
         chart.setBorderVisible(isBorderVisible());
 
         // impostiamo il titolo

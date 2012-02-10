@@ -207,8 +207,8 @@ public class Util {
     }
 
 // confronto fra due strighe che tiene conto dei numeri.
-    // cioè "pippo1" < "pippo2" < "pippo10"
-    // il confronto è case insensitive
+    // cioe' "pippo1" < "pippo2" < "pippo10"
+    // il confronto e' case insensitive
     public static int compare(
             String one,
             String two) {

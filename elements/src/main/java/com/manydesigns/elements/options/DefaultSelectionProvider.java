@@ -61,7 +61,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
     public final static Logger logger =
             LoggerFactory.getLogger(DefaultSelectionProvider.class);
     public static final String NON_WORD_CHARACTERS =
-            " \t\n\f\r\\||!\"£$%&/()='?^[]+*@#<>,;.:-_";
+            " \t\n\f\r\\||!\"\u00ac\u00a3$\u201a\u00c7\u00a8%&/()='?^[]+*@#<>,;.:-_";
 
     //**************************************************************************
     // Constructor
