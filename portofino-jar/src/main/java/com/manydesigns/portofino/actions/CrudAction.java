@@ -48,6 +48,7 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.xml.XmlBuffer;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.forms.CrudPropertyEdit;
 import com.manydesigns.portofino.actions.forms.CrudSelectionProviderEdit;
 import com.manydesigns.portofino.application.Application;
@@ -1144,7 +1145,8 @@ public class CrudAction extends PortletAction implements PageRealizationAware {
             sb.append("?searchString=");
             String encodedSearchString;
             try {
-                encodedSearchString = URLEncoder.encode(searchString, "ISO-8859-1");
+                String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
+                encodedSearchString = URLEncoder.encode(searchString, encoding);
             } catch (UnsupportedEncodingException e) {
                 throw new Error(e);
             }
