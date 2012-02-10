@@ -17,28 +17,42 @@ import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.hibernate.SQLQuery
+import org.apache.shiro.subject.PrincipalCollection
+import org.apache.shiro.subject.SimplePrincipalCollection
+import org.apache.shiro.authz.AuthorizationException
 
 class Security implements ApplicationRealmDelegate {
 
     private static final Logger logger = LoggerFactory.getLogger(Security.class);
 
-    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, Object userName) {
+    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, principal) {
         Application application = realm.getApplication();
         Set<String> groups = new HashSet<String>();
         Configuration conf = application.getPortofinoProperties();
         groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
-        if (userName == null) {
+        def user = null;
+        if (principal == null) {
             groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
-        } else {
+        } else if(principal instanceof PrincipalCollection) {
             groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
             Session session = application.getSession("redmine");
+            def userId = (Integer) principal.asList().get(1);
+            logger.debug("Loading user with id = {}", userId);
+            user = session.load("users", userId);
+        } else if(principal instanceof String) {
+            groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
+            Session session = application.getSession("redmine");
+            logger.debug("Loading user with login = {}", principal);
             org.hibernate.Criteria criteria = session.createCriteria("users");
-            criteria.add(Restrictions.eq("login", userName));
-            def user = criteria.uniqueResult();
-            //TODO
-            if("admin".equals(user.login)) {
-                groups.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS));
-            }
+            criteria.add(Restrictions.eq("login", principal));
+            user = criteria.uniqueResult();
+        } else {
+            throw new AuthorizationException("Invalid principal: " + principal);
+        }
+
+        //TODO
+        if(user != null && "admin".equals(user.login)) {
+            groups.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS));
         }
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(groups);
         Permission permission = new GroupPermission(groups);
@@ -62,11 +76,14 @@ class Security implements ApplicationRealmDelegate {
         criteria.add(Restrictions.eq("login", userName));
         criteria.add(Restrictions.eq("hashed_password", hashedPassword));
 
-        List<Object> result = (List<Object>) criteria.list();
+        List result = criteria.list();
 
         if (result.size() == 1) {
+            def user = result.get(0);
+            PrincipalCollection loginAndId = new SimplePrincipalCollection(userName, realm.name);
+            loginAndId.add(user.id, realm.name);
             SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(userName, password.toCharArray(), realm.name);
+                    new SimpleAuthenticationInfo(loginAndId, password.toCharArray(), realm.name);
             return info;
         } else {
             throw new AuthenticationException("Login failed");

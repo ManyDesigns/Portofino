@@ -5,7 +5,7 @@ import static ch.qos.logback.classic.Level.*
 import ch.qos.logback.core.FileAppender
 
 def catalinaBase = System.getProperty("catalina.base");
-def defaultPattern = "%d{HH:mm:ss.SSS} [userId=%X{userId},userName=%X{userName}] %logger{40} [%F:%L]%n%level: %msg%n";
+def defaultPattern = "%d{HH:mm:ss.SSS} [userId=%X{userId}] %logger{40} [%F:%L]%n%level: %msg%n";
 def appenders = new ArrayList();
 
 if(catalinaBase != null) {
