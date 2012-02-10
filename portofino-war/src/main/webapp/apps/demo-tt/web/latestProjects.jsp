@@ -1,3 +1,5 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java"
+         pageEncoding="UTF-8"%>
 <%@ page import="com.manydesigns.portofino.application.Application" %>
 <%@ page import="org.apache.commons.lang.time.FastDateFormat" %>
 <%@ page import="org.hibernate.Session" %>
@@ -7,8 +9,6 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="com.manydesigns.portofino.application.QueryUtils" %>
 <%@ page import="com.manydesigns.portofino.RequestAttributes" %>
-<%@ page contentType="text/html;charset=ISO-8859-1" language="java"
-         pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>

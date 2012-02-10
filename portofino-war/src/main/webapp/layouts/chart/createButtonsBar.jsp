@@ -7,5 +7,6 @@
     <s:set var="buttonsBarBottom" value="true"/>
     <div class="buttons-bar-top">
 </s:else>
-<s:submit id="User_update" method="update" value="Update"/>
+    <s:submit id="TableDesign_cancel" method="cancel" value="Cancel" />
+    <s:submit id="TableDesign_save" method="save" value="Save" />
 </div>

@@ -2,8 +2,8 @@
 <%@ page import="com.manydesigns.portofino.security.AccessLevel" %>
 <%@ page import="com.manydesigns.portofino.pages.Page" %>
 <%@ page import="com.manydesigns.portofino.system.model.users.Group" %>
-<%@ page contentType="text/html;charset=ISO-8859-1" language="java"
-         pageEncoding="ISO-8859-1"
+<%@ page contentType="text/html;charset=UTF-8" language="java"
+         pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"

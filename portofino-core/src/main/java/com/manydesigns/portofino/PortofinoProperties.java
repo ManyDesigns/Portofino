@@ -70,6 +70,7 @@ public final class PortofinoProperties {
     public static final String HOSTNAMES = "portofino.hostnames";
     public static final String FALLBACK_ACTION_CLASS = "fallback.action.class";
     public static final String SECURITY_REALM_CLASSES = "security.realm.classes";
+    public static final String URL_ENCODING = "url.encoding";
 
     //Email properties
     public static final String MAIL_ENABLED = "mail.enabled";

@@ -64,6 +64,7 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.io.File;
 import java.util.List;
+import java.nio.charset.Charset;
 
 
 /*
@@ -157,6 +158,15 @@ public class PortofinoListener
         applicationStarter = new ApplicationStarter(portofinoConfiguration);
         servletContext.setAttribute(
                 ApplicationAttributes.APPLICATION_STARTER, applicationStarter);
+
+        String encoding = portofinoConfiguration.getString(PortofinoProperties.URL_ENCODING);
+        logger.info("URL character encoding is set to " + encoding);
+        if(!Charset.isSupported(encoding)) {
+            logger.error("The encoding is not supported by the JVM!");
+        }
+        if(!"UTF-8".equals(encoding)) {
+            logger.warn("URL encoding is not UTF-8, but the Stripes framework always generates UTF-8 encoded URLs. URLs with non-ASCII characters may not work.");
+        }
 
         logger.info("Initializing Shiro environment");
         WebEnvironment environment = environmentLoader.initEnvironment(servletContext);

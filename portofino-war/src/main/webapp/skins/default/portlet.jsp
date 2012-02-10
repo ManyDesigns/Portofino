@@ -1,5 +1,5 @@
-<%@ page contentType="text/html;charset=ISO-8859-1" language="java"
-         pageEncoding="ISO-8859-1" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java"
+         pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld" %>
 <%@taglib prefix="mde" uri="/manydesigns-elements" %>
@@ -8,7 +8,7 @@
     <div class="portlet">
         <jsp:useBean id="actionBean" scope="request"
                      type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
-        <stripes:form action="${actionBean.dispatch.originalPath}" method="post">
+        <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>

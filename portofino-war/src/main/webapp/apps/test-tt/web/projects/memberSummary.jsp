@@ -1,13 +1,13 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java"
+         pageEncoding="UTF-8"%>
 <%@ page import="com.manydesigns.portofino.application.Application" %>
+<%@ page import="com.manydesigns.portofino.application.QueryUtils" %>
 <%@ page import="org.apache.commons.collections.MultiHashMap" %>
 <%@ page import="org.apache.commons.collections.MultiMap" %>
+<%@ page import="org.hibernate.Session" %>
 <%@ page import="java.util.Collection" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="org.hibernate.Session" %>
-<%@ page import="com.manydesigns.portofino.application.QueryUtils" %>
-<%@ page contentType="text/html;charset=ISO-8859-1" language="java"
-         pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>

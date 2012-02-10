@@ -47,9 +47,9 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.application.QueryUtils;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.database.TableCriteria;
@@ -105,6 +105,7 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -446,7 +447,7 @@ public class CrudAction extends AbstractPageAction {
         js.endArray();
         js.endObject();
         String jsonText = js.toString();
-        return new NoCacheStreamingResolution("application/json", jsonText);
+        return new NoCacheStreamingResolution("application/json;charset=UTF-8", jsonText);
     }
 
     protected String generateCountQuery(String queryString) throws JSQLParserException {
@@ -1111,7 +1112,14 @@ public class CrudAction extends AbstractPageAction {
         }
         if (searchString != null) {
             sb.append("?searchString=");
-            sb.append(Util.urlencode(searchString));
+            String encodedSearchString;
+            try {
+                String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
+                encodedSearchString = URLEncoder.encode(searchString, encoding);
+            } catch (UnsupportedEncodingException e) {
+                throw new Error(e);
+            }
+            sb.append(encodedSearchString);
         }
         return sb.toString();
     }
@@ -1143,7 +1151,11 @@ public class CrudAction extends AbstractPageAction {
 
         application = pageInstance.getApplication();
         pkHelper = new PkHelper(classAccessor);
-        session = application.getSession(crudConfiguration.getDatabase());
+        try {
+            session = application.getSession(crudConfiguration.getDatabase());
+        } catch (Throwable t) {
+            return forwardToPortletError(t);
+        }
         List<String> parameters = pageInstance.getParameters();
         if(!parameters.isEmpty()) {
             pk = parameters.toArray(new String[parameters.size()]);
