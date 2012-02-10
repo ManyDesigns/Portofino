@@ -48,8 +48,8 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.xml.XmlBuffer;
-import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.database.TableCriteria;
@@ -69,6 +69,7 @@ import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.servlets.DummyHttpServletRequest;
+import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
@@ -1151,11 +1152,7 @@ public class CrudAction extends AbstractPageAction {
 
         application = pageInstance.getApplication();
         pkHelper = new PkHelper(classAccessor);
-        try {
-            session = application.getSession(crudConfiguration.getDatabase());
-        } catch (Throwable t) {
-            return forwardToPortletError(t);
-        }
+        session = application.getSession(crudConfiguration.getDatabase());
         List<String> parameters = pageInstance.getParameters();
         if(!parameters.isEmpty()) {
             pk = parameters.toArray(new String[parameters.size()]);
@@ -1169,11 +1166,12 @@ public class CrudAction extends AbstractPageAction {
                 return notInUseCase(context, parameters);
             }
             object = QueryUtils.getObjectByPk(
-                application,
-                baseTable, pkObject,
-                crudConfiguration.getQuery(), null);
+                    application,
+                    baseTable, pkObject,
+                    crudConfiguration.getQuery(), null);
             if(object != null) {
                 ognlContext.put(crudConfiguration.getActualVariable(), object);
+                ognlContext.put("securityUtils", new SecurityUtilsBean());
                 String description = ShortNameUtils.getName(classAccessor, object);
                 pageInstance.setDescription(description);
             } else {
@@ -1191,7 +1189,7 @@ public class CrudAction extends AbstractPageAction {
         String msg = MessageFormat.format(resourceBundle.getString("crud.notInUseCase"),
                                           StringUtils.join(parameters, "/"));
         SessionMessages.addWarningMessage(msg);
-        return new ForwardResolution("/layouts/crud/notInUseCase.jsp");
+        return new ForwardResolution("/layouts/redirect-to-last-working-page.jsp");
     }
 
     //**************************************************************************

@@ -31,17 +31,20 @@ package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.BlobManager;
+import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
 import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +53,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -106,11 +112,22 @@ public class ApplicationInterceptor implements Interceptor {
                 logger.debug("Preparing PageAction {}", page);
                 PageAction actionBean = ensureActionBean(page);
                 configureActionBean(actionBean, page, application);
-                Resolution resolution = actionBean.prepare(page, actionContext);
-                if(resolution != null) {
+                try {
+                    Resolution resolution = actionBean.prepare(page, actionContext);
+                    if(resolution != null) {
+                        request.setAttribute(INVALID_PAGE_INSTANCE, page);
+                        logger.error("PageAction prepare failed for {}", page);
+                        return resolution;
+                    }
+                } catch (Throwable t) {
                     request.setAttribute(INVALID_PAGE_INSTANCE, page);
                     logger.error("PageAction prepare failed for {}", page);
-                    return resolution;
+                    Locale locale = request.getLocale();
+                    ResourceBundle resourceBundle = application.getBundle(locale);
+                    String msg = MessageFormat.format
+                            (resourceBundle.getString("portlet.exception"), ExceptionUtils.getRootCause(t));
+                    SessionMessages.addErrorMessage(msg);
+                    return new ForwardResolution("/layouts/redirect-to-last-working-page.jsp");
                 }
             }
             PageInstance pageInstance = dispatch.getLastPageInstance();

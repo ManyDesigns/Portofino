@@ -418,7 +418,7 @@ public class DefaultApplication implements Application {
                 }
                 session.close();
             } catch (Throwable e) {
-                logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
+                logger.warn("Couldn't close session: " + ExceptionUtils.getRootCauseMessage(e), e);
             }
             current.removeThreadSession();
         }
