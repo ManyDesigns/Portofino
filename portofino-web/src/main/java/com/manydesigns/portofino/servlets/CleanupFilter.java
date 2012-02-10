@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.servlets;
 
-import com.manydesigns.portofino.dispatcher.RequestAttributes;
+import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import org.slf4j.MDC;
 
