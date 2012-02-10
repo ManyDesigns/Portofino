@@ -49,6 +49,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -436,7 +438,8 @@ public class DatabaseSyncer {
         }
     }
 
-    protected void syncColumns(liquibase.database.structure.Table liquibaseTable, Table sourceTable, Table targetTable) {
+    protected void syncColumns
+            (liquibase.database.structure.Table liquibaseTable, final Table sourceTable, Table targetTable) {
         logger.debug("Synchronizing columns");
         for(liquibase.database.structure.Column liquibaseColumn : liquibaseTable.getColumns()) {
             logger.debug("Processing column: {}", liquibaseColumn.getName());
@@ -466,6 +469,33 @@ public class DatabaseSyncer {
             logger.debug("Column creation successfull. Adding column to table.");
             targetTable.getColumns().add(targetColumn);
         }
+
+        logger.debug("Sorting columns to preserve their previous order as much as possible");
+        Collections.sort(targetTable.getColumns(), new Comparator<Column>() {
+            private int oldIndex(Column c) {
+                int i = 0;
+                for(Column old : sourceTable.getColumns()) {
+                    if(old.getColumnName().equals(c.getColumnName())) {
+                        return i;
+                    }
+                    i++;
+                }
+                return -1;
+            }
+            public int compare(Column c1, Column c2) {
+                Integer index1 = oldIndex(c1);
+                Integer index2 = oldIndex(c2);
+                if(index1 != -1) {
+                    if(index2 != -1) {
+                        return index1.compareTo(index2);
+                    } else {
+                        return -1;
+                    }
+                } else {
+                    return index2 == -1 ? 0 : 1;
+                }
+            }
+        });
     }
 
     protected void copyAnnotations(Annotated source, Annotated target) {

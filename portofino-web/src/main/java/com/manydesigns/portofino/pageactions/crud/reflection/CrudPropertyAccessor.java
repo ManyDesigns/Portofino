@@ -155,4 +155,8 @@ public class CrudPropertyAccessor
     public void set(Object obj, Object value) {
         nestedAccessor.set(obj, value);
     }
+
+    public CrudProperty getCrudProperty() {
+        return crudProperty;
+    }
 }

@@ -40,6 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -70,7 +72,7 @@ public class CrudAccessor
     // Constructors
     //**************************************************************************
 
-    public CrudAccessor(@NotNull CrudConfiguration crudConfiguration, @NotNull ClassAccessor tableAccessor) {
+    public CrudAccessor(@NotNull final CrudConfiguration crudConfiguration, @NotNull ClassAccessor tableAccessor) {
         super(null);
         this.crudConfiguration = crudConfiguration;
         this.tableAccessor = tableAccessor;
@@ -106,6 +108,35 @@ public class CrudAccessor
             }
             i++;
         }
+
+
+        logger.debug("Sorting crud properties to preserve their previous order as much as possible");
+        Arrays.sort(propertyAccessors, new Comparator<CrudPropertyAccessor>() {
+            private int oldIndex(CrudPropertyAccessor c) {
+                int i = 0;
+                for (CrudProperty old : crudConfiguration.getProperties()) {
+                    if (c.getCrudProperty().equals(old)) {
+                        return i;
+                    }
+                    i++;
+                }
+                return -1;
+            }
+
+            public int compare(CrudPropertyAccessor c1, CrudPropertyAccessor c2) {
+                Integer index1 = oldIndex(c1);
+                Integer index2 = oldIndex(c2);
+                if (index1 != -1) {
+                    if (index2 != -1) {
+                        return index1.compareTo(index2);
+                    } else {
+                        return -1;
+                    }
+                } else {
+                    return index2 == -1 ? 0 : 1;
+                }
+            }
+        });
     }
 
     public static CrudProperty findCrudPropertyByName(CrudConfiguration crudConfiguration, String propertyName) {
