@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.pageactions.calendar;
 
-import com.manydesigns.portofino.calendar.AbstractMonth;
+import com.manydesigns.portofino.calendar.AbstractMonthView;
 import com.manydesigns.portofino.calendar.AbstractDay;
 import com.manydesigns.portofino.calendar.AbstractWeek;
 import org.joda.time.DateMidnight;
@@ -44,7 +44,7 @@ import java.util.*;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class MonthView extends AbstractMonth<MonthView.MonthViewWeek> {
+public class MonthView extends AbstractMonthView<MonthView.MonthViewWeek> {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 

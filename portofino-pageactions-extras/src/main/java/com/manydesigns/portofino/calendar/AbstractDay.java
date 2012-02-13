@@ -47,7 +47,7 @@ public class AbstractDay {
         this.dayStart = dayStart;
         this.dayEnd = dayEnd;
         dayInterval = new Interval(dayStart, dayEnd);
-        AbstractMonth.logger.debug("Day interval: {}", dayInterval);
+        AbstractMonthView.logger.debug("Day interval: {}", dayInterval);
     }
 
     public DateMidnight getDayStart() {

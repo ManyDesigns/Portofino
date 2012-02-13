@@ -14,6 +14,7 @@
 <%@ page import="org.joda.time.format.PeriodFormatterBuilder" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Locale" %>
+<%@ page import="net.sourceforge.stripes.util.UrlBuilder" %>
 <%@ page contentType="text/html;charset=ISO-8859-1" language="java"
          pageEncoding="ISO-8859-1"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -68,9 +69,23 @@
                 background-color: #F0F8E5;
             }
             td.twe-hours input.twe-input {
-                display: block;
                 width: 30px;
                 text-align: right;
+            }
+            td.twe-hours img.twe-note {
+                float: right;
+                margin-top: 4px;
+            }
+            div.twe-note, div.twe-ro-note {
+                float: right;
+                margin-top: 4px;
+                width: 9px;
+                height: 9px;
+                background-image: url('<stripes:url value="/layouts/timesheet/empty-note.png"/>');
+                cursor: pointer;
+            }
+            div.twe-note.twe-note-with-content {
+                background-image: url('<stripes:url value="/layouts/timesheet/note.png"/>');
             }
             table.twe-table tfoot tr {
                 background-color: #F0EAD7;
@@ -95,6 +110,33 @@
                 display: none;
             }
         </style>
+        <%
+            WeekEntryModel weekEntryModel =
+                    actionBean.getWeekEntryModel();
+            XhtmlBuffer xb = new XhtmlBuffer(out);
+
+            Locale locale = request.getLocale();
+            DateTimeFormatter longDateFormatter =
+                    DateTimeFormat.longDate().withLocale(locale);
+        %>
+        <div style="float: right">
+            <portofino:buttons list="timesheet-we-navigation" cssClass="portletButton" />
+        </div>
+        Person:
+        <%
+            xb.write(weekEntryModel.getPerson().getLongName());
+        %>
+        <br/>
+        From:
+        <%
+            xb.write(longDateFormatter.print(weekEntryModel.getDay(0).getDate()));
+        %>
+        <br/>
+        To:
+        <%
+            xb.write(longDateFormatter.print(weekEntryModel.getDay(6).getDate()));
+        %>
+        <hr/>
         <div class="twe-container">
         <table class="twe-table">
             <col/>
@@ -113,14 +155,10 @@
                 <th class="twe-activity">Progetto</th>
                 <th class="twe-activity">Attività</th>
                 <%
-                    WeekEntryModel weekEntryModel =
-                            actionBean.getWeekEntryModel();
-                    XhtmlBuffer xb = new XhtmlBuffer(out);
-
                     DateTimeFormatter dayOfWeekFormatter =
-                    DateTimeFormat.forPattern("E").withLocale(Locale.ITALY);
+                    DateTimeFormat.forPattern("E").withLocale(locale);
                     DateTimeFormatter dateFormatter =
-                    DateTimeFormat.shortDate().withLocale(Locale.ITALY);
+                    DateTimeFormat.shortDate().withLocale(locale);
 
                     for (int i = 0; i < 7; i++) {
                         WeekEntryModel.Day day = weekEntryModel.getDay(i);
@@ -241,15 +279,30 @@
                         if (dayStatus == null) {
                             //xb.write("--");
                         } else {
-                            String hours = null;
+                            String hours;
                             WeekEntryModel.Entry entry =
                                     day.findEntryByActivity(activity);
                             String note = null;
-                            if (entry != null) {
+
+                            String inputName = String.format("cell-%d-%s",
+                                    dayIndex, activity.getId());
+                            String noteInputName = String.format("note-%d-%s",
+                                    dayIndex, activity.getId());
+                            int tabIndex = activityIndex +
+                                    dayIndex * weekActivitiesSize;
+
+
+                            if (entry == null) {
+                                hours = null;
+                            } else {
                                 int minutes = entry.getMinutes();
-                                hours = String.format("%d:%02d",
-                                        minutes / 60,
-                                        minutes % 60);
+                                if (minutes == 0) {
+                                    hours = null;
+                                } else {
+                                    hours = String.format("%d:%02d",
+                                            minutes / 60,
+                                            minutes % 60);
+                                }
                                 note = entry.getNote();
                             }
                             if (dayStatus == WeekEntryModel.DayStatus.LOCKED) {
@@ -261,10 +314,10 @@
                                 } else {
                                     if (StringUtils.isNotBlank(note)) {
                                         xb.openElement("div");
-                                        xb.addAttribute("class", "ui-icon ui-icon-comment");
-                                        xb.addAttribute("style", "float: right");
-                                        xb.addAttribute("title", note);
+                                        xb.addAttribute("class", "twe-ro-note");
+                                        xb.writeInputHidden(noteInputName, note);
                                         xb.closeElement("div");
+
                                     }
                                     xb.openElement("span");
                                     xb.addAttribute("class", "twe-ro-hours");
@@ -272,26 +325,15 @@
                                     xb.closeElement("span");
                                 }
                             } else {
-                                if (StringUtils.isBlank(note)) {
-                                    xb.openElement("div");
-                                    xb.addAttribute("class", "ui-icon ui-icon-document");
-                                    xb.addAttribute("style", "float: right");
-                                    xb.closeElement("div");
-                                } else {
-                                    xb.openElement("div");
-                                    xb.addAttribute("class", "ui-icon ui-icon-comment");
-                                    xb.addAttribute("style", "float: right");
-                                    xb.addAttribute("title", note);
-                                    xb.closeElement("div");
-                                }
-                                String name = String.format("cell-%d-%s",
-                                        dayIndex, activity.getId());
-                                int tabIndex = activityIndex +
-                                        dayIndex * weekActivitiesSize;
+                                xb.openElement("div");
+                                xb.addAttribute("class", "twe-note");
+                                xb.writeInputHidden(noteInputName, note);
+                                xb.closeElement("div");
+
                                 xb.openElement("span");
                                 xb.openElement("input");
                                 xb.addAttribute("type", "text");
-                                xb.addAttribute("name", name);
+                                xb.addAttribute("inputName", inputName);
                                 xb.addAttribute("class", "twe-input");
                                 xb.addAttribute("value", hours);
                                 xb.addAttribute("tabindex", Integer.toString(tabIndex));
@@ -339,7 +381,14 @@
             </tfoot>
         </table>
     </div>
-    <input type="hidden" name="weeksAgo" value="<c:out value="${actionBean.weeksAgo}"/>"/>
+    <input type="hidden" name="referenceDate" value="<c:out value="${actionBean.referenceDate}"/>"/>
+    <input type="hidden" name="personId" value="<c:out value="${actionBean.personId}"/>"/>
+        <div id="twe-ro-note-dialog">
+            Read-only note dialog
+        </div>
+        <div id="twe-note-dialog">
+            <textarea style="width:300px; height: 100px;">Note dialog</textarea>
+        </div>
     <script type="text/javascript">
         var hoursRe = /^(\d+):(\d+)$/;
         var hoursRe2 = /^(\d+):?$/;
@@ -439,6 +488,74 @@
             });
         }
         updateWeekTotal();
+
+        // note dialogs initialization
+        $("#twe-ro-note-dialog").dialog({
+            autoOpen: false,
+            height: 200,
+            width: 350,
+            modal: true,
+            buttons: {
+                "Close": function() {
+                    $(this).dialog( "close" );
+                }
+            },
+            close: function() {
+            }
+        });
+
+        $("#twe-note-dialog").dialog({
+            autoOpen: false,
+            height: 200,
+            width: 350,
+            modal: true,
+            buttons: {
+                "Save": function() {
+                    var dialogWrapper = $(this);
+                    var inputWrapper = dialogWrapper.data();
+                    var dialogTextarea = dialogWrapper.find("textarea");
+                    var text = dialogTextarea.text();
+                    inputWrapper.val(text);
+                    dialogWrapper.dialog( "close" );
+                },
+                "Cancel": function() {
+                    $(this).dialog( "close" );
+                }
+            },
+            close: function() {
+            }
+        });
+
+        // note events and display
+        $("div.twe-ro-note").click(function() {
+            var text = $(this).find("input").val();
+            var dialogDiv = $("#twe-ro-note-dialog");
+            dialogDiv.text(text);
+            dialogDiv.dialog("open");
+        });
+
+        $("div.twe-note").click(function() {
+            var inputWrapper = $(this).find("input");
+            var text = inputWrapper.val();
+            var dialogDiv = $("#twe-note-dialog");
+            dialogDiv.data(inputWrapper);
+            var dialogTextarea = dialogDiv.find("textarea");
+            dialogTextarea.text(text);
+            dialogDiv.dialog("open");
+        });
+
+
+        var unsavedChanges = false;
+        $("table.twe-table input[type='text']").change(function(){
+            unsavedChanges = true;
+        });
+        $("button[name!='saveWeekEntryModel']").click(function() {
+            if (unsavedChanges) {
+                return confirm("There are unsaved changes. Abandon page anyway?");
+            } else {
+                return true;
+            }
+        });
     </script>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
