@@ -77,6 +77,8 @@ public class TimesheetAction extends CustomAction {
     protected final static Pattern hoursPattern =
             Pattern.compile("(\\d+):(\\d+)");
     public static final int MINUTES_IN_A_DAY = 24 * 60;
+    public static String ENTRY_INPUT_FORMAT = "cell-%d-%s";
+    public static String NOTE_INPUT_FORMAT = "note-%d-%s";
 
     //**************************************************************************
     // Variables
@@ -241,15 +243,20 @@ public class TimesheetAction extends CustomAction {
                 continue;
             }
             for (Activity activity : weekEntryModel.getActivities()) {
-                String name = String.format("cell-%d-%s",
+                String entryInputName = String.format(ENTRY_INPUT_FORMAT,
                         dayIndex, activity.getId());
-                String value = StringUtils.trimToNull(request.getParameter(name));
-                logger.debug("Week entry parameter: {}: {}", name, value);
+                String entryValue = StringUtils.trimToNull(request.getParameter(entryInputName));
+                logger.debug("Week entry parameter: {}: {}", entryInputName, entryValue);
+
+                String noteInputName = String.format(NOTE_INPUT_FORMAT,
+                        dayIndex, activity.getId());
+                String noteValue = StringUtils.trimToNull(request.getParameter(noteInputName));
+
                 int totalMinutes;
-                if (value == null) {
+                if (entryValue == null) {
                     totalMinutes = 0;
                 } else {
-                    Matcher matcher = hoursPattern.matcher(value);
+                    Matcher matcher = hoursPattern.matcher(entryValue);
                     if (matcher.matches()) {
                         try {
                             int hours = Integer.parseInt(matcher.group(1));
@@ -258,12 +265,12 @@ public class TimesheetAction extends CustomAction {
                         } catch (NumberFormatException e) {
                             totalMinutes = 0;
                             success = false;
-                            SessionMessages.addErrorMessage("Invalid week entry: " + value);
+                            SessionMessages.addErrorMessage("Invalid week entry: " + entryValue);
                         }
                     } else {
                         totalMinutes = 0;
                         success = false;
-                        SessionMessages.addErrorMessage("Invalid week entry: " + value);
+                        SessionMessages.addErrorMessage("Invalid week entry: " + entryValue);
                     }
                 }
                 if (totalMinutes < 0) {
@@ -274,7 +281,7 @@ public class TimesheetAction extends CustomAction {
                     totalMinutes = MINUTES_IN_A_DAY;
                     success = false;
                 }
-                saveWeekEntry(day, activity, totalMinutes);
+                saveWeekEntry(day, activity, totalMinutes, noteValue);
             }
         }
         if (success) {
@@ -349,7 +356,7 @@ public class TimesheetAction extends CustomAction {
         }
     }
 
-    private void saveWeekEntry(WeekEntryModel.Day day, Activity activity, int minutes) {
+    private void saveWeekEntry(WeekEntryModel.Day day, Activity activity, int minutes, String note) {
         PersonDay personDay = personDayDb.get(day.getDate());
         Entry entry = personDay.getEntries().get(activity);
         if (entry == null) {
@@ -357,7 +364,7 @@ public class TimesheetAction extends CustomAction {
             personDay.getEntries().put(activity, entry);
         }
         entry.setMinutes(minutes);
-        entry.setNote("Change me!");
+        entry.setNote(note);
     }
 
 

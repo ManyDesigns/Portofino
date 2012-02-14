@@ -1,20 +1,16 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="com.manydesigns.portofino.pageactions.timesheet.model.Activity" %>
-<%@ page import="com.manydesigns.portofino.pageactions.timesheet.model.Entry" %>
-<%@ page import="com.manydesigns.portofino.pageactions.timesheet.model.PersonDay" %>
-<%@ page
-        import="com.manydesigns.portofino.pageactions.timesheet.model.WeekEntryModel" %>
+<%@ page import="com.manydesigns.portofino.pageactions.timesheet.model.WeekEntryModel" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page
         import="org.joda.time.DateMidnight" %>
-<%@ page import="org.joda.time.Period" %>
 <%@ page import="org.joda.time.format.DateTimeFormat" %>
-<%@ page import="org.joda.time.format.DateTimeFormatter" %>
-<%@ page import="org.joda.time.format.PeriodFormatter" %>
-<%@ page import="org.joda.time.format.PeriodFormatterBuilder" %>
+<%@ page
+        import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Locale" %>
-<%@ page import="net.sourceforge.stripes.util.UrlBuilder" %>
+<%@ page
+        import="com.manydesigns.portofino.pageactions.timesheet.TimesheetAction" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -76,7 +72,15 @@
                 float: right;
                 margin-top: 4px;
             }
-            div.twe-note, div.twe-ro-note {
+            div.twe-ro-note {
+                float: right;
+                margin-top: 4px;
+                width: 9px;
+                height: 9px;
+                background-image: url('<stripes:url value="/layouts/timesheet/note.png"/>');
+                cursor: pointer;
+            }
+            div.twe-note {
                 float: right;
                 margin-top: 4px;
                 width: 9px;
@@ -284,9 +288,9 @@
                                     day.findEntryByActivity(activity);
                             String note = null;
 
-                            String inputName = String.format("cell-%d-%s",
+                            String inputName = String.format(TimesheetAction.ENTRY_INPUT_FORMAT,
                                     dayIndex, activity.getId());
-                            String noteInputName = String.format("note-%d-%s",
+                            String noteInputName = String.format(TimesheetAction.NOTE_INPUT_FORMAT,
                                     dayIndex, activity.getId());
                             int tabIndex = activityIndex +
                                     dayIndex * weekActivitiesSize;
@@ -333,7 +337,7 @@
                                 xb.openElement("span");
                                 xb.openElement("input");
                                 xb.addAttribute("type", "text");
-                                xb.addAttribute("inputName", inputName);
+                                xb.addAttribute("name", inputName);
                                 xb.addAttribute("class", "twe-input");
                                 xb.addAttribute("value", hours);
                                 xb.addAttribute("tabindex", Integer.toString(tabIndex));
@@ -387,7 +391,7 @@
             Read-only note dialog
         </div>
         <div id="twe-note-dialog">
-            <textarea style="width:300px; height: 100px;">Note dialog</textarea>
+            <textarea style="width: 99%; height: 95%">Note dialog</textarea>
         </div>
     <script type="text/javascript">
         var hoursRe = /^(\d+):(\d+)$/;
@@ -512,10 +516,14 @@
             buttons: {
                 "Save": function() {
                     var dialogWrapper = $(this);
-                    var inputWrapper = dialogWrapper.data();
                     var dialogTextarea = dialogWrapper.find("textarea");
-                    var text = dialogTextarea.text();
+                    var text = $.trim(dialogTextarea.val());
+
+                    var divWrapper = dialogWrapper.data("divWrapper");
+                    var inputWrapper = divWrapper.find("input");
                     inputWrapper.val(text);
+                    setNoteWithContent(text, divWrapper);
+
                     dialogWrapper.dialog( "close" );
                 },
                 "Cancel": function() {
@@ -534,14 +542,27 @@
             dialogDiv.dialog("open");
         });
 
-        $("div.twe-note").click(function() {
-            var inputWrapper = $(this).find("input");
-            var text = inputWrapper.val();
-            var dialogDiv = $("#twe-note-dialog");
-            dialogDiv.data(inputWrapper);
-            var dialogTextarea = dialogDiv.find("textarea");
-            dialogTextarea.text(text);
-            dialogDiv.dialog("open");
+        function setNoteWithContent(text, divWrapper) {
+            if (text.length > 0) {
+                divWrapper.addClass("twe-note-with-content");
+            } else {
+                divWrapper.removeClass("twe-note-with-content");
+            }
+        }
+
+        $("div.twe-note").each(function(index, div) {
+            var divWrapper = $(div);
+            var inputWrapper = divWrapper.find("input");
+            var text = $.trim(inputWrapper.val());
+            setNoteWithContent(text, divWrapper);
+            divWrapper.click(function() {
+                var text = $.trim(inputWrapper.val());
+                var dialogDiv = $("#twe-note-dialog");
+                dialogDiv.data("divWrapper", divWrapper);
+                var dialogTextarea = dialogDiv.find("textarea");
+                dialogTextarea.val(text);
+                dialogDiv.dialog("open");
+            });
         });
 
 
