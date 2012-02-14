@@ -76,7 +76,7 @@
         <div style="float: right">
             <portofino:buttons list="timesheet-nwd-navigation" cssClass="portletButton" />
         </div>
-        Month:
+        <fmt:message key="timesheet.month"/>:
         <%
             xb.write(monthFormatter.print(nonWorkingDaysModel.getMonthStart()));
         %>
@@ -92,7 +92,7 @@
                     DateTimeFormatter dayOfWeekFormatter =
                             dayOfWeekFormatterBuilder
                                     .toFormatter()
-                                    .withLocale(Locale.ITALY);
+                                    .withLocale(locale);
                     NonWorkingDaysModel.NWDWeek week = nonWorkingDaysModel.getWeek(0);
                     for (int i = 0; i < 7; i++) {
                         xb.openElement("th");
@@ -122,7 +122,7 @@
                     DateTimeFormatter dayOfMonthFormatter =
                             dayOfMonthFormatterBuilder
                                     .toFormatter()
-                                    .withLocale(Locale.ITALY);
+                                    .withLocale(locale);
                     Interval monthInterval = nonWorkingDaysModel.getMonthInterval();
                     for (int i = 0; i < 6; i++) {
                         week = nonWorkingDaysModel.getWeek(i);
