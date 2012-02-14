@@ -126,17 +126,17 @@
         <div style="float: right">
             <portofino:buttons list="timesheet-we-navigation" cssClass="portletButton" />
         </div>
-        Person:
+        <fmt:message key="timesheet.person"/>:
         <%
             xb.write(weekEntryModel.getPerson().getLongName());
         %>
         <br/>
-        From:
+        <fmt:message key="timesheet.from.day"/>:
         <%
             xb.write(longDateFormatter.print(weekEntryModel.getDay(0).getDate()));
         %>
         <br/>
-        To:
+        <fmt:message key="timesheet.to.day"/>:
         <%
             xb.write(longDateFormatter.print(weekEntryModel.getDay(6).getDate()));
         %>
@@ -155,9 +155,9 @@
             <col class="day-column"/>
             <thead>
             <tr>
-                <th class="twe-activity">Commessa</th>
-                <th class="twe-activity">Progetto</th>
-                <th class="twe-activity">Attivit&agrave;</th>
+                <th class="twe-activity"><fmt:message key="timesheet.level1"/></th>
+                <th class="twe-activity"><fmt:message key="timesheet.level2"/></th>
+                <th class="twe-activity"><fmt:message key="timesheet.level3"/></th>
                 <%
                     DateTimeFormatter dayOfWeekFormatter =
                     DateTimeFormat.forPattern("E").withLocale(locale);
@@ -355,7 +355,7 @@
             </tbody>
             <tfoot>
             <tr>
-                <td class="twe-total" colspan="3">Totale ore settimanali: <span id="twe-week-total" class="twe-week-total"></span></td>
+                <td class="twe-total" colspan="3"><fmt:message key="timesheet.total.week.hours"/>: <span id="twe-week-total" class="twe-week-total"></span></td>
                 <%
                     for (int i = 0; i < 7; i++) {
                         WeekEntryModel.Day day = weekEntryModel.getDay(i);
@@ -500,7 +500,7 @@
             width: 350,
             modal: true,
             buttons: {
-                "Close": function() {
+                "<fmt:message key="commons.close"/>": function() {
                     $(this).dialog( "close" );
                 }
             },
@@ -514,7 +514,7 @@
             width: 350,
             modal: true,
             buttons: {
-                "Save": function() {
+                "<fmt:message key="commons.save"/>": function() {
                     var dialogWrapper = $(this);
                     var dialogTextarea = dialogWrapper.find("textarea");
                     var text = $.trim(dialogTextarea.val());
@@ -526,7 +526,7 @@
 
                     dialogWrapper.dialog( "close" );
                 },
-                "Cancel": function() {
+                "<fmt:message key="commons.cancel"/>": function() {
                     $(this).dialog( "close" );
                 }
             },

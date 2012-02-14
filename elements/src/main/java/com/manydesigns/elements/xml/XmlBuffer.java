@@ -211,26 +211,7 @@ public class XmlBuffer {
     }
 
     public void write(String text) {
-        try {
-            switch (state) {
-                case OPEN:
-                    writer.write(">");
-                case START:
-                case CLOSE:
-                case TEXT:
-                    if (text != null) {
-                        writer.write(escape(text));
-                    }
-                    break;
-
-                default:
-                    throw new IllegalStateException("XmlBuffer state " + state);
-            }
-
-            state = TEXT;
-        } catch (IOException e) {
-            throw new IOError(e);
-        }
+        writeNoHtmlEscape(escape(text));
     }
 
     public void write(XmlBuffer buffer) {
