@@ -36,6 +36,7 @@ import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.pageactions.timesheet.model.*;
 import com.manydesigns.portofino.security.AccessLevel;
@@ -98,6 +99,9 @@ public class TimesheetAction extends CustomAction {
     protected Integer month;
     protected Integer year;
     protected boolean nonWorking;
+
+    protected ResourceBundleManager resourceBundleManager;
+
 
     //**************************************************************************
     // Injections
@@ -193,7 +197,7 @@ public class TimesheetAction extends CustomAction {
     // Week data entry
     //**************************************************************************
 
-    @Button(list = "timesheet-selection", key = "Go to timesheet", order = 1)
+    @Button(list = "timesheet-selection", key = "timesheet.go.to.week.entry", order = 1)
     public Resolution weekEntry() throws Exception {
         DateMidnight referenceDateMidnight =
                 new DateMidnight(referenceDate, dtz);
@@ -204,7 +208,7 @@ public class TimesheetAction extends CustomAction {
         return new ForwardResolution("/layouts/timesheet/week-entry.jsp");
     }
 
-    @Button(list = "timesheet-we-navigation", key = "Previous week", order = 1)
+    @Button(list = "timesheet-we-navigation", key = "timesheet.previous.week", order = 1)
     public Resolution weekEntryPreviousWeek() throws Exception {
         DateMidnight referenceDateMidnight =
                 new DateMidnight(referenceDate, dtz);
@@ -213,7 +217,7 @@ public class TimesheetAction extends CustomAction {
         return weekEntry();
     }
 
-    @Button(list = "timesheet-we-navigation", key = "Next week", order = 2)
+    @Button(list = "timesheet-we-navigation", key = "timesheet.next.week", order = 2)
     public Resolution weekEntryNextWeek() throws Exception {
         DateMidnight referenceDateMidnight =
                 new DateMidnight(referenceDate, dtz);
@@ -373,7 +377,7 @@ public class TimesheetAction extends CustomAction {
     // Non working days view
     //**************************************************************************
 
-    @Button(list = "timesheet-admin", key = "Manage non-working days", order = 1)
+    @Button(list = "timesheet-admin", key = "timesheet.manage.non.working.days", order = 1)
     public Resolution nonWorkingDays() {
         DateTime referenceDateTime = new DateTime(referenceDate, dtz);
         nonWorkingDaysModel = new NonWorkingDaysModel(referenceDateTime);
@@ -381,7 +385,7 @@ public class TimesheetAction extends CustomAction {
         return new ForwardResolution("/layouts/timesheet/non-working-days.jsp");
     }
 
-    @Button(list = "timesheet-nwd-navigation", key = "Previous month", order = 1)
+    @Button(list = "timesheet-nwd-navigation", key = "timesheet.previous.month", order = 1)
     public Resolution nonWorkingDaysPreviousMonth() throws Exception {
         DateMidnight referenceDateMidnight =
                 new DateMidnight(referenceDate, dtz);
@@ -390,7 +394,7 @@ public class TimesheetAction extends CustomAction {
         return nonWorkingDays();
     }
 
-    @Button(list = "timesheet-nwd-navigation", key = "Next month", order = 2)
+    @Button(list = "timesheet-nwd-navigation", key = "timesheet.next.month", order = 2)
     public Resolution nonWorkingDaysNextMonth() throws Exception {
         DateMidnight referenceDateMidnight =
                 new DateMidnight(referenceDate, dtz);

@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.pageactions.timesheet;
 
-import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.annotations.Required;
 
 /**
@@ -43,9 +43,9 @@ public class TimesheetSelection {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     @Required
-    @Label("Persona")
+    @LabelI18N("timesheet.person")
     public String personId;
 
-    @Label("Settimana")
+    @LabelI18N("timesheet.week")
     public String referenceDate;
 }
