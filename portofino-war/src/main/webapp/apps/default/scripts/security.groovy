@@ -28,17 +28,19 @@ class Security implements ApplicationRealmDelegate {
 
     private static final Logger logger = LoggerFactory.getLogger(Security.class);
 
-    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, Object userId) {
+    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, Object userName) {
         Application application = realm.getApplication();
         Set<String> groups = new HashSet<String>();
         Configuration conf = application.getPortofinoProperties();
         groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
-        if (userId == null) {
+        if (userName == null) {
             groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
         } else {
-            User u = (User) QueryUtils.getObjectByPk(
-                    application, application.getSystemDatabaseName(), UserConstants.USER_ENTITY_NAME,
-                    new User((String) userId));
+            Session session = application.getSystemSession();
+            org.hibernate.Criteria criteria = session.createCriteria("users");
+            criteria.add(Restrictions.eq("userName", userName));
+            User u = criteria.uniqueResult();
+
             groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
 
             for (UsersGroups ug : u.getGroups()) {
