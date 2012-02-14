@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.pageactions.timesheet.model;
 
-import com.manydesigns.portofino.calendar.AbstractMonth;
+import com.manydesigns.portofino.calendar.AbstractMonthView;
 import com.manydesigns.portofino.calendar.AbstractDay;
 import com.manydesigns.portofino.calendar.AbstractWeek;
 import org.joda.time.DateMidnight;
@@ -41,7 +41,7 @@ import org.joda.time.DateTime;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class NonWorkingDaysModel extends AbstractMonth<NonWorkingDaysModel.NWDWeek> {
+public class NonWorkingDaysModel extends AbstractMonthView<NonWorkingDaysModel.NWDWeek> {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -61,6 +61,14 @@ public class NonWorkingDaysModel extends AbstractMonth<NonWorkingDaysModel.NWDWe
     @Override
     protected NWDWeek createWeek(DateMidnight weekStart, DateMidnight weekEnd) {
         return new NWDWeek(weekStart, weekEnd);
+    }
+
+    public NWDDay findDayByDateTime(DateTime dateTime) {
+        NWDWeek week = findWeekByDateTime(dateTime);
+        if (week == null) {
+            return null;
+        }
+        return week.findDayByDateTime(dateTime);
     }
 
     public class NWDWeek extends AbstractWeek<NWDDay> {

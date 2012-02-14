@@ -70,6 +70,8 @@ public class WeekEntryModel {
     protected final Day[] days;
     protected final List<Activity> activities;
 
+    protected Person person;
+
     //--------------------------------------------------------------------------
     // Logging
     //--------------------------------------------------------------------------
@@ -141,6 +143,14 @@ public class WeekEntryModel {
             logger.debug("Adding entry to day");
             day.addEntry(activity, entry);
         }
+    }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
     //--------------------------------------------------------------------------

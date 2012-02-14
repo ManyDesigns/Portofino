@@ -1,12 +1,11 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
-<%@ page import="com.manydesigns.portofino.pageactions.calendar.MonthView" %>
+<%@ page import="com.manydesigns.portofino.pageactions.timesheet.model.NonWorkingDaysModel" %>
 <%@ page import="org.joda.time.DateMidnight" %>
 <%@ page import="org.joda.time.DateTimeConstants" %>
 <%@ page import="org.joda.time.Interval" %>
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="org.joda.time.format.DateTimeFormatterBuilder" %>
 <%@ page import="java.util.Locale" %>
-<%@ page import="java.util.Set" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -61,13 +60,32 @@
                 background-color: #FACE00;
             }
         </style>
+        <%
+            NonWorkingDaysModel nonWorkingDaysModel =
+                    actionBean.getNonWorkingDaysModel();
+            XhtmlBuffer xb = new XhtmlBuffer(out);
+
+            Locale locale = request.getLocale();
+            DateTimeFormatter monthFormatter =
+                    new DateTimeFormatterBuilder()
+                    .appendMonthOfYearText()
+                    .appendLiteral(" ")
+                    .appendYear(4, 4)
+                    .toFormatter().withLocale(locale);
+        %>
+        <div style="float: right">
+            <portofino:buttons list="timesheet-nwd-navigation" cssClass="portletButton" />
+        </div>
+        Month:
+        <%
+            xb.write(monthFormatter.print(nonWorkingDaysModel.getMonthStart()));
+        %>
+        <hr/>
         <div class="tnwd-container">
             <table class="tnwd-table">
                 <thead>
                 <tr>
                 <%
-                    XhtmlBuffer xb = new XhtmlBuffer(out);
-
                     DateTimeFormatterBuilder dayOfWeekFormatterBuilder =
                             new DateTimeFormatterBuilder()
                             .appendDayOfWeekShortText();
@@ -75,11 +93,10 @@
                             dayOfWeekFormatterBuilder
                                     .toFormatter()
                                     .withLocale(Locale.ITALY);
-                    MonthView monthView = actionBean.getMonthView();
-                    MonthView.MonthViewWeek week = monthView.getWeek(0);
+                    NonWorkingDaysModel.NWDWeek week = nonWorkingDaysModel.getWeek(0);
                     for (int i = 0; i < 7; i++) {
                         xb.openElement("th");
-                        MonthView.MonthViewDay day = week.getDay(i);
+                        NonWorkingDaysModel.NWDDay day = week.getDay(i);
                         String htmlClass = "tndw-day-of-week";
                         DateMidnight dayStart = day.getDayStart();
                         int dayOfWeek = dayStart.getDayOfWeek();
@@ -106,20 +123,18 @@
                             dayOfMonthFormatterBuilder
                                     .toFormatter()
                                     .withLocale(Locale.ITALY);
-                    Set<DateMidnight> nonWorkingDays =
-                            actionBean.getNonWorkingDays();
-                    Interval monthInterval = monthView.getMonthInterval();
+                    Interval monthInterval = nonWorkingDaysModel.getMonthInterval();
                     for (int i = 0; i < 6; i++) {
-                        week = monthView.getWeek(i);
+                        week = nonWorkingDaysModel.getWeek(i);
                         xb.openElement("tr");
                         for (int j = 0; j < 7; j++) {
-                            MonthView.MonthViewDay day = week.getDay(j);
+                            NonWorkingDaysModel.NWDDay day = week.getDay(j);
                             DateMidnight dayStart = day.getDayStart();
                             xb.openElement("td");
                             if (monthInterval.contains(dayStart)) {
                                 xb.openElement("div");
                                 String htmlClass = "tnws-day";
-                                if (nonWorkingDays.contains(dayStart)) {
+                                if (day.isNonWorking()) {
                                     htmlClass += " tnws-non-working";
                                 }
                                 xb.addAttribute("class", htmlClass);
@@ -139,8 +154,9 @@
                 </tbody>
             </table>
         </div>
-        <input type="hidden" name="month" value="<c:out value="${actionBean.month}"/>"/>
-        <input type="hidden" name="year" value="<c:out value="${actionBean.year}"/>"/>
+        <input type="hidden" name="month" value="<c:out value="${actionBean.referenceDate.month + 1}"/>"/>
+        <input type="hidden" name="year" value="<c:out value="${actionBean.referenceDate.year + 1900}"/>"/>
+        <input type="hidden" name="referenceDate" value="<c:out value="${actionBean.referenceDate}"/>"/>
         <script type="text/javascript">
             function setNotWorkingDay(cell, nonWorking) {
                 var day = cell.text();

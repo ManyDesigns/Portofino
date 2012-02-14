@@ -38,15 +38,15 @@ import org.joda.time.DateTime;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class DefaultMonth extends AbstractMonth<DefaultWeek> {
+public class DefaultMonthView extends AbstractMonthView<DefaultWeek> {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    public DefaultMonth(DateTime referenceDateTime) {
+    public DefaultMonthView(DateTime referenceDateTime) {
         super(referenceDateTime);
     }
 
-    public DefaultMonth(DateTime referenceDateTime, int firstDayOfWeek) {
+    public DefaultMonthView(DateTime referenceDateTime, int firstDayOfWeek) {
         super(referenceDateTime, firstDayOfWeek);
     }
 

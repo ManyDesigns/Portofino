@@ -32,8 +32,8 @@ package com.manydesigns.portofino.pageactions.timesheet.model;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateMidnight;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -50,18 +50,21 @@ public class PersonDay {
     Integer standardWorkingMinutes;
     boolean locked;
 
-    final List<Entry> entries;
+    final Map<Activity, Entry> entries;
 
     public PersonDay(Person person, DateMidnight date) {
         this(person, date, null, false);
     }
 
-    public PersonDay(Person person, DateMidnight date, @Nullable Integer standardWorkingMinutes, boolean locked) {
+    public PersonDay(Person person,
+                     DateMidnight date,
+                     @Nullable Integer standardWorkingMinutes,
+                     boolean locked) {
         this.person = person;
         this.date = date;
         this.standardWorkingMinutes = standardWorkingMinutes;
         this.locked = locked;
-        entries = new ArrayList<Entry>();
+        entries = new HashMap<Activity, Entry>();
     }
 
     public Person getPerson() {
@@ -72,7 +75,7 @@ public class PersonDay {
         return date;
     }
 
-    public List<Entry> getEntries() {
+    public Map<Activity, Entry> getEntries() {
         return entries;
     }
 

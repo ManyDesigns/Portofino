@@ -39,22 +39,15 @@ public class Entry {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    final Activity activity;
     int minutes;
     String note;
 
-    public Entry(Activity activity) {
-        this.activity = activity;
+    public Entry() {
     }
 
-    public Entry(Activity activity, int minutes, String note) {
-        this.activity = activity;
+    public Entry(int minutes, String note) {
         this.minutes = minutes;
         this.note = note;
-    }
-
-    public Activity getActivity() {
-        return activity;
     }
 
     public String getNote() {

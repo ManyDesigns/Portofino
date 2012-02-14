@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.calendar;
 
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
@@ -42,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public abstract class AbstractMonth<T extends AbstractWeek> {
+public abstract class AbstractMonthView<T extends AbstractWeek> {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -71,17 +72,17 @@ public abstract class AbstractMonth<T extends AbstractWeek> {
     //--------------------------------------------------------------------------
 
     public static final Logger logger =
-            LoggerFactory.getLogger(AbstractMonth.class);
+            LoggerFactory.getLogger(AbstractMonthView.class);
 
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
-    public AbstractMonth(DateTime referenceDateTime) {
+    public AbstractMonthView(DateTime referenceDateTime) {
         this(referenceDateTime, DateTimeConstants.MONDAY);
     }
 
-    public AbstractMonth(DateTime referenceDateTime, int firstDayOfWeek) {
+    public AbstractMonthView(DateTime referenceDateTime, int firstDayOfWeek) {
         logger.debug("Initializing month");
         this.referenceDateTime = referenceDateTime;
         logger.debug("Reference date time: {}", referenceDateTime);
@@ -117,6 +118,19 @@ public abstract class AbstractMonth<T extends AbstractWeek> {
     protected abstract T[] createWeeksArray(int size);
 
     protected abstract T createWeek(DateMidnight weekStart, DateMidnight weekEnd);
+
+    public T findWeekByDateTime(@NotNull DateTime dateTime) {
+        if (!monthViewInterval.contains(dateTime)) {
+            logger.debug("DateTime not in monthView internal: {}", dateTime);
+            return null;
+        }
+        for (T current : weeks) {
+            if (current.getWeekInterval().contains(dateTime)) {
+                return current;
+            }
+        }
+        throw new InternalError("DateTime in month but not in month's weeks: " + dateTime);
+    }
 
     //--------------------------------------------------------------------------
     // Getters/setters

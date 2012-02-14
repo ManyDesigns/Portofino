@@ -47,5 +47,5 @@ public class TimesheetSelection {
     public String personId;
 
     @Label("Settimana")
-    public int weeksAgo;
+    public String referenceDate;
 }
