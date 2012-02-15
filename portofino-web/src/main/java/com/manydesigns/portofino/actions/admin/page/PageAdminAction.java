@@ -558,10 +558,15 @@ public class PageAdminAction extends AbstractActionBean {
         registry.register(ChartAction.class, "Chart");
         registry.register(TextAction.class, "Text");
         registry.register(CustomAction.class, "Custom");
+        tryToRegister("com.manydesigns.portofino.pageactions.calendar.CalendarAction", "Calendar");
+        tryToRegister("com.manydesigns.portofino.pageactions.timesheet.TimesheetAction", "Timesheet");
+    }
+
+    private static void tryToRegister(String className, String friendlyName) {
         try {
-            registry.register(Class.forName("com.manydesigns.portofino.pageactions.calendar.CalendarAction"), "Calendar");
+            registry.register(Class.forName(className), friendlyName);
         } catch (Exception e) {
-            logger.warn("Calendar class not found, page not available");
+            logger.warn("{} class not found, {} page not available", className, friendlyName);
         }
     }
 
