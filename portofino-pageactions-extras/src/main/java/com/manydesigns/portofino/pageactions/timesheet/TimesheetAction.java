@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.pageactions.timesheet;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
@@ -144,7 +145,7 @@ public class TimesheetAction extends CustomAction {
         for (Person person : availablePersons) {
             String name;
             if (person.isMe()) {
-                name = "Io";
+                name = ElementsThreadLocals.getText("timesheet.myself");
                 timesheetSelection.personId = person.getId();
             } else {
                 name = person.getLongName();
