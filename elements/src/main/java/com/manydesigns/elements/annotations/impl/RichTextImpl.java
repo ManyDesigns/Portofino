@@ -29,7 +29,6 @@
 
 package com.manydesigns.elements.annotations.impl;
 
-import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.RichText;
 
 import java.lang.annotation.Annotation;
@@ -56,6 +55,6 @@ public class RichTextImpl implements RichText {
     }
     
     public Class<? extends Annotation> annotationType() {
-        return Multiline.class;
+        return RichText.class;
     }
 }
