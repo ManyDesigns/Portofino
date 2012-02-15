@@ -396,6 +396,7 @@
     <script type="text/javascript">
         var hoursRe = /^(\d+):(\d+)$/;
         var hoursRe2 = /^(\d+):?$/;
+        var unsavedChanges = false;
 
         function parseHours(text) {
             var match = hoursRe.exec(text);
@@ -475,6 +476,7 @@
             }
             updateDayTotal(columnIndex);
             updateWeekTotal();
+            unsavedChanges = true;
         }
 
         for (var i = 0; i < 7; i++) {
@@ -514,7 +516,7 @@
             width: 350,
             modal: true,
             buttons: {
-                "<fmt:message key="commons.save"/>": function() {
+                '<fmt:message key="commons.save"/>': function() {
                     var dialogWrapper = $(this);
                     var dialogTextarea = dialogWrapper.find("textarea");
                     var text = $.trim(dialogTextarea.val());
@@ -522,11 +524,12 @@
                     var divWrapper = dialogWrapper.data("divWrapper");
                     var inputWrapper = divWrapper.find("input");
                     inputWrapper.val(text);
+                    unsavedChanges = true;
                     setNoteWithContent(text, divWrapper);
 
                     dialogWrapper.dialog( "close" );
                 },
-                "<fmt:message key="commons.cancel"/>": function() {
+                '<fmt:message key="commons.cancel"/>': function() {
                     $(this).dialog( "close" );
                 }
             },
@@ -565,12 +568,8 @@
             });
         });
 
-
-        var unsavedChanges = false;
-        $("table.twe-table input[type='text']").change(function(){
-            unsavedChanges = true;
-        });
-        $("button[name!='saveWeekEntryModel']").click(function() {
+        // page abandon
+        $("button[type='submit'][name!='saveWeekEntryModel']").click(function() {
             if (unsavedChanges) {
                 return confirm("There are unsaved changes. Abandon page anyway?");
             } else {

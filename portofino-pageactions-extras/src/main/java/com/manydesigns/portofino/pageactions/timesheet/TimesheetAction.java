@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.pageactions.timesheet;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
@@ -45,7 +44,10 @@ import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.*;
+import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONException;
@@ -145,7 +147,7 @@ public class TimesheetAction extends CustomAction {
         for (Person person : availablePersons) {
             String name;
             if (person.isMe()) {
-                name = ElementsThreadLocals.getText("timesheet.myself");
+                name = getMessage("timesheet.myself");
                 timesheetSelection.personId = person.getId();
             } else {
                 name = person.getLongName();
@@ -288,7 +290,8 @@ public class TimesheetAction extends CustomAction {
         }
         if (success) {
             // commit
-            SessionMessages.addInfoMessage("Timesheet salvato con successo");
+            String msg = getMessage("timesheet.saved.successuly");
+            SessionMessages.addInfoMessage(msg);
         }
 
         return weekEntry();
