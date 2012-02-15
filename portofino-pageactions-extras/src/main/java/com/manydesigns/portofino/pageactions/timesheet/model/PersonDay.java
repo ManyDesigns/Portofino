@@ -50,7 +50,7 @@ public class PersonDay {
     Integer standardWorkingMinutes;
     boolean locked;
 
-    final Map<Activity, Entry> entries;
+    final Map<Activity, WeekEntryModel.Entry> entries;
 
     public PersonDay(Person person, DateMidnight date) {
         this(person, date, null, false);
@@ -64,7 +64,7 @@ public class PersonDay {
         this.date = date;
         this.standardWorkingMinutes = standardWorkingMinutes;
         this.locked = locked;
-        entries = new HashMap<Activity, Entry>();
+        entries = new HashMap<Activity, WeekEntryModel.Entry>();
     }
 
     public Person getPerson() {
@@ -75,7 +75,7 @@ public class PersonDay {
         return date;
     }
 
-    public Map<Activity, Entry> getEntries() {
+    public Map<Activity, WeekEntryModel.Entry> getEntries() {
         return entries;
     }
 
@@ -93,5 +93,11 @@ public class PersonDay {
 
     public void setStandardWorkingMinutes(Integer standardWorkingMinutes) {
         this.standardWorkingMinutes = standardWorkingMinutes;
+    }
+
+    public WeekEntryModel.Entry addEntry(Activity activity, int minutes, @Nullable String note) {
+        WeekEntryModel.Entry entry = new WeekEntryModel.Entry(minutes, note);
+        entries.put(activity, entry);
+        return entry;
     }
 }

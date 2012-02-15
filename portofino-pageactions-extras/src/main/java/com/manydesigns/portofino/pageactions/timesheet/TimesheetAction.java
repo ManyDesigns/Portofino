@@ -296,10 +296,13 @@ public class TimesheetAction extends CustomAction {
 
     public void loadWeekEntryModel() throws Exception {
         DateMidnight today = new DateMidnight(dtz);
+        Map<DateMidnight, PersonDay> personDayDb;
         if (mario.getId().equals(personId)) {
             weekEntryModel.setPerson(mario);
+            personDayDb = marioDayDb;
         } else if (giovanni.getId().equals(personId)) {
             weekEntryModel.setPerson(giovanni);
+            personDayDb = giovanniDayDb;
         } else {
             throw new Exception("Person non found");
         }
@@ -345,8 +348,8 @@ public class TimesheetAction extends CustomAction {
                     day.setStatus(WeekEntryModel.DayStatus.OPEN);
                 }
 
-                for (Map.Entry<Activity, Entry> current : personDay.getEntries().entrySet()) {
-                    Entry value = current.getValue();
+                for (Map.Entry<Activity, WeekEntryModel.Entry> current : personDay.getEntries().entrySet()) {
+                    WeekEntryModel.Entry value = current.getValue();
                     day.addEntry(
                             current.getKey(),
                             value.getMinutes(),
@@ -359,10 +362,10 @@ public class TimesheetAction extends CustomAction {
     }
 
     private void saveWeekEntry(WeekEntryModel.Day day, Activity activity, int minutes, String note) {
-        PersonDay personDay = personDayDb.get(day.getDate());
-        Entry entry = personDay.getEntries().get(activity);
+        PersonDay personDay = marioDayDb.get(day.getDate());
+        WeekEntryModel.Entry entry = personDay.getEntries().get(activity);
         if (entry == null) {
-            entry = new Entry();
+            entry = new WeekEntryModel.Entry();
             personDay.getEntries().put(activity, entry);
         }
         entry.setMinutes(minutes);
@@ -474,31 +477,10 @@ public class TimesheetAction extends CustomAction {
     static Person mario = new Person("mario", "Mario Rossi", null, null, true);
     static Person giovanni = new Person("giovanni", "Giovanni Bianchi", null, null, false);
 
-    static final PersonDay mario_5;
-    static final PersonDay mario_4;
-    static final PersonDay mario_3;
-    static final PersonDay mario_2;
-    static final PersonDay mario_1;
-
-    static final Entry entry1;
-    static final Entry entry2;
-    static final Entry entry3;
-
-    static final Entry entry4;
-
-    static final Entry entry5;
-    static final Entry entry6;
-
-    static final Entry entry7;
-    static final Entry entry8;
-    static final Entry entry9;
-    static final Entry entry10;
-
-    static final Entry entry11;
-    static final Entry entry12;
-
-    static Map<DateMidnight, PersonDay> personDayDb
-            = new HashMap<DateMidnight, PersonDay>();
+    static Map<DateMidnight, PersonDay> marioDayDb =
+            new HashMap<DateMidnight, PersonDay>();
+    static Map<DateMidnight, PersonDay> giovanniDayDb =
+            new HashMap<DateMidnight, PersonDay>();
 
     static Set<DateMidnight> nonWorkingDaysDb
             = new HashSet<DateMidnight>();
@@ -508,67 +490,96 @@ public class TimesheetAction extends CustomAction {
         DateMidnight currentDay = today;
         boolean locked = false;
         currentDay = skipNonWorkingDays(currentDay);
-        mario_1 = new PersonDay(mario, currentDay, null, locked);
+        PersonDay mario_1 = new PersonDay(mario, currentDay, null, locked);
 
         currentDay = currentDay.minusDays(1);
         locked = checkSunday(currentDay, locked);
         currentDay = skipNonWorkingDays(currentDay);
-        mario_2 = new PersonDay(mario, currentDay, null, locked);
+        PersonDay mario_2 = new PersonDay(mario, currentDay, null, locked);
 
         currentDay = currentDay.minusDays(1);
         locked = checkSunday(currentDay, locked);
         currentDay = skipNonWorkingDays(currentDay);
-        mario_3 = new PersonDay(mario, currentDay, null, locked);
+        PersonDay mario_3 = new PersonDay(mario, currentDay, null, locked);
 
         currentDay = currentDay.minusDays(1);
         locked = checkSunday(currentDay, locked);
         currentDay = skipNonWorkingDays(currentDay);
-        mario_4 = new PersonDay(mario, currentDay, null, locked);
+        PersonDay mario_4 = new PersonDay(mario, currentDay, null, locked);
 
         currentDay = currentDay.minusDays(1);
         locked = checkSunday(currentDay, locked);
         currentDay = skipNonWorkingDays(currentDay);
-        mario_5 = new PersonDay(mario, currentDay, null, locked);
+        PersonDay mario_5 = new PersonDay(mario, currentDay, null, locked);
 
-        entry1 = new Entry(90, "Intervista con cliente");
-        entry2 = new Entry(210, null);
-        entry3 = new Entry(180, null);
+        currentDay = currentDay.minusDays(1);
+        locked = checkSunday(currentDay, locked);
+        currentDay = skipNonWorkingDays(currentDay);
+        PersonDay mario_6 = new PersonDay(mario, currentDay, null, locked);
 
-        entry4 = new Entry(480, null);
+        currentDay = currentDay.minusDays(1);
+        locked = checkSunday(currentDay, locked);
+        currentDay = skipNonWorkingDays(currentDay);
+        PersonDay mario_7 = new PersonDay(mario, currentDay, null, locked);
 
-        entry5 = new Entry(210, null);
-        entry6 = new Entry(270, null);
+        currentDay = currentDay.minusDays(1);
+        locked = checkSunday(currentDay, locked);
+        currentDay = skipNonWorkingDays(currentDay);
+        PersonDay mario_8 = new PersonDay(mario, currentDay, null, locked);
 
-        entry7 = new Entry(60, null);
-        entry8 = new Entry(180, null);
-        entry9 = new Entry(180, null);
-        entry10 = new Entry(60, null);
+        currentDay = currentDay.minusDays(1);
+        locked = checkSunday(currentDay, locked);
+        currentDay = skipNonWorkingDays(currentDay);
+        PersonDay mario_9 = new PersonDay(mario, currentDay, null, locked);
 
-        entry11 = new Entry(150, null);
-        entry12 = new Entry(60, null);
+        currentDay = currentDay.minusDays(1);
+        locked = checkSunday(currentDay, locked);
+        currentDay = skipNonWorkingDays(currentDay);
+        PersonDay mario_10 = new PersonDay(mario, currentDay, null, locked);
 
-        personDayDb.put(mario_5.getDate(), mario_5);
-        personDayDb.put(mario_4.getDate(), mario_4);
-        personDayDb.put(mario_3.getDate(), mario_3);
-        personDayDb.put(mario_2.getDate(), mario_2);
-        personDayDb.put(mario_1.getDate(), mario_1);
+        marioDayDb.put(mario_1.getDate(), mario_1);
+        marioDayDb.put(mario_2.getDate(), mario_2);
+        marioDayDb.put(mario_3.getDate(), mario_3);
+        marioDayDb.put(mario_4.getDate(), mario_4);
+        marioDayDb.put(mario_5.getDate(), mario_5);
+        marioDayDb.put(mario_6.getDate(), mario_6);
+        marioDayDb.put(mario_7.getDate(), mario_7);
+        marioDayDb.put(mario_8.getDate(), mario_8);
+        marioDayDb.put(mario_9.getDate(), mario_9);
+        marioDayDb.put(mario_10.getDate(), mario_10);
 
-        mario_5.getEntries().put(ac1, entry1);
-        mario_5.getEntries().put(ac4, entry2);
-        mario_5.getEntries().put(ac5, entry3);
 
-        mario_4.getEntries().put(ac1, entry4);
+        mario_1.addEntry(ac2, 150, null);
+        mario_1.addEntry(ac4, 60, null);
 
-        mario_3.getEntries().put(ac1, entry5);
-        mario_3.getEntries().put(ac2, entry6);
+        mario_2.addEntry(ac1, 60, null);
+        mario_2.addEntry(ac2, 180, "Studio di fattibilità");
+        mario_2.addEntry(ac6, 180, null);
+        mario_2.addEntry(ac9, 60, null);
 
-        mario_2.getEntries().put(ac1, entry7);
-        mario_2.getEntries().put(ac2, entry8);
-        mario_2.getEntries().put(ac6, entry9);
-        mario_2.getEntries().put(ac9, entry10);
+        mario_3.addEntry(ac1, 210, null);
+        mario_3.addEntry(ac2, 270, null);
 
-        mario_1.getEntries().put(ac2, entry11);
-        mario_1.getEntries().put(ac4, entry12);
+        mario_4.addEntry(ac1, 480, null);
+
+        mario_5.addEntry(ac1, 90, "Intervista con cliente");
+        mario_5.addEntry(ac4, 210, null);
+        mario_5.addEntry(ac5, 180, null);
+
+        mario_6.addEntry(ac1, 60, null);
+        mario_6.addEntry(ac4, 180, null);
+        mario_6.addEntry(ac5, 300, null);
+
+        mario_7.addEntry(ac5, 480, null);
+
+        mario_8.addEntry(ac2, 240, null);
+        mario_8.addEntry(ac4, 240, null);
+
+        mario_9.addEntry(ac2, 120, null);
+        mario_9.addEntry(ac4, 360, null);
+
+        mario_10.addEntry(ac2, 300, null);
+        mario_10.addEntry(ac6, 180, null);
 
         // set non-working days 60 days before to 60 days after
         currentDay = today.minusDays(60);

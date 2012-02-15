@@ -162,6 +162,9 @@ public class WeekEntryModel {
         int minutes;
         String note;
 
+        public Entry() {
+        }
+
         public Entry(int minutes, String note) {
             this.minutes = minutes;
             this.note = note;
