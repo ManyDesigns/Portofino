@@ -59,6 +59,9 @@
             div.tnws-day.tnws-hover {
                 background-color: #FACE00;
             }
+            div.tnws-buttons {
+                text-align: right;
+            }
         </style>
         <%
             NonWorkingDaysModel nonWorkingDaysModel =
@@ -73,14 +76,18 @@
                     .appendYear(4, 4)
                     .toFormatter().withLocale(locale);
         %>
-        <div style="float: right">
-            <portofino:buttons list="timesheet-nwd-navigation" cssClass="portletButton" />
+        <div class="yui-gc">
+            <div class="yui-u first">
+                <fmt:message key="timesheet.month"/>:
+                <%
+                    xb.write(monthFormatter.print(nonWorkingDaysModel.getMonthStart()));
+                %>
+            </div>
+            <div class="yui-u tnws-buttons">
+                <portofino:buttons list="timesheet-nwd-navigation" cssClass="portletButton" />
+            </div>
         </div>
-        <fmt:message key="timesheet.month"/>:
-        <%
-            xb.write(monthFormatter.print(nonWorkingDaysModel.getMonthStart()));
-        %>
-        <hr/>
+        <div class="horizontalSeparator"></div>
         <div class="tnwd-container">
             <table class="tnwd-table">
                 <thead>
@@ -162,7 +169,7 @@
                 var day = cell.text();
                 var month = $('input[name$="month"]').val();
                 var year = $('input[name$="year"]').val();
-                cell.html("saving");
+                cell.html('<fmt:message key="timesheet.saving"/>');
                 var data = {
                     day : day,
                     month : month,

@@ -44,10 +44,7 @@ import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeZone;
+import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONException;
@@ -188,8 +185,8 @@ public class TimesheetAction extends CustomAction {
     }
 
     public void loadExecuteModel() {
-        availablePersons.add(paolo);
-        availablePersons.add(angelo);
+        availablePersons.add(mario);
+        availablePersons.add(giovanni);
     }
 
 
@@ -298,10 +295,10 @@ public class TimesheetAction extends CustomAction {
 
     public void loadWeekEntryModel() throws Exception {
         DateMidnight today = new DateMidnight(dtz);
-        if (paolo.getId().equals(personId)) {
-            weekEntryModel.setPerson(paolo);
-        } else if (angelo.getId().equals(personId)) {
-            weekEntryModel.setPerson(angelo);
+        if (mario.getId().equals(personId)) {
+            weekEntryModel.setPerson(mario);
+        } else if (giovanni.getId().equals(personId)) {
+            weekEntryModel.setPerson(giovanni);
         } else {
             throw new Exception("Person non found");
         }
@@ -456,52 +453,6 @@ public class TimesheetAction extends CustomAction {
 
     static DateTimeZone dtz = DateTimeZone.UTC;
 
-    static DateMidnight dec26 = new DateMidnight(
-            2011, DateTimeConstants.DECEMBER, 26,
-            dtz);
-    static DateMidnight dec27 = dec26.plusDays(1);
-    static DateMidnight dec28 = dec27.plusDays(1);
-    static DateMidnight dec29 = dec28.plusDays(1);
-    static DateMidnight dec30 = dec29.plusDays(1);
-    static DateMidnight dec31 = dec30.plusDays(1);
-    static DateMidnight jan1 = dec31.plusDays(1);
-    static DateMidnight jan2 = jan1.plusDays(1);
-    static DateMidnight jan3 = jan2.plusDays(1);
-    static DateMidnight jan4 = jan3.plusDays(1);
-    static DateMidnight jan5 = jan4.plusDays(1);
-    static DateMidnight jan6 = jan5.plusDays(1);
-    static DateMidnight jan7 = jan6.plusDays(1);
-    static DateMidnight jan8 = jan7.plusDays(1);
-    static DateMidnight jan9 = jan8.plusDays(1);
-    static DateMidnight jan10 = jan9.plusDays(1);
-    static DateMidnight jan11 = jan10.plusDays(1);
-    static DateMidnight jan12 = jan11.plusDays(1);
-    static DateMidnight jan13 = jan12.plusDays(1);
-    static DateMidnight jan14 = jan13.plusDays(1);
-    static DateMidnight jan15 = jan14.plusDays(1);
-    static DateMidnight jan16 = jan15.plusDays(1);
-    static DateMidnight jan17 = jan16.plusDays(1);
-    static DateMidnight jan18 = jan17.plusDays(1);
-    static DateMidnight jan19 = jan18.plusDays(1);
-    static DateMidnight jan20 = jan19.plusDays(1);
-    static DateMidnight jan21 = jan20.plusDays(1);
-    static DateMidnight jan22 = jan21.plusDays(1);
-    static DateMidnight jan23 = jan22.plusDays(1);
-    static DateMidnight jan24 = jan23.plusDays(1);
-    static DateMidnight jan25 = jan24.plusDays(1);
-    static DateMidnight jan26 = jan25.plusDays(1);
-    static DateMidnight jan27 = jan26.plusDays(1);
-    static DateMidnight jan28 = jan27.plusDays(1);
-    static DateMidnight jan29 = jan28.plusDays(1);
-    static DateMidnight jan30 = jan29.plusDays(1);
-    static DateMidnight jan31 = jan30.plusDays(1);
-    static DateMidnight feb1 = jan31.plusDays(1);
-    static DateMidnight feb2 = feb1.plusDays(1);
-    static DateMidnight feb3 = feb2.plusDays(1);
-    static DateMidnight feb4 = feb3.plusDays(1);
-    static DateMidnight feb5 = feb4.plusDays(1);
-    static DateMidnight feb6 = feb5.plusDays(1);
-
     static ActivityType at0 = new ActivityType("at0", "fatturabile", ActivityMetaType.BILLABLE);
     static ActivityType at1 = new ActivityType("at1", "non fatturabile", ActivityMetaType.NON_BILLABLE);
     static ActivityType at2 = new ActivityType("at2", "assenza", ActivityMetaType.LEAVE);
@@ -519,31 +470,31 @@ public class TimesheetAction extends CustomAction {
     static Activity ac8 = new Activity("ac8", "#0002", "Assenze", "Ferie", null, at2, null, null, null);
     static Activity ac9 = new Activity("ac9", "#0002", "Assenze", "Permesso", null, at2, null, null, null);
 
-    static Person paolo = new Person("paolo", "Paolo Predonzani", null, null, true);
-    static Person angelo = new Person("angelo", "Angelo Lupo", null, null, false);
+    static Person mario = new Person("mario", "Mario Rossi", null, null, true);
+    static Person giovanni = new Person("giovanni", "Giovanni Bianchi", null, null, false);
 
-    static PersonDay paoloJan30 = new PersonDay(paolo, jan30, null, true);
-    static PersonDay paoloJan31 = new PersonDay(paolo, jan31, null, false);
-    static PersonDay paoloFeb1 = new PersonDay(paolo, feb1, null, false);
-    static PersonDay paoloFeb2 = new PersonDay(paolo, feb2, null, false);
-    static PersonDay paoloFeb3 = new PersonDay(paolo, feb3, null, false);
+    static final PersonDay mario1;
+    static final PersonDay mario2;
+    static final PersonDay mario3;
+    static final PersonDay mario4;
+    static final PersonDay mario5;
 
-    static Entry entry1 = new Entry(90, "Intervista con Pippo");
-    static Entry entry2 = new Entry(210, null);
-    static Entry entry3 = new Entry(180, null);
+    static final Entry entry1;
+    static final Entry entry2;
+    static final Entry entry3;
 
-    static Entry entry4 = new Entry(480, null);
+    static final Entry entry4;
 
-    static Entry entry5 = new Entry(210, null);
-    static Entry entry6 = new Entry(270, null);
+    static final Entry entry5;
+    static final Entry entry6;
 
-    static Entry entry7 = new Entry(60, null);
-    static Entry entry8 = new Entry(180, null);
-    static Entry entry9 = new Entry(180, null);
-    static Entry entry10 = new Entry(60, null);
+    static final Entry entry7;
+    static final Entry entry8;
+    static final Entry entry9;
+    static final Entry entry10;
 
-    static Entry entry11 = new Entry(150, null);
-    static Entry entry12 = new Entry(60, null);
+    static final Entry entry11;
+    static final Entry entry12;
 
     static Map<DateMidnight, PersonDay> personDayDb
             = new HashMap<DateMidnight, PersonDay>();
@@ -552,33 +503,82 @@ public class TimesheetAction extends CustomAction {
             = new HashSet<DateMidnight>();
 
     static {
-        personDayDb.put(paoloJan30.getDate(), paoloJan30);
-        personDayDb.put(paoloJan31.getDate(), paoloJan31);
-        personDayDb.put(paoloFeb1.getDate(), paoloFeb1);
-        personDayDb.put(paoloFeb2.getDate(), paoloFeb2);
-        personDayDb.put(paoloFeb3.getDate(), paoloFeb3);
+        DateMidnight today = new DateMidnight(dtz);
+        DateMidnight currentDay = today;
+        currentDay = skipNonWorkingDays(currentDay);
+        mario5 = new PersonDay(mario, currentDay, null, true);
 
-        paoloJan30.getEntries().put(ac1, entry1);
-        paoloJan30.getEntries().put(ac4, entry2);
-        paoloJan30.getEntries().put(ac5, entry3);
+        currentDay = currentDay.minusDays(1);
+        currentDay = skipNonWorkingDays(currentDay);
+        mario4 = new PersonDay(mario, currentDay, null, false);
 
-        paoloJan31.getEntries().put(ac1, entry4);
+        currentDay = currentDay.minusDays(1);
+        currentDay = skipNonWorkingDays(currentDay);
+        mario3 = new PersonDay(mario, currentDay, null, false);
 
-        paoloFeb1.getEntries().put(ac1, entry5);
-        paoloFeb1.getEntries().put(ac2, entry6);
+        currentDay = currentDay.minusDays(1);
+        currentDay = skipNonWorkingDays(currentDay);
+        mario2 = new PersonDay(mario, currentDay, null, false);
 
-        paoloFeb2.getEntries().put(ac1, entry7);
-        paoloFeb2.getEntries().put(ac2, entry8);
-        paoloFeb2.getEntries().put(ac6, entry9);
-        paoloFeb2.getEntries().put(ac9, entry10);
+        currentDay = currentDay.minusDays(1);
+        currentDay = skipNonWorkingDays(currentDay);
+        mario1 = new PersonDay(mario, currentDay, null, false);
 
-        paoloFeb3.getEntries().put(ac2, entry11);
-        paoloFeb3.getEntries().put(ac4, entry12);
+        entry1 = new Entry(90, "Intervista con Pippo");
+        entry2 = new Entry(210, null);
+        entry3 = new Entry(180, null);
 
-        nonWorkingDaysDb.add(jan28);
-        nonWorkingDaysDb.add(jan29);
-        nonWorkingDaysDb.add(feb4);
-        nonWorkingDaysDb.add(feb5);
+        entry4 = new Entry(480, null);
+
+        entry5 = new Entry(210, null);
+        entry6 = new Entry(270, null);
+
+        entry7 = new Entry(60, null);
+        entry8 = new Entry(180, null);
+        entry9 = new Entry(180, null);
+        entry10 = new Entry(60, null);
+
+        entry11 = new Entry(150, null);
+        entry12 = new Entry(60, null);
+
+        personDayDb.put(mario1.getDate(), mario1);
+        personDayDb.put(mario2.getDate(), mario2);
+        personDayDb.put(mario3.getDate(), mario3);
+        personDayDb.put(mario4.getDate(), mario4);
+        personDayDb.put(mario5.getDate(), mario5);
+
+        mario1.getEntries().put(ac1, entry1);
+        mario1.getEntries().put(ac4, entry2);
+        mario1.getEntries().put(ac5, entry3);
+
+        mario2.getEntries().put(ac1, entry4);
+
+        mario3.getEntries().put(ac1, entry5);
+        mario3.getEntries().put(ac2, entry6);
+
+        mario4.getEntries().put(ac1, entry7);
+        mario4.getEntries().put(ac2, entry8);
+        mario4.getEntries().put(ac6, entry9);
+        mario4.getEntries().put(ac9, entry10);
+
+        mario5.getEntries().put(ac2, entry11);
+        mario5.getEntries().put(ac4, entry12);
+
+        // set non-working days 60 days before to 60 days after
+        currentDay = today.minusDays(60);
+        for (int i = 0; i < 120; i++) {
+            if (currentDay.getDayOfWeek() >= DateTimeConstants.SATURDAY) {
+                nonWorkingDaysDb.add(currentDay);
+            }
+            currentDay = currentDay.plusDays(1);
+        }
+    }
+
+    private static DateMidnight skipNonWorkingDays(DateMidnight currentDay) {
+        while (currentDay.getDayOfWeek() >= DateTimeConstants.SATURDAY) {
+            currentDay = currentDay.minusDays(1);
+        }
+        return currentDay;
     }
 
     //--------------------------------------------------------------------------
