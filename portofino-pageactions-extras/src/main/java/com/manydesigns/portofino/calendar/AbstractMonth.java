@@ -55,7 +55,7 @@ public abstract class AbstractMonth<T extends AbstractDay> {
     final DateMidnight monthStart;
     final DateMidnight monthEnd;
     final Interval monthInterval;
-    final int daysInMonth;
+    final int daysCount;
 
     protected final T[] days;
 
@@ -80,12 +80,12 @@ public abstract class AbstractMonth<T extends AbstractDay> {
         monthInterval = new Interval(monthStart, monthEnd);
         logger.debug("Month interval: {}", monthInterval);
 
-        daysInMonth = Days.daysIn(monthInterval).getDays();
-        logger.debug("Initializing {} days", daysInMonth);
+        daysCount = Days.daysIn(monthInterval).getDays();
+        logger.debug("Initializing {} days", daysCount);
 
-        days = createDaysArray(daysInMonth);
+        days = createDaysArray(daysCount);
         DateMidnight dayStart = monthStart;
-        for (int i = 0; i < daysInMonth; i++) {
+        for (int i = 0; i < daysCount; i++) {
             DateMidnight dayEnd = dayStart.plusDays(1);
             days[i] = createDay(dayStart, dayEnd);
 
@@ -132,8 +132,8 @@ public abstract class AbstractMonth<T extends AbstractDay> {
         return monthInterval;
     }
 
-    public int getDaysInMonth() {
-        return daysInMonth;
+    public int getDaysCount() {
+        return daysCount;
     }
 
     public T getDay(int index) {

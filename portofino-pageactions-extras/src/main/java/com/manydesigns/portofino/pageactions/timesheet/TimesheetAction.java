@@ -29,9 +29,9 @@
 
 package com.manydesigns.portofino.pageactions.timesheet;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.PageSize;
-import com.lowagie.text.Paragraph;
+import com.lowagie.text.*;
+import com.lowagie.text.Font;
+import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
@@ -58,6 +58,7 @@ import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
 import org.json.JSONException;
 import org.json.JSONStringer;
 import org.slf4j.Logger;
@@ -65,8 +66,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -89,8 +92,18 @@ public class TimesheetAction extends AbstractPageAction {
     protected final static Pattern hoursPattern =
             Pattern.compile("(\\d+):(\\d+)");
     public static final int MINUTES_IN_A_DAY = 24 * 60;
-    public static String ENTRY_INPUT_FORMAT = "cell-%d-%s";
-    public static String NOTE_INPUT_FORMAT = "note-%d-%s";
+    public static final String ENTRY_INPUT_FORMAT = "cell-%d-%s";
+    public static final String NOTE_INPUT_FORMAT = "note-%d-%s";
+    public static final DateTimeZone dtz = DateTimeZone.UTC;
+
+
+    protected final Font tableHeaderFont =
+        new Font(Font.HELVETICA, 10, Font.BOLD, Color.BLACK);
+    protected final Font tableBodyFont =
+        new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
+    protected final Font headerFont =
+        new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
+
 
     //**************************************************************************
     // Variables
@@ -113,6 +126,31 @@ public class TimesheetAction extends AbstractPageAction {
     protected boolean nonWorking;
 
     protected Form configurationForm;
+
+    /**
+     * Format example: February 13, 2012
+     */
+    protected DateTimeFormatter longDateFormatter;
+
+    /**
+     * Format example: Mon, Tue, etc.
+     */
+    protected DateTimeFormatter dayOfWeekFormatter;
+
+    /**
+     * Format example: 2/13/12
+     */
+    protected DateTimeFormatter dateFormatter;
+
+    /**
+     * Format example: February 2012
+     */
+    protected DateTimeFormatter monthFormatter;
+
+    /**
+     * Format example: 1, 2, 3, etc.
+     */
+    protected DateTimeFormatter dayOfMonthFormatter;
 
 
     //**************************************************************************
@@ -139,6 +177,25 @@ public class TimesheetAction extends AbstractPageAction {
             pageInstance.setConfiguration(new TimesheetConfiguration());
         }
         return null;
+    }
+
+    @Before
+    public void prepareFormatters() {
+        Locale locale = getContext().getRequest().getLocale();
+        longDateFormatter = DateTimeFormat.longDate().withLocale(locale);
+        dayOfWeekFormatter = DateTimeFormat.forPattern("E").withLocale(locale);
+        dateFormatter = DateTimeFormat.shortDate().withLocale(locale);
+        monthFormatter = new DateTimeFormatterBuilder()
+                .appendMonthOfYearText()
+                .appendLiteral(" ")
+                .appendYear(4, 4)
+                .toFormatter().withLocale(locale);
+        dayOfMonthFormatter = new DateTimeFormatterBuilder()
+                .appendDayOfMonth(1)
+                .toFormatter()
+                .withLocale(locale);
+
+
     }
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
@@ -512,7 +569,25 @@ public class TimesheetAction extends AbstractPageAction {
         document.open();
 
         // Add content
-        document.add(new Paragraph("Hello World"));
+        String reportTitle = "Month: " + monthFormatter.print(referenceDateMidnight);
+        document.add(new Paragraph(reportTitle));
+
+        document.add(Chunk.NEWLINE);
+
+        int daysCount = monthReportModel.getDaysCount();
+        float[] colsWidth = new float[daysCount + 1];
+        colsWidth[0] = 5f;
+        for (int i = 0; i < daysCount; i++) {
+            colsWidth[i+1] = 1f;
+        }
+        PdfPTable table = new PdfPTable(colsWidth);
+        table.setWidthPercentage(100.0f);
+        for (int i = 0; i < daysCount; i++) {
+            MonthReportModel.Day day = monthReportModel.getDay(i);
+            String text = dayOfMonthFormatter.print(day.getDayStart());
+            addHeaderCell(table, text);
+        }
+        document.add(table);
 
         // close the document
         document.close();
@@ -528,6 +603,10 @@ public class TimesheetAction extends AbstractPageAction {
                 }
             }
         }.setFilename("month-report.pdf").setLength(tmpFile.length());
+    }
+
+    private void addHeaderCell(PdfPTable table, String text) {
+        table.addCell(new Phrase(text, tableHeaderFont));
     }
 
     public void loadMonthReportModel() {}
@@ -550,8 +629,6 @@ public class TimesheetAction extends AbstractPageAction {
     //--------------------------------------------------------------------------
     // Data provider
     //--------------------------------------------------------------------------
-
-    static DateTimeZone dtz = DateTimeZone.UTC;
 
     static ActivityType at0 = new ActivityType("at0", "fatturabile", ActivityMetaType.BILLABLE);
     static ActivityType at1 = new ActivityType("at1", "non fatturabile", ActivityMetaType.NON_BILLABLE);
@@ -769,5 +846,25 @@ public class TimesheetAction extends AbstractPageAction {
 
     public Form getConfigurationForm() {
         return configurationForm;
+    }
+
+    public DateTimeFormatter getLongDateFormatter() {
+        return longDateFormatter;
+    }
+
+    public DateTimeFormatter getDayOfWeekFormatter() {
+        return dayOfWeekFormatter;
+    }
+
+    public DateTimeFormatter getDateFormatter() {
+        return dateFormatter;
+    }
+
+    public DateTimeFormatter getMonthFormatter() {
+        return monthFormatter;
+    }
+
+    public DateTimeFormatter getDayOfMonthFormatter() {
+        return dayOfMonthFormatter;
     }
 }

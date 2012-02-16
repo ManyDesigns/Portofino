@@ -68,13 +68,7 @@
                     actionBean.getNonWorkingDaysModel();
             XhtmlBuffer xb = new XhtmlBuffer(out);
 
-            Locale locale = request.getLocale();
-            DateTimeFormatter monthFormatter =
-                    new DateTimeFormatterBuilder()
-                    .appendMonthOfYearText()
-                    .appendLiteral(" ")
-                    .appendYear(4, 4)
-                    .toFormatter().withLocale(locale);
+            DateTimeFormatter monthFormatter = actionBean.getMonthFormatter();
         %>
         <div class="yui-gc">
             <div class="yui-u first">
@@ -93,13 +87,6 @@
                 <thead>
                 <tr>
                 <%
-                    DateTimeFormatterBuilder dayOfWeekFormatterBuilder =
-                            new DateTimeFormatterBuilder()
-                            .appendDayOfWeekShortText();
-                    DateTimeFormatter dayOfWeekFormatter =
-                            dayOfWeekFormatterBuilder
-                                    .toFormatter()
-                                    .withLocale(locale);
                     NonWorkingDaysModel.NWDWeek week = nonWorkingDaysModel.getWeek(0);
                     for (int i = 0; i < 7; i++) {
                         xb.openElement("th");
@@ -114,7 +101,7 @@
                         }
                         xb.addAttribute("class", htmlClass);
 
-                        xb.write(dayOfWeekFormatter.print(dayStart));
+                        xb.write(actionBean.getDateFormatter().print(dayStart));
 
                         xb.closeElement("th");
                     }
@@ -123,13 +110,6 @@
                 </thead>
                 <tbody>
                 <%
-                    DateTimeFormatterBuilder dayOfMonthFormatterBuilder =
-                            new DateTimeFormatterBuilder()
-                            .appendDayOfMonth(1);
-                    DateTimeFormatter dayOfMonthFormatter =
-                            dayOfMonthFormatterBuilder
-                                    .toFormatter()
-                                    .withLocale(locale);
                     Interval monthInterval = nonWorkingDaysModel.getMonthInterval();
                     for (int i = 0; i < 6; i++) {
                         week = nonWorkingDaysModel.getWeek(i);
@@ -145,7 +125,7 @@
                                     htmlClass += " tnws-non-working";
                                 }
                                 xb.addAttribute("class", htmlClass);
-                                xb.write(dayOfMonthFormatter.print(dayStart));
+                                xb.write(actionBean.getDayOfMonthFormatter().print(dayStart));
                                 xb.closeElement("div");
                             } else {
                                 xb.openElement("div");
