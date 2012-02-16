@@ -140,7 +140,7 @@
         <%
             xb.write(longDateFormatter.print(weekEntryModel.getDay(6).getDate()));
         %>
-        <hr/>
+        <div class="horizontalSeparator"></div>
         <div class="twe-container">
         <table class="twe-table">
             <col/>

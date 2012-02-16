@@ -224,6 +224,16 @@ public class TimesheetAction extends AbstractPageAction {
         }
     }
 
+    @Button(list = "timesheet-admin", key = "timesheet.report.month", order = 2)
+    public Resolution reportMonth() throws Exception {
+        DateMidnight referenceDateMidnight =
+                new DateMidnight(referenceDate, dtz);
+        
+        return weekEntry();
+    }
+
+
+
     public void loadExecuteModel() {
         availablePersons.add(mario);
         availablePersons.add(giovanni);

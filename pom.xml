@@ -42,6 +42,7 @@
         <groovy.version>1.8.0</groovy.version>
         <json.version>20111031</json.version>
         <liquibase.version>2.0.1</liquibase.version>
+        <itext.version>2.1.7</itext.version>
     </properties>
     <modules>
         <module>elements</module>
