@@ -36,9 +36,11 @@ import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.i18n.ResourceBundleManager;
-import com.manydesigns.portofino.pageactions.custom.CustomAction;
+import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
+import com.manydesigns.portofino.pageactions.timesheet.configuration.TimesheetConfiguration;
 import com.manydesigns.portofino.pageactions.timesheet.model.*;
+import com.manydesigns.portofino.pageactions.timesheet.util.PersonDay;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
@@ -67,7 +69,8 @@ import java.util.regex.Pattern;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresPermissions(level = AccessLevel.VIEW)
-public class TimesheetAction extends CustomAction {
+@ConfigurationClass(TimesheetConfiguration.class)
+public class TimesheetAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -100,7 +103,7 @@ public class TimesheetAction extends CustomAction {
     protected Integer year;
     protected boolean nonWorking;
 
-    protected ResourceBundleManager resourceBundleManager;
+    protected Form configurationForm;
 
 
     //**************************************************************************
@@ -115,20 +118,54 @@ public class TimesheetAction extends CustomAction {
             LoggerFactory.getLogger(TimesheetAction.class);
 
     //**************************************************************************
-    // Setup
+    // Setup & configuration
     //**************************************************************************
-
-    public Class<?> getConfigurationClass() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
         this.pageInstance = pageInstance;
         if(!pageInstance.getParameters().isEmpty()) {
             return new ErrorResolution(404);
         }
+        if(pageInstance.getConfiguration() == null) {
+            pageInstance.setConfiguration(new TimesheetConfiguration());
+        }
         return null;
     }
+
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
+    @RequiresPermissions(level = AccessLevel.EDIT)
+    public Resolution configure() {
+        prepareConfigurationForms();
+        return new ForwardResolution("/layouts/timesheet/configure.jsp");
+    }
+
+    @Button(list = "configuration", key = "commons.updateConfiguration")
+    @RequiresPermissions(level = AccessLevel.EDIT)
+    public Resolution updateConfiguration() {
+        prepareConfigurationForms();
+        readPageConfigurationFromRequest();
+        configurationForm.readFromRequest(context.getRequest());
+        boolean valid = validatePageConfiguration();
+        valid = valid && configurationForm.validate();
+        if(valid) {
+            updatePageConfiguration();
+            configurationForm.writeToObject(pageInstance.getConfiguration());
+            saveConfiguration(pageInstance.getConfiguration());
+            SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
+            return cancel();
+        } else {
+            SessionMessages.addErrorMessage(getMessage("commons.configuration.notUpdated"));
+            return new ForwardResolution("/layouts/timesheet/configure.jsp");
+        }
+    }
+
+    @Override
+    protected void prepareConfigurationForms() {
+        super.prepareConfigurationForms();
+        configurationForm = new FormBuilder(TimesheetConfiguration.class).build();
+        configurationForm.readFromObject(pageInstance.getConfiguration());
+    }
+
 
     //**************************************************************************
     // Default view
@@ -674,4 +711,7 @@ public class TimesheetAction extends CustomAction {
         return nonWorkingDaysModel;
     }
 
+    public Form getConfigurationForm() {
+        return configurationForm;
+    }
 }

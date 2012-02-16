@@ -4,5 +4,5 @@ import javax.xml.bind.annotation.XmlRegistry;
 
 @XmlRegistry
 public class ObjectFactory {
-    public CalendarConfiguration createChartConfiguration() { return new CalendarConfiguration(); }
+    public CalendarConfiguration createCalendarConfiguration() { return new CalendarConfiguration(); }
 }

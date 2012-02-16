@@ -1,16 +1,16 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
+<%@ page import="com.manydesigns.portofino.pageactions.timesheet.TimesheetAction" %>
 <%@ page import="com.manydesigns.portofino.pageactions.timesheet.model.Activity" %>
 <%@ page import="com.manydesigns.portofino.pageactions.timesheet.model.WeekEntryModel" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page
-        import="org.joda.time.DateMidnight" %>
-<%@ page import="org.joda.time.format.DateTimeFormat" %>
+        import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.joda.time.DateMidnight" %>
 <%@ page
-        import="org.joda.time.format.DateTimeFormatter" %>
+        import="org.joda.time.format.DateTimeFormat" %>
+<%@ page import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.Locale" %>
 <%@ page
-        import="com.manydesigns.portofino.pageactions.timesheet.TimesheetAction" %>
+        import="java.util.Locale" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -155,9 +155,9 @@
             <col class="day-column"/>
             <thead>
             <tr>
-                <th class="twe-activity"><fmt:message key="timesheet.level1"/></th>
-                <th class="twe-activity"><fmt:message key="timesheet.level2"/></th>
-                <th class="twe-activity"><fmt:message key="timesheet.level3"/></th>
+                <th class="twe-activity"><c:out value="${actionBean.pageInstance.configuration.level1Label}"/></th>
+                <th class="twe-activity"><c:out value="${actionBean.pageInstance.configuration.level2Label}"/></th>
+                <th class="twe-activity"><c:out value="${actionBean.pageInstance.configuration.level3Label}"/></th>
                 <%
                     DateTimeFormatter dayOfWeekFormatter =
                     DateTimeFormat.forPattern("E").withLocale(locale);
