@@ -29,10 +29,15 @@
 
 package com.manydesigns.portofino.pageactions.timesheet;
 
+import com.lowagie.text.Document;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -41,6 +46,7 @@ import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.timesheet.configuration.TimesheetConfiguration;
 import com.manydesigns.portofino.pageactions.timesheet.model.*;
 import com.manydesigns.portofino.pageactions.timesheet.util.PersonDay;
+import com.manydesigns.portofino.pageactions.timesheet.util.TimesheetSelection;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
@@ -58,6 +64,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -97,6 +105,7 @@ public class TimesheetAction extends AbstractPageAction {
 
     protected WeekEntryModel weekEntryModel;
     protected NonWorkingDaysModel nonWorkingDaysModel;
+    protected MonthReportModel monthReportModel;
 
     protected Integer day;
     protected Integer month;
@@ -223,16 +232,6 @@ public class TimesheetAction extends AbstractPageAction {
             return forwardToPortletPage("/layouts/timesheet/index.jsp");
         }
     }
-
-    @Button(list = "timesheet-admin", key = "timesheet.report.month", order = 2)
-    public Resolution reportMonth() throws Exception {
-        DateMidnight referenceDateMidnight =
-                new DateMidnight(referenceDate, dtz);
-        
-        return weekEntry();
-    }
-
-
 
     public void loadExecuteModel() {
         availablePersons.add(mario);
@@ -486,6 +485,53 @@ public class TimesheetAction extends AbstractPageAction {
             nonWorkingDaysDb.remove(date);
         }
     }
+
+    //**************************************************************************
+    // Month report
+    //**************************************************************************
+
+    @Button(list = "timesheet-admin", key = "timesheet.month.report", order = 2)
+    public Resolution monthReport() throws Exception {
+        DateMidnight referenceDateMidnight =
+                new DateMidnight(referenceDate, dtz);
+        monthReportModel = new MonthReportModel(referenceDateMidnight);
+        loadMonthReportModel();
+
+        final File tmpFile = File.createTempFile("report-", ".pdf");
+        FileOutputStream fos = new FileOutputStream(tmpFile);
+        OutputStream os = new BufferedOutputStream(fos);
+
+        Document document = new Document();
+
+        // set page size and orientation
+        document.setPageSize(PageSize.A4.rotate());
+
+        // Create the writer and open the document
+        PdfWriter writer = PdfWriter.getInstance(
+                document, os);
+        document.open();
+
+        // Add content
+        document.add(new Paragraph("Hello World"));
+
+        // close the document
+        document.close();
+
+        // Send the result
+        FileInputStream fileInputStream = new FileInputStream(tmpFile);
+        return new StreamingResolution(MimeTypes.APPLICATION_PDF, fileInputStream) {
+            @Override
+            protected void stream(HttpServletResponse response) throws Exception {
+                super.stream(response);
+                if (!tmpFile.delete()) {
+                    logger.warn("Could not delete tmp file: {}", tmpFile);
+                }
+            }
+        }.setFilename("month-report.pdf").setLength(tmpFile.length());
+    }
+
+    public void loadMonthReportModel() {}
+
 
     //**************************************************************************
     // Other action handlers

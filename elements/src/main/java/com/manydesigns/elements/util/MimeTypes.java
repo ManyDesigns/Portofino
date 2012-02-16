@@ -27,10 +27,7 @@
  *
  */
 
-package com.manydesigns.portofino.pageactions.timesheet;
-
-import com.manydesigns.elements.annotations.LabelI18N;
-import com.manydesigns.elements.annotations.Required;
+package com.manydesigns.elements.util;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -38,14 +35,10 @@ import com.manydesigns.elements.annotations.Required;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class TimesheetSelection {
+public class MimeTypes {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    @Required
-    @LabelI18N("timesheet.person")
-    public String personId;
-
-    @LabelI18N("timesheet.week")
-    public String referenceDate;
+    public final static String APPLICATION_PDF = "application/pdf";
+    public final static String APPLICATION_JSON_UTF8 = "application/json;charset=UTF-8";
 }
