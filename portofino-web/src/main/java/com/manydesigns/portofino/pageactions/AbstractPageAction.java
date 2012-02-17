@@ -416,7 +416,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         page.getLayout().setLayout(edit.layout);
         page.getDetailLayout().setLayout(edit.detailLayout);
         try {
-            DispatcherLogic.savePage(pageInstance.getDirectory(), page);
+            File pageFile = DispatcherLogic.savePage(pageInstance.getDirectory(), page);
+            logger.info("Page saved to " + pageFile.getAbsolutePath());
         } catch (Exception e) {
             logger.error("Couldn't save page", e);
             return false; //TODO handle return value + script + session msg

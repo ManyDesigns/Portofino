@@ -87,6 +87,7 @@ import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlContext;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.fop.apps.FOPException;
@@ -106,6 +107,7 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.math.BigDecimal;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.*;
@@ -356,8 +358,8 @@ public class CrudAction extends AbstractPageAction {
     protected Resolution doSearch() {
         cancelReturnUrl = new UrlBuilder(
                     context.getLocale(), dispatch.getAbsoluteOriginalPath(), false)
-                    .addParameter(SEARCH_STRING_PARAM, searchString)
                     .toString();
+        cancelReturnUrl = appendSearchStringParamIfNecessary(cancelReturnUrl);
         setupReturnToParentTarget();
 
         if (classAccessor == null) {
@@ -482,8 +484,9 @@ public class CrudAction extends AbstractPageAction {
 
         cancelReturnUrl = new UrlBuilder(
                 Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
-                .addParameter(SEARCH_STRING_PARAM, searchString)
                 .toString();
+
+        cancelReturnUrl = appendSearchStringParamIfNecessary(cancelReturnUrl);
 
         setupReturnToParentTarget();
 
@@ -640,8 +643,8 @@ public class CrudAction extends AbstractPageAction {
                     return getEditView();
                 }
                 SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
-                return new RedirectResolution(dispatch.getOriginalPath())
-                        .addParameter(SEARCH_STRING_PARAM, searchString);
+                return new RedirectResolution(
+                        appendSearchStringParamIfNecessary(dispatch.getOriginalPath()));
             }
         }
         return getEditView();
@@ -699,8 +702,8 @@ public class CrudAction extends AbstractPageAction {
             SessionMessages.addInfoMessage(getMessage(
                     "commons.bulkUpdate.successful",
                     selection.length));
-            return new RedirectResolution(dispatch.getOriginalPath())
-                    .addParameter(SEARCH_STRING_PARAM, searchString);
+            return new RedirectResolution(
+                    appendSearchStringParamIfNecessary(dispatch.getOriginalPath()));
         } else {
             return new ForwardResolution("/layouts/crud/bulk-edit.jsp");
         }
@@ -730,8 +733,7 @@ public class CrudAction extends AbstractPageAction {
         }
         int lastSlashPos = dispatch.getOriginalPath().lastIndexOf("/");
         String url = dispatch.getOriginalPath().substring(0, lastSlashPos);
-        return new RedirectResolution(url)
-                .addParameter(SEARCH_STRING_PARAM, searchString);
+        return new RedirectResolution(appendSearchStringParamIfNecessary(url));
     }
 
     @Button(list = "crud-search", key = "commons.delete", order = 3)
@@ -741,8 +743,7 @@ public class CrudAction extends AbstractPageAction {
         if (selection == null) {
             SessionMessages.addWarningMessage(
                     "DELETE non avvenuto: nessun oggetto selezionato");
-            return new RedirectResolution(dispatch.getOriginalPath())
-                    .addParameter(SEARCH_STRING_PARAM, searchString);
+            return new RedirectResolution(appendSearchStringParamIfNecessary(dispatch.getOriginalPath()));
         }
         for (String current : selection) {
             Serializable pkObject = pkHelper.parsePkString(current);
@@ -761,8 +762,7 @@ public class CrudAction extends AbstractPageAction {
             SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
         }
 
-        return new RedirectResolution(dispatch.getOriginalPath())
-                .addParameter(SEARCH_STRING_PARAM, searchString);
+        return new RedirectResolution(appendSearchStringParamIfNecessary(dispatch.getOriginalPath()));
     }
 
     //**************************************************************************
@@ -798,13 +798,11 @@ public class CrudAction extends AbstractPageAction {
         }
     }
 
-    public Resolution returnToParent() {
+    public Resolution returnToParent() throws Exception {
         RedirectResolution resolution;
         if (pk != null) {
-            resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
-            if(!StringUtils.isEmpty(searchString)) {
-                resolution.addParameter(SEARCH_STRING_PARAM, searchString);
-            }
+            resolution = new RedirectResolution(
+                    appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
         } else {
             PageInstance[] pageInstancePath =
                     dispatch.getPageInstancePath();
@@ -814,10 +812,8 @@ public class CrudAction extends AbstractPageAction {
                 String url = previousPageInstance.getPath();
                 resolution = new RedirectResolution(url, true);
             } else {
-                resolution = new RedirectResolution(calculateBaseSearchUrl(), false);
-                if(!StringUtils.isEmpty(searchString)) {
-                    resolution.addParameter(SEARCH_STRING_PARAM, searchString);
-                }
+                resolution = new RedirectResolution(
+                        appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
             }
         }
 
@@ -938,9 +934,9 @@ public class CrudAction extends AbstractPageAction {
 
     protected String generateObjectUrl(String baseUrl, Object o) {
         String[] objPk = pkHelper.generatePkStringArray(o);
+        String url = baseUrl + "/" + StringUtils.join(objPk, "/");
         return new UrlBuilder(
-                Locale.getDefault(), baseUrl + "/" + StringUtils.join(objPk, "/"), false)
-                .addParameter(SEARCH_STRING_PARAM, searchString)
+                Locale.getDefault(), appendSearchStringParamIfNecessary(url), false)
                 .toString();
     }
 
@@ -1111,18 +1107,45 @@ public class CrudAction extends AbstractPageAction {
             sb.append(property.getName());
             sb.append("}");
         }
-        if (searchString != null) {
-            sb.append("?searchString=");
-            String encodedSearchString;
-            try {
-                String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
-                encodedSearchString = URLEncoder.encode(searchString, encoding);
-            } catch (UnsupportedEncodingException e) {
-                throw new Error(e);
-            }
-            sb.append(encodedSearchString);
-        }
+        appendSearchStringParamIfNecessary(sb);
         return sb.toString();
+    }
+
+    protected String appendSearchStringParamIfNecessary(String s) {
+        return appendSearchStringParamIfNecessary(new StringBuilder(s)).toString();
+    }
+
+    protected StringBuilder appendSearchStringParamIfNecessary(StringBuilder sb) {
+        String searchStringParam = getEncodedSearchStringParam();
+        if(searchStringParam != null) {
+            if(sb.indexOf("?") == -1) {
+                sb.append('?');
+            } else {
+                sb.append('&');
+            }
+            sb.append(searchStringParam);
+        }
+        return sb;
+    }
+
+    protected String getEncodedSearchStringParam() {
+        if(StringUtils.isBlank(searchString)) {
+            return null;
+        }
+        String encodedSearchString = "searchString=";
+        try {
+            String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
+            String encoded = URLEncoder.encode(searchString, encoding);
+            if(searchString.equals(URLDecoder.decode(encoded, encoding))) {
+                encodedSearchString += encoded;
+            } else {
+                logger.warn("Could not encode search string \"" + StringEscapeUtils.escapeJava(searchString) + "\" with encoding " + encoding);
+                return null;
+            }
+        } catch (UnsupportedEncodingException e) {
+            throw new Error(e);
+        }
+        return encodedSearchString;
     }
 
     //**************************************************************************

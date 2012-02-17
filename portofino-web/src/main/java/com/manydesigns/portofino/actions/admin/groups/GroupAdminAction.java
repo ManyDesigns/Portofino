@@ -41,8 +41,8 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pages.Page;
-import com.manydesigns.portofino.system.model.users.Group;
 import com.manydesigns.portofino.security.RequiresAdministrator;
+import com.manydesigns.portofino.system.model.users.Group;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -50,7 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.InputStreamReader;
 import java.sql.Timestamp;
 
 /*
@@ -89,10 +88,10 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
     @Before
     public void prepare() {
         try {
-            Page page = DispatcherLogic.loadPage(new InputStreamReader(getClass().getResourceAsStream("page.xml")));
+            Page page = DispatcherLogic.loadPage(getClass().getResourceAsStream("page.xml"));
             page.init();
             crudConfiguration = DispatcherLogic.loadConfiguration
-                    (new InputStreamReader(getClass().getResourceAsStream("configuration.xml")), CrudConfiguration.class);
+                    (getClass().getResourceAsStream("configuration.xml"), CrudConfiguration.class);
             crudConfiguration.init(application);
             pageInstance = new PageInstance(null, null, application, page);
             pageInstance.setActionBean(this);
