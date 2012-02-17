@@ -57,7 +57,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -111,10 +110,10 @@ public class UserAdminAction extends CrudAction implements AdminAction {
     @Before
     public void prepare() {
         try {
-            Page page = DispatcherLogic.loadPage(new InputStreamReader(getClass().getResourceAsStream("page.xml")));
+            Page page = DispatcherLogic.loadPage(getClass().getResourceAsStream("page.xml"));
             page.init();
             crudConfiguration = DispatcherLogic.loadConfiguration
-                    (new InputStreamReader(getClass().getResourceAsStream("configuration.xml")), CrudConfiguration.class);
+                    (getClass().getResourceAsStream("configuration.xml"), CrudConfiguration.class);
             crudConfiguration.init(application);
             pageInstance = new PageInstance(null, null, application, page);
             pageInstance.setActionBean(this);

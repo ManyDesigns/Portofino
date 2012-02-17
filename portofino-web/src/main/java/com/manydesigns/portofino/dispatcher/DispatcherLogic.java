@@ -150,23 +150,24 @@ public class DispatcherLogic {
     public static File savePage(File directory, Page page) throws Exception {
         File pageFile = new File(directory, "page.xml");
         Marshaller marshaller = pagesJaxbContext.createMarshaller();
+        marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         marshaller.marshal(page, pageFile);
         return pageFile;
     }
 
-    public static Page loadPage(File directory) throws FileNotFoundException, JAXBException {
+    public static Page loadPage(File directory) throws Exception {
         File pageFile = new File(directory, "page.xml");
-        FileReader reader = new FileReader(pageFile);
+        FileInputStream fileInputStream = new FileInputStream(pageFile);
         try {
-            return loadPage(reader);
+            return loadPage(fileInputStream);
         } finally {
-            IOUtils.closeQuietly(reader);
+            IOUtils.closeQuietly(fileInputStream);
         }
     }
 
-    public static Page loadPage(Reader reader) throws JAXBException {
+    public static Page loadPage(InputStream inputStream) throws JAXBException {
         Unmarshaller unmarshaller = pagesJaxbContext.createUnmarshaller();
-        return (Page) unmarshaller.unmarshal(reader);
+        return (Page) unmarshaller.unmarshal(inputStream);
     }
 
     public static Page getPage(File directory) throws Exception {
@@ -179,6 +180,7 @@ public class DispatcherLogic {
         String configurationPackage = configuration.getClass().getPackage().getName();
         JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
         Marshaller marshaller = jaxbContext.createMarshaller();
+        marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         File configurationFile = new File(directory, "configuration.xml");
         marshaller.marshal(configuration, configurationFile);
         return configurationFile;
@@ -189,15 +191,16 @@ public class DispatcherLogic {
             return null;
         }
         File configurationFile = new File(directory, "configuration.xml");
-        FileReader reader = new FileReader(configurationFile);
+        InputStream inputStream = new FileInputStream(configurationFile);
         try {
-            return loadConfiguration(reader, configurationClass);
+            return loadConfiguration(inputStream, configurationClass);
         } finally {
-            IOUtils.closeQuietly(reader);
+            IOUtils.closeQuietly(inputStream);
         }
     }
 
-    public static <T> T loadConfiguration(Reader reader, Class<? extends T> configurationClass) throws Exception {
+    public static <T> T loadConfiguration
+            (InputStream inputStream, Class<? extends T> configurationClass) throws Exception {
         if(configurationClass == null) {
             return null;
         }
@@ -205,7 +208,7 @@ public class DispatcherLogic {
         String configurationPackage = configurationClass.getPackage().getName();
         JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        configuration = unmarshaller.unmarshal(reader);
+        configuration = unmarshaller.unmarshal(inputStream);
         if(!configurationClass.isInstance(configuration)) {
             logger.error("Invalid configuration: expected " + configurationClass + ", got " + configuration);
             return null;
