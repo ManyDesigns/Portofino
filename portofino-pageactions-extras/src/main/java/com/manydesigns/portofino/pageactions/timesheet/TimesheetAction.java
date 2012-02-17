@@ -31,6 +31,7 @@ package com.manydesigns.portofino.pageactions.timesheet;
 
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
+import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import com.manydesigns.elements.forms.Form;
@@ -97,13 +98,14 @@ public class TimesheetAction extends AbstractPageAction {
     public static final DateTimeZone dtz = DateTimeZone.UTC;
 
 
-    protected final Font tableHeaderFont =
+    public static final Font tableHeaderFont =
         new Font(Font.HELVETICA, 10, Font.BOLD, Color.BLACK);
-    protected final Font tableBodyFont =
-        new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
-    protected final Font headerFont =
+    public static final Font tableBodyFont =
+        new Font(Font.HELVETICA, 8, Font.NORMAL, Color.BLACK);
+    public static final Font headerFont =
         new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
 
+    public static final int totalAlignment = Element.ALIGN_CENTER;
 
     //**************************************************************************
     // Variables
@@ -572,21 +574,52 @@ public class TimesheetAction extends AbstractPageAction {
         String reportTitle = "Month: " + monthFormatter.print(referenceDateMidnight);
         document.add(new Paragraph(reportTitle));
 
-        document.add(Chunk.NEWLINE);
-
         int daysCount = monthReportModel.getDaysCount();
-        float[] colsWidth = new float[daysCount + 1];
-        colsWidth[0] = 5f;
+        int columnCount = daysCount + 3;
+        float[] colsWidth = new float[columnCount];
+        colsWidth[0] = 4f;
         for (int i = 0; i < daysCount; i++) {
             colsWidth[i+1] = 1f;
         }
-        PdfPTable table = new PdfPTable(colsWidth);
+        colsWidth[columnCount-2] = 1.5f;
+        colsWidth[columnCount-1] = 2.5f;
+
+        PdfPTable table = new PdfPTable(colsWidth); // Code 1
+        table.setSpacingBefore(10f);
+        table.setSpacingAfter(10f);
         table.setWidthPercentage(100.0f);
+
+        // table headers
+
+        // Date row
+        addCell(table, "Date", Element.ALIGN_LEFT);
         for (int i = 0; i < daysCount; i++) {
             MonthReportModel.Day day = monthReportModel.getDay(i);
             String text = dayOfMonthFormatter.print(day.getDayStart());
-            addHeaderCell(table, text);
+            addCell(table, text, Element.ALIGN_CENTER);
         }
+        addCell(table, "Total", totalAlignment);
+        addCell(table, "Notes", Element.ALIGN_CENTER);
+
+        // Day of week row
+        addCell(table, "Day", Element.ALIGN_LEFT);
+        for (int i = 0; i < daysCount; i++) {
+            MonthReportModel.Day day = monthReportModel.getDay(i);
+            String text = dayOfWeekFormatter.print(day.getDayStart());
+            addCell(table, text, Element.ALIGN_CENTER);
+        }
+        addCell(table, "", totalAlignment);
+        addCell(table, "", Element.ALIGN_CENTER);
+
+
+        // table body
+        MonthReportModel.Node rootNode = monthReportModel.getRootNode();
+        if (rootNode == null) {
+            logger.warn("Empty root node");
+        } else {
+            printNode(table, rootNode, 0);
+        }
+
         document.add(table);
 
         // close the document
@@ -605,11 +638,100 @@ public class TimesheetAction extends AbstractPageAction {
         }.setFilename("month-report.pdf").setLength(tmpFile.length());
     }
 
-    private void addHeaderCell(PdfPTable table, String text) {
-        table.addCell(new Phrase(text, tableHeaderFont));
+    private void printNode(PdfPTable table, MonthReportModel.Node node, int indentation)
+            throws BadElementException {
+        List<MonthReportModel.Node> childNodes = node.getChildNodes();
+        if (childNodes.isEmpty()) {
+            logger.debug("Leaf node: {}", node.getId());
+            PdfPCell cell = createCell(node.getName(), Element.ALIGN_LEFT);
+            float paddingLeft = cell.getPaddingLeft() + indentation * 2;
+            cell.setPaddingLeft(paddingLeft);
+            table.addCell(cell);
+
+            printNodeMinutes(table, node);
+
+            addCell(table, Integer.toString(node.getMinutesTotal()), totalAlignment);
+            addCell(table, "", Element.ALIGN_CENTER);
+        } else {
+            logger.debug("Non-leaf node: {}", node.getId());
+            logger.debug("Printing node header", node.getId());
+            PdfPCell cell = createCell(node.getName(), Element.ALIGN_LEFT);
+            cell.setColspan(monthReportModel.getDaysCount() + 1);
+            float paddingLeft = cell.getPaddingLeft() + indentation * 2;
+            cell.setPaddingLeft(paddingLeft);
+            table.addCell(cell);
+            addCell(table, "", Element.ALIGN_CENTER);
+            addCell(table, "", Element.ALIGN_CENTER);
+
+            logger.debug("Printing child nodes", node.getId());
+            for (MonthReportModel.Node current : childNodes) {
+                printNode(table, current, indentation + 1);
+            }
+
+            logger.debug("Printing nodefooter", node.getId());
+            addCell(table, "Total", Element.ALIGN_RIGHT);
+            printNodeMinutes(table, node);
+            addCell(table, Integer.toString(node.getMinutesTotal()), totalAlignment);
+            addCell(table, "", Element.ALIGN_CENTER);
+        }
     }
 
-    public void loadMonthReportModel() {}
+    private void printNodeMinutes(PdfPTable table, MonthReportModel.Node node)
+            throws BadElementException {
+        for (int i = 0; i < monthReportModel.getDaysCount(); i++) {
+            int minutes = node.getMinutes(i);
+            addCell(table, Integer.toString(minutes), Element.ALIGN_CENTER);
+        }
+    }
+
+    private PdfPCell addCell(PdfPTable table, String text, int alignment)
+            throws BadElementException {
+        PdfPCell cell = createCell(text, alignment);
+        table.addCell(cell);
+        return cell;
+    }
+
+    private PdfPCell createCell(String text, int alignment) {
+        PdfPCell cell = new PdfPCell(new Phrase(text, tableBodyFont));
+        cell.setHorizontalAlignment(alignment);
+        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        return cell;
+    }
+
+
+    public void loadMonthReportModel() {
+        MonthReportModel.Node rootNode =
+                monthReportModel.createNode("root", "root node");
+        monthReportModel.setRootNode(rootNode);
+
+        MonthReportModel.Node node;
+        node = addReportNode(rootNode, ac1);
+        node.setMinutes(3, 20);
+        node.setMinutes(7, 9);
+        node = addReportNode(rootNode, ac2);
+        node.setMinutes(3, 10);
+        node.setMinutes(7, 40);
+        node = addReportNode(rootNode, ac3);
+        node = addReportNode(rootNode, ac4);
+        node = addReportNode(rootNode, ac5);
+        node.setMinutes(3, 12);
+        node.setMinutes(7, 66);
+        node = addReportNode(rootNode, ac6);
+        node = addReportNode(rootNode, ac7);
+        node.setMinutes(3, 42);
+        node.setMinutes(7, 40);
+        node = addReportNode(rootNode, ac8);
+        node = addReportNode(rootNode, ac9);
+
+        rootNode.calculateMinutesFromChildNodes();
+    }
+
+    private MonthReportModel.Node addReportNode(MonthReportModel.Node rootNode, Activity ac) {
+        MonthReportModel.Node node =
+                monthReportModel.createNode(ac.getId(), ac.getLevel3());
+        rootNode.getChildNodes().add(node);
+        return node;
+    }
 
 
     //**************************************************************************

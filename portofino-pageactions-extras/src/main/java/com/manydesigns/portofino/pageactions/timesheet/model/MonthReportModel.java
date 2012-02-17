@@ -31,8 +31,12 @@ package com.manydesigns.portofino.pageactions.timesheet.model;
 
 import com.manydesigns.portofino.calendar.AbstractDay;
 import com.manydesigns.portofino.calendar.AbstractMonth;
-import com.manydesigns.portofino.calendar.DefaultDay;
 import org.joda.time.DateMidnight;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -44,9 +48,33 @@ public class MonthReportModel extends AbstractMonth<MonthReportModel.Day> {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
+
+    //**************************************************************************
+    // Variables
+    //**************************************************************************
+
+    protected Node rootNode;
+
+    //--------------------------------------------------------------------------
+    // Logging
+    //--------------------------------------------------------------------------
+
+    public static final Logger logger =
+            LoggerFactory.getLogger(MonthReportModel.class);
+
+
+
+    //--------------------------------------------------------------------------
+    // Constructor
+    //--------------------------------------------------------------------------
+
     public MonthReportModel(DateMidnight referenceDateMidnight) {
         super(referenceDateMidnight);
     }
+
+    //--------------------------------------------------------------------------
+    // AbstractMonth implementation
+    //--------------------------------------------------------------------------
 
     @Override
     protected Day[] createDaysArray(int size) {
@@ -58,10 +86,104 @@ public class MonthReportModel extends AbstractMonth<MonthReportModel.Day> {
         return new Day(dayStart, dayEnd);
     }
 
+    //--------------------------------------------------------------------------
+    // Methods
+    //--------------------------------------------------------------------------
+
+    public Node createNode(String id, String name) {
+        return new Node(id, name, getDaysCount());
+    }
+
+    //--------------------------------------------------------------------------
+    // Accessors
+    //--------------------------------------------------------------------------
+
+    public Node getRootNode() {
+        return rootNode;
+    }
+
+    public void setRootNode(Node rootNode) {
+        this.rootNode = rootNode;
+    }
+
+
+    //--------------------------------------------------------------------------
+    // Inner classes
+    //--------------------------------------------------------------------------
+
     public static class Day extends AbstractDay {
+        boolean nonWorking;
 
         public Day(DateMidnight dayStart, DateMidnight dayEnd) {
             super(dayStart, dayEnd);
+        }
+
+        public boolean isNonWorking() {
+            return nonWorking;
+        }
+
+        public void setNonWorking(boolean nonWorking) {
+            this.nonWorking = nonWorking;
+        }
+    }
+
+    public static class Node {
+        final List<Node> childNodes;
+        final String id;
+        final String name;
+        final int[] minutesArray;
+
+        public Node(String id, String name, int daysCount) {
+            this.id = id;
+            this.name = name;
+            childNodes = new ArrayList<Node>();
+            minutesArray = new int[daysCount];
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public List<Node> getChildNodes() {
+            return childNodes;
+        }
+
+        public int getMinutes(int index) {
+            return minutesArray[index];
+        }
+
+        public void setMinutes(int index, int value) {
+            minutesArray[index] = value;
+        }
+
+        public int getMinutesTotal() {
+            int total = 0;
+            for (int minutes : minutesArray) {
+                total += minutes;
+            }
+            return total;
+        }
+
+        public void calculateMinutesFromChildNodes() {
+            resetMinutes();
+
+            for (Node current : childNodes) {
+                assert current.minutesArray.length == minutesArray.length;
+                for (int i = 0; i < minutesArray.length; i++) {
+                    minutesArray[i] += current.minutesArray[i];
+                }
+            }
+        }
+
+        private void resetMinutes() {
+            logger.debug("Resetting minutes array");
+            for (int i = 0; i < minutesArray.length; i++) {
+                minutesArray[0] = 0;
+            }
         }
     }
 }

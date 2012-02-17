@@ -217,11 +217,11 @@
                     }
 
                     xb.openElement("td");
-                    xb.write(activity.getGroup1());
+                    xb.write(activity.getLevel1());
                     xb.closeElement("td");
 
                     xb.openElement("td");
-                    xb.write(activity.getGroup2());
+                    xb.write(activity.getLevel2());
                     xb.closeElement("td");
 
                     xb.openElement("td");
@@ -247,9 +247,9 @@
                     }
                     String readUrl = activity.getReadUrl();
                     if (readUrl == null) {
-                        xb.write(activity.getTitle());
+                        xb.write(activity.getLevel3());
                     } else {
-                        xb.writeAnchor(readUrl, activity.getTitle());
+                        xb.writeAnchor(readUrl, activity.getLevel3());
                     }
                     xb.closeElement("td");
 

@@ -42,9 +42,9 @@ public class Activity {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     final String id;
-    String group1;
-    String group2;
-    String title;
+    String level1;
+    String level2;
+    String level3;
     String description;
     ActivityType activityType;
     DateTime start;
@@ -55,13 +55,13 @@ public class Activity {
         this.id = id;
     }
 
-    public Activity(String id, String group1, String group2, String title, String description,
+    public Activity(String id, String level1, String level2, String level3, String description,
                     ActivityType activityType, DateTime start, DateTime end,
                     String readUrl) {
         this.id = id;
-        this.group1 = group1;
-        this.group2 = group2;
-        this.title = title;
+        this.level1 = level1;
+        this.level2 = level2;
+        this.level3 = level3;
         this.description = description;
         this.activityType = activityType;
         this.start = start;
@@ -73,28 +73,28 @@ public class Activity {
         return id;
     }
 
-    public String getGroup1() {
-        return group1;
+    public String getLevel1() {
+        return level1;
     }
 
-    public void setGroup1(String group1) {
-        this.group1 = group1;
+    public void setLevel1(String level1) {
+        this.level1 = level1;
     }
 
-    public String getGroup2() {
-        return group2;
+    public String getLevel2() {
+        return level2;
     }
 
-    public void setGroup2(String group2) {
-        this.group2 = group2;
+    public void setLevel2(String level2) {
+        this.level2 = level2;
     }
 
-    public String getTitle() {
-        return title;
+    public String getLevel3() {
+        return level3;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setLevel3(String level3) {
+        this.level3 = level3;
     }
 
     public String getDescription() {
