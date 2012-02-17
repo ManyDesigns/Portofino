@@ -29,16 +29,24 @@
 
 package com.manydesigns.portofino.pageactions.timesheet;
 
+import com.lowagie.text.*;
+import com.lowagie.text.Font;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.i18n.ResourceBundleManager;
-import com.manydesigns.portofino.pageactions.custom.CustomAction;
+import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
+import com.manydesigns.portofino.pageactions.timesheet.configuration.TimesheetConfiguration;
 import com.manydesigns.portofino.pageactions.timesheet.model.*;
+import com.manydesigns.portofino.pageactions.timesheet.util.PersonDay;
+import com.manydesigns.portofino.pageactions.timesheet.util.TimesheetSelection;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
@@ -50,13 +58,18 @@ import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
 import org.json.JSONException;
 import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
+import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,7 +80,8 @@ import java.util.regex.Pattern;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresPermissions(level = AccessLevel.VIEW)
-public class TimesheetAction extends CustomAction {
+@ConfigurationClass(TimesheetConfiguration.class)
+public class TimesheetAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -78,8 +92,18 @@ public class TimesheetAction extends CustomAction {
     protected final static Pattern hoursPattern =
             Pattern.compile("(\\d+):(\\d+)");
     public static final int MINUTES_IN_A_DAY = 24 * 60;
-    public static String ENTRY_INPUT_FORMAT = "cell-%d-%s";
-    public static String NOTE_INPUT_FORMAT = "note-%d-%s";
+    public static final String ENTRY_INPUT_FORMAT = "cell-%d-%s";
+    public static final String NOTE_INPUT_FORMAT = "note-%d-%s";
+    public static final DateTimeZone dtz = DateTimeZone.UTC;
+
+
+    protected final Font tableHeaderFont =
+        new Font(Font.HELVETICA, 10, Font.BOLD, Color.BLACK);
+    protected final Font tableBodyFont =
+        new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
+    protected final Font headerFont =
+        new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
+
 
     //**************************************************************************
     // Variables
@@ -94,13 +118,39 @@ public class TimesheetAction extends CustomAction {
 
     protected WeekEntryModel weekEntryModel;
     protected NonWorkingDaysModel nonWorkingDaysModel;
+    protected MonthReportModel monthReportModel;
 
     protected Integer day;
     protected Integer month;
     protected Integer year;
     protected boolean nonWorking;
 
-    protected ResourceBundleManager resourceBundleManager;
+    protected Form configurationForm;
+
+    /**
+     * Format example: February 13, 2012
+     */
+    protected DateTimeFormatter longDateFormatter;
+
+    /**
+     * Format example: Mon, Tue, etc.
+     */
+    protected DateTimeFormatter dayOfWeekFormatter;
+
+    /**
+     * Format example: 2/13/12
+     */
+    protected DateTimeFormatter dateFormatter;
+
+    /**
+     * Format example: February 2012
+     */
+    protected DateTimeFormatter monthFormatter;
+
+    /**
+     * Format example: 1, 2, 3, etc.
+     */
+    protected DateTimeFormatter dayOfMonthFormatter;
 
 
     //**************************************************************************
@@ -115,20 +165,73 @@ public class TimesheetAction extends CustomAction {
             LoggerFactory.getLogger(TimesheetAction.class);
 
     //**************************************************************************
-    // Setup
+    // Setup & configuration
     //**************************************************************************
-
-    public Class<?> getConfigurationClass() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
         this.pageInstance = pageInstance;
         if(!pageInstance.getParameters().isEmpty()) {
             return new ErrorResolution(404);
         }
+        if(pageInstance.getConfiguration() == null) {
+            pageInstance.setConfiguration(new TimesheetConfiguration());
+        }
         return null;
     }
+
+    @Before
+    public void prepareFormatters() {
+        Locale locale = getContext().getRequest().getLocale();
+        longDateFormatter = DateTimeFormat.longDate().withLocale(locale);
+        dayOfWeekFormatter = DateTimeFormat.forPattern("E").withLocale(locale);
+        dateFormatter = DateTimeFormat.shortDate().withLocale(locale);
+        monthFormatter = new DateTimeFormatterBuilder()
+                .appendMonthOfYearText()
+                .appendLiteral(" ")
+                .appendYear(4, 4)
+                .toFormatter().withLocale(locale);
+        dayOfMonthFormatter = new DateTimeFormatterBuilder()
+                .appendDayOfMonth(1)
+                .toFormatter()
+                .withLocale(locale);
+
+
+    }
+
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
+    @RequiresPermissions(level = AccessLevel.EDIT)
+    public Resolution configure() {
+        prepareConfigurationForms();
+        return new ForwardResolution("/layouts/timesheet/configure.jsp");
+    }
+
+    @Button(list = "configuration", key = "commons.updateConfiguration")
+    @RequiresPermissions(level = AccessLevel.EDIT)
+    public Resolution updateConfiguration() {
+        prepareConfigurationForms();
+        readPageConfigurationFromRequest();
+        configurationForm.readFromRequest(context.getRequest());
+        boolean valid = validatePageConfiguration();
+        valid = valid && configurationForm.validate();
+        if(valid) {
+            updatePageConfiguration();
+            configurationForm.writeToObject(pageInstance.getConfiguration());
+            saveConfiguration(pageInstance.getConfiguration());
+            SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
+            return cancel();
+        } else {
+            SessionMessages.addErrorMessage(getMessage("commons.configuration.notUpdated"));
+            return new ForwardResolution("/layouts/timesheet/configure.jsp");
+        }
+    }
+
+    @Override
+    protected void prepareConfigurationForms() {
+        super.prepareConfigurationForms();
+        configurationForm = new FormBuilder(TimesheetConfiguration.class).build();
+        configurationForm.readFromObject(pageInstance.getConfiguration());
+    }
+
 
     //**************************************************************************
     // Default view
@@ -441,6 +544,75 @@ public class TimesheetAction extends CustomAction {
     }
 
     //**************************************************************************
+    // Month report
+    //**************************************************************************
+
+    @Button(list = "timesheet-admin", key = "timesheet.month.report", order = 2)
+    public Resolution monthReport() throws Exception {
+        DateMidnight referenceDateMidnight =
+                new DateMidnight(referenceDate, dtz);
+        monthReportModel = new MonthReportModel(referenceDateMidnight);
+        loadMonthReportModel();
+
+        final File tmpFile = File.createTempFile("report-", ".pdf");
+        FileOutputStream fos = new FileOutputStream(tmpFile);
+        OutputStream os = new BufferedOutputStream(fos);
+
+        Document document = new Document();
+
+        // set page size and orientation
+        document.setPageSize(PageSize.A4.rotate());
+
+        // Create the writer and open the document
+        PdfWriter writer = PdfWriter.getInstance(
+                document, os);
+        document.open();
+
+        // Add content
+        String reportTitle = "Month: " + monthFormatter.print(referenceDateMidnight);
+        document.add(new Paragraph(reportTitle));
+
+        document.add(Chunk.NEWLINE);
+
+        int daysCount = monthReportModel.getDaysCount();
+        float[] colsWidth = new float[daysCount + 1];
+        colsWidth[0] = 5f;
+        for (int i = 0; i < daysCount; i++) {
+            colsWidth[i+1] = 1f;
+        }
+        PdfPTable table = new PdfPTable(colsWidth);
+        table.setWidthPercentage(100.0f);
+        for (int i = 0; i < daysCount; i++) {
+            MonthReportModel.Day day = monthReportModel.getDay(i);
+            String text = dayOfMonthFormatter.print(day.getDayStart());
+            addHeaderCell(table, text);
+        }
+        document.add(table);
+
+        // close the document
+        document.close();
+
+        // Send the result
+        FileInputStream fileInputStream = new FileInputStream(tmpFile);
+        return new StreamingResolution(MimeTypes.APPLICATION_PDF, fileInputStream) {
+            @Override
+            protected void stream(HttpServletResponse response) throws Exception {
+                super.stream(response);
+                if (!tmpFile.delete()) {
+                    logger.warn("Could not delete tmp file: {}", tmpFile);
+                }
+            }
+        }.setFilename("month-report.pdf").setLength(tmpFile.length());
+    }
+
+    private void addHeaderCell(PdfPTable table, String text) {
+        table.addCell(new Phrase(text, tableHeaderFont));
+    }
+
+    public void loadMonthReportModel() {}
+
+
+    //**************************************************************************
     // Other action handlers
     //**************************************************************************
 
@@ -457,8 +629,6 @@ public class TimesheetAction extends CustomAction {
     //--------------------------------------------------------------------------
     // Data provider
     //--------------------------------------------------------------------------
-
-    static DateTimeZone dtz = DateTimeZone.UTC;
 
     static ActivityType at0 = new ActivityType("at0", "fatturabile", ActivityMetaType.BILLABLE);
     static ActivityType at1 = new ActivityType("at1", "non fatturabile", ActivityMetaType.NON_BILLABLE);
@@ -674,4 +844,27 @@ public class TimesheetAction extends CustomAction {
         return nonWorkingDaysModel;
     }
 
+    public Form getConfigurationForm() {
+        return configurationForm;
+    }
+
+    public DateTimeFormatter getLongDateFormatter() {
+        return longDateFormatter;
+    }
+
+    public DateTimeFormatter getDayOfWeekFormatter() {
+        return dayOfWeekFormatter;
+    }
+
+    public DateTimeFormatter getDateFormatter() {
+        return dateFormatter;
+    }
+
+    public DateTimeFormatter getMonthFormatter() {
+        return monthFormatter;
+    }
+
+    public DateTimeFormatter getDayOfMonthFormatter() {
+        return dayOfMonthFormatter;
+    }
 }

@@ -12,7 +12,7 @@
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="form"/>
         <portofino:buttons list="timesheet-selection" cssClass="portletButton" />
-        <hr/>
+        <div class="horizontalSeparator"></div>
         <portofino:buttons list="timesheet-admin" cssClass="portletButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">

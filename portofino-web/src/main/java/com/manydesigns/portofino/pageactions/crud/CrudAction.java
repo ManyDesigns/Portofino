@@ -47,6 +47,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
+import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.QueryUtils;
@@ -69,7 +70,6 @@ import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.servlets.DummyHttpServletRequest;
-import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
@@ -448,7 +448,7 @@ public class CrudAction extends AbstractPageAction {
         js.endArray();
         js.endObject();
         String jsonText = js.toString();
-        return new NoCacheStreamingResolution("application/json;charset=UTF-8", jsonText);
+        return new NoCacheStreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
     }
 
     protected String generateCountQuery(String queryString) throws JSQLParserException {
@@ -893,7 +893,7 @@ public class CrudAction extends AbstractPageAction {
 
         String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
         logger.debug("jsonOptions: {}", text);
-        return new NoCacheStreamingResolution("application/json", text);
+        return new NoCacheStreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, text);
     }
 
 
@@ -1506,7 +1506,7 @@ public class CrudAction extends AbstractPageAction {
             final File tmpFile = File.createTempFile(crudConfiguration.getName(), ".search.pdf");
             exportSearchPdf(tmpFile);
             FileInputStream fileInputStream = new FileInputStream(tmpFile);
-            return new StreamingResolution("application/pdf", fileInputStream) {
+            return new StreamingResolution(MimeTypes.APPLICATION_PDF, fileInputStream) {
                 @Override
                 protected void stream(HttpServletResponse response) throws Exception {
                     super.stream(response);

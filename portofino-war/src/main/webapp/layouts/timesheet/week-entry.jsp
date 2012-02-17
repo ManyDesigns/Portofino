@@ -1,16 +1,14 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
+<%@ page import="com.manydesigns.portofino.pageactions.timesheet.TimesheetAction" %>
 <%@ page import="com.manydesigns.portofino.pageactions.timesheet.model.Activity" %>
 <%@ page import="com.manydesigns.portofino.pageactions.timesheet.model.WeekEntryModel" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page
-        import="org.joda.time.DateMidnight" %>
-<%@ page import="org.joda.time.format.DateTimeFormat" %>
-<%@ page
-        import="org.joda.time.format.DateTimeFormatter" %>
+        import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.joda.time.DateMidnight" %>
+<%@ page import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.Locale" %>
 <%@ page
-        import="com.manydesigns.portofino.pageactions.timesheet.TimesheetAction" %>
+        import="java.util.Locale" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -118,10 +116,6 @@
             WeekEntryModel weekEntryModel =
                     actionBean.getWeekEntryModel();
             XhtmlBuffer xb = new XhtmlBuffer(out);
-
-            Locale locale = request.getLocale();
-            DateTimeFormatter longDateFormatter =
-                    DateTimeFormat.longDate().withLocale(locale);
         %>
         <div style="float: right">
             <portofino:buttons list="timesheet-we-navigation" cssClass="portletButton" />
@@ -133,6 +127,7 @@
         <br/>
         <fmt:message key="timesheet.from.day"/>:
         <%
+            DateTimeFormatter longDateFormatter = actionBean.getLongDateFormatter();
             xb.write(longDateFormatter.print(weekEntryModel.getDay(0).getDate()));
         %>
         <br/>
@@ -140,7 +135,7 @@
         <%
             xb.write(longDateFormatter.print(weekEntryModel.getDay(6).getDate()));
         %>
-        <hr/>
+        <div class="horizontalSeparator"></div>
         <div class="twe-container">
         <table class="twe-table">
             <col/>
@@ -155,15 +150,10 @@
             <col class="day-column"/>
             <thead>
             <tr>
-                <th class="twe-activity"><fmt:message key="timesheet.level1"/></th>
-                <th class="twe-activity"><fmt:message key="timesheet.level2"/></th>
-                <th class="twe-activity"><fmt:message key="timesheet.level3"/></th>
+                <th class="twe-activity"><c:out value="${actionBean.pageInstance.configuration.level1Label}"/></th>
+                <th class="twe-activity"><c:out value="${actionBean.pageInstance.configuration.level2Label}"/></th>
+                <th class="twe-activity"><c:out value="${actionBean.pageInstance.configuration.level3Label}"/></th>
                 <%
-                    DateTimeFormatter dayOfWeekFormatter =
-                    DateTimeFormat.forPattern("E").withLocale(locale);
-                    DateTimeFormatter dateFormatter =
-                    DateTimeFormat.shortDate().withLocale(locale);
-
                     for (int i = 0; i < 7; i++) {
                         WeekEntryModel.Day day = weekEntryModel.getDay(i);
                         DateMidnight dayDate = day.getDate();
@@ -183,7 +173,7 @@
 
 
                         xb.openElement("div");
-                        xb.write(dayOfWeekFormatter.print(dayDate));
+                        xb.write(actionBean.getDayOfWeekFormatter().print(dayDate));
                         if (dayStatus == WeekEntryModel.DayStatus.LOCKED) {
                             xb.openElement("span");
                             xb.addAttribute("class", "ui-icon ui-icon-locked");
@@ -193,7 +183,7 @@
                         }
                         xb.closeElement("div");
 
-                        xb.write(dateFormatter.print(dayDate));
+                        xb.write(actionBean.getDateFormatter().print(dayDate));
 
                         if (dayStatus != null) {
                             String id = "swm-" + i;

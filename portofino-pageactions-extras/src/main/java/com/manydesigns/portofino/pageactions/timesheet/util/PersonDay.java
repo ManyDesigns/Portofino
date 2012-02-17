@@ -27,8 +27,11 @@
  *
  */
 
-package com.manydesigns.portofino.pageactions.timesheet.model;
+package com.manydesigns.portofino.pageactions.timesheet.util;
 
+import com.manydesigns.portofino.pageactions.timesheet.model.Activity;
+import com.manydesigns.portofino.pageactions.timesheet.model.Person;
+import com.manydesigns.portofino.pageactions.timesheet.model.WeekEntryModel;
 import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateMidnight;
 
