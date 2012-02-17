@@ -612,6 +612,11 @@ public class PageAdminAction extends AbstractActionBean {
         childPagesForm = setupChildPagesForm(childPages, directory, getPage().getLayout(), "");
         if(PageActionLogic.supportsDetail(getPageInstance().getActionClass())) {
             File detailDirectory = new File(directory, PageInstance.DETAIL);
+            if(!detailDirectory.isDirectory() && !detailDirectory.mkdir()) {
+                logger.error("Could not create detail directory{}", detailDirectory.getAbsolutePath());
+                SessionMessages.addErrorMessage("Could not create detail directory");
+                return;
+            }
             detailChildPagesForm =
                     setupChildPagesForm(detailChildPages, detailDirectory, getPage().getDetailLayout(), "detail");
         }
@@ -689,10 +694,16 @@ public class PageAdminAction extends AbstractActionBean {
     public Resolution updatePageChildren() {
         setupChildPages();
         String[] order = context.getRequest().getParameterValues("childrenTable_0");
+        if(order == null) {
+            order = new String[0];
+        }
         boolean success = updatePageChildren(childPagesForm, childPages, getPage().getLayout(), order);
         childPages.clear();
         if(success && detailChildPagesForm != null) {
             order = context.getRequest().getParameterValues("childrenTable_1");
+            if(order == null) {
+                order = new String[0];
+            }
             updatePageChildren(detailChildPagesForm, detailChildPages, getPage().getDetailLayout(), order);
             detailChildPages.clear();
         }
