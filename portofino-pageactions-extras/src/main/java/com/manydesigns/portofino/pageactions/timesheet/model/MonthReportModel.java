@@ -35,6 +35,7 @@ import org.joda.time.DateMidnight;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +54,9 @@ public class MonthReportModel extends AbstractMonth<MonthReportModel.Day> {
     // Variables
     //**************************************************************************
 
+    protected final String personId;
+    protected final String personName;
+
     protected Node rootNode;
 
     //--------------------------------------------------------------------------
@@ -68,8 +72,11 @@ public class MonthReportModel extends AbstractMonth<MonthReportModel.Day> {
     // Constructor
     //--------------------------------------------------------------------------
 
-    public MonthReportModel(DateMidnight referenceDateMidnight) {
+    public MonthReportModel(DateMidnight referenceDateMidnight,
+                            String personId, String personName) {
         super(referenceDateMidnight);
+        this.personId = personId;
+        this.personName = personName;
     }
 
     //--------------------------------------------------------------------------
@@ -106,6 +113,13 @@ public class MonthReportModel extends AbstractMonth<MonthReportModel.Day> {
         this.rootNode = rootNode;
     }
 
+    public String getPersonId() {
+        return personId;
+    }
+
+    public String getPersonName() {
+        return personName;
+    }
 
     //--------------------------------------------------------------------------
     // Inner classes
@@ -132,6 +146,7 @@ public class MonthReportModel extends AbstractMonth<MonthReportModel.Day> {
         final String id;
         final String name;
         final int[] minutesArray;
+        Color color;
 
         public Node(String id, String name, int daysCount) {
             this.id = id;
@@ -158,6 +173,14 @@ public class MonthReportModel extends AbstractMonth<MonthReportModel.Day> {
 
         public void setMinutes(int index, int value) {
             minutesArray[index] = value;
+        }
+
+        public Color getColor() {
+            return color;
+        }
+
+        public void setColor(Color color) {
+            this.color = color;
         }
 
         public int getMinutesTotal() {

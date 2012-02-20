@@ -31,11 +31,14 @@ package com.manydesigns.portofino.pageactions.timesheet;
 
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
+import com.lowagie.text.Image;
+import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.gfx.ColorUtils;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.util.MimeTypes;
@@ -65,6 +68,7 @@ import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
@@ -101,11 +105,13 @@ public class TimesheetAction extends AbstractPageAction {
     public static final Font tableHeaderFont =
         new Font(Font.HELVETICA, 10, Font.BOLD, Color.BLACK);
     public static final Font tableBodyFont =
-        new Font(Font.HELVETICA, 8, Font.NORMAL, Color.BLACK);
+        new Font(Font.HELVETICA, 7, Font.NORMAL, Color.BLACK);
     public static final Font headerFont =
         new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
 
     public static final int totalAlignment = Element.ALIGN_CENTER;
+
+    public static Color REPORT_NON_WORKING_COLOR = Color.LIGHT_GRAY;
 
     //**************************************************************************
     // Variables
@@ -553,7 +559,10 @@ public class TimesheetAction extends AbstractPageAction {
     public Resolution monthReport() throws Exception {
         DateMidnight referenceDateMidnight =
                 new DateMidnight(referenceDate, dtz);
-        monthReportModel = new MonthReportModel(referenceDateMidnight);
+        String personId = "MR";
+        String personName = "Mario Rossi";
+        monthReportModel = new MonthReportModel(
+                referenceDateMidnight, personId, personName);
         loadMonthReportModel();
 
         final File tmpFile = File.createTempFile("report-", ".pdf");
@@ -571,13 +580,43 @@ public class TimesheetAction extends AbstractPageAction {
         document.open();
 
         // Add content
-        String reportTitle = "Month: " + monthFormatter.print(referenceDateMidnight);
-        document.add(new Paragraph(reportTitle));
+        PdfPTable headerTable = new PdfPTable(3);
+        headerTable.setWidthPercentage(100.0f);
+
+        ServletContext context = getContext().getServletContext();
+        String imagePath = context.getRealPath("/famfamfam_mini_icons/action_back.gif");
+        Image image = Image.getInstance(imagePath);
+        image.scalePercent(100f);
+        PdfPCell headerCell = new PdfPCell(image);
+        headerCell.setBorder(Rectangle.NO_BORDER);
+        headerTable.addCell(headerCell);
+
+        headerCell = new PdfPCell(new Phrase("Timesheet"));
+        headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        headerCell.setBorder(Rectangle.NO_BORDER);
+        headerTable.addCell(headerCell);
+
+        Paragraph headerParagraph = new Paragraph();
+        String personTitle = String.format("Name: %s",
+                monthReportModel.getPersonName());
+        String monthTitle = String.format("Month: %s",
+                monthFormatter.print(referenceDateMidnight));
+        headerParagraph.add(new Chunk(personTitle));
+        headerParagraph.add(Chunk.NEWLINE);
+        headerParagraph.add(new Chunk(monthTitle));
+
+        headerCell = new PdfPCell(headerParagraph);
+        headerCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        headerCell.setBorder(Rectangle.NO_BORDER);
+        headerTable.addCell(headerCell);
+
+        document.add(headerTable);
+
 
         int daysCount = monthReportModel.getDaysCount();
         int columnCount = daysCount + 3;
         float[] colsWidth = new float[columnCount];
-        colsWidth[0] = 4f;
+        colsWidth[0] = 5f;
         for (int i = 0; i < daysCount; i++) {
             colsWidth[i+1] = 1f;
         }
@@ -596,7 +635,11 @@ public class TimesheetAction extends AbstractPageAction {
         for (int i = 0; i < daysCount; i++) {
             MonthReportModel.Day day = monthReportModel.getDay(i);
             String text = dayOfMonthFormatter.print(day.getDayStart());
-            addCell(table, text, Element.ALIGN_CENTER);
+            PdfPCell cell = createCell(text, Element.ALIGN_CENTER);
+            if (day.isNonWorking()) {
+                cell.setBackgroundColor(REPORT_NON_WORKING_COLOR);
+            }
+            table.addCell(cell);
         }
         addCell(table, "Total", totalAlignment);
         addCell(table, "Notes", Element.ALIGN_CENTER);
@@ -606,7 +649,11 @@ public class TimesheetAction extends AbstractPageAction {
         for (int i = 0; i < daysCount; i++) {
             MonthReportModel.Day day = monthReportModel.getDay(i);
             String text = dayOfWeekFormatter.print(day.getDayStart());
-            addCell(table, text, Element.ALIGN_CENTER);
+            PdfPCell cell = createCell(text, Element.ALIGN_CENTER);
+            if (day.isNonWorking()) {
+                cell.setBackgroundColor(REPORT_NON_WORKING_COLOR);
+            }
+            table.addCell(cell);
         }
         addCell(table, "", totalAlignment);
         addCell(table, "", Element.ALIGN_CENTER);
@@ -641,14 +688,17 @@ public class TimesheetAction extends AbstractPageAction {
     private void printNode(PdfPTable table, MonthReportModel.Node node, int indentation)
             throws BadElementException {
         List<MonthReportModel.Node> childNodes = node.getChildNodes();
+        Color color = node.getColor();
+        Color nonWorkingColor = ColorUtils.multiply(color, REPORT_NON_WORKING_COLOR);
         if (childNodes.isEmpty()) {
             logger.debug("Leaf node: {}", node.getId());
             PdfPCell cell = createCell(node.getName(), Element.ALIGN_LEFT);
             float paddingLeft = cell.getPaddingLeft() + indentation * 2;
             cell.setPaddingLeft(paddingLeft);
+            cell.setBackgroundColor(color);
             table.addCell(cell);
 
-            printNodeMinutes(table, node);
+            printNodeMinutes(table, node, color, nonWorkingColor);
 
             addCell(table, Integer.toString(node.getMinutesTotal()), totalAlignment);
             addCell(table, "", Element.ALIGN_CENTER);
@@ -656,10 +706,13 @@ public class TimesheetAction extends AbstractPageAction {
             logger.debug("Non-leaf node: {}", node.getId());
             logger.debug("Printing node header", node.getId());
             PdfPCell cell = createCell(node.getName(), Element.ALIGN_LEFT);
-            cell.setColspan(monthReportModel.getDaysCount() + 1);
             float paddingLeft = cell.getPaddingLeft() + indentation * 2;
             cell.setPaddingLeft(paddingLeft);
+            cell.setBackgroundColor(color);
             table.addCell(cell);
+
+            printNodeBlankMinutes(table, node, color, nonWorkingColor);
+
             addCell(table, "", Element.ALIGN_CENTER);
             addCell(table, "", Element.ALIGN_CENTER);
 
@@ -668,25 +721,54 @@ public class TimesheetAction extends AbstractPageAction {
                 printNode(table, current, indentation + 1);
             }
 
-            logger.debug("Printing nodefooter", node.getId());
-            addCell(table, "Total", Element.ALIGN_RIGHT);
-            printNodeMinutes(table, node);
+            logger.debug("Printing node footer", node.getId());
+            addCell(table, "Total (" + node.getName() + ")", Element.ALIGN_RIGHT);
+            printNodeMinutes(table, node, null, REPORT_NON_WORKING_COLOR);
             addCell(table, Integer.toString(node.getMinutesTotal()), totalAlignment);
             addCell(table, "", Element.ALIGN_CENTER);
         }
     }
 
-    private void printNodeMinutes(PdfPTable table, MonthReportModel.Node node)
+    private void printNodeMinutes(PdfPTable table, MonthReportModel.Node node,
+                                  Color color, Color nonWorkingColor)
             throws BadElementException {
         for (int i = 0; i < monthReportModel.getDaysCount(); i++) {
+            MonthReportModel.Day day = monthReportModel.getDay(i);
+            Color actualBackgroundColor = (day.isNonWorking())
+                    ? nonWorkingColor
+                    : color;
             int minutes = node.getMinutes(i);
-            addCell(table, Integer.toString(minutes), Element.ALIGN_CENTER);
+            addCell(table, Integer.toString(minutes), Element.ALIGN_CENTER, actualBackgroundColor);
+        }
+    }
+
+    private void printNodeBlankMinutes(PdfPTable table,
+                                       MonthReportModel.Node node,
+                                       Color color,
+                                       Color nonWorkingColor)
+            throws BadElementException {
+        if (color == null) {
+            color = Color.WHITE;
+        }
+        for (int i = 0; i < monthReportModel.getDaysCount(); i++) {
+            MonthReportModel.Day day = monthReportModel.getDay(i);
+            Color actualBackgroundColor = (day.isNonWorking())
+                    ? nonWorkingColor
+                    : color;
+            addCell(table, "", Element.ALIGN_CENTER, actualBackgroundColor);
         }
     }
 
     private PdfPCell addCell(PdfPTable table, String text, int alignment)
             throws BadElementException {
+        return addCell(table, text, alignment, null);
+    }
+    private PdfPCell addCell(PdfPTable table, String text, int alignment, Color backgroundColor)
+            throws BadElementException {
         PdfPCell cell = createCell(text, alignment);
+        if (backgroundColor != null) {
+            cell.setBackgroundColor(backgroundColor);
+        }
         table.addCell(cell);
         return cell;
     }
@@ -702,33 +784,81 @@ public class TimesheetAction extends AbstractPageAction {
     public void loadMonthReportModel() {
         MonthReportModel.Node rootNode =
                 monthReportModel.createNode("root", "root node");
+        rootNode.setColor(new Color(0x88a1c7));
         monthReportModel.setRootNode(rootNode);
 
+
         MonthReportModel.Node node;
-        node = addReportNode(rootNode, ac1);
-        node.setMinutes(3, 20);
+        Color color = new Color(0xfff8cb);
+
+        MonthReportModel.Node euProjectsNode = addReportNode(rootNode, "eu", "EU-Projects", new Color(50,50,255));
+        node = addReportNode(euProjectsNode, "prjx", "Project x", color);
+        node = addReportNode(euProjectsNode, "prjy", "Project y", color);
+        node = addReportNode(euProjectsNode, "prjz", "Project z", color);
+
+        Color euColor = new Color(200, 200, 255);
+        MonthReportModel.Node rdActivitiesNode = addReportNode(euProjectsNode, "rd", "R&D Activities", euColor);
+        node = addReportNode(rdActivitiesNode, "prjx", "Project x", color);
+        node = addReportNode(rdActivitiesNode, "prjy", "Project y", color);
+        node = addReportNode(rdActivitiesNode, "prjz", "Project z", color);
+
+        MonthReportModel.Node demonstrationNode = addReportNode(euProjectsNode, "demo", "Demonstration", euColor);
+        node = addReportNode(demonstrationNode, "prjx", "Project x", color);
+        node = addReportNode(demonstrationNode, "prjy", "Project y", color);
+        node = addReportNode(demonstrationNode, "prjz", "Project z", color);
+
+        MonthReportModel.Node managementNode = addReportNode(euProjectsNode, "mgmt", "Management", euColor);
+        node = addReportNode(managementNode, "prjx", "Project x", color);
+        node = addReportNode(managementNode, "prjy", "Project y", color);
+        node = addReportNode(managementNode, "prjz", "Project z", color);
+
+        MonthReportModel.Node otherActivitiesNode = addReportNode(euProjectsNode, "oa", "Other Activities", euColor);
+        node = addReportNode(otherActivitiesNode, "prjx", "Project x", color);
+        node = addReportNode(otherActivitiesNode, "prjy", "Project y", color);
+        node = addReportNode(otherActivitiesNode, "prjz", "Project z", color);
+
+        MonthReportModel.Node internalNode = addReportNode(rootNode, "in", "Internal and Other Projects", new Color(30,255,30));
+        node = addReportNode(internalNode, "te", "Teaching", color);
+        node = addReportNode(internalNode, "b", "B", color);
+        node = addReportNode(internalNode, "c", "C", color);
+
+        MonthReportModel.Node absencesNode = addReportNode(rootNode, "abs", "Absences", new Color(30,255,30));
+        node = addReportNode(absencesNode, "al", "Annual Leave", color);
+        node = addReportNode(absencesNode, "sl", "Special Leave", color);
+        node = addReportNode(absencesNode, "ill", "Illness", color);
+
         node.setMinutes(7, 9);
-        node = addReportNode(rootNode, ac2);
         node.setMinutes(3, 10);
         node.setMinutes(7, 40);
-        node = addReportNode(rootNode, ac3);
-        node = addReportNode(rootNode, ac4);
-        node = addReportNode(rootNode, ac5);
         node.setMinutes(3, 12);
         node.setMinutes(7, 66);
-        node = addReportNode(rootNode, ac6);
-        node = addReportNode(rootNode, ac7);
         node.setMinutes(3, 42);
         node.setMinutes(7, 40);
-        node = addReportNode(rootNode, ac8);
-        node = addReportNode(rootNode, ac9);
 
+        absencesNode.calculateMinutesFromChildNodes();
+        internalNode.calculateMinutesFromChildNodes();
+        otherActivitiesNode.calculateMinutesFromChildNodes();
+        managementNode.calculateMinutesFromChildNodes();
+        demonstrationNode.calculateMinutesFromChildNodes();
+        rdActivitiesNode.calculateMinutesFromChildNodes();
+        euProjectsNode.calculateMinutesFromChildNodes();
         rootNode.calculateMinutesFromChildNodes();
+
+        for (int i = 0; i < monthReportModel.getDaysCount(); i++) {
+            MonthReportModel.Day day = monthReportModel.getDay(i);
+            DateMidnight date = day.getDayStart();
+            int dayOfWeek = date.getDayOfWeek();
+            if (dayOfWeek == DateTimeConstants.SATURDAY
+                    || dayOfWeek == DateTimeConstants.SUNDAY) {
+                day.setNonWorking(true);
+            }
+        }
     }
 
-    private MonthReportModel.Node addReportNode(MonthReportModel.Node rootNode, Activity ac) {
+    private MonthReportModel.Node addReportNode(MonthReportModel.Node rootNode, String id, String name, Color color) {
         MonthReportModel.Node node =
-                monthReportModel.createNode(ac.getId(), ac.getLevel3());
+                monthReportModel.createNode(id, name);
+        node.setColor(color);
         rootNode.getChildNodes().add(node);
         return node;
     }
