@@ -560,6 +560,7 @@ public class PageAdminAction extends AbstractActionBean {
         registry.register(CustomAction.class, "Custom");
         tryToRegister("com.manydesigns.portofino.pageactions.calendar.CalendarAction", "Calendar");
         tryToRegister("com.manydesigns.portofino.pageactions.timesheet.TimesheetAction", "Timesheet");
+        tryToRegister("com.manydesigns.portofino.pageactions.jsgantt.JsGanttAction", "jsGantt");
     }
 
     private static void tryToRegister(String className, String friendlyName) {
