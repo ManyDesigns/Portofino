@@ -35,10 +35,14 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.jsgantt.configuration.JsGanttConfiguration;
+import com.manydesigns.portofino.pageactions.jsgantt.model.ProjectModel;
+import com.manydesigns.portofino.pageactions.jsgantt.model.Task;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import net.sourceforge.stripes.action.*;
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +66,7 @@ public class JsGanttAction extends AbstractPageAction {
     //**************************************************************************
     // Variables
     //**************************************************************************
-
-
+    protected ProjectModel projectModel;
 
     //**************************************************************************
     // Injections
@@ -113,85 +116,70 @@ public class JsGanttAction extends AbstractPageAction {
     }
 
     public Resolution xmlData() {
+        projectModel = new ProjectModel();
+        loadProjectModel();
         XmlBuffer xb = new XmlBuffer();
+        xb.openElement("project");
+
+        for(Task task : projectModel.getTasks()){
+            xb.openElement("task");
+            printTaskElement(xb, "pID", Integer.toString(task.getId()));
+            printTaskElement(xb, "pName", task.getName());
+            printTaskElement(xb, "pStart", task.getStart());
+            printTaskElement(xb, "pEnd", task.getEnd());
+            printTaskElement(xb, "pColor", task.getColor());
+            printTaskElement(xb, "pLink", task.getLink());
+            printTaskElement(xb, "pMile", Integer.toString(task.getMile()));
+            printTaskElement(xb, "pRes", task.getResource());
+            printTaskElement(xb, "pComp", Integer.toString(task.getComp()));
+            printTaskElement(xb, "pGroup", Integer.toString(task.getGroup()));
+            printTaskElement(xb, "pParent", Integer.toString(task.getParent()));
+            printTaskElement(xb, "pOpen", Integer.toString(task.getOpen()));
+            printTaskElement(xb, "pDepend", StringUtils.join(task.getDepend(), ","));
+            xb.closeElement("task");
+        }
+        xb.closeElement("project");
 
 
-        String text = "<project>\n" +
-                "<task>\n" +
-                "\t<pID>10</pID>\n" +
-                "\t<pName>WCF Changes</pName>\n" +
-                "\t<pStart></pStart>\n" +
-                "\t<pEnd></pEnd>\n" +
-                "\t<pColor>0000ff</pColor>\n" +
-                "\t<pLink></pLink>\n" +
-                "\t<pMile>0</pMile>\n" +
-                "\t<pRes></pRes>\n" +
-                "\t<pComp>0</pComp>\n" +
-                "\t<pGroup>1</pGroup>\n" +
-                "\t<pParent>0</pParent>\n" +
-                "\t<pOpen>1</pOpen>\n" +
-                "\t<pDepend />\n" +
-                "</task>\n" +
-                "<task>\n" +
-                "\t<pID>20</pID>\n" +
-                "\t<pName>Move to WCF from remoting</pName>\n" +
-                "\t<pStart>9/11/2008</pStart>\n" +
-                "\t<pEnd>9/15/2008</pEnd>\n" +
-                "\t<pColor>0000ff</pColor>\n" +
-                "\t<pLink></pLink>\n" +
-                "\t<pMile>0</pMile>\n" +
-                "\t<pRes>Rich</pRes>\n" +
-                "\t<pComp>10</pComp>\n" +
-                "\t<pGroup>0</pGroup>\n" +
-                "\t<pParent>10</pParent>\n" +
-                "\t<pOpen>1</pOpen>\n" +
-                "\t<pDepend></pDepend>\n" +
-                "\t<pCaption>Brian</pCaption>\n" +
-                "</task>\n" +
-                "<task>\n" +
-                "\t<pID>30</pID>\n" +
-                "\t<pName>add Auditing</pName>\n" +
-                "\t<pStart>9/19/2008</pStart>\n" +
-                "\t<pEnd>9/21/2008</pEnd>\n" +
-                "\t<pColor>0000ff</pColor>\n" +
-                "\t<pLink></pLink>\n" +
-                "\t<pMile>0</pMile>\n" +
-                "\t<pRes>Shlomy</pRes>\n" +
-                "\t<pComp>50</pComp>\n" +
-                "\t<pGroup>0</pGroup>\n" +
-                "\t<pParent>10</pParent>\n" +
-                "\t<pOpen>1</pOpen>\n" +
-                "\t<pDepend>20</pDepend>\n" +
-                "\t<pCaption>Shlomy</pCaption>\n" +
-                "</task>\n" +
-                "<task>\n" +
-                "\t<pID>40</pID>\n" +
-                "\t<pName>Yet another task</pName>\n" +
-                "\t<pStart>9/23/2008</pStart>\n" +
-                "\t<pEnd>9/24/2008</pEnd>\n" +
-                "\t<pColor>0000ff</pColor>\n" +
-                "\t<pLink></pLink>\n" +
-                "\t<pMile>0</pMile>\n" +
-                "\t<pRes>Shlomy</pRes>\n" +
-                "\t<pComp>30</pComp>\n" +
-                "\t<pGroup>0</pGroup>\n" +
-                "\t<pParent>0</pParent>\n" +
-                "\t<pOpen>1</pOpen>\n" +
-                "\t<pDepend>20,30</pDepend>\n" +
-                "\t<pCaption>Shlomy</pCaption>\n" +
-                "</task>\n" +
-                "</project>";
-
-        return new NoCacheStreamingResolution("text/xml", text);
+        return new NoCacheStreamingResolution("text/xml", xb.toString());
     }
 
+    private void printTaskElement(XmlBuffer xb, String pStart, DateTime start) {
+        String text = (start == null) ? "" : start.toString("dd/MM/yyyy") ;
+        printTaskElement(xb, pStart, text);
+    }
 
+    private void printTaskElement(XmlBuffer xb, String pId, String s) {
+        xb.openElement(pId);
+        xb.write(s);
+        xb.closeElement(pId);
+    }
 
 
     //--------------------------------------------------------------------------
     // Data provider
     //--------------------------------------------------------------------------
+    protected void loadProjectModel() {
+        DateTime d1 = new DateTime();
+        DateTime d2 = d1.plusDays(4);
+        DateTime d3 = d2.plusDays(4);
+        DateTime d4 = d3.plusDays(2);
+        DateTime d5 = d4.plusDays(2);
+        DateTime d6 = d5.plusDays(2);
 
+        Task t1 = new Task(10, "WCF Changes", null, null, "0000ff", null, 0, null, 0, 1,0,1);
+        Task t2 = new Task(20, "Move to WCF from remoting", d1, d2, "0000ff", null, 0, null, 0, 0,10,1);
+        Task t3 = new Task(30, "add Auditing", d3, d4, "0000ff", null, 0, null, 0, 0,10,1);
+        Task t4 = new Task(40, "Yet another task", d5, d6, "0000ff", null, 0, null, 0, 0,0,1);
+        t3.getDepend().add(20);
+
+        projectModel.getTasks().add(t1);
+        projectModel.getTasks().add(t2);
+        projectModel.getTasks().add(t3);
+        projectModel.getTasks().add(t4);
+
+
+    }
     //--------------------------------------------------------------------------
     // Getters/setters
     //--------------------------------------------------------------------------

@@ -39,6 +39,8 @@
             g.setShowDur(1); // Show/Hide Duration (0/1)
             g.setShowComp(1); // Show/Hide % Complete(0/1)
             g.setCaptionType('Resource');  // Set to Show Caption (None,Caption,Resource,Duration,Complete)
+            g.setDateInputFormat('dd/mm/yyyy')  // Set format of input dates ('mm/dd/yyyy', 'dd/mm/yyyy', 'yyyy-mm-dd')
+            g.setDateDisplayFormat('dd/mm/yyyy') // Set format to display dates ('mm/dd/yyyy', 'dd/mm/yyyy', 'yyyy-mm-dd')
 
 
             //var gr = new Graphics();

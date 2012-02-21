@@ -53,8 +53,13 @@ public class JsGanttConfiguration implements PageActionConfiguration {
     //**************************************************************************
     // Fields
     //**************************************************************************
-
-
+    boolean showResource = true;
+    boolean showDuration = true;
+    boolean showComplete = true;
+    String captionType = "None";
+    boolean showStartDate = true;
+    boolean showEndDate = true;
+    String dateDisplayFormat = "mm/dd/yyyy";
 
     //**************************************************************************
     // Fields for wire-up
@@ -86,5 +91,59 @@ public class JsGanttConfiguration implements PageActionConfiguration {
     //**************************************************************************
 
 
+    public String getCaptionType() {
+        return captionType;
+    }
 
+    public void setCaptionType(String captionType) {
+        this.captionType = captionType;
+    }
+
+    public String getDateDisplayFormat() {
+        return dateDisplayFormat;
+    }
+
+    public void setDateDisplayFormat(String dateDisplayFormat) {
+        this.dateDisplayFormat = dateDisplayFormat;
+    }
+
+    public boolean isShowComplete() {
+        return showComplete;
+    }
+
+    public void setShowComplete(boolean showComplete) {
+        this.showComplete = showComplete;
+    }
+
+    public boolean isShowDuration() {
+        return showDuration;
+    }
+
+    public void setShowDuration(boolean showDuration) {
+        this.showDuration = showDuration;
+    }
+
+    public boolean isShowEndDate() {
+        return showEndDate;
+    }
+
+    public void setShowEndDate(boolean showEndDate) {
+        this.showEndDate = showEndDate;
+    }
+
+    public boolean isShowResource() {
+        return showResource;
+    }
+
+    public void setShowResource(boolean showResource) {
+        this.showResource = showResource;
+    }
+
+    public boolean isShowStartDate() {
+        return showStartDate;
+    }
+
+    public void setShowStartDate(boolean showStartDate) {
+        this.showStartDate = showStartDate;
+    }
 }
