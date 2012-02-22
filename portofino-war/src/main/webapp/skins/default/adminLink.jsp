@@ -9,7 +9,7 @@
                 AdminAction adminAction = (AdminAction) request.getAttribute("actionBean");
                 if(adminAction != null) {
                     String link = ObjectUtils.toString(pageContext.getAttribute("link"), "/");
-                    if(link.equals(adminAction.getRequestedPath())) {
+                    if(!"/".equals(link) && adminAction.getActionPath().startsWith(link)) {
                         out.print(" selected");
                     }
                 }

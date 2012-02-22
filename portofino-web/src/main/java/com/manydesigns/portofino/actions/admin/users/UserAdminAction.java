@@ -323,10 +323,6 @@ public class UserAdminAction extends CrudAction implements AdminAction {
         return dispatch.getOriginalPath();
     }
 
-    public String getRequestedPath() {
-        return getActionPath();
-    }
-
     public String getUserId() {
         return userId;
     }

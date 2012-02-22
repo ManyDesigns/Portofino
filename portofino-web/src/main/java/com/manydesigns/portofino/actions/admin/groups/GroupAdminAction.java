@@ -172,10 +172,6 @@ public class GroupAdminAction extends CrudAction implements AdminAction {
         return dispatch.getOriginalPath();
     }
 
-    public String getRequestedPath() {
-        return getActionPath();
-    }
-
     public String getGroupId() {
         return groupId;
     }

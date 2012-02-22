@@ -104,7 +104,7 @@
                                                    link="/actions/admin/groups"/>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Root permissions"
-                                                   link="/actions/admin/root-page/pagePermissions"/>
+                                                   link="/actions/admin/root-page/permissions"/>
                         </ul>
                     </li>
                     <li>
@@ -115,7 +115,7 @@
                                                    link="/actions/admin/settings"/>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Top-level pages"
-                                                   link="/actions/admin/root-page/pageChildren"/>
+                                                   link="/actions/admin/root-page/children"/>
                         </ul>
                     </li>
                     <li>

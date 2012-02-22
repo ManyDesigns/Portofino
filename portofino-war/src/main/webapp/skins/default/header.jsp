@@ -44,5 +44,4 @@
         <stripes:link href="/actions/user/help"><fmt:message key="skins.default.header.help"/></stripes:link>
     </c:if>
 </div>
-<h1><stripes:link href="/"><c:out
-        value="${app.name}"/></stripes:link></h1>
+<h1><stripes:link href="/"><c:out value="${app.name}"/></stripes:link></h1>

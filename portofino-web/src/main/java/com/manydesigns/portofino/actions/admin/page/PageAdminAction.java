@@ -691,11 +691,15 @@ public class PageAdminAction extends AbstractActionBean {
 
         childPagesForm = new TableFormBuilder(EditChildPage.class)
                 .configNRows(childPages.size())
-                .configFields("active", "name", "title", "showInNavigation", "embedded")
+                .configFields(getChildPagesFormFields())
                 .configPrefix(prefix)
                 .build();
         childPagesForm.readFromObject(childPages);
         return childPagesForm;
+    }
+
+    protected String[] getChildPagesFormFields() {
+        return new String[] { "active", "name", "title", "showInNavigation", "embedded" };
     }
 
     @RequiresAdministrator
@@ -717,6 +721,7 @@ public class PageAdminAction extends AbstractActionBean {
             detailChildPages.clear();
         }
         setupChildPages(); //Re-read sorted values
+        SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
         return forwardToPageChildren();
     }
 

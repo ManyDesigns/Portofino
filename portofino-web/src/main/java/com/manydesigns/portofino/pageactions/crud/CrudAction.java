@@ -1179,11 +1179,14 @@ public class CrudAction extends AbstractPageAction {
         this.crudConfiguration = (CrudConfiguration) pageInstance.getConfiguration();
 
         if (crudConfiguration == null) {
+            logger.warn("Crud is not configured: " + pageInstance.getPath());
             return null;
         }
 
         Database actualDatabase = crudConfiguration.getActualDatabase();
         if (actualDatabase == null) {
+            logger.warn("Crud " + crudConfiguration.getName() + " (" + pageInstance.getPath() + ") " +
+                        "has an invalid database: " + crudConfiguration.getDatabase());
             return null;
         }
 

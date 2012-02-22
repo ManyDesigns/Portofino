@@ -27,9 +27,14 @@
 *
 */
 
-package com.manydesigns.portofino.actions.admin;
+package com.manydesigns.portofino.actions.admin.page;
 
-import net.sourceforge.stripes.action.ActionBean;
+import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.security.RequiresAdministrator;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -37,10 +42,30 @@ import net.sourceforge.stripes.action.ActionBean;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface AdminAction extends ActionBean {
+@UrlBinding("/actions/admin/root-page/permissions")
+public class RootPermissionsAction extends RootConfigurationAction {
     public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+            "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    String getActionPath();
+    @Override
+    @DefaultHandler
+    @RequiresAdministrator
+    public Resolution pagePermissions() {
+        return super.pagePermissions();
+    }
+
+    @Override
+    protected Resolution forwardToPagePermissions() {
+        return new ForwardResolution("/layouts/admin/rootPermissions.jsp");
+    }
+
+    @Button(list = "root-permissions", key = "commons.update", order = 1)
+    public Resolution updatePagePermissions() {
+        return super.updatePagePermissions();
+    }
+
+    public String getActionPath() {
+        return "/actions/admin/root-page/permissions";
+    }
 
 }
