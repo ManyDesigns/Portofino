@@ -17,7 +17,7 @@ public class Task {
     String resource ;
     int comp;
     int group;
-    int parent;
+    Task parent;
     int open;
     final List<Integer> depend = new ArrayList<Integer>();
 
@@ -26,7 +26,7 @@ public class Task {
 
     public Task(int id, String name, DateTime start, DateTime end, String color,
                 String link, int mile, String resource, int comp, int group,
-                int parent, int open) {
+                int open) {
         this.color = color;
         this.comp = comp;
         this.end = end;
@@ -36,7 +36,6 @@ public class Task {
         this.mile = mile;
         this.name = name;
         this.open = open;
-        this.parent = parent;
         this.resource = resource;
         this.start = start;
     }
@@ -118,11 +117,11 @@ public class Task {
         this.open = open;
     }
 
-    public int getParent() {
+    public Task getParent() {
         return parent;
     }
 
-    public void setParent(int parent) {
+    public void setParent(Task parent) {
         this.parent = parent;
     }
 

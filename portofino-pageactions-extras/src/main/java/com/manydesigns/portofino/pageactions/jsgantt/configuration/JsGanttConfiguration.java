@@ -28,6 +28,7 @@
  */
 package com.manydesigns.portofino.pageactions.jsgantt.configuration;
 
+import com.manydesigns.elements.annotations.*;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -90,7 +92,10 @@ public class JsGanttConfiguration implements PageActionConfiguration {
     // Getters/setters
     //**************************************************************************
 
-
+    @XmlAttribute
+    @Required
+    @LabelI18N("jsgantt.configuration.captionType")
+    @Select(values = {"None","Caption","Resource","Duration","Complete"}, labels = {"None","Caption","Resource","Duration","Complete"})
     public String getCaptionType() {
         return captionType;
     }
@@ -99,6 +104,9 @@ public class JsGanttConfiguration implements PageActionConfiguration {
         this.captionType = captionType;
     }
 
+    @XmlAttribute
+    @Required
+    @LabelI18N("jsgantt.configuration.dateDisplayFormat")
     public String getDateDisplayFormat() {
         return dateDisplayFormat;
     }
@@ -107,6 +115,9 @@ public class JsGanttConfiguration implements PageActionConfiguration {
         this.dateDisplayFormat = dateDisplayFormat;
     }
 
+    @XmlAttribute
+    @Required
+    @LabelI18N("jsgantt.configuration.showComplete")
     public boolean isShowComplete() {
         return showComplete;
     }
@@ -115,6 +126,9 @@ public class JsGanttConfiguration implements PageActionConfiguration {
         this.showComplete = showComplete;
     }
 
+    @XmlAttribute
+    @Required
+    @LabelI18N("jsgantt.configuration.showDuration")
     public boolean isShowDuration() {
         return showDuration;
     }
@@ -123,6 +137,20 @@ public class JsGanttConfiguration implements PageActionConfiguration {
         this.showDuration = showDuration;
     }
 
+    @XmlAttribute
+    @Required
+    @LabelI18N("jsgantt.configuration.showStartDate")
+    public boolean isShowStartDate() {
+        return showStartDate;
+    }
+
+    public void setShowStartDate(boolean showStartDate) {
+        this.showStartDate = showStartDate;
+    }
+
+    @XmlAttribute
+    @Required
+    @LabelI18N("jsgantt.configuration.showEndDate")
     public boolean isShowEndDate() {
         return showEndDate;
     }
@@ -131,6 +159,9 @@ public class JsGanttConfiguration implements PageActionConfiguration {
         this.showEndDate = showEndDate;
     }
 
+    @XmlAttribute
+    @Required
+    @LabelI18N("jsgantt.configuration.showResources")
     public boolean isShowResource() {
         return showResource;
     }
@@ -139,11 +170,5 @@ public class JsGanttConfiguration implements PageActionConfiguration {
         this.showResource = showResource;
     }
 
-    public boolean isShowStartDate() {
-        return showStartDate;
-    }
 
-    public void setShowStartDate(boolean showStartDate) {
-        this.showStartDate = showStartDate;
-    }
 }

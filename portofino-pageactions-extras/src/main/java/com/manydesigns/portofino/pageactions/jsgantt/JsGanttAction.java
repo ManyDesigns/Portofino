@@ -29,6 +29,9 @@
 
 package com.manydesigns.portofino.pageactions.jsgantt;
 
+import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -69,8 +72,10 @@ public class JsGanttAction extends AbstractPageAction {
     protected ProjectModel projectModel;
 
     //**************************************************************************
-    // Injections
+    // Support objects
     //**************************************************************************
+
+    protected Form configurationForm;
 
     //**************************************************************************
     // Logging
@@ -95,6 +100,8 @@ public class JsGanttAction extends AbstractPageAction {
     }
 
 
+
+
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configure() {
@@ -102,6 +109,34 @@ public class JsGanttAction extends AbstractPageAction {
         return new ForwardResolution("/layouts/jsgantt/configure.jsp");
     }
 
+    @Button(list = "configuration", key = "commons.updateConfiguration")
+    @RequiresPermissions(level = AccessLevel.EDIT)
+    public Resolution updateConfiguration() {
+        prepareConfigurationForms();
+        readPageConfigurationFromRequest();
+        configurationForm.readFromRequest(context.getRequest());
+        boolean valid = validatePageConfiguration();
+        valid = valid && configurationForm.validate();
+        if(valid) {
+            updatePageConfiguration();
+            configurationForm.writeToObject(pageInstance.getConfiguration());
+            saveConfiguration(pageInstance.getConfiguration());
+            SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
+            return cancel();
+        } else {
+            SessionMessages.addErrorMessage(getMessage("commons.configuration.notUpdated"));
+            return new ForwardResolution("/layouts/jsgantt/configure.jsp");
+        }
+    }
+
+    @Override
+    protected void prepareConfigurationForms() {
+        super.prepareConfigurationForms();
+        configurationForm = new FormBuilder(JsGanttConfiguration.class)
+                .configFields( "captionType", "dateDisplayFormat", "showStartDate",
+                        "showEndDate", "showResource", "showDuration", "showComplete" ).build();
+        configurationForm.readFromObject(pageInstance.getConfiguration());
+    }
 
 
 
@@ -133,7 +168,11 @@ public class JsGanttAction extends AbstractPageAction {
             printTaskElement(xb, "pRes", task.getResource());
             printTaskElement(xb, "pComp", Integer.toString(task.getComp()));
             printTaskElement(xb, "pGroup", Integer.toString(task.getGroup()));
-            printTaskElement(xb, "pParent", Integer.toString(task.getParent()));
+            if(task.getParent()!=null) {
+                printTaskElement(xb, "pParent", Integer.toString(task.getParent().getId()));
+            } else {
+                printTaskElement(xb, "pParent", "0");
+            }
             printTaskElement(xb, "pOpen", Integer.toString(task.getOpen()));
             printTaskElement(xb, "pDepend", StringUtils.join(task.getDepend(), ","));
             xb.closeElement("task");
@@ -167,21 +206,37 @@ public class JsGanttAction extends AbstractPageAction {
         DateTime d5 = d4.plusDays(2);
         DateTime d6 = d5.plusDays(2);
 
-        Task t1 = new Task(10, "WCF Changes", null, null, "0000ff", null, 0, null, 0, 1,0,1);
-        Task t2 = new Task(20, "Move to WCF from remoting", d1, d2, "0000ff", null, 0, null, 0, 0,10,1);
-        Task t3 = new Task(30, "add Auditing", d3, d4, "0000ff", null, 0, null, 0, 0,10,1);
-        Task t4 = new Task(40, "Yet another task", d5, d6, "0000ff", null, 0, null, 0, 0,0,1);
+        Task t1 = new Task(10, "WCF Changes", null, null, "0000ff", null, 0, "Giampiero", 0, 1, 1);
+        Task t2 = new Task(20, "Move to WCF from remoting", d1, d2, "99ff55", null, 0, "Angelo", 100, 0,1);
+        Task t3 = new Task(30, "add Auditing", d3, d4, "99ff55", null, 0, "Paolo", 20, 0, 1);
+        Task t4 = new Task(40, "Yet another task", d5, d6, "99ff55", null, 0, "Alessio", 3, 0, 1);
+        Task t5 = new Task(50, "Project End", d6, d6, "99ff55", null, 1, "Giampiero", 100, 0, 1);
+
         t3.getDepend().add(20);
+        t2.setParent(t1);
+        t3.setParent(t1);
 
         projectModel.getTasks().add(t1);
         projectModel.getTasks().add(t2);
         projectModel.getTasks().add(t3);
         projectModel.getTasks().add(t4);
+        projectModel.getTasks().add(t5);
 
 
     }
     //--------------------------------------------------------------------------
     // Getters/setters
     //--------------------------------------------------------------------------
+    public Form getConfigurationForm() {
+        return configurationForm;
+    }
+
+    public ProjectModel getProjectModel() {
+        return projectModel;
+    }
+
+    public JsGanttConfiguration getConfiguration() {
+        return (JsGanttConfiguration) pageInstance.getConfiguration();
+    }
 
 }

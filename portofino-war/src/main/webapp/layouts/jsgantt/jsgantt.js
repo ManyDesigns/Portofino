@@ -1035,6 +1035,7 @@ Complete-Displays task percent complete</p>
                vLeftTable += '</span>';
 
                if( vTaskList[i].getGroup()) {
+
                   if( vTaskList[i].getOpen() == 1) 
                      vLeftTable += '<SPAN id="group_' + vID + '" style="color:#000000; cursor:pointer; font-weight:bold; FONT-SIZE: 12px;" onclick="JSGantt.folder(' + vID + ','+vGanttVar+');'+vGanttVar+'.DrawDependencies();">&ndash;</span><span style="color:#000000">&nbsp</SPAN>' ;
                   else
@@ -1905,9 +1906,9 @@ JSGantt.folder= function (pID,ganttObj) {
             JSGantt.show(pID, 1, ganttObj);
 
                if (JSGantt.isIE()) 
-                  {JSGantt.findObj('group_'+pID).innerText = '�';}
+                  {JSGantt.findObj('group_'+pID).innerText = '-';}
                else
-                  {JSGantt.findObj('group_'+pID).textContent = '�';}
+                  {JSGantt.findObj('group_'+pID).textContent = '-';}
 
          }
 
