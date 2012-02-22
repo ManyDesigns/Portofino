@@ -1,5 +1,4 @@
 <%@ page import="com.manydesigns.portofino.actions.admin.AdminAction" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.lang.ObjectUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -10,7 +9,7 @@
                 AdminAction adminAction = (AdminAction) request.getAttribute("actionBean");
                 if(adminAction != null) {
                     String link = ObjectUtils.toString(pageContext.getAttribute("link"), "/");
-                    if(!"/".equals(link) && adminAction.getActionPath().startsWith(link)) {
+                    if(link.equals(adminAction.getRequestedPath())) {
                         out.print(" selected");
                     }
                 }

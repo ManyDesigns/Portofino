@@ -42,4 +42,6 @@ public interface AdminAction extends ActionBean {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
     String getActionPath();
+
+    String getRequestedPath();
 }

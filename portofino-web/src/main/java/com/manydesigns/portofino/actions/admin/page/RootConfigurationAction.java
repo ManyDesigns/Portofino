@@ -34,13 +34,13 @@ import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.actions.admin.SettingsAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
-import net.sourceforge.stripes.controller.ActionResolver;
 import net.sourceforge.stripes.controller.LifecycleStage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +54,8 @@ import java.io.File;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresAdministrator
-@UrlBinding("/actions/admin/root-permissions")
-public class RootPermissionsAction extends PageAdminAction implements AdminAction {
+@UrlBinding("/actions/admin/root-page/{!event}")
+public class RootConfigurationAction extends PageAdminAction implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -70,9 +70,12 @@ public class RootPermissionsAction extends PageAdminAction implements AdminActio
     // Action events
     //--------------------------------------------------------------------------
 
+    protected String requestedPath;
+
     @Override
     @After(stages = LifecycleStage.BindingAndValidation)
     public void prepare() {
+        requestedPath = context.getRequest().getServletPath();
         originalPath = "/";
         application = (Application) context.getRequest().getAttribute(RequestAttributes.APPLICATION);
         File rootDir = application.getPagesDir();
@@ -84,16 +87,17 @@ public class RootPermissionsAction extends PageAdminAction implements AdminActio
         }
         PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage);
         dispatch = new Dispatch(context.getRequest().getContextPath(), originalPath, rootPageInstance);
+        context.getRequest().setAttribute(RequestAttributes.DISPATCH, dispatch);
     }
-
-    @DefaultHandler
-    public Resolution execute() {
-        return pagePermissions();
-    }
-
+    
     @Override
     protected Resolution forwardToPagePermissions() {
         return new ForwardResolution("/layouts/admin/rootPermissions.jsp");
+    }
+
+    @Override
+    protected Resolution forwardToPageChildren() {
+        return new ForwardResolution("/layouts/admin/rootChildren.jsp");
     }
 
     @Button(list = "root-permissions", key = "commons.update", order = 1)
@@ -101,13 +105,25 @@ public class RootPermissionsAction extends PageAdminAction implements AdminActio
         return super.updatePagePermissions();
     }
 
-    @Button(list = "root-permissions", key = "commons.returnToPages", order = 2)
+    @Override
+    @Button(list = "root-children", key = "commons.update", order = 1)
+    public Resolution updatePageChildren() {
+        return super.updatePageChildren();
+    }
+
+    @Buttons({
+        @Button(list = "root-permissions", key = "commons.returnToPages", order = 2),
+        @Button(list = "root-children", key = "commons.returnToPages", order = 2)
+    })
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }
 
     public String getActionPath() {
-        return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
+        return "/actions/admin/root-page/";
     }
 
+    public String getRequestedPath() {
+        return requestedPath;
+    }
 }
