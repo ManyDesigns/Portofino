@@ -49,6 +49,18 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
+      <source>mail/pom.xml</source>
+      <outputDirectory>mail</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-pageactions-extras/pom.xml</source>
+      <outputDirectory>portofino-pageactions-extras</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>portofino-war/pom.xml</source>
       <outputDirectory>portofino-war</outputDirectory>
       <destName>pom.xml</destName>
