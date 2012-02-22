@@ -38,14 +38,14 @@ import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.model.database.Column;
+import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
-import net.sf.jsqlparser.statement.select.OrderByElement;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.*;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -482,14 +482,14 @@ public class QueryUtils {
 
     public static Object getObjectByPk(
             Application application, String database, String entityName,
-            Serializable pk, String queryString, Object rootObject) {
-        if(!queryString.toUpperCase().contains("WHERE")) { //TODO
+            Serializable pk, String hqlQueryString, Object rootObject) {
+        if(!hqlQueryString.toUpperCase().contains("WHERE")) { //TODO
             return getObjectByPk(application, database, entityName, pk);
         }
         TableAccessor table = application.getTableAccessor(database, entityName);
         List<Object> result;
         PropertyAccessor[] keyProperties = table.getKeyProperties();
-        OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
+        OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(hqlQueryString);
         String formatString = sqlFormat.getFormatString();
         Object[] ognlParameters = sqlFormat.evaluateOgnlExpressions(rootObject);
         int i = keyProperties.length;
@@ -498,11 +498,12 @@ public class QueryUtils {
         System.arraycopy(ognlParameters, 0, parameters, i, p);
         int indexOfWhere = formatString.toUpperCase().indexOf("WHERE") + 5; //5 = "WHERE".length()
         String formatStringPrefix = formatString.substring(0, indexOfWhere);
+        String mainEntityAlias = getEntityAlias(entityName, formatString);
         formatString = formatString.substring(indexOfWhere);
 
         for(PropertyAccessor propertyAccessor : keyProperties) {
             i--;
-            formatString = propertyAccessor.getName() + " = ? AND " + formatString;
+            formatString = mainEntityAlias + propertyAccessor.getName() + " = ? AND " + formatString;
             parameters[i] = propertyAccessor.get(pk);
         }
         formatString = formatStringPrefix + " " + formatString;
@@ -513,6 +514,36 @@ public class QueryUtils {
         } else {
             return null;
         }
+    }
+
+    private static String getEntityAlias(String entityName, String hqlQueryString) {
+        try {
+            CCJSqlParserManager parserManager = new CCJSqlParserManager();
+            PlainSelect plainSelect =
+                (PlainSelect) ((Select) parserManager.parse(new StringReader(hqlQueryString))).getSelectBody();
+            FromItem fromItem = plainSelect.getFromItem();
+            if (hasEntityAlias(entityName, fromItem)) {
+                return fromItem.getAlias() + ".";
+            }
+            for(Object o : plainSelect.getJoins()) {
+                Join join = (Join) o;
+                if (hasEntityAlias(entityName, join.getRightItem())) {
+                    return join.getRightItem().getAlias() + ".";
+                }
+            }
+            logger.debug("Alias from entity " + entityName + " not found in query " + hqlQueryString);
+            return "";
+        } catch(Exception e) {
+            logger.debug("Couldn't parse query " + hqlQueryString +
+                         ", assuming entity " + entityName + " has no alias", e);
+            return "";
+        }
+    }
+
+    private static boolean hasEntityAlias(String entityName, FromItem fromItem) {
+        return fromItem instanceof net.sf.jsqlparser.schema.Table &&
+               ((net.sf.jsqlparser.schema.Table) fromItem).getName().equals(entityName) &&
+               !StringUtils.isBlank(fromItem.getAlias());
     }
 
     public static void commit(Application application, String databaseName) {

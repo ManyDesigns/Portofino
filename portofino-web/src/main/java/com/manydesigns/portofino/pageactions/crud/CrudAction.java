@@ -79,9 +79,12 @@ import jxl.write.*;
 import jxl.write.Number;
 import jxl.write.biff.RowsExceededException;
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Function;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlContext;
@@ -411,6 +414,7 @@ public class CrudAction extends AbstractPageAction {
 
         String queryString = query.getQueryString();
         String totalRecordsQueryString = generateCountQuery(queryString);
+        //TODO gestire count non disponibile (totalRecordsQueryString == null)
         List<Object> result = QueryUtils.runHqlQuery
                 (session, totalRecordsQueryString,
                         query.getParamaters());
@@ -455,11 +459,29 @@ public class CrudAction extends AbstractPageAction {
 
     protected String generateCountQuery(String queryString) throws JSQLParserException {
         CCJSqlParserManager parserManager = new CCJSqlParserManager();
-        queryString = "SELECT count(*) " + queryString;
-        PlainSelect plainSelect =
+        try {
+            PlainSelect plainSelect =
                 (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
-        plainSelect.setOrderByElements(null);
-        return plainSelect.toString();
+            List items = plainSelect.getSelectItems();
+            if(items.size() != 1) {
+                logger.error("I don't know how to generate a count query for {}", queryString);
+                return null;
+            }
+            SelectExpressionItem item = (SelectExpressionItem) items.get(0);
+            Function function = new Function();
+            function.setName("count");
+            function.setParameters(new ExpressionList(Arrays.asList(item.getExpression())));
+            item.setExpression(function);
+            logger.debug("Query string {} contains select");
+            return plainSelect.toString();
+        } catch(Exception e) {
+            logger.debug("Query string {} does not contain select");
+            queryString = "SELECT count(*) " + queryString;
+            PlainSelect plainSelect =
+                (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
+            plainSelect.setOrderByElements(null);
+            return plainSelect.toString();
+        }
     }
 
     @Button(list = "crud-search-form", key = "commons.resetSearch", order = 2)

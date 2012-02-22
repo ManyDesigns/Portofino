@@ -523,6 +523,10 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
     }
 
+    public String getRequestedPath() {
+        return getActionPath();
+    }
+
     protected String getMessage(String key, Object... args) {
         Locale locale = context.getLocale();
         ResourceBundle resourceBundle = application.getBundle(locale);

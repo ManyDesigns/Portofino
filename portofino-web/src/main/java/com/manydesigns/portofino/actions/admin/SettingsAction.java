@@ -189,4 +189,8 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
     public String getActionPath() {
         return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
     }
+
+    public String getRequestedPath() {
+        return getActionPath();
+    }
 }

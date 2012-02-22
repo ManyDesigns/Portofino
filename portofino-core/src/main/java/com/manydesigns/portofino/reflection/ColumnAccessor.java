@@ -74,7 +74,9 @@ public class ColumnAccessor
         this.nestedPropertyAccessor = nestedPropertyAccessor;
 
         annotations.put(Required.class, new RequiredImpl(!column.isNullable()));
-        annotations.put(MaxLength.class, new MaxLengthImpl(column.getLength()));
+        if(String.class.equals(column.getActualJavaType())) {
+            annotations.put(MaxLength.class, new MaxLengthImpl(column.getLength()));
+        }
         annotations.put(PrecisionScale.class,
                 new PrecisionScaleImpl(column.getLength(), column.getScale()));
         annotations.put(Enabled.class, new EnabledImpl(true));
