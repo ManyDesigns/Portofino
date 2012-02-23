@@ -51,7 +51,27 @@ public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public PostgreSQLDatabasePlatform() {
-        super(new PostgreSQLDialect());
+        super(new PostgreSQLDialect() {
+            //Fixes a bug with PostgreSQL < 8.2 (supportsGetGeneratedKeys)
+            public String getIdentitySelectString(String table, String column, int type) {
+                if(table.startsWith("\"")) {
+                    table = table.substring(1, table.length() - 1);
+                } else {
+                    table = table.toLowerCase();
+                }
+                if(column.startsWith("\"")) {
+                    column = column.substring(1, column.length() - 1);
+                } else {
+                    column = column.toLowerCase();
+                }
+                return new StringBuffer().append("select currval('\"")
+                    .append(table)
+                    .append('_')
+                    .append(column)
+                    .append("_seq\"')")
+                    .toString();
+            }
+        });
     }
 
     //**************************************************************************
