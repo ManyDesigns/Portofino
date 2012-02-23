@@ -43,7 +43,7 @@
                     .toFormatter()
                     .withLocale(request.getLocale());
     XhtmlBuffer xhtmlBuffer = new XhtmlBuffer(out);
-    ResourceBundle resourceBundle = actionBean.getLocalizationContext().getResourceBundle();
+    ResourceBundle resourceBundle = actionBean.getApplication().getBundle(request.getLocale());
 %>
 <style type="text/css">
     .calendar-container {
@@ -114,16 +114,16 @@
         %>
         <button type="submit" name="today" <%= todayDisabled ? "disabled='true'" : "" %>
                 class="ui-button ui-widget <%= todayDisabled ? "ui-state-disabled" : "ui-state-default" %> ui-corner-all ui-button-text-only ui-button">
-            <span class="ui-button-text"><fmt:message key="calendar.today" bundle="${actionBean.localizationContext}" /></span>
+            <span class="ui-button-text"><fmt:message key="calendar.today" /></span>
         </button>
         <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
                 type="submit" name="prevMonth" role="button" aria-disabled="false"
-                title='<fmt:message key="calendar.previous" bundle="${actionBean.localizationContext}" />'>
+                title='<fmt:message key="calendar.previous" />'>
             <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-w"></span>
             <span class="ui-button-text">&nbsp;</span>
         </button><button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
                          type="submit" name="nextMonth" role="button" aria-disabled="false"
-                         title='<fmt:message key="calendar.next" bundle="${actionBean.localizationContext}" />'>
+                         title='<fmt:message key="calendar.next" />'>
             <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-e"></span>
             <span class="ui-button-text">&nbsp;</span>
         </button>
@@ -134,9 +134,9 @@
     <div class="yui-u" style="text-align: right">
         <div id="calendarViewType">
             <input type="radio" id="calendarViewType-month" name="calendarViewType" checked="checked" value="month"
-                   /><label for="calendarViewType-month"><fmt:message key="calendar.monthView" bundle="${actionBean.localizationContext}" /></label>
+                   /><label for="calendarViewType-month"><fmt:message key="calendar.monthView" /></label>
             <input type="radio" id="calendarViewType-agenda" name="calendarViewType" value="agenda"
-                   /><label for="calendarViewType-agenda"><fmt:message key="calendar.agendaView" bundle="${actionBean.localizationContext}" /></label>
+                   /><label for="calendarViewType-agenda"><fmt:message key="calendar.agendaView" /></label>
         </div>
         <script>
             $(function() {

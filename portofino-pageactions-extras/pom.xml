@@ -9,7 +9,7 @@
         <version>4.0.rc9</version>
     </parent>
     <artifactId>portofino-pageactions-extras</artifactId>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <name>manydesigns-portofino-pageactions-extras</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
@@ -18,6 +18,13 @@
             <artifactId>portofino-web</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-war</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+            <type>war</type>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

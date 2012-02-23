@@ -24,7 +24,7 @@
     <div style="width: 100%; position: relative;">
         <div class="calendar-legend-area calendar-legend" style="width: 9.5em; margin-right: 0.5em;">
             <h3 style="margin: 0;">
-                <fmt:message key="calendar.calendars.legend" bundle="${actionBean.localizationContext}" />
+                <fmt:message key="calendar.calendars.legend" />
                 <a class="calendar-legend-hide-link" href="#">&lt;&lt;</a>
             </h3>
             <ul style="margin-left: 0;">

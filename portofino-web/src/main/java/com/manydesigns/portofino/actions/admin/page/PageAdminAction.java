@@ -56,6 +56,7 @@ import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
+import com.manydesigns.portofino.pageactions.calendar.CalendarAction;
 import com.manydesigns.portofino.pageactions.chart.ChartAction;
 import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
@@ -558,7 +559,7 @@ public class PageAdminAction extends AbstractActionBean {
         registry.register(ChartAction.class, "Chart");
         registry.register(TextAction.class, "Text");
         registry.register(CustomAction.class, "Custom");
-        tryToRegister("com.manydesigns.portofino.pageactions.calendar.CalendarAction", "Calendar");
+        registry.register(CalendarAction.class, "Calendar");
         tryToRegister("com.manydesigns.portofino.pageactions.timesheet.TimesheetAction", "Timesheet");
         tryToRegister("com.manydesigns.portofino.pageactions.jsgantt.JsGanttAction", "jsGantt");
     }

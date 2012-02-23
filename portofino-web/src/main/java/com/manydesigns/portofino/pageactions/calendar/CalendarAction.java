@@ -111,14 +111,6 @@ public class CalendarAction extends CustomAction {
         return null;
     }
 
-    @Before
-    public void prepare() {
-        resourceBundleManager =
-                new ResourceBundleManager(application.getAppDir(), "pageactions-extras-messages");
-        MultipleTextProvider textProvider = (MultipleTextProvider) ElementsThreadLocals.getTextProvider();
-        textProvider.getResourceBundles().add(0, resourceBundleManager.getBundle(context.getLocale()));
-    }
-
     @Override
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
     @RequiresPermissions(level = AccessLevel.EDIT)
@@ -233,13 +225,6 @@ public class CalendarAction extends CustomAction {
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
-
-    public LocalizationContext getLocalizationContext() {
-        Locale locale = context.getLocale();
-        LocalizationContext localizationContext =
-                    new LocalizationContext(resourceBundleManager.getBundle(locale), locale);
-        return localizationContext;
-    }
 
     public long getReferenceDateTimeLong() {
         return referenceDateTime.getMillis();
