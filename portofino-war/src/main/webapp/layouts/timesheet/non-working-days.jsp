@@ -28,7 +28,7 @@
                 overflow-x: auto;
             }
             table.tnwd-table {
-                width: 25em;
+                width: 30em;
                 table-layout: fixed;
             }
             table.tnwd-table th, table.tnwd-table td {
@@ -101,7 +101,7 @@
                         }
                         xb.addAttribute("class", htmlClass);
 
-                        xb.write(actionBean.getDateFormatter().print(dayStart));
+                        xb.write(actionBean.getDayOfWeekFormatter().print(dayStart));
 
                         xb.closeElement("th");
                     }

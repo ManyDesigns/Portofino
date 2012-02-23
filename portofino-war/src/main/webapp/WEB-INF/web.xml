@@ -9,9 +9,6 @@
     <display-name>ManyDesigns Portofino</display-name>
     <description>ManyDesigns Portofino</description>
 
-    <!--<listener>
-        <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
-    </listener>-->
     <listener>
         <description>Application context and session listener</description>
         <listener-class>
@@ -100,7 +97,7 @@
 
         <init-param>
             <param-name>logLevel</param-name>
-            <param-value>DEBUG</param-value>
+            <param-value>INFO</param-value>
         </init-param>
     </filter>
 
@@ -153,66 +150,10 @@
         <dispatcher>INCLUDE</dispatcher>
     </filter-mapping>
     
-    <!--<context-param>
-      <param-name>
-        javax.servlet.jsp.jstl.fmt.localizationContext
-      </param-name>
-      <param-value>StripesResources</param-value>
-    </context-param>-->
-
     <session-config>
         <session-timeout>60</session-timeout>
     </session-config>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
-    <!-- Uncomment and configure this section to enable container-managed security
-        <security-constraint>
-            <web-resource-collection>
-                <web-resource-name>Servlets</web-resource-name>
-                <description>Servlets under container-managed security</description>
-                <url-pattern>*.action</url-pattern>
-                <http-method>GET</http-method>
-                <http-method>POST</http-method>
-                <http-method>HEAD</http-method>
-                <http-method>PUT</http-method>
-                <http-method>OPTIONS</http-method>
-                <http-method>TRACE</http-method>
-                <http-method>DELETE</http-method>
-            </web-resource-collection>
-            <auth-constraint>
-                <description>
-                    Role (i.e. user group) containing all the users who can access the application.
-                    Make sure this role is listend in the security-role section below.
-                </description>
-                <role-name>Users</role-name>
-            </auth-constraint>
-        </security-constraint>
-        <login-config>
-            <auth-method>FORM</auth-method>
-            <form-login-config>
-                <form-login-page>/Login</form-login-page>
-                <form-error-page>/LoginErrorPage</form-error-page>
-            </form-login-config>
-        </login-config>
-        <security-role>
-            <description>
-                Role (i.e. user group) containing all the users who can access the application
-            </description>
-            <role-name>Users</role-name>
-        </security-role>
-    -->
-
-<!--  <security-constraint>
-     <web-resource-collection>
-        <web-resource-name>Protected Context</web-resource-name>
-          <url-pattern>/usr/*</url-pattern>
-          <url-pattern>/Login</url-pattern>
-      </web-resource-collection>
-
-      <user-data-constraint>
-         <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-      </user-data-constraint>
-    </security-constraint>
--->
 </web-app>

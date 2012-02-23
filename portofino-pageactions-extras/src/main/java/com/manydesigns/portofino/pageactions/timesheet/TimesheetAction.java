@@ -94,20 +94,20 @@ public class TimesheetAction extends AbstractPageAction {
     // Constants
     //**************************************************************************
 
-    protected final static Pattern hoursPattern =
+    protected final static Pattern      hoursPattern       =
             Pattern.compile("(\\d+):(\\d+)");
-    public static final int MINUTES_IN_A_DAY = 24 * 60;
-    public static final String ENTRY_INPUT_FORMAT = "cell-%d-%s";
-    public static final String NOTE_INPUT_FORMAT = "note-%d-%s";
-    public static final DateTimeZone dtz = DateTimeZone.UTC;
+    public static final    int          MINUTES_IN_A_DAY   = 24 * 60;
+    public static final    String       ENTRY_INPUT_FORMAT = "cell-%d-%s";
+    public static final    String       NOTE_INPUT_FORMAT  = "note-%d-%s";
+    public static final    DateTimeZone dtz                = DateTimeZone.UTC;
 
 
     public static final Font tableHeaderFont =
-        new Font(Font.HELVETICA, 10, Font.BOLD, Color.BLACK);
-    public static final Font tableBodyFont =
-        new Font(Font.HELVETICA, 7, Font.NORMAL, Color.BLACK);
-    public static final Font headerFont =
-        new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
+            new Font(Font.HELVETICA, 10, Font.BOLD, Color.BLACK);
+    public static final Font tableBodyFont   =
+            new Font(Font.HELVETICA, 7, Font.NORMAL, Color.BLACK);
+    public static final Font headerFont      =
+            new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
 
     public static final int totalAlignment = Element.ALIGN_CENTER;
 
@@ -120,13 +120,13 @@ public class TimesheetAction extends AbstractPageAction {
     protected Form form;
 
     protected String personId;
-    protected Date referenceDate;
+    protected Date   referenceDate;
 
     protected final List<Person> availablePersons = new ArrayList<Person>();
 
-    protected WeekEntryModel weekEntryModel;
+    protected WeekEntryModel      weekEntryModel;
     protected NonWorkingDaysModel nonWorkingDaysModel;
-    protected MonthReportModel monthReportModel;
+    protected MonthReportModel    monthReportModel;
 
     protected Integer day;
     protected Integer month;
@@ -178,10 +178,10 @@ public class TimesheetAction extends AbstractPageAction {
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
         this.pageInstance = pageInstance;
-        if(!pageInstance.getParameters().isEmpty()) {
+        if (!pageInstance.getParameters().isEmpty()) {
             return new ErrorResolution(404);
         }
-        if(pageInstance.getConfiguration() == null) {
+        if (pageInstance.getConfiguration() == null) {
             pageInstance.setConfiguration(new TimesheetConfiguration());
         }
         return null;
@@ -221,7 +221,7 @@ public class TimesheetAction extends AbstractPageAction {
         configurationForm.readFromRequest(context.getRequest());
         boolean valid = validatePageConfiguration();
         valid = valid && configurationForm.validate();
-        if(valid) {
+        if (valid) {
             updatePageConfiguration();
             configurationForm.writeToObject(pageInstance.getConfiguration());
             saveConfiguration(pageInstance.getConfiguration());
@@ -439,7 +439,7 @@ public class TimesheetAction extends AbstractPageAction {
             if (day.isNonWorking()) {
                 day.setStandardWorkingMinutes(0);
             } else {
-                day.setStandardWorkingMinutes(8*60);
+                day.setStandardWorkingMinutes(8 * 60);
             }
 
             logger.debug("Setting today flag");
@@ -487,7 +487,6 @@ public class TimesheetAction extends AbstractPageAction {
     }
 
 
-
     //**************************************************************************
     // Non working days view
     //**************************************************************************
@@ -496,7 +495,8 @@ public class TimesheetAction extends AbstractPageAction {
     public Resolution nonWorkingDays() {
         DateTime referenceDateTime = new DateTime(referenceDate, dtz);
         nonWorkingDaysModel = new NonWorkingDaysModel(referenceDateTime);
-        loadNonWorkingDays();
+        loadNonWorkingDays(nonWorkingDaysModel.getMonthStart(),
+                nonWorkingDaysModel.getMonthEnd());
         return new ForwardResolution("/layouts/timesheet/non-working-days.jsp");
     }
 
@@ -520,7 +520,7 @@ public class TimesheetAction extends AbstractPageAction {
 
     public Resolution configureNonWorkingDay() throws JSONException {
         logger.info("Configuring non working day. Year/month/day: {}/{}/{}. Non-working: {}",
-                new Object[] {year, month, day, nonWorking});
+                new Object[]{year, month, day, nonWorking});
         DateMidnight today = new DateMidnight(year, month, day, dtz);
         saveNonWorkingDay(today, nonWorking);
         JSONStringer js = new JSONStringer();
@@ -532,7 +532,7 @@ public class TimesheetAction extends AbstractPageAction {
         return new NoCacheStreamingResolution("application/json", jsonText);
     }
 
-    public void loadNonWorkingDays() {
+    public void loadNonWorkingDays(DateMidnight monthStart, DateMidnight monthEnd) {
         for (DateMidnight current : nonWorkingDaysDb) {
             DateTime dateTime = current.toDateTime();
             NonWorkingDaysModel.NWDDay day =
@@ -618,10 +618,10 @@ public class TimesheetAction extends AbstractPageAction {
         float[] colsWidth = new float[columnCount];
         colsWidth[0] = 5f;
         for (int i = 0; i < daysCount; i++) {
-            colsWidth[i+1] = 1f;
+            colsWidth[i + 1] = 1f;
         }
-        colsWidth[columnCount-2] = 1.5f;
-        colsWidth[columnCount-1] = 2.5f;
+        colsWidth[columnCount - 2] = 1.5f;
+        colsWidth[columnCount - 1] = 2.5f;
 
         PdfPTable table = new PdfPTable(colsWidth); // Code 1
         table.setSpacingBefore(10f);
@@ -763,6 +763,7 @@ public class TimesheetAction extends AbstractPageAction {
             throws BadElementException {
         return addCell(table, text, alignment, null);
     }
+
     private PdfPCell addCell(PdfPTable table, String text, int alignment, Color backgroundColor)
             throws BadElementException {
         PdfPCell cell = createCell(text, alignment);
@@ -791,7 +792,7 @@ public class TimesheetAction extends AbstractPageAction {
         MonthReportModel.Node node;
         Color color = new Color(0xfff8cb);
 
-        MonthReportModel.Node euProjectsNode = addReportNode(rootNode, "eu", "EU-Projects", new Color(50,50,255));
+        MonthReportModel.Node euProjectsNode = addReportNode(rootNode, "eu", "EU-Projects", new Color(50, 50, 255));
         node = addReportNode(euProjectsNode, "prjx", "Project x", color);
         node = addReportNode(euProjectsNode, "prjy", "Project y", color);
         node = addReportNode(euProjectsNode, "prjz", "Project z", color);
@@ -817,12 +818,12 @@ public class TimesheetAction extends AbstractPageAction {
         node = addReportNode(otherActivitiesNode, "prjy", "Project y", color);
         node = addReportNode(otherActivitiesNode, "prjz", "Project z", color);
 
-        MonthReportModel.Node internalNode = addReportNode(rootNode, "in", "Internal and Other Projects", new Color(30,255,30));
+        MonthReportModel.Node internalNode = addReportNode(rootNode, "in", "Internal and Other Projects", new Color(30, 255, 30));
         node = addReportNode(internalNode, "te", "Teaching", color);
         node = addReportNode(internalNode, "b", "B", color);
         node = addReportNode(internalNode, "c", "C", color);
 
-        MonthReportModel.Node absencesNode = addReportNode(rootNode, "abs", "Absences", new Color(30,255,30));
+        MonthReportModel.Node absencesNode = addReportNode(rootNode, "abs", "Absences", new Color(30, 255, 30));
         node = addReportNode(absencesNode, "al", "Annual Leave", color);
         node = addReportNode(absencesNode, "sl", "Special Leave", color);
         node = addReportNode(absencesNode, "ill", "Illness", color);
@@ -899,10 +900,10 @@ public class TimesheetAction extends AbstractPageAction {
     static Activity ac8 = new Activity("ac8", "#0002", "Assenze", "Ferie", null, at2, null, null, null);
     static Activity ac9 = new Activity("ac9", "#0002", "Assenze", "Permesso", null, at2, null, null, null);
 
-    static Person mario = new Person("mario", "Mario Rossi", null, null, true);
+    static Person mario    = new Person("mario", "Mario Rossi", null, null, true);
     static Person giovanni = new Person("giovanni", "Giovanni Bianchi", null, null, false);
 
-    static Map<DateMidnight, PersonDay> marioDayDb =
+    static Map<DateMidnight, PersonDay> marioDayDb    =
             new HashMap<DateMidnight, PersonDay>();
     static Map<DateMidnight, PersonDay> giovanniDayDb =
             new HashMap<DateMidnight, PersonDay>();
