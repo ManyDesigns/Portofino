@@ -561,6 +561,7 @@ public class PageAdminAction extends AbstractActionBean {
         tryToRegister("com.manydesigns.portofino.pageactions.calendar.CalendarAction", "Calendar");
         tryToRegister("com.manydesigns.portofino.pageactions.timesheet.TimesheetAction", "Timesheet");
         tryToRegister("com.manydesigns.portofino.pageactions.jsgantt.JsGanttAction", "jsGantt");
+        tryToRegister("com.manydesigns.portofino.pageactions.treeview.TreeViewAction", "Tree View");
     }
 
     private static void tryToRegister(String className, String friendlyName) {
