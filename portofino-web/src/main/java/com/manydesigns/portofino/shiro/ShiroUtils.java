@@ -29,8 +29,10 @@
 
 package com.manydesigns.portofino.shiro;
 
-import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
+
+import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -38,24 +40,26 @@ import org.apache.shiro.subject.Subject;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class SecurityUtilsBean {
+public class ShiroUtils {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    public Subject getSubject() {
-        return SecurityUtils.getSubject();
+    public static Object getPrimaryPrincipal(Subject s) {
+        return getPrincipal(s, 0);
     }
 
-    public org.apache.shiro.mgt.SecurityManager getSecurityManager() {
-        return SecurityUtils.getSecurityManager();
-    }
-
-    public Object getPrimaryPrincipal() {
-        return ShiroUtils.getPrimaryPrincipal(getSubject());
-    }
-
-    public Object getPrincipal(int index) {
-        return ShiroUtils.getPrincipal(getSubject(), index);
+    public static Object getPrincipal(Subject s, int i) {
+        Object principal = s.getPrincipal();
+        if(principal instanceof PrincipalCollection) {
+            List principals = ((PrincipalCollection) principal).asList();
+            return principals.get(i);
+        } else {
+            if(i == 0) {
+                return principal;
+            } else {
+                throw new IndexOutOfBoundsException("The subject has only 1 principal, index " + i + " is not valid");
+            }
+        }
     }
 
 }

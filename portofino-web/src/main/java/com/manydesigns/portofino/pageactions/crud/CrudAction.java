@@ -48,6 +48,7 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.MimeTypes;
+import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.QueryUtils;
@@ -624,6 +625,18 @@ public class CrudAction extends AbstractPageAction {
                 }
                 pk = pkHelper.generatePkStringArray(object);
                 String url = dispatch.getOriginalPath() + "/" + StringUtils.join(pk, "/");
+                XhtmlBuffer buffer = new XhtmlBuffer();
+                buffer.write(getMessage("commons.save.successful") + ". ");
+                String createUrl = dispatch.getAbsoluteOriginalPath();
+                if(!createUrl.contains("?")) {
+                    createUrl += "?";
+                } else {
+                    createUrl += "&";
+                }
+                createUrl += "create=";
+                createUrl = appendSearchStringParamIfNecessary(createUrl);
+                buffer.writeAnchor(createUrl, getMessage("commons.create.another"));
+                SessionMessages.addInfoMessage(buffer);
                 return new RedirectResolution(url);
             }
         }
