@@ -54,16 +54,10 @@ public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
         super(new PostgreSQLDialect() {
             //Fixes a bug with PostgreSQL < 8.2 (supportsGetGeneratedKeys)
             public String getIdentitySelectString(String table, String column, int type) {
-                if(table.startsWith("\"")) {
-                    table = table.substring(1, table.length() - 1);
-                } else {
-                    table = table.toLowerCase();
-                }
-                if(column.startsWith("\"")) {
-                    column = column.substring(1, column.length() - 1);
-                } else {
-                    column = column.toLowerCase();
-                }
+                table = table.replace("\"", "");
+                column = column.replace("\"", "");
+                System.err.println("XXXXXXXXXXXXX " + table);
+                System.err.println("XXXXXXXXXXXXX " + column);
                 return new StringBuffer().append("select currval('\"")
                     .append(table)
                     .append('_')
