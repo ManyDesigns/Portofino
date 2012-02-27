@@ -33,7 +33,7 @@ import com.manydesigns.portofino.pageactions.timesheet.model.Activity;
 import com.manydesigns.portofino.pageactions.timesheet.model.Person;
 import com.manydesigns.portofino.pageactions.timesheet.model.WeekEntryModel;
 import org.jetbrains.annotations.Nullable;
-import org.joda.time.DateMidnight;
+import org.joda.time.LocalDate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,19 +48,19 @@ public class PersonDay {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
-    final Person person;
-    final DateMidnight date;
+    final Person    person;
+    final LocalDate date;
     Integer standardWorkingMinutes;
     boolean locked;
 
     final Map<Activity, WeekEntryModel.Entry> entries;
 
-    public PersonDay(Person person, DateMidnight date) {
+    public PersonDay(Person person, LocalDate date) {
         this(person, date, null, false);
     }
 
     public PersonDay(Person person,
-                     DateMidnight date,
+                     LocalDate date,
                      @Nullable Integer standardWorkingMinutes,
                      boolean locked) {
         this.person = person;
@@ -74,7 +74,7 @@ public class PersonDay {
         return person;
     }
 
-    public DateMidnight getDate() {
+    public LocalDate getDate() {
         return date;
     }
 

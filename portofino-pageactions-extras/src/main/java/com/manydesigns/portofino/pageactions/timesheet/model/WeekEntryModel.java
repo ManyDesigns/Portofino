@@ -30,9 +30,8 @@
 package com.manydesigns.portofino.pageactions.timesheet.model;
 
 import org.jetbrains.annotations.Nullable;
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeConstants;
-import org.joda.time.Interval;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,15 +58,12 @@ public class WeekEntryModel {
     // Fields
     //--------------------------------------------------------------------------
 
-    final DateMidnight referenceDateMidnight;
-    final int referenceYear;
-    final int referenceMonth;
+    final LocalDate referenceDate;
 
-    final DateMidnight weekStart;
-    final DateMidnight weekEnd;
-    final Interval weekInterval;
+    final LocalDate firstDate;
+    final LocalDate lastDate;
 
-    protected final Day[] days;
+    protected final Day[]          days;
     protected final List<Activity> activities;
 
     protected Person person;
@@ -83,19 +79,16 @@ public class WeekEntryModel {
     // Constructors
     //--------------------------------------------------------------------------
 
-    public WeekEntryModel(DateMidnight referenceDateMidnight) {
+    public WeekEntryModel(LocalDate referenceDate) {
         logger.debug("Initializing week entry model");
-        this.referenceDateMidnight = referenceDateMidnight;
-        referenceYear = referenceDateMidnight.getYear();
-        referenceMonth = referenceDateMidnight.getMonthOfYear();
+        this.referenceDate = referenceDate;
 
-        weekStart = referenceDateMidnight.withDayOfWeek(DateTimeConstants.MONDAY);
-        weekEnd = weekStart.plusWeeks(1);
-        weekInterval = new Interval(weekStart, weekEnd);
+        firstDate = referenceDate.withDayOfWeek(DateTimeConstants.MONDAY);
+        lastDate = firstDate.plusWeeks(1).minusDays(1);
 
         logger.debug("Initializing weeks");
         days = new Day[7];
-        DateMidnight dayStart = weekStart;
+        LocalDate dayStart = firstDate;
         for (int i = 0; i < days.length; i++) {
             days[i] = new Day(dayStart);
 
@@ -117,7 +110,7 @@ public class WeekEntryModel {
         return days[index];
     }
 
-    public Day findDayByDate(DateMidnight date) {
+    public Day findDayByDate(LocalDate date) {
         for (Day day : days) {
             if (day.getDate().equals(date)) {
                 return day;
@@ -135,7 +128,7 @@ public class WeekEntryModel {
         return null;
     }
 
-    public void addEntry(DateMidnight date, Activity activity, Entry entry) {
+    public void addEntry(LocalDate date, Activity activity, Entry entry) {
         Day day = findDayByDate(date);
         if (day == null) {
             logger.warn("Date not in range: {}", date);
@@ -153,13 +146,17 @@ public class WeekEntryModel {
         this.person = person;
     }
 
+    public LocalDate getReferenceDate() {
+        return referenceDate;
+    }
+
     //--------------------------------------------------------------------------
     // Inner classes
     //--------------------------------------------------------------------------
 
     public static class Entry {
 
-        int minutes;
+        int    minutes;
         String note;
 
         public Entry() {
@@ -189,20 +186,20 @@ public class WeekEntryModel {
 
 
     public class Day {
-        final DateMidnight date;
-        Integer standardWorkingMinutes;
+        final LocalDate date;
+        Integer   standardWorkingMinutes;
         DayStatus status;
-        boolean nonWorking;
-        boolean today;
+        boolean   nonWorking;
+        boolean   today;
 
         final Map<Activity, Entry> entries;
 
-        public Day(DateMidnight date) {
+        public Day(LocalDate date) {
             this.date = date;
             entries = new HashMap<Activity, Entry>();
         }
 
-        public DateMidnight getDate() {
+        public LocalDate getDate() {
             return date;
         }
 

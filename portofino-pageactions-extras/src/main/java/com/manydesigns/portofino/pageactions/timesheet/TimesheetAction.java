@@ -56,10 +56,7 @@ import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.DateTimeZone;
+import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
@@ -160,6 +157,11 @@ public class TimesheetAction extends AbstractPageAction {
      */
     protected DateTimeFormatter dayOfMonthFormatter;
 
+    /**
+     * yyyy M d
+     */
+    protected DateTimeFormatter referenceDateFormatter;
+
 
     //**************************************************************************
     // Injections
@@ -202,8 +204,7 @@ public class TimesheetAction extends AbstractPageAction {
                 .appendDayOfMonth(1)
                 .toFormatter()
                 .withLocale(locale);
-
-
+        referenceDateFormatter = DateTimeFormat.forPattern("yyyy M d");
     }
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
@@ -276,8 +277,7 @@ public class TimesheetAction extends AbstractPageAction {
         DateTimeFormatter formatter = DateTimeFormat.shortDate().withLocale(Locale.ITALY);
         for (int i = 0; i < 10; i++) {
             DateMidnight sunday = monday.plusDays(6);
-            Date date = monday.toDate();
-            String value = date.toString();
+            String value = referenceDateFormatter.print(monday);
             if (i == 0) {
                 // set default date
                 timesheetSelection.referenceDate = value;
@@ -310,9 +310,8 @@ public class TimesheetAction extends AbstractPageAction {
 
     @Button(list = "timesheet-selection", key = "timesheet.go.to.week.entry", order = 1)
     public Resolution weekEntry() throws Exception {
-        DateMidnight referenceDateMidnight =
-                new DateMidnight(referenceDate, dtz);
-        weekEntryModel = new WeekEntryModel(referenceDateMidnight);
+        LocalDate referenceLocalDate = new LocalDate(referenceDate);
+        weekEntryModel = new WeekEntryModel(referenceLocalDate);
 
         loadWeekEntryModel();
 
@@ -321,28 +320,29 @@ public class TimesheetAction extends AbstractPageAction {
 
     @Button(list = "timesheet-we-navigation", key = "timesheet.previous.week", order = 1)
     public Resolution weekEntryPreviousWeek() throws Exception {
-        DateMidnight referenceDateMidnight =
-                new DateMidnight(referenceDate, dtz);
-        referenceDateMidnight = referenceDateMidnight.minusWeeks(1);
-        referenceDate = referenceDateMidnight.toDate();
+        LocalDate referenceLocalDate = new LocalDate(referenceDate);
+        referenceLocalDate = referenceLocalDate.minusWeeks(1);
+        referenceDate = new Date(referenceLocalDate.getYear() - 1900,
+                referenceLocalDate.getMonthOfYear() - 1,
+                referenceLocalDate.getDayOfMonth());
         return weekEntry();
     }
 
     @Button(list = "timesheet-we-navigation", key = "timesheet.next.week", order = 2)
     public Resolution weekEntryNextWeek() throws Exception {
-        DateMidnight referenceDateMidnight =
-                new DateMidnight(referenceDate, dtz);
-        referenceDateMidnight = referenceDateMidnight.plusWeeks(1);
-        referenceDate = referenceDateMidnight.toDate();
+        LocalDate referenceLocalDate = new LocalDate(referenceDate);
+        referenceLocalDate = referenceLocalDate.plusWeeks(1);
+        referenceDate = new Date(referenceLocalDate.getYear() - 1900,
+                referenceLocalDate.getMonthOfYear() - 1,
+                referenceLocalDate.getDayOfMonth());
         return weekEntry();
     }
 
     @Button(list = "timesheet-week-entry", key = "commons.save", order = 1)
     public Resolution saveWeekEntryModel() throws Exception {
-        DateMidnight referenceDateMidnight =
-                new DateMidnight(referenceDate, dtz);
+        LocalDate referenceLocalDate = new LocalDate(referenceDate);
 
-        weekEntryModel = new WeekEntryModel(referenceDateMidnight);
+        weekEntryModel = new WeekEntryModel(referenceLocalDate);
 
         loadWeekEntryModel();
 
@@ -409,8 +409,8 @@ public class TimesheetAction extends AbstractPageAction {
     }
 
     public void loadWeekEntryModel() throws Exception {
-        DateMidnight today = new DateMidnight(dtz);
-        Map<DateMidnight, PersonDay> personDayDb;
+        LocalDate today = new LocalDate();
+        Map<LocalDate, PersonDay> personDayDb;
         if (mario.getId().equals(personId)) {
             weekEntryModel.setPerson(mario);
             personDayDb = marioDayDb;
@@ -443,7 +443,7 @@ public class TimesheetAction extends AbstractPageAction {
             }
 
             logger.debug("Setting today flag");
-            DateMidnight dayDate = day.getDate();
+            LocalDate dayDate = day.getDate();
             if (dayDate.equals(today)) {
                 day.setToday(true);
             }
@@ -521,7 +521,7 @@ public class TimesheetAction extends AbstractPageAction {
     public Resolution configureNonWorkingDay() throws JSONException {
         logger.info("Configuring non working day. Year/month/day: {}/{}/{}. Non-working: {}",
                 new Object[]{year, month, day, nonWorking});
-        DateMidnight today = new DateMidnight(year, month, day, dtz);
+        LocalDate today = new LocalDate(year, month, day);
         saveNonWorkingDay(today, nonWorking);
         JSONStringer js = new JSONStringer();
         js.object()
@@ -533,8 +533,8 @@ public class TimesheetAction extends AbstractPageAction {
     }
 
     public void loadNonWorkingDays(DateMidnight monthStart, DateMidnight monthEnd) {
-        for (DateMidnight current : nonWorkingDaysDb) {
-            DateTime dateTime = current.toDateTime();
+        for (LocalDate current : nonWorkingDaysDb) {
+            DateTime dateTime = new DateTime(current, dtz);
             NonWorkingDaysModel.NWDDay day =
                     nonWorkingDaysModel.findDayByDateTime(dateTime);
             if (day != null) {
@@ -543,7 +543,7 @@ public class TimesheetAction extends AbstractPageAction {
         }
     }
 
-    public void saveNonWorkingDay(DateMidnight date, boolean nonWorking) {
+    public void saveNonWorkingDay(LocalDate date, boolean nonWorking) {
         if (nonWorking) {
             nonWorkingDaysDb.add(date);
         } else {
@@ -903,17 +903,17 @@ public class TimesheetAction extends AbstractPageAction {
     static Person mario    = new Person("mario", "Mario Rossi", null, null, true);
     static Person giovanni = new Person("giovanni", "Giovanni Bianchi", null, null, false);
 
-    static Map<DateMidnight, PersonDay> marioDayDb    =
-            new HashMap<DateMidnight, PersonDay>();
-    static Map<DateMidnight, PersonDay> giovanniDayDb =
-            new HashMap<DateMidnight, PersonDay>();
+    static Map<LocalDate, PersonDay> marioDayDb    =
+            new HashMap<LocalDate, PersonDay>();
+    static Map<LocalDate, PersonDay> giovanniDayDb =
+            new HashMap<LocalDate, PersonDay>();
 
-    static Set<DateMidnight> nonWorkingDaysDb
-            = new HashSet<DateMidnight>();
+    static Set<LocalDate> nonWorkingDaysDb
+            = new HashSet<LocalDate>();
 
     static {
-        DateMidnight today = new DateMidnight(dtz);
-        DateMidnight currentDay = today;
+        LocalDate today = new LocalDate();
+        LocalDate currentDay = today;
         boolean locked = false;
         currentDay = skipNonWorkingDays(currentDay);
         PersonDay mario_1 = new PersonDay(mario, currentDay, null, locked);
@@ -1017,11 +1017,11 @@ public class TimesheetAction extends AbstractPageAction {
         }
     }
 
-    private static boolean checkSunday(DateMidnight currentDay, boolean locked) {
+    private static boolean checkSunday(LocalDate currentDay, boolean locked) {
         return locked || (currentDay.getDayOfWeek() == DateTimeConstants.SUNDAY);
     }
 
-    private static DateMidnight skipNonWorkingDays(DateMidnight currentDay) {
+    private static LocalDate skipNonWorkingDays(LocalDate currentDay) {
         while (currentDay.getDayOfWeek() >= DateTimeConstants.SATURDAY) {
             currentDay = currentDay.minusDays(1);
         }
@@ -1119,5 +1119,9 @@ public class TimesheetAction extends AbstractPageAction {
 
     public DateTimeFormatter getDayOfMonthFormatter() {
         return dayOfMonthFormatter;
+    }
+
+    public DateTimeFormatter getReferenceDateFormatter() {
+        return referenceDateFormatter;
     }
 }
