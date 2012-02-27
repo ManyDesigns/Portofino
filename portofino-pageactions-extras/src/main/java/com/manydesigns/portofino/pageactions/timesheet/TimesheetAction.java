@@ -274,7 +274,6 @@ public class TimesheetAction extends AbstractPageAction {
 
         DateMidnight today = new DateMidnight(dtz);
         DateMidnight monday = today.withDayOfWeek(DateTimeConstants.MONDAY);
-        DateTimeFormatter formatter = DateTimeFormat.shortDate().withLocale(Locale.ITALY);
         for (int i = 0; i < 10; i++) {
             DateMidnight sunday = monday.plusDays(6);
             String value = referenceDateFormatter.print(monday);
@@ -282,7 +281,7 @@ public class TimesheetAction extends AbstractPageAction {
                 // set default date
                 timesheetSelection.referenceDate = value;
             }
-            String label = formatter.print(monday) + " - " + formatter.print(sunday);
+            String label = dateFormatter.print(monday) + " - " + dateFormatter.print(sunday);
             weeksAgoSelectionProvider.appendRow(value, label, true);
             monday = monday.minusWeeks(1);
         }
@@ -344,68 +343,97 @@ public class TimesheetAction extends AbstractPageAction {
 
         weekEntryModel = new WeekEntryModel(referenceLocalDate);
 
-        loadWeekEntryModel();
+        try {
+            beginWeekEntryTransaction();
 
-        HttpServletRequest request = getContext().getRequest();
+            loadWeekEntryModel();
 
-        boolean success = true;
-        for (int dayIndex = 0; dayIndex < 7; dayIndex++) {
-            WeekEntryModel.Day day = weekEntryModel.getDay(dayIndex);
+            HttpServletRequest request = getContext().getRequest();
 
-            WeekEntryModel.DayStatus dayStatus =
-                    day.getStatus();
-            if (dayStatus == null || dayStatus == WeekEntryModel.DayStatus.LOCKED) {
-                continue;
+            boolean success = true;
+            for (int dayIndex = 0; dayIndex < 7; dayIndex++) {
+                WeekEntryModel.Day day = weekEntryModel.getDay(dayIndex);
+
+                WeekEntryModel.DayStatus dayStatus =
+                        day.getStatus();
+                if (dayStatus == null || dayStatus == WeekEntryModel.DayStatus.LOCKED) {
+                    continue;
+                }
+                for (Activity activity : weekEntryModel.getActivities()) {
+                    success = saveOneWeekEntry(request, success, dayIndex, day, activity);
+                }
             }
-            for (Activity activity : weekEntryModel.getActivities()) {
-                String entryInputName = String.format(ENTRY_INPUT_FORMAT,
-                        dayIndex, activity.getId());
-                String entryValue = StringUtils.trimToNull(request.getParameter(entryInputName));
-                logger.debug("Week entry parameter: {}: {}", entryInputName, entryValue);
-
-                String noteInputName = String.format(NOTE_INPUT_FORMAT,
-                        dayIndex, activity.getId());
-                String noteValue = StringUtils.trimToNull(request.getParameter(noteInputName));
-
-                int totalMinutes;
-                if (entryValue == null) {
-                    totalMinutes = 0;
-                } else {
-                    Matcher matcher = hoursPattern.matcher(entryValue);
-                    if (matcher.matches()) {
-                        try {
-                            int hours = Integer.parseInt(matcher.group(1));
-                            int minutes = Integer.parseInt(matcher.group(2));
-                            totalMinutes = hours * 60 + minutes;
-                        } catch (NumberFormatException e) {
-                            totalMinutes = 0;
-                            success = false;
-                            SessionMessages.addErrorMessage("Invalid week entry: " + entryValue);
-                        }
-                    } else {
-                        totalMinutes = 0;
-                        success = false;
-                        SessionMessages.addErrorMessage("Invalid week entry: " + entryValue);
-                    }
-                }
-                if (totalMinutes < 0) {
-                    totalMinutes = 0;
-                    success = false;
-                }
-                if (totalMinutes > MINUTES_IN_A_DAY) {
-                    totalMinutes = MINUTES_IN_A_DAY;
-                    success = false;
-                }
-                saveWeekEntry(day, activity, totalMinutes, noteValue);
+            if (success) {
+                commitWeekEntryTransaction();
+                String msg = getMessage("timesheet.saved.successuly");
+                SessionMessages.addInfoMessage(msg);
+            } else {
+                rollbackWeekEntryTransaction();
             }
+        } finally {
+            endWeekEntryTransaction();
         }
-        if (success) {
-            // commit
-            String msg = getMessage("timesheet.saved.successuly");
-            SessionMessages.addInfoMessage(msg);
-        }
-
         return weekEntry();
+    }
+
+    private boolean saveOneWeekEntry(HttpServletRequest request, boolean success, int dayIndex, WeekEntryModel.Day day, Activity activity) {
+        WeekEntryModel.Entry oldEntry =
+                day.findEntryByActivity(activity);
+        String entryInputName = String.format(ENTRY_INPUT_FORMAT,
+                dayIndex, activity.getId());
+        String entryValue = StringUtils.trimToNull(request.getParameter(entryInputName));
+        logger.debug("Week entry parameter: {}: {}", entryInputName, entryValue);
+
+        String noteInputName = String.format(NOTE_INPUT_FORMAT,
+                dayIndex, activity.getId());
+        String noteValue = StringUtils.trimToNull(request.getParameter(noteInputName));
+
+        int totalMinutes;
+        if (entryValue == null) {
+            totalMinutes = 0;
+        } else {
+            Matcher matcher = hoursPattern.matcher(entryValue);
+            if (matcher.matches()) {
+                try {
+                    int hours = Integer.parseInt(matcher.group(1));
+                    int minutes = Integer.parseInt(matcher.group(2));
+                    totalMinutes = hours * 60 + minutes;
+                } catch (NumberFormatException e) {
+                    totalMinutes = 0;
+                    success = false;
+                    SessionMessages.addErrorMessage("Invalid week entry: " + entryValue);
+                }
+            } else {
+                totalMinutes = 0;
+                success = false;
+                SessionMessages.addErrorMessage("Invalid week entry: " + entryValue);
+            }
+        }
+        if (totalMinutes < 0) {
+            totalMinutes = 0;
+            success = false;
+        }
+        if (totalMinutes > MINUTES_IN_A_DAY) {
+            totalMinutes = MINUTES_IN_A_DAY;
+            success = false;
+        }
+        if (totalMinutes == 0 && noteValue == null) {
+            if (oldEntry == null) {
+                logger.debug("Empty entry. Do nothing.");
+            } else {
+                logger.debug("Deleting entry.");
+                deleteWeekEntry(day, activity);
+            }
+        } else {
+            if (oldEntry == null) {
+                logger.debug("Saving new entry.");
+                saveWeekEntry(day, activity, totalMinutes, noteValue);
+            } else {
+                logger.debug("Updating entry.");
+                updateWeekEntry(day, activity, totalMinutes, noteValue);
+            }
+        }
+        return success;
     }
 
     public void loadWeekEntryModel() throws Exception {
@@ -475,15 +503,42 @@ public class TimesheetAction extends AbstractPageAction {
         }
     }
 
-    private void saveWeekEntry(WeekEntryModel.Day day, Activity activity, int minutes, String note) {
+    protected void beginWeekEntryTransaction() {
+        logger.debug("Begin week entry transaction");
+    }
+
+    protected void commitWeekEntryTransaction() {
+        logger.debug("Commit week entry transaction");
+    }
+
+    protected void rollbackWeekEntryTransaction() {
+        logger.debug("Rollback week entry transaction");
+    }
+
+    protected void endWeekEntryTransaction() {
+        logger.debug("End week entry transaction");
+    }
+
+    protected void saveWeekEntry(WeekEntryModel.Day day, Activity activity, int minutes, String note) {
         PersonDay personDay = marioDayDb.get(day.getDate());
-        WeekEntryModel.Entry entry = personDay.getEntries().get(activity);
-        if (entry == null) {
-            entry = new WeekEntryModel.Entry();
-            personDay.getEntries().put(activity, entry);
-        }
+        WeekEntryModel.Entry entry = new WeekEntryModel.Entry();
         entry.setMinutes(minutes);
         entry.setNote(note);
+        personDay.getEntries().put(activity, entry);
+    }
+
+    protected void updateWeekEntry(WeekEntryModel.Day day, Activity activity, int minutes, String note) {
+        PersonDay personDay = marioDayDb.get(day.getDate());
+        Map<Activity, WeekEntryModel.Entry> entries = personDay.getEntries();
+        WeekEntryModel.Entry entry = entries.get(activity);
+        entry.setMinutes(minutes);
+        entry.setNote(note);
+    }
+
+    protected void deleteWeekEntry(WeekEntryModel.Day day, Activity activity) {
+        PersonDay personDay = marioDayDb.get(day.getDate());
+        Map<Activity, WeekEntryModel.Entry> entries = personDay.getEntries();
+        entries.remove(activity);
     }
 
 
