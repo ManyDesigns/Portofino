@@ -534,7 +534,7 @@ public class TimesheetAction extends AbstractPageAction {
 
     public void loadNonWorkingDays(DateMidnight monthStart, DateMidnight monthEnd) {
         for (LocalDate current : nonWorkingDaysDb) {
-            DateTime dateTime = new DateTime(current, dtz);
+            DateTime dateTime = current.toDateTimeAtCurrentTime(dtz);
             NonWorkingDaysModel.NWDDay day =
                     nonWorkingDaysModel.findDayByDateTime(dateTime);
             if (day != null) {

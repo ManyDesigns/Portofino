@@ -51,19 +51,19 @@ public abstract class AbstractMonthView<T extends AbstractWeek> {
     // Fields
     //--------------------------------------------------------------------------
 
-    final DateTime referenceDateTime;
-    final int firstDayOfWeek;
+    final DateTime     referenceDateTime;
+    final int          firstDayOfWeek;
     final DateMidnight referenceDateMidnight;
-    final int referenceYear;
-    final int referenceMonth;
+    final int          referenceYear;
+    final int          referenceMonth;
 
     final DateMidnight monthStart;
     final DateMidnight monthEnd;
-    final Interval monthInterval;
+    final Interval     monthInterval;
 
-    final DateMidnight monthViewStart;
-    final DateMidnight monthViewEnd;
-    protected final Interval monthViewInterval;
+    final           DateMidnight monthViewStart;
+    final           DateMidnight monthViewEnd;
+    protected final Interval     monthViewInterval;
 
     protected final T[] weeks;
 
@@ -101,7 +101,6 @@ public abstract class AbstractMonthView<T extends AbstractWeek> {
         monthViewEnd = monthViewStart.plusWeeks(6);
         monthViewInterval = new Interval(monthViewStart, monthViewEnd);
         logger.debug("Month view start: {}", monthViewStart);
-
 
 
         logger.debug("Initializing weeks");
