@@ -56,10 +56,14 @@ public class ElementsFileUtils {
     //**************************************************************************
 
     public static String getRelativePath(File ancestor, File file) {
+	return getRelativePath(ancestor, file, System.getProperty("file.separator"));
+    }
+
+    public static String getRelativePath(File ancestor, File file, String separator) {
         String path = file.getName();
         File parent = file.getParentFile();
         while (parent != null && !parent.equals(ancestor)) {
-            path = parent.getName() + File.separator + path;
+            path = parent.getName() + separator + path;
             parent = parent.getParentFile();
         }
         return path;

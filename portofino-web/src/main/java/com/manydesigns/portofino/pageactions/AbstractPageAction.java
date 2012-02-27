@@ -376,7 +376,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
                                DefaultSelectionProvider selectionProvider) {
         for(File file : files) {
             if(file.isFile() && file.getName().endsWith(".jsp")) {
-                String path = File.separator + ElementsFileUtils.getRelativePath(root, file);
+                String path = "/" + ElementsFileUtils.getRelativePath(root, file, "/");
                 String name = file.getName();
                 if(DEFAULT_LAYOUT.equals(path)) {
                     name += " (default)";
