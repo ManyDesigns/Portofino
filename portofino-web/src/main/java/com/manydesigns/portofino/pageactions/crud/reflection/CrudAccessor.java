@@ -115,7 +115,7 @@ public class CrudAccessor
             private int oldIndex(CrudPropertyAccessor c) {
                 int i = 0;
                 for (CrudProperty old : crudConfiguration.getProperties()) {
-                    if (c.getCrudProperty().equals(old)) {
+                    if (old.equals(c.getCrudProperty())) {
                         return i;
                     }
                     i++;
