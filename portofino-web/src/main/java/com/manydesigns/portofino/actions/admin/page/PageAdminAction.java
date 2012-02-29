@@ -449,6 +449,11 @@ public class PageAdminAction extends AbstractActionBean {
             //TODO gestione eccezioni
             newParent = destinationDispatch.getLastPageInstance();
         }
+        if(newParent.getDirectory().equals(oldParent.getDirectory())) {
+            List<String> params = newParent.getParameters();
+            newParent = new PageInstance(newParent.getParent(), newParent.getDirectory(), application, oldParent.getPage());
+            newParent.getParameters().addAll(params);
+        }
         if(!SecurityLogic.isAdministrator(context.getRequest())) {
             Subject subject = SecurityUtils.getSubject();
             if(!SecurityLogic.hasPermissions(newParent, subject, AccessLevel.EDIT)) {
