@@ -37,7 +37,7 @@ package com.manydesigns.portofino.security;
  */
 public enum AccessLevel {
 
-    NONE(0), VIEW(1), EDIT(2), DENY(Integer.MAX_VALUE);
+    NONE(0), VIEW(1), EDIT(2), DEVELOP(3), DENY(Integer.MAX_VALUE);
 
     private AccessLevel(int level) {
         this.level = level;

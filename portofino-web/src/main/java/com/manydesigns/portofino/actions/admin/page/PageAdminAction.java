@@ -466,7 +466,7 @@ public class PageAdminAction extends AbstractActionBean {
         }
         if(!SecurityLogic.isAdministrator(context.getRequest())) {
             Subject subject = SecurityUtils.getSubject();
-            if(!SecurityLogic.hasPermissions(newParent, subject, AccessLevel.EDIT)) {
+            if(!SecurityLogic.hasPermissions(newParent, subject, AccessLevel.DEVELOP)) {
                 SessionMessages.addErrorMessage(getMessage("page.copyOrMove.forbidden.accessLevel"));
                 return new RedirectResolution(dispatch.getOriginalPath());
             }

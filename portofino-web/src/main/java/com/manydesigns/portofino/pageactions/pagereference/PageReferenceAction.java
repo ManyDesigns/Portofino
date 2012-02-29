@@ -136,7 +136,7 @@ public class PageReferenceAction extends AbstractPageAction {
     }
 
     @Button(list = "configuration", key = "commons.updateConfiguration")
-    @RequiresPermissions(level = AccessLevel.EDIT)
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() {
         setupConfigurationForm();
         form.readFromRequest(context.getRequest());

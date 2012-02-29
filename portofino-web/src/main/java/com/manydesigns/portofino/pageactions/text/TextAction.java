@@ -270,7 +270,7 @@ public class TextAction extends AbstractPageAction {
     }*/
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
-    @RequiresPermissions(level = AccessLevel.EDIT)
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() throws IOException {
         prepareConfigurationForms();
         loadContent();
@@ -278,7 +278,7 @@ public class TextAction extends AbstractPageAction {
     }
 
     @Button(list = "configuration", key = "commons.updateConfiguration")
-    @RequiresPermissions(level = AccessLevel.EDIT)
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() throws IOException {
         prepareConfigurationForms();
         readPageConfigurationFromRequest();
@@ -403,13 +403,13 @@ public class TextAction extends AbstractPageAction {
         }
     }
 
-    @RequiresPermissions(level = AccessLevel.EDIT)
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution browse() {
         logger.info("Browse");
         return new ForwardResolution("/layouts/text/browse.jsp");
     }
 
-    @RequiresPermissions(level = AccessLevel.EDIT)
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution browsePages() {
         logger.info("Browse Pages");
         return new ForwardResolution("/layouts/text/browsePages.jsp");
@@ -457,6 +457,7 @@ public class TextAction extends AbstractPageAction {
     }
 
     @Button(list = "manage-attachments", key = "commons.ok", order = 1)
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution save() {
         if(downloadable == null) {
             downloadable = new String[0];

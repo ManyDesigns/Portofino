@@ -263,7 +263,7 @@ public class ChartAction extends AbstractPageAction {
     }
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
-    @RequiresPermissions(level = AccessLevel.EDIT)
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();
         return new ForwardResolution("/layouts/chart/configure.jsp");
@@ -300,7 +300,7 @@ public class ChartAction extends AbstractPageAction {
     }
 
     @Button(list = "configuration", key = "commons.updateConfiguration")
-    @RequiresPermissions(level = AccessLevel.EDIT)
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() {
         synchronized (application) {
             prepareConfigurationForms();

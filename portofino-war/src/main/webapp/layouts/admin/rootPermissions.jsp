@@ -67,6 +67,14 @@
                                             %>>
                                         <fmt:message key="permissions.level.edit" />
                                     </option>
+                                    <option value="<%= AccessLevel.DEVELOP.name() %>"
+                                            <%
+                                                if (AccessLevel.DEVELOP.equals(localAccessLevel)) {
+                                                    out.print("selected='selected'");
+                                                }
+                                            %>>
+                                        <fmt:message key="permissions.level.develop" />
+                                    </option>
                                     <option value="<%= AccessLevel.DENY.name() %>"
                                             <%
                                                 if (AccessLevel.DENY.equals(localAccessLevel)) {

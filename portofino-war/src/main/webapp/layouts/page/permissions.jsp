@@ -110,6 +110,14 @@
                                             %>>
                                         <fmt:message key="permissions.level.edit" />
                                     </option>
+                                    <option value="<%= AccessLevel.DEVELOP.name() %>"
+                                            <%
+                                                if (AccessLevel.DEVELOP.equals(localAccessLevel)) {
+                                                    out.print("selected='selected'");
+                                                }
+                                            %>>
+                                        <fmt:message key="permissions.level.develop" />
+                                    </option>
                                     <option value="<%= AccessLevel.DENY.name() %>"
                                             <%
                                                 if (AccessLevel.DENY.equals(localAccessLevel)) {
@@ -129,7 +137,7 @@
                                                Permissions testConf = new Permissions();
                                                testConf.getActualPermissions()
                                                        .put(groupId, permissions.getActualPermissions().get(groupId));
-                                               testConf.getActualLevels().put(groupId, AccessLevel.EDIT);
+                                               testConf.getActualLevels().put(groupId, AccessLevel.DEVELOP);
                                                PagePermission pagePermission =
                                                        new PagePermission
                                                                (testConf, AccessLevel.NONE, testedPermission);
