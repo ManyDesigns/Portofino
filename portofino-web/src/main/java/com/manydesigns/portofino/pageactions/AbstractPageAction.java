@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
@@ -547,11 +548,13 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     protected void updateScript() {
         File directory = pageInstance.getDirectory();
         File groovyScriptFile = ScriptingUtil.getGroovyScriptFile(directory, "action");
+        FileWriter fw = null;
         try {
+            fw = new FileWriter(groovyScriptFile);
+            fw.write(script);
             Class<?> scriptClass = DispatcherLogic.setActionClass(directory, script);
             if(scriptClass == null) {
                 SessionMessages.addErrorMessage(getMessage("script.class.invalid"));
-                return;
             }
             if(this instanceof GroovyObject) {
                 //Attempt to remove old instance of custom action bean
@@ -572,6 +575,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             String pageId = pageInstance.getPage().getId();
             logger.warn("Couldn't compile script for page " + pageId, e);
             SessionMessages.addErrorMessage(getMessage("script.compile.failed"));
+        } finally {
+            IOUtils.closeQuietly(fw);
         }
     }
 

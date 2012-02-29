@@ -256,23 +256,19 @@ public class DispatcherLogic {
         }
     }
 
-    public static Class<? extends PageAction> setActionClass(File directory, String source) throws IOException {
+    public static Class<? extends PageAction> setActionClass(File directory, String source) {
         File groovyScriptFile =
                 ScriptingUtil.getGroovyScriptFile(directory, "action");
         GroovyClassLoader loader = new GroovyClassLoader();
         Class<? extends PageAction> scriptClass =
                 loader.parseClass(source, groovyScriptFile.getAbsolutePath());
         if(!isValidActionClass(scriptClass)) {
+            actionClassCache.remove(directory);
             return null;
-        }
-        FileWriter fw = new FileWriter(groovyScriptFile);
-        try {
-            fw.write(source);
+        } else {
             actionClassCache.put(directory, scriptClass);
-        } finally {
-            IOUtils.closeQuietly(fw);
+            return scriptClass;
         }
-        return scriptClass;
     }
 
     public static boolean isValidActionClass(Class<?> actionClass) {
