@@ -46,6 +46,7 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.timesheet.configuration.TimesheetConfiguration;
 import com.manydesigns.portofino.pageactions.timesheet.model.*;
@@ -83,6 +84,7 @@ import java.util.regex.Pattern;
  */
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ConfigurationClass(TimesheetConfiguration.class)
+@PageActionName("Timesheet")
 public class TimesheetAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

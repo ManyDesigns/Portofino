@@ -99,4 +99,13 @@ public class PageActionLogic {
             }
         }
     }
+
+    public static String getDescriptionKey(Class<?> actionClass) {
+        PageActionName annotation = actionClass.getAnnotation(PageActionName.class);
+        if(annotation != null) {
+            return annotation.value();
+        } else {
+            return actionClass.getName();
+        }
+    }
 }

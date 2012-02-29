@@ -56,13 +56,8 @@ import com.manydesigns.portofino.model.ModelObject;
 import com.manydesigns.portofino.model.ModelObjectVisitor;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
-import com.manydesigns.portofino.pageactions.calendar.CalendarAction;
-import com.manydesigns.portofino.pageactions.chart.ChartAction;
-import com.manydesigns.portofino.pageactions.crud.CrudAction;
-import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionInfo;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
-import com.manydesigns.portofino.pageactions.text.TextAction;
 import com.manydesigns.portofino.pages.*;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
@@ -124,6 +119,8 @@ public class PageAdminAction extends AbstractActionBean {
     protected String fragment;
     protected String title;
 
+    protected final PageActionRegistry registry = new PageActionRegistry();
+
     @After(stages = LifecycleStage.BindingAndValidation) //Cosi' puo' influenzare SecurityInterceptor (dispatch)
     public void prepare() {
         Application application =
@@ -140,6 +137,19 @@ public class PageAdminAction extends AbstractActionBean {
             throw new Error("Couldn't instantiate action", e);
         }
         context.getRequest().setAttribute(RequestAttributes.DISPATCH, dispatch);
+
+        List<String> knownPageActions = application.getPortofinoProperties().getList("pageactions");
+        for(String pageAction : knownPageActions) {
+            tryToRegisterPageAction(pageAction);
+        }
+    }
+
+    protected void tryToRegisterPageAction(String className) {
+        try {
+            registry.register(Class.forName(className));
+        } catch (Exception e) {
+            logger.warn("{} class not found, page not available", className);
+        }
     }
 
     protected String getMessage(String key, Object... args) {
@@ -557,28 +567,8 @@ public class PageAdminAction extends AbstractActionBean {
 
     }
 
-    protected static final PageActionRegistry registry = new PageActionRegistry();
-
-    static {
-        registry.register(CrudAction.class, "Crud");
-        registry.register(ChartAction.class, "Chart");
-        registry.register(TextAction.class, "Text");
-        registry.register(CustomAction.class, "Custom");
-        registry.register(CalendarAction.class, "Calendar");
-        tryToRegister("com.manydesigns.portofino.pageactions.timesheet.TimesheetAction", "Timesheet");
-        tryToRegister("com.manydesigns.portofino.pageactions.jsgantt.JsGanttAction", "jsGantt");
-        tryToRegister("com.manydesigns.portofino.pageactions.treeview.TreeViewAction", "Tree View");
-    }
-
-    private static void tryToRegister(String className, String friendlyName) {
-        try {
-            registry.register(Class.forName(className), friendlyName);
-        } catch (Exception e) {
-            logger.warn("{} class not found, {} page not available", className, friendlyName);
-        }
-    }
-
     private void prepareNewPageForm() {
+        application.getPortofinoProperties().getProperties("");
         DefaultSelectionProvider classSelectionProvider = new DefaultSelectionProvider("actionClassName");
         for(PageActionInfo info : registry) {
             classSelectionProvider.appendRow(info.actionClass.getName(), info.description, true);

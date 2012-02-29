@@ -48,7 +48,8 @@ public class PageActionRegistry implements Iterable<PageActionInfo> {
 
     protected final List<PageActionInfo> registry = new CopyOnWriteArrayList<PageActionInfo>();
 
-    public PageActionInfo register(Class<?> actionClass, String descriptionKey) {
+    public PageActionInfo register(Class<?> actionClass) {
+        String descriptionKey = PageActionLogic.getDescriptionKey(actionClass);
         Class<?> configurationClass = PageActionLogic.getConfigurationClass(actionClass);
         String scriptTemplate = PageActionLogic.getScriptTemplate(actionClass);
         boolean supportsDetail = PageActionLogic.supportsDetail(actionClass);

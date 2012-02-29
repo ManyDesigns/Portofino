@@ -35,6 +35,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.treeview.configuration.TreeViewConfiguration;
 import com.manydesigns.portofino.pageactions.treeview.model.Node;
@@ -53,6 +54,7 @@ import org.slf4j.LoggerFactory;
  */
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ConfigurationClass(TreeViewConfiguration.class)
+@PageActionName("TreeView")
 public class TreeViewAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

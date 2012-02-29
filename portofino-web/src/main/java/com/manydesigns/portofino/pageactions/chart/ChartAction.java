@@ -43,6 +43,7 @@ import com.manydesigns.portofino.chart.ChartGenerator;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.chart.configuration.ChartConfiguration;
@@ -72,6 +73,7 @@ import java.util.Properties;
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ScriptTemplate("script_template.txt")
 @ConfigurationClass(ChartConfiguration.class)
+@PageActionName("Chart")
 public class ChartAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

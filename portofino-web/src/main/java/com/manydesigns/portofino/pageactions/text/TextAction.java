@@ -34,6 +34,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.text.configuration.Attachment;
@@ -63,6 +64,7 @@ import java.util.regex.Pattern;
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ScriptTemplate("script_template.txt")
 @ConfigurationClass(TextConfiguration.class)
+@PageActionName("Text")
 public class TextAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

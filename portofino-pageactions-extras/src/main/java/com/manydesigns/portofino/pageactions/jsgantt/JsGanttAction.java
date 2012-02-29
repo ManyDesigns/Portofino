@@ -36,6 +36,7 @@ import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.jsgantt.configuration.JsGanttConfiguration;
 import com.manydesigns.portofino.pageactions.jsgantt.model.ProjectModel;
@@ -57,6 +58,7 @@ import org.slf4j.LoggerFactory;
  */
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ConfigurationClass(JsGanttConfiguration.class)
+@PageActionName("jsGantt")
 public class JsGanttAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
