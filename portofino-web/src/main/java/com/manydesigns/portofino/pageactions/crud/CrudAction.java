@@ -100,6 +100,7 @@ import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 import org.hibernate.Session;
+import org.hibernate.exception.ConstraintViolationException;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONStringer;
@@ -615,10 +616,13 @@ public class CrudAction extends AbstractPageAction {
         if (form.validate()) {
             form.writeToObject(object);
             if(createValidate(object)) {
-                session.save(baseTable.getActualEntityName(), object);
-                createPostProcess(object);
                 try {
+                    session.save(baseTable.getActualEntityName(), object);
+                    createPostProcess(object);
                     session.getTransaction().commit();
+                } catch(ConstraintViolationException e) {
+                    SessionMessages.addErrorMessage(getMessage("crud.constraintViolation"));
+                    return getCreateView();
                 } catch (Throwable e) {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
@@ -669,10 +673,13 @@ public class CrudAction extends AbstractPageAction {
         if (form.validate()) {
             form.writeToObject(object);
             if(editValidate(object)) {
-                session.update(baseTable.getActualEntityName(), object);
-                editPostProcess(object);
                 try {
+                    session.update(baseTable.getActualEntityName(), object);
+                    editPostProcess(object);
                     session.getTransaction().commit();
+                } catch(ConstraintViolationException e) {
+                    SessionMessages.addErrorMessage(getMessage("crud.constraintViolation"));
+                    return getEditView();
                 } catch (Throwable e) {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
