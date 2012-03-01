@@ -107,7 +107,7 @@
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
 
-     <filter>
+    <filter>
         <description>Dynamically maps URLs to ActionBeans.</description>
         <display-name>Stripes Dynamic Mapping Filter</display-name>
         <filter-name>DynamicMappingFilter</filter-name>
