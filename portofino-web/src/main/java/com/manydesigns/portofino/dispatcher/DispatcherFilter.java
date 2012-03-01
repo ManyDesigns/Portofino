@@ -35,11 +35,9 @@ import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.i18n.MultipleTextProvider;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.starter.ApplicationStarter;
-import com.manydesigns.portofino.i18n.MultipleTextProvider;
-import net.sourceforge.stripes.controller.StripesFilter;
-import net.sourceforge.stripes.localization.LocalePicker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,9 +94,7 @@ public class DispatcherFilter implements Filter {
             request.setAttribute(RequestAttributes.MODEL, model);
 
             //I18n
-            LocalePicker localePicker = StripesFilter.getConfiguration().getLocalePicker();
-            //Use the same algorithm as Stripes
-            Locale locale = localePicker.pickLocale((HttpServletRequest) request);
+            Locale locale = request.getLocale();
             LocalizationContext localizationContext =
                     new LocalizationContext(application.getBundle(locale), locale);
             request.setAttribute(Config.FMT_LOCALIZATION_CONTEXT + ".request", localizationContext);
