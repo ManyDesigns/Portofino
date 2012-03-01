@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+  <id>extras-evaluation-bin</id>
+  <formats>
+    <format>tar.gz</format>
+    <format>zip</format>
+  </formats>
+  <files>
+    <file>
+      <source>EVALUATION-LICENSE.txt</source>
+      <outputDirectory></outputDirectory>
+      <destName>EVALUATION-LICENSE.txt</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>THIRDPARTIES.txt</source>
+      <outputDirectory></outputDirectory>
+      <destName>THIRDPARTIES.txt</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-pageactions-extras/target/portofino-pageactions-extras-${project.version}.war</source>
+      <outputDirectory></outputDirectory>
+      <destName>portofino-pageactions-extras-${project.version}.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+  </files>
+</assembly>
