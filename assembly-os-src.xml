@@ -55,12 +55,6 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>portofino-pageactions-extras/pom.xml</source>
-      <outputDirectory>portofino-pageactions-extras</outputDirectory>
-      <destName>pom.xml</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
       <source>portofino-war/pom.xml</source>
       <outputDirectory>portofino-war</outputDirectory>
       <destName>pom.xml</destName>
@@ -83,8 +77,15 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>portofino-jar/src/main</directory>
-      <outputDirectory>portofino-jar/src/main</outputDirectory>
+      <directory>portofino-core/src/main</directory>
+      <outputDirectory>portofino-core/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-web/src/main</directory>
+      <outputDirectory>portofino-web/src/main</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -92,6 +93,13 @@
     <fileSet>
       <directory>portofino-war/src/main</directory>
       <outputDirectory>portofino-war/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>mail/src/main</directory>
+      <outputDirectory>mail/src/main</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
