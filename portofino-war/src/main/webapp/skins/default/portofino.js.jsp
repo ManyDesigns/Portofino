@@ -103,37 +103,38 @@ function showCopyPageDialog(pagePath, contextPath) {
     return false;
 }
 
-$(function() {
-    var decorateButton = function(selector, options) {
+var portofino = {
+    decorateButton: function(selector, options) {
         $(selector).each(function(index, element) {
             element = $(element);
             element.html(element.find('.ui-button-text').html());
             element.button(options);
         });
-    };
+    },
 
-    var decorateIconButton = function(selector, icon) {
-        decorateButton(selector, {
+    decorateIconButton: function(selector, icon) {
+        portofino.decorateButton(selector, {
             icons: {
                 primary: icon
             },
             text: false
         });
-    };
+    }
+};
 
-    decorateButton("button.contentButton");
-    decorateButton("button.portletButton");
+$(function() {
+    portofino.decorateButton("button.contentButton");
+    portofino.decorateButton("button.portletButton");
 
-    decorateIconButton("button.arrow-4", "ui-icon-arrow-4");
-    decorateIconButton("button.refresh", "ui-icon-refresh");
-    decorateIconButton("button.person", "ui-icon-person");
-    decorateIconButton("button.copy", "ui-icon-copy");
-    decorateIconButton("button.plusthick", "ui-icon-plusthick");
-    decorateIconButton("button.minusthick", "ui-icon-minusthick");
-    decorateIconButton("button.transferthick-e-w", "ui-icon-transferthick-e-w");
-    decorateIconButton("button.folder-open", "ui-icon-folder-open");
-    decorateIconButton(".portletHeaderButtons button[name=configure]", "ui-icon-wrench");
-    decorateIconButton(".portletHeaderButtons button[name=manageAttachments]", "ui-icon-link");
+    portofino.decorateIconButton("button.arrow-4", "ui-icon-arrow-4");
+    portofino.decorateIconButton("button.refresh", "ui-icon-refresh");
+    portofino.decorateIconButton("button.person", "ui-icon-person");
+    portofino.decorateIconButton("button.copy", "ui-icon-copy");
+    portofino.decorateIconButton("button.plusthick", "ui-icon-plusthick");
+    portofino.decorateIconButton("button.minusthick", "ui-icon-minusthick");
+    portofino.decorateIconButton("button.transferthick-e-w", "ui-icon-transferthick-e-w");
+    portofino.decorateIconButton("button.folder-open", "ui-icon-folder-open");
+    portofino.decorateIconButton(".portletHeaderButtons button[name=configure]", "ui-icon-wrench");
 });
 
 function enablePortletDragAndDrop(button) {

@@ -17,6 +17,7 @@
 <%@ tag import="com.manydesigns.portofino.dispatcher.PageInstance" %>
 <%@ tag import="org.apache.shiro.subject.Subject" %>
 <%@ tag import="org.apache.shiro.SecurityUtils" %>
+<%@ tag import="java.util.UUID" %>
 
 <%@ attribute name="list" required="true" %>
 <%@ attribute name="cssClass" required="false" %>
@@ -46,12 +47,17 @@
                 continue;
             }
             XhtmlBuffer buffer = new XhtmlBuffer(out);
+            Button theButton = button.getButton();
+            boolean hasIcon = !StringUtils.isBlank(theButton.icon());
             buffer.openElement("button");
+            String id = UUID.randomUUID().toString();
+            if(hasIcon) {
+                buffer.addAttribute("id", id);
+            }
             if(!ButtonsLogic.doGuardsPass(actionBean, handler, GuardType.ENABLED)) {
                 buffer.addAttribute("disabled", "disabled");
             }
             buffer.addAttribute("name", handler.getName());
-            Button theButton = button.getButton();
             %>
                 <fmt:message key="<%= theButton.key() %>" var="__buttonValue" scope="page" />
             <%
@@ -62,7 +68,6 @@
             if(cssClass != null) {
                 actualCssClass += cssClass;
             }
-            boolean hasIcon = !StringUtils.isBlank(theButton.icon());
             if(hasIcon) {
                 actualCssClass += " ui-button-icon-only";
             } else {
@@ -79,6 +84,13 @@
             buffer.write(value);
             buffer.closeElement("span");
             buffer.closeElement("button");
+            if(hasIcon) {
+                %><script type="text/javascript">
+                    $(function() {
+                        portofino.decorateIconButton("#<%= id %>", "<%= theButton.icon() %>");
+                    });
+                </script><%
+            }
         }
     }
 %>

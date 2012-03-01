@@ -17,6 +17,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.model.Model;
@@ -24,8 +25,8 @@ import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.pages.*;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
-import com.manydesigns.portofino.stripes.ModelActionResolver;
 import com.manydesigns.portofino.security.RequiresPermissions;
+import com.manydesigns.portofino.stripes.ModelActionResolver;
 import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
@@ -264,7 +265,9 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return layoutName;
     }
 
-    @Button(list = "configuration", key = "commons.cancel", order = 99)
+    @Buttons({
+        @Button(list = "configuration", key = "commons.cancel", order = 99),
+        @Button(list = "edit-content",  key = "commons.cancel", order = 99)})
     public Resolution cancel() {
         return new RedirectResolution(getCancelReturnUrl(), false);
     }

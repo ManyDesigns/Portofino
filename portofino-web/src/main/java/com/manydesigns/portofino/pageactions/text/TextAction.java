@@ -271,9 +271,8 @@ public class TextAction extends AbstractPageAction {
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
     @RequiresPermissions(level = AccessLevel.DEVELOP)
-    public Resolution configure() throws IOException {
+    public Resolution configure() {
         prepareConfigurationForms();
-        loadContent();
         return new ForwardResolution("/layouts/text/configure.jsp");
     }
 
@@ -285,8 +284,6 @@ public class TextAction extends AbstractPageAction {
         boolean valid = validatePageConfiguration();
         if (valid) {
             updatePageConfiguration();
-            saveContent();
-
             SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
             return cancel();
         } else {
@@ -415,11 +412,33 @@ public class TextAction extends AbstractPageAction {
         return new ForwardResolution("/layouts/text/browsePages.jsp");
     }
 
-    @Button(list = "portletHeaderButtons", key = "layouts.text.manage-attachments.manage_attachments_for_page", order = 2, icon = "ui-icon-link")
+    @Button(list = "portletHeaderButtons", key = "layouts.text.manage-attachments.manage_attachments_for_page", order = 3, icon = "ui-icon-link")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution manageAttachments() {
         logger.info("Manage attachments");
         return new ForwardResolution("/layouts/text/manage-attachments.jsp");
+    }
+
+    @Button(list = "portletHeaderButtons", key = "layouts.text.edit", order = 2, icon = "ui-icon-document")
+    @RequiresPermissions(level = AccessLevel.EDIT)
+    public Resolution editContent() throws IOException {
+        try {
+            loadContent();
+            logger.info("Edit content");
+            return new ForwardResolution("/layouts/text/edit-content.jsp");
+        } catch (IOException e) {
+            logger.error("Could not load content", e);
+            SessionMessages.addErrorMessage("Could not load content: " + e);
+            return execute();
+        }
+    }
+
+    @Button(list = "edit-content", key = "commons.update")
+    @RequiresPermissions(level = AccessLevel.EDIT)
+    public Resolution updateContent() throws IOException {
+        saveContent();
+        SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
+        return cancel();
     }
 
     @RequiresPermissions(level = AccessLevel.EDIT)
