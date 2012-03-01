@@ -702,8 +702,7 @@ public class CrudAction extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkEdit() {
         if (selection == null || selection.length == 0) {
-            SessionMessages.addWarningMessage(
-                    "Nessun oggetto selezionato");
+            SessionMessages.addWarningMessage(getMessage("commons.bulkUpdate.nothingSelected"));
             return new RedirectResolution(cancelReturnUrl, false);
         }
 
@@ -785,8 +784,7 @@ public class CrudAction extends AbstractPageAction {
     public Resolution bulkDelete() {
         int deleted = 0;
         if (selection == null) {
-            SessionMessages.addWarningMessage(
-                    "DELETE non avvenuto: nessun oggetto selezionato");
+            SessionMessages.addWarningMessage(getMessage("commons.bulkDelete.nothingSelected"));
             return new RedirectResolution(appendSearchStringParamIfNecessary(dispatch.getOriginalPath()));
         }
         for (String current : selection) {
