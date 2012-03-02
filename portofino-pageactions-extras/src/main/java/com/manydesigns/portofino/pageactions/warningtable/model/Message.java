@@ -42,7 +42,7 @@ public class Message {
     public Message() {
     }
 
-    public Message(Color level, String message, String title) {
+    public Message(Color level, String title, String message) {
         this.level = level;
         this.message = message;
         this.title = title;
