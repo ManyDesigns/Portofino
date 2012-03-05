@@ -63,19 +63,6 @@
     </filter-mapping>
 
     <filter>
-        <filter-name>portofino-dispatcher</filter-name>
-        <filter-class>
-            com.manydesigns.portofino.dispatcher.DispatcherFilter
-        </filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>portofino-dispatcher</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
-    </filter-mapping>
-
-    <filter>
         <filter-name>UrlRewriteFilter</filter-name>
         <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
 
@@ -108,11 +95,11 @@
     </filter-mapping>
 
     <filter>
-        <description>Dynamically maps URLs to ActionBeans.</description>
-        <display-name>Stripes Dynamic Mapping Filter</display-name>
-        <filter-name>DynamicMappingFilter</filter-name>
+        <description>Stripes Filter</description>
+        <display-name>Stripes Filter</display-name>
+        <filter-name>StripesFilter</filter-name>
         <filter-class>
-          net.sourceforge.stripes.controller.DynamicMappingFilter
+          net.sourceforge.stripes.controller.StripesFilter
         </filter-class>
         <init-param>
 			<param-name>ActionResolver.Class</param-name>
@@ -140,6 +127,36 @@
             <param-name>LocalePicker.Locales</param-name>
             <param-value>it,en</param-value>
         </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>StripesFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>portofino-dispatcher</filter-name>
+        <filter-class>
+            com.manydesigns.portofino.dispatcher.DispatcherFilter
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>portofino-dispatcher</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+
+    <filter>
+        <description>Dynamically maps URLs to ActionBeans.</description>
+        <display-name>Stripes Dynamic Mapping Filter</display-name>
+        <filter-name>DynamicMappingFilter</filter-name>
+        <filter-class>
+          net.sourceforge.stripes.controller.DynamicMappingFilter
+        </filter-class>
     </filter>
 
     <filter-mapping>
