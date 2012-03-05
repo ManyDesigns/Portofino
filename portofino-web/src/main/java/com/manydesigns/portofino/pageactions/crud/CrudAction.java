@@ -339,11 +339,7 @@ public class CrudAction extends AbstractPageAction {
     @DefaultHandler
     public Resolution execute() {
         if (object == null) {
-            if(isEmbedded()) {
-                return embeddedSearch();
-            } else {
-                return doSearch();
-            }
+            return doSearch();
         } else {
             return read();
         }
@@ -363,12 +359,6 @@ public class CrudAction extends AbstractPageAction {
     }
 
     protected Resolution doSearch() {
-        cancelReturnUrl = new UrlBuilder(
-                    context.getLocale(), dispatch.getAbsoluteOriginalPath(), false)
-                    .toString();
-        cancelReturnUrl = appendSearchStringParamIfNecessary(cancelReturnUrl);
-        setupReturnToParentTarget();
-
         if (classAccessor == null) {
             logger.debug("Crud not correctly configured");
             return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
@@ -379,28 +369,19 @@ public class CrudAction extends AbstractPageAction {
 //            loadObjects();
             setupTableForm(Mode.VIEW);
 
-
-            return getSearchView();
+            if(isEmbedded()) {
+                return getEmbeddedSearchView();
+            } else {
+                cancelReturnUrl = new UrlBuilder(
+                    context.getLocale(), dispatch.getAbsoluteOriginalPath(), false)
+                    .toString();
+                cancelReturnUrl = appendSearchStringParamIfNecessary(cancelReturnUrl);
+                setupReturnToParentTarget();
+                return getSearchView();
+            }
         } catch(Exception e) {
             logger.warn("Crud not correctly configured", e);
             return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
-        }
-    }
-
-    public Resolution embeddedSearch() {
-        if (classAccessor == null) {
-            logger.debug("Crud not correctly configured");
-            return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
-        }
-
-        try {
-            loadObjects();
-            setupTableForm(Mode.VIEW);
-            tableForm.setSelectable(false);
-            return getEmbeddedSearchView();
-        } catch(Exception e) {
-            logger.error("Crud not correctly configured", e);
-            return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
         }
     }
 
@@ -1850,7 +1831,8 @@ public class CrudAction extends AbstractPageAction {
     }
 
     protected Resolution getEmbeddedSearchView() {
-        return new ForwardResolution("/layouts/crud/embedded-search.jsp");
+        return new ForwardResolution("/layouts/crud/search.jsp");
+        //return new ForwardResolution("/layouts/crud/embedded-search.jsp");
     }
 
     //**************************************************************************
