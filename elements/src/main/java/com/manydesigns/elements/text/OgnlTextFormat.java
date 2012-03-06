@@ -29,12 +29,17 @@
 
 package com.manydesigns.elements.text;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
+import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -53,6 +58,8 @@ public class OgnlTextFormat
     //**************************************************************************
 
     protected boolean url = false;
+    protected String encoding = "ISO-8859-1";
+    protected Locale locale;
 
     public static final Logger logger =
             LoggerFactory.getLogger(OgnlTextFormat.class);
@@ -87,10 +94,20 @@ public class OgnlTextFormat
         for (int i = 0; i < args.length; i++) {
             Object arg = args[i];
             String argString = (String) OgnlUtils.convertValue(arg, String.class);
-            argStrings[i] = url ? Util.urlencode(argString) : argString;
+            try {
+                argStrings[i] = url ? URLEncoder.encode(argString, encoding) : argString;
+            } catch (UnsupportedEncodingException e) {
+                throw new Error(e);
+            }
         }
 
-        String result = MessageFormat.format(getFormatString(), (Object[]) argStrings);
+        Locale locale = this.locale;
+        if(locale == null) {
+            HttpServletRequest req =
+                ElementsThreadLocals.getHttpServletRequest();
+            locale = req.getLocale();
+        }
+        String result = new MessageFormat(getFormatString(), locale).format(argStrings);
 
         if (url) {
             result = Util.getAbsoluteUrl(result);
@@ -122,5 +139,21 @@ public class OgnlTextFormat
 
     public void setUrl(boolean url) {
         this.url = url;
+    }
+
+    public String getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
+
+    public Locale getLocale() {
+        return locale;
+    }
+
+    public void setLocale(Locale locale) {
+        this.locale = locale;
     }
 }

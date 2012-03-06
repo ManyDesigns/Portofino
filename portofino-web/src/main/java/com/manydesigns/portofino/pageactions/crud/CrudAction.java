@@ -527,9 +527,11 @@ public class CrudAction extends AbstractPageAction {
                 if (field instanceof FileBlobField) {
                     if(baseUrl == null) {
                         String readLinkExpression = getReadLinkExpression();
+                        String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
                         OgnlTextFormat hrefFormat =
                                 OgnlTextFormat.create(readLinkExpression);
                         hrefFormat.setUrl(true);
+                        hrefFormat.setEncoding(encoding);
                         baseUrl = hrefFormat.format(obj);
                     }
 
@@ -611,7 +613,7 @@ public class CrudAction extends AbstractPageAction {
                     return getCreateView();
                 }
                 pk = pkHelper.generatePkStringArray(object);
-                String url = dispatch.getOriginalPath() + "/" + StringUtils.join(pk, "/");
+                String url = dispatch.getOriginalPath() + "/" + getPkForUrl(pk);
                 XhtmlBuffer buffer = new XhtmlBuffer();
                 buffer.write(getMessage("commons.save.successful") + ". ");
                 String createUrl = dispatch.getAbsoluteOriginalPath();
@@ -629,6 +631,19 @@ public class CrudAction extends AbstractPageAction {
         }
 
         return getCreateView();
+    }
+
+    protected String getPkForUrl(String[] pk) {
+        String[] escapedPk = new String[pk.length];
+        String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
+        try {
+            for(int i = 0; i < pk.length; i++) {
+                escapedPk[i] = URLEncoder.encode(pk[i], encoding);
+            }
+        } catch (UnsupportedEncodingException e) {
+            throw new Error(e);
+        }
+        return StringUtils.join(escapedPk, "/");
     }
 
     //**************************************************************************
@@ -689,7 +704,7 @@ public class CrudAction extends AbstractPageAction {
 
         if (selection.length == 1) {
             pk = selection[0].split("/");
-            String url = dispatch.getOriginalPath() + "/" + StringUtils.join(pk, "/");
+            String url = dispatch.getOriginalPath() + "/" + getPkForUrl(pk);
             return new RedirectResolution(url)
                     .addParameter("cancelReturnUrl", cancelReturnUrl)
                     .addParameter("edit");
@@ -945,8 +960,10 @@ public class CrudAction extends AbstractPageAction {
     protected String calculateBaseSearchUrl() {
         assert pk != null; //Ha senso solo in modalita' read/detail
         String baseUrl = dispatch.getAbsoluteOriginalPath();
-        int lastSlashIndex = baseUrl.lastIndexOf('/');
-        baseUrl = baseUrl.substring(0, lastSlashIndex);
+        for(int i = 0; i < pk.length; i++) {
+            int lastSlashIndex = baseUrl.lastIndexOf('/');
+            baseUrl = baseUrl.substring(0, lastSlashIndex);
+        }
         return baseUrl;
     }
 
@@ -957,7 +974,7 @@ public class CrudAction extends AbstractPageAction {
 
     protected String generateObjectUrl(String baseUrl, Object o) {
         String[] objPk = pkHelper.generatePkStringArray(o);
-        String url = baseUrl + "/" + StringUtils.join(objPk, "/");
+        String url = baseUrl + "/" + getPkForUrl(objPk);
         return new UrlBuilder(
                 Locale.getDefault(), appendSearchStringParamIfNecessary(url), false)
                 .toString();
@@ -1053,6 +1070,8 @@ public class CrudAction extends AbstractPageAction {
         OgnlTextFormat hrefFormat =
                 OgnlTextFormat.create(readLinkExpression);
         hrefFormat.setUrl(true);
+        String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
+        hrefFormat.setEncoding(encoding);
 
         TableFormBuilder tableFormBuilder = new TableFormBuilder(classAccessor);
 
@@ -1124,7 +1143,7 @@ public class CrudAction extends AbstractPageAction {
             if (first) {
                 first = false;
             } else {
-                sb.append(",");
+                sb.append("/");
             }
             sb.append("%{");
             sb.append(property.getName());
@@ -1204,7 +1223,15 @@ public class CrudAction extends AbstractPageAction {
         session = application.getSession(crudConfiguration.getDatabase());
         List<String> parameters = pageInstance.getParameters();
         if(!parameters.isEmpty()) {
+            String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
             pk = parameters.toArray(new String[parameters.size()]);
+            try {
+                for(int i = 0; i < pk.length; i++) {
+                    pk[i] = URLDecoder.decode(pk[i], encoding);
+                }
+            } catch (UnsupportedEncodingException e) {
+                throw new Error(e);
+            }
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
 
             Serializable pkObject;

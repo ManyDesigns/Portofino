@@ -56,6 +56,12 @@ public class CustomTypeConverter implements TypeConverter {
         if ((toType == Timestamp.class) && (value instanceof Date)) {
             Date thisValue = (Date) value;
             return new Timestamp(thisValue.getTime());
+        } else if ((toType == Timestamp.class) && (value instanceof String)) {
+            try {
+                return Timestamp.valueOf((String) value);
+            } catch (Exception e) {
+                return throwFailedConversion(value, toType, e);
+            }
         } else if ((toType == Time.class) && (value instanceof Date)) {
             Date thisValue = (Date) value;
             return new Time(thisValue.getTime());
@@ -65,10 +71,14 @@ public class CustomTypeConverter implements TypeConverter {
             try {
                 return Class.forName((String) value);
             } catch (Exception e) {
-                throw new IllegalArgumentException("Unable to convert type " + value.getClass().getName() + " of " + value + " to type of " + toType.getName(), e);
+                return throwFailedConversion(value, toType, e);
             }
         } else {
             return conv.convertValue(context, target, member, propertyName, value, toType);
         }
+    }
+
+    private Object throwFailedConversion(Object value, Class toType, Exception e) {
+        throw new IllegalArgumentException("Unable to convert type " + value.getClass().getName() + " of " + value + " to type of " + toType.getName(), e);
     }
 }

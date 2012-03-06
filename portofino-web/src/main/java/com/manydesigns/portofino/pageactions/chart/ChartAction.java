@@ -76,7 +76,7 @@ import java.util.Properties;
 @PageActionName("Chart")
 public class ChartAction extends AbstractPageAction {
     public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+            "Copyright (c) 2005-2012, ManyDesigns srl";
 
     //**************************************************************************
     // Constants
