@@ -770,9 +770,8 @@ public class CrudAction extends AbstractPageAction {
                 SessionMessages.addErrorMessage(rootCauseMessage);
             }
         }
-        int lastSlashPos = dispatch.getOriginalPath().lastIndexOf("/");
-        String url = dispatch.getOriginalPath().substring(0, lastSlashPos);
-        return new RedirectResolution(appendSearchStringParamIfNecessary(url));
+        String url = calculateBaseSearchUrl();
+        return new RedirectResolution(appendSearchStringParamIfNecessary(url), false);
     }
 
     @Button(list = "crud-search", key = "commons.delete", order = 3)
