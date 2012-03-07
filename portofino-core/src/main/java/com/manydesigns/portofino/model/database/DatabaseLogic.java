@@ -188,6 +188,16 @@ public class DatabaseLogic {
         return null;
     }
 
+    public static Column findColumnByPropertyName(Table table, String propertyName) {
+        for (Column column : table.getColumns()) {
+            if (column.getActualPropertyName().equals(propertyName)) {
+                return column;
+            }
+        }
+        logger.debug("Property {} not found in {}", propertyName, table);
+        return null;
+    }
+
     public static @Nullable Column findColumnByQualifiedName(
             Model model, String qualifiedColumnName) {
         int lastDot = qualifiedColumnName.lastIndexOf(".");

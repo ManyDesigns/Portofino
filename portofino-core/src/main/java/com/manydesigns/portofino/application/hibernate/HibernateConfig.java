@@ -758,7 +758,7 @@ public class HibernateConfig {
         prop.setName(relationship.getActualOnePropertyName());
         prop.setNodeName(relationship.getActualOnePropertyName());
         prop.setValue(m2o);
-        prop.setCascade("all");
+        prop.setCascade("none"); //TODO era "all", capire
         prop.setInsertable(false);
         prop.setUpdateable(false);
         clazz.addProperty(prop);

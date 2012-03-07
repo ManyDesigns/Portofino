@@ -39,6 +39,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -88,12 +90,6 @@ public class PkHelper {
         return OgnlTextFormat.create(sb.toString());
     }
 
-    public Serializable parsePkString(String pkString) {
-        String[] pkList = StringUtils.split(pkString, ",");
-
-        return getPrimaryKey(pkList);
-    }
-
     public Serializable getPrimaryKey(String... params) {
         int i = 0;
         Serializable result = (Serializable)classAccessor.newInstance();
@@ -121,6 +117,18 @@ public class PkHelper {
             array[i] = stringValue;
         }
         return array;
+    }
+
+    public String getPkStringForUrl(Object o, String encoding) throws UnsupportedEncodingException {
+        return getPkStringForUrl(generatePkStringArray(o), encoding);
+    }
+
+    public String getPkStringForUrl(String[] pk, String encoding) throws UnsupportedEncodingException {
+        String[] escapedPk = new String[pk.length];
+        for(int i = 0; i < pk.length; i++) {
+            escapedPk[i] = URLEncoder.encode(pk[i], encoding);
+        }
+        return StringUtils.join(escapedPk, "/");
     }
 
 }

@@ -77,86 +77,86 @@ public class QueryTest extends TestCase {
         TableCriteria criteria = new TableCriteria(new FakeTable());
 
         QueryStringWithParameters query = QueryUtils.mergeQuery("from test", criteria, null);
-        assertEquals(0, query.getParamaters().length);
+        assertEquals(0, query.getParameters().length);
         assertEquals("FROM test", query.getQueryString());
 
         query = QueryUtils.mergeQuery("select foo, bar from test", criteria, null);
-        assertEquals(0, query.getParamaters().length);
+        assertEquals(0, query.getParameters().length);
         assertEquals("SELECT foo, bar FROM test", query.getQueryString());
 
         query = QueryUtils.mergeQuery("from test where a = b", criteria, null);
-        assertEquals(0, query.getParamaters().length);
+        assertEquals(0, query.getParameters().length);
         assertEquals("FROM test WHERE a = b", query.getQueryString());
 
         query = QueryUtils.mergeQuery("select foo, bar from test where a = b", criteria, null);
-        assertEquals(0, query.getParamaters().length);
+        assertEquals(0, query.getParameters().length);
         assertEquals("SELECT foo, bar FROM test WHERE a = b", query.getQueryString());
 
         PropertyAccessor propertyAccessor = new ColumnAccessor(new FakeColumn(), false, false, null);
         criteria.eq(propertyAccessor, 42);
 
         query = QueryUtils.mergeQuery("from test", criteria, null);
-        assertEquals(1, query.getParamaters().length);
-        assertEquals(42, query.getParamaters()[0]);
+        assertEquals(1, query.getParameters().length);
+        assertEquals(42, query.getParameters()[0]);
         assertEquals("FROM test WHERE test = ?", query.getQueryString());
 
         query = QueryUtils.mergeQuery("select foo, bar from test", criteria, null);
-        assertEquals(1, query.getParamaters().length);
-        assertEquals(42, query.getParamaters()[0]);
+        assertEquals(1, query.getParameters().length);
+        assertEquals(42, query.getParameters()[0]);
         assertEquals("SELECT foo, bar FROM test WHERE test = ?", query.getQueryString());
 
         query = QueryUtils.mergeQuery("from test where a = b", criteria, null);
-        assertEquals(1, query.getParamaters().length);
-        assertEquals(42, query.getParamaters()[0]);
+        assertEquals(1, query.getParameters().length);
+        assertEquals(42, query.getParameters()[0]);
         assertEquals("FROM test WHERE a = b AND test = ?", query.getQueryString());
 
         query = QueryUtils.mergeQuery("select foo, bar from test where a = b", criteria, null);
-        assertEquals(1, query.getParamaters().length);
-        assertEquals(42, query.getParamaters()[0]);
+        assertEquals(1, query.getParameters().length);
+        assertEquals(42, query.getParameters()[0]);
         assertEquals("SELECT foo, bar FROM test WHERE a = b AND test = ?", query.getQueryString());
 
         criteria.orderBy(propertyAccessor, Criteria.OrderBy.ASC);
 
         query = QueryUtils.mergeQuery("from test", criteria, null);
-        assertEquals(1, query.getParamaters().length);
-        assertEquals(42, query.getParamaters()[0]);
+        assertEquals(1, query.getParameters().length);
+        assertEquals(42, query.getParameters()[0]);
         assertEquals("FROM test WHERE test = ? ORDER BY test", query.getQueryString());
 
         query = QueryUtils.mergeQuery("select foo, bar from test", criteria, null);
-        assertEquals(1, query.getParamaters().length);
-        assertEquals(42, query.getParamaters()[0]);
+        assertEquals(1, query.getParameters().length);
+        assertEquals(42, query.getParameters()[0]);
         assertEquals("SELECT foo, bar FROM test WHERE test = ? ORDER BY test", query.getQueryString());
 
         query = QueryUtils.mergeQuery("from test where a = b", criteria, null);
-        assertEquals(1, query.getParamaters().length);
-        assertEquals(42, query.getParamaters()[0]);
+        assertEquals(1, query.getParameters().length);
+        assertEquals(42, query.getParameters()[0]);
         assertEquals("FROM test WHERE a = b AND test = ? ORDER BY test", query.getQueryString());
 
         query = QueryUtils.mergeQuery("select foo, bar from test where a = b", criteria, null);
-        assertEquals(1, query.getParamaters().length);
-        assertEquals(42, query.getParamaters()[0]);
+        assertEquals(1, query.getParameters().length);
+        assertEquals(42, query.getParameters()[0]);
         assertEquals("SELECT foo, bar FROM test WHERE a = b AND test = ? ORDER BY test", query.getQueryString());
 
         criteria.orderBy(propertyAccessor, Criteria.OrderBy.DESC);
 
         query = QueryUtils.mergeQuery("from test", criteria, null);
-        assertEquals(1, query.getParamaters().length);
-        assertEquals(42, query.getParamaters()[0]);
+        assertEquals(1, query.getParameters().length);
+        assertEquals(42, query.getParameters()[0]);
         assertEquals("FROM test WHERE test = ? ORDER BY test DESC", query.getQueryString());
 
         query = QueryUtils.mergeQuery("select foo, bar from test", criteria, null);
-        assertEquals(1, query.getParamaters().length);
-        assertEquals(42, query.getParamaters()[0]);
+        assertEquals(1, query.getParameters().length);
+        assertEquals(42, query.getParameters()[0]);
         assertEquals("SELECT foo, bar FROM test WHERE test = ? ORDER BY test DESC", query.getQueryString());
 
         query = QueryUtils.mergeQuery("from test where a = b", criteria, null);
-        assertEquals(1, query.getParamaters().length);
-        assertEquals(42, query.getParamaters()[0]);
+        assertEquals(1, query.getParameters().length);
+        assertEquals(42, query.getParameters()[0]);
         assertEquals("FROM test WHERE a = b AND test = ? ORDER BY test DESC", query.getQueryString());
 
         query = QueryUtils.mergeQuery("select foo, bar from test where a = b", criteria, null);
-        assertEquals(1, query.getParamaters().length);
-        assertEquals(42, query.getParamaters()[0]);
+        assertEquals(1, query.getParameters().length);
+        assertEquals(42, query.getParameters()[0]);
         assertEquals("SELECT foo, bar FROM test WHERE a = b AND test = ? ORDER BY test DESC", query.getQueryString());
     }
 

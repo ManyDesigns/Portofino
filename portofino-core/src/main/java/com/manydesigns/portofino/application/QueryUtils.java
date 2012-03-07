@@ -130,7 +130,7 @@ public class QueryUtils {
         return runHqlQuery(
                 session,
                 queryStringWithParameters.getQueryString(),
-                queryStringWithParameters.getParamaters(),
+                queryStringWithParameters.getParameters(),
                 firstResult,
                 maxResults
         );
@@ -335,7 +335,7 @@ public class QueryUtils {
             @Nullable Integer maxResults) {
         QueryStringWithParameters result = mergeQuery(queryString, criteria, rootObject);
 
-        return runHqlQuery(session, result.getQueryString(), result.getParamaters(), firstResult, maxResults);
+        return runHqlQuery(session, result.getQueryString(), result.getParameters(), firstResult, maxResults);
     }
 
     public static QueryStringWithParameters mergeQuery
@@ -347,7 +347,7 @@ public class QueryUtils {
         QueryStringWithParameters criteriaQuery =
                 getQueryStringWithParametersForCriteria(criteria);
         String criteriaQueryString = criteriaQuery.getQueryString();
-        Object[] criteriaParameters = criteriaQuery.getParamaters();
+        Object[] criteriaParameters = criteriaQuery.getParameters();
 
         CCJSqlParserManager parserManager = new CCJSqlParserManager();
         PlainSelect parsedQueryString;

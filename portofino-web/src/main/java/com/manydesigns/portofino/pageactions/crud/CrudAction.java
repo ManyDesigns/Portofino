@@ -402,7 +402,7 @@ public class CrudAction extends AbstractPageAction {
         //TODO gestire count non disponibile (totalRecordsQueryString == null)
         List<Object> result = QueryUtils.runHqlQuery
                 (session, totalRecordsQueryString,
-                        query.getParamaters());
+                        query.getParameters());
         long totalRecords = (Long) result.get(0);
 
         setupTableForm(Mode.VIEW);
@@ -634,16 +634,12 @@ public class CrudAction extends AbstractPageAction {
     }
 
     protected String getPkForUrl(String[] pk) {
-        String[] escapedPk = new String[pk.length];
         String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
         try {
-            for(int i = 0; i < pk.length; i++) {
-                escapedPk[i] = URLEncoder.encode(pk[i], encoding);
-            }
+            return pkHelper.getPkStringForUrl(pk, encoding);
         } catch (UnsupportedEncodingException e) {
-            throw new Error(e);
+            throw new Error(e); //TODO
         }
-        return StringUtils.join(escapedPk, "/");
     }
 
     //**************************************************************************
@@ -783,7 +779,8 @@ public class CrudAction extends AbstractPageAction {
             return new RedirectResolution(appendSearchStringParamIfNecessary(dispatch.getOriginalPath()));
         }
         for (String current : selection) {
-            Serializable pkObject = pkHelper.parsePkString(current);
+            String[] pkArr = current.split("/");
+            Serializable pkObject = pkHelper.getPrimaryKey(pkArr);
             Object obj = QueryUtils.getObjectByPk(application, baseTable, pkObject);
             if(deleteValidate(obj)) {
                 session.delete(baseTable.getActualEntityName(), obj);
@@ -1180,7 +1177,8 @@ public class CrudAction extends AbstractPageAction {
             if(searchString.equals(URLDecoder.decode(encoded, encoding))) {
                 encodedSearchString += encoded;
             } else {
-                logger.warn("Could not encode search string \"" + StringEscapeUtils.escapeJava(searchString) + "\" with encoding " + encoding);
+                logger.warn("Could not encode search string \"" + StringEscapeUtils.escapeJava(searchString) +
+                            "\" with encoding " + encoding);
                 return null;
             }
         } catch (UnsupportedEncodingException e) {
@@ -1790,7 +1788,7 @@ public class CrudAction extends AbstractPageAction {
     @Button(list = "crud-read", key = "commons.exportPdf", order = 3)
     public Resolution exportReadPdf() {
         try {
-            final File tmpFile = File.createTempFile(crudConfiguration.getName(), ".read.pdf");
+            final File tmpFile = File.createTempFile("export." + crudConfiguration.getName(), ".read.pdf");
             exportReadPdf(tmpFile);
             FileInputStream fileInputStream = new FileInputStream(tmpFile);
             return new StreamingResolution("application/pdf", fileInputStream) {
