@@ -30,19 +30,27 @@
 package com.manydesigns.portofino.pageactions.m2m;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
+import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.ognl.OgnlUtils;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.SelectionProviderLogic;
+import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.m2m.configuration.ManyToManyConfiguration;
+import com.manydesigns.portofino.pageactions.m2m.configuration.ViewType;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
@@ -80,11 +88,12 @@ public class ManyToManyAction extends AbstractPageAction {
     protected TableAccessor relationTableAccessor;
     protected TableAccessor manyTableAccessor;
 
-    protected String returnTo;
-
     //Checkboxes view
     protected Map<Object, Boolean> booleanRelation;
     protected List<String> selectedPrimaryKeys = new ArrayList<String>();
+
+    //Configuration
+    protected Form configurationForm;
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
         this.pageInstance = pageInstance;
@@ -97,10 +106,6 @@ public class ManyToManyAction extends AbstractPageAction {
 
     @Before
     public void prepare() {
-        if(isEmbedded()) {
-            returnTo = context.getRequest().getContextPath() + "/" +
-                       dispatch.getLastPageInstance().getParent().getUrlFragment();
-        }
         Table table = m2mConfiguration.getActualRelationTable();
         relationTableAccessor = new TableAccessor(table);
         manyTableAccessor = new TableAccessor(m2mConfiguration.getActualManyTable());
@@ -217,16 +222,79 @@ public class ManyToManyAction extends AbstractPageAction {
             }
         }
         session.getTransaction().commit();
-        if(returnTo != null) {
-            return new RedirectResolution(returnTo, false);
-        } else {
-            session.beginTransaction();
-            loadAssociations(); //TODO inefficiente
-            return view();
-        }
+        SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
+        return cancel();
     }
 
+    //Configuration
+
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
+    public Resolution configure() {
+        prepareConfigurationForms();
+        return new ForwardResolution("/layouts/m2m/configure.jsp");
+    }
+
+    @Button(list = "configuration", key = "commons.updateConfiguration")
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
+    public Resolution updateConfiguration() {
+        prepareConfigurationForms();
+        readPageConfigurationFromRequest();
+        configurationForm.readFromRequest(context.getRequest());
+        boolean valid = validatePageConfiguration();
+        valid = configurationForm.validate() && valid;
+        if(valid) {
+            updatePageConfiguration();
+            configurationForm.writeToObject(m2mConfiguration);
+            saveConfiguration(m2mConfiguration);
+            SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
+        }
+        return cancel();
+    }
+
+    @Override
+    protected void prepareConfigurationForms() {
+        super.prepareConfigurationForms();
+        FormBuilder formBuilder = new FormBuilder(ManyToManyConfiguration.class);
+        String general = "General";
+        String oneSide = "One- side of the relation";
+        String manySide = "-Many side of the relation";
+        formBuilder.configFieldSetNames(general, oneSide, manySide);
+        formBuilder.configFields(
+                new String[] { "viewType", "relationDatabase", "relationQuery" },
+                new String[] { "onePropertyName", "oneSelectable", "oneExpression", "oneDatabase", "oneQuery" },
+                new String[] { "manyPropertyName", "manyDatabase", "manyQuery" });
+
+        DefaultSelectionProvider viewTypeSelectionProvider = new DefaultSelectionProvider("viewType");
+        String label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.CHECKBOXES");
+        viewTypeSelectionProvider.appendRow(ViewType.CHECKBOXES.name(), label, true);
+        label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.LISTS");
+        viewTypeSelectionProvider.appendRow(ViewType.LISTS.name(), label, true);
+        formBuilder.configSelectionProvider(viewTypeSelectionProvider, "viewType");
+
+        addDatabaseSelectionProvider(formBuilder, "oneDatabase");
+        addDatabaseSelectionProvider(formBuilder, "manyDatabase");
+        addDatabaseSelectionProvider(formBuilder, "relationDatabase");
+        configurationForm = formBuilder.build();
+        configurationForm.readFromObject(m2mConfiguration);
+    }
+
+    protected void addDatabaseSelectionProvider(FormBuilder formBuilder, String propertyName) {
+        SelectionProvider databaseSelectionProvider =
+                SelectionProviderLogic.createSelectionProvider(
+                        propertyName,
+                        model.getDatabases(),
+                        Database.class,
+                        null,
+                        new String[]{ "databaseName" });
+        formBuilder.configSelectionProvider(databaseSelectionProvider, propertyName);
+    }
+
+    //Extension hooks
+
     protected void prepareSave(Object newRelation) {}
+
+    //Getters/Setters
 
     public Serializable getOnePk() {
         return onePk;
@@ -268,11 +336,7 @@ public class ManyToManyAction extends AbstractPageAction {
         this.selectedPrimaryKeys = selectedPrimaryKeys;
     }
 
-    public String getReturnTo() {
-        return returnTo;
-    }
-
-    public void setReturnTo(String returnTo) {
-        this.returnTo = returnTo;
+    public Form getConfigurationForm() {
+        return configurationForm;
     }
 }

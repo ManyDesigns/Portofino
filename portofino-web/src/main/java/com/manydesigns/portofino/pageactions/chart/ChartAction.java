@@ -41,6 +41,7 @@ import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.chart.ChartGenerator;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
@@ -273,11 +274,11 @@ public class ChartAction extends AbstractPageAction {
     protected void prepareConfigurationForms() {
         super.prepareConfigurationForms();
         SelectionProvider databaseSelectionProvider =
-                createSelectionProvider("database",
+                SelectionProviderLogic.createSelectionProvider("database",
                         model.getDatabases(),
                         Database.class,
                         null,
-                        new String[] { "databaseName" });
+                        new String[]{"databaseName"});
         DefaultSelectionProvider typeSelectionProvider = new DefaultSelectionProvider("type");
         for(int i = 0; i < chartTypeValues.length; i++) {
             typeSelectionProvider.appendRow(chartTypeValues[i], chartTypeLabels[i], true);

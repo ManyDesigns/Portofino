@@ -32,6 +32,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
@@ -198,6 +199,14 @@ public class TextAction extends AbstractPageAction {
         sb.append(content.substring(lastEnd));
 
         return sb.toString();
+    }
+
+    @Override
+    @Buttons({
+        @Button(list = "configuration", key = "commons.cancel", order = 99),
+        @Button(list = "edit-content",  key = "commons.cancel", order = 99)})
+    public Resolution cancel() {
+        return super.cancel();
     }
 
     /*protected String convertPathToInternalLink(String path) {

@@ -16,7 +16,6 @@
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <input type="hidden" name="returnTo" value="${actionBean.returnTo}" />
         <%
             ClassAccessor ca = actionBean.getManyTableAccessor();
             XhtmlBuffer buffer = new XhtmlBuffer(out);

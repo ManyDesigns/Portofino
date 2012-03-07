@@ -46,7 +46,6 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
-import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XmlBuffer;
@@ -56,6 +55,7 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
@@ -297,34 +297,15 @@ public class CrudAction extends AbstractPageAction {
         if (sql != null) {
             Session session = application.getSession(databaseName);
             Collection<Object[]> objects = QueryUtils.runSql(session, sql);
-            selectionProvider = createSelectionProvider(name, fieldNames.length, fieldTypes, objects);
+            selectionProvider = SelectionProviderLogic.createSelectionProvider(name, fieldNames.length, fieldTypes, objects);
             selectionProvider.setDisplayMode(dm);
         } else if (hql != null) {
-            Database database = DatabaseLogic.findDatabaseByName(model, databaseName);
-            Table table = QueryUtils.getTableFromQueryString(database, hql);
-            String entityName = table.getActualEntityName();
-            Session session = application.getSession(databaseName);
-            Collection<Object> objects = QueryUtils.getObjects(session, hql, null, null);
-            TableAccessor tableAccessor =
-                    application.getTableAccessor(databaseName, entityName);
-            ShortName shortNameAnnotation =
-                    tableAccessor.getAnnotation(ShortName.class);
-            TextFormat[] textFormats = null;
-            //L'ordinamento e' usato solo in caso di chiave singola
-            if (shortNameAnnotation != null && tableAccessor.getKeyProperties().length == 1) {
-                textFormats = new TextFormat[] {
-                    OgnlTextFormat.create(shortNameAnnotation.value())
-                };
-            }
-
-            selectionProvider = createSelectionProvider
-                    (name, objects, tableAccessor.getKeyProperties(), textFormats);
+            selectionProvider =
+                    SelectionProviderLogic.createSelectionProviderFromHql(name, application, databaseName, hql, dm);
 
             if(current instanceof ForeignKey) {
                 selectionProvider.sortByLabel();
             }
-
-            selectionProvider.setDisplayMode(dm);
         } else {
             logger.warn("ModelSelection provider '{}':" +
                     " both 'hql' and 'sql' are null", name);
@@ -1895,12 +1876,12 @@ public class CrudAction extends AbstractPageAction {
         super.prepareConfigurationForms();
 
         SelectionProvider databaseSelectionProvider =
-                createSelectionProvider(
+                SelectionProviderLogic.createSelectionProvider(
                         "database",
                         model.getDatabases(),
                         Database.class,
                         null,
-                        new String[] { "databaseName" });
+                        new String[]{"databaseName"});
         crudConfigurationForm = new FormBuilder(CrudConfiguration.class)
                 .configFields(CRUD_CONFIGURATION_FIELDS)
                 .configFieldSetNames("Crud")

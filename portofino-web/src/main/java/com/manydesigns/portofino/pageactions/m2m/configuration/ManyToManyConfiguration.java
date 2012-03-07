@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.pageactions.m2m.configuration;
 
+import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.QueryUtils;
@@ -65,6 +66,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     protected String oneQuery;
     protected String oneExpression;
     protected String onePropertyName;
+    protected boolean oneSelectable = true;
     //Target
     protected String manyDatabase;
     protected String manyQuery;
@@ -161,6 +163,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     }
 
     @Required
+    @Multiline
     @XmlAttribute(required = true)
     public String getRelationQuery() {
         return relationQuery;
@@ -180,6 +183,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
         this.viewType = viewType;
     }
 
+    @Multiline
     @XmlAttribute(required = false)
     public String getOneQuery() {
         return oneQuery;
@@ -190,6 +194,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     }
 
     @Required
+    @Multiline
     @XmlAttribute(required = true)
     public String getManyQuery() {
         return manyQuery;
@@ -226,6 +231,16 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
 
     public void setOneExpression(String oneExpression) {
         this.oneExpression = oneExpression;
+    }
+
+    @Required
+    @XmlAttribute(required = true)
+    public boolean isOneSelectable() {
+        return oneSelectable;
+    }
+
+    public void setOneSelectable(boolean oneSelectable) {
+        this.oneSelectable = oneSelectable;
     }
 
     public Database getActualOneDatabase() {
