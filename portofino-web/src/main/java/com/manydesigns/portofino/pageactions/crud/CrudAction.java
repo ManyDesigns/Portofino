@@ -212,7 +212,7 @@ public class CrudAction extends AbstractPageAction {
         }
     }
 
-    private void setupSelectionProviders() {
+    protected void setupSelectionProviders() {
         Set<String> configuredSPs = new HashSet<String>();
         for(SelectionProviderReference ref : crudConfiguration.getSelectionProviders()) {
             boolean added;
@@ -246,7 +246,7 @@ public class CrudAction extends AbstractPageAction {
         }
     }
 
-    private boolean setupSelectionProvider(
+    protected boolean setupSelectionProvider(
             @Nullable SelectionProviderReference ref,
             DatabaseSelectionProvider current,
             Set<String> configuredSPs) {

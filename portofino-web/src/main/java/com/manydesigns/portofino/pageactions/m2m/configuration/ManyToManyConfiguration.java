@@ -40,10 +40,7 @@ import com.manydesigns.portofino.model.database.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -61,18 +58,13 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     // Fields
     //**************************************************************************
 
-    //Source
-    protected String oneDatabase;
-    protected String oneQuery;
     protected String oneExpression;
-    protected String onePropertyName;
-    //Target
-    protected String manyDatabase;
-    protected String manyQuery;
-    protected String manyPropertyName;
+    protected SelectionProviderReference oneSelectionProvider;
 
-    protected String relationDatabase;
-    protected String relationQuery;
+    protected SelectionProviderReference manySelectionProvider;
+
+    protected String database;
+    protected String query;
     protected String viewType;
 
     //**************************************************************************
@@ -105,27 +97,29 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
 
     public void init(Application application) {
         assert viewType != null;
-        assert relationDatabase != null;
-        assert relationQuery != null;
-        assert onePropertyName != null;
-        assert manyPropertyName != null;
-        assert manyQuery != null;
+        assert database != null;
+        assert query != null;
+        assert manySelectionProvider != null;
 
-        actualRelationDatabase = DatabaseLogic.findDatabaseByName(application.getModel(), relationDatabase);
+        actualRelationDatabase = DatabaseLogic.findDatabaseByName(application.getModel(), database);
         if(actualRelationDatabase != null) {
-            actualRelationTable = QueryUtils.getTableFromQueryString(actualRelationDatabase, relationQuery);
-        }
-        if(oneDatabase != null) {
-            actualOneDatabase = DatabaseLogic.findDatabaseByName(application.getModel(), oneDatabase);
+            actualRelationTable = QueryUtils.getTableFromQueryString(actualRelationDatabase, query);
+
+            manySelectionProvider.init(actualRelationTable);
+            String manyDatabaseName = manySelectionProvider.getActualSelectionProvider().getToDatabase();
+            actualManyDatabase =
+                DatabaseLogic.findDatabaseByName(application.getModel(), manyDatabaseName);
+            actualManyTable = manySelectionProvider.getActualSelectionProvider().getToTable();
+
+            if(oneSelectionProvider != null) {
+                oneSelectionProvider.init(actualRelationTable);
+                String oneDatabaseName = oneSelectionProvider.getActualSelectionProvider().getToDatabase();
+                actualOneDatabase =
+                    DatabaseLogic.findDatabaseByName(application.getModel(), oneDatabaseName);
+            }
         } else {
-            actualOneDatabase = actualRelationTable.getSchema().getDatabase();
+            throw new Error("Relation database " + database + " not found");
         }
-        if(manyDatabase != null) {
-            actualManyDatabase = DatabaseLogic.findDatabaseByName(application.getModel(), manyDatabase);
-        } else {
-            actualManyDatabase = actualRelationTable.getSchema().getDatabase();
-        }
-        actualManyTable = QueryUtils.getTableFromQueryString(actualManyDatabase, manyQuery);
         actualViewType = ViewType.valueOf(viewType);
     }
 
@@ -133,43 +127,25 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     // Getters/setters
     //**************************************************************************
 
-    @XmlAttribute(required = false)
-    public String getOneDatabase() {
-        return oneDatabase;
-    }
-
-    public void setOneDatabase(String oneDatabase) {
-        this.oneDatabase = oneDatabase;
-    }
-
-    @XmlAttribute(required = false)
-    public String getManyDatabase() {
-        return manyDatabase;
-    }
-
-    public void setManyDatabase(String manyDatabase) {
-        this.manyDatabase = manyDatabase;
-    }
-
     @Required
     @XmlAttribute(required = true)
-    public String getRelationDatabase() {
-        return relationDatabase;
+    public String getDatabase() {
+        return database;
     }
 
-    public void setRelationDatabase(String relationDatabase) {
-        this.relationDatabase = relationDatabase;
+    public void setDatabase(String database) {
+        this.database = database;
     }
 
     @Required
     @Multiline
     @XmlAttribute(required = true)
-    public String getRelationQuery() {
-        return relationQuery;
+    public String getQuery() {
+        return query;
     }
 
-    public void setRelationQuery(String relationQuery) {
-        this.relationQuery = relationQuery;
+    public void setQuery(String query) {
+        this.query = query;
     }
 
     @Required
@@ -182,47 +158,6 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
         this.viewType = viewType;
     }
 
-    @Multiline
-    @XmlAttribute(required = false)
-    public String getOneQuery() {
-        return oneQuery;
-    }
-
-    public void setOneQuery(String oneQuery) {
-        this.oneQuery = oneQuery;
-    }
-
-    @Required
-    @Multiline
-    @XmlAttribute(required = true)
-    public String getManyQuery() {
-        return manyQuery;
-    }
-
-    public void setManyQuery(String manyQuery) {
-        this.manyQuery = manyQuery;
-    }
-
-    @Required
-    @XmlAttribute(required = true)
-    public String getManyPropertyName() {
-        return manyPropertyName;
-    }
-
-    public void setManyPropertyName(String manyPropertyName) {
-        this.manyPropertyName = manyPropertyName;
-    }
-
-    @Required
-    @XmlAttribute(required = true)
-    public String getOnePropertyName() {
-        return onePropertyName;
-    }
-
-    public void setOnePropertyName(String onePropertyName) {
-        this.onePropertyName = onePropertyName;
-    }
-
     @XmlAttribute(required = false)
     public String getOneExpression() {
         return oneExpression;
@@ -230,6 +165,25 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
 
     public void setOneExpression(String oneExpression) {
         this.oneExpression = oneExpression;
+    }
+
+    @XmlElement(name = "one", required = false)
+    public SelectionProviderReference getOneSelectionProvider() {
+        return oneSelectionProvider;
+    }
+
+    public void setOneSelectionProvider(SelectionProviderReference oneSelectionProvider) {
+        this.oneSelectionProvider = oneSelectionProvider;
+    }
+
+    @Required
+    @XmlElement(name = "many", required = true)
+    public SelectionProviderReference getManySelectionProvider() {
+        return manySelectionProvider;
+    }
+
+    public void setManySelectionProvider(SelectionProviderReference manySelectionProvider) {
+        this.manySelectionProvider = manySelectionProvider;
     }
 
     public Database getActualOneDatabase() {

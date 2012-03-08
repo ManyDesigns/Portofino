@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.pageactions.crud.configuration;
+package com.manydesigns.portofino.pageactions.m2m.configuration;
 
 import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.portofino.model.database.ForeignKey;
@@ -66,8 +66,8 @@ public class SelectionProviderReference {
     //**************************************************************************
 
     protected ForeignKey foreignKey;
-    protected DisplayMode displayMode;
-    protected ModelSelectionProvider selectionProvider;
+    private DisplayMode displayMode;
+    private ModelSelectionProvider selectionProvider;
 
     private static final Logger logger = LoggerFactory.getLogger(SelectionProviderReference.class);
 

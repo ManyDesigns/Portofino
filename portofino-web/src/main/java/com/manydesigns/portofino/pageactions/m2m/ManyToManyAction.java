@@ -49,13 +49,13 @@ import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
-import com.manydesigns.portofino.model.database.Database;
-import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.m2m.configuration.ManyToManyConfiguration;
+import com.manydesigns.portofino.pageactions.m2m.configuration.SelectionProviderReference;
 import com.manydesigns.portofino.pageactions.m2m.configuration.ViewType;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
@@ -65,7 +65,10 @@ import net.sourceforge.stripes.action.*;
 import ognl.OgnlContext;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.*;
 
@@ -97,12 +100,17 @@ public class ManyToManyAction extends AbstractPageAction {
 
     protected SelectField oneSelectField;
 
+    protected boolean correctlyConfigured;
+
     //Checkboxes view
     protected Map<Object, Boolean> booleanRelation;
     protected List<String> selectedPrimaryKeys = new ArrayList<String>();
 
     //Configuration
     protected Form configurationForm;
+
+    //Logging
+    private  static final Logger logger = LoggerFactory.getLogger(ManyToManyAction.class);
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
         this.pageInstance = pageInstance;
@@ -115,6 +123,10 @@ public class ManyToManyAction extends AbstractPageAction {
 
     @Before
     public void prepare() throws NoSuchFieldException {
+        if(m2mConfiguration == null || m2mConfiguration.getActualRelationTable() == null ||
+           m2mConfiguration.getActualManyTable() == null) {
+            return;
+        }
         Table table = m2mConfiguration.getActualRelationTable();
         relationTableAccessor = new TableAccessor(table);
         manyTableAccessor = new TableAccessor(m2mConfiguration.getActualManyTable());
@@ -123,31 +135,62 @@ public class ManyToManyAction extends AbstractPageAction {
             //Set primary key
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
             onePk = (Serializable) OgnlUtils.getValueQuietly(expression, ognlContext, this); //TODO handle exception
+            correctlyConfigured = true;
         } else {
             //Setup "one" selection
-            if(!StringUtils.isBlank(m2mConfiguration.getOneQuery())) {
+            SelectionProviderReference oneSelectionProvider = m2mConfiguration.getOneSelectionProvider();
+            if(oneSelectionProvider != null) {
+                ModelSelectionProvider actualSelectionProvider = oneSelectionProvider.getActualSelectionProvider();
+                if(!(actualSelectionProvider instanceof DatabaseSelectionProvider)) {
+                    logger.warn("Selection provider {} not supported", actualSelectionProvider);
+                    return;
+                }
                 JavaClassAccessor myselfAccessor = JavaClassAccessor.getClassAccessor(getClass());
                 String databaseName = m2mConfiguration.getActualOneDatabase().getDatabaseName();
-                SelectionProvider selectionProvider =
-                        SelectionProviderLogic.createSelectionProviderFromHql
-                                ("onePk", application, databaseName, m2mConfiguration.getOneQuery(),
-                                 DisplayMode.DROPDOWN);
+
+                DatabaseSelectionProvider sp =
+                        (DatabaseSelectionProvider) actualSelectionProvider;
+
+                DefaultSelectionProvider selectionProvider;
+                String name = sp.getName();
+                String hql = sp.getHql();
+
+                if (hql != null) {
+                    selectionProvider =
+                            SelectionProviderLogic.createSelectionProviderFromHql
+                                    (name, application, databaseName, hql, DisplayMode.DROPDOWN);
+
+                    if(sp instanceof ForeignKey) {
+                        selectionProvider.sortByLabel();
+                    }
+                } else {
+                    logger.warn("ModelSelection provider '{}': unsupported query", name);
+                    return;
+                }
                 oneSelectField =
                         new SelectField(myselfAccessor.getProperty("onePk"), selectionProvider, Mode.EDIT, "__");
                 oneSelectField.readFromObject(this);
                 oneSelectField.readFromObject(this);
                 oneSelectField.readFromRequest(context.getRequest());
                 oneSelectField.writeToObject(this);
+                correctlyConfigured = true;
             }
         }
     }
 
     @DefaultHandler
-    public Resolution execute() throws NoSuchFieldException { //TODO
+    public Resolution execute() {
+        if(!correctlyConfigured) {
+            return forwardToPortletNotConfigured();
+        }
         if(onePk != null) {
-            loadAssociations();
-            if(potentiallyAvailableAssociations == null && onePk != null) {
-                return forwardToPortletNotConfigured(); //TODO
+            try {
+                loadAssociations();
+                if(potentiallyAvailableAssociations == null && onePk != null) {
+                    return forwardToPortletNotConfigured(); //TODO
+                }
+            } catch (NoSuchFieldException e) {
+                return forwardToPortletNotConfigured();
             }
         }
         return view();
@@ -171,19 +214,29 @@ public class ManyToManyAction extends AbstractPageAction {
     protected void loadAssociations() throws NoSuchFieldException {
         Table table = m2mConfiguration.getActualRelationTable();
         TableCriteria criteria = new TableCriteria(table);
+        //TODO chiave multipla
+        String onePropertyName = m2mConfiguration.getOneSelectionProvider().getActualSelectionProvider().getReferences().get(0).getActualFromColumn().getActualPropertyName();
         PropertyAccessor onePropertyAccessor =
-                relationTableAccessor.getProperty(m2mConfiguration.getOnePropertyName());
+                relationTableAccessor.getProperty(onePropertyName);
+        //TODO chiave multipla
+        SelectionProviderReference manySelectionProvider = m2mConfiguration.getManySelectionProvider();
+        String manyPropertyName = manySelectionProvider.getActualSelectionProvider().getReferences().get(0).getActualFromColumn().getActualPropertyName();
         PropertyAccessor manyPropertyAccessor =
-                relationTableAccessor.getProperty(m2mConfiguration.getManyPropertyName());
+                relationTableAccessor.getProperty(manyPropertyName);
         criteria = criteria.eq(onePropertyAccessor, onePk);
         QueryStringWithParameters queryString =
-                QueryUtils.mergeQuery(m2mConfiguration.getRelationQuery(), criteria, this);
-        Session session = application.getSession(m2mConfiguration.getRelationDatabase());
+                QueryUtils.mergeQuery(m2mConfiguration.getQuery(), criteria, this);
+        Session session = application.getSession(m2mConfiguration.getDatabase());
         existingAssociations =
                 QueryUtils.runHqlQuery(session, queryString.getQueryString(), queryString.getParameters());
         availableAssociations = new ArrayList<Object>();
+        String manyQuery = ((DatabaseSelectionProvider) manySelectionProvider.getActualSelectionProvider()).getHql();
+        if(manyQuery == null) {
+            logger.error("Couldn't determine many query");
+            return;
+        }
         potentiallyAvailableAssociations =
-                QueryUtils.runHqlQuery(session, m2mConfiguration.getManyQuery(), null);
+                QueryUtils.runHqlQuery(session, manyQuery, null);
         PropertyAccessor[] manyKeyProperties = manyTableAccessor.getKeyProperties();
         //TODO handle manyKeyProperties.length > 1
         PropertyAccessor manyPkAccessor = manyTableAccessor.getProperty(manyKeyProperties[0].getName());
@@ -210,12 +263,19 @@ public class ManyToManyAction extends AbstractPageAction {
     @Button(list = "m2m-checkboxes-edit", key = "commons.update")
     @Guard(test = "onePk != null", type = GuardType.VISIBLE)
     public Resolution saveCheckboxes() throws Exception {
+        if(!correctlyConfigured) {
+            return forwardToPortletNotConfigured();
+        }
         loadAssociations();
         PkHelper pkHelper = new PkHelper(manyTableAccessor);
+        //TODO chiave multipla
+        String onePropertyName = m2mConfiguration.getOneSelectionProvider().getActualSelectionProvider().getReferences().get(0).getActualFromColumn().getActualPropertyName();
         PropertyAccessor onePropertyAccessor =
-                relationTableAccessor.getProperty(m2mConfiguration.getOnePropertyName());
+                relationTableAccessor.getProperty(onePropertyName);
+        //TODO chiave multipla
+        String manyPropertyName = m2mConfiguration.getManySelectionProvider().getActualSelectionProvider().getReferences().get(0).getActualFromColumn().getActualPropertyName();
         PropertyAccessor manyPropertyAccessor =
-                relationTableAccessor.getProperty(m2mConfiguration.getManyPropertyName());
+                relationTableAccessor.getProperty(manyPropertyName);
         Session session = application.getSession(m2mConfiguration.getActualRelationDatabase().getDatabaseName());
         PropertyAccessor[] manyKeyProperties = manyTableAccessor.getKeyProperties();
         //TODO handle manyKeyProperties.length > 1
@@ -224,11 +284,7 @@ public class ManyToManyAction extends AbstractPageAction {
             Serializable pkObject = pkHelper.getPrimaryKey(pkString.split("/"));
             Object pk = manyPkAccessor.get(pkObject);
             if(!isExistingAssociation(manyPropertyAccessor, pk)) {
-                Object newRelation = relationTableAccessor.newInstance();
-                onePropertyAccessor.set(newRelation, onePk);
-                manyPropertyAccessor.set(newRelation, pk);
-                prepareSave(newRelation);
-                session.save(m2mConfiguration.getActualRelationTable().getActualEntityName(), newRelation);
+                Object newRelation = saveNewRelation(session, pk, onePropertyAccessor, manyPropertyAccessor);
                 existingAssociations.add(newRelation);
             }
         }
@@ -239,9 +295,8 @@ public class ManyToManyAction extends AbstractPageAction {
             Object pkObject = manyPropertyAccessor.get(o);
             String pkString =
                     (String) OgnlUtils.convertValue(pkObject, String.class);
-            //String pkString = StringUtils.join(pkHelper.generatePkStringArray(o), "/");
             if(!selectedPrimaryKeys.contains(pkString)) {
-                session.delete(m2mConfiguration.getActualRelationTable().getActualEntityName(), o);
+                deleteRelation(session, o);
                 it.remove();
             }
         }
@@ -254,6 +309,19 @@ public class ManyToManyAction extends AbstractPageAction {
         } else {
             return cancel();
         }
+    }
+
+    protected void deleteRelation(Session session, Object rel) {
+        session.delete(m2mConfiguration.getActualRelationTable().getActualEntityName(), rel);
+    }
+
+    protected Object saveNewRelation(Session session, Object pk, PropertyAccessor onePropertyAccessor, PropertyAccessor manyPropertyAccessor) {
+        Object newRelation = relationTableAccessor.newInstance();
+        onePropertyAccessor.set(newRelation, onePk);
+        manyPropertyAccessor.set(newRelation, pk);
+        prepareSave(newRelation);
+        session.save(m2mConfiguration.getActualRelationTable().getActualEntityName(), newRelation);
+        return newRelation;
     }
 
     //Configuration
@@ -269,31 +337,32 @@ public class ManyToManyAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() {
         prepareConfigurationForms();
+        ConfigurationForm conf = new ConfigurationForm(m2mConfiguration);
+        configurationForm.readFromObject(conf);
         readPageConfigurationFromRequest();
         configurationForm.readFromRequest(context.getRequest());
         boolean valid = validatePageConfiguration();
         valid = configurationForm.validate() && valid;
         if(valid) {
             updatePageConfiguration();
-            configurationForm.writeToObject(m2mConfiguration);
+            configurationForm.writeToObject(conf);
+            conf.writeTo(m2mConfiguration);
             saveConfiguration(m2mConfiguration);
             SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
+            return cancel();
+        } else {
+            SessionMessages.addErrorMessage(getMessage("commons.configuration.notUpdated"));
+            return new ForwardResolution("/layouts/m2m/configure.jsp");
         }
-        return cancel();
     }
 
     @Override
     protected void prepareConfigurationForms() {
         super.prepareConfigurationForms();
-        FormBuilder formBuilder = new FormBuilder(ManyToManyConfiguration.class);
-        String general = "General";
-        String oneSide = "One- side of the relation";
-        String manySide = "-Many side of the relation";
-        formBuilder.configFieldSetNames(general, oneSide, manySide);
-        formBuilder.configFields(
-                new String[] { "viewType", "relationDatabase", "relationQuery" },
-                new String[] { "onePropertyName", "oneExpression", "oneDatabase", "oneQuery" },
-                new String[] { "manyPropertyName", "manyDatabase", "manyQuery" });
+        FormBuilder formBuilder = new FormBuilder(ConfigurationForm.class);
+        formBuilder
+            .configFields("viewType", "database", "query", "oneExpression", "oneSpName", "manySpName")
+            .configFieldSetNames("Many to many");
 
         DefaultSelectionProvider viewTypeSelectionProvider = new DefaultSelectionProvider("viewType");
         String label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.CHECKBOXES");
@@ -302,22 +371,71 @@ public class ManyToManyAction extends AbstractPageAction {
         viewTypeSelectionProvider.appendRow(ViewType.LISTS.name(), label, true);
         formBuilder.configSelectionProvider(viewTypeSelectionProvider, "viewType");
 
-        addDatabaseSelectionProvider(formBuilder, "oneDatabase");
-        addDatabaseSelectionProvider(formBuilder, "manyDatabase");
-        addDatabaseSelectionProvider(formBuilder, "relationDatabase");
-        configurationForm = formBuilder.build();
-        configurationForm.readFromObject(m2mConfiguration);
-    }
-
-    protected void addDatabaseSelectionProvider(FormBuilder formBuilder, String propertyName) {
         SelectionProvider databaseSelectionProvider =
                 SelectionProviderLogic.createSelectionProvider(
-                        propertyName,
+                        "database",
                         model.getDatabases(),
                         Database.class,
                         null,
                         new String[]{ "databaseName" });
-        formBuilder.configSelectionProvider(databaseSelectionProvider, propertyName);
+        formBuilder.configSelectionProvider(databaseSelectionProvider, "database");
+
+        List<ModelSelectionProvider> sps = new ArrayList<ModelSelectionProvider>();
+        sps.addAll(m2mConfiguration.getActualRelationTable().getForeignKeys());
+
+        SelectionProvider oneSp =
+                SelectionProviderLogic.createSelectionProvider(
+                        "oneSpName",
+                        sps,
+                        ModelSelectionProvider.class,
+                        null,
+                        new String[]{ "name" });
+        formBuilder.configSelectionProvider(oneSp, "oneSpName");
+        SelectionProvider manySp =
+                SelectionProviderLogic.createSelectionProvider(
+                        "manySpName",
+                        sps,
+                        ModelSelectionProvider.class,
+                        null,
+                        new String[]{ "name" });
+        formBuilder.configSelectionProvider(manySp, "manySpName");
+
+        configurationForm = formBuilder.build();
+        configurationForm.readFromObject(new ConfigurationForm(m2mConfiguration));
+    }
+
+    protected void addSpRefSelectionProvider
+            (final List<ModelSelectionProvider> sps, Form form, String fieldName)
+            throws NoSuchFieldException {
+        SelectionProvider sp =
+                SelectionProviderLogic.createSelectionProvider(
+                        fieldName,
+                        sps,
+                        ModelSelectionProvider.class,
+                        null,
+                        new String[]{ "name" });
+        JavaClassAccessor acc = JavaClassAccessor.getClassAccessor(ManyToManyConfiguration.class);
+        form.get(0).add(new SelectField(acc.getProperty(fieldName), sp, Mode.EDIT, "") {
+            @Override
+            public void readFromRequest(HttpServletRequest req) {
+                String stringValue = req.getParameter(inputName);
+                if(!StringUtils.isEmpty(stringValue)) {
+                    for(ModelSelectionProvider msp : sps) {
+                        if(msp.getName().equals(stringValue)) {
+                            SelectionProviderReference ref = new SelectionProviderReference();
+                            if(msp instanceof ForeignKey) {
+                                ref.setForeignKeyName(msp.getName());
+                            } else {
+                                ref.setSelectionProviderName(msp.getName());
+                            }
+                            selectionModel.setValue(selectionModelIndex, ref);
+                        }
+                    }
+                } else {
+                    selectionModel.setValue(selectionModelIndex, null);
+                }
+            }
+        });
     }
 
     //Extension hooks
