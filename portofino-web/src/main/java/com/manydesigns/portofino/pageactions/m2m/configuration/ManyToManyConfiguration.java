@@ -66,7 +66,6 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     protected String oneQuery;
     protected String oneExpression;
     protected String onePropertyName;
-    protected boolean oneSelectable = true;
     //Target
     protected String manyDatabase;
     protected String manyQuery;
@@ -231,16 +230,6 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
 
     public void setOneExpression(String oneExpression) {
         this.oneExpression = oneExpression;
-    }
-
-    @Required
-    @XmlAttribute(required = true)
-    public boolean isOneSelectable() {
-        return oneSelectable;
-    }
-
-    public void setOneSelectable(boolean oneSelectable) {
-        this.oneSelectable = oneSelectable;
     }
 
     public Database getActualOneDatabase() {

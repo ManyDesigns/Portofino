@@ -50,7 +50,7 @@ import java.lang.reflect.Method;
  *
  * Runs guards on the selected action bean handler.
  */
-@Intercepts(LifecycleStage.CustomValidation)
+@Intercepts(LifecycleStage.EventHandling)
 public class GuardsInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";

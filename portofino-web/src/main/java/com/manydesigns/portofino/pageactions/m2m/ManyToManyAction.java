@@ -30,16 +30,22 @@
 package com.manydesigns.portofino.pageactions.m2m;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.application.QueryUtils;
+import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
@@ -57,6 +63,7 @@ import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.util.PkHelper;
 import net.sourceforge.stripes.action.*;
 import ognl.OgnlContext;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
 import java.io.Serializable;
@@ -88,6 +95,8 @@ public class ManyToManyAction extends AbstractPageAction {
     protected TableAccessor relationTableAccessor;
     protected TableAccessor manyTableAccessor;
 
+    protected SelectField oneSelectField;
+
     //Checkboxes view
     protected Map<Object, Boolean> booleanRelation;
     protected List<String> selectedPrimaryKeys = new ArrayList<String>();
@@ -105,17 +114,31 @@ public class ManyToManyAction extends AbstractPageAction {
     }
 
     @Before
-    public void prepare() {
+    public void prepare() throws NoSuchFieldException {
         Table table = m2mConfiguration.getActualRelationTable();
         relationTableAccessor = new TableAccessor(table);
         manyTableAccessor = new TableAccessor(m2mConfiguration.getActualManyTable());
-        //Set primary key
         String expression = m2mConfiguration.getOneExpression();
-        if(expression != null) {
+        if(!StringUtils.isBlank(expression)) {
+            //Set primary key
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
             onePk = (Serializable) OgnlUtils.getValueQuietly(expression, ognlContext, this); //TODO handle exception
         } else {
-            //TODO
+            //Setup "one" selection
+            if(!StringUtils.isBlank(m2mConfiguration.getOneQuery())) {
+                JavaClassAccessor myselfAccessor = JavaClassAccessor.getClassAccessor(getClass());
+                String databaseName = m2mConfiguration.getActualOneDatabase().getDatabaseName();
+                SelectionProvider selectionProvider =
+                        SelectionProviderLogic.createSelectionProviderFromHql
+                                ("onePk", application, databaseName, m2mConfiguration.getOneQuery(),
+                                 DisplayMode.DROPDOWN);
+                oneSelectField =
+                        new SelectField(myselfAccessor.getProperty("onePk"), selectionProvider, Mode.EDIT, "__");
+                oneSelectField.readFromObject(this);
+                oneSelectField.readFromObject(this);
+                oneSelectField.readFromRequest(context.getRequest());
+                oneSelectField.writeToObject(this);
+            }
         }
     }
 
@@ -123,21 +146,21 @@ public class ManyToManyAction extends AbstractPageAction {
     public Resolution execute() throws NoSuchFieldException { //TODO
         if(onePk != null) {
             loadAssociations();
-            if(potentiallyAvailableAssociations == null) {
+            if(potentiallyAvailableAssociations == null && onePk != null) {
                 return forwardToPortletNotConfigured(); //TODO
             }
-            return view();
-        } else {
-            return forwardToPortletNotConfigured(); //TODO
         }
+        return view();
     }
 
     protected Resolution view() {
         switch (m2mConfiguration.getActualViewType()) {
             case CHECKBOXES:
                 booleanRelation = new LinkedHashMap<Object, Boolean>();
-                for(Object o : potentiallyAvailableAssociations) {
-                    booleanRelation.put(o, !availableAssociations.contains(o));
+                if(potentiallyAvailableAssociations != null) {
+                    for(Object o : potentiallyAvailableAssociations) {
+                        booleanRelation.put(o, !availableAssociations.contains(o));
+                    }
                 }
                 return forwardTo("/layouts/m2m/checkboxes.jsp");
             default:
@@ -185,6 +208,7 @@ public class ManyToManyAction extends AbstractPageAction {
     }
 
     @Button(list = "m2m-checkboxes-edit", key = "commons.update")
+    @Guard(test = "onePk != null", type = GuardType.VISIBLE)
     public Resolution saveCheckboxes() throws Exception {
         loadAssociations();
         PkHelper pkHelper = new PkHelper(manyTableAccessor);
@@ -223,7 +247,13 @@ public class ManyToManyAction extends AbstractPageAction {
         }
         session.getTransaction().commit();
         SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
-        return cancel();
+        if(oneSelectField != null) {
+            session.beginTransaction();
+            loadAssociations();
+            return view();
+        } else {
+            return cancel();
+        }
     }
 
     //Configuration
@@ -262,7 +292,7 @@ public class ManyToManyAction extends AbstractPageAction {
         formBuilder.configFieldSetNames(general, oneSide, manySide);
         formBuilder.configFields(
                 new String[] { "viewType", "relationDatabase", "relationQuery" },
-                new String[] { "onePropertyName", "oneSelectable", "oneExpression", "oneDatabase", "oneQuery" },
+                new String[] { "onePropertyName", "oneExpression", "oneDatabase", "oneQuery" },
                 new String[] { "manyPropertyName", "manyDatabase", "manyQuery" });
 
         DefaultSelectionProvider viewTypeSelectionProvider = new DefaultSelectionProvider("viewType");
@@ -338,5 +368,9 @@ public class ManyToManyAction extends AbstractPageAction {
 
     public Form getConfigurationForm() {
         return configurationForm;
+    }
+
+    public SelectField getOneSelectField() {
+        return oneSelectField;
     }
 }
