@@ -66,7 +66,8 @@ public class WeekEntryModel {
     protected final Day[]          days;
     protected final List<Activity> activities;
 
-    protected Person person;
+    protected String personId;
+    protected String personName;
 
     //--------------------------------------------------------------------------
     // Logging
@@ -138,12 +139,20 @@ public class WeekEntryModel {
         }
     }
 
-    public Person getPerson() {
-        return person;
+    public String getPersonId() {
+        return personId;
     }
 
-    public void setPerson(Person person) {
-        this.person = person;
+    public void setPersonId(String personId) {
+        this.personId = personId;
+    }
+
+    public String getPersonName() {
+        return personName;
+    }
+
+    public void setPersonName(String personName) {
+        this.personName = personName;
     }
 
     public LocalDate getReferenceDate() {

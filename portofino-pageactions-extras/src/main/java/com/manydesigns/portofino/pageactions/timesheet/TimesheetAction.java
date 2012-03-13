@@ -31,7 +31,6 @@ package com.manydesigns.portofino.pageactions.timesheet;
 
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
-import com.lowagie.text.Image;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
@@ -66,7 +65,6 @@ import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
@@ -356,7 +354,7 @@ public class TimesheetAction extends AbstractPageAction {
     }
 
     public void loadExecuteModel() {
-        logger.debug("Load execute model");
+        logger.debug("Placeholder");
     }
 
 
@@ -494,35 +492,35 @@ public class TimesheetAction extends AbstractPageAction {
     }
 
     public void loadWeekEntryModel() throws Exception {
-        logger.debug("Load week entry model");
+        logger.debug("Placeholder");
     }
 
     public void beginWeekEntryTransaction() {
-        logger.debug("Begin week entry transaction");
+        logger.debug("Placeholder");
     }
 
     public void commitWeekEntryTransaction() {
-        logger.debug("Commit week entry transaction");
+        logger.debug("Placeholder");
     }
 
     public void rollbackWeekEntryTransaction() {
-        logger.debug("Rollback week entry transaction");
+        logger.debug("Placeholder");
     }
 
     public void endWeekEntryTransaction() {
-        logger.debug("End week entry transaction");
+        logger.debug("Placeholder");
     }
 
     public void saveWeekEntry(WeekEntryModel.Day day, Activity activity, int minutes, String note) {
-        logger.debug("Save week entry");
+        logger.debug("Placeholder");
     }
 
     public void updateWeekEntry(WeekEntryModel.Day day, Activity activity, int minutes, String note) {
-        logger.debug("Update week entry");
+        logger.debug("Placeholder");
     }
 
     public void deleteWeekEntry(WeekEntryModel.Day day, Activity activity) {
-        logger.debug("Delete week entry");
+        logger.debug("Placeholder");
     }
 
 
@@ -604,37 +602,7 @@ public class TimesheetAction extends AbstractPageAction {
         document.open();
 
         // Add content
-        PdfPTable headerTable = new PdfPTable(3);
-        headerTable.setWidthPercentage(100.0f);
-
-        ServletContext context = getContext().getServletContext();
-        String imagePath = context.getRealPath("/famfamfam_mini_icons/action_back.gif");
-        Image image = Image.getInstance(imagePath);
-        image.scalePercent(100f);
-        PdfPCell headerCell = new PdfPCell(image);
-        headerCell.setBorder(Rectangle.NO_BORDER);
-        headerTable.addCell(headerCell);
-
-        headerCell = new PdfPCell(new Phrase("Timesheet"));
-        headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        headerCell.setBorder(Rectangle.NO_BORDER);
-        headerTable.addCell(headerCell);
-
-        Paragraph headerParagraph = new Paragraph();
-        String personTitle = String.format("Name: %s",
-                monthReportModel.getPersonName());
-        String monthTitle = String.format("Month: %s",
-                monthFormatter.print(referenceDateMidnight));
-        headerParagraph.add(new Chunk(personTitle));
-        headerParagraph.add(Chunk.NEWLINE);
-        headerParagraph.add(new Chunk(monthTitle));
-
-        headerCell = new PdfPCell(headerParagraph);
-        headerCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        headerCell.setBorder(Rectangle.NO_BORDER);
-        headerTable.addCell(headerCell);
-
-        document.add(headerTable);
+        addMonthReportHeader(document);
 
 
         int daysCount = monthReportModel.getDaysCount();
@@ -709,8 +677,48 @@ public class TimesheetAction extends AbstractPageAction {
         }.setFilename("month-report.pdf").setLength(tmpFile.length());
     }
 
-    protected void printNode(PdfPTable table, MonthReportModel.Node node, int indentation)
-            throws BadElementException {
+    public void addMonthReportHeader(Document document) throws Exception {
+        PdfPTable headerTable = new PdfPTable(3);
+        headerTable.setWidthPercentage(100.0f);
+
+        addMonthReportHeaderLeft(headerTable);
+        addMonthReportHeaderCenter(headerTable);
+        addMonthReportHeaderRight(headerTable);
+
+        document.add(headerTable);
+    }
+
+    public void addMonthReportHeaderLeft(PdfPTable headerTable) throws Exception {
+        logger.debug("Placeholder");
+    }
+
+    public void addMonthReportHeaderCenter(PdfPTable headerTable) throws Exception {
+        PdfPCell headerCell = new PdfPCell(new Phrase("Timesheet"));
+        headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        headerCell.setBorder(Rectangle.NO_BORDER);
+        headerTable.addCell(headerCell);
+    }
+
+    public void addMonthReportHeaderRight(PdfPTable headerTable) throws Exception {
+        DateMidnight referenceDateMidnight =
+                monthReportModel.getReferenceDateMidnight();
+        Paragraph headerParagraph = new Paragraph();
+        String personTitle = String.format("Name: %s",
+                monthReportModel.getPersonName());
+        String monthTitle = String.format("Month: %s",
+                monthFormatter.print(referenceDateMidnight));
+        headerParagraph.add(new Chunk(personTitle));
+        headerParagraph.add(Chunk.NEWLINE);
+        headerParagraph.add(new Chunk(monthTitle));
+
+        PdfPCell headerCell = new PdfPCell(headerParagraph);
+        headerCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        headerCell.setBorder(Rectangle.NO_BORDER);
+        headerTable.addCell(headerCell);
+    }
+
+    public void printNode(PdfPTable table, MonthReportModel.Node node, int indentation)
+            throws Exception {
         List<MonthReportModel.Node> childNodes = node.getChildNodes();
         Color color = node.getColor();
         Color nonWorkingColor = ColorUtils.multiply(color, REPORT_NON_WORKING_COLOR);
@@ -753,9 +761,9 @@ public class TimesheetAction extends AbstractPageAction {
         }
     }
 
-    protected void printNodeMinutes(PdfPTable table, MonthReportModel.Node node,
+    public void printNodeMinutes(PdfPTable table, MonthReportModel.Node node,
                                   Color color, Color nonWorkingColor)
-            throws BadElementException {
+            throws Exception {
         for (int i = 0; i < monthReportModel.getDaysCount(); i++) {
             MonthReportModel.Day day = monthReportModel.getDay(i);
             Color actualBackgroundColor = (day.isNonWorking())
@@ -766,11 +774,11 @@ public class TimesheetAction extends AbstractPageAction {
         }
     }
 
-    protected void printNodeBlankMinutes(PdfPTable table,
+    public void printNodeBlankMinutes(PdfPTable table,
                                        MonthReportModel.Node node,
                                        Color color,
                                        Color nonWorkingColor)
-            throws BadElementException {
+            throws Exception {
         if (color == null) {
             color = Color.WHITE;
         }
@@ -783,13 +791,13 @@ public class TimesheetAction extends AbstractPageAction {
         }
     }
 
-    protected PdfPCell addCell(PdfPTable table, String text, int alignment)
-            throws BadElementException {
+    public PdfPCell addCell(PdfPTable table, String text, int alignment)
+            throws Exception {
         return addCell(table, text, alignment, null);
     }
 
-    protected PdfPCell addCell(PdfPTable table, String text, int alignment, Color backgroundColor)
-            throws BadElementException {
+    public PdfPCell addCell(PdfPTable table, String text, int alignment, Color backgroundColor)
+            throws Exception {
         PdfPCell cell = createCell(text, alignment);
         if (backgroundColor != null) {
             cell.setBackgroundColor(backgroundColor);
@@ -798,7 +806,7 @@ public class TimesheetAction extends AbstractPageAction {
         return cell;
     }
 
-    protected PdfPCell createCell(String text, int alignment) {
+    public PdfPCell createCell(String text, int alignment) throws Exception {
         PdfPCell cell = new PdfPCell(new Phrase(text, tableBodyFont));
         cell.setHorizontalAlignment(alignment);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
@@ -807,10 +815,10 @@ public class TimesheetAction extends AbstractPageAction {
 
 
     public void loadMonthReportModel() {
-        logger.debug("Load month report model");
+        logger.debug("Placeholder");
     }
 
-    protected MonthReportModel.Node addReportNode(MonthReportModel.Node rootNode, String id, String name, Color color) {
+    public MonthReportModel.Node addReportNode(MonthReportModel.Node rootNode, String id, String name, Color color) {
         MonthReportModel.Node node =
                 monthReportModel.createNode(id, name);
         node.setColor(color);

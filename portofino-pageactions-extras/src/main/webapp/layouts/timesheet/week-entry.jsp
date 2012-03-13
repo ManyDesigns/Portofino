@@ -164,7 +164,7 @@
 </div>
 <fmt:message key="timesheet.person"/>:
 <%
-    xb.write(weekEntryModel.getPerson().getLongName());
+    xb.write(weekEntryModel.getPersonName());
 %>
 <br/>
 <fmt:message key="timesheet.from.day"/>:

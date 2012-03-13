@@ -1,8 +1,13 @@
+import com.lowagie.text.Image
+import com.lowagie.text.Rectangle
+import com.lowagie.text.pdf.PdfPCell
+import com.lowagie.text.pdf.PdfPTable
 import com.manydesigns.portofino.pageactions.timesheet.TimesheetAction
 import com.manydesigns.portofino.pageactions.timesheet.util.PersonDay
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import java.awt.Color
+import javax.servlet.ServletContext
 import org.joda.time.DateMidnight
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
@@ -173,10 +178,12 @@ class %{#generatedClassName} extends TimesheetAction {
         LocalDate today = new LocalDate();
         Map<LocalDate, PersonDay> personDayDb;
         if (mario.getId().equals(personId)) {
-            weekEntryModel.setPerson(mario);
+            weekEntryModel.setPersonId(mario.id);
+            weekEntryModel.setPersonName(mario.longName);
             personDayDb = marioDayDb;
         } else if (giovanni.getId().equals(personId)) {
-            weekEntryModel.setPerson(giovanni);
+            weekEntryModel.setPersonId(giovanni.id);
+            weekEntryModel.setPersonName(giovanni.longName);
             personDayDb = giovanniDayDb;
         } else {
             throw new Exception("Person non found");
@@ -368,5 +375,16 @@ class %{#generatedClassName} extends TimesheetAction {
             }
         }
     }
+
+    public void addMonthReportHeaderLeft(PdfPTable headerTable) throws Exception {
+        ServletContext context = getContext().getServletContext();
+        String imagePath = context.getRealPath("/famfamfam_mini_icons/action_back.gif");
+        Image image = Image.getInstance(imagePath);
+        image.scalePercent(100f);
+        PdfPCell headerCell = new PdfPCell(image);
+        headerCell.setBorder(Rectangle.NO_BORDER);
+        headerTable.addCell(headerCell);
+    }
+
 
 }
