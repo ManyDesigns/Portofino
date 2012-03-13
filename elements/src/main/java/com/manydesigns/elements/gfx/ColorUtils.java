@@ -42,6 +42,16 @@ public class ColorUtils {
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
 
+    public static Color add(Color color1, Color color2) {
+        float[] components1 = color1.getRGBComponents(null);
+        float[] components2 = color2.getRGBComponents(null);
+        float[] components = new float[4];
+        for (int i = 0; i < 4; i++) {
+            components[i] = components1[i] + components2[i];
+        }
+        return new Color(components[0], components[1], components[2], components[3]);
+    }
+
     public static Color average(Color color1, Color color2) {
         float[] components1 = color1.getRGBComponents(null);
         float[] components2 = color2.getRGBComponents(null);
@@ -79,7 +89,7 @@ public class ColorUtils {
                 0.11f * components[2];
     }
 
-    public static String toHexString(Color color) {
-        return String.format("%x", color.getRGB());
+    public static String toHtmlColor(Color color) {
+        return String.format("#%x", color.getRGB() & 0xffffff);
     }
 }

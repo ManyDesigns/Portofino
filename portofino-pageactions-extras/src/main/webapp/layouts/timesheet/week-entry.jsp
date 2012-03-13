@@ -1,3 +1,4 @@
+<%@ page import="com.manydesigns.elements.gfx.ColorUtils" %>
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page
         import="com.manydesigns.portofino.pageactions.timesheet.TimesheetAction" %>
@@ -5,23 +6,18 @@
         import="com.manydesigns.portofino.pageactions.timesheet.model.Activity" %>
 <%@ page
         import="com.manydesigns.portofino.pageactions.timesheet.model.WeekEntryModel" %>
-<%@ page
-        import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.joda.time.LocalDate" %>
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
+<%@ page import="java.awt.*" %>
 <%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
-         pageEncoding="UTF-8"
-        %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-        %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-        %>
+         pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="stripes"
-           uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
-        %>
-<%@taglib prefix="mde" uri="/manydesigns-elements"
-        %>
+           uri="http://stripes.sourceforge.net/stripes-dynattr.tld" %>
+<%@ taglib prefix="mde" uri="/manydesigns-elements" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/${skin}/modal-page.jsp">
 <jsp:useBean id="actionBean" scope="request"
@@ -34,6 +30,40 @@
     <c:out value="${actionBean.page.title}"/>
 </stripes:layout-component>
 <stripes:layout-component name="portletBody">
+<%
+    Color borderColor = new Color(0xCBCBCB);
+
+    Color todayColor;
+    Color nonWorkingColor;
+    Color headerBgColor;
+    Color headerColor;
+    Color footerBgColor;
+    Color footerColor;
+
+    int colorScheme = 1;
+    switch (colorScheme) {
+        default:
+            todayColor = new Color(0xfff7c6);
+            nonWorkingColor = new Color(0xD7F7EC);
+            headerBgColor = new Color(0x8899DD);
+            headerColor = Color.WHITE;
+            footerBgColor = new Color(0xF7EBD7);
+            footerColor = new Color(0x333333);
+    }
+
+    Color dayTodayHeaderBgColor = ColorUtils.multiply(headerBgColor, todayColor);
+    Color dayNonWorkingHeaderBgColor = ColorUtils.multiply(headerBgColor, nonWorkingColor);
+
+    Color oddRowBgColor = Color.WHITE;
+    Color evenRowBgColor = new Color(0xEDF5FF);
+    Color hoursTodayOddBgColor = ColorUtils.multiply(oddRowBgColor, todayColor);
+    Color hoursTodayEvenBgColor = ColorUtils.multiply(evenRowBgColor, todayColor);
+    Color hoursNonWorkingOddBgColor = ColorUtils.multiply(oddRowBgColor, nonWorkingColor);
+    Color hoursNonWorkingEvenBgColor = ColorUtils.multiply(evenRowBgColor, nonWorkingColor);
+
+    Color todayFooterBgColor = ColorUtils.multiply(footerBgColor, todayColor);
+    Color nonWorkingFooterBgColor = ColorUtils.multiply(footerBgColor, nonWorkingColor);
+%>
 <style type="text/css">
     div.twe-container {
         overflow-x: auto;
@@ -48,37 +78,51 @@
     }
 
     table.twe-table th, table.twe-table td {
-        border-color: #dddddd;
+        border-color: <%= ColorUtils.toHtmlColor(borderColor) %>;
     }
 
     th.twe-activity {
-        background-color: #567050;
-        color: white;
+        background-color: <%= ColorUtils.toHtmlColor(headerBgColor) %>;
+        color: <%= ColorUtils.toHtmlColor(headerColor) %>;
     }
 
     th.twe-day {
-        background-color: #94B47B;
-        color: white;
+        background-color: <%= ColorUtils.toHtmlColor(headerBgColor) %>;
+        color: <%= ColorUtils.toHtmlColor(headerColor) %>;
     }
 
     th.twe-day.twe-today {
-        background-color: #B4C97E;
+        background-color: <%= ColorUtils.toHtmlColor(dayTodayHeaderBgColor) %>;
+        color: <%= ColorUtils.toHtmlColor(headerColor) %>;
     }
 
     th.twe-day.twe-non-working {
-        background-color: #74936C;
+        background-color: <%= ColorUtils.toHtmlColor(dayNonWorkingHeaderBgColor) %>;
+        color: <%= ColorUtils.toHtmlColor(headerColor) %>;
+    }
+
+    table.twe-table tr.odd {
+        background-color: <%= ColorUtils.toHtmlColor(oddRowBgColor) %>;
     }
 
     table.twe-table tr.even {
-        background-color: #FCFAF3
+        background-color: <%= ColorUtils.toHtmlColor(evenRowBgColor) %>;
     }
 
-    td.twe-hours.twe-today {
-        background-color: #FFF2B5;
+    tr.odd td.twe-hours.twe-today {
+        background-color: <%= ColorUtils.toHtmlColor(hoursTodayOddBgColor) %>;
     }
 
-    td.twe-hours.twe-non-working {
-        background-color: #F0F8E5;
+    tr.even td.twe-hours.twe-today {
+        background-color: <%= ColorUtils.toHtmlColor(hoursTodayEvenBgColor) %>;
+    }
+
+    tr.odd td.twe-hours.twe-non-working {
+        background-color: <%= ColorUtils.toHtmlColor(hoursNonWorkingOddBgColor) %>;
+    }
+
+    tr.even td.twe-hours.twe-non-working {
+        background-color: <%= ColorUtils.toHtmlColor(hoursNonWorkingEvenBgColor) %>;
     }
 
     td.twe-hours input.twe-input {
@@ -114,8 +158,8 @@
     }
 
     table.twe-table tfoot tr {
-        background-color: #F0EAD7;
-        color: #625644;
+        background-color: <%= ColorUtils.toHtmlColor(footerBgColor) %>;
+        color: <%= ColorUtils.toHtmlColor(footerColor) %>;
         font-weight: bold;
     }
 
@@ -124,7 +168,11 @@
     }
 
     td.twe-summary.twe-today {
-        background-color: #F9EFBE;
+        background-color: <%= ColorUtils.toHtmlColor(todayFooterBgColor) %>;
+    }
+
+    td.twe-summary.twe-non-working {
+        background-color: <%= ColorUtils.toHtmlColor(nonWorkingFooterBgColor) %>;
     }
 
     span.twe-ro-hours, span.twe-day-total {

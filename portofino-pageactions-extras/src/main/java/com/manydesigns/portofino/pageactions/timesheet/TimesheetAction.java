@@ -616,10 +616,7 @@ public class TimesheetAction extends AbstractPageAction {
     public Resolution monthReport() throws Exception {
         DateMidnight referenceDateMidnight =
                 new DateMidnight(referenceDate, dtz);
-        String personId = "MR";
-        String personName = "Mario Rossi";
-        monthReportModel = new MonthReportModel(
-                referenceDateMidnight, personId, personName);
+        monthReportModel = new MonthReportModel(referenceDateMidnight);
         loadMonthReportModel();
 
         final File tmpFile = File.createTempFile("report-", ".pdf");
@@ -840,6 +837,9 @@ public class TimesheetAction extends AbstractPageAction {
 
 
     public void loadMonthReportModel() {
+        monthReportModel.setPersonId("MR");
+        monthReportModel.setPersonName("Mario Rossi");
+
         MonthReportModel.Node rootNode =
                 monthReportModel.createNode("root", "root node");
         rootNode.setColor(new Color(0x88a1c7));
@@ -913,7 +913,7 @@ public class TimesheetAction extends AbstractPageAction {
         }
     }
 
-    private MonthReportModel.Node addReportNode(MonthReportModel.Node rootNode, String id, String name, Color color) {
+    protected MonthReportModel.Node addReportNode(MonthReportModel.Node rootNode, String id, String name, Color color) {
         MonthReportModel.Node node =
                 monthReportModel.createNode(id, name);
         node.setColor(color);

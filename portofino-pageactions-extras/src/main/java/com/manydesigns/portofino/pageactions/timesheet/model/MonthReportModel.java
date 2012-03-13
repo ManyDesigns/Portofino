@@ -54,8 +54,8 @@ public class MonthReportModel extends AbstractMonth<MonthReportModel.Day> {
     // Variables
     //**************************************************************************
 
-    protected final String personId;
-    protected final String personName;
+    protected String personId;
+    protected String personName;
 
     protected Node rootNode;
 
@@ -67,16 +67,12 @@ public class MonthReportModel extends AbstractMonth<MonthReportModel.Day> {
             LoggerFactory.getLogger(MonthReportModel.class);
 
 
-
     //--------------------------------------------------------------------------
     // Constructor
     //--------------------------------------------------------------------------
 
-    public MonthReportModel(DateMidnight referenceDateMidnight,
-                            String personId, String personName) {
+    public MonthReportModel(DateMidnight referenceDateMidnight) {
         super(referenceDateMidnight);
-        this.personId = personId;
-        this.personName = personName;
     }
 
     //--------------------------------------------------------------------------
@@ -117,8 +113,16 @@ public class MonthReportModel extends AbstractMonth<MonthReportModel.Day> {
         return personId;
     }
 
+    public void setPersonId(String personId) {
+        this.personId = personId;
+    }
+
     public String getPersonName() {
         return personName;
+    }
+
+    public void setPersonName(String personName) {
+        this.personName = personName;
     }
 
     //--------------------------------------------------------------------------
@@ -143,9 +147,9 @@ public class MonthReportModel extends AbstractMonth<MonthReportModel.Day> {
 
     public static class Node {
         final List<Node> childNodes;
-        final String id;
-        final String name;
-        final int[] minutesArray;
+        final String     id;
+        final String     name;
+        final int[]      minutesArray;
         Color color;
 
         public Node(String id, String name, int daysCount) {
