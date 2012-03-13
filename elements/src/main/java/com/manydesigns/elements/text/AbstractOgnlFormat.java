@@ -77,7 +77,9 @@ public abstract class AbstractOgnlFormat {
         int index = 0;
         while (m.find()) {
             int start = m.start();
-            sb.append(ognlFormat.substring(previousEnd, start));
+            String text = ognlFormat.substring(previousEnd, start);
+            String escapedText = escapeText(text);
+            sb.append(escapedText);
             String group = m.group();
             String ognlExpression = group.substring(2, group.length()-1);
             replaceOgnlExpression(sb, index, ognlExpression);
@@ -89,7 +91,9 @@ public abstract class AbstractOgnlFormat {
             previousEnd = end;
             index++;
         }
-        sb.append(ognlFormat.substring(previousEnd, ognlFormat.length()));
+        String text = ognlFormat.substring(previousEnd, ognlFormat.length());
+        String escapedText = escapeText(text);
+        sb.append(escapedText);
 
         formatString = sb.toString();
 
@@ -99,6 +103,10 @@ public abstract class AbstractOgnlFormat {
         parsedOgnlExpressions =
                 new Object[parsedOgnlExpressionList.size()];
         parsedOgnlExpressionList.toArray(parsedOgnlExpressions);
+    }
+
+    protected String escapeText(String text) {
+        return text;
     }
 
     protected abstract void replaceOgnlExpression(StringBuilder sb,

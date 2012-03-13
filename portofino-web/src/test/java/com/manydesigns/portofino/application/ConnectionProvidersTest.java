@@ -74,7 +74,8 @@ public class ConnectionProvidersTest extends AbstractPortofinoTest {
         databases.add(database);
         application.saveXmlModel();
 
-        File connectionsFile = application.getAppConnectionsFile();
+//        File connectionsFile = application.getAppConnectionsFile();
+        File connectionsFile = null;
 
         assertEquals(4, databases.size());
         InputStream is = null;

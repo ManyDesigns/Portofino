@@ -120,6 +120,12 @@ public class OgnlTextFormat
     // AbstractOgnlFormat implementation
     //**************************************************************************
 
+
+    @Override
+    protected String escapeText(String text) {
+        return text.replace("'", "''").replace("{", "'{'");
+    }
+
     protected void replaceOgnlExpression(StringBuilder sb,
                                          int index,
                                          String ognlExpression) {

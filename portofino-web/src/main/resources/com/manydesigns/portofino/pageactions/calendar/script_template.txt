@@ -3,9 +3,9 @@ import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class %{#generatedClassName} extends CalendarAction '{'
+class %{#generatedClassName} extends CalendarAction {
 
     //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino
     //Write your code here
 
-'}'
+}

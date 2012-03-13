@@ -84,7 +84,6 @@ public class DefaultApplication implements Application {
     //**************************************************************************
 
     public static final String APP_BLOBS_DIR = "blobs";
-    public static final String APP_CONNECTIONS_FILE = "portofino-connections.xml";
     public static final String APP_DBS_DIR = "dbs";
     public static final String APP_MODEL_FILE = "portofino-model.xml";
     public static final String APP_SCRIPTS_DIR = "scripts";
@@ -101,7 +100,6 @@ public class DefaultApplication implements Application {
     protected final org.apache.commons.configuration.Configuration portofinoConfiguration;
     protected final org.apache.commons.configuration.Configuration appConfiguration;
     protected final DatabasePlatformsManager databasePlatformsManager;
-//    protected List<ConnectionProvider> connectionProviders;
     protected Model model;
     protected final Map<String, HibernateDatabaseSetup> setups;
 
@@ -109,7 +107,6 @@ public class DefaultApplication implements Application {
 
     protected final File appDir;
     protected final File appBlobsDir;
-    protected final File appConnectionsFile;
     protected final File appDbsDir;
     protected final File appModelFile;
     protected final File appScriptsDir;
@@ -148,10 +145,6 @@ public class DefaultApplication implements Application {
         appBlobsDir = new File(appDir, APP_BLOBS_DIR);
         logger.info("Application blobs dir: {}", appBlobsDir.getAbsolutePath());
         boolean result = ElementsFileUtils.ensureDirectoryExistsAndWritable(appBlobsDir);
-
-        appConnectionsFile = new File(appDir, APP_CONNECTIONS_FILE);
-        logger.info("Application connections file: {}",
-                appConnectionsFile.getAbsolutePath());
 
         appDbsDir = new File(appDir, APP_DBS_DIR);
         logger.info("Application dbs dir: {}",
@@ -545,10 +538,6 @@ public class DefaultApplication implements Application {
 
     public File getAppBlobsDir() {
         return appBlobsDir;
-    }
-
-    public File getAppConnectionsFile() {
-        return appConnectionsFile;
     }
 
     public File getPagesDir() {

@@ -325,7 +325,7 @@ public class MutableHttpServletRequest implements MultipartRequest {
     }
 
     public Locale getLocale() {
-        throw new UnsupportedOperationException();
+        return Locale.getDefault();
     }
 
     public Enumeration getLocales() {

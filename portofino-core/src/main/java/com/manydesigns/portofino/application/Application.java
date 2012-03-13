@@ -64,7 +64,6 @@ public interface Application {
 
     File getAppDir();
     File getAppBlobsDir();
-    File getAppConnectionsFile();
     File getPagesDir();
     File getAppDbsDir();
     File getAppModelFile();
