@@ -363,7 +363,7 @@
                 String noteInputName = String.format(TimesheetAction.NOTE_INPUT_FORMAT,
                         dayIndex, activity.getId());
                 int tabIndex = activityIndex +
-                        dayIndex * weekActivitiesSize;
+                        dayIndex * weekActivitiesSize + 1;
 
 
                 if (entry == null) {
