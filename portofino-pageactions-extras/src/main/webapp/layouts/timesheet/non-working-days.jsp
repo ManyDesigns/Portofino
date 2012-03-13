@@ -1,22 +1,15 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
+<%@ page import="com.manydesigns.elements.gfx.ColorUtils" %>
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
-<%@ page
-        import="com.manydesigns.portofino.pageactions.timesheet.model.NonWorkingDaysModel" %>
+<%@ page import="com.manydesigns.portofino.pageactions.timesheet.model.NonWorkingDaysModel" %>
 <%@ page import="org.joda.time.DateMidnight" %>
 <%@ page import="org.joda.time.DateTimeConstants" %>
 <%@ page import="org.joda.time.Interval" %>
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java"
-         pageEncoding="UTF-8"
-        %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-        %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-        %>
-<%@ taglib prefix="stripes"
-           uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
-        %>
-<%@taglib prefix="mde" uri="/manydesigns-elements"
-        %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld" %>
+<%@taglib prefix="mde" uri="/manydesigns-elements" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/${skin}/modal-page.jsp">
     <jsp:useBean id="actionBean" scope="request"
@@ -41,16 +34,16 @@
             }
 
             table.tnwd-table th, table.tnwd-table td {
-                border-color: #dddddd;
+                border-color: <%= ColorUtils.toHtmlColor(actionBean.getBorderColor()) %>;
             }
 
             th.tndw-day-of-week {
-                background-color: #94B47B;
+                background-color: <%= ColorUtils.toHtmlColor(actionBean.getHeaderBgColor()) %>;
                 color: white;
             }
 
             th.tndw-saturday, th.tndw-sunday {
-                background-color: #74936C;
+                background-color: <%= ColorUtils.toHtmlColor(actionBean.getDayNonWorkingHeaderBgColor()) %>;
             }
 
             table.tnwd-table tbody td {
@@ -67,13 +60,12 @@
             }
 
             div.tnws-day.tnws-non-working {
-                background-color: #F0F8E5;
-                color: #993333;
+                background-color: <%= ColorUtils.toHtmlColor(actionBean.getNonWorkingColor()) %>;
                 font-weight: bold;
             }
 
             div.tnws-day.tnws-hover {
-                background-color: #FACE00;
+                background-color: <%= ColorUtils.toHtmlColor(actionBean.getTodayColor()) %>;
             }
 
             div.tnws-buttons {

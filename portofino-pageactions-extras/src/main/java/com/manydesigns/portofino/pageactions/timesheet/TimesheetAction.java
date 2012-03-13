@@ -165,6 +165,30 @@ public class TimesheetAction extends AbstractPageAction {
     protected DateTimeFormatter referenceDateFormatter;
 
 
+    /**
+     * Color scheme
+     */
+    protected Color borderColor;
+    protected Color todayColor;
+    protected Color nonWorkingColor;
+    protected Color headerBgColor;
+    protected Color headerColor;
+    protected Color footerBgColor;
+    protected Color footerColor;
+    protected Color dayTodayHeaderBgColor;
+    protected Color dayNonWorkingHeaderBgColor;
+
+    protected Color oddRowBgColor;
+    protected Color evenRowBgColor;
+    protected Color hoursTodayOddBgColor;
+    protected Color hoursTodayEvenBgColor;
+    protected Color hoursNonWorkingOddBgColor;
+    protected Color hoursNonWorkingEvenBgColor;
+
+    protected Color todayFooterBgColor;
+    protected Color nonWorkingFooterBgColor;
+
+
     //**************************************************************************
     // Injections
     //**************************************************************************
@@ -207,6 +231,34 @@ public class TimesheetAction extends AbstractPageAction {
                 .toFormatter()
                 .withLocale(locale);
         referenceDateFormatter = DateTimeFormat.forPattern("yyyy M d");
+    }
+
+    @Before
+    public void prepareColorScheme() {
+        int colorScheme = 1;
+        switch (colorScheme) {
+            default:
+                borderColor = new Color(0xCBCBCB);
+                todayColor = new Color(0xfff7c6);
+                nonWorkingColor = new Color(0xD7F7EC);
+                headerBgColor = new Color(0x8899DD);
+                headerColor = Color.WHITE;
+                footerBgColor = new Color(0xF7EBD7);
+                footerColor = new Color(0x333333);
+        }
+        dayTodayHeaderBgColor = ColorUtils.multiply(headerBgColor, todayColor);
+        dayNonWorkingHeaderBgColor = ColorUtils.multiply(headerBgColor, nonWorkingColor);
+
+        oddRowBgColor = Color.WHITE;
+        evenRowBgColor = new Color(0xEDF5FF);
+        hoursTodayOddBgColor = ColorUtils.multiply(oddRowBgColor, todayColor);
+        hoursTodayEvenBgColor = ColorUtils.multiply(evenRowBgColor, todayColor);
+        hoursNonWorkingOddBgColor = ColorUtils.multiply(oddRowBgColor, nonWorkingColor);
+        hoursNonWorkingEvenBgColor = ColorUtils.multiply(evenRowBgColor, nonWorkingColor);
+
+        todayFooterBgColor = ColorUtils.multiply(footerBgColor, todayColor);
+        nonWorkingFooterBgColor = ColorUtils.multiply(footerBgColor, nonWorkingColor);
+
     }
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
@@ -1180,5 +1232,73 @@ public class TimesheetAction extends AbstractPageAction {
 
     public DateTimeFormatter getReferenceDateFormatter() {
         return referenceDateFormatter;
+    }
+
+    public Color getBorderColor() {
+        return borderColor;
+    }
+
+    public Color getTodayColor() {
+        return todayColor;
+    }
+
+    public Color getNonWorkingColor() {
+        return nonWorkingColor;
+    }
+
+    public Color getHeaderBgColor() {
+        return headerBgColor;
+    }
+
+    public Color getHeaderColor() {
+        return headerColor;
+    }
+
+    public Color getFooterBgColor() {
+        return footerBgColor;
+    }
+
+    public Color getFooterColor() {
+        return footerColor;
+    }
+
+    public Color getDayTodayHeaderBgColor() {
+        return dayTodayHeaderBgColor;
+    }
+
+    public Color getDayNonWorkingHeaderBgColor() {
+        return dayNonWorkingHeaderBgColor;
+    }
+
+    public Color getOddRowBgColor() {
+        return oddRowBgColor;
+    }
+
+    public Color getEvenRowBgColor() {
+        return evenRowBgColor;
+    }
+
+    public Color getHoursTodayOddBgColor() {
+        return hoursTodayOddBgColor;
+    }
+
+    public Color getHoursTodayEvenBgColor() {
+        return hoursTodayEvenBgColor;
+    }
+
+    public Color getHoursNonWorkingOddBgColor() {
+        return hoursNonWorkingOddBgColor;
+    }
+
+    public Color getHoursNonWorkingEvenBgColor() {
+        return hoursNonWorkingEvenBgColor;
+    }
+
+    public Color getTodayFooterBgColor() {
+        return todayFooterBgColor;
+    }
+
+    public Color getNonWorkingFooterBgColor() {
+        return nonWorkingFooterBgColor;
     }
 }

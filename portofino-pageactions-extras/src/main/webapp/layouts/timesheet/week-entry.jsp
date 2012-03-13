@@ -9,7 +9,6 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.joda.time.LocalDate" %>
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
-<%@ page import="java.awt.*" %>
 <%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8" %>
@@ -30,40 +29,6 @@
     <c:out value="${actionBean.page.title}"/>
 </stripes:layout-component>
 <stripes:layout-component name="portletBody">
-<%
-    Color borderColor = new Color(0xCBCBCB);
-
-    Color todayColor;
-    Color nonWorkingColor;
-    Color headerBgColor;
-    Color headerColor;
-    Color footerBgColor;
-    Color footerColor;
-
-    int colorScheme = 1;
-    switch (colorScheme) {
-        default:
-            todayColor = new Color(0xfff7c6);
-            nonWorkingColor = new Color(0xD7F7EC);
-            headerBgColor = new Color(0x8899DD);
-            headerColor = Color.WHITE;
-            footerBgColor = new Color(0xF7EBD7);
-            footerColor = new Color(0x333333);
-    }
-
-    Color dayTodayHeaderBgColor = ColorUtils.multiply(headerBgColor, todayColor);
-    Color dayNonWorkingHeaderBgColor = ColorUtils.multiply(headerBgColor, nonWorkingColor);
-
-    Color oddRowBgColor = Color.WHITE;
-    Color evenRowBgColor = new Color(0xEDF5FF);
-    Color hoursTodayOddBgColor = ColorUtils.multiply(oddRowBgColor, todayColor);
-    Color hoursTodayEvenBgColor = ColorUtils.multiply(evenRowBgColor, todayColor);
-    Color hoursNonWorkingOddBgColor = ColorUtils.multiply(oddRowBgColor, nonWorkingColor);
-    Color hoursNonWorkingEvenBgColor = ColorUtils.multiply(evenRowBgColor, nonWorkingColor);
-
-    Color todayFooterBgColor = ColorUtils.multiply(footerBgColor, todayColor);
-    Color nonWorkingFooterBgColor = ColorUtils.multiply(footerBgColor, nonWorkingColor);
-%>
 <style type="text/css">
     div.twe-container {
         overflow-x: auto;
@@ -78,51 +43,51 @@
     }
 
     table.twe-table th, table.twe-table td {
-        border-color: <%= ColorUtils.toHtmlColor(borderColor) %>;
+        border-color: <%= ColorUtils.toHtmlColor(actionBean.getBorderColor()) %>;
     }
 
     th.twe-activity {
-        background-color: <%= ColorUtils.toHtmlColor(headerBgColor) %>;
-        color: <%= ColorUtils.toHtmlColor(headerColor) %>;
+        background-color: <%= ColorUtils.toHtmlColor(actionBean.getHeaderBgColor()) %>;
+        color: <%= ColorUtils.toHtmlColor(actionBean.getHeaderColor()) %>;
     }
 
     th.twe-day {
-        background-color: <%= ColorUtils.toHtmlColor(headerBgColor) %>;
-        color: <%= ColorUtils.toHtmlColor(headerColor) %>;
+        background-color: <%= ColorUtils.toHtmlColor(actionBean.getHeaderBgColor()) %>;
+        color: <%= ColorUtils.toHtmlColor(actionBean.getHeaderColor()) %>;
     }
 
     th.twe-day.twe-today {
-        background-color: <%= ColorUtils.toHtmlColor(dayTodayHeaderBgColor) %>;
-        color: <%= ColorUtils.toHtmlColor(headerColor) %>;
+        background-color: <%= ColorUtils.toHtmlColor(actionBean.getDayTodayHeaderBgColor()) %>;
+        color: <%= ColorUtils.toHtmlColor(actionBean.getHeaderColor()) %>;
     }
 
     th.twe-day.twe-non-working {
-        background-color: <%= ColorUtils.toHtmlColor(dayNonWorkingHeaderBgColor) %>;
-        color: <%= ColorUtils.toHtmlColor(headerColor) %>;
+        background-color: <%= ColorUtils.toHtmlColor(actionBean.getDayNonWorkingHeaderBgColor()) %>;
+        color: <%= ColorUtils.toHtmlColor(actionBean.getHeaderColor()) %>;
     }
 
     table.twe-table tr.odd {
-        background-color: <%= ColorUtils.toHtmlColor(oddRowBgColor) %>;
+        background-color: <%= ColorUtils.toHtmlColor(actionBean.getOddRowBgColor()) %>;
     }
 
     table.twe-table tr.even {
-        background-color: <%= ColorUtils.toHtmlColor(evenRowBgColor) %>;
+        background-color: <%= ColorUtils.toHtmlColor(actionBean.getEvenRowBgColor()) %>;
     }
 
     tr.odd td.twe-hours.twe-today {
-        background-color: <%= ColorUtils.toHtmlColor(hoursTodayOddBgColor) %>;
+        background-color: <%= ColorUtils.toHtmlColor(actionBean.getHoursTodayOddBgColor()) %>;
     }
 
     tr.even td.twe-hours.twe-today {
-        background-color: <%= ColorUtils.toHtmlColor(hoursTodayEvenBgColor) %>;
+        background-color: <%= ColorUtils.toHtmlColor(actionBean.getHoursTodayEvenBgColor()) %>;
     }
 
     tr.odd td.twe-hours.twe-non-working {
-        background-color: <%= ColorUtils.toHtmlColor(hoursNonWorkingOddBgColor) %>;
+        background-color: <%= ColorUtils.toHtmlColor(actionBean.getHoursNonWorkingOddBgColor()) %>;
     }
 
     tr.even td.twe-hours.twe-non-working {
-        background-color: <%= ColorUtils.toHtmlColor(hoursNonWorkingEvenBgColor) %>;
+        background-color: <%= ColorUtils.toHtmlColor(actionBean.getHoursNonWorkingEvenBgColor()) %>;
     }
 
     td.twe-hours input.twe-input {
@@ -158,8 +123,8 @@
     }
 
     table.twe-table tfoot tr {
-        background-color: <%= ColorUtils.toHtmlColor(footerBgColor) %>;
-        color: <%= ColorUtils.toHtmlColor(footerColor) %>;
+        background-color: <%= ColorUtils.toHtmlColor(actionBean.getFooterBgColor()) %>;
+        color: <%= ColorUtils.toHtmlColor(actionBean.getFooterColor()) %>;
         font-weight: bold;
     }
 
@@ -168,11 +133,11 @@
     }
 
     td.twe-summary.twe-today {
-        background-color: <%= ColorUtils.toHtmlColor(todayFooterBgColor) %>;
+        background-color: <%= ColorUtils.toHtmlColor(actionBean.getTodayFooterBgColor()) %>;
     }
 
     td.twe-summary.twe-non-working {
-        background-color: <%= ColorUtils.toHtmlColor(nonWorkingFooterBgColor) %>;
+        background-color: <%= ColorUtils.toHtmlColor(actionBean.getNonWorkingFooterBgColor()) %>;
     }
 
     span.twe-ro-hours, span.twe-day-total {
