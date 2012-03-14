@@ -3,7 +3,7 @@ function updateSelectOptions(relName, selectionProviderIndex, methodName) {
 
     var data = {
         relName : relName,
-        selectionProviderIndex : selectionProviderIndex,
+        selectionProviderIndex : selectionProviderIndex
     };
     data[methodName] = '';
     for (var i = 3; i < arguments.length; i++ ) {
@@ -119,6 +119,10 @@ $(function() {
             toolbar: 'Full',
             toolbarCanCollapse: false
         };
-        element.ckeditor(conf);
+        if(element.ckeditor) {
+            element.ckeditor(conf);
+        } else if(console && console.error) {
+            console.error("CKEditor not loaded! Make sure that ckeditor/ckeditor.js and ckeditor/adapters/jquery.js are included in your page.");
+        }
     });
 });

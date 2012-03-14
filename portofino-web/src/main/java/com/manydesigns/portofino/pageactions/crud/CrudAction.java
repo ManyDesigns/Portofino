@@ -2068,9 +2068,12 @@ public class CrudAction extends AbstractPageAction {
     private void updateProperties() {
         propertiesTableForm.writeToObject(edits);
 
-        crudConfiguration.getProperties().clear();
+        List<CrudProperty> newProperties = new ArrayList<CrudProperty>();
         for (CrudPropertyEdit edit : edits) {
-            CrudProperty crudProperty = new CrudProperty();
+            CrudProperty crudProperty = findProperty(edit.name, crudConfiguration.getProperties());
+            if(crudProperty == null) {
+                crudProperty = new CrudProperty();
+            }
 
             crudProperty.setName(edit.name);
             crudProperty.setLabel(edit.label);
@@ -2080,8 +2083,19 @@ public class CrudAction extends AbstractPageAction {
             crudProperty.setInsertable(edit.insertable);
             crudProperty.setUpdatable(edit.updatable);
 
-            crudConfiguration.getProperties().add(crudProperty);
+            newProperties.add(crudProperty);
         }
+        crudConfiguration.getProperties().clear();
+        crudConfiguration.getProperties().addAll(newProperties);
+    }
+
+    protected CrudProperty findProperty(String name, List<CrudProperty> properties) {
+        for(CrudProperty p : properties) {
+            if(p.getName().equals(name)) {
+                return p;
+            }
+        }
+        return null;
     }
 
     protected SelectionProviderReference makeSelectionProviderReference(ModelSelectionProvider dsp) {

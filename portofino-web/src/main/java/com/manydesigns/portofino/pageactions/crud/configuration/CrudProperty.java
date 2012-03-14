@@ -30,12 +30,14 @@
 package com.manydesigns.portofino.pageactions.crud.configuration;
 
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.model.Annotated;
+import com.manydesigns.portofino.model.Annotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,7 +47,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 */
 
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class CrudProperty {
+public class CrudProperty implements Annotated {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
 
@@ -61,6 +63,8 @@ public class CrudProperty {
     protected boolean enabled;
     protected boolean insertable;
     protected boolean updatable;
+
+    protected final List<Annotation> annotations = new ArrayList<Annotation>();
 
     //**************************************************************************
     // Logging
@@ -81,6 +85,11 @@ public class CrudProperty {
 
     public void init(Application application) {
         assert name != null;
+        for(Annotation annotation : annotations) {
+            annotation.reset();
+            annotation.init(application.getModel());
+            annotation.link(application.getModel());
+        }
     }
 
     //**************************************************************************
@@ -151,4 +160,9 @@ public class CrudProperty {
         this.updatable = updatable;
     }
 
+    @XmlElementWrapper(name="annotations")
+    @XmlElement(name = "annotation", type = Annotation.class)
+    public List<Annotation> getAnnotations() {
+        return annotations;
+    }
 }

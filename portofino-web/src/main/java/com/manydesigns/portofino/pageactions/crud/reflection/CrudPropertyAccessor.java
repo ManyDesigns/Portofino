@@ -71,7 +71,7 @@ public class CrudPropertyAccessor
     public CrudPropertyAccessor(@Nullable CrudProperty crudProperty,
                                 PropertyAccessor nestedAccessor,
                                 boolean inKey) {
-        super(null);
+        super(crudProperty.getAnnotations());
         this.crudProperty = crudProperty;
         this.nestedAccessor = nestedAccessor;
 

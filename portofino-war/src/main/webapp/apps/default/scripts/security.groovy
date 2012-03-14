@@ -36,7 +36,7 @@ class Security implements ApplicationRealmDelegate {
         if (userName == null) {
             groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
         } else {
-            Session session = application.getSystemSession();
+            Session session = application.getSession("portofino");
             org.hibernate.Criteria criteria = session.createCriteria("users");
             criteria.add(Restrictions.eq("userName", userName));
             User u = criteria.uniqueResult();
@@ -57,7 +57,7 @@ class Security implements ApplicationRealmDelegate {
 
     AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, String userName, String password) {
         Application application = realm.application;
-        Session session = application.getSystemSession();
+        Session session = application.getSession("portofino");
         org.hibernate.Criteria criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq("userName", userName));
         criteria.add(Restrictions.eq(UserConstants.PASSWORD, password));
@@ -82,14 +82,14 @@ class Security implements ApplicationRealmDelegate {
 
     List<String> getUsers(ApplicationRealm realm) {
         Application application = realm.application;
-        Session session = application.getSystemSession();
+        Session session = application.getSession("portofino");
         SQLQuery query = session.createSQLQuery("select userName from \"USERS\"");
         return query.list();
     }
 
     List<String> getGroups(ApplicationRealm realm) {
         Application application = realm.application;
-        Session session = application.getSystemSession();
+        Session session = application.getSession("portofino");
         SQLQuery query = session.createSQLQuery("select name from \"GROUPS\"");
         return query.list(); //TODO verificare
     }
@@ -104,7 +104,7 @@ class Security implements ApplicationRealmDelegate {
         user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
         int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
         user.setFailedLoginAttempts(failedAttempts+1);
-        Session session = application.getSystemSession();
+        Session session = application.getSession("portofino");
         session.update(user);
         session.getTransaction().commit();
     }
@@ -113,7 +113,7 @@ class Security implements ApplicationRealmDelegate {
         user.setFailedLoginAttempts(0);
         user.setLastLoginDate(new Timestamp(new Date().getTime()));
         user.setToken(null);
-        Session session = application.getSystemSession();
+        Session session = application.getSession("portofino");
         Transaction tx = session.getTransaction();
         try {
             User existingUser = findUserByUserName(session, user.getUserName());

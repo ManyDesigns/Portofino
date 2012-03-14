@@ -53,7 +53,10 @@ public class CustomTypeConverter implements TypeConverter {
 
     public Object convertValue(Map context, Object target, Member member,
             String propertyName, Object value, Class toType) {
-        if ((toType == Timestamp.class) && (value instanceof Date)) {
+        if ((toType == Boolean.class || toType == Boolean.TYPE) && (value instanceof String)) {
+            String thisValue = (String) value;
+            return Boolean.valueOf(thisValue);
+        } else if ((toType == Timestamp.class) && (value instanceof Date)) {
             Date thisValue = (Date) value;
             return new Timestamp(thisValue.getTime());
         } else if ((toType == Timestamp.class) && (value instanceof String)) {
