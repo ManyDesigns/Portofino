@@ -32,8 +32,8 @@ package com.manydesigns.portofino.stripes;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.ActionBean;
@@ -45,7 +45,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -63,7 +62,6 @@ public class ModelActionResolver extends NameBasedActionResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelActionResolver.class);
 
-    protected Dispatcher dispatcher;
     protected ServletContext servletContext;
 
     protected Map<Class<? extends ActionBean>,Map<String,Method>> eventMappings;
@@ -72,19 +70,6 @@ public class ModelActionResolver extends NameBasedActionResolver {
     public void init(Configuration configuration) throws Exception {
         super.init(configuration);
         servletContext = configuration.getServletContext();
-        logger.debug("Retrieving application starter");
-        ApplicationStarter applicationStarter =
-                (ApplicationStarter) servletContext.getAttribute(
-                        ApplicationAttributes.APPLICATION_STARTER);
-
-        logger.debug("Retrieving application");
-        Application application;
-        try {
-            application = applicationStarter.getApplication();
-            dispatcher = new Dispatcher(application);
-        } catch (Exception e) {
-            throw new ServletException(e);
-        }
 
         Field eventMappingsField = AnnotatedClassActionResolver.class.getDeclaredField("eventMappings");
         eventMappingsField.setAccessible(true);
@@ -146,7 +131,23 @@ public class ModelActionResolver extends NameBasedActionResolver {
         if(dispatch != null && path.equals(dispatch.getOriginalPath())) {
             return dispatch;
         } else {
-            return dispatcher.createDispatch(request.getContextPath(), path);
+            return getDispatcher().createDispatch(request.getContextPath(), path);
+        }
+    }
+
+    protected Dispatcher getDispatcher() {
+        logger.debug("Retrieving application starter");
+        ApplicationStarter applicationStarter =
+                (ApplicationStarter) servletContext.getAttribute(
+                        ApplicationAttributes.APPLICATION_STARTER);
+
+        logger.debug("Retrieving application");
+        Application application;
+        try {
+            application = applicationStarter.getApplication();
+            return new Dispatcher(application);
+        } catch (Exception e) {
+            throw new Error("Couldn't get application", e);
         }
     }
 

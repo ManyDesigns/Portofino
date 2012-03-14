@@ -38,7 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -57,18 +56,16 @@ public class ApplicationLocalizationBundleFactory implements LocalizationBundleF
     private static final Logger logger = LoggerFactory.getLogger(ApplicationLocalizationBundleFactory.class);
 
     protected ServletContext servletContext;
-    protected Application application;
 
     public ResourceBundle getErrorMessageBundle(Locale locale) throws MissingResourceException {
-        return application.getBundle(locale);
+        return getApplication().getBundle(locale);
     }
 
     public ResourceBundle getFormFieldBundle(Locale locale) throws MissingResourceException {
-        return application.getBundle(locale);
+        return getApplication().getBundle(locale);
     }
 
-    public void init(Configuration configuration) throws Exception {
-        servletContext = configuration.getServletContext();
+    private Application getApplication() {
         logger.debug("Retrieving application starter");
         ApplicationStarter applicationStarter =
                 (ApplicationStarter) servletContext.getAttribute(
@@ -76,9 +73,13 @@ public class ApplicationLocalizationBundleFactory implements LocalizationBundleF
 
         logger.debug("Retrieving application");
         try {
-            application = applicationStarter.getApplication();
+            return applicationStarter.getApplication();
         } catch (Exception e) {
-            throw new ServletException(e);
+            throw new Error("Couldn't start application", e);
         }
+    }
+
+    public void init(Configuration configuration) throws Exception {
+        servletContext = configuration.getServletContext();
     }
 }
