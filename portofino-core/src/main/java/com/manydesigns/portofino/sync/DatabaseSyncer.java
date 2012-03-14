@@ -410,6 +410,7 @@ public class DatabaseSyncer {
             targetTable.setEntityName(sourceTable.getEntityName());
             targetTable.setJavaClass(sourceTable.getJavaClass());
             targetTable.setManyToMany(sourceTable.getManyToMany());
+            targetTable.setShortName(sourceTable.getShortName());
             copyAnnotations(sourceTable, targetTable);
 
             syncColumns(liquibaseTable, sourceTable, targetTable);
@@ -450,12 +451,10 @@ public class DatabaseSyncer {
 
             logger.debug("Merging column attributes and annotations");
             targetColumn.setAutoincrement(liquibaseColumn.isAutoIncrement());
-            int jdbcType = liquibaseColumn.getDataType();
-            String typeName = liquibaseColumn.getTypeName();
-            targetColumn.setJdbcType(jdbcType);
+            targetColumn.setJdbcType(liquibaseColumn.getDataType());
             targetColumn.setColumnType(liquibaseColumn.getTypeName());
             targetColumn.setLength(liquibaseColumn.getColumnSize());
-            targetColumn.setNullable(liquibaseColumn.isNullable());
+            targetColumn.setNullable(liquibaseColumn.isNullable() || liquibaseColumn.getDefaultValue() != null);
             targetColumn.setScale(liquibaseColumn.getDecimalDigits());
             //TODO liquibaseColumn.getLengthSemantics()
 
