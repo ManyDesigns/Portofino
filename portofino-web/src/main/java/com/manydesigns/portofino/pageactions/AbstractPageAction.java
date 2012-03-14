@@ -195,7 +195,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     protected boolean saveConfiguration(Object configuration) {
         try {
-            DispatcherLogic.saveConfiguration(pageInstance.getDirectory(), configuration);
+            File confFile = DispatcherLogic.saveConfiguration(pageInstance.getDirectory(), configuration);
+            logger.info("Configuration saved to " + confFile.getAbsolutePath());
             return true;
         } catch (Exception e) {
             logger.error("Couldn't save configuration", e);

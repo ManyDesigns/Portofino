@@ -231,6 +231,19 @@ public class CrudAction extends AbstractPageAction {
             }
         }
 
+
+        //Remove disabled selection providers and mark them as configured to avoid re-adding them
+        Iterator<CrudSelectionProvider> it = crudSelectionProviders.iterator();
+        while (it.hasNext()) {
+            CrudSelectionProvider sp = it.next();
+            if(sp.getSelectionProvider() == null) {
+                it.remove();
+                for(String fieldName : sp.getFieldNames()) {
+                    configuredSPs.add(fieldName);
+                }
+            }
+        }
+
         Table table = crudConfiguration.getActualTable();
         if(table != null) {
             for(ForeignKey fk : table.getForeignKeys()) {
@@ -281,6 +294,10 @@ public class CrudAction extends AbstractPageAction {
             Collections.addAll(configuredSPs, fieldNames);
             return true;
         } else {
+            //To avoid automatically adding a FK later
+            CrudSelectionProvider crudSelectionProvider =
+                new CrudSelectionProvider(null, fieldNames);
+            crudSelectionProviders.add(crudSelectionProvider);
             return false;
         }
     }
