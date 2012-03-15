@@ -51,6 +51,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.security.MessageDigest;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -99,11 +100,11 @@ public class ApplicationRealm extends AuthorizingRealm implements UsersGroupsDAO
         return ensureDelegate().getAuthenticationInfo(this, username, password);
     }
 
-    public List<String> getUsers() {
+    public Set<String> getUsers() {
         return ensureDelegate().getUsers(this);
     }
 
-    public List<String> getGroups() {
+    public Set<String> getGroups() {
         return ensureDelegate().getGroups(this);
     }
 

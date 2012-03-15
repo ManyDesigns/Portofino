@@ -80,18 +80,18 @@ class Security implements ApplicationRealmDelegate {
         }
     }
 
-    List<String> getUsers(ApplicationRealm realm) {
+    Set<String> getUsers(ApplicationRealm realm) {
         Application application = realm.application;
         Session session = application.getSession("portofino");
         SQLQuery query = session.createSQLQuery("select userName from \"USERS\"");
-        return query.list();
+        return new LinkedHashSet<String>(query.list());
     }
 
-    List<String> getGroups(ApplicationRealm realm) {
+    Set<String> getGroups(ApplicationRealm realm) {
         Application application = realm.application;
         Session session = application.getSession("portofino");
         SQLQuery query = session.createSQLQuery("select name from \"GROUPS\"");
-        return query.list(); //TODO verificare
+        return new LinkedHashSet<String>(query.list()); //TODO verificare
     }
 
     //From LoginAction

@@ -808,7 +808,7 @@ public class PageAdminAction extends AbstractActionBean {
     // Page permisssions
     //--------------------------------------------------------------------------
 
-    protected List<String> groups;
+    protected Set<String> groups;
 
     //<group, level>
     protected Map<String, String> accessLevels = new HashMap<String, String>();
@@ -816,7 +816,7 @@ public class PageAdminAction extends AbstractActionBean {
     protected Map<String, List<String>> permissions = new HashMap<String, List<String>>();
 
     protected String testUserId;
-    protected List<String> users;
+    protected Set<String> users;
     protected AccessLevel testedAccessLevel;
     protected Set<String> testedPermissions;
 
@@ -828,8 +828,9 @@ public class PageAdminAction extends AbstractActionBean {
                 (UsersGroupsDAO) context.getServletContext().getAttribute(ApplicationAttributes.USERS_GROUPS_DAO);
 
         if(dao != null) {
-            users = new ArrayList<String>(dao.getUsers());
-            users.add(0, null);
+            users = new LinkedHashSet<String>();
+            users.add(null);
+            users.addAll(dao.getUsers());
         }
 
         return forwardToPagePermissions();
@@ -894,7 +895,7 @@ public class PageAdminAction extends AbstractActionBean {
         if(dao != null) {
             groups = dao.getGroups();
         } else {
-            groups = new ArrayList<String>();
+            groups = new LinkedHashSet<String>();
             Configuration conf = application.getPortofinoProperties();
             groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
             groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
@@ -902,14 +903,10 @@ public class PageAdminAction extends AbstractActionBean {
             groups.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS));
             Permissions permissions = SecurityLogic.calculateActualPermissions(getPageInstance());
             for(String group : permissions.getActualLevels().keySet()) {
-                if(!groups.contains(group)) {
-                    groups.add(group);
-                }
+                groups.add(group);
             }
             for(String group : permissions.getActualPermissions().keySet()) {
-                if(!groups.contains(group)) {
-                    groups.add(group);
-                }
+                groups.add(group);
             }
         }
     }
@@ -976,7 +973,7 @@ public class PageAdminAction extends AbstractActionBean {
     // Getters/Setters
     //--------------------------------------------------------------------------
 
-    public List<String> getGroups() {
+    public Set<String> getGroups() {
         return groups;
     }
 
@@ -1004,7 +1001,7 @@ public class PageAdminAction extends AbstractActionBean {
         this.testUserId = testUserId;
     }
 
-    public List<String> getUsers() {
+    public Set<String> getUsers() {
         return users;
     }
 

@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
+* Copyright (C) 2005-2012 ManyDesigns srl.  All rights reserved.
 * http://www.manydesigns.com/
 *
 * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.shiro;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,7 +41,7 @@ public interface UsersGroupsDAO {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    List<String> getUsers();
+    Set<String> getUsers();
 
-    List<String> getGroups();
+    Set<String> getGroups();
 }

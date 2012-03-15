@@ -32,7 +32,7 @@ package com.manydesigns.portofino.shiro;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authz.AuthorizationInfo;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -48,7 +48,7 @@ public interface ApplicationRealmDelegate {
 
     AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, String userName, String password);
 
-    List<String> getUsers(ApplicationRealm realm);
+    Set<String> getUsers(ApplicationRealm realm);
 
-    List<String> getGroups(ApplicationRealm realm);
+    Set<String> getGroups(ApplicationRealm realm);
 }

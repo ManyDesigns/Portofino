@@ -90,16 +90,16 @@ class Security implements ApplicationRealmDelegate {
         }
     }
 
-    List<String> getUsers(ApplicationRealm realm) {
+    Set<String> getUsers(ApplicationRealm realm) {
         Application application = realm.application;
         Session session = application.getSession("redmine");
         SQLQuery query = session.createSQLQuery("select \"login\" from \"users\"");
-        return query.list();
+        return new LinkedHashSet<String>(query.list());
     }
 
-    List<String> getGroups(ApplicationRealm realm) {
+    Set<String> getGroups(ApplicationRealm realm) {
         Application application = realm.application;
-        def groups = new ArrayList<String>();
+        def groups = new LinkedHashSet<String>();
         Configuration conf = application.getPortofinoProperties();
         def group = conf.getString(PortofinoProperties.GROUP_ALL);
         groups.add(group);

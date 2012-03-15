@@ -1308,7 +1308,7 @@ public class CrudAction extends AbstractPageAction {
     @Button(list = "crud-search", key = "commons.exportExcel", order = 5)
     public Resolution exportSearchExcel() {
         try {
-            final File tmpFile = File.createTempFile(crudConfiguration.getName(), ".search.xls");
+            final File tmpFile = File.createTempFile(crudConfiguration.getName() + ".search", ".xls");
             exportSearchExcel(tmpFile);
             FileInputStream fileInputStream = new FileInputStream(tmpFile);
             return new StreamingResolution("application/vnd.ms-excel", fileInputStream) {
@@ -1337,8 +1337,12 @@ public class CrudAction extends AbstractPageAction {
         WritableWorkbook workbook = null;
         try {
             workbook = Workbook.createWorkbook(fileTemp);
+            String title = crudConfiguration.getSearchTitle();
+            if(StringUtils.isBlank(title)) {
+                title = "export";
+            }
             WritableSheet sheet =
-                    workbook.createSheet(crudConfiguration.getSearchTitle(), 0);
+                    workbook.createSheet(title, 0);
 
             addHeaderToSearchSheet(sheet);
 
@@ -1574,7 +1578,7 @@ public class CrudAction extends AbstractPageAction {
     @Button(list = "crud-search", key = "commons.exportPdf", order = 4)
     public Resolution exportSearchPdf() {
         try {
-            final File tmpFile = File.createTempFile(crudConfiguration.getName(), ".search.pdf");
+            final File tmpFile = File.createTempFile(crudConfiguration.getName() + ".search", ".pdf");
             exportSearchPdf(tmpFile);
             FileInputStream fileInputStream = new FileInputStream(tmpFile);
             return new StreamingResolution(MimeTypes.APPLICATION_PDF, fileInputStream) {
@@ -1608,9 +1612,7 @@ public class CrudAction extends AbstractPageAction {
 
             Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
 
-            ClassLoader cl = getClass().getClassLoader();
-            InputStream xsltStream = cl.getResourceAsStream(
-                    TEMPLATE_FOP_SEARCH);
+            InputStream xsltStream = getSearchPdfXsltStream();
 
             // Setup XSLT
             TransformerFactory Factory = TransformerFactory.newInstance();
@@ -1645,6 +1647,12 @@ public class CrudAction extends AbstractPageAction {
                 SessionMessages.addErrorMessage(e.getMessage());
             }
         }
+    }
+
+    protected InputStream getSearchPdfXsltStream() {
+        ClassLoader cl = getClass().getClassLoader();
+        return cl.getResourceAsStream(
+                TEMPLATE_FOP_SEARCH);
     }
 
     public XmlBuffer composeXmlSearch() {

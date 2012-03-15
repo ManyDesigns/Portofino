@@ -121,7 +121,7 @@ public class ApplicationInterceptor implements Interceptor {
                     }
                 } catch (Throwable t) {
                     request.setAttribute(INVALID_PAGE_INSTANCE, page);
-                    logger.error("PageAction prepare failed for {}", page);
+                    logger.error("PageAction prepare failed for " + page, t);
                     Locale locale = request.getLocale();
                     ResourceBundle resourceBundle = application.getBundle(locale);
                     String msg = MessageFormat.format
