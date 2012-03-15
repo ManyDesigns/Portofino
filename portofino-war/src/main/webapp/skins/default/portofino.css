@@ -86,6 +86,7 @@ Body and content layout
     -moz-border-radius: 6px;
     border-radius: 6px;
     background-color: white;
+    position: relative;
 }
 
 .yui-t3 #yui-main div#content {
@@ -131,6 +132,11 @@ div.contentBody {
     background-color: #eef;
     padding: 0.5em 1em;
     clear: both;
+}
+
+.contentFooter {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
 }
 
 .contentHeader {

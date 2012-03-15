@@ -9,10 +9,10 @@ function fixSideBar() {
             var contentOffsetHeight = contentNode.attr('offsetHeight');
             var sideBarOffsetHeight = sideBarNode.attr('offsetHeight');
             if (contentOffsetHeight < sideBarOffsetHeight) {
-                contentNode.css('min-height', sideBarOffsetHeight + 'px')
+                contentNode.css('min-height', (sideBarOffsetHeight + 5) + 'px')
             }
 
-            contentNode = $('div.search_results.withSearchForm');
+            contentNode = $('div.search_results.withSearchForm'); //TODO Serve ancora?
             sideBarNode = contentNode.parent().parent();
             contentOffsetHeight = contentNode.attr('offsetHeight');
             sideBarOffsetHeight = sideBarNode.attr('offsetHeight');
