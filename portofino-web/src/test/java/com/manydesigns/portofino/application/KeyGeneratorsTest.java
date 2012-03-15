@@ -173,12 +173,12 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         myGroup.setCreationDate(new Timestamp(new Date().getTime()));
         myGroup.setName("testGroup");
         myGroup.setDescription("this is a description");
-        Session session = application.getSystemSession();
+        Session session = application.getSession("portofino");
         session.save("groups", myGroup);
         session.getTransaction().commit();
 
         Table table = DatabaseLogic.findTableByEntityName(
-                application.getSystemDatabase(), UserConstants.GROUP_ENTITY_NAME);
+                DatabaseLogic.findDatabaseByName(application.getModel(), "portofino"), UserConstants.GROUP_ENTITY_NAME);
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         final long expectedId = 3L;

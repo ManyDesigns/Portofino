@@ -78,7 +78,7 @@ public class PwdRecoveryAction extends AbstractActionBean {
 
     public String send(){
         User user;
-        Session session = application.getSystemSession();
+        Session session = application.getSession("portofino");
         try {
 
             user = findUserByEmail(email);
@@ -114,7 +114,7 @@ public class PwdRecoveryAction extends AbstractActionBean {
             session.getTransaction().commit();
             SessionMessages.addInfoMessage("An email was sent to your address. " +
                     "Please check your email.");
-            QueryUtils.commit(application, application.getSystemDatabaseName());
+            QueryUtils.commit(application, "portofino");
             return SUCCESS;
         } catch (Exception e) {
             final String errore = "Errore nella verifica della email. " +
@@ -127,7 +127,7 @@ public class PwdRecoveryAction extends AbstractActionBean {
     }
 
     public User findUserByEmail(String email) {
-        Session session = application.getSystemSession();
+        Session session = application.getSession("portofino");
         org.hibernate.Criteria criteria = session.createCriteria(UserConstants.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("email", email));
         return (User) criteria.uniqueResult();

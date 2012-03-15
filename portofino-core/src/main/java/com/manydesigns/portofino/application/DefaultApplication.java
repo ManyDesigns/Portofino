@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.application;
 
 import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.hibernate.HibernateConfig;
 import com.manydesigns.portofino.application.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
@@ -336,14 +335,6 @@ public class DefaultApplication implements Application {
         return null;
     }
 
-    public String getSystemDatabaseName() {
-        return portofinoConfiguration.getString(PortofinoProperties.SYSTEM_DATABASE);
-    }
-
-    public Database getSystemDatabase() {
-        return DatabaseLogic.findDatabaseByName(model, getSystemDatabaseName());
-    }
-
     public org.apache.commons.configuration.Configuration getPortofinoProperties() {
         return portofinoConfiguration;
     }
@@ -377,10 +368,6 @@ public class DefaultApplication implements Application {
 
     public Session getSession(String databaseName) {
         return ensureDatabaseSetup(databaseName).getThreadSession();
-    }
-
-    public Session getSystemSession() {
-        return getSession(getSystemDatabaseName());
     }
 
     protected HibernateDatabaseSetup ensureDatabaseSetup(String databaseName) {

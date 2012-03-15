@@ -33,7 +33,6 @@ import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.ConnectionProvider;
-import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.configuration.Configuration;
 import org.hibernate.Session;
@@ -86,9 +85,6 @@ public interface Application {
 
     ConnectionProvider getConnectionProvider(String databaseName);
 
-    String getSystemDatabaseName();
-    Database getSystemDatabase();
-
     //**************************************************************************
     // Configuration access
     //**************************************************************************
@@ -113,8 +109,6 @@ public interface Application {
     //**************************************************************************
 
     Session getSession(String databaseName);
-
-    Session getSystemSession();
 
     void closeSession(String databaseName);
 

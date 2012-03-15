@@ -148,7 +148,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
     }
 
     protected void setupUserGroups() {
-        Session session = application.getSystemSession();
+        Session session = application.getSession("portofino");
         Criteria criteria = session.createCriteria(UserConstants.GROUP_ENTITY_NAME);
         List<Group> groups = new ArrayList(criteria.list());
         availableUserGroups = new ArrayList<Group>();
@@ -193,11 +193,11 @@ public class UserAdminAction extends CrudAction implements AdminAction {
 
     protected Group getGroup(String name) {
         TableAccessor table =
-                application.getTableAccessor(application.getSystemDatabaseName(), UserConstants.GROUP_ENTITY_NAME);
+                application.getTableAccessor("portofino", UserConstants.GROUP_ENTITY_NAME);
         assert table != null;
 
         String actualEntityName = table.getTable().getActualEntityName();
-        Session session = application.getSystemSession();
+        Session session = application.getSession("portofino");
         List result = QueryUtils.runHqlQuery
                 (session,
                         "FROM " + actualEntityName + " WHERE name = ?",
@@ -242,7 +242,7 @@ public class UserAdminAction extends CrudAction implements AdminAction {
                 }
             }
         }
-        Session session = application.getSystemSession();
+        Session session = application.getSession("portofino");
         for(String groupName : names) {
             Group group = (Group) session
                     .createCriteria(UserConstants.GROUP_ENTITY_NAME)

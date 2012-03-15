@@ -91,7 +91,7 @@ public class LostPwdChangeAction extends AbstractActionBean {
                 User user = findUserByToken(token);
                 user.setPwd(pwd.pwd);
                 user.setPwdModDate(new Timestamp(new Date().getTime()));
-                Session session = application.getSystemSession();
+                Session session = application.getSession("portofino");
                 session.update(UserConstants.USER_ENTITY_NAME, user);
                 session.getTransaction().commit();
                 logger.debug("User {} updated", user.getEmail());
@@ -103,7 +103,7 @@ public class LostPwdChangeAction extends AbstractActionBean {
     }
 
     public User findUserByToken(String token) {
-        Session session = application.getSystemSession();
+        Session session = application.getSession("portofino");
         org.hibernate.Criteria criteria = session.createCriteria(UserConstants.USER_ENTITY_NAME);
         criteria.add(Restrictions.eq("token", token));
         return (User) criteria.uniqueResult();
