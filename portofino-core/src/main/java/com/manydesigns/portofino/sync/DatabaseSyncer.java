@@ -454,7 +454,7 @@ public class DatabaseSyncer {
             targetColumn.setJdbcType(liquibaseColumn.getDataType());
             targetColumn.setColumnType(liquibaseColumn.getTypeName());
             targetColumn.setLength(liquibaseColumn.getColumnSize());
-            targetColumn.setNullable(liquibaseColumn.isNullable() || liquibaseColumn.getDefaultValue() != null);
+            targetColumn.setNullable(liquibaseColumn.isNullable());
             targetColumn.setScale(liquibaseColumn.getDecimalDigits());
             //TODO liquibaseColumn.getLengthSemantics()
 

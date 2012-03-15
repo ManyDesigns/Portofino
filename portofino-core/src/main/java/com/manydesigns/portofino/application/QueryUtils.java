@@ -43,6 +43,7 @@ import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.select.*;
@@ -378,7 +379,11 @@ public class QueryUtils {
         Expression whereExpression;
         if(parsedQueryString.getWhere() != null) {
             if(parsedCriteriaQuery.getWhere() != null) {
-                whereExpression = new AndExpression(parsedQueryString.getWhere(), parsedCriteriaQuery.getWhere());
+                whereExpression = parsedQueryString.getWhere();
+                if(!(whereExpression instanceof Parenthesis)) {
+                    whereExpression = new Parenthesis(whereExpression);
+                }
+                whereExpression = new AndExpression(whereExpression, parsedCriteriaQuery.getWhere());
             } else {
                 whereExpression = parsedQueryString.getWhere();
             }
@@ -392,7 +397,8 @@ public class QueryUtils {
             orderByElement.setAsc(criteria.getOrderBy().isAsc());
             String propertyName = criteria.getOrderBy().getPropertyAccessor().getName();
             orderByElement.setExpression(
-                    new net.sf.jsqlparser.schema.Column(new net.sf.jsqlparser.schema.Table(), propertyName));
+                    new net.sf.jsqlparser.schema.Column(
+                            new net.sf.jsqlparser.schema.Table(), propertyName));
             orderByElements.add(orderByElement);
             parsedQueryString.setOrderByElements(orderByElements);
         }
