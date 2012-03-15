@@ -37,6 +37,7 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
+import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.security.AccessLevel;
@@ -60,6 +61,7 @@ import java.util.List;
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ConfigurationClass(CalendarConfiguration.class)
 @PageActionName("Calendar")
+@ScriptTemplate("script_template.txt")
 public class CalendarAction extends CustomAction {
     public static final String copyright =
             "Copyright (c) 2005-2011, ManyDesigns srl";
