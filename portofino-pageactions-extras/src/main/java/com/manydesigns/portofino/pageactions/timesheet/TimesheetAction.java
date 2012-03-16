@@ -689,7 +689,9 @@ public class TimesheetAction extends AbstractPageAction {
     }
 
     public void addMonthReportHeaderLeft(PdfPTable headerTable) throws Exception {
-        logger.debug("Placeholder");
+        PdfPCell headerCell = new PdfPCell(new Phrase(""));
+        headerCell.setBorder(Rectangle.NO_BORDER);
+        headerTable.addCell(headerCell);
     }
 
     public void addMonthReportHeaderCenter(PdfPTable headerTable) throws Exception {
