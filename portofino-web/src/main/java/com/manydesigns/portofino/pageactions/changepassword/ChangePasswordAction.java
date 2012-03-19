@@ -92,8 +92,11 @@ public class ChangePasswordAction extends AbstractPageAction {
         if(!isConfigurationValid()) {
             return forwardToPortletNotConfigured();
         }
-        String fwd = "/layouts/changepassword/change.jsp";
-        return new ForwardResolution(fwd);
+        if(isEmbedded()) {
+            return new ForwardResolution("/layouts/changepassword/embedded.jsp");
+        } else {
+            return new ForwardResolution("/layouts/changepassword/change.jsp");
+        }
     }
 
     protected boolean isConfigurationValid() {
