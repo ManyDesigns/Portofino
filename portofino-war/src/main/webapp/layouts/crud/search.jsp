@@ -7,6 +7,7 @@
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.CrudAction"/>
+    <c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.crudConfiguration.searchTitle}"/>
     </stripes:layout-component>
@@ -23,14 +24,14 @@
                 </div>
             </div>
         </c:if>
-        <div class="search_results">
+        <div id="search_results_${pageId}" class="search_results">
             <%@include file="datatable.jsp"%>
             <portofino:buttons list="crud-search" cssClass="portletButton" />
         </div>
     </stripes:layout-component>
 
     <script type="text/javascript">
-        $(".search_results button[name=bulkDelete]").click(function() {
+        $("#search_results_${pageId} button[name=bulkDelete]").click(function() {
             return confirm ('<fmt:message key="commons.confirm" />');
         });
         $(".search_form_toggle_link").click(makeToggleFunction());
