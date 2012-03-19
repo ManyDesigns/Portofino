@@ -95,7 +95,7 @@ public class ChangePasswordAction extends AbstractPageAction {
         if(isEmbedded()) {
             return new ForwardResolution("/layouts/changepassword/embedded.jsp");
         } else {
-            return new ForwardResolution("/layouts/changepassword/change.jsp");
+            return forwardToPortletPage("/layouts/changepassword/change.jsp");
         }
     }
 
@@ -140,7 +140,7 @@ public class ChangePasswordAction extends AbstractPageAction {
             }
         }
         String fwd = "/layouts/changepassword/change.jsp";
-        return new ForwardResolution(fwd);
+        return forwardToPortletPage(fwd);
     }
 
     @Override
