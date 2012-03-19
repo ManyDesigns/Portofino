@@ -499,6 +499,11 @@ public class PageAdminAction extends AbstractActionBean {
                     } else {
                         logger.debug("Copying directory");
                         FileUtils.copyDirectory(pageInstance.getDirectory(), newDirectory);
+                        logger.debug("Generating a new Id for the new page");
+                        Page newPage = DispatcherLogic.getPage(newDirectory);
+                        String pageId = RandomUtil.createRandomId();
+                        newPage.setId(pageId);
+                        DispatcherLogic.savePage(newDirectory, newPage);
                     }
                     logger.debug("Registering the new child page in parent page (directory: {})",
                             newDirectory);
