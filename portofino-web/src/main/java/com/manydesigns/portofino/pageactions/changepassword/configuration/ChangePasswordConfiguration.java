@@ -29,20 +29,21 @@
 
 package com.manydesigns.portofino.pageactions.changepassword.configuration;
 
+import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.annotations.Multiline;
-import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.Table;
-import com.manydesigns.portofino.pageactions.m2m.configuration.SelectionProviderReference;
-import com.manydesigns.portofino.pageactions.m2m.configuration.ViewType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -104,6 +105,7 @@ public class ChangePasswordConfiguration implements PageActionConfiguration {
     //**************************************************************************
 
     @XmlAttribute(required = false)
+    @LabelI18N("changepasswordaction.configuration.database")
     public String getDatabase() {
         return database;
     }
@@ -114,6 +116,7 @@ public class ChangePasswordConfiguration implements PageActionConfiguration {
 
     @Multiline
     @XmlAttribute(required = false)
+    @LabelI18N("changepasswordaction.configuration.query")
     public String getQuery() {
         return query;
     }
@@ -123,6 +126,7 @@ public class ChangePasswordConfiguration implements PageActionConfiguration {
     }
 
     @XmlAttribute(required = false)
+    @LabelI18N("changepasswordaction.configuration.property")
     public String getProperty() {
         return property;
     }

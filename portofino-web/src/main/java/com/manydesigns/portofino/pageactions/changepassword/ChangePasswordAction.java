@@ -29,12 +29,14 @@
 
 package com.manydesigns.portofino.pageactions.changepassword;
 
+import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.annotations.Password;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.portofino.buttons.annotations.Button;
@@ -56,6 +58,8 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -163,7 +167,7 @@ public class ChangePasswordAction extends AbstractPageAction {
         try {
             return query.uniqueResult();
         } catch (NonUniqueResultException e) {
-            //TODO sessionMessages
+            logger.error("The query did not return a unique result", e);
             return null;
         }
     }
@@ -227,6 +231,19 @@ public class ChangePasswordAction extends AbstractPageAction {
                         new String[] { "databaseName" });
         formBuilder.configSelectionProvider(databaseSelectionProvider, "database");
 
+        if(configuration.getActualTable() != null) {
+            ClassAccessor accessor = new TableAccessor(configuration.getActualTable());
+            SelectionProvider propertySelectionProvider =
+                SelectionProviderLogic.createSelectionProvider(
+                        "property",
+                        Arrays.asList(accessor.getProperties()),
+                        PropertyAccessor.class,
+                        null,
+                        new String[] { "name" });
+
+            formBuilder.configSelectionProvider(propertySelectionProvider, "property");
+        }
+
         configurationForm = formBuilder.build();
         configurationForm.readFromObject(configuration);
     }
@@ -246,6 +263,7 @@ public class ChangePasswordAction extends AbstractPageAction {
 
     @Password
     @Required
+    @LabelI18N("changepasswordaction.old.password")
     public String getOldPassword() {
         return oldPassword;
     }
@@ -256,6 +274,7 @@ public class ChangePasswordAction extends AbstractPageAction {
 
     @Password(confirmationRequired = true)
     @Required
+    @LabelI18N("changepasswordaction.new.password")
     public String getNewPassword() {
         return newPassword;
     }

@@ -16,7 +16,7 @@
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="configurationForm"/>
         <%@include file="../script-configuration.jsp" %>
-        <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+        <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">
