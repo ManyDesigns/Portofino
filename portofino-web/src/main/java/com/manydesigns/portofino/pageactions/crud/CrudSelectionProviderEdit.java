@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
+* Copyright (C) 2005-2012 ManyDesigns srl.  All rights reserved.
 * http://www.manydesigns.com/
 *
 * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -40,7 +40,7 @@ import com.manydesigns.elements.options.DisplayMode;
  */
 public class CrudSelectionProviderEdit {
     public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+            "Copyright (c) 2005-2012, ManyDesigns srl";
 
     @Updatable(false)
     public String columns;

@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
+* Copyright (C) 2005-2012 ManyDesigns srl.  All rights reserved.
 * http://www.manydesigns.com/
 *
 * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -55,7 +55,7 @@ import java.util.List;
  */
 public class DefaultMailSender implements MailSender {
     public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+            "Copyright (c) 2005-2012, ManyDesigns srl";
 
     protected final MailQueue queue;
     protected boolean alive;
