@@ -742,6 +742,7 @@ public class CrudAction extends AbstractPageAction {
     @Button(list = "crud-read", key = "commons.delete", order = 2)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution delete() {
+        String url = calculateBaseSearchUrl();
         if(deleteValidate(object)) {
             session.delete(baseTable.getActualEntityName(), object);
             try {
@@ -757,7 +758,6 @@ public class CrudAction extends AbstractPageAction {
                 SessionMessages.addErrorMessage(rootCauseMessage);
             }
         }
-        String url = calculateBaseSearchUrl();
         return new RedirectResolution(appendSearchStringParamIfNecessary(url), false);
     }
 
