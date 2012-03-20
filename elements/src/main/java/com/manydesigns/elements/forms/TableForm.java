@@ -1,29 +1,22 @@
 /*
- * Copyright (C) 2005-2011 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2012 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
  * the following license terms apply:
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 3 as published by
- * the Free Software Foundation.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * There are special exceptions to the terms and conditions of the GPL
- * as it is applied to this software. View the full text of the
- * exception in file OPEN-SOURCE-LICENSE.txt in the directory of this
- * software distribution.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * This program is distributed WITHOUT ANY WARRANTY; and without the
- * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, see http://www.gnu.org/licenses/gpl.txt
- * or write to:
- * Free Software Foundation, Inc.,
- * 59 Temple Place - Suite 330,
- * Boston, MA  02111-1307  USA
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -54,7 +47,7 @@ import java.util.Collection;
 */
 public class TableForm implements Element {
     public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+            "Copyright (c) 2005-2012, ManyDesigns srl";
 
     protected String selectInputName = "select";
 
@@ -242,7 +235,7 @@ public class TableForm implements Element {
 
     public class Row extends AbstractCompositeElement<Field> {
         public static final String copyright =
-                "Copyright (c) 2005-2011, ManyDesigns srl";
+                "Copyright (c) 2005-2012, ManyDesigns srl";
 
         protected String key;
         protected final int index;
@@ -333,7 +326,7 @@ public class TableForm implements Element {
 
     public class Column {
         public static final String copyright =
-                "Copyright (c) 2005-2011, ManyDesigns srl";
+                "Copyright (c) 2005-2012, ManyDesigns srl";
 
         protected final PropertyAccessor propertyAccessor;
 

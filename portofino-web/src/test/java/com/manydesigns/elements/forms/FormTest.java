@@ -12,7 +12,7 @@ import com.manydesigns.elements.util.Util;
 */
 public class FormTest extends AbstractElementsTest {
     public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+            "Copyright (c) 2005-2012, ManyDesigns srl";
 
     private Form form;
     private Form formWithPrefix;

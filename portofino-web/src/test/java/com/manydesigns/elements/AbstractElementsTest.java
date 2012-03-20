@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 */
 public abstract class AbstractElementsTest extends TestCase {
     public static final String copyright =
-            "Copyright (c) 2005-2011, ManyDesigns srl";
+            "Copyright (c) 2005-2012, ManyDesigns srl";
 
     public Configuration elementsConfiguration;
 
