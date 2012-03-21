@@ -23,9 +23,11 @@
 package com.manydesigns.elements.fields.search;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.annotations.Id;
+import com.manydesigns.elements.annotations.InputName;
+import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.elements.fields.FieldUtils;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.util.Util;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,18 +81,7 @@ public abstract class AbstractSearchField implements SearchField {
         Object[] inputNameArgs = {prefix, localInputName};
         inputName = StringUtils.join(inputNameArgs);
 
-        if (accessor.isAnnotationPresent(LabelI18N.class)) {
-            String text = accessor.getAnnotation(LabelI18N.class).value();
-            logger.debug("LabelI18N annotation present with value: {}", text);
-
-            label = getText(text);
-        } else if (accessor.isAnnotationPresent(Label.class)) {
-            label = accessor.getAnnotation(Label.class).value();
-            logger.debug("Label annotation present with value: ", label);
-        } else {
-            label = Util.guessToWords(accessor.getName());
-            logger.debug("Setting label from property name: ", label);
-        }
+        label = FieldUtils.getLabel(accessor);
 
         Required requiredAnnotation = accessor.getAnnotation(Required.class);
         if (requiredAnnotation != null) {

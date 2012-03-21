@@ -25,6 +25,7 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.*;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -359,6 +360,7 @@ public class Table implements ModelObject, Annotated {
                 "{0}.{1}.{2}", databaseName, schemaName, tableName);
     }
 
+    public static final String[] KEYWORDS = { "member", "order", "group", "select", "update", "from" };
 
     //**************************************************************************
     // Rende un nome secondo le regole che specificano gli identificatori in HQL
@@ -388,7 +390,14 @@ public class Table implements ModelObject, Annotated {
             String letter = String.valueOf(others.charAt(i));
             result.append(checkOtherLetters(letter));
         }
-        return result.toString();
+        String normalizedName = result.toString();
+        if(ArrayUtils.contains(KEYWORDS, normalizedName.toLowerCase())) {
+            normalizedName = "_" + normalizedName;
+        }
+        if(!name.equals(normalizedName)) {
+            logger.warn("Entity name " + name + " normalized to " + normalizedName);
+        }
+        return normalizedName;
     }
 
     private static String checkFirstLetter(String letter) {

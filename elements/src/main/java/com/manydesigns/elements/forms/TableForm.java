@@ -23,14 +23,13 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.Element;
+import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.annotations.Help;
-import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.FieldUtils;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
-import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -100,7 +99,7 @@ public class TableForm implements Element {
             if (column.title != null) {
                 xb.addAttribute("title", column.title);
             }
-            column.labelToXhtml(xb);
+            xb.write(column.getActualLabel());
             xb.closeElement("th");
         }
         xb.closeElement("tr");
@@ -365,8 +364,14 @@ public class TableForm implements Element {
             this.label = label;
         }
 
-        public void labelToXhtml(XhtmlBuffer xb) {
-            xb.write(StringUtils.capitalize(label));
+        public String getActualLabel() {
+            boolean capitalize = ElementsProperties.getConfiguration().getBoolean(
+                    ElementsProperties.FIELDS_LABEL_CAPITALIZE);
+            if (capitalize) {
+                return StringUtils.capitalize(label);
+            } else {
+                return label;
+            }
         }
 
         public TextFormat getHrefTextFormat() {

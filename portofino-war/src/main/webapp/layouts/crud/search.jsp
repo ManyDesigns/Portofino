@@ -13,7 +13,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:if test="${not empty actionBean.searchForm}">
-            <a class="search_form_toggle_link" href="#">
+            <a id="search_form_toggle_link_${pageId}" href="#">
                 <c:if test="${actionBean.searchVisible}"><fmt:message key="layouts.crud.search.hideSearch" /></c:if>
                 <c:if test="${!actionBean.searchVisible}"><fmt:message key="layouts.crud.search.showSearch" /></c:if>
             </a>
@@ -34,7 +34,7 @@
         $("#search_results_${pageId} button[name=bulkDelete]").click(function() {
             return confirm ('<fmt:message key="commons.confirm" />');
         });
-        $(".search_form_toggle_link").click(makeToggleFunction());
+        $("#search_form_toggle_link_${pageId}").click(makeToggleFunction());
         function makeToggleFunction() {
             var visible = ${actionBean.searchVisible};
             return function(event) {
@@ -45,6 +45,7 @@
                 } else {
                     $(event.target).html('<fmt:message key="layouts.crud.search.showSearch" />');
                 }
+                return false;
             };
         }
     </script>

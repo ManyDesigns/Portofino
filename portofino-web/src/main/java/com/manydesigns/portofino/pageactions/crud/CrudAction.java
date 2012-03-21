@@ -345,7 +345,8 @@ public class CrudAction extends AbstractPageAction {
         @Button(list = "portlet-default-button", key = "commons.search")
     })
     public Resolution search() {
-        searchVisible = true;
+        //If embedded, search is always closed by default
+        searchVisible = !isEmbedded();
         return doSearch();
     }
 
@@ -986,6 +987,13 @@ public class CrudAction extends AbstractPageAction {
                 .configPrefix(searchPrefix)
                 .build();
 
+        if(!isEmbedded()) {
+            logger.debug("Search form not embedded, no risk of clashes - reading parameters from request");
+            readSearchFormFromRequest();
+        }
+    }
+
+    protected void readSearchFormFromRequest() {
         if (StringUtils.isBlank(searchString)) {
             searchForm.readFromRequest(context.getRequest());
             searchString = searchForm.toSearchString();

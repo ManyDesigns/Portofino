@@ -13,7 +13,7 @@
                 TableForm.Column[] columns = tableForm.getColumns();
                 for (TableForm.Column column : columns) {
                     out.print("<th>");
-                    out.print(StringEscapeUtils.escapeHtml(column.getLabel()));
+                    out.print(StringEscapeUtils.escapeHtml(column.getActualLabel()));
                     out.print("</th>");
                 }
             %>
@@ -94,7 +94,7 @@
                     out.print(StringEscapeUtils.escapeJavaScript(propertyAccessor.getName()));
                     out.print("\"");
                     out.print(", label : \"");
-                    out.print(StringEscapeUtils.escapeJavaScript(column.getLabel()));
+                    out.print(StringEscapeUtils.escapeJavaScript(column.getActualLabel()));
                     out.print("\"");
                     out.print(", formatter : elementsFormatter, sortable : true");
                     out.print("}");

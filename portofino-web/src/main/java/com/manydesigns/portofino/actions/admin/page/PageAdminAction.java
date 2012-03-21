@@ -365,7 +365,9 @@ public class PageAdminAction extends AbstractActionBean {
             }
             logger.info("Page " + pageId + " created. Path: " + directory.getAbsolutePath());
             SessionMessages.addInfoMessage(getMessage("page.create.successful"));
-            return new RedirectResolution(configurePath + "/" + fragment).addParameter("configure");
+            String url = context.getRequest().getContextPath() + "/" + configurePath + "/" + fragment;
+            return new RedirectResolution(url, false)
+                            .addParameter("configure").addParameter("cancelReturnUrl", url);
         } else {
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
         }
