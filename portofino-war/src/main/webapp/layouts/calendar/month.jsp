@@ -304,6 +304,7 @@
         }
         xhtmlBuffer.closeElement("h3");
 
+        //Print time interval
         xhtmlBuffer.openElement("p");
         String timeDescription;
         DateTimeFormatter startFormatter =
@@ -324,12 +325,21 @@
         }
         xhtmlBuffer.write(timeDescription);
         xhtmlBuffer.closeElement("p");
+
+        //Print edit link
         if(event.getEditUrl() != null) {
             xhtmlBuffer.openElement("p");
             String editText = resourceBundle.getString("calendar.event.edit");
             xhtmlBuffer.writeAnchor(event.getEditUrl(), editText);
             xhtmlBuffer.closeElement("p");
         }
+
+        //Print calendar info
+        xhtmlBuffer.openElement("p");
+        xhtmlBuffer.addAttribute("style", "font-weight: bold; color: " + event.getCalendar().getForegroundHtmlColor());
+        xhtmlBuffer.write(event.getCalendar().getName());
+        xhtmlBuffer.closeElement("p");
+
         xhtmlBuffer.closeElement("div");
         return dialogId;
     }

@@ -42,6 +42,7 @@
         </div>
         <div class="calendar-view">
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+            <input type="hidden" name="calendarViewType" value="<c:out value="${actionBean.calendarViewType}"/>"/>
             <jsp:include page="${actionBean.calendarViewType}.jsp" />
         </div>
     </div>
