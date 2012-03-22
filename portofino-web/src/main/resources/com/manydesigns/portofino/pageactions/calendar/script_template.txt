@@ -1,6 +1,7 @@
 import com.manydesigns.portofino.pageactions.calendar.*
 import com.manydesigns.portofino.security.*
 import org.joda.time.*
+import java.awt.Color
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class %{#generatedClassName} extends CalendarAction {
@@ -238,7 +239,7 @@ class %{#generatedClassName} extends CalendarAction {
 
         eventInterval = new Interval(time.plusHours(20).plusMinutes(30), time.plusDays(1));
         event = new Event(
-                testCal3, "e31", "Cena aziendale", eventInterval, null, null);
+                testCal3, "e31b", "Cena aziendale", eventInterval, null, null);
         events.add(event);
 
         time = time.plusDays(2);
@@ -278,7 +279,7 @@ class %{#generatedClassName} extends CalendarAction {
 
         eventInterval = new Interval(time, time.plusDays(1));
         event = new Event(
-                testCal5, "e", "Primo dell'anno", eventInterval, null, null);
+                testCal5, "e35", "Primo dell'anno", eventInterval, null, null);
         events.add(event);
 
         time = time.plusDays(1);
@@ -292,16 +293,16 @@ class %{#generatedClassName} extends CalendarAction {
 
         eventInterval = new Interval(time, time.plusDays(1));
         event = new Event(
-                testCal5, "e", "Epifania", eventInterval, null, null);
+                testCal5, "e36", "Epifania", eventInterval, null, null);
         events.add(event);
     }
 
     def loadCalendars() {
-        Calendar testCal1 = new Calendar("alice", "Alice", "#16A765");
-        Calendar testCal2 = new Calendar("bob", "Bob", "#DFAB67");
-        Calendar testCal3 = new Calendar("carlo", "Carlo", "#9FC6E7");
-        Calendar testCal4 = new Calendar("davide", "Davide", "#D8C06A");
-        Calendar testCal5 = new Calendar("festivita", "Festivita", "#FF7537");
+        Calendar testCal1 = new Calendar("alice", "Alice", new Color(0xe0, 0x40, 0x30));
+        Calendar testCal2 = new Calendar("bob", "Bob", Color.GREEN.darker());
+        Calendar testCal3 = new Calendar("carlo", "Carlo", new Color(0x40, 0xA0, 0xe0));
+        Calendar testCal4 = new Calendar("davide", "Davide", new Color(0xd0, 0xd0, 0x20));
+        Calendar testCal5 = new Calendar("festivita", "Festivita", Color.CYAN.darker());
         calendars.add(testCal1);
         calendars.add(testCal2);
         calendars.add(testCal3);

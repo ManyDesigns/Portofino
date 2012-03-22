@@ -30,7 +30,7 @@
             <ul style="margin-left: 0;">
                 <c:forEach var="calendar" items="${actionBean.calendars}">
                     <li style="margin: 0.5em 0; list-style: none;">
-                        <div style="background-color: ${calendar.color}; height: 1em;
+                        <div style="background-color: ${calendar.backgroundHtmlColor}; height: 1em;
                              width: 1em; display: inline-block;">&nbsp;</div>
                         ${calendar.name}
                     </li>
@@ -41,6 +41,7 @@
             <h3 style="margin: 0;"><a href="#">&gt;&gt;</a></h3>
         </div>
         <div class="calendar-view">
+            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
             <jsp:include page="${actionBean.calendarViewType}.jsp" />
         </div>
     </div>

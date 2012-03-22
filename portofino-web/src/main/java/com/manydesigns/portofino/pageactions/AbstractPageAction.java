@@ -324,15 +324,13 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             if(!StringUtils.isEmpty(url)) {
                 return url;
             } else {
-                PageInstance parent = dispatch.getLastPageInstance().getParent();
-                if(parent != null) {
-                    return context.getRequest().getContextPath() + "/" +
-                           parent.getPath();
-                } else {
-                    return dispatch.getAbsoluteOriginalPath();
-                }
+                return getDefaultCancelReturnUrl();
             }
         }
+    }
+
+    protected String getDefaultCancelReturnUrl() {
+        return dispatch.getAbsoluteOriginalPath();
     }
 
     public void setCancelReturnUrl(String cancelReturnUrl) {

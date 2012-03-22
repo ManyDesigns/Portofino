@@ -113,39 +113,29 @@
             boolean todayDisabled = monthInterval.contains(new DateTime());
         %>
         <button type="submit" name="today" <%= todayDisabled ? "disabled='true'" : "" %>
-                class="ui-button ui-widget <%= todayDisabled ? "ui-state-disabled" : "ui-state-default" %> ui-corner-all ui-button-text-only ui-button">
-            <span class="ui-button-text"><fmt:message key="calendar.today" /></span>
+                class="ui-button ui-widget <%= todayDisabled ? "ui-state-disabled" : "ui-state-default" %> ui-corner-all ui-button-text-only">
+            <span class="ui-button-text"><fmt:message key="calendar.currentMonth" /></span>
         </button>
-        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
-                type="submit" name="prevMonth" role="button" aria-disabled="false"
-                title='<fmt:message key="calendar.previous" />'>
+        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary"
+                type="submit" name="prevMonth" role="button" aria-disabled="false">
             <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-w"></span>
-            <span class="ui-button-text">&nbsp;</span>
-        </button><button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
-                         type="submit" name="nextMonth" role="button" aria-disabled="false"
-                         title='<fmt:message key="calendar.next" />'>
-            <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-e"></span>
-            <span class="ui-button-text">&nbsp;</span>
+            <span class="ui-button-text"><fmt:message key="calendar.previous" /></span>
+        </button>
+        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-secondary"
+                         type="submit" name="nextMonth" role="button" aria-disabled="false">
+            <span class="ui-button-text"><fmt:message key="calendar.next" /></span>
+            <span class="ui-button-icon-secondary ui-icon ui-icon-carat-1-e"></span>
         </button>
         <span style="margin-left: 1em;">
-            <%= StringUtils.capitalize(monthFormatter.print(monthView.getReferenceDateTime())) %>
+            <h3 style="margin: 0; display: inline;"><%= StringUtils.capitalize(monthFormatter.print(monthView.getReferenceDateTime())) %></h3>
         </span>
     </div>
     <div class="yui-u" style="text-align: right">
-        <div id="calendarViewType">
-            <input type="radio" id="calendarViewType-month" name="calendarViewType" checked="checked" value="month"
-                   /><label for="calendarViewType-month"><fmt:message key="calendar.monthView" /></label>
-            <input type="radio" id="calendarViewType-agenda" name="calendarViewType" value="agenda"
-                   /><label for="calendarViewType-agenda"><fmt:message key="calendar.agendaView" /></label>
-        </div>
-        <script>
-            $(function() {
-                $("#calendarViewType").buttonset();
-                $("#calendarViewType-agenda").click(function() {
-                    $(this).closest("form").submit();
-                });
-            });
-        </script>
+        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-secondary"
+                         type="submit" name="agendaView" role="button" aria-disabled="false">
+            <span class="ui-button-text"><fmt:message key="calendar.agendaView" /></span>
+            <span class="ui-button-icon-secondary ui-icon ui-icon-carat-1-e"></span>
+        </button>
     </div>
 </div>
 <div class="horizontalSeparator"></div>
@@ -190,7 +180,7 @@
                             if(!monthInterval.contains(day.getDayStart())) {
                                 xhtmlBuffer.addAttribute("class", "outOfMonth");
                             }
-                            int dayOfMonth = day.getDayStart().dayOfMonth().get();
+                            int dayOfMonth = day.getDayStart().getDayOfMonth();
                             if(1 == dayOfMonth) {
                                 xhtmlBuffer.write(firstDayOfMonthFormatter.print(day.getDayStart()));
                             } else {
@@ -242,6 +232,15 @@
         <% } %>
     </div>
 </div><%!
+    protected DateTimeFormatter getHoursMinutesFormatter(ResourceBundle resourceBundle) {
+        return new DateTimeFormatterBuilder()
+                .appendHourOfDay(2)
+                .appendLiteral(":")
+                .appendMinuteOfHour(2)
+                .toFormatter()
+                .withLocale(resourceBundle.getLocale());
+    }
+
     private void writeMoreEventsLink
             (MonthView monthView, int maxEventsPerCell, XhtmlBuffer xhtmlBuffer, MonthView.MonthViewDay day, int dayOfWeek,
              ResourceBundle resourceBundle) {
@@ -255,8 +254,9 @@
                 more++;
             }
         }
-        if(more > 0) {
-            String dialogId = "more-events-dialog-" + day.getDayStart().getMillis();
+        String dialogId = null;
+        if(more > 1) {
+            dialogId = "more-events-dialog-" + day.getDayStart().getMillis();
             xhtmlBuffer.openElement("div");
             xhtmlBuffer.addAttribute("id", dialogId);
             xhtmlBuffer.addAttribute("class", "event-dialog");
@@ -264,6 +264,18 @@
                 writeEventDiv(monthView, day, dayOfWeek, i, xhtmlBuffer, resourceBundle);
             }
             xhtmlBuffer.closeElement("div");
+        } else if(more == 1) {
+            EventWeek eventWeek = eventsOfTheDay.get(eventsOfTheDay.size() - 1);
+            //Event content
+            Event event = eventWeek.getEvent();
+            DateTime start = event.getInterval().getStart();
+            DateTime end = event.getInterval().getEnd();
+            DateTimeFormatter hhmmFormatter = getHoursMinutesFormatter(resourceBundle);
+            dialogId = writeEventDialog(monthView, day, xhtmlBuffer, resourceBundle,
+                                        eventWeek, start, end, hhmmFormatter);
+
+        }
+        if(dialogId != null) {
             xhtmlBuffer.openElement("a");
             xhtmlBuffer.addAttribute("href", "#");
             xhtmlBuffer.addAttribute("onclick", "$('#" + dialogId + "').dialog('open'); return false;");
@@ -371,13 +383,7 @@
         DateTime start = event.getInterval().getStart();
         DateTime end = event.getInterval().getEnd();
 
-        DateTimeFormatter hhmmFormatter =
-                new DateTimeFormatterBuilder()
-                        .appendHourOfDay(2)
-                        .appendLiteral(":")
-                        .appendMinuteOfHour(2)
-                        .toFormatter()
-                        .withLocale(resourceBundle.getLocale());
+        DateTimeFormatter hhmmFormatter = getHoursMinutesFormatter(resourceBundle);
 
         //Dialog
         String dialogId = writeEventDialog
@@ -391,12 +397,12 @@
                 (event.getInterval().getStart().getMillisOfDay() != 0 ||
                  event.getInterval().getEnd().getMillisOfDay() != 0);
         if(!eventLastsLessThanOneDay) {
-            xhtmlBuffer.addAttribute("style", "background-color: " + event.getCalendar().getColor());
+            xhtmlBuffer.addAttribute("style", "background-color: " + event.getCalendar().getBackgroundHtmlColor());
         }
         xhtmlBuffer.openElement("a");
         if(eventLastsLessThanOneDay) {
             xhtmlBuffer.addAttribute
-                    ("style", "float: left; color: " + event.getCalendar().getColor());
+                    ("style", "float: left; color: " + event.getCalendar().getForegroundHtmlColor());
         } else {
             xhtmlBuffer.addAttribute("style", "float: left;");
         }
@@ -440,13 +446,7 @@
         }
         DateTime end = event.getInterval().getEnd();
 
-        DateTimeFormatter hhmmFormatter =
-                new DateTimeFormatterBuilder()
-                        .appendHourOfDay(2)
-                        .appendLiteral(":")
-                        .appendMinuteOfHour(2)
-                        .toFormatter()
-                        .withLocale(resourceBundle.getLocale());
+        DateTimeFormatter hhmmFormatter = getHoursMinutesFormatter(resourceBundle);
 
         //Dialog
         String dialogId = writeEventDialog
@@ -455,7 +455,7 @@
         //Cell contents
         xhtmlBuffer.openElement("div");
         xhtmlBuffer.openElement("a");
-        xhtmlBuffer.addAttribute("style", "font-weight: bold; color: " + event.getCalendar().getColor());
+        xhtmlBuffer.addAttribute("style", "font-weight: bold; color: " + event.getCalendar().getForegroundHtmlColor());
         xhtmlBuffer.addAttribute("href", "#");
         xhtmlBuffer.addAttribute("onclick", "$('#" + dialogId + "').dialog('open'); return false;");
         if(start.getMillisOfDay() > 0) {

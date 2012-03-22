@@ -147,31 +147,37 @@ public class CalendarAction extends CustomAction {
     @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution execute() {
         if("agenda".equals(calendarViewType)) {
-            agendaView = new AgendaView(referenceDateTime);
-            int maxEvents = getConfiguration().getEstimateEventsPerPageInAgendaView();
-            loadObjects(agendaView.getFirstDay().toDateTime(), maxEvents);
-            int added = 0;
-            for(Event event : events) {
-                added += agendaView.addEvent(event);
-                if(added >= maxEvents) {
-                    break;
-                }
-            }
-            agendaView.sortEvents();
+            return agendaView();
         } else {
-            calendarViewType = "month";
-            monthView = new MonthView(referenceDateTime);
-            loadObjects(monthView.getMonthViewInterval());
-            for(Event event : events) {
-                monthView.addEvent(event);
+            return monthView();
+        }
+    }
+
+    public Resolution monthView() {
+        calendarViewType = "month";
+        monthView = new MonthView(referenceDateTime);
+        loadObjects(monthView.getMonthViewInterval());
+        for(Event event : events) {
+            monthView.addEvent(event);
+        }
+        monthView.sortEvents();
+        return forwardTo("/layouts/calendar/calendar.jsp");
+    }
+
+    public Resolution agendaView() {
+        calendarViewType = "agenda";
+        agendaView = new AgendaView(referenceDateTime);
+        int maxEvents = getConfiguration().getEstimateEventsPerPageInAgendaView();
+        loadObjects(agendaView.getFirstDay().toDateTime(), maxEvents);
+        int added = 0;
+        for(Event event : events) {
+            added += agendaView.addEvent(event);
+            if(added >= maxEvents) {
+                break;
             }
-            monthView.sortEvents();
         }
-        if (isEmbedded()) {
-            return new ForwardResolution("/layouts/calendar/calendar.jsp");
-        } else {
-            return forwardToPortletPage("/layouts/calendar/calendar.jsp");
-        }
+        agendaView.sortEvents();
+        return forwardTo("/layouts/calendar/calendar.jsp");
     }
 
     public Resolution nextMonth() {
