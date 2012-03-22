@@ -140,7 +140,7 @@
         background-color: <%= ColorUtils.toHtmlColor(actionBean.getNonWorkingFooterBgColor()) %>;
     }
 
-    span.twe-ro-hours, span.twe-day-total {
+    span.twe-ro-hours, span.twe-day-total, span.twe-day-overtime {
         display: block;
         width: 32px;
         text-align: right;
@@ -231,7 +231,7 @@
             xb.write(actionBean.getDateFormatter().print(dayDate));
 
             if (dayStatus != null) {
-                String id = "swm-" + i;
+                String id = "twe-swm-" + i;
                 Integer standardWorkingMinutes =
                         day.getStandardWorkingMinutes();
                 String value = (standardWorkingMinutes == null)
@@ -397,8 +397,6 @@
     <%
         for (int i = 0; i < 7; i++) {
             WeekEntryModel.Day day = weekEntryModel.getDay(i);
-            LocalDate dayDate = day.getDate();
-            WeekEntryModel.DayStatus dayStatus = day.getStatus();
 
             xb.openElement("td");
             String htmlClass = "twe-summary";
@@ -414,6 +412,35 @@
 
             xb.openElement("span");
             xb.addAttribute("class", "twe-day-total");
+            xb.closeElement("span");
+
+            xb.closeElement("td");
+        }
+    %>
+</tr>
+<tr>
+    <td class="twe-total" colspan="3"><fmt:message
+            key="timesheet.total.overtime"/>: <span id="twe-week-overtime"
+                                                      class="twe-week-total"></span>
+    </td>
+    <%
+        for (int i = 0; i < 7; i++) {
+            WeekEntryModel.Day day = weekEntryModel.getDay(i);
+
+            xb.openElement("td");
+            String htmlClass = "twe-summary";
+            if (day.isNonWorking()) {
+                htmlClass += " twe-non-working";
+            }
+
+            if (day.isToday()) {
+                htmlClass += " twe-today";
+            }
+
+            xb.addAttribute("class", htmlClass);
+
+            xb.openElement("span");
+            xb.addAttribute("class", "twe-day-overtime");
             xb.closeElement("span");
 
             xb.closeElement("td");
@@ -478,7 +505,26 @@
         var hours = Math.floor(totalMinutes / 60);
         var minutes = totalMinutes % 60;
         var totalTime = formatHoursMinutes(hours, minutes);
-        $("table.twe-table tfoot tr:first-child td:nth-child(" +
+        $("table.twe-table tfoot tr:nth-child(1) td:nth-child(" +
+                (2 + index) +
+                ") span").html(totalTime);
+
+        //overtime
+        var overtimeMinutes;
+        var swmId = "twe-swm-" + index;
+        var standardWorkingMinutes = $("input#" + swmId).val();
+        if (isNaN(standardWorkingMinutes + 1)) {
+            overtimeMinutes = 0;
+        } else {
+            overtimeMinutes = totalMinutes - standardWorkingMinutes;
+        }
+        if (overtimeMinutes < 0) {
+            overtimeMinutes = 0;
+        }
+        hours = Math.floor(overtimeMinutes / 60);
+        minutes = overtimeMinutes % 60;
+        totalTime = formatHoursMinutes(hours, minutes);
+        $("table.twe-table tfoot tr:nth-child(2) td:nth-child(" +
                 (2 + index) +
                 ") span").html(totalTime);
     }
@@ -492,7 +538,18 @@
         var hours = Math.floor(totalMinutes / 60);
         var minutes = totalMinutes % 60;
         var totalTime = formatHoursMinutes(hours, minutes);
-        $("span.twe-week-total").html(totalTime);
+        $("span#twe-week-total").html(totalTime);
+
+        // overtime
+        totalMinutes = 0;
+        $("span.twe-day-overtime").each(function(spanIndex, currentSpan) {
+            var text = $(currentSpan).html();
+            totalMinutes += parseHours(text);
+        });
+        hours = Math.floor(totalMinutes / 60);
+        minutes = totalMinutes % 60;
+        totalTime = formatHoursMinutes(hours, minutes);
+        $("span#twe-week-overtime").html(totalTime);
     }
 
     function cellUpdated(wrappedInput, columnIndex) {
