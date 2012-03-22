@@ -5,9 +5,9 @@
 <%@taglib prefix="mde" uri="/manydesigns-elements" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-definition>
-    <div class="portlet">
-        <jsp:useBean id="actionBean" scope="request"
-                     type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
+    <jsp:useBean id="actionBean" scope="request"
+                 type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
+    <div class="portlet" id="portlet_${actionBean.pageInstance.page.id}">
         <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
