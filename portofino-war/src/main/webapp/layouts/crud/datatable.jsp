@@ -26,6 +26,8 @@
         </tbody>
     </table>
 </div>
+<input type="hidden" name="sortProperty" value="${actionBean.sortProperty}" />
+<input type="hidden" name="sortDirection" value="${actionBean.sortDirection}" />
 <script type="text/javascript">
     var initDatatable_<c:out value="${pageId}" /> = function() {
         var elementsFormatter = function(elCell, oRecord, oColumn, sData) {
@@ -122,6 +124,13 @@
                 url = url + "&searchString=" + encodeURIComponent(
                     '<%= StringEscapeUtils.escapeJavaScript(actionBean.getSearchString()) %>');
             </c:if>
+
+            //Update sort input fields in the form
+            $('#<c:out value="portlet_${pageId}" /> input[name=sortProperty]').val(sort);
+            $('#<c:out value="portlet_${pageId}" /> input[name=sortDirection]').val(dir);
+
+            console.log($('#<c:out value="portlet_${pageId}" /> input[name=sortDirection]'));
+
             return url;
         };
 
