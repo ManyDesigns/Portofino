@@ -1872,7 +1872,7 @@ public class CrudAction extends AbstractPageAction {
 
     public static final String[][] CRUD_CONFIGURATION_FIELDS =
             {{"name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
-              "largeResultSet", "rowsPerPage"}};
+              "largeResultSet", "paginated", "rowsPerPage"}};
 
     public Form crudConfigurationForm;
     public TableForm propertiesTableForm;

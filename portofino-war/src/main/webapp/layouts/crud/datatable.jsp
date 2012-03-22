@@ -108,11 +108,16 @@
             var sort = (oState.sortedBy) ? oState.sortedBy.key : "";
             var dir = (oState.sortedBy && oState.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc";
             var startIndex = (oState.pagination) ? oState.pagination.recordOffset : 0;
-            var maxResults = (oState.pagination) ? oState.pagination.rowsPerPage : <%= actionBean.getCrudConfiguration().getActualRowsPerPage() %>;
+            var maxResults = null;
+            <c:if test="${actionBean.crudConfiguration.paginated}">
+                maxResults = (oState.pagination) ? oState.pagination.rowsPerPage : ${actionBean.crudConfiguration.rowsPerPage};
+            </c:if>
 
             // Build custom request
-            var url = "&firstResult=" + startIndex +
-                    "&maxResults=" + maxResults + "&sortProperty=" + sort + "&sortDirection=" + dir;
+            var url = "&firstResult=" + startIndex + "&sortProperty=" + sort + "&sortDirection=" + dir;
+            if(maxResults) {
+                url += "&maxResults=" + maxResults;
+            }
             <c:if test="${not empty actionBean.searchString}">
                 url = url + "&searchString=" + encodeURIComponent(
                     '<%= StringEscapeUtils.escapeJavaScript(actionBean.getSearchString()) %>');
@@ -124,21 +129,26 @@
             generateRequest: generateRequest,
             initialRequest: generateRequest(),
             dynamicData: true,
-            paginator : new YAHOO.widget.Paginator({
-                rowsPerPage: <%= actionBean.getCrudConfiguration().getActualRowsPerPage() %>,
+            MSG_EMPTY: '<fmt:message key="layouts.crud.datatable.msg_empty"/>'
+        };
+
+        <c:if test="${actionBean.crudConfiguration.paginated}">
+            myConfigs.paginator = new YAHOO.widget.Paginator({
+                rowsPerPage: <%= actionBean.getCrudConfiguration().getRowsPerPage() %>,
                 firstPageLinkLabel: '&lt;&lt; <fmt:message key="commons.first" />',
                 previousPageLinkLabel: '&lt; <fmt:message key="commons.prev" />',
                 nextPageLinkLabel: '<fmt:message key="commons.next" /> &gt;',
                 lastPageLinkLabel: '<fmt:message key="commons.last" /> &gt;&gt;'
-            }),
-            MSG_EMPTY: '<fmt:message key="layouts.crud.datatable.msg_empty"/>'
-        };
+            });
+        </c:if>
 
         var myDataTable = new YAHOO.widget.DataTable(
                 '<c:out value="tableContainer-${pageId}" />', myColumnDefs, myDataSource, myConfigs);
         myDataTable.doBeforeLoadData = function(oRequest, oResponse, oPayload) {
             oPayload.totalRecords = oResponse.meta.totalRecords;
-            oPayload.pagination.recordOffset = oResponse.meta.startIndex;
+            if(oPayload.pagination) {
+                oPayload.pagination.recordOffset = oResponse.meta.startIndex;
+            }
             return oPayload;
         };
         myDataTable.doBeforePaginatorChange = function(oPaginatorState) {
