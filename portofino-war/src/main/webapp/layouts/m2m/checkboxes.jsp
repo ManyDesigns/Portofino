@@ -18,11 +18,11 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:if test="${not empty actionBean.oneSelectField}">
-            <mde:write name="actionBean" property="oneSelectField" />
+            <span class="onePkContainer"><mde:write name="actionBean" property="oneSelectField" /></span>
             <br />
             <script type="text/javascript">
                 $(function() {
-                    $("#__onePk").change(function() {
+                    $(".onePkContainer select").change(function() {
                         $(this).attr("form").submit();
                     });
                 });
