@@ -27,9 +27,8 @@ import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
-import com.manydesigns.portofino.model.database.Database;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
-import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.model.database.*;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +51,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     //**************************************************************************
 
     protected String oneExpression;
+    protected String onePropertyName;
     protected SelectionProviderReference oneSelectionProvider;
 
     protected SelectionProviderReference manySelectionProvider;
@@ -64,6 +64,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     // Fields for wire-up
     //**************************************************************************
 
+    protected String actualOnePropertyName;
     protected Database actualOneDatabase;
     protected Database actualManyDatabase;
     protected Database actualRelationDatabase;
@@ -89,31 +90,64 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     //**************************************************************************
 
     public void init(Application application) {
-        assert viewType != null;
-        assert database != null;
-        assert query != null;
-        assert manySelectionProvider != null;
-
-        actualRelationDatabase = DatabaseLogic.findDatabaseByName(application.getModel(), database);
-        if(actualRelationDatabase != null) {
-            actualRelationTable = QueryUtils.getTableFromQueryString(actualRelationDatabase, query);
-
-            manySelectionProvider.init(actualRelationTable);
-            String manyDatabaseName = manySelectionProvider.getActualSelectionProvider().getToDatabase();
-            actualManyDatabase =
-                DatabaseLogic.findDatabaseByName(application.getModel(), manyDatabaseName);
-            actualManyTable = manySelectionProvider.getActualSelectionProvider().getToTable();
-
-            if(oneSelectionProvider != null) {
-                oneSelectionProvider.init(actualRelationTable);
-                String oneDatabaseName = oneSelectionProvider.getActualSelectionProvider().getToDatabase();
-                actualOneDatabase =
-                    DatabaseLogic.findDatabaseByName(application.getModel(), oneDatabaseName);
-            }
-        } else {
-            throw new Error("Relation database " + database + " not found");
+        if(viewType == null) {
+            viewType = ViewType.CHECKBOXES.name();
         }
         actualViewType = ViewType.valueOf(viewType);
+
+        if(database != null && query != null) {
+            actualRelationDatabase = DatabaseLogic.findDatabaseByName(application.getModel(), database);
+            if(actualRelationDatabase != null) {
+                actualRelationTable = QueryUtils.getTableFromQueryString(actualRelationDatabase, query);
+
+                if(actualRelationTable != null) {
+                    if(manySelectionProvider != null) {
+                        manySelectionProvider.init(actualRelationTable);
+                        ModelSelectionProvider actualSelectionProvider = manySelectionProvider.getActualSelectionProvider();
+                        String manyDatabaseName = actualSelectionProvider.getToDatabase();
+                        actualManyDatabase =
+                            DatabaseLogic.findDatabaseByName(application.getModel(), manyDatabaseName);
+                        actualManyTable = actualSelectionProvider.getToTable();
+                        if(actualManyTable == null && actualSelectionProvider instanceof DatabaseSelectionProvider) {
+                            logger.debug("Trying to determine the many table from the selection provider query");
+                            String hql = ((DatabaseSelectionProvider) actualSelectionProvider).getHql();
+                            if(hql != null) {
+                                actualManyTable = QueryUtils.getTableFromQueryString(actualManyDatabase, hql);
+                            }
+                        }
+                        if(actualManyTable == null) {
+                            logger.error("Invalid selection provider: only foreign keys or HQL selection providers that select a single entity are supported");
+                        }
+                    } else {
+                        logger.error("Many-side selection provider is required");
+                    }
+
+                    if(oneSelectionProvider != null) {
+                        oneSelectionProvider.init(actualRelationTable);
+                        String oneDatabaseName = oneSelectionProvider.getActualSelectionProvider().getToDatabase();
+                        actualOneDatabase =
+                            DatabaseLogic.findDatabaseByName(application.getModel(), oneDatabaseName);
+                    }
+                } else {
+                    logger.error("Table not found");
+                }
+            } else {
+                logger.error("Relation database " + database + " not found");
+            }
+
+            if(StringUtils.isBlank(oneExpression)) {
+                //TODO chiave multipla
+                try {
+                    actualOnePropertyName =
+                            getOneSelectionProvider().getActualSelectionProvider().getReferences().get(0)
+                                    .getActualFromColumn().getActualPropertyName();
+                } catch (Throwable t) {
+                    logger.error("Couldn't determine one property name", t);
+                }
+            } else {
+                actualOnePropertyName = onePropertyName;
+            }
+        }
     }
 
     //**************************************************************************
@@ -160,6 +194,15 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
         this.oneExpression = oneExpression;
     }
 
+    @XmlAttribute(required = false)
+    public String getOnePropertyName() {
+        return onePropertyName;
+    }
+
+    public void setOnePropertyName(String onePropertyName) {
+        this.onePropertyName = onePropertyName;
+    }
+
     @XmlElement(name = "one", required = false)
     public SelectionProviderReference getOneSelectionProvider() {
         return oneSelectionProvider;
@@ -201,5 +244,9 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
 
     public Table getActualManyTable() {
         return actualManyTable;
+    }
+
+    public String getActualOnePropertyName() {
+        return actualOnePropertyName;
     }
 }

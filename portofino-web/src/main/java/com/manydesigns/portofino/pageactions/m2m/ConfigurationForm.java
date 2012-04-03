@@ -22,7 +22,6 @@
 
 package com.manydesigns.portofino.pageactions.m2m;
 
-import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.portofino.model.database.ForeignKey;
 import com.manydesigns.portofino.model.database.ModelSelectionProvider;
 import com.manydesigns.portofino.pageactions.m2m.configuration.ManyToManyConfiguration;
@@ -40,7 +39,7 @@ public class ConfigurationForm extends ManyToManyConfiguration {
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
     public String oneSpName;
-    @Required
+
     public String manySpName;
 
     public ConfigurationForm(ManyToManyConfiguration m2mConfiguration) {
@@ -48,6 +47,7 @@ public class ConfigurationForm extends ManyToManyConfiguration {
         setDatabase(m2mConfiguration.getDatabase());
         setQuery(m2mConfiguration.getQuery());
         setOneExpression(m2mConfiguration.getOneExpression());
+        setOnePropertyName(m2mConfiguration.getOnePropertyName());
         if(m2mConfiguration.getOneSelectionProvider() != null) {
             oneSpName = m2mConfiguration.getOneSelectionProvider().getActualSelectionProvider().getName();
         }
@@ -61,6 +61,7 @@ public class ConfigurationForm extends ManyToManyConfiguration {
         m2mConfiguration.setDatabase(database);
         m2mConfiguration.setQuery(query);
         m2mConfiguration.setOneExpression(oneExpression);
+        m2mConfiguration.setOnePropertyName(onePropertyName);
         if(StringUtils.isEmpty(oneSpName)) {
             m2mConfiguration.setOneSelectionProvider(null);
         } else {
@@ -86,7 +87,7 @@ public class ConfigurationForm extends ManyToManyConfiguration {
             }
         }
 
-        if(StringUtils.isEmpty(manySpName)) {
+        if(StringUtils.isEmpty(manySpName) || m2mConfiguration.getActualRelationTable() == null) {
             m2mConfiguration.setManySelectionProvider(null);
         } else {
             boolean found = false;

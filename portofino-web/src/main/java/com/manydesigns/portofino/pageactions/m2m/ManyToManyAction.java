@@ -118,11 +118,17 @@ public class ManyToManyAction extends AbstractPageAction {
     public void prepare() throws NoSuchFieldException {
         if(m2mConfiguration == null || m2mConfiguration.getActualRelationTable() == null ||
            m2mConfiguration.getActualManyTable() == null) {
+            logger.error("Configuration is null or relation/many table not found (check previous log messages)");
             return;
         }
         Table table = m2mConfiguration.getActualRelationTable();
         relationTableAccessor = new TableAccessor(table);
         manyTableAccessor = new TableAccessor(m2mConfiguration.getActualManyTable());
+        if(StringUtils.isBlank(m2mConfiguration.getActualOnePropertyName())) {
+            logger.error("One property name not set");
+            return;
+        }
+
         String expression = m2mConfiguration.getOneExpression();
         if(!StringUtils.isBlank(expression)) {
             //Set primary key
@@ -208,7 +214,7 @@ public class ManyToManyAction extends AbstractPageAction {
         Table table = m2mConfiguration.getActualRelationTable();
         TableCriteria criteria = new TableCriteria(table);
         //TODO chiave multipla
-        String onePropertyName = m2mConfiguration.getOneSelectionProvider().getActualSelectionProvider().getReferences().get(0).getActualFromColumn().getActualPropertyName();
+        String onePropertyName = m2mConfiguration.getActualOnePropertyName();
         PropertyAccessor onePropertyAccessor =
                 relationTableAccessor.getProperty(onePropertyName);
         //TODO chiave multipla
@@ -354,7 +360,7 @@ public class ManyToManyAction extends AbstractPageAction {
         super.prepareConfigurationForms();
         FormBuilder formBuilder = new FormBuilder(ConfigurationForm.class);
         formBuilder
-            .configFields("viewType", "database", "query", "oneExpression", "oneSpName", "manySpName")
+            .configFields("viewType", "database", "query", "oneExpression", "onePropertyName", "oneSpName", "manySpName")
             .configFieldSetNames("Many to many");
 
         DefaultSelectionProvider viewTypeSelectionProvider = new DefaultSelectionProvider("viewType");
@@ -373,25 +379,28 @@ public class ManyToManyAction extends AbstractPageAction {
                         new String[]{ "databaseName" });
         formBuilder.configSelectionProvider(databaseSelectionProvider, "database");
 
-        List<ModelSelectionProvider> sps = new ArrayList<ModelSelectionProvider>();
-        sps.addAll(m2mConfiguration.getActualRelationTable().getForeignKeys());
+        if(m2mConfiguration != null && m2mConfiguration.getActualRelationTable() != null) {
+            List<ModelSelectionProvider> sps = new ArrayList<ModelSelectionProvider>();
+            sps.addAll(m2mConfiguration.getActualRelationTable().getForeignKeys());
+            sps.addAll(m2mConfiguration.getActualRelationTable().getSelectionProviders());
 
-        SelectionProvider oneSp =
-                SelectionProviderLogic.createSelectionProvider(
-                        "oneSpName",
-                        sps,
-                        ModelSelectionProvider.class,
-                        null,
-                        new String[]{ "name" });
-        formBuilder.configSelectionProvider(oneSp, "oneSpName");
-        SelectionProvider manySp =
-                SelectionProviderLogic.createSelectionProvider(
-                        "manySpName",
-                        sps,
-                        ModelSelectionProvider.class,
-                        null,
-                        new String[]{ "name" });
-        formBuilder.configSelectionProvider(manySp, "manySpName");
+            SelectionProvider oneSp =
+                    SelectionProviderLogic.createSelectionProvider(
+                            "oneSpName",
+                            sps,
+                            ModelSelectionProvider.class,
+                            null,
+                            new String[]{ "name" });
+            formBuilder.configSelectionProvider(oneSp, "oneSpName");
+            SelectionProvider manySp =
+                    SelectionProviderLogic.createSelectionProvider(
+                            "manySpName",
+                            sps,
+                            ModelSelectionProvider.class,
+                            null,
+                            new String[]{ "name" });
+            formBuilder.configSelectionProvider(manySp, "manySpName");
+        }
 
         configurationForm = formBuilder.build();
         configurationForm.readFromObject(new ConfigurationForm(m2mConfiguration));
