@@ -1863,7 +1863,6 @@ public class CrudAction extends AbstractPageAction {
 
     protected Resolution getEmbeddedSearchView() {
         return new ForwardResolution("/layouts/crud/search.jsp");
-        //return new ForwardResolution("/layouts/crud/embedded-search.jsp");
     }
 
     //**************************************************************************

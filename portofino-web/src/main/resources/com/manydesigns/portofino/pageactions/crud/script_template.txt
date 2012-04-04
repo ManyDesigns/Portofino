@@ -19,4 +19,57 @@ class %{#generatedClassName} extends CrudAction {
     //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino
     //Write your code here
 
+    //**************************************************************************
+    // Extension hooks
+    //**************************************************************************
+
+    protected void createSetup(Object object) {}
+
+    protected boolean createValidate(Object object) {
+        return true;
+    }
+
+    protected void createPostProcess(Object object) {}
+
+
+    protected void editSetup(Object object) {}
+
+    protected boolean editValidate(Object object) {
+        return true;
+    }
+
+    protected void editPostProcess(Object object) {}
+
+
+    protected boolean deleteValidate(Object object) {
+        return true;
+    }
+
+    protected void deletePostProcess(Object object) {}
+
+
+    protected Resolution getBulkEditView() {
+        return super.getBulkEditView();
+    }
+
+    protected Resolution getCreateView() {
+        return super.getCreateView();
+    }
+
+    protected Resolution getEditView() {
+        return super.getEditView();
+    }
+
+    protected Resolution getReadView() {
+        return super.getReadView();
+    }
+
+    protected Resolution getSearchView() {
+        return super.getSearchView();
+    }
+
+    protected Resolution getEmbeddedSearchView() {
+        return super.getEmbeddedSearchView();
+    }
+
 }
