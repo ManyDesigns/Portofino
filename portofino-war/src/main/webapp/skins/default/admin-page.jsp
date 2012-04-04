@@ -97,12 +97,6 @@
                         <div class="navigationHeader">Security</div>
                         <ul>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
-                                                   text="Users"
-                                                   link="/actions/admin/users"/>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
-                                                   text="Groups"
-                                                   link="/actions/admin/groups"/>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Root permissions"
                                                    link="/actions/admin/root-page/permissions"/>
                         </ul>
