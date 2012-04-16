@@ -80,7 +80,7 @@ public class HibernateConfig {
     public Configuration buildSessionFactory(Database database) {
         try {
             Configuration configuration = new Configuration()
-                    .setProperty("default_entity_mode", "dynamic-map");
+                    .setProperty("hibernate.default_entity_mode", "dynamic-map");
 
             JdbcConnectionProvider jdbcConnectionProvider =
                     (JdbcConnectionProvider) connectionProvider;
