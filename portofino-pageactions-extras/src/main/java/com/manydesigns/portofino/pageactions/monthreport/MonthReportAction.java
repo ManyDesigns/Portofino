@@ -41,6 +41,8 @@ import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.monthreport.configuration.MonthReportConfiguration;
 import com.manydesigns.portofino.pageactions.monthreport.model.MonthReportModel;
+import com.manydesigns.portofino.pageactions.monthreport.util.MonthSelection;
+import com.manydesigns.portofino.pageactions.monthreport.util.MonthSelectionHelper;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
@@ -87,6 +89,7 @@ public class MonthReportAction extends AbstractPageAction {
     protected DateMidnight     referenceDateMidnight;
     protected MonthReportModel monthReportModel;
 
+    protected Form monthSelectorForm;
     protected Form parameterForm;
     protected Form configurationForm;
 
@@ -98,12 +101,19 @@ public class MonthReportAction extends AbstractPageAction {
     /**
      * Format example: February 2012
      */
-    protected DateTimeFormatter monthFormatter;
+    protected DateTimeFormatter monthYearFormatter;
 
     /**
      * Format example: 1, 2, 3, etc.
      */
     protected DateTimeFormatter dayOfMonthFormatter;
+
+    /**
+     * Format example: February
+     */
+    protected DateTimeFormatter month;
+
+
 
 
     /**
@@ -151,7 +161,7 @@ public class MonthReportAction extends AbstractPageAction {
     public void prepareFormatters() {
         Locale locale = getContext().getRequest().getLocale();
         dayOfWeekFormatter = DateTimeFormat.forPattern("E").withLocale(locale);
-        monthFormatter = new DateTimeFormatterBuilder()
+        monthYearFormatter = new DateTimeFormatterBuilder()
                 .appendMonthOfYearText()
                 .appendLiteral(" ")
                 .appendYear(4, 4)
@@ -211,12 +221,26 @@ public class MonthReportAction extends AbstractPageAction {
 
     @DefaultHandler
     public Resolution execute() {
+        setupMonthSelectionForm();
         setupParameterForm();
         if (isEmbedded()) {
             return new ForwardResolution("/layouts/monthreport/index.jsp");
         } else {
             return forwardToPortletPage("/layouts/monthreport/index.jsp");
         }
+    }
+
+    private void setupMonthSelectionForm() {
+        FormBuilder formBuilder = new FormBuilder(MonthSelection.class);
+        formBuilder.configSelectionProvider(
+                MonthSelectionHelper.getMonthSelectionProvider(),
+                "month"
+        );
+        formBuilder.configSelectionProvider(
+                MonthSelectionHelper.getYearSelectionProvider(2000, 2012),
+                "year"
+        );
+        monthSelectorForm = formBuilder.build();
     }
 
     public void setupParameterForm() {
@@ -366,7 +390,7 @@ public class MonthReportAction extends AbstractPageAction {
         String personTitle = String.format("Name: %s",
                 monthReportModel.getPersonName());
         String monthTitle = String.format("Month: %s",
-                monthFormatter.print(referenceDateMidnight));
+                monthYearFormatter.print(referenceDateMidnight));
         headerParagraph.add(new Chunk(personTitle));
         headerParagraph.add(Chunk.NEWLINE);
         headerParagraph.add(new Chunk(monthTitle));
@@ -542,12 +566,12 @@ public class MonthReportAction extends AbstractPageAction {
         this.dayOfWeekFormatter = dayOfWeekFormatter;
     }
 
-    public DateTimeFormatter getMonthFormatter() {
-        return monthFormatter;
+    public DateTimeFormatter getMonthYearFormatter() {
+        return monthYearFormatter;
     }
 
-    public void setMonthFormatter(DateTimeFormatter monthFormatter) {
-        this.monthFormatter = monthFormatter;
+    public void setMonthYearFormatter(DateTimeFormatter monthYearFormatter) {
+        this.monthYearFormatter = monthYearFormatter;
     }
 
     public DateTimeFormatter getDayOfMonthFormatter() {
