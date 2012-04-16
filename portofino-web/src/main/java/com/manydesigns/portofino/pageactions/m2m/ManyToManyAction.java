@@ -133,7 +133,7 @@ public class ManyToManyAction extends AbstractPageAction {
         if(!StringUtils.isBlank(expression)) {
             //Set primary key
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-            onePk = (Serializable) OgnlUtils.getValueQuietly(expression, ognlContext, this); //TODO handle exception
+            onePk = OgnlUtils.getValueQuietly(expression, ognlContext, this); //TODO handle exception
             correctlyConfigured = true;
         } else {
             assert !StringUtils.isBlank(m2mConfiguration.getActualOnePropertyName());

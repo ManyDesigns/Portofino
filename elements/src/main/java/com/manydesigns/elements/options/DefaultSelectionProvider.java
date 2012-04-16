@@ -259,7 +259,8 @@ public class DefaultSelectionProvider implements SelectionProvider {
                     Object value = values[j];
                     String labelSearch = labelSearches[j];
 
-                    if (matching && matchLabel(cellLabel, labelSearch)) {
+                    //#163 cellLabel != null
+                    if (matching && cellLabel != null && matchLabel(cellLabel, labelSearch)) {
                         Option currentOption = optionsArray[j].get(cellValue);
                         if(currentOption == null || !currentOption.active) {
                             optionsArray[j].put(cellValue, new Option(cellValue, cellLabel, row.isActive()));

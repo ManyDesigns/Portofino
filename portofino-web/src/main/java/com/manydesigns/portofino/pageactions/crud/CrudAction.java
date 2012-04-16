@@ -1240,7 +1240,7 @@ public class CrudAction extends AbstractPageAction {
             object = QueryUtils.getObjectByPk(
                     application,
                     baseTable, pkObject,
-                    crudConfiguration.getQuery(), null);
+                    crudConfiguration.getQuery(), this);
             if(object != null) {
                 ognlContext.put(crudConfiguration.getActualVariable(), object);
                 String description = ShortNameUtils.getName(classAccessor, object);
@@ -1299,7 +1299,7 @@ public class CrudAction extends AbstractPageAction {
         object = QueryUtils.getObjectByPk(
                 application,
                 baseTable, pkObject,
-                crudConfiguration.getQuery(), null);
+                crudConfiguration.getQuery(), this);
     }
 
     //**************************************************************************
