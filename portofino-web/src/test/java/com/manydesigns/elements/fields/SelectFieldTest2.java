@@ -46,14 +46,16 @@ public class SelectFieldTest2 extends AbstractElementsTest {
             {1, 1},
             {1, 2},
             {1, 3},
-            {2, 4}
+            {2, 4},
+            {2, null}
     };
 
     String[][] labelsArray = {
             {"paperino", "qui"},
             {"paperino", "quo"},
             {"paperino", "qua"},
-            {"cip", "ciop"}
+            {"cip", "ciop"},
+            {"cip", null}
     };
 
     DefaultSelectionProvider selectionProvider;
@@ -201,6 +203,26 @@ public class SelectFieldTest2 extends AbstractElementsTest {
         assertEquals(3, selectField2.getValue());
 
         checkOptions2();
+    }
+
+    public void testNullInSecondField() {
+        Bean bean = new Bean(2, null);
+        form.readFromObject(bean);
+        assertFalse(form.validate());
+
+        assertEquals(2, selectField1.getValue());
+        assertNull(selectField2.getValue());
+
+        Map<Object,SelectionModel.Option> options0 = selectField1.getOptions();
+        assertNotNull(options0);
+        assertEquals(2, options0.size());
+        assertEquals("paperino", options0.get(1).label);
+        assertEquals("cip", options0.get(2).label);
+
+        Map<Object,SelectionModel.Option> options1 = selectField2.getOptions();
+        assertNotNull(options1);
+        assertEquals(1, options1.size());
+        assertEquals("ciop", options1.get(4).label);
     }
 
     public static class Bean {
