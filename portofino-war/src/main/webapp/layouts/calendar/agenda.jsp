@@ -71,37 +71,27 @@
                 class="ui-button ui-widget <%= todayDisabled ? "ui-state-disabled" : "ui-state-default" %> ui-corner-all ui-button-text-only ui-button">
             <span class="ui-button-text"><fmt:message key="calendar.today" /></span>
         </button>
-        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
-                type="submit" name="prevDay" role="button" aria-disabled="false"
-                title='<fmt:message key="calendar.previous" />'>
+        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary"
+                type="submit" name="prevDay" role="button" aria-disabled="false">
             <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-w"></span>
-            <span class="ui-button-text">&nbsp;</span>
-        </button><button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
-                         type="submit" name="nextDay" role="button" aria-disabled="false"
-                         title='<fmt:message key="calendar.next" />'>
-            <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-e"></span>
-            <span class="ui-button-text">&nbsp;</span>
+            <span class="ui-button-text"><fmt:message key="calendar.previous" /></span>
+        </button>
+        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-secondary"
+                         type="submit" name="nextDay" role="button" aria-disabled="false">
+            <span class="ui-button-text"><fmt:message key="calendar.next" /></span>
+            <span class="ui-button-icon-secondary ui-icon ui-icon-carat-1-e"></span>
         </button>
     </div>
     <div class="yui-u" style="text-align: right">
-        <div id="calendarViewType">
-            <input type="radio" id="calendarViewType-month" name="calendarViewType" value="month"
-                   /><label for="calendarViewType-month"><fmt:message key="calendar.monthView" /></label>
-            <input type="radio" id="calendarViewType-agenda" name="calendarViewType" checked="checked" value="agenda"
-                   /><label for="calendarViewType-agenda"><fmt:message key="calendar.agendaView" /></label>
-        </div>
-        <script>
-            $(function() {
-                $("#calendarViewType").buttonset();
-                $("#calendarViewType-month").click(function() {
-                    $(this).closest("form").submit();
-                });
-            });
-        </script>
+        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-secondary"
+                         type="submit" name="monthView" role="button" aria-disabled="false">
+            <span class="ui-button-text"><fmt:message key="calendar.monthView" /></span>
+            <span class="ui-button-icon-secondary ui-icon ui-icon-carat-1-e"></span>
+        </button>
     </div>
 </div>
 <div style="white-space: nowrap; clear: both; margin-bottom: 1em;">
-        <%= StringUtils.capitalize(dateFormatter.print(referenceDateTime)) %>
+    <h3 style="margin: 0; text-align: center;"><%= StringUtils.capitalize(dateFormatter.print(referenceDateTime)) %></h3>
 </div>
 <script type="text/javascript">
     $(function() {
@@ -156,7 +146,7 @@
                 writeEventDialog(hhmmFormatter, xhtmlBuffer, day, event, start, end, resourceBundle);
 
         xhtmlBuffer.openElement("a");
-        xhtmlBuffer.addAttribute("style", "color: " + event.getCalendar().getColor() + ";");
+        xhtmlBuffer.addAttribute("style", "color: " + event.getCalendar().getForegroundHtmlColor() + ";");
         xhtmlBuffer.addAttribute("href", "#");
         xhtmlBuffer.addAttribute("onclick", "$('#" + dialogId + "').dialog('open'); return false;");
         xhtmlBuffer.write(event.getDescription());

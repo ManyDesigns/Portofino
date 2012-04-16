@@ -1863,7 +1863,6 @@ public class CrudAction extends AbstractPageAction {
 
     protected Resolution getEmbeddedSearchView() {
         return new ForwardResolution("/layouts/crud/search.jsp");
-        //return new ForwardResolution("/layouts/crud/embedded-search.jsp");
     }
 
     //**************************************************************************
@@ -1872,7 +1871,7 @@ public class CrudAction extends AbstractPageAction {
 
     public static final String[][] CRUD_CONFIGURATION_FIELDS =
             {{"name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
-              "largeResultSet", "rowsPerPage"}};
+              "largeResultSet", "paginated", "rowsPerPage"}};
 
     public Form crudConfigurationForm;
     public TableForm propertiesTableForm;

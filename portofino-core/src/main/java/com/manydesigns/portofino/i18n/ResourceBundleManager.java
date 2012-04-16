@@ -102,7 +102,7 @@ public class ResourceBundleManager {
                 configuration = new PropertiesConfiguration(bundleFile);
                 FileChangedReloadingStrategy reloadingStrategy = new FileChangedReloadingStrategy();
                 configuration.setReloadingStrategy(reloadingStrategy);
-                bundle = new ConfigurationResourceBundle(configuration);
+                bundle = new ConfigurationResourceBundle(configuration, locale);
                 bundle.setParent(parentBundle);
                 resourceBundles.put(locale, bundle);
             } catch (ConfigurationException e) {

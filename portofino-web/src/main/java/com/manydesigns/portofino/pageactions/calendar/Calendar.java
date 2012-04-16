@@ -22,6 +22,10 @@
 
 package com.manydesigns.portofino.pageactions.calendar;
 
+import com.manydesigns.elements.gfx.ColorUtils;
+
+import java.awt.*;
+
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -38,7 +42,8 @@ public class Calendar {
 
     protected String id;
     protected String name;
-    protected String color;
+    protected Color foregroundColor;
+    protected Color backgroundColor;
 
     //--------------------------------------------------------------------------
     // Constructors
@@ -47,10 +52,18 @@ public class Calendar {
     public Calendar() {
     }
 
-    public Calendar(String id, String name, String color) {
+    public Calendar(String id, String name, Color color) {
         this.id = id;
         this.name = name;
-        this.color = color;
+        this.backgroundColor = color;
+        this.foregroundColor = ColorUtils.subtract(backgroundColor, new Color(0x16, 0x16, 0x16));
+    }
+
+    public Calendar(String id, String name, Color backgroundColor, Color foregroundColor) {
+        this.id = id;
+        this.name = name;
+        this.foregroundColor = foregroundColor;
+        this.backgroundColor = backgroundColor;
     }
 
     //--------------------------------------------------------------------------
@@ -73,11 +86,27 @@ public class Calendar {
         this.name = name;
     }
 
-    public String getColor() {
-        return color;
+    public Color getForegroundColor() {
+        return foregroundColor;
     }
 
-    public void setColor(String color) {
-        this.color = color;
+    public void setForegroundColor(Color foregroundColor) {
+        this.foregroundColor = foregroundColor;
+    }
+
+    public Color getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setBackgroundColor(Color backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+
+    public String getForegroundHtmlColor() {
+        return ColorUtils.toHtmlColor(foregroundColor);
+    }
+
+    public String getBackgroundHtmlColor() {
+        return ColorUtils.toHtmlColor(backgroundColor);
     }
 }

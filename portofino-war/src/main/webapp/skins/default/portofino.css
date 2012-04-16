@@ -44,7 +44,16 @@ jQuery ui smoothness theme overrides
 
 .ui-button-text-only .ui-button-text { padding: .1em .5em; }
 .ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { padding: 0; text-indent: -9999999px; }
-.ui-button-text-icon-primary .ui-button-text, .ui-button-text-icons .ui-button-text { padding: .1em 0.5em .1em 1.6em; }
+
+.ui-button-text-icon-primary .ui-button-text {
+    padding: .1em 0.5em .1em 1.6em;
+}
+
+.ui-button-text-icon-secondary .ui-button-text,
+.ui-button-text-icons .ui-button-text {
+    padding: .1em 1.6em .1em 0.5em;
+}
+
 input.ui-button { padding: .1em .5em; }
 
 button.ui-button-icon-only { width: 1.6em; }

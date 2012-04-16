@@ -155,7 +155,7 @@ public class TextAction extends AbstractPageAction {
     }
 
     protected static final String BASE_USER_URL_PATTERN =
-            "(href|src)\\s*=\\s*\"\\s*((http(s)?://)?((HOSTS)(:\\d+)?)?)?((/[^/?]*)+)(\\?[^\"]*)?\\s*\"";
+            "(href|src)\\s*=\\s*\"\\s*((http(s)?://)?((HOSTS)(:\\d+)?)?)?((/[^/?\"]*)+)(\\?[^\"]*)?\\s*\"";
 
     protected String processContentBeforeSave(String content) {
         List<String> hosts = new ArrayList<String>();
@@ -167,15 +167,20 @@ public class TextAction extends AbstractPageAction {
         Matcher matcher = pattern.matcher(content);
         int lastEnd = 0;
         StringBuilder sb = new StringBuilder();
+        String contextPath = context.getRequest().getContextPath();
         while (matcher.find()) {
             String attribute = matcher.group(1);
             String path = matcher.group(8 + hosts.size());
             String queryString = matcher.group(10 + hosts.size());
+            String hostAndPort = matcher.group(5);
+            if(!StringUtils.isBlank(hostAndPort) && !path.startsWith(contextPath)) {
+                logger.debug("Path refers to another web application on the same host, skipping: {}", path);
+                continue;
+            }
 
             sb.append(content.substring(lastEnd, matcher.start()));
             sb.append("portofino:hrefAttribute=\"").append(attribute).append("\"");
 
-            String contextPath = context.getRequest().getContextPath();
             if(path.startsWith(contextPath)) {
                 path = path.substring(contextPath.length());
             }

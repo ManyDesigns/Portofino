@@ -37,9 +37,11 @@ public class ConfigurationResourceBundle extends ResourceBundle {
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
     protected Configuration configuration;
+    protected Locale locale;
 
-    public ConfigurationResourceBundle(Configuration configuration) {
+    public ConfigurationResourceBundle(Configuration configuration, Locale locale) {
         this.configuration = configuration;
+        this.locale = locale;
     }
 
     public Object handleGetObject(String key) {
@@ -72,5 +74,10 @@ public class ConfigurationResourceBundle extends ResourceBundle {
     @Override
     public void setParent(ResourceBundle parent) {
         super.setParent(parent);
+    }
+
+    @Override
+    public Locale getLocale() {
+        return locale;
     }
 }

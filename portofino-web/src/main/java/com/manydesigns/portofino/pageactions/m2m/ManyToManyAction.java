@@ -82,7 +82,7 @@ public class ManyToManyAction extends AbstractPageAction {
 
     protected ManyToManyConfiguration m2mConfiguration;
 
-    protected Serializable onePk;
+    protected Object onePk;
 
     protected List existingAssociations;
     protected List availableAssociations;
@@ -118,11 +118,17 @@ public class ManyToManyAction extends AbstractPageAction {
     public void prepare() throws NoSuchFieldException {
         if(m2mConfiguration == null || m2mConfiguration.getActualRelationTable() == null ||
            m2mConfiguration.getActualManyTable() == null) {
+            logger.error("Configuration is null or relation/many table not found (check previous log messages)");
             return;
         }
         Table table = m2mConfiguration.getActualRelationTable();
         relationTableAccessor = new TableAccessor(table);
         manyTableAccessor = new TableAccessor(m2mConfiguration.getActualManyTable());
+        if(StringUtils.isBlank(m2mConfiguration.getActualOnePropertyName())) {
+            logger.error("One property name not set");
+            return;
+        }
+
         String expression = m2mConfiguration.getOneExpression();
         if(!StringUtils.isBlank(expression)) {
             //Set primary key
@@ -130,6 +136,7 @@ public class ManyToManyAction extends AbstractPageAction {
             onePk = (Serializable) OgnlUtils.getValueQuietly(expression, ognlContext, this); //TODO handle exception
             correctlyConfigured = true;
         } else {
+            assert !StringUtils.isBlank(m2mConfiguration.getActualOnePropertyName());
             //Setup "one" selection
             SelectionProviderReference oneSelectionProvider = m2mConfiguration.getOneSelectionProvider();
             if(oneSelectionProvider != null) {
@@ -138,7 +145,15 @@ public class ManyToManyAction extends AbstractPageAction {
                     logger.warn("Selection provider {} not supported", actualSelectionProvider);
                     return;
                 }
-                JavaClassAccessor myselfAccessor = JavaClassAccessor.getClassAccessor(getClass());
+
+                TableAccessor tableAccessor = new TableAccessor(m2mConfiguration.getActualRelationTable());
+                PropertyAccessor onePkAccessor = tableAccessor.getProperty(m2mConfiguration.getActualOnePropertyName());
+
+                if(onePkAccessor == null) {
+                    logger.warn("Not a property: {}", m2mConfiguration.getActualOnePropertyName());
+                    return;
+                }
+
                 String databaseName = m2mConfiguration.getActualOneDatabase().getDatabaseName();
 
                 DatabaseSelectionProvider sp =
@@ -160,12 +175,14 @@ public class ManyToManyAction extends AbstractPageAction {
                     logger.warn("ModelSelection provider '{}': unsupported query", name);
                     return;
                 }
+
+                Object myInstance = tableAccessor.newInstance();
                 oneSelectField =
-                        new SelectField(myselfAccessor.getProperty("onePk"), selectionProvider, Mode.EDIT, "__");
-                oneSelectField.readFromObject(this);
-                oneSelectField.readFromObject(this);
+                        new SelectField(onePkAccessor, selectionProvider, Mode.EDIT, "__");
+                oneSelectField.setRequired(false);
                 oneSelectField.readFromRequest(context.getRequest());
-                oneSelectField.writeToObject(this);
+                oneSelectField.writeToObject(myInstance);
+                onePk = onePkAccessor.get(myInstance);
                 correctlyConfigured = true;
             }
         }
@@ -208,7 +225,7 @@ public class ManyToManyAction extends AbstractPageAction {
         Table table = m2mConfiguration.getActualRelationTable();
         TableCriteria criteria = new TableCriteria(table);
         //TODO chiave multipla
-        String onePropertyName = m2mConfiguration.getOneSelectionProvider().getActualSelectionProvider().getReferences().get(0).getActualFromColumn().getActualPropertyName();
+        String onePropertyName = m2mConfiguration.getActualOnePropertyName();
         PropertyAccessor onePropertyAccessor =
                 relationTableAccessor.getProperty(onePropertyName);
         //TODO chiave multipla
@@ -262,7 +279,7 @@ public class ManyToManyAction extends AbstractPageAction {
         loadAssociations();
         PkHelper pkHelper = new PkHelper(manyTableAccessor);
         //TODO chiave multipla
-        String onePropertyName = m2mConfiguration.getOneSelectionProvider().getActualSelectionProvider().getReferences().get(0).getActualFromColumn().getActualPropertyName();
+        String onePropertyName = m2mConfiguration.getActualOnePropertyName();
         PropertyAccessor onePropertyAccessor =
                 relationTableAccessor.getProperty(onePropertyName);
         //TODO chiave multipla
@@ -354,7 +371,7 @@ public class ManyToManyAction extends AbstractPageAction {
         super.prepareConfigurationForms();
         FormBuilder formBuilder = new FormBuilder(ConfigurationForm.class);
         formBuilder
-            .configFields("viewType", "database", "query", "oneExpression", "oneSpName", "manySpName")
+            .configFields("viewType", "database", "query", "oneExpression", "onePropertyName", "oneSpName", "manySpName")
             .configFieldSetNames("Many to many");
 
         DefaultSelectionProvider viewTypeSelectionProvider = new DefaultSelectionProvider("viewType");
@@ -373,25 +390,28 @@ public class ManyToManyAction extends AbstractPageAction {
                         new String[]{ "databaseName" });
         formBuilder.configSelectionProvider(databaseSelectionProvider, "database");
 
-        List<ModelSelectionProvider> sps = new ArrayList<ModelSelectionProvider>();
-        sps.addAll(m2mConfiguration.getActualRelationTable().getForeignKeys());
+        if(m2mConfiguration != null && m2mConfiguration.getActualRelationTable() != null) {
+            List<ModelSelectionProvider> sps = new ArrayList<ModelSelectionProvider>();
+            sps.addAll(m2mConfiguration.getActualRelationTable().getForeignKeys());
+            sps.addAll(m2mConfiguration.getActualRelationTable().getSelectionProviders());
 
-        SelectionProvider oneSp =
-                SelectionProviderLogic.createSelectionProvider(
-                        "oneSpName",
-                        sps,
-                        ModelSelectionProvider.class,
-                        null,
-                        new String[]{ "name" });
-        formBuilder.configSelectionProvider(oneSp, "oneSpName");
-        SelectionProvider manySp =
-                SelectionProviderLogic.createSelectionProvider(
-                        "manySpName",
-                        sps,
-                        ModelSelectionProvider.class,
-                        null,
-                        new String[]{ "name" });
-        formBuilder.configSelectionProvider(manySp, "manySpName");
+            SelectionProvider oneSp =
+                    SelectionProviderLogic.createSelectionProvider(
+                            "oneSpName",
+                            sps,
+                            ModelSelectionProvider.class,
+                            null,
+                            new String[]{ "name" });
+            formBuilder.configSelectionProvider(oneSp, "oneSpName");
+            SelectionProvider manySp =
+                    SelectionProviderLogic.createSelectionProvider(
+                            "manySpName",
+                            sps,
+                            ModelSelectionProvider.class,
+                            null,
+                            new String[]{ "name" });
+            formBuilder.configSelectionProvider(manySp, "manySpName");
+        }
 
         configurationForm = formBuilder.build();
         configurationForm.readFromObject(new ConfigurationForm(m2mConfiguration));
@@ -437,11 +457,11 @@ public class ManyToManyAction extends AbstractPageAction {
 
     //Getters/Setters
 
-    public Serializable getOnePk() {
+    public Object getOnePk() {
         return onePk;
     }
 
-    public void setOnePk(Serializable onePk) {
+    public void setOnePk(Object onePk) {
         this.onePk = onePk;
     }
 
