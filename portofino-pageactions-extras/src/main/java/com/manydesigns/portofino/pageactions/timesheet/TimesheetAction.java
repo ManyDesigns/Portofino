@@ -22,18 +22,11 @@
 
 package com.manydesigns.portofino.pageactions.timesheet;
 
-import com.lowagie.text.*;
-import com.lowagie.text.Font;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.PdfPCell;
-import com.lowagie.text.pdf.PdfPTable;
-import com.lowagie.text.pdf.PdfWriter;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.gfx.ColorUtils;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -42,7 +35,10 @@ import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.timesheet.configuration.TimesheetConfiguration;
-import com.manydesigns.portofino.pageactions.timesheet.model.*;
+import com.manydesigns.portofino.pageactions.timesheet.model.Activity;
+import com.manydesigns.portofino.pageactions.timesheet.model.NonWorkingDaysModel;
+import com.manydesigns.portofino.pageactions.timesheet.model.Person;
+import com.manydesigns.portofino.pageactions.timesheet.model.WeekEntryModel;
 import com.manydesigns.portofino.pageactions.timesheet.util.TimesheetSelection;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
@@ -59,16 +55,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -79,7 +72,7 @@ import java.util.List;
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ConfigurationClass(TimesheetConfiguration.class)
 @PageActionName("Timesheet")
-@ScriptTemplate("script_template.txt")
+@ScriptTemplate("script_template.groovy")
 public class TimesheetAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
@@ -95,18 +88,6 @@ public class TimesheetAction extends AbstractPageAction {
     public static final    String       NOTE_INPUT_FORMAT  = "note-%d-%s";
     public static final    DateTimeZone dtz                = DateTimeZone.UTC;
 
-
-    public static final Font tableHeaderFont =
-            new Font(Font.HELVETICA, 10, Font.BOLD, Color.BLACK);
-    public static final Font tableBodyFont   =
-            new Font(Font.HELVETICA, 7, Font.NORMAL, Color.BLACK);
-    public static final Font headerFont      =
-            new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
-
-    public static final int totalAlignment = Element.ALIGN_CENTER;
-
-    public static Color REPORT_NON_WORKING_COLOR = Color.LIGHT_GRAY;
-
     //**************************************************************************
     // Variables
     //**************************************************************************
@@ -120,7 +101,6 @@ public class TimesheetAction extends AbstractPageAction {
 
     protected WeekEntryModel      weekEntryModel;
     protected NonWorkingDaysModel nonWorkingDaysModel;
-    protected MonthReportModel    monthReportModel;
 
     protected Integer day;
     protected Integer month;
@@ -570,259 +550,6 @@ public class TimesheetAction extends AbstractPageAction {
     }
 
     //**************************************************************************
-    // Month report
-    //**************************************************************************
-
-    @Button(list = "timesheet-admin", key = "timesheet.month.report", order = 2)
-    public Resolution monthReport() throws Exception {
-        DateMidnight referenceDateMidnight =
-                new DateMidnight(referenceDate, dtz);
-        monthReportModel = new MonthReportModel(referenceDateMidnight);
-        loadMonthReportModel();
-
-        final File tmpFile = File.createTempFile("report-", ".pdf");
-        FileOutputStream fos = new FileOutputStream(tmpFile);
-        OutputStream os = new BufferedOutputStream(fos);
-
-        Document document = new Document();
-
-        // set page size and orientation
-        document.setPageSize(PageSize.A4.rotate());
-
-        // Create the writer and open the document
-        PdfWriter writer = PdfWriter.getInstance(
-                document, os);
-        document.open();
-
-        // Add content
-        addMonthReportHeader(document);
-
-
-        int daysCount = monthReportModel.getDaysCount();
-        int columnCount = daysCount + 3;
-        float[] colsWidth = new float[columnCount];
-        colsWidth[0] = 5f;
-        for (int i = 0; i < daysCount; i++) {
-            colsWidth[i + 1] = 1f;
-        }
-        colsWidth[columnCount - 2] = 1.5f;
-        colsWidth[columnCount - 1] = 2.5f;
-
-        PdfPTable table = new PdfPTable(colsWidth); // Code 1
-        table.setSpacingBefore(10f);
-        table.setSpacingAfter(10f);
-        table.setWidthPercentage(100.0f);
-
-        // table headers
-
-        // Date row
-        addCell(table, "Date", Element.ALIGN_LEFT);
-        for (int i = 0; i < daysCount; i++) {
-            MonthReportModel.Day day = monthReportModel.getDay(i);
-            String text = dayOfMonthFormatter.print(day.getDayStart());
-            PdfPCell cell = createCell(text, Element.ALIGN_CENTER);
-            if (day.isNonWorking()) {
-                cell.setBackgroundColor(REPORT_NON_WORKING_COLOR);
-            }
-            table.addCell(cell);
-        }
-        addCell(table, "Total", totalAlignment);
-        addCell(table, "Notes", Element.ALIGN_CENTER);
-
-        // Day of week row
-        addCell(table, "Day", Element.ALIGN_LEFT);
-        for (int i = 0; i < daysCount; i++) {
-            MonthReportModel.Day day = monthReportModel.getDay(i);
-            String text = dayOfWeekFormatter.print(day.getDayStart());
-            PdfPCell cell = createCell(text, Element.ALIGN_CENTER);
-            if (day.isNonWorking()) {
-                cell.setBackgroundColor(REPORT_NON_WORKING_COLOR);
-            }
-            table.addCell(cell);
-        }
-        addCell(table, "", totalAlignment);
-        addCell(table, "", Element.ALIGN_CENTER);
-
-
-        // table body
-        MonthReportModel.Node rootNode = monthReportModel.getRootNode();
-        if (rootNode == null) {
-            logger.warn("Empty root node");
-        } else {
-            printNode(table, rootNode, 0);
-        }
-
-        document.add(table);
-
-        // close the document
-        document.close();
-
-        // Send the result
-        FileInputStream fileInputStream = new FileInputStream(tmpFile);
-        return new StreamingResolution(MimeTypes.APPLICATION_PDF, fileInputStream) {
-            @Override
-            protected void stream(HttpServletResponse response) throws Exception {
-                super.stream(response);
-                if (!tmpFile.delete()) {
-                    logger.warn("Could not delete tmp file: {}", tmpFile);
-                }
-            }
-        }.setFilename("month-report.pdf").setLength(tmpFile.length());
-    }
-
-    public void addMonthReportHeader(Document document) throws Exception {
-        PdfPTable headerTable = new PdfPTable(3);
-        headerTable.setWidthPercentage(100.0f);
-
-        addMonthReportHeaderLeft(headerTable);
-        addMonthReportHeaderCenter(headerTable);
-        addMonthReportHeaderRight(headerTable);
-
-        document.add(headerTable);
-    }
-
-    public void addMonthReportHeaderLeft(PdfPTable headerTable) throws Exception {
-        PdfPCell headerCell = new PdfPCell(new Phrase(""));
-        headerCell.setBorder(Rectangle.NO_BORDER);
-        headerTable.addCell(headerCell);
-    }
-
-    public void addMonthReportHeaderCenter(PdfPTable headerTable) throws Exception {
-        PdfPCell headerCell = new PdfPCell(new Phrase("Timesheet"));
-        headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-        headerCell.setBorder(Rectangle.NO_BORDER);
-        headerTable.addCell(headerCell);
-    }
-
-    public void addMonthReportHeaderRight(PdfPTable headerTable) throws Exception {
-        DateMidnight referenceDateMidnight =
-                monthReportModel.getReferenceDateMidnight();
-        Paragraph headerParagraph = new Paragraph();
-        String personTitle = String.format("Name: %s",
-                monthReportModel.getPersonName());
-        String monthTitle = String.format("Month: %s",
-                monthFormatter.print(referenceDateMidnight));
-        headerParagraph.add(new Chunk(personTitle));
-        headerParagraph.add(Chunk.NEWLINE);
-        headerParagraph.add(new Chunk(monthTitle));
-
-        PdfPCell headerCell = new PdfPCell(headerParagraph);
-        headerCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        headerCell.setBorder(Rectangle.NO_BORDER);
-        headerTable.addCell(headerCell);
-    }
-
-    public void printNode(PdfPTable table, MonthReportModel.Node node, int indentation)
-            throws Exception {
-        List<MonthReportModel.Node> childNodes = node.getChildNodes();
-        Color color = node.getColor();
-        Color nonWorkingColor = ColorUtils.multiply(color, REPORT_NON_WORKING_COLOR);
-        if (childNodes.isEmpty()) {
-            logger.debug("Leaf node: {}", node.getId());
-            PdfPCell cell = createCell(node.getName(), Element.ALIGN_LEFT);
-            float paddingLeft = cell.getPaddingLeft() + indentation * 2;
-            cell.setPaddingLeft(paddingLeft);
-            cell.setBackgroundColor(color);
-            table.addCell(cell);
-
-            printNodeMinutes(table, node, color, nonWorkingColor);
-
-            addCell(table, Integer.toString(node.getMinutesTotal()), totalAlignment);
-            addCell(table, "", Element.ALIGN_CENTER);
-        } else {
-            logger.debug("Non-leaf node: {}", node.getId());
-            logger.debug("Printing node header", node.getId());
-            PdfPCell cell = createCell(node.getName(), Element.ALIGN_LEFT);
-            float paddingLeft = cell.getPaddingLeft() + indentation * 2;
-            cell.setPaddingLeft(paddingLeft);
-            cell.setBackgroundColor(color);
-            table.addCell(cell);
-
-            printNodeBlankMinutes(table, node, color, nonWorkingColor);
-
-            addCell(table, "", Element.ALIGN_CENTER);
-            addCell(table, "", Element.ALIGN_CENTER);
-
-            logger.debug("Printing child nodes", node.getId());
-            for (MonthReportModel.Node current : childNodes) {
-                printNode(table, current, indentation + 1);
-            }
-
-            logger.debug("Printing node footer", node.getId());
-            addCell(table, "Total (" + node.getName() + ")", Element.ALIGN_RIGHT);
-            printNodeMinutes(table, node, null, REPORT_NON_WORKING_COLOR);
-            addCell(table, Integer.toString(node.getMinutesTotal()), totalAlignment);
-            addCell(table, "", Element.ALIGN_CENTER);
-        }
-    }
-
-    public void printNodeMinutes(PdfPTable table, MonthReportModel.Node node,
-                                  Color color, Color nonWorkingColor)
-            throws Exception {
-        for (int i = 0; i < monthReportModel.getDaysCount(); i++) {
-            MonthReportModel.Day day = monthReportModel.getDay(i);
-            Color actualBackgroundColor = (day.isNonWorking())
-                    ? nonWorkingColor
-                    : color;
-            int minutes = node.getMinutes(i);
-            addCell(table, Integer.toString(minutes), Element.ALIGN_CENTER, actualBackgroundColor);
-        }
-    }
-
-    public void printNodeBlankMinutes(PdfPTable table,
-                                       MonthReportModel.Node node,
-                                       Color color,
-                                       Color nonWorkingColor)
-            throws Exception {
-        if (color == null) {
-            color = Color.WHITE;
-        }
-        for (int i = 0; i < monthReportModel.getDaysCount(); i++) {
-            MonthReportModel.Day day = monthReportModel.getDay(i);
-            Color actualBackgroundColor = (day.isNonWorking())
-                    ? nonWorkingColor
-                    : color;
-            addCell(table, "", Element.ALIGN_CENTER, actualBackgroundColor);
-        }
-    }
-
-    public PdfPCell addCell(PdfPTable table, String text, int alignment)
-            throws Exception {
-        return addCell(table, text, alignment, null);
-    }
-
-    public PdfPCell addCell(PdfPTable table, String text, int alignment, Color backgroundColor)
-            throws Exception {
-        PdfPCell cell = createCell(text, alignment);
-        if (backgroundColor != null) {
-            cell.setBackgroundColor(backgroundColor);
-        }
-        table.addCell(cell);
-        return cell;
-    }
-
-    public PdfPCell createCell(String text, int alignment) throws Exception {
-        PdfPCell cell = new PdfPCell(new Phrase(text, tableBodyFont));
-        cell.setHorizontalAlignment(alignment);
-        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        return cell;
-    }
-
-
-    public void loadMonthReportModel() {
-        logger.debug("Placeholder");
-    }
-
-    public MonthReportModel.Node addReportNode(MonthReportModel.Node rootNode, String id, String name, Color color) {
-        MonthReportModel.Node node =
-                monthReportModel.createNode(id, name);
-        node.setColor(color);
-        rootNode.getChildNodes().add(node);
-        return node;
-    }
-
-
-    //**************************************************************************
     // Other action handlers
     //**************************************************************************
 
@@ -834,17 +561,6 @@ public class TimesheetAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution cancel() {
         return super.cancel();
-    }
-
-    public static boolean checkSunday(LocalDate currentDay, boolean locked) {
-        return locked || (currentDay.getDayOfWeek() == DateTimeConstants.SUNDAY);
-    }
-
-    public static LocalDate skipNonWorkingDays(LocalDate currentDay) {
-        while (currentDay.getDayOfWeek() >= DateTimeConstants.SATURDAY) {
-            currentDay = currentDay.minusDays(1);
-        }
-        return currentDay;
     }
 
     //--------------------------------------------------------------------------

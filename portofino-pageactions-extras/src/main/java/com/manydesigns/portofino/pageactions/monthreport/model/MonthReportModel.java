@@ -20,7 +20,7 @@
  *
  */
 
-package com.manydesigns.portofino.pageactions.timesheet.model;
+package com.manydesigns.portofino.pageactions.monthreport.model;
 
 import com.manydesigns.portofino.calendar.AbstractDay;
 import com.manydesigns.portofino.calendar.AbstractMonth;

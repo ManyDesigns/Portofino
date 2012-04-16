@@ -1,21 +1,14 @@
-import com.lowagie.text.Image
-import com.lowagie.text.Rectangle
-import com.lowagie.text.pdf.PdfPCell
-import com.lowagie.text.pdf.PdfPTable
 import com.manydesigns.portofino.pageactions.timesheet.TimesheetAction
 import com.manydesigns.portofino.pageactions.timesheet.util.PersonDay
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
-import java.awt.Color
-import javax.servlet.ServletContext
-import org.joda.time.DateMidnight
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
 import org.joda.time.LocalDate
 import com.manydesigns.portofino.pageactions.timesheet.model.*
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class %{#generatedClassName} extends TimesheetAction {
+class MyTimesheetAction extends TimesheetAction {
 
     //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino
     //Write your code here
@@ -157,6 +150,16 @@ class %{#generatedClassName} extends TimesheetAction {
         }
     }
 
+    public static boolean checkSunday(LocalDate currentDay, boolean locked) {
+        return locked || (currentDay.getDayOfWeek() == DateTimeConstants.SUNDAY);
+    }
+
+    public static LocalDate skipNonWorkingDays(LocalDate currentDay) {
+        while (currentDay.getDayOfWeek() >= DateTimeConstants.SATURDAY) {
+            currentDay = currentDay.minusDays(1);
+        }
+        return currentDay;
+    }
 
     //**************************************************************************
     // Index view
@@ -292,98 +295,6 @@ class %{#generatedClassName} extends TimesheetAction {
         } else {
             nonWorkingDaysDb.remove(date);
         }
-    }
-
-    //**************************************************************************
-    // Month report
-    //**************************************************************************
-
-    @Override
-    public void loadMonthReportModel() {
-        monthReportModel.setPersonId("MR");
-        monthReportModel.setPersonName("Mario Rossi");
-
-        MonthReportModel.Node rootNode =
-                monthReportModel.createNode("root", "root node");
-        rootNode.setColor(new Color(0x88a1c7));
-        monthReportModel.setRootNode(rootNode);
-
-
-        MonthReportModel.Node node;
-        Color color = new Color(0xfff8cb);
-
-        MonthReportModel.Node euProjectsNode = addReportNode(rootNode, "eu", "EU-Projects", new Color(50, 50, 255));
-        node = addReportNode(euProjectsNode, "prjx", "Project x", color);
-        node = addReportNode(euProjectsNode, "prjy", "Project y", color);
-        node = addReportNode(euProjectsNode, "prjz", "Project z", color);
-
-        Color euColor = new Color(200, 200, 255);
-        MonthReportModel.Node rdActivitiesNode = addReportNode(euProjectsNode, "rd", "R&D Activities", euColor);
-        node = addReportNode(rdActivitiesNode, "prjx", "Project x", color);
-        node = addReportNode(rdActivitiesNode, "prjy", "Project y", color);
-        node = addReportNode(rdActivitiesNode, "prjz", "Project z", color);
-
-        MonthReportModel.Node demonstrationNode = addReportNode(euProjectsNode, "demo", "Demonstration", euColor);
-        node = addReportNode(demonstrationNode, "prjx", "Project x", color);
-        node = addReportNode(demonstrationNode, "prjy", "Project y", color);
-        node = addReportNode(demonstrationNode, "prjz", "Project z", color);
-
-        MonthReportModel.Node managementNode = addReportNode(euProjectsNode, "mgmt", "Management", euColor);
-        node = addReportNode(managementNode, "prjx", "Project x", color);
-        node = addReportNode(managementNode, "prjy", "Project y", color);
-        node = addReportNode(managementNode, "prjz", "Project z", color);
-
-        MonthReportModel.Node otherActivitiesNode = addReportNode(euProjectsNode, "oa", "Other Activities", euColor);
-        node = addReportNode(otherActivitiesNode, "prjx", "Project x", color);
-        node = addReportNode(otherActivitiesNode, "prjy", "Project y", color);
-        node = addReportNode(otherActivitiesNode, "prjz", "Project z", color);
-
-        MonthReportModel.Node internalNode = addReportNode(rootNode, "in", "Internal and Other Projects", new Color(30, 255, 30));
-        node = addReportNode(internalNode, "te", "Teaching", color);
-        node = addReportNode(internalNode, "b", "B", color);
-        node = addReportNode(internalNode, "c", "C", color);
-
-        MonthReportModel.Node absencesNode = addReportNode(rootNode, "abs", "Absences", new Color(30, 255, 30));
-        node = addReportNode(absencesNode, "al", "Annual Leave", color);
-        node = addReportNode(absencesNode, "sl", "Special Leave", color);
-        node = addReportNode(absencesNode, "ill", "Illness", color);
-
-        node.setMinutes(7, 9);
-        node.setMinutes(3, 10);
-        node.setMinutes(7, 40);
-        node.setMinutes(3, 12);
-        node.setMinutes(7, 66);
-        node.setMinutes(3, 42);
-        node.setMinutes(7, 40);
-
-        absencesNode.calculateMinutesFromChildNodes();
-        internalNode.calculateMinutesFromChildNodes();
-        otherActivitiesNode.calculateMinutesFromChildNodes();
-        managementNode.calculateMinutesFromChildNodes();
-        demonstrationNode.calculateMinutesFromChildNodes();
-        rdActivitiesNode.calculateMinutesFromChildNodes();
-        euProjectsNode.calculateMinutesFromChildNodes();
-        rootNode.calculateMinutesFromChildNodes();
-
-        for (int i = 0; i < monthReportModel.getDaysCount(); i++) {
-            MonthReportModel.Day day = monthReportModel.getDay(i);
-            DateMidnight date = day.getDayStart();
-            int dayOfWeek = date.getDayOfWeek();
-            if (dayOfWeek == DateTimeConstants.SATURDAY
-                    || dayOfWeek == DateTimeConstants.SUNDAY) {
-                day.setNonWorking(true);
-            }
-        }
-    }
-
-    public void addMonthReportHeaderLeft(PdfPTable headerTable) throws Exception {
-        ServletContext context = getContext().getServletContext();
-        String imagePath = context.getRealPath("/famfamfam_mini_icons/action_back.gif");
-        Image image = Image.getInstance(imagePath);
-        image.scalePercent(100f);
-        PdfPCell headerCell = new PdfPCell(image);
-        headerCell.setBorder(Rectangle.NO_BORDER);
-        headerTable.addCell(headerCell);
     }
 
 
