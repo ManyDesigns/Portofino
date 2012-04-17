@@ -2,12 +2,14 @@ import com.manydesigns.portofino.pageactions.timesheet.TimesheetAction
 import com.manydesigns.portofino.pageactions.timesheet.util.PersonDay
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
+import com.manydesigns.portofino.security.SupportsPermissions
 import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants
 import org.joda.time.LocalDate
 import com.manydesigns.portofino.pageactions.timesheet.model.*
 
 @RequiresPermissions(level = AccessLevel.VIEW)
+@SupportsPermissions(TimesheetAction.PERMISSION_MANAGE_NON_WORKING_DAYS)
 class MyTimesheetAction extends TimesheetAction {
 
     //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino

@@ -42,6 +42,7 @@ import com.manydesigns.portofino.pageactions.timesheet.model.WeekEntryModel;
 import com.manydesigns.portofino.pageactions.timesheet.util.TimesheetSelection;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
+import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
@@ -73,6 +74,7 @@ import java.util.regex.Pattern;
 @ConfigurationClass(TimesheetConfiguration.class)
 @PageActionName("Timesheet")
 @ScriptTemplate("script_template.groovy")
+@SupportsPermissions(TimesheetAction.PERMISSION_MANAGE_NON_WORKING_DAYS)
 public class TimesheetAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
@@ -87,6 +89,14 @@ public class TimesheetAction extends AbstractPageAction {
     public static final    String       ENTRY_INPUT_FORMAT = "cell-%d-%s";
     public static final    String       NOTE_INPUT_FORMAT  = "note-%d-%s";
     public static final    DateTimeZone dtz                = DateTimeZone.UTC;
+
+    //**************************************************************************
+    // Permissions
+    //**************************************************************************
+
+    public static final String PERMISSION_MANAGE_NON_WORKING_DAYS =
+            "timesheet.permissions.manage.non.working.days";
+
 
     //**************************************************************************
     // Variables
@@ -502,6 +512,7 @@ public class TimesheetAction extends AbstractPageAction {
     //**************************************************************************
 
     @Button(list = "timesheet-admin", key = "timesheet.manage.non.working.days", order = 1)
+    @RequiresPermissions(permissions = TimesheetAction.PERMISSION_MANAGE_NON_WORKING_DAYS)
     public Resolution nonWorkingDays() {
         DateTime referenceDateTime = new DateTime(referenceDate, dtz);
         nonWorkingDaysModel = new NonWorkingDaysModel(referenceDateTime);
@@ -510,6 +521,7 @@ public class TimesheetAction extends AbstractPageAction {
     }
 
     @Button(list = "timesheet-nwd-navigation", key = "timesheet.previous.month", order = 1)
+    @RequiresPermissions(permissions = TimesheetAction.PERMISSION_MANAGE_NON_WORKING_DAYS)
     public Resolution nonWorkingDaysPreviousMonth() throws Exception {
         DateMidnight referenceDateMidnight =
                 new DateMidnight(referenceDate, dtz);
@@ -519,6 +531,7 @@ public class TimesheetAction extends AbstractPageAction {
     }
 
     @Button(list = "timesheet-nwd-navigation", key = "timesheet.next.month", order = 2)
+    @RequiresPermissions(permissions = TimesheetAction.PERMISSION_MANAGE_NON_WORKING_DAYS)
     public Resolution nonWorkingDaysNextMonth() throws Exception {
         DateMidnight referenceDateMidnight =
                 new DateMidnight(referenceDate, dtz);
@@ -527,6 +540,7 @@ public class TimesheetAction extends AbstractPageAction {
         return nonWorkingDays();
     }
 
+    @RequiresPermissions(permissions = TimesheetAction.PERMISSION_MANAGE_NON_WORKING_DAYS)
     public Resolution configureNonWorkingDay() throws JSONException {
         logger.info("Configuring non working day. Year/month/day: {}/{}/{}. Non-working: {}",
                 new Object[]{year, month, day, nonWorking});
@@ -556,7 +570,8 @@ public class TimesheetAction extends AbstractPageAction {
     @Override
     @Buttons({
             @Button(list = "timesheet-week-entry", key = "commons.ok", order = 99),
-            @Button(list = "timesheet-non-working-days", key = "commons.ok", order = 99)
+            @Button(list = "timesheet-non-working-days", key = "commons.ok", order = 99),
+            @Button(list = "configuration", key = "commons.cancel", order = 99)
     })
     @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution cancel() {
