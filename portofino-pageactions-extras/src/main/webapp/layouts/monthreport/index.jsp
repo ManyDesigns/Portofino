@@ -10,9 +10,8 @@
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <c:if test="${not empty actionBean.parameterForm}">
-            <mde:write name="actionBean" property="parameterForm"/>
-        </c:if>
+        <mde:write name="actionBean" property="parametersForm"/>
+        <div class="horizontalSeparator"></div>
         <portofino:buttons list="report-list" cssClass="portletButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">

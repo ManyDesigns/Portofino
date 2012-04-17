@@ -22,6 +22,8 @@
 
 package com.manydesigns.portofino.pageactions.monthreport.util;
 
+import com.manydesigns.elements.annotations.Required;
+
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -32,6 +34,9 @@ public class MonthSelection {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
+    @Required
     public int month;
+
+    @Required
     public int year;
 }

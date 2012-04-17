@@ -48,6 +48,7 @@ import com.manydesigns.portofino.security.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
@@ -89,8 +90,7 @@ public class MonthReportAction extends AbstractPageAction {
     protected DateMidnight     referenceDateMidnight;
     protected MonthReportModel monthReportModel;
 
-    protected Form monthSelectorForm;
-    protected Form parameterForm;
+    protected Form parametersForm;
     protected Form configurationForm;
 
     /**
@@ -221,8 +221,7 @@ public class MonthReportAction extends AbstractPageAction {
 
     @DefaultHandler
     public Resolution execute() {
-        setupMonthSelectionForm();
-        setupParameterForm();
+        setupParametersForm();
         if (isEmbedded()) {
             return new ForwardResolution("/layouts/monthreport/index.jsp");
         } else {
@@ -230,7 +229,7 @@ public class MonthReportAction extends AbstractPageAction {
         }
     }
 
-    private void setupMonthSelectionForm() {
+    public void setupParametersForm() {
         FormBuilder formBuilder = new FormBuilder(MonthSelection.class);
         formBuilder.configSelectionProvider(
                 MonthSelectionHelper.getMonthSelectionProvider(),
@@ -240,11 +239,13 @@ public class MonthReportAction extends AbstractPageAction {
                 MonthSelectionHelper.getYearSelectionProvider(2000, 2012),
                 "year"
         );
-        monthSelectorForm = formBuilder.build();
-    }
+        parametersForm = formBuilder.build();
 
-    public void setupParameterForm() {
-        logger.debug("Placeholder");
+        LocalDate today = new LocalDate();
+        MonthSelection monthSelection = new MonthSelection();
+        monthSelection.year = today.getYear();
+        monthSelection.month = today.getMonthOfYear();
+        parametersForm.readFromObject(monthSelection);
     }
 
 
@@ -254,13 +255,13 @@ public class MonthReportAction extends AbstractPageAction {
 
     @Button(list = "report-list", key = "month.report.default.report", order = 1)
     public Resolution defaultReport() throws Exception {
-        setupParameterForm();
-        if (parameterForm != null) {
-            parameterForm.readFromRequest(context.getRequest());
-            if (!parameterForm.validate()) {
+        setupParametersForm();
+        if (parametersForm != null) {
+            parametersForm.readFromRequest(context.getRequest());
+            if (!parametersForm.validate()) {
                 return forwardToPortletPage("/layouts/monthreport/index.jsp");
             }
-            if (!parameterFormValidate()) {
+            if (!parametersFormValidate()) {
                 return forwardToPortletPage("/layouts/monthreport/index.jsp");
             }
         }
@@ -511,11 +512,14 @@ public class MonthReportAction extends AbstractPageAction {
     }
 
     public void setupReferenceDateMidnight() {
-        logger.debug("Placeholder");
-        referenceDateMidnight = new DateMidnight(dtz);
+        MonthSelection monthSelection = new MonthSelection();
+        parametersForm.writeToObject(monthSelection);
+
+        referenceDateMidnight = new DateMidnight(
+                monthSelection.year, monthSelection.month, 1, dtz);
     }
 
-    public boolean parameterFormValidate() {
+    public boolean parametersFormValidate() {
         logger.debug("Placeholder");
         return true;
     }
@@ -534,12 +538,12 @@ public class MonthReportAction extends AbstractPageAction {
         this.referenceDateMidnight = referenceDateMidnight;
     }
 
-    public Form getParameterForm() {
-        return parameterForm;
+    public Form getParametersForm() {
+        return parametersForm;
     }
 
-    public void setParameterForm(Form parameterForm) {
-        this.parameterForm = parameterForm;
+    public void setParametersForm(Form parametersForm) {
+        this.parametersForm = parametersForm;
     }
 
     public MonthReportModel getMonthReportModel() {
@@ -580,14 +584,6 @@ public class MonthReportAction extends AbstractPageAction {
 
     public void setDayOfMonthFormatter(DateTimeFormatter dayOfMonthFormatter) {
         this.dayOfMonthFormatter = dayOfMonthFormatter;
-    }
-
-    public static Color getREPORT_NON_WORKING_COLOR() {
-        return REPORT_NON_WORKING_COLOR;
-    }
-
-    public static void setREPORT_NON_WORKING_COLOR(Color REPORT_NON_WORKING_COLOR) {
-        MonthReportAction.REPORT_NON_WORKING_COLOR = REPORT_NON_WORKING_COLOR;
     }
 
     public int getTotalAlignment() {

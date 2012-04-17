@@ -175,8 +175,8 @@ class MyMonthReportAction extends MonthReportAction {
     //**************************************************************************
 
     @Override
-    public void setupParameterForm() {
-        super.setupParameterForm();
+    public void setupParametersForm() {
+        super.setupParametersForm();
     }
 
 
@@ -276,8 +276,8 @@ class MyMonthReportAction extends MonthReportAction {
         super.setupReferenceDateMidnight();
     }
 
-    public boolean parameterFormValidate() {
-        return super.parameterFormValidate();
+    public boolean parametersFormValidate() {
+        return super.parametersFormValidate();
     }
 
 }
