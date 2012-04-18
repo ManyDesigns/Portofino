@@ -243,6 +243,10 @@ public class WeekEntryModel {
         }
 
         public void addEntry(Activity activity, Entry entry) {
+            if (activity == null) {
+                logger.warn("Null activity");
+                return;
+            }
             if (!activities.contains(activity)) {
                 logger.warn("Activity {} not in week entry model", activity.getId());
                 return;

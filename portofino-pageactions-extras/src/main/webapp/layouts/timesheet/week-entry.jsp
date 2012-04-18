@@ -510,13 +510,11 @@
                 ") span").html(totalTime);
 
         //overtime
-        var overtimeMinutes;
         var swmId = "twe-swm-" + index;
         var standardWorkingMinutes = $("input#" + swmId).val();
-        if (isNaN(standardWorkingMinutes + 1)) {
+        var overtimeMinutes = totalMinutes - standardWorkingMinutes;
+        if (isNaN(overtimeMinutes)) {
             overtimeMinutes = 0;
-        } else {
-            overtimeMinutes = totalMinutes - standardWorkingMinutes;
         }
         if (overtimeMinutes < 0) {
             overtimeMinutes = 0;
