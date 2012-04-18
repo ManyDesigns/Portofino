@@ -296,12 +296,12 @@ public class TimesheetAction extends AbstractPageAction {
         DefaultSelectionProvider personSelectionProvider =
                 new DefaultSelectionProvider("person");
         for (Person person : availablePersons) {
-            String name;
+            String name = person.getLongName();
             if (person.isMe()) {
-                name = getMessage("timesheet.myself");
+                name = String.format("%s (%s)",
+                        name,
+                        getMessage("timesheet.myself"));
                 timesheetSelection.personId = person.getId();
-            } else {
-                name = person.getLongName();
             }
             personSelectionProvider.appendRow(person.getId(), name, true);
         }
