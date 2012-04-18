@@ -347,6 +347,9 @@ public class TimesheetAction extends AbstractPageAction {
 
     @Button(list = "timesheet-selection", key = "timesheet.go.to.week.entry", order = 1)
     public Resolution weekEntry() throws Exception {
+        if (personId == null) {
+            return execute();
+        }
         LocalDate referenceLocalDate = new LocalDate(referenceDate);
         weekEntryModel = new WeekEntryModel(referenceLocalDate);
 
