@@ -60,7 +60,6 @@ import java.awt.*;
 import java.io.*;
 import java.util.List;
 import java.util.Locale;
-import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -270,7 +269,7 @@ public class MonthReportAction extends AbstractPageAction {
         monthReportModel = new MonthReportModel(referenceDateMidnight);
         loadMonthReportModel();
 
-        final File tmpFile = File.createTempFile("report-", ".pdf");
+        final File tmpFile = File.createTempFile("month-report-", ".pdf");
         FileOutputStream fos = new FileOutputStream(tmpFile);
         OutputStream os = new BufferedOutputStream(fos);
 
@@ -357,7 +356,13 @@ public class MonthReportAction extends AbstractPageAction {
                     logger.warn("Could not delete tmp file: {}", tmpFile);
                 }
             }
-        }.setFilename("month-report.pdf").setLength(tmpFile.length());
+        }.setFilename(getDefaultReportFilename()).setLength(tmpFile.length());
+    }
+
+    public String getDefaultReportFilename() {
+        return String.format("month-report-%s-%d.pdf",
+                referenceDateMidnight.getMonthOfYear(),
+                referenceDateMidnight.getYear());
     }
 
     public void addMonthReportHeader(Document document) throws Exception {
