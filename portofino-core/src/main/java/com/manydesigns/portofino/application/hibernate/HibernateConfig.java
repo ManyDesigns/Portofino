@@ -79,8 +79,10 @@ public class HibernateConfig {
 
     public Configuration buildSessionFactory(Database database) {
         try {
-            Configuration configuration = new Configuration()
-                    .setProperty("hibernate.default_entity_mode", "dynamic-map");
+            Configuration configuration = new Configuration();
+
+            // mettendo la modalità dynamic map, non funzionano le entità mappate su bean.
+            // configuration.setProperty("hibernate.default_entity_mode", "dynamic-map");
 
             JdbcConnectionProvider jdbcConnectionProvider =
                     (JdbcConnectionProvider) connectionProvider;
