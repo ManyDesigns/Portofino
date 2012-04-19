@@ -1,13 +1,17 @@
 ^profiles.xml
 ^target
-^portofino-jar/target
+^portofino-core/target
+^portofino-web/target
 ^portofino-war/target
+^portofino-pageactions-extras/target
 ^elements/target
 ^elements-struts1/target
 ^elements-struts2/target
 ^elements-extras/target
+^mail/target
 ^out/
-^portofino-war/src/main/webapp/apps/hrgest
+^[.]idea/
+^.*/overlays/[^/]+[.]info$
 derby.log
 syntax: glob
 *.DS_Store

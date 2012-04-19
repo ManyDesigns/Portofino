@@ -1,0 +1,6 @@
+<configuration
+        database="redmine" legend="Issues by project/tracker" name="Issues by project/tracker" orientation="VERTICAL"
+        query="select &quot;tracker_id&quot;, &quot;project_id&quot;, count(*), t.&quot;name&quot;, &quot;projects&quot;.&quot;name&quot; from &quot;issues&quot; join &quot;trackers&quot; t on &quot;tracker_id&quot; = t.&quot;id&quot; join &quot;projects&quot; on &quot;project_id&quot; = &quot;projects&quot;.&quot;id&quot; group by &quot;tracker_id&quot;, &quot;project_id&quot;"
+        type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?search_tracker_id=%{series}"
+        xAxisName="Projects" yAxisName="Number of issues">
+</configuration>

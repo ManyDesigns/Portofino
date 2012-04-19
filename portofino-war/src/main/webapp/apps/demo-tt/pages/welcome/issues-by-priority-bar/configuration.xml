@@ -1,0 +1,6 @@
+<configuration
+        database="redmine" legend="Issues by project/priority" name="Issues by project/priority" orientation="VERTICAL"
+        query="select &quot;priority_id&quot;, &quot;issues&quot;.&quot;project_id&quot;, count(*), priority.&quot;name&quot;, &quot;projects&quot;.&quot;name&quot; from &quot;issues&quot; join &quot;enumerations&quot; priority on &quot;priority_id&quot; = priority.&quot;id&quot; join &quot;projects&quot; on &quot;issues&quot;.&quot;project_id&quot; = &quot;projects&quot;.&quot;id&quot; group by &quot;priority_id&quot;, &quot;issues&quot;.&quot;project_id&quot;"
+        type="STACKED_BAR_3D" xAxisName="Projects" yAxisName="Number of issues"
+        urlExpression="/projects/%{category}/issues?search_priority_id=%{series}">
+</configuration>

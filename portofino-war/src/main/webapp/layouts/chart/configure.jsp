@@ -5,14 +5,10 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><stripes:layout-render name="/skins/${skin}/modal-page.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.chart.ChartAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.chart.ChartAction"/>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="configuration" cssClass="contentButton" />
-        <div class="breadcrumbs">
-            <div class="inner">
-                <mde:write name="breadcrumbs"/>
-            </div>
-        </div>
+        <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletHeader">
         <%@include file="../portlet-common-configuration.jsp" %>
@@ -25,8 +21,9 @@
             <li><strong>1D Charts:</strong>
                 key, value, (optional) label</li>
             <li><strong>2D Charts:</strong>
-                value, x axis key, y axis key, (optional) x axis label, (optional) y axis label</li>
+                x axis key, y axis key, value, (optional) x axis label, (optional) y axis label</li>
         </ul>
+        <%@include file="../script-configuration.jsp" %>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>

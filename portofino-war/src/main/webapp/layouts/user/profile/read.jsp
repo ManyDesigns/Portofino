@@ -9,11 +9,7 @@
     <stripes:layout-component name="contentHeader">
         <stripes:submit name="updateConfiguration" value="Update configuration" class="contentButton"/>
         <stripes:submit name="cancel" value="Cancel" class="contentButton"/>
-        <div class="breadcrumbs">
-            <div class="inner">
-                <mde:write name="breadcrumbs"/>
-            </div>
-        </div>
+        <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <jsp:include page="readButtonsBar.jsp"/>

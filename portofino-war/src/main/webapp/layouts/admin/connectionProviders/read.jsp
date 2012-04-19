@@ -39,7 +39,7 @@
     </stripes:layout-component>
     <script type="text/javascript">
         $("button[name=delete]").click(function() {
-            return confirm ('Are you sure?');
+            return confirm ('<fmt:message key="commons.confirm" />');
         });
     </script>
 </stripes:layout-render>

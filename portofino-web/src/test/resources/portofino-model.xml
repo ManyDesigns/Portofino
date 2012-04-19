@@ -1,0 +1,1605 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+    <databases>
+        <database databaseName="portofino">
+            <schemas>
+                <schema schemaName="public">
+                    <tables>
+                        <table tableName="users"
+                               javaClass="com.manydesigns.portofino.system.model.users.User">
+                            <columns>
+                                <column columnName="userid"
+                                        columnType="IDENTITY"
+                                        javaType="java.lang.Long"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        propertyName="userId"
+                                        autoincrement="true"
+                                        searchable="true">
+                                </column>
+                                <column columnName="emailaddress"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="75"
+                                        scale="0"
+                                        nullable="false"
+                                        propertyName="email"
+                                        autoincrement="false"
+                                        searchable="true">
+                                    <annotations>
+                                        <annotation type="com.manydesigns.elements.annotations.Email"/>
+                                    </annotations>
+                                </column>
+                                <column columnName="pwd"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="50"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="false"
+                                        >
+                                    <annotations>
+                                        <annotation type="com.manydesigns.elements.annotations.Password"/>
+                                    </annotations>
+                                </column>
+
+                                <column columnName="state"
+                                        columnType="bigint"
+                                        javaType="java.lang.Long"
+                                        length="19"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        />
+                                <column columnName="token"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="100"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="false"
+                                        />
+                                <column columnName="remquestion"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="false"
+                                        propertyName="remQuestion"
+                                        />
+                                <column columnName="remans"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        autoincrement="false"
+                                        nullable="true"
+                                        searchable="false"
+                                        />
+
+                                <column columnName="username"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="50"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="userName"
+                                        />
+                                <column columnName="firstname"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="50"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="firstName"
+                                        />
+                                <column columnName="middlename"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="50"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="middleName"
+                                        />
+                                <column columnName="lastname"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="75"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="lastName"
+                                        />
+                                <column columnName="jobtitle"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="50"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="jobTitle"
+                                        />
+                                <column columnName="defaultuser"
+                                        columnType="boolean"
+                                        javaType="java.lang.Boolean"
+                                        length="1"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="defaultUser"
+                                        />
+                                <column columnName="extauth"
+                                        columnType="boolean"
+                                        javaType="java.lang.Boolean"
+                                        length="1"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="extAuth"
+                                        />
+                                 <column columnName="agreedtoterms"
+                                        columnType="boolean"
+                                        javaType="java.lang.Boolean"
+                                        length="1"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="agreedToTerms"
+                                        /> 
+                                <column columnName="creationdate"
+                                        columnType="timestamp"
+                                        javaType="java.sql.Timestamp"
+                                        length="15"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="creationDate"
+                                        />
+                                <column columnName="deletiondate"
+                                        columnType="timestamp"
+                                        javaType="java.sql.Timestamp"
+                                        length="29"
+                                        scale="6"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        nullable="true"
+                                        propertyName="deletionDate"
+                                        />
+                                <column columnName="modifieddate"
+                                        columnType="timestamp"
+                                        javaType="java.sql.Timestamp"
+                                        length="29"
+                                        scale="6"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        nullable="true"
+                                        propertyName="modifiedDate"/>
+                                <column columnName="lastpwdmoddate"
+                                        columnType="timestamp"
+                                        javaType="java.sql.Timestamp"
+                                        length="29"
+                                        scale="6"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        nullable="true"
+                                        propertyName="pwdModDate"/>
+                                <column columnName="lastlogindate"
+                                        columnType="timestamp"
+                                        javaType="java.sql.Timestamp"
+                                        length="29"
+                                        scale="6"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        nullable="true"
+                                        propertyName="lastLoginDate"/>
+                                <column columnName="lastfailedlogindate"
+                                        columnType="timestamp"
+                                        javaType="java.sql.Timestamp"
+                                        length="29"
+                                        scale="6"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        nullable="true"
+                                        propertyName="lastFailedLoginDate"/>
+                                <column columnName="failedloginattempts"
+                                        columnType="INTEGER"
+                                        javaType="java.lang.Integer"
+                                        length="10"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="failedLoginAttempts"
+                                        />
+                                <column columnName="gracelogincount"
+                                        columnType="INTEGER"
+                                        javaType="java.lang.Integer"
+                                        length="10"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="graceLoginCount"
+                                        />
+                                <column columnName="bounced"
+                                        columnType="INTEGER"
+                                        javaType="java.lang.Integer"
+                                        length="10"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="bounced"
+                                        />
+                            </columns>
+                            <primaryKey primaryKeyName="pk_user">
+                                <column columnName="userid"/>
+                            </primaryKey>
+                            <foreignKeys>
+                                <foreignKey foreignKeyName="fk_user_1"
+                                            virtual="false"
+                                            toDatabase="portofino"
+                                            toSchema="public"
+                                            toTable="userstate"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION"
+                                            manyPropertyName="users"
+                                            onePropertyName="state">
+                                    <references>
+                                        <reference fromColumn="state"
+                                                   toColumn="id"/>
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
+                            <annotations>
+                                <annotation type="com.manydesigns.elements.annotations.ShortName">
+                                    <value>%{userName} (%{email})</value>
+                                </annotation>
+                            </annotations>
+                        </table>
+                        <table tableName="groups"
+                               javaClass="com.manydesigns.portofino.system.model.users.Group">
+                            <columns>
+                                <column columnName="groupid"
+                                        autoincrement="true"
+                                        columnType="IDENTITY"
+                                        javaType="java.lang.Long"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        propertyName="groupId"
+                                        searchable="true"/>
+                                <column columnName="name"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="50"
+                                        scale="0"
+                                        autoincrement="false"
+                                        nullable="false"
+                                        searchable="true"/>
+                                <column columnName="description"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        autoincrement="false"
+                                        nullable="true"
+                                        searchable="true">
+                                    <annotations>
+                                        <annotation type="com.manydesigns.elements.annotations.Status">
+                                            <value>admin</value>
+                                            <value/>
+                                            <value/>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column columnName="creatorid"
+                                        columnType="BIGINT"
+                                        javaType="java.lang.Long"
+                                        length="19"
+                                        scale="0"
+                                        nullable="true"
+                                        searchable="false"
+                                        autoincrement="false"
+                                        propertyName="creatorId"/>
+                                <column columnName="deletiondate"
+                                        columnType="timestamp"
+                                        javaType="java.sql.Timestamp"
+                                        length="29"
+                                        scale="6"
+                                        nullable="true"
+                                        searchable="true"
+                                        autoincrement="false"
+                                        propertyName="deletionDate"/>
+                                <column columnName="creationdate"
+                                        columnType="timestamp"
+                                        javaType="java.sql.Timestamp"
+                                        length="29"
+                                        scale="6"
+                                        nullable="true"
+                                        searchable="true"
+                                        autoincrement="false"
+                                        propertyName="creationDate"/>
+                            </columns>
+                            <primaryKey primaryKeyName="pk_group">
+                                <column columnName="groupid"/>
+                            </primaryKey>
+                            <foreignKeys>
+                                <foreignKey foreignKeyName="fk_group_1"
+                                            virtual="false"
+                                            toDatabase="portofino"
+                                            toSchema="public"
+                                            toTable="users"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION"
+                                            manyPropertyName="groupsCreated"
+                                            onePropertyName="creatorId">
+                                    <references>
+                                        <reference fromColumn="creatorid"
+                                                   toColumn="userid"/>
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
+                            <annotations>
+                                <annotation type="com.manydesigns.elements.annotations.ShortName">
+                                    <value>%{name} (%{description})</value>
+                                </annotation>
+                            </annotations>
+                        </table>
+                        <table tableName="users_groups" manyToMany="true" javaClass="com.manydesigns.portofino.system.model.users.UsersGroups"
+                               >
+                            <columns>
+                                <column columnName="userid"
+                                        columnType="BIGINT"
+                                        javaType="java.lang.Long"
+                                        length="8"
+                                        scale="0"
+                                        autoincrement="false"
+                                        nullable="false"
+                                        searchable="true"/>
+                                <column columnName="groupid"
+                                        columnType="BIGINT"
+                                        javaType="java.lang.Long"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="deletiondate"
+                                        columnType="timestamp"
+                                        javaType="java.sql.Timestamp"
+                                        length="29"
+                                        scale="6"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="deletionDate"/>
+                                <column columnName="creationdate"
+                                        columnType="timestamp"
+                                        javaType="java.sql.Timestamp"
+                                        length="29"
+                                        scale="6"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="creationDate"/>
+                                </columns>
+                                <primaryKey primaryKeyName="pk_group">
+                                    <column columnName="userid"/>
+                                    <column columnName="groupid"/>
+                                    <column columnName="creationdate"/>
+                                </primaryKey>
+                                <foreignKeys>
+                                <foreignKey foreignKeyName="fk_ug_1"
+                                            virtual="false"
+                                              toDatabase="portofino"
+                                              toSchema="public"
+                                              toTable="users"
+                                              onUpdate="NO ACTION"
+                                              onDelete="NO ACTION"
+                                              manyPropertyName="groups"
+                                              onePropertyName="user">
+                                    <references>
+                                        <reference fromColumn="userid"
+                                                   toColumn="userid"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey foreignKeyName="fk_ug_2"
+                                            virtual="false"
+                                            toDatabase="portofino"
+                                            toSchema="public"
+                                            toTable="groups"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION"
+                                            manyPropertyName="users"
+                                            onePropertyName="group">
+                                    <references>
+                                        <reference fromColumn="groupid"
+                                                   toColumn="groupid"/>
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
+                        </table>
+
+                        <table tableName="emailstate">
+                            <columns>
+                                <column columnName="id"
+                                        columnType="IDENTITY"
+                                        javaType="java.lang.Integer"
+                                        length="10"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="false"
+                                        />
+                                <column columnName="name"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="75"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        />
+                                <column columnName="description"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        />
+                            </columns>
+                            <primaryKey primaryKeyName="emailstate_pkey">
+                                <column columnName="id"/>
+                            </primaryKey>
+                        </table>
+                        <table tableName="emailqueue" javaClass="com.manydesigns.portofino.system.model.email.EmailBean">
+                            <columns>
+                                <column columnName="ID"
+                                        columnType="VARCHAR"
+                                        javaType="java.lang.String"
+                                        autoincrement="false"
+                                        jdbcType="1"
+                                        length="25"
+                                        nullable="false"
+                                        propertyName="id"
+                                        scale="0" />
+                                <column columnName="subject"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="100"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="body"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="4000"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="to_"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="100"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="to"/>
+                                <column columnName="attachmentpath"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="attachmentPath"/>
+                                <column columnName="attachmentdescription"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="attachmentDescription"/>
+                                <column columnName="attachmentname"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="attachmentName"/>
+                                <column columnName="from_"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="100"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="from"/>
+                                <column columnName="createdate"
+                                        columnType="date"
+                                        javaType="java.sql.Timestamp"
+                                        length="13"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"
+                                        propertyName="createDate"
+                                        />
+                                <column columnName="state"
+                                        columnType="bigint"
+                                        javaType="java.lang.Long"
+                                        length="10"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="pk_emailqueue">
+                                    <column columnName="id"/>
+                            </primaryKey>
+                            <foreignKeys>
+                                <foreignKey foreignKeyName="fk_emailqueue_1"
+                                            virtual="false"
+                                            toDatabase="portofino"
+                                            toTable="emailstate"
+                                            toSchema="public"
+                                            onDelete="NO ACTION"
+                                            onUpdate="NO ACTION">
+                                    <references>
+                                        <reference fromColumn="state"
+                                                   toColumn="id"/>
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
+                        </table>
+                        <table tableName="userstate"
+                               javaClass="com.manydesigns.portofino.system.model.users.UserState">
+                            <columns>
+                                <column autoincrement="true"
+                                        columnName="id"
+                                        columnType="identity"
+                                        javaType="java.lang.Long"
+                                        length="19"
+                                        nullable="false"
+                                        scale="0"
+                                        searchable="true"/>
+                                <column autoincrement="false"
+                                        columnName="description"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        nullable="true"
+                                        scale="0"
+                                        searchable="true"/>
+                                <column autoincrement="false"
+                                        columnName="name"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="75"
+                                        nullable="false"
+                                        scale="0"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="userstate_pkey">
+                                <column columnName="id"/>
+                            </primaryKey>
+                            <annotations>
+                                <annotation type="com.manydesigns.elements.annotations.ShortName">
+                                    <value>%{name}</value>
+                                </annotation>
+                            </annotations>
+                        </table>
+                    </tables>
+                </schema>
+            </schemas>
+        </database>
+        <database databaseName="jpetstore">
+            <schemas>
+                <schema schemaName="PUBLIC">
+                    <tables>
+                        <table tableName="lineitem">
+                            <columns>
+                                <column columnName="orderid"
+                                        columnType="INTEGER"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="linenum"
+                                        columnType="INTEGER"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="itemid"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true" />
+                                <column columnName="quantity"
+                                        columnType="INTEGER"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="unitprice"
+                                        columnType="numeric"
+                                        javaType="java.math.BigDecimal"
+                                        length="10"
+                                        scale="2"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="pk_lineitem">
+                                <column columnName="orderid"/>
+                                <column columnName="linenum"/>
+                            </primaryKey>
+                        </table>
+                        <table tableName="category">
+                            <columns>
+                                <column columnName="catid"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="10"
+                                        scale = "0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="name"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="80"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="descn"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="pk_category">
+                                <column columnName="catid"/>
+                            </primaryKey>
+                        </table>
+                        <table tableName="product">
+                            <columns>
+                                <column columnName="productid"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="10"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="category"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="10"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="name"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="80"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="descn"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true">
+                                    <annotations>
+                                        <annotation type="com.manydesigns.elements.annotations.Label">
+                                            <value>description</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                            </columns>
+                            <primaryKey primaryKeyName="pk_category">
+                                <column columnName="productid"/>
+                            </primaryKey>
+                            <foreignKeys>
+                                <foreignKey foreignKeyName="fk_product_1"
+                                            virtual="false"
+                                            toDatabase="jpetstore"
+                                            toSchema="PUBLIC"
+                                            toTable="category"
+                                            onUpdate="NO ACTION"
+                                            onDelete="CASCADE">
+                                    <references>
+                                        <reference fromColumn="category"
+                                                   toColumn="catid"/>
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
+                        </table>
+                        <table tableName="supplier">
+                            <columns>
+                                <column autoincrement="false" columnName="suppid" columnType="INTEGER" javaType="java.lang.Integer" length="10" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="name" columnType="varchar" javaType="java.lang.String" length="80" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="status" columnType="varchar" javaType="java.lang.String" length="2" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="addr1" columnType="varchar" javaType="java.lang.String" length="80" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="addr2" columnType="varchar" javaType="java.lang.String" length="80" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="city" columnType="varchar" javaType="java.lang.String" length="80" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="state" columnType="varchar" javaType="java.lang.String" length="80" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="zip" columnType="varchar" javaType="java.lang.String" length="5" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="phone" columnType="varchar" javaType="java.lang.String" length="80" nullable="true" scale="0" searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="pk_supplier" >
+                                <column columnName="suppid">
+                                    <incrementGenerator/>
+                                </column>
+                            </primaryKey>
+                        </table>
+                        <table tableName="orders">
+                            <columns>
+                                <column autoincrement="false" columnName="orderid" columnType="INTEGER" javaType="java.lang.Integer" length="10" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="userid" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="orderdate" columnType="date" javaType="java.util.Date" length="13" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="shipaddr1" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="shipaddr2" columnType="varchar" javaType="java.lang.String" length="80" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="shipcity" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="shipstate" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="shipzip" columnType="varchar" javaType="java.lang.String" length="20" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="shipcountry" columnType="varchar" javaType="java.lang.String" length="20" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="billaddr1" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="billaddr2" columnType="varchar" javaType="java.lang.String" length="80" nullable="true" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="billcity" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="billstate" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="billzip" columnType="varchar" javaType="java.lang.String" length="20" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="billcountry" columnType="varchar" javaType="java.lang.String" length="20" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="courier" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="totalprice" columnType="numeric" javaType="java.math.BigDecimal" length="10" nullable="false" scale="2" searchable="true"/>
+                                <column autoincrement="false" columnName="billtofirstname" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="billtolastname" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="shiptofirstname" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="shiptolastname" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="creditcard" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="exprdate" columnType="varchar" javaType="java.lang.String" length="7" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="cardtype" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="locale" columnType="varchar" javaType="java.lang.String" length="80" nullable="false" scale="0" searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="pk_orders">
+                                <column columnName="orderid">
+                                    <tableGenerator table="sequence" keyColumn="name" keyValue="ordernum" valueColumn="nextid"/>
+                                </column>
+                            </primaryKey>
+                        </table>
+                        <table tableName="sequence">
+                            <columns>
+                                <column autoincrement="false" columnName="name" columnType="varchar" javaType="java.lang.String" length="30" nullable="false" scale="0" searchable="true"/>
+                                <column autoincrement="false" columnName="nextid" columnType="INTEGER" javaType="java.lang.Integer" length="10" nullable="false" scale="0" searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="pk_sequence">
+                                <column columnName="name"/>
+                            </primaryKey>
+                        </table>
+                    </tables>
+                </schema>
+            </schemas>
+        </database>
+        <database databaseName="hibernatetest">
+            <schemas>
+                <schema schemaName="PUBLIC">
+                    <tables>
+                        <table tableName="test">
+                            <columns>
+                                <column autoincrement="false"
+                                        columnName="id" columnType="bigint"
+                                        javaType="java.lang.Long" length="19" 
+                                        nullable="false" scale="0" searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="test_pkey">
+                                <column columnName="id">
+                                    <sequenceGenerator name = "test_seq"/>
+                                </column>
+                            </primaryKey>
+                        </table>
+                        <table tableName="table1">
+                            <columns>
+                                <column columnName="id"
+                                        columnType="IDENTITY"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="true"
+                                        searchable="true"/>
+                                <column columnName="testo"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="15"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="pk_table1">
+                                <column columnName="id"/>
+                            </primaryKey>
+                        </table>
+                        <table tableName="table4">
+                            <columns>
+                                <column columnName="id"
+                                        columnType="IDENTITY"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="true"
+                                        searchable="true"/>
+                                <column columnName="testo"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="15"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="pk_table4">
+                                <column columnName="id"/>
+                            </primaryKey>
+                        </table>
+                        <table tableName="table2">
+                            <columns>
+                                <column columnName="id1"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="3"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="id2"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="3"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="testo"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="15"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="pk_table2">
+                                <column columnName="id1"/>
+                                <column columnName="id2"/>
+                            </primaryKey>
+                        </table>
+                        <table tableName="table3" manyToMany="true">
+                            <columns>
+                                <column columnName="id"
+                                        columnType="IDENTITY"
+                                        javaType="java.lang.Long"
+                                        length="19"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="true"
+                                        searchable="true"/>
+                                <column columnName="t2_id1"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="3"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="t2_id2"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="3"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="tb1_id"
+                                        columnType="INTEGER"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="tb4_id"
+                                        columnType="INTEGER"
+                                        javaType="java.lang.Integer"
+                                        length="8"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="pk_table3">
+                                <column columnName="id"/>
+                            </primaryKey>
+                            <foreignKeys>
+                                <foreignKey foreignKeyName="fk_tb_2"
+                                            virtual="false"
+                                            toDatabase="hibernatetest"
+                                            toSchema="PUBLIC"
+                                            toTable="table2"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION">
+                                    <references>
+                                        <reference fromColumn="t2_id1"
+                                                   toColumn="id1"/>
+                                        <reference fromColumn="t2_id2"
+                                                   toColumn="id2"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey foreignKeyName="fk_tb_1"
+                                            virtual="false"
+                                            toDatabase="hibernatetest"
+                                            toSchema="PUBLIC"
+                                            toTable="table1"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION">
+                                    <references>
+                                        <reference fromColumn="tb1_id"
+                                                   toColumn="id"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey foreignKeyName="fk_tb_4"
+                                            virtual="false"
+                                            toDatabase="hibernatetest"
+                                            toSchema="PUBLIC"
+                                            toTable="table4"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION">
+                                    <references>
+                                        <reference fromColumn="tb4_id"
+                                                   toColumn="id"/>
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
+                        </table>
+                        <table tableName="comune">
+                            <columns>
+                                <column columnName="regione"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="provincia"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="comune"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="comune_pk">
+                                <column columnName="regione"/>
+                                <column columnName="provincia"/>
+                                <column columnName="comune"/>
+                            </primaryKey>
+                        </table>
+                        <table tableName="delibera">
+                            <columns>
+                               <column columnName="id"
+                                        columnType="IDENTITY"
+                                        javaType="java.lang.Long"
+                                        length="19"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="true"
+                                        searchable="true"/>
+                                <column columnName="testo"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="255"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="regione"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="provincia"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="comune"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="catid"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="10"
+                                        scale="0"
+                                        nullable="true"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="deliber_pk">
+                                <column columnName="id"/>
+                            </primaryKey>
+                            <foreignKeys>
+                                <foreignKey foreignKeyName="fk_delibera_1"
+                                            virtual="true"
+                                            toDatabase="hibernatetest"
+                                            toSchema="PUBLIC"
+                                            toTable="comune"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION">
+                                    <references>
+                                        <reference fromColumn="comune"
+                                                   toColumn="comune"/>
+                                        <reference fromColumn="provincia"
+                                                   toColumn="provincia"/>
+                                        <reference fromColumn="regione"
+                                                   toColumn="regione"/>
+                                    </references>
+                                </foreignKey>
+
+                                <foreignKey foreignKeyName="fk_delibera_2"
+                                            virtual="true"
+                                            toDatabase="jpetstore"
+                                            toSchema="PUBLIC"
+                                            toTable="category"
+                                            onUpdate="NO ACTION"
+                                            onDelete="NO ACTION">
+                                    <references>
+                                        <reference fromColumn="catid"
+                                                   toColumn="catid"/>                                        
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
+                        </table>
+                        <table tableName="domanda">
+                            <columns>
+                                <column columnName="protocollo"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="20"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="richiedente"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="regione"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="provincia"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="comune"
+                                        columnType="varchar"
+                                        javaType="java.lang.String"
+                                        length="30"
+                                        scale="0"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                                <column columnName="data"
+                                        columnType="date"
+                                        javaType="java.sql.Timestamp"
+                                        length="29"
+                                        scale="6"
+                                        nullable="false"
+                                        autoincrement="false"
+                                        searchable="true"/>
+                            </columns>
+                            <primaryKey primaryKeyName="domanda_pkey">
+                                <column columnName="protocollo"/>
+                            </primaryKey>
+                            <foreignKeys>
+                                <foreignKey foreignKeyName="domanda_regione_fkey"
+                                            virtual="false"
+                                            toDatabase="hibernatetest"
+                                            toSchema="PUBLIC"
+                                            toTable="comune"
+                                            onDelete="NO ACTION"
+                                            onUpdate="NO ACTION">
+                                    <references>
+                                        <reference fromColumn="regione"
+                                                   toColumn="regione"/>
+                                        <reference fromColumn="provincia"
+                                                   toColumn="provincia"/>
+                                        <reference fromColumn="comune"
+                                                   toColumn="comune"/>
+                                    </references>
+                                </foreignKey>
+                            </foreignKeys>
+                        </table>
+                    </tables>
+                </schema>
+            </schemas>
+        </database>
+    </databases>
+    <rootPage title="Portofino4" description="portofino 4" id="/">
+        <childPages>
+        <textPage id="homepage" title="Homepage" description="Homepage" code="zpAUFstfgEUSzsEX9HoO">
+            <permissions>
+                <allow>
+                    <group>anonymous</group>
+                </allow>
+            </permissions>
+        </textPage>
+        <folderPage id="model" title="Model" description="Model">
+            <childPages>
+                <customPage id="ConnectionProviders"
+                          url="/model/ConnectionProviders.action"
+                          title="Connection providers"
+                          description="Connection providers"/>
+                <customFolderPage  id="TableData" url="/model/TableData.action" type="table-data"
+                          title="Table data" description="Table data"/>
+                <customFolderPage id="TabelDesign" url="/model/TableDesign.action" type="table-design"
+                          title="Table design" description="Table design"/>
+                <customPage  id="SelfTest" url="/model/SelfTest.action" title="Self test"
+                          description="Self test"/>
+                <customPage id="SiteMap" url="/model/SiteMap.action" title="Site map"
+                          description="Site map"/>
+                <customPage id="DDLWriter" url="/model/DDLWriter.action" title="DDL Writer"
+                          description="DDL Writer"/>
+            </childPages>
+            <permissions>
+                <allow>
+                    <group>admins</group>
+                </allow>
+            </permissions>
+        </folderPage>
+        <folderPage id="system-admin" title="System administration"
+                  description="System administration">
+            <childPages>
+                <customPage id="ServerInfo" url="/system-admin/ServerInfo.action"
+                          title="Server info" description="Server info"/>
+                <customPage id="ConfigurationProperties" url="/system-admin/ConfigurationProperties.action"
+                          title="Configuration properties"
+                          description="Configuration properties"/>
+                <customPage url="/system-admin/Logs.action" id="Logs" title="Logs"
+                          description="Logs"/>
+            </childPages>
+            <permissions>
+                <allow>
+                    <group>admins</group>
+                </allow>
+            </permissions>
+        </folderPage>
+        <customPage id="Profile" url="/Profile.action" title="Profile" description="Profile">
+            <permissions>
+                <allow>
+                    <group>registered</group>
+                </allow>
+            </permissions>
+        </customPage>
+        <folderPage id="usersAdmin" description="User admin" title="admin user">
+            <childPages>
+            <crudPage title="userAdmin"
+                         id="userAdmin"
+                         description="user administration" url="/usersAdmin/Users.action">
+                <crud name = "users"
+                         database="portofino"
+                         query="FROM users"
+                         searchTitle="Users"
+                         createTitle="Create new user"
+                         readTitle="User"
+                         editTitle="Edit user">
+                    <properties>
+                        <property name="userId"/>
+                        <property name="userName"/>
+                        <property name="email"/>
+                        <property name="jobTitle"/>
+                        <property name="firstName"/>
+                        <property name="middleName"/>
+                        <property name="lastName"/>
+                        <property name="state"/>
+                    </properties>
+                    <selectionProviders>
+                        <selectionProvider name="mysel" database="portofino"
+                                           hql="FROM portofino.PUBLIC.userstate">
+                            <selectionProperties>
+                                <selectionProperty name="state"/>
+                            </selectionProperties>
+                        </selectionProvider>
+                    </selectionProviders>
+                    <buttons>
+                        <button name="add_group"
+                                label="Add selected groups"
+                                method="addGroups"
+                                guard=""/>
+                        <button name="rem_group"
+                                label="Remove  selected groups"
+                                method="removeGroups"
+                                guard=""/>
+                        <button name="reset"
+                                label="Reset password"
+                                method="resetPassword"
+                                guard=""/>
+                    </buttons>
+                    <subCruds>
+                        <crud name="active"
+                                 database="portofino"
+                                 query="FROM groups groups WHERE groups.groupId NOT IN (SELECT groups2.groupId FROM portofino.PUBLIC.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
+                                 searchTitle="Active groups">
+                            <properties>
+                                <property name="groupId"/>
+                                <property name="name"/>
+                                <property name="description"/>
+                            </properties>
+                        </crud>
+                        <crud name="current"
+                                 database="portofino"
+                                 query="FROM groups groups WHERE groups.groupId in (SELECT groups2.groupId FROM portofino.PUBLIC.users_groups ug INNER JOIN ug.group groups2 WHERE ug.userid=%{userId} AND ug.deletionDate is null) "
+                                 searchTitle="Current groups">
+                            <properties>
+                                <property name="groupId"/>
+                                <property name="name"/>
+                                <property name="description"/>
+                            </properties>
+                        </crud>
+
+                        <crud name="past"
+                                 database="portofino"
+                                 query="FROM users_groups ug WHERE ug.userid=%{userId} AND ug.deletionDate IS NOT null"
+                                 searchTitle="Past groups">
+                            <properties>
+                                <property name="userid"/>
+                                <property name="groupid"/>
+                                <property name="creationDate"/>
+                                <property name="deletionDate"/>
+                            </properties>
+                        </crud>
+                    </subCruds>
+                </crud>
+            </crudPage>
+            <crudPage title="groupAdmin"
+                         id="groupAdmin"
+                         description="groups administration" url="/usersAdmin/Groups.action">
+                <crud name="groupAdmin"
+                         database="portofino"
+                         query="from groups"
+                         searchTitle="Groups"
+                         createTitle="Create new group"
+                         readTitle="Group"
+                         editTitle="Edit group">
+                    <properties>
+                        <property name="groupId"/>
+                        <property name="name"/>
+                        <property name="description"/>
+                        <property name="deletionDate"/>
+                        <property name="creationDate"/>
+                        <property name="creatorId"/>
+                    </properties>
+                    <selectionProviders>
+                        <selectionProvider name="mysel" database="portofino"
+                                           hql="FROM portofino.PUBLIC.users">
+                        <!--sql="SELECT userid, firstname ||' '|| lastname || '('|| emailaddress || ')' FROM users ORDER BY lastname, firstname"-->
+                            <selectionProperties>
+                                <selectionProperty name="creatorId"/>
+                            </selectionProperties>
+                        </selectionProvider>
+                    </selectionProviders>
+                </crud>
+            </crudPage>
+            </childPages>
+            <permissions>
+                <allow>
+                    <group>users</group>
+                </allow>
+            </permissions>
+
+        </folderPage>
+        <folderPage id="usecases" title="Use cases"
+                  description="Use cases">
+            <childPages>
+            <crudPage description="uc1" id="uc1" title="uc1">
+                <crud name="usecase1"
+                 table="jpetstore.PUBLIC.product"
+                 query="FROM jpetstore.PUBLIC.product product where product.category = %{'FISH'}"
+                 searchTitle="Products in category FISH"
+                 createTitle="Create product in category FISH"
+                 readTitle="Product in category FISH"
+                 editTitle="Edit product in category FISH">
+                    <properties>
+                        <property name="productid">
+                            <annotations>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Label">
+                                    <value>product id</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.InSummary">
+                                    <value>true</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Searchable">
+                                    <value>true</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Access">
+                                    <value>write</value>
+                                </annotation>
+                            </annotations>
+                        </property>
+                        <property name="category">
+                            <annotations>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.InSummary">
+                                    <value>false</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Searchable">
+                                    <value>false</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Access">
+                                    <value>read</value>
+                                </annotation>
+                            </annotations>
+                        </property>
+                        <property name="name">
+                            <annotations>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.InSummary">
+                                    <value>true</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Searchable">
+                                    <value>true</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Access">
+                                    <value>write</value>
+                                </annotation>
+                            </annotations>
+                        </property>
+                        <property name="descn">
+                            <annotations>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.InSummary">
+                                    <value>true</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Searchable">
+                                    <value>true</value>
+                                </annotation>
+                                <annotation
+                                        type="com.manydesigns.elements.annotations.Access">
+                                    <value>write</value>
+                                </annotation>
+                            </annotations>
+                        </property>
+                    </properties>
+                </crud>
+            </crudPage>
+            <crudPage description="uc2" id="uc2" title="uc2">
+                <crud name="usecase2"
+                         table="jpetstore.PUBLIC.category"
+                         query="FROM jpetstore.PUBLIC.category"
+                         searchTitle="Categories"
+                         createTitle="Create new category"
+                         readTitle="Category"
+                         editTitle="Edit category">
+                    <properties>
+                        <property name="catid"/>
+                        <property name="name"/>
+                        <property name="descn"/>
+                    </properties>
+                    <buttons>
+                        <button name="customButton1" method="someMethod" label="Custom button 1"/>
+                        <button name="customButton2"
+                                label="Custom button 2"
+                                script="action.addInfoMessage('Button pressed!'); return 'returnToSearch';"
+                                scriptLanguage="groovy"
+                                guard=""/>
+                    </buttons>
+                    <subCruds>
+                        <crud name="usecase3"
+                                 table="jpetstore.PUBLIC.product"
+                                 query="FROM jpetstore.PUBLIC.product product WHERE product.category = %{catid}"
+                                 searchTitle="Products in category">
+                            <properties>
+                                <property name="productid"/>
+                                <property name="category"/>
+                                <property name="name"/>
+                                <property name="descn"/>
+                            </properties>
+                        </crud>
+                    </subCruds>
+                </crud>
+            </crudPage>
+            <crudPage description="rimborsi" title="rimborsi" id="rimborsi">
+                <crud name="rimborsi"
+                 table="hibernatetest.PUBLIC.rimborso"
+                 query="FROM hibernatetest.PUBLIC.rimborso rimborso"
+                 searchTitle="Rimborsi"
+                 createTitle="Crea rimborso"
+                 readTitle="Rimborso"
+                 editTitle="Modifica rimborso">
+            <properties>
+                <property name="id">
+                    <annotations>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.InSummary">
+                            <value>true</value>
+                        </annotation>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Searchable">
+                            <value>true</value>
+                        </annotation>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Access">
+                            <value>write</value>
+                        </annotation>
+                    </annotations>
+                </property>
+                <property name="persona_id">
+                    <annotations>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.InSummary">
+                            <value>false</value>
+                        </annotation>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Searchable">
+                            <value>false</value>
+                        </annotation>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Access">
+                            <value>read</value>
+                        </annotation>
+                    </annotations>
+                </property>
+                <property name="familiare_id">
+                    <annotations>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.InSummary">
+                            <value>true</value>
+                        </annotation>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Searchable">
+                            <value>true</value>
+                        </annotation>
+                        <annotation
+                                type="com.manydesigns.elements.annotations.Access">
+                            <value>write</value>
+                        </annotation>
+                    </annotations>
+                </property>
+            </properties>
+            <selectionProviders>
+                <!-- Esempio con selection provider con hql
+                <selectionProvider name="mysel" database="hibernatetest"
+                                   hql="FROM hibernatetest.PUBLIC.familiare WHERE persona_id = 1">
+                    <selectionProperties>
+                        <selectionProperty name="familiare_id"/>
+                    </selectionProperties>
+                </selectionProvider>
+                -->
+                <selectionProvider name="mysel" database="hibernatetest"
+                                   sql="SELECT p.id AS a, p.nome as b, f.id AS c, f.nome AS d FROM PUBLIC.persona p JOIN PUBLIC.familiare f ON f.persona_id = p.id ORDER BY p.id, f.id">
+                    <selectionProperties>
+                        <selectionProperty name="persona_id"/>
+                        <selectionProperty name="familiare_id"/>
+                    </selectionProperties>
+                </selectionProvider>
+            </selectionProviders>
+        </crud>
+            </crudPage>
+            <portletPage name="portlet1"
+                         id="portlet1"
+                         description="portlet 1"
+                         type="pieChart"
+                         title="Title 1"
+                         legend="category"
+                         database="jpetstore"
+                         query="SELECT category, count(*) FROM product WHERE %{'pippo'} IS NOT NULL GROUP BY category ORDER BY category"
+                         urlExpression="http://www.google.com/search?q=%{key}"
+                        />
+            </childPages>
+            <permissions>
+                <allow>
+                    <group>users</group>
+                </allow>
+            </permissions>
+        </folderPage>
+        </childPages>
+        <permissions>
+            <allow>
+                <group>anonymous</group>
+            </allow>
+        </permissions>
+    </rootPage>
+</model>

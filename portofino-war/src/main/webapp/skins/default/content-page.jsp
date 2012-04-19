@@ -20,7 +20,7 @@
         <jsp:include page="head.jsp"/>
         <stripes:layout-component name="customScripts"/>
         <jsp:useBean id="actionBean" scope="request"
-             type="com.manydesigns.portofino.actions.PortletAction"/>
+             type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
         <title><c:out value="${actionBean.dispatch.lastPageInstance.page.description}"/></title>
     </head>
     <body class="yui-skin-sam">
@@ -46,11 +46,7 @@
                                                 <input type="hidden" name="<%= param.getKey() %>" value="<%= param.getValue() %>" />
                                             <% } %>
                                         </c:if>
-                                        <div class="breadcrumbs">
-                                            <div class="inner">
-                                                <mde:write name="breadcrumbs"/>
-                                            </div>
-                                        </div>
+                                        <jsp:include page="breadcrumbs.jsp" />
                                     </stripes:form>
                                 </div>
                                 <div class="contentBarRight">
@@ -61,6 +57,7 @@
                                             <div class="contentBarButtons">
                                                 <portofino:page-layout-button />
                                                 <portofino:reload-model-button />
+                                                <portofino:page-children-button />
                                                 <portofino:page-permissions-button />
                                                 <portofino:page-copy-button />
                                                 <portofino:page-new-button />
@@ -86,7 +83,7 @@
                 </div>
             </div>
             <div id="sidebar" class="yui-b">
-                <mde:write name="navigation"/>
+                <jsp:include page="navigation.jsp"/>
             </div>
             <script type="text/javascript">
                 fixSideBar();

@@ -1,0 +1,7 @@
+<page description="Workload" id="4xozy9lfgmco7rxts05kodp56" title="workload">
+    <permissions />
+    <layout>
+        <self container="default" order="0"/>
+        <childPages/>
+    </layout>
+</page>

@@ -1,0 +1,13 @@
+<page description="People" id="fwyg067k9g0mpoq8e9ingwwu5" title="People">
+    <permissions />
+    <layout>
+        <self container="default" order="0"/>
+        <childPages />
+    </layout>
+    <detailLayout>
+        <self  container="default" order="2"/>
+        <detailChildPages>
+            <childPage name="tickets" container="contentLayoutBottom" order="0" showInNavigation="false"/>
+        </detailChildPages>
+    </detailLayout>
+</page>

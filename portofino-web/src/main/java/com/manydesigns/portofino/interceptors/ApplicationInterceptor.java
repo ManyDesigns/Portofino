@@ -1,0 +1,179 @@
+/*
+ * Copyright (C) 2005-2012 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
+ *
+ * Unless you have purchased a commercial license agreement from ManyDesigns srl,
+ * the following license terms apply:
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+package com.manydesigns.portofino.interceptors;
+
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.blobs.BlobManager;
+import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.RequestAttributes;
+import com.manydesigns.portofino.application.AppProperties;
+import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.dispatcher.*;
+import com.manydesigns.portofino.pageactions.PageActionLogic;
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.controller.ExecutionContext;
+import net.sourceforge.stripes.controller.Interceptor;
+import net.sourceforge.stripes.controller.Intercepts;
+import net.sourceforge.stripes.controller.LifecycleStage;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang.time.StopWatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.bind.JAXBException;
+import java.io.File;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+/*
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+*/
+@Intercepts(LifecycleStage.CustomValidation)
+public class ApplicationInterceptor implements Interceptor {
+    public static final String copyright =
+            "Copyright (c) 2005-2012, ManyDesigns srl";
+
+    public final static Logger logger =
+            LoggerFactory.getLogger(ApplicationInterceptor.class);
+    public static final String INVALID_PAGE_INSTANCE = "validDispatchPathLength";
+
+    public Resolution intercept(ExecutionContext context) throws Exception {
+        logger.debug("Retrieving Stripes objects");
+        ActionBeanContext actionContext = context.getActionBeanContext();
+
+        logger.debug("Retrieving Servlet API objects");
+        HttpServletRequest request = actionContext.getRequest();
+
+        logger.debug("Retrieving Portofino application");
+        Application application =
+                (Application) request.getAttribute(
+                        RequestAttributes.APPLICATION);
+
+        logger.debug("Starting page response timer");
+        StopWatch stopWatch = new StopWatch();
+        // There is no need to stop this timer.
+        stopWatch.start();
+        request.setAttribute(RequestAttributes.STOP_WATCH, stopWatch);
+
+        logger.debug("Setting skin");
+        if(request.getAttribute("skin") == null) {
+            String skin = application.getAppConfiguration().getString(AppProperties.SKIN);
+            request.setAttribute("skin", skin);
+        }
+
+        logger.debug("Setting blobs directory");
+        BlobManager blobManager = ElementsThreadLocals.getBlobManager();
+        blobManager.setBlobsDir(application.getAppBlobsDir());
+
+        Dispatch dispatch =
+                (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
+        if (dispatch != null) {
+            logger.debug("Preparing PageActions");
+            for(PageInstance page : dispatch.getPageInstancePath()) {
+                if(page.getParent() == null) {
+                    logger.debug("Not preparing root");
+                    continue;
+                }
+                logger.debug("Preparing PageAction {}", page);
+                PageAction actionBean = ensureActionBean(page);
+                configureActionBean(actionBean, page, application);
+                try {
+                    Resolution resolution = actionBean.prepare(page, actionContext);
+                    if(resolution != null) {
+                        request.setAttribute(INVALID_PAGE_INSTANCE, page);
+                        logger.error("PageAction prepare failed for {}", page);
+                        return resolution;
+                    }
+                } catch (Throwable t) {
+                    request.setAttribute(INVALID_PAGE_INSTANCE, page);
+                    logger.error("PageAction prepare failed for " + page, t);
+                    Locale locale = request.getLocale();
+                    ResourceBundle resourceBundle = application.getBundle(locale);
+                    String msg = MessageFormat.format
+                            (resourceBundle.getString("portlet.exception"), ExceptionUtils.getRootCause(t));
+                    SessionMessages.addErrorMessage(msg);
+                    return new ForwardResolution("/layouts/redirect-to-last-working-page.jsp");
+                }
+            }
+            PageInstance pageInstance = dispatch.getLastPageInstance();
+            request.setAttribute(RequestAttributes.PAGE_INSTANCE, pageInstance);
+        }
+
+        return context.proceed();
+    }
+
+    protected PageAction ensureActionBean(PageInstance page) throws IllegalAccessException, InstantiationException {
+        PageAction action = page.getActionBean();
+        if(action == null) {
+            action = page.getActionClass().newInstance();
+            page.setActionBean(action);
+        }
+        return action;
+    }
+
+    protected void configureActionBean
+            (PageAction actionBean, PageInstance pageInstance, Application application)
+            throws JAXBException, IOException {
+        File configurationFile = new File(pageInstance.getDirectory(), "configuration.xml");
+        Object configuration = getConfigurationFromCache(configurationFile);
+        if(configuration != null) {
+            pageInstance.setConfiguration(configuration);
+        } else {
+            try {
+                Class<?> configurationClass = PageActionLogic.getConfigurationClass(actionBean.getClass());
+                configuration = DispatcherLogic.loadConfiguration
+                        (pageInstance.getDirectory(), configurationClass);
+
+                if(configuration instanceof PageActionConfiguration) {
+                    ((PageActionConfiguration) configuration).init(application);
+                }
+                if(configuration != null) {
+                    putConfigurationInCache(configurationFile, configuration);
+                    pageInstance.setConfiguration(configuration);
+                }
+            } catch (Throwable t) {
+                logger.error("Couldn't load configuration from " + configurationFile.getAbsolutePath(), t);
+            }
+        }
+    }
+
+    //TODO!!!
+    //private ConcurrentMap<File, Object> configurationCache = new ConcurrentHashMap<File, Object>();
+
+    private void putConfigurationInCache(File pageFile, Object configuration) {
+        //configurationCache.put(pageFile, configuration);
+    }
+
+    private Object getConfigurationFromCache(File pageFile) {
+        return null; //configurationCache.get(pageFile);
+    }
+
+}

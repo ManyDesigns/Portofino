@@ -1,0 +1,7 @@
+<page description="Latest News" id="dwd0mzli5ri4imwtsucczfgaa" title="Latest News">
+    <permissions />
+    <layout>
+        <self container="default" order="0"/>
+        <childPages/>
+    </layout>
+</page>

@@ -1,0 +1,5 @@
+<configuration
+        database="redmine" legend="Issues by date" name="Issues by date" orientation="VERTICAL"
+        query="select 'anno-mese', concat(Year(&quot;created_on&quot;),'-',  Month(&quot;created_on&quot;)) data, count(*) from &quot;issues&quot; where &quot;project_id&quot; = %{#project.id} group by &quot;created_on&quot; order by &quot;created_on&quot;" type="BAR" urlExpression="/projects/%{#project.id}/issues?search_status_id=%{series}&amp;tracker_id=%{category}"
+        xAxisName="Tracker" yAxisName="Number of issues">
+</configuration>

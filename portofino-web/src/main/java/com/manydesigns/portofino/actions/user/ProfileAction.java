@@ -1,0 +1,250 @@
+/*
+ * Copyright (C) 2005-2012 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
+ *
+ * Unless you have purchased a commercial license agreement from ManyDesigns srl,
+ * the following license terms apply:
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+//
+//package com.manydesigns.portofino.actions.user;
+//
+//import com.manydesigns.elements.Mode;
+//import com.manydesigns.elements.forms.Form;
+//import com.manydesigns.elements.forms.FormBuilder;
+//import com.manydesigns.elements.messages.SessionMessages;
+//import com.manydesigns.elements.reflection.ClassAccessor;
+//import com.manydesigns.portofino.ApplicationAttributes;
+//import com.manydesigns.portofino.PortofinoProperties;
+//import com.manydesigns.portofino.SessionAttributes;
+//import com.manydesigns.portofino.dispatcher.AbstractActionBean;
+//import com.manydesigns.portofino.RequestAttributes;
+//import com.manydesigns.portofino.application.Application;
+//import com.manydesigns.portofino.application.QueryUtils;
+//import com.manydesigns.portofino.di.Inject;
+//import com.manydesigns.portofino.dispatcher.Dispatch;
+//import com.manydesigns.portofino.logic.SecurityLogic;
+//import com.manydesigns.portofino.model.database.DatabaseLogic;
+//import com.manydesigns.portofino.system.model.users.Group;
+//import com.manydesigns.portofino.system.model.users.User;
+//import com.manydesigns.portofino.system.model.users.UsersGroups;
+//import net.sourceforge.stripes.action.*;
+//import org.apache.commons.configuration.Configuration;
+//import org.hibernate.Session;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
+//import sun.misc.BASE64Encoder;
+//
+//import javax.servlet.http.HttpSession;
+//import java.security.MessageDigest;
+//import java.sql.Timestamp;
+//import java.util.ArrayList;
+//import java.util.Date;
+//import java.util.List;
+//
+///*
+//* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+//* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+//* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+//* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+//*/
+//@UrlBinding("/actions/profile")
+//public class ProfileAction extends AbstractActionBean {
+//    public static final String copyright =
+//            "Copyright (c) 2005-2012, ManyDesigns srl";
+//
+//    //**************************************************************************
+//    // Injections
+//    //**************************************************************************
+//
+//    @Inject(RequestAttributes.APPLICATION)
+//    public Application application;
+//
+//    @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
+//    public Configuration portofinoConfiguration;
+//
+//    @Inject(RequestAttributes.DISPATCH)
+//    public Dispatch dispatch;
+//
+//    public List<Group> groups;
+//
+//    private Boolean enc;
+//    private String userId;
+//
+//    @Before
+//    public void prepare() {
+//        groups = new ArrayList<Group>();
+//        enc = portofinoConfiguration.getBoolean(
+//                PortofinoProperties.PWD_ENCRYPTED, false);
+//    }
+//
+//    //**************************************************************************
+//    // User
+//    //**************************************************************************
+//    public Form form;
+//
+//    public static final Logger logger =
+//            LoggerFactory.getLogger(ProfileAction.class);
+//
+//    @DefaultHandler
+//    public Resolution execute() {
+//        HttpSession session = getSession();
+//        userId = (String) session.getAttribute(SessionAttributes.USER_ID);
+//        return read();
+//    }
+//
+//    private Resolution read() {
+//        User thisUser =
+//            (User) QueryUtils.getObjectByPk
+//                    (application, application.getSystemDatabaseName(),
+//                     DatabaseLogic.USER_ENTITY_NAME, new User(userId));
+//        ClassAccessor accessor =
+//                application.getTableAccessor(application.getSystemDatabaseName(), DatabaseLogic.USER_ENTITY_NAME);
+//        FormBuilder formBuilder = new FormBuilder(accessor);
+//        formBuilder.configFields("email", "userName", "firstName",
+//                "middleName", "lastName", "creationDate");
+//        for (UsersGroups ug : thisUser.getGroups()){
+//            Group grp = ug.getGroup();
+//
+//            if(ug.getDeletionDate()==null){
+//                groups.add(grp);
+//            }
+//        }
+//        form = formBuilder
+//                .configMode(Mode.VIEW)
+//                .build();
+//        form.readFromObject(thisUser);
+//        return new ForwardResolution("/layouts/user/profile/read.jsp");
+//    }
+//
+//    public Resolution edit() {
+//        userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
+//        User thisUser =
+//            (User) QueryUtils.getObjectByPk
+//                (application, application.getSystemDatabaseName(),
+//                 DatabaseLogic.USER_ENTITY_NAME, new User(userId));
+//
+//        ClassAccessor accessor =
+//                application.getTableAccessor(application.getSystemDatabaseName(), DatabaseLogic.USER_ENTITY_NAME);
+//        FormBuilder formBuilder = new FormBuilder(accessor);
+//        form = formBuilder
+//                .configFields("email", "userName", "firstName",
+//                        "middleName", "lastName")
+//                .configMode(Mode.EDIT)
+//                .build();
+//        form.readFromObject(thisUser);
+//        return new ForwardResolution("/layouts/user/profile/edit.jsp");
+//    }
+//
+//    public Resolution update() {
+//        userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
+//        User thisUser =
+//            (User) QueryUtils.getObjectByPk
+//                (application, application.getSystemDatabaseName(),
+//                 DatabaseLogic.USER_ENTITY_NAME, new User(userId));
+//        ClassAccessor accessor =
+//                application.getTableAccessor(application.getSystemDatabaseName(), DatabaseLogic.USER_ENTITY_NAME);
+//        FormBuilder formBuilder = new FormBuilder(accessor);
+//        form = formBuilder
+//                .configFields("email", "userName", "firstName",
+//                        "middleName", "lastName")
+//                .configMode(Mode.EDIT)
+//                .build();
+//        form.readFromObject(thisUser);
+//        form.readFromRequest(context.getRequest());
+//
+//        if(form.validate()){
+//            form.writeToObject(thisUser);
+//            Session session = application.getSystemSession();
+//            session.update(DatabaseLogic.USER_ENTITY_NAME, thisUser);
+//            session.getTransaction().commit();
+//            logger.debug("User {} updated", thisUser.getEmail());
+//            SessionMessages.addInfoMessage("Utente aggiornato correttamente");
+//            return new RedirectResolution(dispatch.getOriginalPath());
+//        } else {
+//            return new ForwardResolution("/layouts/user/profile/edit.jsp");
+//        }
+//    }
+//
+//    public Resolution changePwd() {
+//        userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
+//        form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
+//                .configMode(Mode.EDIT)
+//                .build();
+//        return new ForwardResolution("/layouts/user/profile/changePwd.jsp");
+//    }
+//
+//    public Resolution updatePwd() {
+//        userId = (String) getSession().getAttribute(SessionAttributes.USER_ID);
+//        User thisUser =
+//            (User) QueryUtils.getObjectByPk
+//                    (application, application.getSystemDatabaseName(),
+//                            DatabaseLogic.USER_ENTITY_NAME, new User(userId));
+//
+//        form = new FormBuilder(ChangePasswordFormBean.class).configFields("oldPwd", "pwd")
+//                .configMode(Mode.EDIT)
+//                .build();
+//        form.readFromRequest(context.getRequest());
+//
+//        if(form.validate()) {
+//            ChangePasswordFormBean bean = new ChangePasswordFormBean();
+//            form.writeToObject(bean);
+//
+//            String encOldPwd;
+//            if (portofinoConfiguration.getBoolean(PortofinoProperties.PWD_ENCRYPTED, false)){
+//                try {
+//                    MessageDigest md = MessageDigest.getInstance("SHA-1");
+//                    md.update(bean.oldPwd.getBytes("UTF-8"));
+//                    byte raw[] = md.digest();
+//                    encOldPwd = (new BASE64Encoder()).encode(raw);
+//                } catch (Exception e) {
+//                    throw new Error(e);
+//                }
+//            } else {
+//                encOldPwd = bean.oldPwd;
+//            }
+//
+//            if(encOldPwd.equals(thisUser.getPwd())) {
+//                thisUser.setPwd(bean.pwd);
+//                if (enc) {
+//                    thisUser.setPwd(SecurityLogic.encryptPassword(bean.pwd));
+//                } else {
+//                    thisUser.setPwd(bean.pwd);
+//                }
+//                thisUser.setPwdModDate(new Timestamp(new Date().getTime()));
+//
+//                Session session = application.getSystemSession();
+//                session.update(DatabaseLogic.USER_ENTITY_NAME, thisUser);
+//                session.getTransaction().commit();
+//                logger.debug("User {} updated", thisUser.getEmail());
+//                SessionMessages.addInfoMessage("Password correctely updated");
+//
+//                return new RedirectResolution(dispatch.getOriginalPath());
+//            } else {
+//                SessionMessages.addErrorMessage
+//                        ("La password non corrisponde a quella in uso");
+//                return new ForwardResolution("/layouts/user/profile/changePwd.jsp");
+//            }
+//        } else {
+//            return new ForwardResolution("/layouts/user/profile/changePwd.jsp");
+//        }
+//    }
+//
+//    // do not expose this method publicly
+//    protected HttpSession getSession() {
+//        return context.getRequest().getSession(false);
+//    }
+//}

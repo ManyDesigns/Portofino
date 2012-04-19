@@ -1,6 +1,8 @@
+<%@ page import="com.manydesigns.portofino.breadcrumbs.BreadcrumbItem" %>
 <%@ page import="com.manydesigns.portofino.breadcrumbs.Breadcrumbs" %>
-<%@ page import="com.manydesigns.elements.util.Util" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.PageInstance" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8" %><%@
     taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%><%@
@@ -9,7 +11,7 @@
     taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%@
     taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/${skin}/modal-page.jsp" formActionUrl="/actions/admin/page">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.PageAdminAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="page-create" cssClass="contentButton"/>
     </stripes:layout-component>
@@ -40,24 +42,19 @@
     <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">
         <portofino:buttons list="page-create" cssClass="contentButton"/>
+        <% PageInstance pageInstance = actionBean.dispatch.getLastPageInstance(); %>
         <script type="text/javascript">
             var rootPath = "<%= request.getContextPath() %>";
-            var rootBreadcrumbs = ""; //"<span class='breadcrumb-item'>${actionBean.application.model.rootPage.title}</span>";
+            var rootBreadcrumbs = "";
 
-            var currentPath = "<%= actionBean.dispatch.getPathUrl() %>";
+            var currentPath = "<%= pageInstance.getPath() %>";
             var currentBreadcrumbs =
-                    "<%= StringEscapeUtils.escapeJavaScript(
-                            Util.elementToString(new Breadcrumbs(actionBean.dispatch, false))) %>" +
-                    "<span class='breadcrumb-separator'> &gt; </span>";
+                    "<%= generateBreadcrumbs(new Breadcrumbs(actionBean.dispatch)) %>";
 
-            var parentPath = "<%= actionBean.dispatch.getParentPathUrl() %>";
+            var parentPath = "<%= pageInstance.getParent().getPath() %>";
             var parentBreadcrumbs =
-                    "<%= StringEscapeUtils.escapeJavaScript(
-                            Util.elementToString(
-                                new Breadcrumbs(actionBean.dispatch,
-                                                actionBean.dispatch.getPageInstancePath().length - 1,
-                                                false))) %>" +
-                    "<span class='breadcrumb-separator'> &gt; </span>";
+                    "<%= generateBreadcrumbs(new Breadcrumbs(actionBean.dispatch,
+                                                actionBean.dispatch.getPageInstancePath().length - 1)) %>";
 
             var urlField = $("#url");
             var breadcrumbsField = $("#breadcrumbs");
@@ -79,8 +76,8 @@
                     baseBreadcrumbs = parentBreadcrumbs;
                 }
 
-                urlField.html(basePath + "/" + fragmentField.val());
-                breadcrumbsField.html(baseBreadcrumbs + "<span class='breadcrumb-item'>" + titleField.val() + "</span>");
+                urlField.html(htmlEscape(basePath + "/" + fragmentField.val()));
+                breadcrumbsField.html(htmlEscape(baseBreadcrumbs + titleField.val()));
             }
 
             fragmentField.change(recalculateUrlAndBreadcrumbs);
@@ -95,3 +92,14 @@
         </script>
     </stripes:layout-component>
 </stripes:layout-render>
+<%!
+    private String generateBreadcrumbs(Breadcrumbs breadcrumbs) {
+        List<BreadcrumbItem> items = breadcrumbs.getItems();
+        StringBuilder sb = new StringBuilder();
+        for (BreadcrumbItem current : items) {
+            sb.append(current.getText());
+            sb.append(" > ");
+        }
+        return StringEscapeUtils.escapeJavaScript(sb.toString());
+    }
+%>

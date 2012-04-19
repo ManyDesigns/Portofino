@@ -13,7 +13,7 @@
 --%><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" style="height: 100%;">
 <jsp:useBean id="actionBean" scope="request"
-             type="com.manydesigns.portofino.actions.TextAction"/>
+             type="com.manydesigns.portofino.pageactions.text.TextAction"/>
 <head>
     <title><fmt:message key="layouts.text.browse.browse_server"/></title>
     <jsp:include page="/skins/${skin}/head.jsp" />

@@ -44,7 +44,16 @@ jQuery ui smoothness theme overrides
 
 .ui-button-text-only .ui-button-text { padding: .1em .5em; }
 .ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { padding: 0; text-indent: -9999999px; }
-.ui-button-text-icon-primary .ui-button-text, .ui-button-text-icons .ui-button-text { padding: .1em 0.5em .1em 1.6em; }
+
+.ui-button-text-icon-primary .ui-button-text {
+    padding: .1em 0.5em .1em 1.6em;
+}
+
+.ui-button-text-icon-secondary .ui-button-text,
+.ui-button-text-icons .ui-button-text {
+    padding: .1em 1.6em .1em 0.5em;
+}
+
 input.ui-button { padding: .1em .5em; }
 
 button.ui-button-icon-only { width: 1.6em; }
@@ -86,6 +95,7 @@ Body and content layout
     -moz-border-radius: 6px;
     border-radius: 6px;
     background-color: white;
+    position: relative;
 }
 
 .yui-t3 #yui-main div#content {
@@ -131,6 +141,11 @@ div.contentBody {
     background-color: #eef;
     padding: 0.5em 1em;
     clear: both;
+}
+
+.contentFooter {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
 }
 
 .contentHeader {
@@ -313,7 +328,7 @@ ul.errorMessages, ul.warningMessages, ul.infoMessages {
 
 ul.errorMessages li, ul.warningMessages li, ul.infoMessages li {
     list-style-type: none;
-    padding-left: 24px;
+    padding-left: 28px;
 }
 
 ul.errorMessages {
@@ -321,7 +336,7 @@ ul.errorMessages {
     background-color: #fff8f0;
     background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-cross-24.png");
     background-repeat: no-repeat;
-    background-position: 4px center;
+    background-position: 5px center;
 }
 
 ul.warningMessages {
@@ -329,7 +344,7 @@ ul.warningMessages {
     background-color: #fffff0;
     background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/warning-24.png");
     background-repeat: no-repeat;
-    background-position: 4px center;
+    background-position: 5px center;
 }
 
 ul.infoMessages {
@@ -337,7 +352,7 @@ ul.infoMessages {
     background-color: #f0fff0;
     background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-check-24.png");
     background-repeat: no-repeat;
-    background-position: 4px center;
+    background-position: 5px center;
 }
 
 /*******************************************************************************

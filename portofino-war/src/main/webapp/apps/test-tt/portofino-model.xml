@@ -1505,7 +1505,7 @@
                         <table tableName="OLDPWD">
                             <annotations/>
                             <columns>
-<column autoincrement="false" columnName="ID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="id" scale="0">
+<column autoincrement="false" columnName="ID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="id" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="CREATEDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="createDate" scale="10">
@@ -1514,7 +1514,7 @@
 <column autoincrement="false" columnName="PASSWORD" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="true" propertyName="password" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="USERID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="userId" scale="0">
+<column autoincrement="false" columnName="USERID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="userId" scale="0">
     <annotations/>
 </column>
                             </columns>
@@ -1533,7 +1533,7 @@
                         <table javaClass="com.manydesigns.portofino.system.model.messages.Message" tableName="MSG">
                             <annotations/>
                             <columns>
-<column autoincrement="false" columnName="ID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="id" scale="0">
+<column autoincrement="false" columnName="ID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="id" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="SUBJECT" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" propertyName="subject" scale="0">
@@ -1542,10 +1542,10 @@
 <column autoincrement="false" columnName="BODY" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="4000" nullable="true" propertyName="body" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="TO_" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="toId" scale="0">
+<column autoincrement="false" columnName="TO_" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="toId" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="FROM_" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="fromId" scale="0">
+<column autoincrement="false" columnName="FROM_" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="fromId" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="CREATIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="creationDate" scale="10">
@@ -1584,7 +1584,7 @@
 </annotation>
                             </annotations>
                             <columns>
-<column autoincrement="false" columnName="USERID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="userId" scale="0">
+<column autoincrement="false" columnName="USERID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="userId" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">
@@ -1699,10 +1699,10 @@
 </annotation>
                             </annotations>
                             <columns>
-<column autoincrement="false" columnName="GROUPID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="groupId" scale="0">
+<column autoincrement="false" columnName="GROUPID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="groupId" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="CREATORID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="creatorId" scale="0">
+<column autoincrement="false" columnName="CREATORID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="true" propertyName="creatorId" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="NAME" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="50" nullable="true" propertyName="name" scale="0">
@@ -1736,78 +1736,13 @@
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="EMAILSTATE">
-                            <annotations/>
-                            <columns>
-<column autoincrement="false" columnName="ID" columnType="DECIMAL" javaType="java.lang.Integer" jdbcType="3" length="10" nullable="false" propertyName="id" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="NAME" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="75" nullable="false" propertyName="name" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="DESCRIPTION" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" propertyName="description" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="EMAILSTATE_PKEY">
-<column columnName="ID"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table javaClass="com.manydesigns.portofino.system.model.email.EmailBean" tableName="EMAILQUEUE">
-                            <annotations/>
-                            <columns>
-<column autoincrement="false" columnName="ID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="id" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="SUBJECT" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="100" nullable="true" propertyName="subject" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="BODY" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="4000" nullable="true" propertyName="body" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="TO_" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="100" nullable="true" propertyName="to" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="FROM_" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="100" nullable="true" propertyName="from" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="CREATEDATE" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="8" nullable="true" propertyName="createDate" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="STATE" columnType="DECIMAL" javaType="java.lang.Integer" jdbcType="3" length="10" nullable="true" propertyName="state" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="ATTACHMENTPATH" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" propertyName="attachmentPath" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="ATTACHMENTDESCRIPTION" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" propertyName="attachmentDescription" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="ATTACHMENTNAME" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" propertyName="attachmentName" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys>
-<foreignKey onDelete="importedKeyRestrict" onUpdate="importedKeyRestrict" hql="from emailstate" name="FK_EMAILQUEUE_1" toDatabase="portofino" toSchema="PUBLIC" toTable="EMAILSTATE">
-    <references>
-        <reference fromColumn="STATE" toColumn="ID"/>
-    </references>
-</foreignKey>
-                            </foreignKeys>
-                            <primaryKey primaryKeyName="EMAILQUEUE_PKEY">
-<column columnName="ID"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
                         <table javaClass="com.manydesigns.portofino.system.model.users.UsersGroups" manyToMany="true" tableName="USERS_GROUPS">
                             <annotations/>
                             <columns>
-<column autoincrement="false" columnName="GROUPID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="groupid" scale="0">
+<column autoincrement="false" columnName="GROUPID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="groupid" scale="0">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="USERID" columnType="CHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="userid" scale="0">
+<column autoincrement="false" columnName="USERID" columnType="VARCHAR" javaType="java.lang.String" jdbcType="1" length="25" nullable="false" propertyName="userid" scale="0">
     <annotations/>
 </column>
 <column autoincrement="false" columnName="DELETIONDATE" columnType="TIMESTAMP" javaType="java.util.Date" jdbcType="93" length="23" nullable="true" propertyName="deletionDate" scale="10">

@@ -78,7 +78,7 @@
                 </div>
             </div>
             <div id="sidebar" class="yui-b">
-                <mde:write name="navigation"/>
+                <jsp:include page="navigation.jsp"/>
             </div>
             <script type="text/javascript">
                 fixSideBar();

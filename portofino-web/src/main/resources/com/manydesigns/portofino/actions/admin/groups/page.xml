@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page id="groups"
+      description="Groups administration" fragment="actions/admin/groups"
+      title="Groups">
+</page>

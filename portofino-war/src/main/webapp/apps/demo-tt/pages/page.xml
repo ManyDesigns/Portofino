@@ -1,0 +1,12 @@
+<page id="root" description="portofino 4" title="Ticket Tracker (Portofino 4 Demo)" navigationRoot="GHOST_ROOT">
+    <permissions>
+        <group level="VIEW" name="all"/>
+    </permissions>
+    <layout>
+        <childPages>
+            <childPage name="welcome" showInNavigation="true"/>
+            <childPage name="projects" showInNavigation="true"/>
+            <childPage name="people" showInNavigation="true"/>
+        </childPages>
+    </layout>
+</page>

@@ -6,7 +6,7 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><stripes:layout-render name="/skins/${skin}/content-page.jsp" >
     <jsp:useBean id="actionBean" scope="request"
-                 type="com.manydesigns.portofino.actions.PortletAction"/>
+                 type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
     <stripes:layout-component name="contentBody">
         <mde:sessionMessages/>
         <portofino:portlets list="default" />

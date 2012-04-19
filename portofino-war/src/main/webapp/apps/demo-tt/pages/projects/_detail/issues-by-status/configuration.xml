@@ -1,0 +1,2 @@
+<configuration database="redmine" legend="Issues by status" name="Issues by status" orientation="HORIZONTAL" query="select &quot;status_id&quot;, count(*), status.&quot;name&quot;&#xD;&#xA;from &quot;issues&quot; join &quot;issue_statuses&quot; status on &quot;status_id&quot; = status.&quot;id&quot;&#xD;&#xA;where &quot;project_id&quot; = %{#project.id}&#xD;&#xA;group by &quot;status_id&quot;" type="PIE3D" urlExpression="/projects/%{#project.id}/issues?search_status_id=%{key}">
+</configuration>

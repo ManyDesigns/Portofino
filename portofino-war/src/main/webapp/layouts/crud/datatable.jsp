@@ -13,7 +13,7 @@
                 TableForm.Column[] columns = tableForm.getColumns();
                 for (TableForm.Column column : columns) {
                     out.print("<th>");
-                    out.print(StringEscapeUtils.escapeHtml(column.getLabel()));
+                    out.print(StringEscapeUtils.escapeHtml(column.getActualLabel()));
                     out.print("</th>");
                 }
             %>
@@ -26,6 +26,8 @@
         </tbody>
     </table>
 </div>
+<input type="hidden" name="sortProperty" value="${actionBean.sortProperty}" />
+<input type="hidden" name="sortDirection" value="${actionBean.sortDirection}" />
 <script type="text/javascript">
     var initDatatable_<c:out value="${pageId}" /> = function() {
         var elementsFormatter = function(elCell, oRecord, oColumn, sData) {
@@ -94,7 +96,7 @@
                     out.print(StringEscapeUtils.escapeJavaScript(propertyAccessor.getName()));
                     out.print("\"");
                     out.print(", label : \"");
-                    out.print(StringEscapeUtils.escapeJavaScript(column.getLabel()));
+                    out.print(StringEscapeUtils.escapeJavaScript(column.getActualLabel()));
                     out.print("\"");
                     out.print(", formatter : elementsFormatter, sortable : true");
                     out.print("}");
@@ -108,15 +110,27 @@
             var sort = (oState.sortedBy) ? oState.sortedBy.key : "";
             var dir = (oState.sortedBy && oState.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc";
             var startIndex = (oState.pagination) ? oState.pagination.recordOffset : 0;
-            var maxResults = (oState.pagination) ? oState.pagination.rowsPerPage : <%= actionBean.getCrud().getActualRowsPerPage() %>;
+            var maxResults = null;
+            <c:if test="${actionBean.crudConfiguration.paginated}">
+                maxResults = (oState.pagination) ? oState.pagination.rowsPerPage : ${actionBean.crudConfiguration.rowsPerPage};
+            </c:if>
 
             // Build custom request
-            var url = "&firstResult=" + startIndex +
-                    "&maxResults=" + maxResults + "&sortProperty=" + sort + "&sortDirection=" + dir;
+            var url = "&firstResult=" + startIndex + "&sortProperty=" + sort + "&sortDirection=" + dir;
+            if(maxResults) {
+                url += "&maxResults=" + maxResults;
+            }
             <c:if test="${not empty actionBean.searchString}">
                 url = url + "&searchString=" + encodeURIComponent(
                     '<%= StringEscapeUtils.escapeJavaScript(actionBean.getSearchString()) %>');
             </c:if>
+
+            //Update sort input fields in the form
+            $('#<c:out value="portlet_${pageId}" /> input[name=sortProperty]').val(sort);
+            $('#<c:out value="portlet_${pageId}" /> input[name=sortDirection]').val(dir);
+
+            console.log($('#<c:out value="portlet_${pageId}" /> input[name=sortDirection]'));
+
             return url;
         };
 
@@ -124,21 +138,26 @@
             generateRequest: generateRequest,
             initialRequest: generateRequest(),
             dynamicData: true,
-            paginator : new YAHOO.widget.Paginator({
-                rowsPerPage: <%= actionBean.getCrud().getActualRowsPerPage() %>,
+            MSG_EMPTY: '<fmt:message key="layouts.crud.datatable.msg_empty"/>'
+        };
+
+        <c:if test="${actionBean.crudConfiguration.paginated}">
+            myConfigs.paginator = new YAHOO.widget.Paginator({
+                rowsPerPage: <%= actionBean.getCrudConfiguration().getRowsPerPage() %>,
                 firstPageLinkLabel: '&lt;&lt; <fmt:message key="commons.first" />',
                 previousPageLinkLabel: '&lt; <fmt:message key="commons.prev" />',
                 nextPageLinkLabel: '<fmt:message key="commons.next" /> &gt;',
                 lastPageLinkLabel: '<fmt:message key="commons.last" /> &gt;&gt;'
-            }),
-            MSG_EMPTY: '<fmt:message key="layouts.crud.datatable.msg_empty"/>'
-        };
+            });
+        </c:if>
 
         var myDataTable = new YAHOO.widget.DataTable(
                 '<c:out value="tableContainer-${pageId}" />', myColumnDefs, myDataSource, myConfigs);
         myDataTable.doBeforeLoadData = function(oRequest, oResponse, oPayload) {
             oPayload.totalRecords = oResponse.meta.totalRecords;
-            oPayload.pagination.recordOffset = oResponse.meta.startIndex;
+            if(oPayload.pagination) {
+                oPayload.pagination.recordOffset = oResponse.meta.startIndex;
+            }
             return oPayload;
         };
         myDataTable.doBeforePaginatorChange = function(oPaginatorState) {

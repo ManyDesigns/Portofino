@@ -1,0 +1,97 @@
+<configuration createTitle="Create issue" database="redmine" editTitle="Edit issue" largeResultSet="false" name="Tickets"
+               query="from issues where assigned_to_id = %{#person.id}" readTitle="Issue" searchTitle="Issues" variable="issue">
+    <annotations/>
+    <properties>
+        <property enabled="true" inSummary="true" insertable="true" label="" name="id" searchable="true"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="true" insertable="true" label="" name="tracker_id" searchable="true"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="true" insertable="true" label="" name="project_id" searchable="true"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="true" insertable="true" label="" name="subject" searchable="true"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="false" insertable="true" label="" name="description" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="false" insertable="true" label="" name="due_date" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="false" insertable="true" label="" name="category_id" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="false" insertable="true" label="" name="status_id" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="true" insertable="true" label="" name="assigned_to_id" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="false" insertable="true" label="" name="priority_id" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="false" insertable="true" label="" name="fixed_version_id" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="false" insertable="true" label="" name="author_id" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="false" insertable="true" label="" name="lock_version" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="false" insertable="true" label="" name="created_on" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="true" inSummary="false" insertable="true" label="" name="updated_on" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="false" inSummary="false" insertable="true" name="start_date" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="false" inSummary="false" insertable="true" name="done_ratio" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="false" inSummary="false" insertable="true" name="estimated_hours" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="false" inSummary="false" insertable="true" name="parent_id" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="false" inSummary="false" insertable="true" name="root_id" searchable="false"
+                  updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="false" inSummary="false" insertable="true" name="lft" searchable="false" updatable="true">
+            <annotations/>
+        </property>
+        <property enabled="false" inSummary="false" insertable="true" name="rgt" searchable="false" updatable="true">
+            <annotations/>
+        </property>
+    </properties>
+    <selectionProviders>
+        <selectionProvider displayMode="DROPDOWN" enabled="true" selectionProvider="sp_issue_status"/>
+        <selectionProvider displayMode="DROPDOWN" enabled="true" selectionProvider="sp_issue_priority"/>
+        <selectionProvider displayMode="DROPDOWN" enabled="true" selectionProvider="sp_issue_tracker"/>
+    </selectionProviders>
+</configuration>

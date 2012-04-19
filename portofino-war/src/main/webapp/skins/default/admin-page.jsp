@@ -5,13 +5,12 @@
     response.addHeader("Cache-Control", "no-cache");
     response.addHeader("Cache-Control", "no-store");
     response.setDateHeader("Expires", 0);
-%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
-<%@ taglib prefix="mde" uri="/manydesigns-elements"%>
-<%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-definition><%--
+%><%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
+%><%@ taglib prefix="mde" uri="/manydesigns-elements"
+%><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
+%><stripes:layout-definition><%--
 --%><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
     <head>
@@ -98,14 +97,8 @@
                         <div class="navigationHeader">Security</div>
                         <ul>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
-                                                   text="Users"
-                                                   link="/actions/admin/users"/>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
-                                                   text="Groups"
-                                                   link="/actions/admin/groups"/>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Root permissions"
-                                                   link="/actions/admin/root-permissions"/>
+                                                   link="/actions/admin/root-page/permissions"/>
                         </ul>
                     </li>
                     <li>
@@ -114,9 +107,9 @@
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Settings"
                                                    link="/actions/admin/settings"/>
-                            <%--<stripes:layout-render name="/skins/default/adminLink.jsp"
-                                                   text="Email"
-                                                   link="/"/>--%>
+                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                                                   text="Top-level pages"
+                                                   link="/actions/admin/root-page/children"/>
                         </ul>
                     </li>
                     <li>

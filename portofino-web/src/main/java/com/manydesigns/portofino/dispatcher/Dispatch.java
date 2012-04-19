@@ -1,0 +1,104 @@
+/*
+ * Copyright (C) 2005-2012 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
+ *
+ * Unless you have purchased a commercial license agreement from ManyDesigns srl,
+ * the following license terms apply:
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+package com.manydesigns.portofino.dispatcher;
+
+import com.manydesigns.elements.util.Util;
+import com.manydesigns.portofino.pages.NavigationRoot;
+import net.sourceforge.stripes.action.ActionBean;
+
+/*
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+*/
+public class Dispatch {
+    public static final String copyright =
+            "Copyright (c) 2005-2012, ManyDesigns srl";
+
+    protected final String contextPath;
+    protected final String originalPath;
+    protected final PageInstance[] pageInstancePath;
+
+    public Dispatch(String contextPath,
+                    String originalPath,
+                    PageInstance... pageInstancePath) {
+        this.contextPath = contextPath;
+        this.originalPath = originalPath;
+        this.pageInstancePath = pageInstancePath;
+    }
+
+    public String getContextPath() {
+        return contextPath;
+    }
+
+    public PageInstance[] getPageInstancePath() {
+        return pageInstancePath;
+    }
+
+    public PageInstance[] getPageInstancePath(int startIndex) {
+        return Util.copyOfRange(pageInstancePath, startIndex, pageInstancePath.length);
+    }
+
+    public PageInstance getRootPageInstance() {
+        return pageInstancePath[0];
+    }
+
+    public PageInstance getLastPageInstance() {
+        return pageInstancePath[pageInstancePath.length - 1];
+    }
+
+    public String getOriginalPath() {
+        return originalPath;
+    }
+
+    public String getAbsoluteOriginalPath() {
+        if ("/".equals(contextPath)) {
+            return getOriginalPath();
+        } else {
+            return contextPath + getOriginalPath();
+        }
+    }
+
+    public PageInstance getPageInstance(int index) {
+        if(index >= 0) {
+            return getPageInstancePath()[index];
+        } else {
+            return getPageInstancePath()[getPageInstancePath().length + index];
+        }
+    }
+
+    public int getClosestSubtreeRootIndex() {
+        PageInstance[] path = getPageInstancePath();
+        for(int i = path.length - 1; i > 0; i--) {
+            if(path[i].getPage().getActualNavigationRoot() != NavigationRoot.INHERIT) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    public Class<? extends ActionBean> getActionBeanClass() {
+        return getLastPageInstance().getActionClass();
+    }
+}

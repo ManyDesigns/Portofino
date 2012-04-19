@@ -1,0 +1,21 @@
+table.warningTable {
+    width: 100%;
+    border: 0px;
+    padding: 0px;
+    border-style: solid;
+}
+
+table.warningTable th{
+    border: 1px;
+    padding: 2px;
+    border-style: solid;
+    border-color: #7D98B8;
+    text-transform: uppercase;
+}
+table.warningTable td{
+    border: 1px;
+    padding: 2px;
+    margin: 3px;
+    border-style: solid;
+    border-color: #7D98B8;
+}

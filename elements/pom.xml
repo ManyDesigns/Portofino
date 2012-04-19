@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.0.rc7</version>
+        <version>4.0.2</version>
     </parent>
     <artifactId>elements</artifactId>
     <packaging>jar</packaging>
@@ -58,6 +58,12 @@
                     <artifactId>commons-beanutils-core</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>${commons.collections.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ognl</groupId>

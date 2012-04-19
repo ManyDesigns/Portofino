@@ -6,25 +6,22 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/skins/${skin}/modal-page.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.TextAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.text.TextAction"/>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="manage-attachments" cssClass="contentButton" />
-        <div class="breadcrumbs">
-            <div class="inner">
-                <mde:write name="breadcrumbs"/>
-            </div>
-        </div>
+        <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.text.manage-attachments.manage_attachments_for_page"/> <c:out value="${actionBean.textPage.title}"/>
+        <fmt:message key="layouts.text.manage-attachments.manage_attachments_for_page"/>
+        <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
-        <c:if test="${not empty actionBean.textPage.attachments}">
+        <c:if test="${not empty actionBean.textConfiguration.attachments}">
             <fmt:message key="commons.attachments"/>:
             <br/>
             <table class="noBorder">
-                <c:forEach var="attachment" items="${actionBean.textPage.attachments}">
+                <c:forEach var="attachment" items="${actionBean.textConfiguration.attachments}">
                     <tr>
                         <td>
                             <stripes:checkbox name="selection" value="${attachment.id}"/>
@@ -41,7 +38,7 @@
             </table>
             <br/>
             <portofino:buttons list="manage-attachments-delete" cssClass="portletButton" />
-        </c:if><c:if test="${empty actionBean.textPage.attachments}">
+        </c:if><c:if test="${empty actionBean.textConfiguration.attachments}">
             <fmt:message key="layouts.text.manage-attachments.manage_attachments_for_page"/>
         </c:if>
         <div class="horizontalSeparator"></div>

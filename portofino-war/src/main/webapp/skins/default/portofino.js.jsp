@@ -9,10 +9,10 @@ function fixSideBar() {
             var contentOffsetHeight = contentNode.attr('offsetHeight');
             var sideBarOffsetHeight = sideBarNode.attr('offsetHeight');
             if (contentOffsetHeight < sideBarOffsetHeight) {
-                contentNode.css('min-height', sideBarOffsetHeight + 'px')
+                contentNode.css('min-height', (sideBarOffsetHeight + 5) + 'px')
             }
 
-            contentNode = $('div.search_results.withSearchForm');
+            contentNode = $('div.search_results.withSearchForm'); //TODO Serve ancora?
             sideBarNode = contentNode.parent().parent();
             contentOffsetHeight = contentNode.attr('offsetHeight');
             sideBarOffsetHeight = sideBarNode.attr('offsetHeight');
@@ -34,9 +34,9 @@ function copyFormAsHiddenFields(source, form) {
     });
 }
 
-function confirmDeletePage(pageId, contextPath) {
+function confirmDeletePage(pagePath, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/actions/admin/page/dialog?confirmDelete&pageId=" + pageId, function() {
+    dialogDiv.load(contextPath + "/actions/admin/page/dialog?confirmDelete&pagePath=" + pagePath, function() {
         dialogDiv.find("#dialog-confirm-delete-page").dialog({
             modal: true,
             width: 500,
@@ -57,9 +57,9 @@ function confirmDeletePage(pageId, contextPath) {
     return false;
 }
 
-function showMovePageDialog(pageId, contextPath) {
+function showMovePageDialog(pagePath, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/actions/admin/page/dialog?chooseNewLocation&pageId=" + pageId, function() {
+    dialogDiv.load(contextPath + "/actions/admin/page/dialog?chooseNewLocation&pagePath=" + pagePath, function() {
         dialogDiv.find("#dialog-move-page").dialog({
             modal: true,
             width: 500,
@@ -80,9 +80,9 @@ function showMovePageDialog(pageId, contextPath) {
     return false;
 }
 
-function showCopyPageDialog(pageId, contextPath) {
+function showCopyPageDialog(pagePath, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/actions/admin/page/dialog?copyPageDialog&pageId=" + pageId, function() {
+    dialogDiv.load(contextPath + "/actions/admin/page/dialog?copyPageDialog&pagePath=" + pagePath, function() {
         dialogDiv.find("#dialog-copy-page").dialog({
             modal: true,
             width: 500,
@@ -103,36 +103,38 @@ function showCopyPageDialog(pageId, contextPath) {
     return false;
 }
 
-$(function() {
-    var decorateButton = function(selector, options) {
+var portofino = {
+    decorateButton: function(selector, options) {
         $(selector).each(function(index, element) {
             element = $(element);
             element.html(element.find('.ui-button-text').html());
             element.button(options);
         });
-    };
+    },
 
-    var decorateIconButton = function(selector, icon) {
-        decorateButton(selector, {
+    decorateIconButton: function(selector, icon) {
+        portofino.decorateButton(selector, {
             icons: {
                 primary: icon
             },
             text: false
         });
-    };
+    }
+};
 
-    decorateButton("button.contentButton");
-    decorateButton("button.portletButton");
+$(function() {
+    portofino.decorateButton("button.contentButton");
+    portofino.decorateButton("button.portletButton");
 
-    decorateIconButton("button.arrow-4", "ui-icon-arrow-4");
-    decorateIconButton("button.refresh", "ui-icon-refresh");
-    decorateIconButton("button.person", "ui-icon-person");
-    decorateIconButton("button.copy", "ui-icon-copy");
-    decorateIconButton("button.plusthick", "ui-icon-plusthick");
-    decorateIconButton("button.minusthick", "ui-icon-minusthick");
-    decorateIconButton("button.transferthick-e-w", "ui-icon-transferthick-e-w");
-    decorateIconButton(".portletHeaderButtons button[name=configure]", "ui-icon-wrench");
-    decorateIconButton(".portletHeaderButtons button[name=manageAttachments]", "ui-icon-link");
+    portofino.decorateIconButton("button.arrow-4", "ui-icon-arrow-4");
+    portofino.decorateIconButton("button.refresh", "ui-icon-refresh");
+    portofino.decorateIconButton("button.person", "ui-icon-person");
+    portofino.decorateIconButton("button.copy", "ui-icon-copy");
+    portofino.decorateIconButton("button.plusthick", "ui-icon-plusthick");
+    portofino.decorateIconButton("button.minusthick", "ui-icon-minusthick");
+    portofino.decorateIconButton("button.transferthick-e-w", "ui-icon-transferthick-e-w");
+    portofino.decorateIconButton("button.folder-open", "ui-icon-folder-open");
+    portofino.decorateIconButton(".portletHeaderButtons button[name=configure]", "ui-icon-wrench");
 });
 
 function enablePortletDragAndDrop(button) {
@@ -156,7 +158,6 @@ function enablePortletDragAndDrop(button) {
             var wrapper = $(element);
             var templateHiddenField = wrapper.children("input[type=hidden]").first();
             var elements = wrapper.sortable('toArray');
-            console.log(templateHiddenField);
             for(var e in elements) {
                 var id = elements[e];
                 var hiddenField = document.createElement("input");
@@ -164,7 +165,6 @@ function enablePortletDragAndDrop(button) {
                 hiddenField.setAttribute("name", templateHiddenField.val());
                 hiddenField.setAttribute("value", id.substring("portletWrapper_".length));
                 theButton.before(hiddenField);
-                console.log(hiddenField);
             }
         });
         return true;

@@ -6,12 +6,12 @@
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.CrudAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.CrudAction"/>
     <stripes:layout-component name="pageTitle">
-        <c:out value="${actionBean.crud.searchTitle}"/>
+        <c:out value="${actionBean.crudConfiguration.searchTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.crud.searchTitle}"/>
+        <c:out value="${actionBean.crudConfiguration.searchTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="contentButtons" cssClass="contentButton" />
@@ -38,7 +38,7 @@
 
         <script type="text/javascript">
             $(".search_results button[name=bulkDelete]").click(function() {
-                return confirm ('Are you sure?');
+                return confirm ('<fmt:message key="commons.confirm" />');
             });
             $(".search_form_toggle_link").click(makeToggleFunction());
             function makeToggleFunction() {

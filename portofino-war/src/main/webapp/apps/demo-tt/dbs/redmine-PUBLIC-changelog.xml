@@ -537,7 +537,7 @@
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column defaultValue="" name="name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" unique="true"/>
             </column>
             <column name="description" type="TEXT"/>
             <column defaultValue="" name="homepage" type="VARCHAR(255)"/>
