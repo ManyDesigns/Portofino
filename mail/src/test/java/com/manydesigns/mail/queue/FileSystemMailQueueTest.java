@@ -194,12 +194,18 @@ public class FileSystemMailQueueTest extends TestCase {
         assertEquals(null, mq.loadEmail("aaa"));
 
         Email email = new Email();
+        Attachment attachment = new Attachment();
+        attachment.setInputStream(new ByteArrayInputStream("foo".getBytes()));
+        email.getAttachments().add(attachment);
         String id = mq.enqueue(email);
 
         mq.markSent(id);
         assertEquals(null, mq.loadEmail(id));
 
         email = new Email();
+        attachment = new Attachment();
+        attachment.setInputStream(new ByteArrayInputStream("foo".getBytes()));
+        email.getAttachments().add(attachment);
         id = mq.enqueue(email);
 
         if(ElementsFileUtils.setWritable(fsmq.getSentDirectory(), false)) {
@@ -220,6 +226,9 @@ public class FileSystemMailQueueTest extends TestCase {
 
         FileUtils.deleteDirectory(fsmq.getSentDirectory());
         email = new Email();
+        attachment = new Attachment();
+        attachment.setInputStream(new ByteArrayInputStream("foo".getBytes()));
+        email.getAttachments().add(attachment);
         id = mq.enqueue(email);
         mq.markSent(id);
         assertEquals(null, mq.loadEmail(id));
