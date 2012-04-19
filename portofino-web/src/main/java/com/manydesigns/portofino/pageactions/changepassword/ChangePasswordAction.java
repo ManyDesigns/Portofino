@@ -116,6 +116,7 @@ public class ChangePasswordAction extends AbstractPageAction {
         }
         form.readFromRequest(context.getRequest());
         if(form.validate()) {
+            form.writeToObject(this);
             Object user = loadUser();
             if(user != null) {
                 try {
@@ -123,6 +124,11 @@ public class ChangePasswordAction extends AbstractPageAction {
                     String oldPwd = getOldPasswordFromUser(user, pwdAccessor);
                     if(encrypt(oldPassword).equals(oldPwd)) {
                         savePassword(user, pwdAccessor);
+                        //Empty fields
+                        oldPassword = null;
+                        newPassword = null;
+                        form.readFromObject(this);
+                        SessionMessages.addInfoMessage(getMessage("changepasswordaction.password.changed"));
                     } else {
                         SessionMessages.addErrorMessage(getMessage("changepasswordaction.wrong.password"));
                     }
