@@ -27,6 +27,7 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
+import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
@@ -41,18 +42,13 @@ import org.slf4j.LoggerFactory;
  */
 @RequiresPermissions(level = AccessLevel.VIEW)
 @PageActionName("Custom")
+@ScriptTemplate("script_template.groovy")
 public class CustomAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
     public static final Logger logger =
             LoggerFactory.getLogger(CustomAction.class);
-
-    @DefaultHandler
-    public Resolution execute() {
-        String fwd = "/layouts/custom/example.jsp";
-        return forwardTo(fwd);
-    }
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
     @RequiresPermissions(level = AccessLevel.DEVELOP)

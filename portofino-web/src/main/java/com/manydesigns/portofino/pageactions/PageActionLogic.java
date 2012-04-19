@@ -74,7 +74,7 @@ public class PageActionLogic {
             try {
                 return IOUtils.toString(actionClass.getResourceAsStream(templateLocation));
             } catch (Exception e) {
-                throw new Error("Can't load script template: " + templateLocation, e);
+                throw new Error("Can't load script template: " + templateLocation + " for class: " + actionClass.getName(), e);
             }
         } else {
             String template = getScriptTemplate(actionClass.getSuperclass());
