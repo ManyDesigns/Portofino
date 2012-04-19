@@ -23,11 +23,13 @@
 package com.manydesigns.mail.queue;
 
 import com.manydesigns.elements.util.ElementsFileUtils;
+import com.manydesigns.mail.queue.model.Attachment;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
 import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -287,6 +289,39 @@ public class FileSystemMailQueueTest extends TestCase {
         assertEquals(1, email.getRecipients().size());
         assertEquals(Recipient.Type.TO, email.getRecipients().get(0).getType());
         assertEquals("mario", email.getRecipients().get(0).getAddress());
+    }
+
+    public void testAttachments() throws IOException, QueueException {
+        File file = File.createTempFile("mail", ".queue");
+        file.deleteOnExit();
+        file = new File(file.getAbsolutePath() + ".d");
+
+        MailQueue mq = new LockingMailQueue(new FileSystemMailQueue(file));
+
+        assertTrue(mq.getEnqueuedEmailIds().isEmpty());
+        assertEquals(null, mq.loadEmail("aaa"));
+
+        Email email = new Email();
+        email.setSubject("pippo");
+        email.getRecipients().add(new Recipient(Recipient.Type.TO, "mario"));
+        Attachment attachment = new Attachment();
+        attachment.setName("foo");
+        attachment.setDescription("bar");
+        attachment.setInputStream(new ByteArrayInputStream("quux".getBytes()));
+        email.getAttachments().add(attachment);
+        String id = mq.enqueue(email);
+
+        assertEquals(1, mq.getEnqueuedEmailIds().size());
+
+        email = mq.loadEmail(id);
+        assertEquals("pippo", email.getSubject());
+        assertEquals(1, email.getRecipients().size());
+        assertEquals(Recipient.Type.TO, email.getRecipients().get(0).getType());
+        assertEquals("mario", email.getRecipients().get(0).getAddress());
+        assertEquals(1, email.getAttachments().size());
+        File attachmentFile = new File(email.getAttachments().get(0).getFilePath());
+        attachmentFile.deleteOnExit();
+        assertTrue(attachmentFile.exists());
     }
 
 }

@@ -24,9 +24,11 @@ package com.manydesigns.mail.queue;
 
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.elements.util.RandomUtil;
+import com.manydesigns.mail.queue.model.Attachment;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +100,19 @@ public class FileSystemMailQueue implements MailQueue {
             String emailId = RandomUtil.createRandomId(20);
             File destinationFile = getEmailFile(emailId);
             checkDirectory(queuedDirectory);
+            if(!email.getAttachments().isEmpty()) {
+                File attachDir = getEmailAttachmentsDirectory(emailId);
+                checkDirectory(attachDir);
+                for(Attachment attachment : email.getAttachments()) {
+                    String attachmentId = RandomUtil.createRandomId(20);
+                    File attachmentFile = new File(attachDir, attachmentId + ".bin");
+                    FileOutputStream fos = new FileOutputStream(attachmentFile);
+                    IOUtils.copy(attachment.getInputStream(), fos);
+                    IOUtils.closeQuietly(fos);
+                    IOUtils.closeQuietly(attachment.getInputStream());
+                    attachment.setFilePath(attachmentFile.getAbsolutePath());
+                }
+            }
             marshaller.marshal(email, destinationFile);
             return emailId;
         } catch (Exception e) {
@@ -106,6 +122,10 @@ public class FileSystemMailQueue implements MailQueue {
 
     protected File getEmailFile(String emailId) {
         return RandomUtil.getCodeFile(queuedDirectory, "email-{0}.xml", emailId);
+    }
+
+    protected File getEmailAttachmentsDirectory(String emailId) {
+        return RandomUtil.getCodeFile(queuedDirectory, "email-{0}-attachments", emailId);
     }
 
     public List<String> getEnqueuedEmailIds() throws QueueException {

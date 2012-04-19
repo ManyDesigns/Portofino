@@ -42,11 +42,17 @@ public class Email {
     String textBody;
     String htmlBody;
     final List<Recipient> recipients = new ArrayList<Recipient>();
+    final List<Attachment> attachments = new ArrayList<Attachment>();
     String from;
 
     @XmlElement
     public List<Recipient> getRecipients() {
         return recipients;
+    }
+
+    @XmlElement
+    public List<Attachment> getAttachments() {
+        return attachments;
     }
 
     @XmlAttribute

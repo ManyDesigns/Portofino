@@ -24,19 +24,19 @@ package com.manydesigns.mail.sender;
 
 import com.manydesigns.mail.queue.MailParseException;
 import com.manydesigns.mail.queue.MailQueue;
+import com.manydesigns.mail.queue.model.Attachment;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
-import org.apache.commons.mail.DefaultAuthenticator;
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.HtmlEmail;
-import org.apache.commons.mail.SimpleEmail;
+import org.apache.commons.mail.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.activation.FileDataSource;
 import javax.mail.IllegalWriteException;
 import javax.mail.MessagingException;
 import javax.mail.MethodNotSupportedException;
 import javax.mail.internet.ParseException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -168,14 +168,41 @@ public class DefaultMailSender implements MailSender {
         String textBody = emailBean.getTextBody();
         String htmlBody = emailBean.getHtmlBody();
         if(null == htmlBody) {
-            SimpleEmail simpleEmail = new SimpleEmail();
-            simpleEmail.setMsg(textBody);
-            email = simpleEmail;
+            if(emailBean.getAttachments().isEmpty()) {
+                SimpleEmail simpleEmail = new SimpleEmail();
+                simpleEmail.setMsg(textBody);
+                email = simpleEmail;
+            } else {
+                MultiPartEmail multiPartEmail = new MultiPartEmail();
+                multiPartEmail.setMsg(textBody);
+                for(Attachment attachment : emailBean.getAttachments()) {
+                    EmailAttachment emailAttachment = new EmailAttachment();
+                    emailAttachment.setName(attachment.getName());
+                    emailAttachment.setDisposition(attachment.getDisposition());
+                    emailAttachment.setDescription(attachment.getDescription());
+                    emailAttachment.setPath(attachment.getFilePath());
+                    multiPartEmail.attach(emailAttachment);
+                }
+                email = multiPartEmail;
+            }
         } else {
             HtmlEmail htmlEmail =  new HtmlEmail();
             htmlEmail.setHtmlMsg(htmlBody);
             if(textBody != null) {
                 htmlEmail.setTextMsg(textBody);
+            }
+            for(Attachment attachment : emailBean.getAttachments()) {
+                if(!attachment.isEmbedded()) {
+                    EmailAttachment emailAttachment = new EmailAttachment();
+                    emailAttachment.setName(attachment.getName());
+                    emailAttachment.setDisposition(attachment.getDisposition());
+                    emailAttachment.setDescription(attachment.getDescription());
+                    emailAttachment.setPath(attachment.getFilePath());
+                    htmlEmail.attach(emailAttachment);
+                } else {
+                    FileDataSource dataSource = new FileDataSource(new File(attachment.getFilePath()));
+                    htmlEmail.embed(dataSource, attachment.getName(), attachment.getContentId());
+                }
             }
             email = htmlEmail;
         }

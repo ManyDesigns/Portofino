@@ -28,10 +28,14 @@ import com.manydesigns.mail.queue.FileSystemMailQueue;
 import com.manydesigns.mail.queue.LockingMailQueue;
 import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.queue.QueueException;
+import com.manydesigns.mail.queue.model.Attachment;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
 import junit.framework.TestCase;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -123,7 +127,8 @@ public class SenderTest extends TestCase {
         }
     }
 
-    public void testHtml() throws QueueException {
+    public void testHtml() throws QueueException, IOException {
+        //with html body only
         Email myEmail = new Email();
         myEmail.setFrom("granatella@gmail.com");
         myEmail.getRecipients().add(new Recipient(Recipient.Type.TO, "giampiero.granatella@manydesigns.com"));
@@ -145,6 +150,7 @@ public class SenderTest extends TestCase {
             it.remove();
         }
 
+        //with html body and text body
         myEmail = new Email();
         myEmail.setFrom("granatella@gmail.com");
         myEmail.getRecipients().add(new Recipient(Recipient.Type.TO, "giampiero.granatella@manydesigns.com"));
@@ -167,6 +173,63 @@ public class SenderTest extends TestCase {
             assertTrue(msg.getBody().contains("textBody"));
             it.remove();
         }
+
+        //with html body and attachments
+        myEmail = new Email();
+        myEmail.setFrom("alessiostalla@gmail.com");
+        myEmail.getRecipients().add(new Recipient(Recipient.Type.TO, "alessiostalla@gmail.com"));
+        myEmail.setSubject("subj");
+        String htmlBody = "<body>body<img src=\"cid:attach2\" /></body>";
+        myEmail.setHtmlBody(htmlBody);
+
+        Attachment attachment = new Attachment();
+        attachment.setName("attachName1");
+        attachment.setDescription("attachDescr1");
+        attachment.setInputStream(new ByteArrayInputStream("attachContent1".getBytes()));
+        myEmail.getAttachments().add(attachment);
+
+        attachment = new Attachment();
+        attachment.setName("feather.gif");
+        attachment.setDescription("attachDescr2");
+        attachment.setInputStream(getClass().getResourceAsStream("feather.gif"));
+        attachment.setEmbedded(true);
+        attachment.setContentId("attach2");
+        myEmail.getAttachments().add(attachment);
+        queue.enqueue(myEmail);
+        try {
+            Thread.sleep(sender.getPollInterval() * 2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertTrue(queue.getEnqueuedEmailIds().isEmpty());
+
+        assertEquals(1, server.getReceivedEmailSize());
+        it = server.getReceivedEmail();
+        while (it.hasNext()) {
+            SmtpMessage msg = (SmtpMessage) it.next();
+            assertTrue(msg.getBody().contains(htmlBody));
+
+            assertTrue(msg.getBody().contains(
+                    "Content-Type: application/octet-stream; name=attachName1" +
+                    "Content-Transfer-Encoding: 7bit" +
+                    "Content-Disposition: attachment; filename=attachName1" +
+                    "Content-Description: attachDescr1\n" +
+                    "attachContent1"));
+
+            String encodedAttachment =
+                    new String(
+                            Base64.encodeBase64(
+                                    IOUtils.toByteArray(getClass().getResourceAsStream("feather.gif"))));
+            assertTrue(msg.getBody().contains(
+                    "Content-Type: application/octet-stream; name=feather.gif" +
+                            "Content-Transfer-Encoding: base64" +
+                            "Content-Disposition: inline; filename=feather.gif" +
+                            "Content-ID: <attach2>\n" +
+                            encodedAttachment));
+            it.remove();
+        }
+
+
     }
 
     public void testServerDown() throws QueueException {
