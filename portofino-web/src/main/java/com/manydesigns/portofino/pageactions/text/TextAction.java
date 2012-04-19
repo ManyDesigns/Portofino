@@ -56,7 +56,7 @@ import java.util.regex.Pattern;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @RequiresPermissions(level = AccessLevel.VIEW)
-@ScriptTemplate("script_template.txt")
+@ScriptTemplate("script_template.groovy")
 @ConfigurationClass(TextConfiguration.class)
 @PageActionName("Text")
 public class TextAction extends AbstractPageAction {

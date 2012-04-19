@@ -65,7 +65,7 @@ import java.util.Properties;
 */
 @UrlBinding("/actions/chart")
 @RequiresPermissions(level = AccessLevel.VIEW)
-@ScriptTemplate("script_template.txt")
+@ScriptTemplate("script_template.groovy")
 @ConfigurationClass(ChartConfiguration.class)
 @PageActionName("Chart")
 public class ChartAction extends AbstractPageAction {

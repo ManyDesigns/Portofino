@@ -15,7 +15,7 @@ import org.joda.time.*
 import java.awt.Color
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class %{#generatedClassName} extends CalendarAction {
+class MyCalendar extends CalendarAction {
 
     //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino
     //Example below. Adapt it to your needs.

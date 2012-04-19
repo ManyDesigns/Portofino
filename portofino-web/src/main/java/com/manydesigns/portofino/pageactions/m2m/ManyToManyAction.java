@@ -73,7 +73,7 @@ import java.util.*;
  */
 @UrlBinding("/actions/m2m")
 @RequiresPermissions(level = AccessLevel.VIEW)
-@ScriptTemplate("script_template.txt")
+@ScriptTemplate("script_template.groovy")
 @ConfigurationClass(ManyToManyConfiguration.class)
 @PageActionName("Many-to-Many")
 public class ManyToManyAction extends AbstractPageAction {

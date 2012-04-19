@@ -41,6 +41,7 @@ import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
+import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.changepassword.configuration.ChangePasswordConfiguration;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
@@ -63,6 +64,7 @@ import java.util.Arrays;
 @RequiresPermissions(level = AccessLevel.VIEW)
 @PageActionName("Change Password")
 @ConfigurationClass(ChangePasswordConfiguration.class)
+@ScriptTemplate("script_template.groovy")
 public class ChangePasswordAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
@@ -196,7 +198,6 @@ public class ChangePasswordAction extends AbstractPageAction {
     protected String encrypt(String oldPassword) {
         return oldPassword;
     }
-
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
     @RequiresPermissions(level = AccessLevel.DEVELOP)

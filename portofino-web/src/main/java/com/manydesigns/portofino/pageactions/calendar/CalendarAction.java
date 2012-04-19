@@ -54,7 +54,7 @@ import java.util.List;
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ConfigurationClass(CalendarConfiguration.class)
 @PageActionName("Calendar")
-@ScriptTemplate("script_template.txt")
+@ScriptTemplate("script_template.groovy")
 public class CalendarAction extends CustomAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";

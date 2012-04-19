@@ -10,10 +10,10 @@ import net.sourceforge.stripes.action.*
 import org.hibernate.*
 import org.hibernate.criterion.*
 
-import com.manydesigns.portofino.pageactions.m2m.*
+import com.manydesigns.portofino.pageactions.text.*
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class %{#generatedClassName} extends ManyToManyAction {
+class MyTextAction extends TextAction {
 
     //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino
     //Write your code here

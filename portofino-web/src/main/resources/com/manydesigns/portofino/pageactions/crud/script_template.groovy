@@ -14,7 +14,7 @@ import com.manydesigns.portofino.pageactions.crud.*
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
-class %{#generatedClassName} extends CrudAction {
+class MyCrudAction extends CrudAction {
 
     //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino
     //Write your code here

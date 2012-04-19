@@ -121,7 +121,7 @@ import java.util.regex.Pattern;
 */
 @SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
 @RequiresPermissions(level = AccessLevel.VIEW)
-@ScriptTemplate("script_template.txt")
+@ScriptTemplate("script_template.groovy")
 @ConfigurationClass(CrudConfiguration.class)
 @SupportsDetail
 @PageActionName("Crud")

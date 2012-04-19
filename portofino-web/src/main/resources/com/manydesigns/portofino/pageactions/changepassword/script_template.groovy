@@ -10,12 +10,18 @@ import net.sourceforge.stripes.action.*
 import org.hibernate.*
 import org.hibernate.criterion.*
 
-import com.manydesigns.portofino.pageactions.chart.*
+import com.manydesigns.portofino.pageactions.changepassword.*
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class %{#generatedClassName} extends ChartAction {
+class MyChangePasswordAction extends ChangePasswordAction {
 
     //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino
     //Write your code here
+
+    @Override
+    protected String encrypt(String password) {
+        //By default, the password is not encrypted
+        return password;
+    }
 
 }
