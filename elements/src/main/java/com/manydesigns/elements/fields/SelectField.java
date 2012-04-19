@@ -63,6 +63,9 @@ public class SelectField extends AbstractField {
     protected String autocompleteId;
     protected String autocompleteInputName;
 
+    protected String createNewValueHref;
+    protected String createNewValueText;
+
     //**************************************************************************
     // Costruttori
     //**************************************************************************
@@ -236,12 +239,14 @@ public class SelectField extends AbstractField {
         switch (displayMode) {
             case DROPDOWN:
                 valueToXhtmlEditDropDown(xb);
+                addCreateNewLink(xb);
                 break;
             case RADIO:
                 valueToXhtmlEditRadio(xb);
                 break;
             case AUTOCOMPLETE:
                 valueToXhtmlEditAutocomplete(xb);
+                addCreateNewLink(xb);
                 break;
             default:
                 throw new IllegalStateException(
@@ -252,6 +257,41 @@ public class SelectField extends AbstractField {
         } else {
         }
         */
+    }
+
+    protected void addCreateNewLink(XhtmlBuffer xb) {
+        if (createNewValueHref != null) {
+            String onclick = createNewValueHref;
+            if(onclick.contains("?")) {
+                onclick += "&";
+            } else {
+                onclick += "?";
+            }
+            onclick += "popupCloseCallback=popupCloseCallback_" + id;
+            onclick = "window.open('" + StringEscapeUtils.escapeJavaScript(onclick) + "', '_blank', " +
+                      "'width=700, height=500, location=0'); return false;";
+            xb.write(" ");
+            xb.openElement("a");
+            xb.addAttribute("href", "#");
+            xb.addAttribute("onclick", onclick);
+            xb.write(createNewValueText);
+            xb.closeElement("a");
+            String js = composeCreateNewJs();
+            xb.writeJavaScript(js);
+        }
+    }
+
+    public String composeCreateNewJs() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(MessageFormat.format(
+                "function popupCloseCallback_{0}(val) '{'" +
+                        "if(val) updateSelectOptions(''{1}'', {2}, ''jsonSelectFieldOptions''",
+                StringEscapeUtils.escapeJavaScript(id),
+                StringEscapeUtils.escapeJavaScript(selectionModel.getName()),
+                selectionModelIndex));
+        appendIds(sb);
+        sb.append(");}");
+        return sb.toString();
     }
 
     public void valueToXhtmlEditDropDown(XhtmlBuffer xb) {
@@ -553,5 +593,21 @@ public class SelectField extends AbstractField {
 
     public void setDisplayMode(DisplayMode displayMode) {
         this.displayMode = displayMode;
+    }
+
+    public String getCreateNewValueHref() {
+        return createNewValueHref;
+    }
+
+    public void setCreateNewValueHref(String createNewValueHref) {
+        this.createNewValueHref = createNewValueHref;
+    }
+
+    public String getCreateNewValueText() {
+        return createNewValueText;
+    }
+
+    public void setCreateNewValueText(String createNewValueText) {
+        this.createNewValueText = createNewValueText;
     }
 }

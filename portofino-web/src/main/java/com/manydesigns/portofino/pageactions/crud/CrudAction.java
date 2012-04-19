@@ -163,6 +163,10 @@ public class CrudAction extends AbstractPageAction {
     protected String selectFieldMode;
     protected String labelSearch;
 
+    //Popup
+    protected boolean popup;
+    protected String popupCloseCallback;
+
     //--------------------------------------------------------------------------
     // UI forms
     //--------------------------------------------------------------------------
@@ -604,21 +608,26 @@ public class CrudAction extends AbstractPageAction {
                     SessionMessages.addErrorMessage(rootCauseMessage);
                     return getCreateView();
                 }
-                pk = pkHelper.generatePkStringArray(object);
-                String url = dispatch.getOriginalPath() + "/" + getPkForUrl(pk);
-                XhtmlBuffer buffer = new XhtmlBuffer();
-                buffer.write(getMessage("commons.save.successful") + ". ");
-                String createUrl = dispatch.getAbsoluteOriginalPath();
-                if(!createUrl.contains("?")) {
-                    createUrl += "?";
+                if(popup) {
+                    popupCloseCallback += "(true)";
+                    return new ForwardResolution("/layouts/crud/popup/close.jsp");
                 } else {
-                    createUrl += "&";
+                    pk = pkHelper.generatePkStringArray(object);
+                    String url = dispatch.getOriginalPath() + "/" + getPkForUrl(pk);
+                    XhtmlBuffer buffer = new XhtmlBuffer();
+                    buffer.write(getMessage("commons.save.successful") + ". ");
+                    String createUrl = dispatch.getAbsoluteOriginalPath();
+                    if(!createUrl.contains("?")) {
+                        createUrl += "?";
+                    } else {
+                        createUrl += "&";
+                    }
+                    createUrl += "create=";
+                    createUrl = appendSearchStringParamIfNecessary(createUrl);
+                    buffer.writeAnchor(createUrl, getMessage("commons.create.another"));
+                    SessionMessages.addInfoMessage(buffer);
+                    return new RedirectResolution(url);
                 }
-                createUrl += "create=";
-                createUrl = appendSearchStringParamIfNecessary(createUrl);
-                buffer.writeAnchor(createUrl, getMessage("commons.create.another"));
-                SessionMessages.addInfoMessage(buffer);
-                return new RedirectResolution(url);
             }
         }
 
@@ -854,7 +863,12 @@ public class CrudAction extends AbstractPageAction {
         @Button(list = "configuration", key = "commons.cancel", order = 99)
     })
     public Resolution cancel() {
-        return super.cancel();
+        if(popup) {
+            popupCloseCallback += "(false)";
+            return new ForwardResolution("/layouts/crud/popup/close.jsp");
+        } else {
+            return super.cancel();
+        }
     }
 
     //**************************************************************************
@@ -1846,7 +1860,11 @@ public class CrudAction extends AbstractPageAction {
     }
 
     protected Resolution getCreateView() {
-        return new ForwardResolution("/layouts/crud/create.jsp");
+        if(popup) {
+            return new ForwardResolution("/layouts/crud/popup/create.jsp");
+        } else {
+            return new ForwardResolution("/layouts/crud/create.jsp");
+        }
     }
 
     protected Resolution getEditView() {
@@ -2323,5 +2341,21 @@ public class CrudAction extends AbstractPageAction {
 
     public void setLabelSearch(String labelSearch) {
         this.labelSearch = labelSearch;
+    }
+
+    public boolean isPopup() {
+        return popup;
+    }
+
+    public void setPopup(boolean popup) {
+        this.popup = popup;
+    }
+
+    public String getPopupCloseCallback() {
+        return popupCloseCallback;
+    }
+
+    public void setPopupCloseCallback(String popupCloseCallback) {
+        this.popupCloseCallback = popupCloseCallback;
     }
 }
