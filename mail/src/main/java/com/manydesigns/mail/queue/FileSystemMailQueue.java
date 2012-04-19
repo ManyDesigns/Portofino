@@ -166,12 +166,23 @@ public class FileSystemMailQueue implements MailQueue {
         try {
             File emailFile = getEmailFile(id);
             if(emailFile.exists()) {
+                File attachmentsDir = getEmailAttachmentsDirectory(id);
                 if(keepSent) {
                     logger.info("Moving email with id {} to sent directory", id);
                     FileUtils.moveToDirectory(emailFile, sentDirectory, false);
+                    if(attachmentsDir.exists()) {
+                        FileUtils.moveToDirectory(attachmentsDir, sentDirectory, false);
+                    }
                 } else {
                     logger.info("Deleting sent email with id {}", id);
-                    if(!emailFile.delete()) {
+                    boolean success = emailFile.delete();
+                    if(attachmentsDir.exists()) {
+                        for(File attachmentFile : attachmentsDir.listFiles()) {
+                            success = attachmentFile.delete() && success;
+                        }
+                        success = attachmentsDir.delete() && success;
+                    }
+                    if(!success) {
                         throw new QueueException("Couldn't mark mail as sent");
                     }
                 }
@@ -188,13 +199,17 @@ public class FileSystemMailQueue implements MailQueue {
         try {
             File emailFile = getEmailFile(id);
             if(emailFile.exists()) {
+                File attachmentsDir = getEmailAttachmentsDirectory(id);
                 logger.info("Marking email with id {} as failed", id);
                 FileUtils.moveToDirectory(emailFile, failedDirectory, false);
+                if(attachmentsDir.exists()) {
+                    FileUtils.moveToDirectory(attachmentsDir, failedDirectory, false);
+                }
             } else {
-                logger.debug("Not marking email with id {} as sent", id);
+                logger.debug("Not marking email with id {} as failed", id);
             }
         } catch (IOException e) {
-            throw new QueueException("Couldn't mark mail as sent", e);
+            throw new QueueException("Couldn't mark mail as failed", e);
         }
     }
 
