@@ -127,7 +127,7 @@ public class SenderTest extends TestCase {
         }
     }
 
-    public void testHtml() throws QueueException, IOException {
+    public void testHtml() throws QueueException {
         //with html body only
         Email myEmail = new Email();
         myEmail.setFrom("granatella@gmail.com");
@@ -173,9 +173,11 @@ public class SenderTest extends TestCase {
             assertTrue(msg.getBody().contains("textBody"));
             it.remove();
         }
+    }
 
-        //with html body and attachments
-        myEmail = new Email();
+    public void testAttachments() throws QueueException, IOException {
+        //with text body and attachments
+        Email myEmail = new Email();
         myEmail.setFrom("alessiostalla@gmail.com");
         myEmail.getRecipients().add(new Recipient(Recipient.Type.TO, "alessiostalla@gmail.com"));
         myEmail.setSubject("subj");
@@ -204,7 +206,7 @@ public class SenderTest extends TestCase {
         assertTrue(queue.getEnqueuedEmailIds().isEmpty());
 
         assertEquals(1, server.getReceivedEmailSize());
-        it = server.getReceivedEmail();
+        Iterator it = server.getReceivedEmail();
         while (it.hasNext()) {
             SmtpMessage msg = (SmtpMessage) it.next();
             assertTrue(msg.getBody().contains(htmlBody));
@@ -222,14 +224,67 @@ public class SenderTest extends TestCase {
                                     IOUtils.toByteArray(getClass().getResourceAsStream("feather.gif"))));
             assertTrue(msg.getBody().contains(
                     "Content-Type: application/octet-stream; name=feather.gif" +
-                            "Content-Transfer-Encoding: base64" +
-                            "Content-Disposition: inline; filename=feather.gif" +
-                            "Content-ID: <attach2>\n" +
-                            encodedAttachment));
+                    "Content-Transfer-Encoding: base64" +
+                    "Content-Disposition: inline; filename=feather.gif" +
+                    "Content-ID: <attach2>\n" +
+                    encodedAttachment));
             it.remove();
         }
 
+        //with html body and attachments
+        myEmail = new Email();
+        myEmail.setFrom("alessiostalla@gmail.com");
+        myEmail.getRecipients().add(new Recipient(Recipient.Type.TO, "alessiostalla@gmail.com"));
+        myEmail.setSubject("subj");
+        String body = "body";
+        myEmail.setTextBody(body);
 
+        attachment = new Attachment();
+        attachment.setName("attachName1");
+        attachment.setDescription("attachDescr1");
+        attachment.setInputStream(new ByteArrayInputStream("attachContent1".getBytes()));
+        myEmail.getAttachments().add(attachment);
+
+        attachment = new Attachment();
+        attachment.setName("feather.gif");
+        attachment.setDescription("attachDescr2");
+        attachment.setInputStream(getClass().getResourceAsStream("feather.gif"));
+        attachment.setEmbedded(true);
+        attachment.setContentId("attach2");
+        myEmail.getAttachments().add(attachment);
+        queue.enqueue(myEmail);
+        try {
+            Thread.sleep(sender.getPollInterval() * 2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertTrue(queue.getEnqueuedEmailIds().isEmpty());
+
+        assertEquals(1, server.getReceivedEmailSize());
+        it = server.getReceivedEmail();
+        while (it.hasNext()) {
+            SmtpMessage msg = (SmtpMessage) it.next();
+            assertTrue(msg.getBody().contains(body));
+
+            assertTrue(msg.getBody().contains(
+                    "Content-Type: application/octet-stream; name=attachName1" +
+                    "Content-Transfer-Encoding: 7bit" +
+                    "Content-Disposition: attachment; filename=attachName1" +
+                    "Content-Description: attachDescr1\n" +
+                    "attachContent1"));
+
+            String encodedAttachment =
+                    new String(
+                            Base64.encodeBase64(
+                                    IOUtils.toByteArray(getClass().getResourceAsStream("feather.gif"))));
+            assertTrue(msg.getBody().contains(
+                    "Content-Type: application/octet-stream; name=feather.gif" +
+                    "Content-Transfer-Encoding: base64" +
+                    "Content-Disposition: attachment; filename=feather.gif" +
+                    "Content-Description: attachDescr2\n" +
+                    encodedAttachment));
+            it.remove();
+        }
     }
 
     public void testServerDown() throws QueueException {
