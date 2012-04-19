@@ -85,6 +85,7 @@ import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlContext;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -1622,12 +1623,13 @@ public class CrudAction extends AbstractPageAction {
         FopFactory fopFactory = FopFactory.newInstance();
 
         FileOutputStream out = null;
+        InputStream xsltStream = null;
         try {
             out = new FileOutputStream(tempPdfFile);
 
             Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
 
-            InputStream xsltStream = getSearchPdfXsltStream();
+            xsltStream = getSearchPdfXsltStream();
 
             // Setup XSLT
             TransformerFactory Factory = TransformerFactory.newInstance();
@@ -1653,6 +1655,7 @@ public class CrudAction extends AbstractPageAction {
             logger.warn("IOException", e);
             SessionMessages.addErrorMessage(e.getMessage());
         } finally {
+            IOUtils.closeQuietly(xsltStream);
             try {
                 if (out != null)
                     out.close();
@@ -1664,10 +1667,21 @@ public class CrudAction extends AbstractPageAction {
         }
     }
 
-    protected InputStream getSearchPdfXsltStream() {
-        ClassLoader cl = getClass().getClassLoader();
-        return cl.getResourceAsStream(
-                TEMPLATE_FOP_SEARCH);
+    protected InputStream getSearchPdfXsltStream() throws FileNotFoundException {
+        String templateFop = TEMPLATE_FOP_SEARCH;
+        return getXsltStream(templateFop);
+    }
+
+    private InputStream getXsltStream(String templateFop) throws FileNotFoundException {
+        File fopFile = new File(pageInstance.getDirectory(), templateFop);
+        if(fopFile.exists()) {
+            logger.debug("Custom FOP template found: {}", fopFile);
+            return new FileInputStream(fopFile);
+        } else {
+            logger.debug("Using default FOP template: {}", templateFop);
+            ClassLoader cl = getClass().getClassLoader();
+            return cl.getResourceAsStream(templateFop);
+        }
     }
 
     public XmlBuffer composeXmlSearch() {
@@ -1762,14 +1776,13 @@ public class CrudAction extends AbstractPageAction {
         FopFactory fopFactory = FopFactory.newInstance();
 
         FileOutputStream out = null;
+        InputStream xsltStream = null;
         try {
             out = new FileOutputStream(tempPdfFile);
 
             Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
 
-            ClassLoader cl = getClass().getClassLoader();
-            InputStream xsltStream = cl.getResourceAsStream(
-                    TEMPLATE_FOP_READ);
+            xsltStream = getXsltStream(TEMPLATE_FOP_READ);
 
             // Setup XSLT
             TransformerFactory Factory = TransformerFactory.newInstance();
@@ -1795,6 +1808,7 @@ public class CrudAction extends AbstractPageAction {
             logger.warn("IOException", e);
             SessionMessages.addErrorMessage(e.getMessage());
         } finally {
+            IOUtils.closeQuietly(xsltStream);
             try {
                 if (out != null)
                     out.close();
