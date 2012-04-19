@@ -198,15 +198,19 @@ public class FileSystemMailQueueTest extends TestCase {
         attachment.setInputStream(new ByteArrayInputStream("foo".getBytes()));
         email.getAttachments().add(attachment);
         String id = mq.enqueue(email);
+        assertTrue(new File(attachment.getFilePath()).exists());
 
         mq.markSent(id);
         assertEquals(null, mq.loadEmail(id));
+        assertFalse(new File(attachment.getFilePath()).exists());
+
 
         email = new Email();
         attachment = new Attachment();
         attachment.setInputStream(new ByteArrayInputStream("foo".getBytes()));
         email.getAttachments().add(attachment);
         id = mq.enqueue(email);
+        assertTrue(new File(attachment.getFilePath()).exists());
 
         if(ElementsFileUtils.setWritable(fsmq.getSentDirectory(), false)) {
             try {
@@ -220,9 +224,11 @@ public class FileSystemMailQueueTest extends TestCase {
         if(ElementsFileUtils.setWritable(fsmq.getSentDirectory(), true)) {
             mq.markSent(id);
             assertEquals(null, mq.loadEmail(id));
+            assertFalse(new File(attachment.getFilePath()).exists());
         } else {
             fail("Couldn't make sent directory writable");
         }
+
 
         FileUtils.deleteDirectory(fsmq.getSentDirectory());
         email = new Email();
@@ -230,8 +236,10 @@ public class FileSystemMailQueueTest extends TestCase {
         attachment.setInputStream(new ByteArrayInputStream("foo".getBytes()));
         email.getAttachments().add(attachment);
         id = mq.enqueue(email);
+        assertTrue(new File(attachment.getFilePath()).exists());
         mq.markSent(id);
         assertEquals(null, mq.loadEmail(id));
+        assertFalse(new File(attachment.getFilePath()).exists());
         mq.markSent(id);
     }
 
@@ -248,13 +256,22 @@ public class FileSystemMailQueueTest extends TestCase {
         assertEquals(null, mq.loadEmail("aaa"));
 
         Email email = new Email();
+        Attachment attachment = new Attachment();
+        attachment.setInputStream(new ByteArrayInputStream("foo".getBytes()));
+        email.getAttachments().add(attachment);
         String id = mq.enqueue(email);
+        assertTrue(new File(attachment.getFilePath()).exists());
 
         mq.markFailed(id);
         assertEquals(null, mq.loadEmail(id));
+        assertFalse(new File(attachment.getFilePath()).exists());
 
         email = new Email();
+        attachment = new Attachment();
+        attachment.setInputStream(new ByteArrayInputStream("foo".getBytes()));
+        email.getAttachments().add(attachment);
         id = mq.enqueue(email);
+        assertTrue(new File(attachment.getFilePath()).exists());
 
         if(ElementsFileUtils.setWritable(fsmq.getFailedDirectory(), false)) {
             try {
@@ -268,15 +285,21 @@ public class FileSystemMailQueueTest extends TestCase {
         if(ElementsFileUtils.setWritable(fsmq.getFailedDirectory(), true)) {
             mq.markFailed(id);
             assertEquals(null, mq.loadEmail(id));
+            assertFalse(new File(attachment.getFilePath()).exists());
         } else {
             fail("Couldn't make failed directory writable");
         }
 
         FileUtils.deleteDirectory(fsmq.getFailedDirectory());
         email = new Email();
+        attachment = new Attachment();
+        attachment.setInputStream(new ByteArrayInputStream("foo".getBytes()));
+        email.getAttachments().add(attachment);
         id = mq.enqueue(email);
+        assertTrue(new File(attachment.getFilePath()).exists());
         mq.markFailed(id);
         assertEquals(null, mq.loadEmail(id));
+        assertFalse(new File(attachment.getFilePath()).exists());
         mq.markFailed(id);
     }
 
