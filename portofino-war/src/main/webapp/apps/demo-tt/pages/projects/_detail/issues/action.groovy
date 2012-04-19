@@ -8,15 +8,6 @@ import com.manydesigns.elements.fields.SelectField
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
 class issues extends CrudAction {
-    @Override
-    protected void setupForm(Mode mode) {
-        super.setupForm(mode)
-        SelectField sf = (SelectField) form.findFieldByPropertyName("tracker_id");
-        sf.setCreateNewValueHref("/portofino4/trackers?create=&popup=true")
-        sf.setCreateNewValueText("create new")
-    }
-
-
 
     void createSetup(object) {
         object.project_id = ognlContext.project.id;
