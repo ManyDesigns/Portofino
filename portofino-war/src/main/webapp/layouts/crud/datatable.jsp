@@ -129,8 +129,6 @@
             $('#<c:out value="portlet_${pageId}" /> input[name=sortProperty]').val(sort);
             $('#<c:out value="portlet_${pageId}" /> input[name=sortDirection]').val(dir);
 
-            console.log($('#<c:out value="portlet_${pageId}" /> input[name=sortDirection]'));
-
             return url;
         };
 
