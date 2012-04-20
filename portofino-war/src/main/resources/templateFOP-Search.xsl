@@ -16,6 +16,8 @@
                     </fo:block>
                     <fo:block font-size="10pt">
                         <fo:table table-layout="fixed" width="100%" border-collapse="separate">
+                            <xsl:apply-templates select="column"/>
+
                             <fo:table-header>
                                 <xsl:apply-templates select="header"/>
                             </fo:table-header>
@@ -62,6 +64,13 @@
                 <xsl:value-of select="value"/>
             </fo:block>
         </fo:table-cell>
+    </xsl:template>
+
+    <xsl:template match="column">
+        <xsl:variable name="columnWidth">
+            <xsl:value-of select="width"/>
+        </xsl:variable>
+        <fo:table-column column-width="{$columnWidth}"/>
     </xsl:template>
 
 

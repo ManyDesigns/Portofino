@@ -1692,6 +1692,62 @@ public class CrudAction extends AbstractPageAction {
         xb.write(crudConfiguration.getSearchTitle());
         xb.closeElement("table");
 
+        double[] headerSizes = new double[tableForm.getColumns().length];
+        for(int i = 0; i < headerSizes.length; i++) {
+            TableForm.Column col = tableForm.getColumns()[i];
+            int length = StringUtils.length(col.getLabel());
+            headerSizes[i] = length;
+        }
+
+        double[] columnSizes = new double[tableForm.getColumns().length];
+        for (TableForm.Row row : tableForm.getRows()) {
+            int i = 0;
+            for (Field field : row) {
+                int size = StringUtils.length(field.getStringValue());
+                double relativeSize = ((double) size) / tableForm.getRows().length;
+                columnSizes[i++] += relativeSize;
+            }
+        }
+
+        double totalSize = 0;
+        for (int i = 0; i < columnSizes.length; i++) {
+            double effectiveSize = Math.max(columnSizes[i], headerSizes[i]);
+            columnSizes[i] = effectiveSize;
+            totalSize += effectiveSize;
+        }
+        while(totalSize > 75) {
+            int maxIndex = 0;
+            double max = 0;
+            for(int i = 0; i < columnSizes.length; i++) {
+                if(columnSizes[i] > max) {
+                    max = columnSizes[i];
+                    maxIndex = i;
+                }
+            }
+            columnSizes[maxIndex] -= 1;
+            totalSize -= 1;
+        }
+        while(totalSize < 70) {
+            int minIndex = 0;
+            double min = Double.MAX_VALUE;
+            for(int i = 0; i < columnSizes.length; i++) {
+                if(columnSizes[i] < min) {
+                    min = columnSizes[i];
+                    minIndex = i;
+                }
+            }
+            columnSizes[minIndex] += 1;
+            totalSize += 1;
+        }
+
+        for (int i = 0; i < columnSizes.length; i++) {
+            xb.openElement("column");
+            xb.openElement("width");
+            xb.write(columnSizes[i] + "em");
+            xb.closeElement("width");
+            xb.closeElement("column");
+        }
+
         for (TableForm.Column col : tableForm.getColumns()) {
             xb.openElement("header");
             xb.openElement("nameColumn");
