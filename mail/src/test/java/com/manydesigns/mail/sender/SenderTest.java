@@ -51,6 +51,7 @@ public class SenderTest extends TestCase {
     private static final int SMTP_PORT = 2026;
     private SimpleSmtpServer server;
     MailSender sender;
+    MailSenderRunnable runnable;
     MailQueue queue;
     FileSystemMailQueue fsQueue;
     protected Thread senderThread;
@@ -66,14 +67,15 @@ public class SenderTest extends TestCase {
         queue = new LockingMailQueue(fsQueue);
         sender = new DefaultMailSender(queue);
         sender.setPort(SMTP_PORT);
-        senderThread = new Thread(sender);
+        runnable = new MailSenderRunnable(sender);
+        senderThread = new Thread(runnable);
         senderThread.start();
     }
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        sender.stop();
+        runnable.stop();
         server.stop();
         senderThread.join();
     }
@@ -86,7 +88,7 @@ public class SenderTest extends TestCase {
         myEmail.setTextBody("body");
         queue.enqueue(myEmail);
         try {
-            Thread.sleep(sender.getPollInterval() * 2);
+            Thread.sleep(runnable.getPollInterval() * 2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -113,7 +115,7 @@ public class SenderTest extends TestCase {
         myEmail.setTextBody("body");
         queue.enqueue(myEmail);
         try {
-            Thread.sleep(sender.getPollInterval() * 2);
+            Thread.sleep(runnable.getPollInterval() * 2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -136,7 +138,7 @@ public class SenderTest extends TestCase {
         myEmail.setHtmlBody("<body>body1</body>");
         queue.enqueue(myEmail);
         try {
-            Thread.sleep(sender.getPollInterval() * 2);
+            Thread.sleep(runnable.getPollInterval() * 2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -159,7 +161,7 @@ public class SenderTest extends TestCase {
         myEmail.setHtmlBody("<body>body2</body>");
         queue.enqueue(myEmail);
         try {
-            Thread.sleep(sender.getPollInterval() * 2);
+            Thread.sleep(runnable.getPollInterval() * 2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -199,7 +201,7 @@ public class SenderTest extends TestCase {
         myEmail.getAttachments().add(attachment);
         queue.enqueue(myEmail);
         try {
-            Thread.sleep(sender.getPollInterval() * 2);
+            Thread.sleep(runnable.getPollInterval() * 2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -254,7 +256,7 @@ public class SenderTest extends TestCase {
         myEmail.getAttachments().add(attachment);
         queue.enqueue(myEmail);
         try {
-            Thread.sleep(sender.getPollInterval() * 2);
+            Thread.sleep(runnable.getPollInterval() * 2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -296,7 +298,7 @@ public class SenderTest extends TestCase {
         myEmail.setTextBody("body");
         queue.enqueue(myEmail);
         try {
-            Thread.sleep(sender.getPollInterval() * 2);
+            Thread.sleep(runnable.getPollInterval() * 2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -306,7 +308,7 @@ public class SenderTest extends TestCase {
 
         sender.setPort(SMTP_PORT);
         try {
-            Thread.sleep(sender.getPollInterval() * 3);
+            Thread.sleep(runnable.getPollInterval() * 3);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -326,7 +328,7 @@ public class SenderTest extends TestCase {
         myEmail.setTextBody("body");
         queue.enqueue(myEmail);
         try {
-            Thread.sleep(sender.getPollInterval() * 2);
+            Thread.sleep(runnable.getPollInterval() * 2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -335,7 +337,7 @@ public class SenderTest extends TestCase {
         sender.setLogin("fake");
         sender.setPassword("login");
         try {
-            Thread.sleep(sender.getPollInterval() * 2);
+            Thread.sleep(runnable.getPollInterval() * 2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -350,7 +352,7 @@ public class SenderTest extends TestCase {
         myEmail.setTextBody("body");
         queue.enqueue(myEmail);
         try {
-            Thread.sleep(sender.getPollInterval() * 2);
+            Thread.sleep(runnable.getPollInterval() * 2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -365,7 +367,7 @@ public class SenderTest extends TestCase {
         fw.close();
         assertFalse(queue.getEnqueuedEmailIds().isEmpty());
         try {
-            Thread.sleep(sender.getPollInterval() * 2);
+            Thread.sleep(runnable.getPollInterval() * 2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -385,7 +387,7 @@ public class SenderTest extends TestCase {
 
         queue.enqueue(myEmail);
         try {
-            Thread.sleep(sender.getPollInterval() * 2);
+            Thread.sleep(runnable.getPollInterval() * 2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -393,7 +395,7 @@ public class SenderTest extends TestCase {
         assertEquals(1, server.getReceivedEmailSize());
 
         try {
-            Thread.sleep(sender.getPollInterval() * 2);
+            Thread.sleep(runnable.getPollInterval() * 2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -405,7 +407,7 @@ public class SenderTest extends TestCase {
         }
 
         try {
-            Thread.sleep(sender.getPollInterval() * 2);
+            Thread.sleep(runnable.getPollInterval() * 2);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -418,7 +420,7 @@ public class SenderTest extends TestCase {
     public void testBrutalTermination() throws InterruptedException {
         senderThread.interrupt();
         senderThread.join();
-        assertFalse(sender.isAlive());
+        assertFalse(runnable.isAlive());
     }
 
 }

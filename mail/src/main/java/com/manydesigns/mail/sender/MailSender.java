@@ -22,23 +22,19 @@
 
 package com.manydesigns.mail.sender;
 
+import java.util.Set;
+
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface MailSender extends Runnable {
+public interface MailSender {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    void run();
-
-    void stop();
-
-    int getPollInterval();
-
-    void setPollInterval(int pollInterval);
+    int runOnce(Set<String> idsToMarkAsSent);
 
     String getServer();
 
@@ -60,5 +56,4 @@ public interface MailSender extends Runnable {
 
     void setPassword(String password);
 
-    boolean isAlive();
 }

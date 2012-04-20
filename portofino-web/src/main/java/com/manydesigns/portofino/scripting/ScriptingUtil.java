@@ -141,8 +141,9 @@ public class ScriptingUtil {
         cc.setClasspath(classpath);
         cc.setRecompileGroovySource(true);
         GroovyClassLoader gcl = new GroovyClassLoader(ScriptingUtil.class.getClassLoader(), cc);
-        GROOVY_CLASS_LOADER = new GroovyClassLoader(gcl);
-        GROOVY_CLASS_LOADER.setShouldRecompile(true);
+        GroovyClassLoader defaultClassLoader = new GroovyClassLoader(gcl);
+        defaultClassLoader.setShouldRecompile(true);
+        GROOVY_CLASS_LOADER = defaultClassLoader;
     }
 
     public static void removeBaseClassLoader(Application application) {

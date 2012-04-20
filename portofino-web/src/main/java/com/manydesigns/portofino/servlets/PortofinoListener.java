@@ -32,6 +32,7 @@ import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
+import com.manydesigns.portofino.quartz.MailSenderJob;
 import com.manydesigns.portofino.shiro.UsersGroupsDAO;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -45,6 +46,8 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.WebEnvironment;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -56,8 +59,8 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.io.File;
-import java.util.List;
 import java.nio.charset.Charset;
+import java.util.List;
 
 
 /*
@@ -97,7 +100,6 @@ public class PortofinoListener
     protected ApplicationStarter applicationStarter;
 
     protected MailSender mailSender;
-    protected Thread mailSenderThread;
 
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
 
@@ -201,17 +203,6 @@ public class PortofinoListener
         MDC.clear();
         logger.info("ManyDesigns Portofino stopping...");
         applicationStarter.destroy();
-        if (mailSender != null) {
-            logger.info("Terminating the mail sender...");
-            mailSender.stop();
-            try {
-                mailSenderThread.join();
-            } catch (InterruptedException e) {
-                logger.debug("Mail sender thread interrupted, not waiting", e);
-            }
-            logger.info("Mail sender terminated");
-        }
-
         logger.info("Destroying Shiro environment");
         environmentLoader.destroyEnvironment(servletContext);
         logger.info("ManyDesigns Portofino stopped.");
@@ -256,12 +247,32 @@ public class PortofinoListener
                 mailSender.setPassword(password);
                 mailSender.setPort(port);
                 mailSender.setSsl(ssl);
-                mailSenderThread = new Thread(mailSender);
-                mailSenderThread.setDaemon(true);
-                mailSenderThread.start();
-                servletContext.setAttribute(
-                    ApplicationAttributes.MAIL_QUEUE, mailQueue);
-                logger.info("Mail sender started");
+
+                try {
+                    Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+                    JobDetail job = JobBuilder
+                            .newJob(MailSenderJob.class)
+                            .withIdentity("mail.sender", "portofino")
+                            .build();
+
+                    int pollInterval = portofinoConfiguration.getInt(PortofinoProperties.MAIL_SENDER_POLL_INTERVAL);
+
+                    Trigger trigger = TriggerBuilder.newTrigger()
+                      .withIdentity("mail.sender.trigger", "portofino")
+                      .startNow()
+                      .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                              .withIntervalInMilliseconds(pollInterval)
+                              .repeatForever())
+                      .build();
+
+                    scheduler.getContext().put(MailSenderJob.MAIL_SENDER_KEY, mailSender);
+                    scheduler.scheduleJob(job, trigger);
+                    servletContext.setAttribute(
+                        ApplicationAttributes.MAIL_QUEUE, mailQueue);
+                    logger.info("Mail sender started");
+                } catch (SchedulerException e) {
+                    logger.error("Couldn't start email task", e);
+                }
             }
         }
     }

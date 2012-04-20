@@ -37,8 +37,8 @@ import javax.mail.MessagingException;
 import javax.mail.MethodNotSupportedException;
 import javax.mail.internet.ParseException;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -51,8 +51,6 @@ public class DefaultMailSender implements MailSender {
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
     protected final MailQueue queue;
-    protected boolean alive;
-    protected int pollInterval = 1000;
 
     protected String server = "localhost";
     protected int port = 25;
@@ -60,96 +58,68 @@ public class DefaultMailSender implements MailSender {
     protected String login;
     protected String password;
 
-    protected static final Logger logger = LoggerFactory.getLogger(DefaultMailSender.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultMailSender.class);
 
     public DefaultMailSender(MailQueue queue) {
         this.queue = queue;
     }
 
-    public void run() {
-        alive = true;
+    public int runOnce(Set<String> idsToMarkAsSent) {
+        List<String> ids;
         try {
-            mainLoop();
-        } catch (InterruptedException e) {
-            stop();
+            ids = queue.getEnqueuedEmailIds();
+        } catch (Throwable e) {
+            logger.error("Couldn't read email queue", e);
+            return -1;
         }
-    }
-
-    protected void mainLoop() throws InterruptedException {
-        List<String> idsToMarkAsSent = new ArrayList<String>();
-        int pollIntervalMultiplier = 1;
-        while (alive) {
-            long now = System.currentTimeMillis();
-            List<String> ids;
-            try {
-                ids = queue.getEnqueuedEmailIds();
-            } catch (Throwable e) {
-                logger.error("Couldn't read email queue", e);
+        int serverErrors = 0;
+        for(String id : ids) {
+            if(idsToMarkAsSent.contains(id)) {
+                logger.info("Mail with id {} already sent but mark failed, retrying", id);
+                try {
+                    queue.markSent(id);
+                    idsToMarkAsSent.remove(id);
+                } catch (Throwable e) {
+                    logger.error("Couldn't mark mail as sent", e);
+                }
                 continue;
             }
-            int serverErrors = 0;
-            for(String id : ids) {
-                if(idsToMarkAsSent.contains(id)) {
-                    logger.info("Mail with id {} already sent but mark failed, retrying", id);
-                    try {
-                        queue.markSent(id);
-                        idsToMarkAsSent.remove(id);
-                    } catch (Throwable e) {
-                        logger.error("Couldn't mark mail as sent", e);
-                    }
-                    continue;
-                }
-                Email email;
+            Email email;
+            try {
+                email = queue.loadEmail(id);
+            } catch (MailParseException e) {
+                logger.error("Mail with id " + id + " is corrupted, marking as failed", e);
+                markFailed(id, e);
+                continue;
+            } catch (Throwable e) {
+                logger.error("Unexpected error loading mail with id " + id + ", skipping", e);
+                continue;
+            }
+            if(email != null) {
                 try {
-                    email = queue.loadEmail(id);
-                } catch (MailParseException e) {
-                    logger.error("Mail with id " + id + " is corrupted, marking as failed", e);
-                    markFailed(id, e);
-                    continue;
-                } catch (Throwable e) {
-                    logger.error("Unexpected error loading mail with id " + id + ", skipping", e);
-                    continue;
-                }
-                if(email != null) {
-                    try {
-                        logger.info("Sending email with id {}", id);
-                        send(email);
-                        logger.info("Email with id {} sent, marking", id);
-                        queue.markSent(id);
-                    } catch (EmailException e) {
-                        Throwable cause = e.getCause();
-                        if(cause instanceof ParseException ||
-                           cause instanceof IllegalWriteException ||
-                           cause instanceof MethodNotSupportedException) {
-                            markFailed(id, cause);
-                        } else if(cause instanceof MessagingException) {
-                            logger.warn("Mail not sent due to known server error, NOT marking as failed", e);
-                            serverErrors++;
-                        } else {
-                            markFailed(id, e);
-                        }
-                    } catch (Throwable e) {
-                        logger.error("Couldn't mark mail as sent", e);
-                        idsToMarkAsSent.add(id);
+                    logger.info("Sending email with id {}", id);
+                    send(email);
+                    logger.info("Email with id {} sent, marking", id);
+                    queue.markSent(id);
+                } catch (EmailException e) {
+                    Throwable cause = e.getCause();
+                    if(cause instanceof ParseException ||
+                       cause instanceof IllegalWriteException ||
+                       cause instanceof MethodNotSupportedException) {
+                        markFailed(id, cause);
+                    } else if(cause instanceof MessagingException) {
+                        logger.warn("Mail not sent due to known server error, NOT marking as failed", e);
+                        serverErrors++;
+                    } else {
+                        markFailed(id, e);
                     }
+                } catch (Throwable e) {
+                    logger.error("Couldn't mark mail as sent", e);
+                    idsToMarkAsSent.add(id);
                 }
-            }
-            if(serverErrors > 0) {
-                if(pollIntervalMultiplier < 10) {
-                    pollIntervalMultiplier++;
-                    logger.debug("{} server errors, increased poll interval multiplier to {}",
-                            serverErrors, pollIntervalMultiplier);
-                }
-            } else {
-                pollIntervalMultiplier = 1;
-                logger.debug("No server errors, poll interval multiplier reset");
-            }
-            long sleep = pollInterval * pollIntervalMultiplier - (System.currentTimeMillis() - now);
-            if(sleep > 0) {
-                logger.debug("Sleeping for {}ms", sleep);
-                Thread.sleep(sleep);
             }
         }
+        return serverErrors;
     }
 
     protected void markFailed(String id, Throwable e) {
@@ -234,18 +204,6 @@ public class DefaultMailSender implements MailSender {
         logger.debug("Exiting send(Email)");
     }
 
-    public void stop() {
-        alive = false;
-    }
-
-    public int getPollInterval() {
-        return pollInterval;
-    }
-
-    public void setPollInterval(int pollInterval) {
-        this.pollInterval = pollInterval;
-    }
-
     public String getServer() {
         return server;
     }
@@ -286,7 +244,4 @@ public class DefaultMailSender implements MailSender {
         this.password = password;
     }
 
-    public boolean isAlive() {
-        return alive;
-    }
 }
