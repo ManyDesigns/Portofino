@@ -39,6 +39,7 @@ import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,10 +155,33 @@ public class TextAction extends AbstractPageAction {
         }
     }
 
+    protected String processContentBeforeSave(String content) {
+        content = processAttachmentUrls(content);
+        content = processLocalUrls(content);
+        return content;
+    }
+
+    protected String processAttachmentUrls(String content) {
+        String baseUrl = StringEscapeUtils.escapeHtml(generateViewAttachmentUrl("").replace("?", "\\?"));
+        String patternString = "src\\s*=\\s*\"\\s*" + baseUrl + "([^\"]+)\"";
+        Pattern pattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(content);
+        int lastEnd = 0;
+        StringBuilder sb = new StringBuilder();
+        while (matcher.find()) {
+            String attachmentId = matcher.group(1);
+            sb.append(content.substring(lastEnd, matcher.start()));
+            sb.append("portofino:attachment=\"").append(attachmentId).append("\"");
+            lastEnd = matcher.end();
+        }
+        sb.append(content.substring(lastEnd));
+        return sb.toString();
+    }
+
     protected static final String BASE_USER_URL_PATTERN =
             "(href|src)\\s*=\\s*\"\\s*((http(s)?://)?((HOSTS)(:\\d+)?)?)?((/[^/?\"]*)+)(\\?[^\"]*)?\\s*\"";
 
-    protected String processContentBeforeSave(String content) {
+    protected String processLocalUrls(String content) {
         List<String> hosts = new ArrayList<String>();
         hosts.add(context.getRequest().getLocalAddr());
         hosts.add(context.getRequest().getLocalName());
@@ -227,12 +251,38 @@ public class TextAction extends AbstractPageAction {
         return sb.toString();
     }*/
 
+    protected String processContentBeforeView(String content) {
+        content = restoreAttachmentUrls(content);
+        content = restoreLocalUrls(content);
+        return content;
+    }
+
+    protected static final String PORTOFINO_ATTACHMENT_PATTERN =
+            "portofino:attachment=\"([^\"]+)\"";
+
+    protected String restoreAttachmentUrls(String content) {
+        Pattern pattern = Pattern.compile(PORTOFINO_ATTACHMENT_PATTERN);
+        Matcher matcher = pattern.matcher(content);
+        int lastEnd = 0;
+        StringBuilder sb = new StringBuilder();
+        while (matcher.find()) {
+            String attachmentId = matcher.group(1);
+
+            sb.append(content.substring(lastEnd, matcher.start()));
+            sb.append("src=\"").append(generateViewAttachmentUrl(attachmentId)).append("\"");
+
+            lastEnd = matcher.end();
+        }
+        sb.append(content.substring(lastEnd));
+        return sb.toString();
+    }
+
     protected static final String PORTOFINO_HREF_PATTERN =
             "portofino:hrefAttribute=\"([^\"]+)\" " +
             "portofino:link=\"([^\"]+)\"" +
             "( portofino:queryString=\"([^\"]+)\")?";
 
-    protected String processContentBeforeView(String content) {
+    protected String restoreLocalUrls(String content) {
         Pattern pattern = Pattern.compile(PORTOFINO_HREF_PATTERN);
         Matcher matcher = pattern.matcher(content);
         int lastEnd = 0;
@@ -348,10 +398,14 @@ public class TextAction extends AbstractPageAction {
                 upload.getFileName(), upload.getContentType(),
                 upload.getSize());
         viewAttachmentUrl =
-                String.format("%s?viewAttachment=&id=%s",
-                        dispatch.getAbsoluteOriginalPath(),
-                        attachmentId);
+                generateViewAttachmentUrl(attachmentId);
         saveConfiguration(textConfiguration);
+    }
+
+    protected String generateViewAttachmentUrl(String attachmentId) {
+        return String.format("%s?viewAttachment=&id=%s",
+                dispatch.getAbsoluteOriginalPath(),
+                attachmentId);
     }
 
     @RequiresPermissions(level = AccessLevel.VIEW)
