@@ -29,7 +29,6 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
-import groovy.lang.GroovyClassLoader;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -249,18 +248,16 @@ public class DispatcherLogic {
         }
     }
 
-    public static Class<? extends PageAction> setActionClass(File directory, String source) {
+    public static Class<? extends PageAction> setActionClass(File directory) throws IOException {
         File groovyScriptFile =
                 ScriptingUtil.getGroovyScriptFile(directory, "action");
-        GroovyClassLoader loader = new GroovyClassLoader();
-        Class<? extends PageAction> scriptClass =
-                loader.parseClass(source, groovyScriptFile.getAbsolutePath());
+        Class<?> scriptClass = ScriptingUtil.getGroovyClass(groovyScriptFile);
         if(!isValidActionClass(scriptClass)) {
             actionClassCache.remove(directory);
             return null;
         } else {
-            actionClassCache.put(directory, scriptClass);
-            return scriptClass;
+            actionClassCache.put(directory, (Class<? extends PageAction>) scriptClass);
+            return (Class<? extends PageAction>) scriptClass;
         }
     }
 

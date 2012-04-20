@@ -148,12 +148,12 @@ public class PortofinoListener
         }
 
         logger.info("Creating the application starter...");
-        applicationStarter = new ApplicationStarter(portofinoConfiguration);
+        applicationStarter = new WebApplicationStarter(portofinoConfiguration);
         servletContext.setAttribute(
                 ApplicationAttributes.APPLICATION_STARTER, applicationStarter);
 
         String encoding = portofinoConfiguration.getString(PortofinoProperties.URL_ENCODING);
-        logger.info("URL character encoding is set to " + encoding);
+        logger.info("URL character encoding is set to " + encoding + ". Make sure the web server uses the same encoding to parse URLs.");
         if(!Charset.isSupported(encoding)) {
             logger.error("The encoding is not supported by the JVM!");
         }

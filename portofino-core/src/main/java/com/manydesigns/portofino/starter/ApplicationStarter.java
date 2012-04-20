@@ -63,22 +63,22 @@ public class ApplicationStarter {
     // Fields
     //--------------------------------------------------------------------------
 
-    private final Configuration portofinoConfiguration;
+    protected final Configuration portofinoConfiguration;
 
-    private Status status;
+    protected Status status;
 
-    private DatabasePlatformsManager databasePlatformsManager;
-    private Application tmpApplication;
-    private Application application;
-    private String appId;
+    protected DatabasePlatformsManager databasePlatformsManager;
+    protected Application tmpApplication;
+    protected Application application;
+    protected String appId;
 
-    private File appDir;
+    protected File appDir;
 
     //--------------------------------------------------------------------------
     // Logging
     //--------------------------------------------------------------------------
 
-    public final static Logger logger =
+    private final static Logger logger =
             LoggerFactory.getLogger(ApplicationStarter.class);
 
     //--------------------------------------------------------------------------

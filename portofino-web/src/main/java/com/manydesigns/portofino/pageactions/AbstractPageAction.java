@@ -489,7 +489,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         try {
             fw = new FileWriter(groovyScriptFile);
             fw.write(script);
-            Class<?> scriptClass = DispatcherLogic.setActionClass(directory, script);
+            fw.flush();
+            Class<?> scriptClass = DispatcherLogic.setActionClass(directory);
             if(scriptClass == null) {
                 SessionMessages.addErrorMessage(getMessage("script.class.invalid"));
             }

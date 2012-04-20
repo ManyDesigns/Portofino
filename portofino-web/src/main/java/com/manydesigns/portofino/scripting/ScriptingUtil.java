@@ -25,12 +25,16 @@ package com.manydesigns.portofino.scripting;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.RandomUtil;
+import com.manydesigns.portofino.application.Application;
 import groovy.lang.Binding;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
 import groovy.lang.GroovyShell;
 import ognl.OgnlContext;
 import org.apache.commons.io.IOUtils;
+import org.codehaus.groovy.control.CompilerConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileReader;
@@ -45,6 +49,9 @@ import java.io.IOException;
 public class ScriptingUtil {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(ScriptingUtil.class);
 
     public static final String GROOVY_FILE_NAME_PATTERN = "{0}.groovy";
 
@@ -73,13 +80,11 @@ public class ScriptingUtil {
     }
 
     public static GroovyObject getGroovyObject(File file) throws IOException {
-        ClassLoader parent = ScriptingUtil.class.getClassLoader();
-        GroovyClassLoader loader = new GroovyClassLoader(parent);
         if(!file.exists()) {
             return null;
         }
 
-        Class groovyClass = loader.parseClass(file);
+        Class groovyClass = GROOVY_CLASS_LOADER.parseClass(file);
 
         try {
             return (GroovyObject) groovyClass.newInstance();
@@ -89,10 +94,7 @@ public class ScriptingUtil {
     }
 
     public static GroovyObject getGroovyObject(String text, String fileName) {
-        ClassLoader parent = ScriptingUtil.class.getClassLoader();
-        GroovyClassLoader loader = new GroovyClassLoader(parent);
-
-        Class groovyClass = loader.parseClass(text, fileName);
+        Class groovyClass = GROOVY_CLASS_LOADER.parseClass(text, fileName);
 
         try {
             return (GroovyObject) groovyClass.newInstance();
@@ -105,19 +107,45 @@ public class ScriptingUtil {
         return RandomUtil.getCodeFile(storageDir, GROOVY_FILE_NAME_PATTERN, pageId);
     }
 
-    public static final GroovyClassLoader GROOVY_CLASS_LOADER =
-            new GroovyClassLoader(ScriptingUtil.class.getClassLoader());
+    public static GroovyClassLoader GROOVY_CLASS_LOADER =
+            makeFallbackClassLoader();
+
+    protected static GroovyClassLoader makeFallbackClassLoader() {
+        return new GroovyClassLoader(ScriptingUtil.class.getClassLoader());
+    }
 
     public static Class<?> getGroovyClass(File storageDirFile, String id) throws IOException {
         File scriptFile = getGroovyScriptFile(storageDirFile, id);
+        return getGroovyClass(scriptFile);
+    }
+
+    public static Class<?> getGroovyClass(File scriptFile) throws IOException {
         if(!scriptFile.exists()) {
             return null;
         }
         FileReader fr = new FileReader(scriptFile);
         String script = IOUtils.toString(fr);
         IOUtils.closeQuietly(fr);
+        return getGroovyClass(script, scriptFile);
+    }
+
+    public static Class<?> getGroovyClass(String script, File scriptFile) {
         String path = scriptFile.getAbsolutePath();
-        Class groovyClass = GROOVY_CLASS_LOADER.parseClass(script, path);
-        return groovyClass;
+        return GROOVY_CLASS_LOADER.parseClass(script, path);
+    }
+
+    public static void initBaseClassLoader(Application application) {
+        CompilerConfiguration cc = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
+        String classpath = new File(application.getAppScriptsDir(), "common").getAbsolutePath();
+        logger.info("Base classpath for application " + application.getAppId() + " is " + classpath);
+        cc.setClasspath(classpath);
+        cc.setRecompileGroovySource(true);
+        GroovyClassLoader gcl = new GroovyClassLoader(ScriptingUtil.class.getClassLoader(), cc);
+        GROOVY_CLASS_LOADER = new GroovyClassLoader(gcl);
+        GROOVY_CLASS_LOADER.setShouldRecompile(true);
+    }
+
+    public static void removeBaseClassLoader(Application application) {
+        GROOVY_CLASS_LOADER = makeFallbackClassLoader();
     }
 }
