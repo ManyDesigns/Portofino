@@ -43,6 +43,7 @@
                 nextNavigationItem = current;
             }
             xb.writeAnchor(current.getPath(), current.getPage().getTitle());
+            xb.closeElement("li");
         }
         %></ul><%
         if (nextNavigationItem != null) {

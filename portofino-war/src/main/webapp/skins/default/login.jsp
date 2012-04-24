@@ -35,7 +35,7 @@
                     <div class="portletWrapper noSpacing">
                         <div class="portlet">
                             <div class="portletHeader">
-                                <div class="yui-g">
+                                <div>
                                     <div class="portletTitle">
                                         <h1><fmt:message key="skins.default.login.login_to"/>: <c:out value="${applicationName}"/></h1>
                                     </div>

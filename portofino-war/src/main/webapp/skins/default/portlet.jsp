@@ -14,7 +14,7 @@
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
             <div class="portletHeader">
                 <stripes:layout-component name="portletHeader">
-                    <div class="yui-g">
+                    <div>
                         <div class="portletTitle">
                             <h1>
                             <stripes:layout-component name="portletTitle">
