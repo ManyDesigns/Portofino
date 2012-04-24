@@ -85,7 +85,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
     public static final String CONF_FORM_PREFIX = "config";
-    public static final String DEFAULT_LAYOUT = "/layouts/portlet/portlet-page-1-2-1-symmetric.jsp";
 
     //--------------------------------------------------------------------------
     // Properties
@@ -282,13 +281,18 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     protected String getLayoutJsp(Layout layout) {
         if(layout == null) {
-            return DEFAULT_LAYOUT;
+            return getDefaultLayoutJsp();
         }
         String layoutName = layout.getLayout();
         if(StringUtils.isBlank(layoutName)) {
-            return DEFAULT_LAYOUT;
+            return getDefaultLayoutJsp();
         }
         return layoutName;
+    }
+
+    protected String getDefaultLayoutJsp() {
+        return String.format("/skins/%s/portlet-layouts/default.jsp",
+                             context.getRequest().getAttribute(RequestAttributes.SKIN));
     }
 
     @Button(list = "configuration", key = "commons.cancel", order = 99)
@@ -389,14 +393,18 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
                         PortofinoProperties.WAR_REAL_PATH);
         File webappFile = new File(warRealPath);
 
-        File layoutsDir = new File(new File(warRealPath, "layouts"), "portlet");
-        File[] files = layoutsDir.listFiles();
+        File skinsDir = new File(warRealPath, "skins");
+        String skin = context.getRequest().getAttribute(RequestAttributes.SKIN) + "";
+        File layoutsDir = new File(new File(skinsDir, skin), "portlet-layouts");
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("jsp");
-        visitJspFiles(webappFile, files, selectionProvider);
+        if(layoutsDir.isDirectory()) {
+            File[] files = layoutsDir.listFiles();
+            visitJspFiles(webappFile, files, selectionProvider);
+        }
 
         layoutsDir = new File(application.getAppDir(), "layouts");
         if(layoutsDir.isDirectory()) {
-            files = layoutsDir.listFiles();
+            File[] files = layoutsDir.listFiles();
             visitJspFiles(webappFile, files, selectionProvider);
         }
         return selectionProvider;
@@ -408,10 +416,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             if(file.isFile() && file.getName().endsWith(".jsp")) {
                 String path = "/" + ElementsFileUtils.getRelativePath(root, file, "/");
                 String name = file.getName();
-                if(DEFAULT_LAYOUT.equals(path)) {
-                    name += " (default)";
-                }
-                selectionProvider.appendRow(path, name, true);
+                selectionProvider.appendRow(path, name.substring(0, name.length() - 4), true);
             } else if(file.isDirectory()) {
                 visitJspFiles(root, file.listFiles(), selectionProvider);
             }

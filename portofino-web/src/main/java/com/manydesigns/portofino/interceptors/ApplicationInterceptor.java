@@ -84,9 +84,9 @@ public class ApplicationInterceptor implements Interceptor {
         request.setAttribute(RequestAttributes.STOP_WATCH, stopWatch);
 
         logger.debug("Setting skin");
-        if(request.getAttribute("skin") == null) {
+        if(request.getAttribute(RequestAttributes.SKIN) == null) {
             String skin = application.getAppConfiguration().getString(AppProperties.SKIN);
-            request.setAttribute("skin", skin);
+            request.setAttribute(RequestAttributes.SKIN, skin);
         }
 
         logger.debug("Setting blobs directory");
