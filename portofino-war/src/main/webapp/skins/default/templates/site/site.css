@@ -1,0 +1,66 @@
+.yui-t4 #yui-main div#content, .yui-t2 #yui-main div#content {
+    margin-left: 0;
+    border: none;
+    background-color: white;
+    position: relative;
+}
+
+div.contentBody {
+    padding: 0;
+}
+
+.navigation {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    top: 0;
+    padding-top: 1em;
+    padding-left: 1em;
+    background-color: #F8F8FF;
+}
+
+.portlets {
+    padding: 1em;
+}
+
+.portletWrapper {
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.tab {
+    padding: 1em;
+    font-weight: bold;
+}
+
+.tab-row {
+    border-top: solid 1px #808080;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    margin-bottom: 0;
+    margin-left: 0;
+    background-color: #65A7DB;
+    overflow: hidden;
+}
+
+.tab-row.first {
+    border-top: none;
+}
+
+.tab-row a, .tab-row a:visited {
+    color: white;
+}
+
+.tab.path {
+    border: none;
+    background-color: #ffffff;
+}
+
+.tab.selected {
+    border: none;
+    background-color: #EEEEFF;
+}
+
+.tab.selected a, .tab.selected a:visited {
+    color: blue;
+}

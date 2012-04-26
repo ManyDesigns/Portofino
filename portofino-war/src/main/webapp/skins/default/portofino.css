@@ -67,11 +67,11 @@ button.ui-button-icon-only { width: 1.6em; }
 Header / footer
 *******************************************************************************/
 
-div#hd {
+#hd-title {
     min-height: 3em;
 }
 
-div#hd h1 {
+div#hd-title h1 {
     margin-bottom: 0.5em;
 }
 
@@ -85,6 +85,7 @@ div#hd h1 {
     padding-top: 0.5em;
     margin-bottom: 0.5em;
     margin-left: 1em;
+    font-size: 1.2em;
 }
 
 .tab-row.first {

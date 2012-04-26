@@ -7,21 +7,15 @@
 <%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="org.apache.shiro.SecurityUtils" %>
-<%@ page import="com.manydesigns.elements.servlet.ServletUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <jsp:useBean id="dispatch" scope="request" type="com.manydesigns.portofino.dispatcher.Dispatch" />
 <jsp:useBean id="app" scope="request" type="com.manydesigns.portofino.application.Application" />
 <%
     boolean admin = SecurityLogic.isAdministrator(request);
-    int startingLevel = 0;
-    int maxLevel = 10000;
-    String param = request.getParameter("navigation.startingLevel");
+    int maxLevels = 1;
+    String param = request.getParameter("tabs.maxLevels");
     if(param != null) {
-        startingLevel = Integer.parseInt(param);
-    }
-    param = request.getParameter("navigation.maxLevel");
-    if(param != null) {
-        maxLevel = Integer.parseInt(param);
+        maxLevels = Integer.parseInt(param);
     }
 
     Navigation navigation = new Navigation(app, dispatch, SecurityUtils.getSubject(), admin);
@@ -34,43 +28,37 @@
         navigationItems.add(rootNavigationItem);
     }
     boolean first = true;
-    int level = 0;
+    int depth = 0;
     while (!navigationItems.isEmpty()) {
+        depth++;
         NavigationItem nextNavigationItem = null;
-        if(level >= startingLevel) {
-            if (first) {
-                first = false;
-            } else {
-                %><hr><%
-            }
-            %><ul><%
+        if (first) {
+            first = false;
+            %><div class="tab-row first"><%
+        } else {
+            %><div class="tab-row"><%
         }
         for (NavigationItem current : navigationItems) {
             XhtmlBuffer xb = new XhtmlBuffer(out);
-            if(level >= startingLevel) {
-                xb.openElement("li");
-                if (current.isInPath()) {
-                    if (current.isSelected()) {
-                        xb.addAttribute("class", "selected");
-                    } else {
-                        xb.addAttribute("class", "path");
-                    }
-                    nextNavigationItem = current;
+            xb.openElement("span");
+            if (current.isInPath()) {
+                if (current.isSelected() || depth >= maxLevels) {
+                    xb.addAttribute("class", "tab selected");
+                } else {
+                    xb.addAttribute("class", "tab path");
                 }
-                xb.writeAnchor(current.getPath(), current.getPage().getTitle());
-                xb.closeElement("li");
-            } else if (current.isInPath()) {
                 nextNavigationItem = current;
+            } else {
+                xb.addAttribute("class", "tab");
             }
+            xb.writeAnchor(current.getPath(), current.getPage().getTitle());
+            xb.closeElement("span");
         }
-        if(level >= startingLevel) {
-            %></ul><%
-        }
-        if (nextNavigationItem != null && level < maxLevel) {
+        %></div><%
+        if (nextNavigationItem != null && depth < maxLevels) {
             navigationItems = nextNavigationItem.getChildNavigationItems();
         } else {
             navigationItems = Collections.EMPTY_LIST;
         }
-        level++;
     }
 %>

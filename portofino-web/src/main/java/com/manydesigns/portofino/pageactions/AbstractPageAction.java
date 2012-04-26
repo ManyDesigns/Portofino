@@ -79,9 +79,9 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
-            {{"id", "navigationRoot", "template", "detailTemplate", "description"}};
+            {{"id", "navigationRoot", "description", "template", "detailTemplate", "description"}};
     public static final String[][] PAGE_CONFIGURATION_FIELDS_NO_DETAIL =
-            {{"id", "navigationRoot", "template", "detailTemplate"}};
+            {{"id", "navigationRoot", "description", "template", "detailTemplate"}};
     public static final String PAGE_PORTLET_NOT_CONFIGURED = "/layouts/portlet-not-configured.jsp";
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 

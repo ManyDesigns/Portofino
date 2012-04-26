@@ -16,34 +16,36 @@
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.dispatcher.AbstractActionBean"/>
 <fmt:setLocale value="${pageContext.request.locale}"/>
 
-<div id="globalLinks">
-    <c:if test="${mde:getBoolean(portofinoConfiguration, 'user.enabled')}">
-        <c:if test="<%= SecurityUtils.getSubject().isAuthenticated() %>">
-            <c:out value="<%= ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) %>"/> - 
-            <!--<stripes:link href="/actions/profile"><c:out
-                    value="${userName}"/></stripes:link> -
-            <stripes:link
-                    href="/actions/user/settings"><fmt:message key="skins.default.header.settings" /></stripes:link> -
-            <stripes:link
-                    href="/actions/user/help"><fmt:message key="skins.default.header.help" /></stripes:link> - -->
-            <% if(SecurityLogic.isAdministrator(request)) { %>
-                <stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction"><fmt:message key="skins.default.header.administration"/></stripes:link> -
-            <% } %>
-            <stripes:link beanclass="com.manydesigns.portofino.actions.user.LoginAction">
-                <stripes:param name="logout"/>
-                <fmt:message key="skins.default.header.log_out"/>
-            </stripes:link>
-        </c:if><c:if test="<%= !SecurityUtils.getSubject().isAuthenticated() %>">
-            <!-- <stripes:link href="/actions/user/help"><fmt:message key="skins.default.header.help" /></stripes:link> - -->
-            <stripes:link beanclass="com.manydesigns.portofino.actions.user.LoginAction">
-                <stripes:param name="returnUrl" value="${actionBean.originalPath}"/>
-                <fmt:message key="skins.default.header.log_in"/>
-            </stripes:link>
+<div id="hd-title">
+    <div id="globalLinks">
+        <c:if test="${mde:getBoolean(portofinoConfiguration, 'user.enabled')}">
+            <c:if test="<%= SecurityUtils.getSubject().isAuthenticated() %>">
+                <c:out value="<%= ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) %>"/> -
+                <!--<stripes:link href="/actions/profile"><c:out
+                        value="${userName}"/></stripes:link> -
+                <stripes:link
+                        href="/actions/user/settings"><fmt:message key="skins.default.header.settings" /></stripes:link> -
+                <stripes:link
+                        href="/actions/user/help"><fmt:message key="skins.default.header.help" /></stripes:link> - -->
+                <% if(SecurityLogic.isAdministrator(request)) { %>
+                    <stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction"><fmt:message key="skins.default.header.administration"/></stripes:link> -
+                <% } %>
+                <stripes:link beanclass="com.manydesigns.portofino.actions.user.LoginAction">
+                    <stripes:param name="logout"/>
+                    <fmt:message key="skins.default.header.log_out"/>
+                </stripes:link>
+            </c:if><c:if test="<%= !SecurityUtils.getSubject().isAuthenticated() %>">
+                <!-- <stripes:link href="/actions/user/help"><fmt:message key="skins.default.header.help" /></stripes:link> - -->
+                <stripes:link beanclass="com.manydesigns.portofino.actions.user.LoginAction">
+                    <stripes:param name="returnUrl" value="${actionBean.originalPath}"/>
+                    <fmt:message key="skins.default.header.log_in"/>
+                </stripes:link>
+            </c:if>
+        </c:if><c:if
+            test="${not mde:getBoolean(portofinoConfiguration, 'user.enabled')}">
+            <stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction"><fmt:message key="skins.default.header.administration"/></stripes:link> -
+            <stripes:link href="/actions/user/help"><fmt:message key="skins.default.header.help"/></stripes:link>
         </c:if>
-    </c:if><c:if
-        test="${not mde:getBoolean(portofinoConfiguration, 'user.enabled')}">
-        <stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction"><fmt:message key="skins.default.header.administration"/></stripes:link> -
-        <stripes:link href="/actions/user/help"><fmt:message key="skins.default.header.help"/></stripes:link>
-    </c:if>
+    </div>
+    <h1><stripes:link href="/"><c:out value="${app.name}"/></stripes:link></h1>
 </div>
-<h1><stripes:link href="/"><c:out value="${app.name}"/></stripes:link></h1>
