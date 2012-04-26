@@ -48,6 +48,9 @@ public class EditPage {
     @Required
     public NavigationRoot navigationRoot;
 
+    @Required
+    public String template;
+
     @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.layout")
     @Required
     public String layout;

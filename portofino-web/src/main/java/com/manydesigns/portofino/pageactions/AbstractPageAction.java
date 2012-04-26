@@ -62,6 +62,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -78,9 +79,9 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
-            {{"id", "navigationRoot", "layout", "detailLayout", "description"}};
+            {{"id", "navigationRoot", "template", "layout", "detailLayout", "description"}};
     public static final String[][] PAGE_CONFIGURATION_FIELDS_NO_DETAIL =
-            {{"id", "navigationRoot", "layout", "description"}};
+            {{"id", "navigationRoot", "template", "layout", "description"}};
     public static final String PAGE_PORTLET_NOT_CONFIGURED = "/layouts/portlet-not-configured.jsp";
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
@@ -287,11 +288,42 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         if(StringUtils.isBlank(layoutName)) {
             return getDefaultLayoutJsp();
         }
+
+        try {
+            if(context.getServletContext().getResource(layoutName) == null) {
+                return getDefaultLayoutJsp();
+            }
+        } catch (MalformedURLException e) {
+            logger.error("Malformed layout path", e);
+            return getDefaultLayoutJsp();
+        }
         return layoutName;
     }
 
     protected String getDefaultLayoutJsp() {
-        return String.format("/skins/%s/portlet-layouts/default.jsp",
+        return String.format("/skins/%s/page-layouts/default.jsp",
+                             context.getRequest().getAttribute(RequestAttributes.SKIN));
+    }
+
+    public String getPageTemplate() {
+        String template = getPage().getTemplate();
+        if(StringUtils.isBlank(template)) {
+            return getDefaultPageTemplate();
+        }
+
+        try {
+            if(context.getServletContext().getResource(template) == null) {
+                return getDefaultPageTemplate();
+            }
+        } catch (MalformedURLException e) {
+            logger.error("Malformed template path", e);
+            return getDefaultPageTemplate();
+        }
+        return template;
+    }
+
+    protected String getDefaultPageTemplate() {
+        return String.format("/skins/%s/page-templates/default-content-page.jsp",
                              context.getRequest().getAttribute(RequestAttributes.SKIN));
     }
 
@@ -358,6 +390,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
                               PAGE_CONFIGURATION_FIELDS_NO_DETAIL)
                 .configFieldSetNames("Page");
 
+        SelectionProvider templateSelectionProvider = createTemplateSelectionProvider();
+        formBuilder.configSelectionProvider(templateSelectionProvider, "template");
         SelectionProvider layoutSelectionProvider = createLayoutSelectionProvider();
         formBuilder.configSelectionProvider(layoutSelectionProvider, "layout");
         SelectionProvider detailLayoutSelectionProvider = createLayoutSelectionProvider();
@@ -377,6 +411,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         edit.id = page.getId();
         edit.description = page.getDescription();
         edit.navigationRoot = page.getActualNavigationRoot();
+        edit.template = getPageTemplate();
         edit.layout = getLayoutJsp(page.getLayout());
         edit.detailLayout = getLayoutJsp(page.getDetailLayout());
         pageConfigurationForm.readFromObject(edit);
@@ -387,7 +422,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
     }
 
-    private SelectionProvider createLayoutSelectionProvider() {
+    protected SelectionProvider createJspSelectionProvider(String jspDir) {
         String warRealPath =
                 portofinoConfiguration.getString(
                         PortofinoProperties.WAR_REAL_PATH);
@@ -395,30 +430,38 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
         File skinsDir = new File(warRealPath, "skins");
         String skin = context.getRequest().getAttribute(RequestAttributes.SKIN) + "";
-        File layoutsDir = new File(new File(skinsDir, skin), "portlet-layouts");
+        File layoutsDir = new File(new File(skinsDir, skin), jspDir);
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("jsp");
         if(layoutsDir.isDirectory()) {
             File[] files = layoutsDir.listFiles();
-            visitJspFiles(webappFile, files, selectionProvider);
+            visitJspFiles(webappFile, files, selectionProvider, false);
         }
 
-        layoutsDir = new File(application.getAppDir(), "layouts");
+        layoutsDir = new File(application.getAppDir(), jspDir);
         if(layoutsDir.isDirectory()) {
             File[] files = layoutsDir.listFiles();
-            visitJspFiles(webappFile, files, selectionProvider);
+            visitJspFiles(webappFile, files, selectionProvider, false);
         }
         return selectionProvider;
     }
 
+    protected SelectionProvider createLayoutSelectionProvider() {
+        return createJspSelectionProvider("page-layouts");
+    }
+
+    protected SelectionProvider createTemplateSelectionProvider() {
+        return createJspSelectionProvider("page-templates");
+    }
+
     private void visitJspFiles(File root, File[] files,
-                               DefaultSelectionProvider selectionProvider) {
+                               DefaultSelectionProvider selectionProvider, boolean recursive) {
         for(File file : files) {
             if(file.isFile() && file.getName().endsWith(".jsp")) {
                 String path = "/" + ElementsFileUtils.getRelativePath(root, file, "/");
                 String name = file.getName();
                 selectionProvider.appendRow(path, name.substring(0, name.length() - 4), true);
-            } else if(file.isDirectory()) {
-                visitJspFiles(root, file.listFiles(), selectionProvider);
+            } else if(file.isDirectory() && recursive) {
+                visitJspFiles(root, file.listFiles(), selectionProvider, true);
             }
         }
     }
@@ -448,6 +491,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         page.setTitle(title);
         page.setDescription(edit.description);
         page.setNavigationRoot(edit.navigationRoot.name());
+        page.setTemplate(edit.template);
         page.getLayout().setLayout(edit.layout);
         page.getDetailLayout().setLayout(edit.detailLayout);
         try {
