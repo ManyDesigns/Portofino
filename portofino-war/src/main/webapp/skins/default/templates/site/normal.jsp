@@ -21,7 +21,7 @@
               href="<stripes:url value="/skins/default/templates/site/site.css"/>"/>
         <stripes:layout-component name="customScripts"/>
         <jsp:useBean id="actionBean" scope="request"
-             type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
+                     type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
         <title><c:out value="${actionBean.dispatch.lastPageInstance.page.description}"/></title>
     </head>
     <body class="yui-skin-sam">
@@ -53,24 +53,6 @@
                 </div>
             </div>
             <div id="sidebar" class="yui-b">
-                <div style="border: dashed 1px black; padding: 5px;">
-                    <stripes:form action="/actions/admin/page" method="post" id="pageAdminForm">
-                        <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
-                        <!-- Admin buttons -->
-                        <% if(SecurityLogic.isAdministrator(request)) { %>
-                            <div class="contentBarButtons">
-                                <portofino:page-layout-button />
-                                <portofino:reload-model-button />
-                                <portofino:page-children-button />
-                                <portofino:page-permissions-button />
-                                <portofino:page-copy-button />
-                                <portofino:page-new-button />
-                                <portofino:page-delete-button />
-                                <portofino:page-move-button />
-                            </div>
-                        <% } %>
-                    </stripes:form>
-                </div>
                 <jsp:include page="../../navigation.jsp">
                     <jsp:param name="navigation.startingLevel" value="1" />
                 </jsp:include>

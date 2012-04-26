@@ -29,14 +29,14 @@ div.contentBody {
 }
 
 .tab {
-    padding: 1em;
+    padding: .8em 1em .8em .8em;
     font-weight: bold;
+    float: left;
 }
 
 .tab-row {
     border-top: solid 1px #808080;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
+    padding: 0;
     margin-bottom: 0;
     margin-left: 0;
     background-color: #65A7DB;
@@ -53,14 +53,20 @@ div.contentBody {
 
 .tab.path {
     border: none;
-    background-color: #ffffff;
+    background-color: #65A7DB;
 }
 
 .tab.selected {
     border: none;
-    background-color: #EEEEFF;
+    background: #65A7DB url('../../images/tab-selected.png') no-repeat center bottom;
 }
 
-.tab.selected a, .tab.selected a:visited {
-    color: blue;
+#pageAdminForm {
+    float: right;
+    margin-top: 0.6em;
+    margin-right: 0.5em;
+}
+
+#hd {
+    margin-bottom: 1em;
 }
