@@ -12,7 +12,7 @@
 <jsp:useBean id="app" scope="request" type="com.manydesigns.portofino.application.Application" />
 <%
     boolean admin = SecurityLogic.isAdministrator(request);
-    int startingLevel = 2;
+    int startingLevel = 0;
     int maxLevel = 10000;
     Object attribute = request.getAttribute("navigation.startingLevel");
     if(attribute instanceof Number) {
