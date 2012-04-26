@@ -79,9 +79,9 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
-            {{"id", "navigationRoot", "template", "layout", "detailLayout", "description"}};
+            {{"id", "navigationRoot", "template", "detailTemplate", "description"}};
     public static final String[][] PAGE_CONFIGURATION_FIELDS_NO_DETAIL =
-            {{"id", "navigationRoot", "template", "layout", "description"}};
+            {{"id", "navigationRoot", "template", "detailTemplate"}};
     public static final String PAGE_PORTLET_NOT_CONFIGURED = "/layouts/portlet-not-configured.jsp";
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
@@ -277,42 +277,25 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         setupPortlets(pageInstance, pageJsp);
         HttpServletRequest request = context.getRequest();
         request.setAttribute("cancelReturnUrl", getCancelReturnUrl());
-        return new ForwardResolution(getLayoutJsp(pageInstance.getLayout()));
-    }
-
-    protected String getLayoutJsp(Layout layout) {
-        if(layout == null) {
-            return getDefaultLayoutJsp();
-        }
-        String layoutName = layout.getLayout();
-        if(StringUtils.isBlank(layoutName)) {
-            return getDefaultLayoutJsp();
-        }
-
-        try {
-            if(context.getServletContext().getResource(layoutName) == null) {
-                return getDefaultLayoutJsp();
-            }
-        } catch (MalformedURLException e) {
-            logger.error("Malformed layout path", e);
-            return getDefaultLayoutJsp();
-        }
-        return layoutName;
-    }
-
-    protected String getDefaultLayoutJsp() {
-        return String.format("/skins/%s/page-layouts/default.jsp",
-                             context.getRequest().getAttribute(RequestAttributes.SKIN));
+        return new ForwardResolution("/layouts/normal.jsp");
     }
 
     public String getPageTemplate() {
-        String template = getPage().getTemplate();
+        Layout layout = getPageInstance().getLayout();
+        return getPageTemplate(layout);
+    }
+
+    public String getPageTemplate(Layout layout) {
+        String template = layout.getTemplate();
         if(StringUtils.isBlank(template)) {
             return getDefaultPageTemplate();
         }
 
         try {
-            if(context.getServletContext().getResource(template) == null) {
+            Object skin = context.getRequest().getAttribute(RequestAttributes.SKIN);
+            String templateRealPath = "/skins/" + skin + template;
+            if(context.getServletContext().getResource(templateRealPath) == null) {
+                logger.warn("Template file {} does not exist, using default", templateRealPath);
                 return getDefaultPageTemplate();
             }
         } catch (MalformedURLException e) {
@@ -323,8 +306,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     }
 
     protected String getDefaultPageTemplate() {
-        return String.format("/skins/%s/page-templates/default-content-page.jsp",
-                             context.getRequest().getAttribute(RequestAttributes.SKIN));
+        return "/templates/default";
     }
 
     @Button(list = "configuration", key = "commons.cancel", order = 99)
@@ -390,12 +372,10 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
                               PAGE_CONFIGURATION_FIELDS_NO_DETAIL)
                 .configFieldSetNames("Page");
 
-        SelectionProvider templateSelectionProvider = createTemplateSelectionProvider();
-        formBuilder.configSelectionProvider(templateSelectionProvider, "template");
-        SelectionProvider layoutSelectionProvider = createLayoutSelectionProvider();
-        formBuilder.configSelectionProvider(layoutSelectionProvider, "layout");
-        SelectionProvider detailLayoutSelectionProvider = createLayoutSelectionProvider();
-        formBuilder.configSelectionProvider(detailLayoutSelectionProvider, "detailLayout");
+        SelectionProvider layoutSelectionProvider = createTemplateSelectionProvider();
+        formBuilder.configSelectionProvider(layoutSelectionProvider, "template");
+        SelectionProvider detailLayoutSelectionProvider = createTemplateSelectionProvider();
+        formBuilder.configSelectionProvider(detailLayoutSelectionProvider, "detailTemplate");
 
         DefaultSelectionProvider navRootSelectionProvider = new DefaultSelectionProvider("navigationRoot");
         String label = getMessage("com.manydesigns.portofino.pageactions.EditPage.navigationRoot.inherit");
@@ -411,9 +391,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         edit.id = page.getId();
         edit.description = page.getDescription();
         edit.navigationRoot = page.getActualNavigationRoot();
-        edit.template = getPageTemplate();
-        edit.layout = getLayoutJsp(page.getLayout());
-        edit.detailLayout = getLayoutJsp(page.getDetailLayout());
+        edit.template = getPageTemplate(page.getLayout());
+        edit.detailTemplate = getPageTemplate(page.getDetailLayout());
         pageConfigurationForm.readFromObject(edit);
         title = page.getTitle();
 
@@ -422,48 +401,26 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
     }
 
-    protected SelectionProvider createJspSelectionProvider(String jspDir) {
+    protected SelectionProvider createTemplateSelectionProvider() {
         String warRealPath =
                 portofinoConfiguration.getString(
                         PortofinoProperties.WAR_REAL_PATH);
-        File webappFile = new File(warRealPath);
-
         File skinsDir = new File(warRealPath, "skins");
         String skin = context.getRequest().getAttribute(RequestAttributes.SKIN) + "";
-        File layoutsDir = new File(new File(skinsDir, skin), jspDir);
-        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("jsp");
+        File skinDir = new File(skinsDir, skin);
+        File layoutsDir = new File(skinDir, "templates");
+        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("template");
         if(layoutsDir.isDirectory()) {
             File[] files = layoutsDir.listFiles();
-            visitJspFiles(webappFile, files, selectionProvider, false);
-        }
-
-        layoutsDir = new File(application.getAppDir(), jspDir);
-        if(layoutsDir.isDirectory()) {
-            File[] files = layoutsDir.listFiles();
-            visitJspFiles(webappFile, files, selectionProvider, false);
-        }
-        return selectionProvider;
-    }
-
-    protected SelectionProvider createLayoutSelectionProvider() {
-        return createJspSelectionProvider("page-layouts");
-    }
-
-    protected SelectionProvider createTemplateSelectionProvider() {
-        return createJspSelectionProvider("page-templates");
-    }
-
-    private void visitJspFiles(File root, File[] files,
-                               DefaultSelectionProvider selectionProvider, boolean recursive) {
-        for(File file : files) {
-            if(file.isFile() && file.getName().endsWith(".jsp")) {
-                String path = "/" + ElementsFileUtils.getRelativePath(root, file, "/");
-                String name = file.getName();
-                selectionProvider.appendRow(path, name.substring(0, name.length() - 4), true);
-            } else if(file.isDirectory() && recursive) {
-                visitJspFiles(root, file.listFiles(), selectionProvider, true);
+            for(File file : files) {
+                if(file.isDirectory()) {
+                    String path = "/" + ElementsFileUtils.getRelativePath(skinDir, file, "/");
+                    String name = file.getName();
+                    selectionProvider.appendRow(path, name, true);
+                }
             }
         }
+        return selectionProvider;
     }
 
     protected void readPageConfigurationFromRequest() {
@@ -491,9 +448,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         page.setTitle(title);
         page.setDescription(edit.description);
         page.setNavigationRoot(edit.navigationRoot.name());
-        page.setTemplate(edit.template);
-        page.getLayout().setLayout(edit.layout);
-        page.getDetailLayout().setLayout(edit.detailLayout);
+        page.getLayout().setTemplate(edit.template);
+        page.getDetailLayout().setTemplate(edit.detailTemplate);
         try {
             File pageFile = DispatcherLogic.savePage(pageInstance.getDirectory(), page);
             logger.info("Page saved to " + pageFile.getAbsolutePath());

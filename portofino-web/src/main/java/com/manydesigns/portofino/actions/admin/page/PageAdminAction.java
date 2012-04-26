@@ -324,6 +324,8 @@ public class PageAdminAction extends AbstractActionBean {
             }
             if(directory.mkdirs()) {
                 try {
+                    page.getLayout().setTemplate(parentPage.getLayout().getTemplate());
+                    page.getDetailLayout().setTemplate(parentPage.getDetailLayout().getTemplate());
                     logger.debug("Creating the new child page in directory: {}", directory);
                     DispatcherLogic.savePage(directory, page);
                     if(configuration != null) {
@@ -798,6 +800,10 @@ public class PageAdminAction extends AbstractActionBean {
 
     public TableForm getDetailChildPagesForm() {
         return detailChildPagesForm;
+    }
+
+    public String getPageTemplate() {
+        return "/templates/default";
     }
 
     protected Resolution forwardToPageChildren() {

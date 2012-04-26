@@ -43,7 +43,7 @@ public class Layout {
     // Fields
     //**************************************************************************
 
-    protected String layout;
+    protected String template;
     protected Self self;
     protected final ArrayList<ChildPage> childPages;
 
@@ -76,12 +76,12 @@ public class Layout {
     //**************************************************************************
 
     @XmlAttribute
-    public String getLayout() {
-        return layout;
+    public String getTemplate() {
+        return template;
     }
 
-    public void setLayout(String layout) {
-        this.layout = layout;
+    public void setTemplate(String template) {
+        this.template = template;
     }
 
     @XmlElement

@@ -48,7 +48,6 @@ public class Page {
     protected String id;
     protected String title;
     protected String description;
-    protected String template;
     protected Layout layout;
     protected Layout detailLayout;
     protected Permissions permissions;
@@ -135,19 +134,6 @@ public class Page {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    /**
-     * Page template
-     */
-    @XmlAttribute(required = true)
-    @Required
-    public String getTemplate() {
-        return template;
-    }
-
-    public void setTemplate(String template) {
-        this.template = template;
     }
 
     @XmlElement()

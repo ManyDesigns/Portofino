@@ -4,7 +4,7 @@
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<stripes:layout-render name="/skins/${skin}/modal-page.jsp">
+<stripes:layout-render name="/skins/${skin}/${actionBean.pageTemplate}/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.ProfileAction"/>
     <stripes:layout-component name="contentHeader">
         <stripes:submit name="updateConfiguration" value="Update configuration" class="contentButton"/>
