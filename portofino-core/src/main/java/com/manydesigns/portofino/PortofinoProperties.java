@@ -80,7 +80,7 @@ public final class PortofinoProperties {
     public static final String MAIL_POP3_PASSWORD = "mail.pop3.password";
     public static final String MAIL_BOUNCE_ENABLED = "mail.bounce.enabled";
     public static final String MAIL_POP3_SSL_ENABLED = "mail.pop3.ssl.enabled";
-    public static final String KEEP_SENT = "mail.keep.sent";
+    public static final String MAIL_KEEP_SENT = "mail.keep.sent";
     public static final String MAIL_QUEUE_LOCATION = "mail.queue.location";
     public static final String MAIL_SENDER_POLL_INTERVAL = "mail.sender.poll.interval";
 

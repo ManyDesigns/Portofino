@@ -233,7 +233,7 @@ public class PortofinoListener
                 String password = portofinoConfiguration.getString(
                         PortofinoProperties.MAIL_SMTP_PASSWORD);
                 boolean keepSent = portofinoConfiguration.getBoolean(
-                        PortofinoProperties.KEEP_SENT, false);
+                        PortofinoProperties.MAIL_KEEP_SENT, false);
 
                 String mailQueueLocation =
                         portofinoConfiguration.getString(PortofinoProperties.MAIL_QUEUE_LOCATION);
