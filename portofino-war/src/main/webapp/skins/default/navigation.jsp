@@ -12,6 +12,16 @@
 <jsp:useBean id="app" scope="request" type="com.manydesigns.portofino.application.Application" />
 <%
     boolean admin = SecurityLogic.isAdministrator(request);
+    int startingLevel = 2;
+    int maxLevel = 10000;
+    Object attribute = request.getAttribute("navigation.startingLevel");
+    if(attribute instanceof Number) {
+        startingLevel = ((Number) attribute).intValue();
+    }
+    attribute = request.getAttribute("navigation.maxLevels");
+    if(attribute instanceof Number) {
+        maxLevel = ((Number) attribute).intValue();
+    }
 
     Navigation navigation = new Navigation(app, dispatch, SecurityUtils.getSubject(), admin);
     List<NavigationItem> navigationItems;
@@ -23,33 +33,43 @@
         navigationItems.add(rootNavigationItem);
     }
     boolean first = true;
+    int level = 0;
     while (!navigationItems.isEmpty()) {
         NavigationItem nextNavigationItem = null;
-        if (first) {
-            first = false;
-        } else {
-            %><hr><%
+        if(level >= startingLevel) {
+            if (first) {
+                first = false;
+            } else {
+                %><hr><%
+            }
+            %><ul><%
         }
-        %><ul><%
         for (NavigationItem current : navigationItems) {
             XhtmlBuffer xb = new XhtmlBuffer(out);
-            xb.openElement("li");
-            if (current.isInPath()) {
-                if (current.isSelected()) {
-                    xb.addAttribute("class", "selected");
-                } else {
-                    xb.addAttribute("class", "path");
+            if(level >= startingLevel) {
+                xb.openElement("li");
+                if (current.isInPath()) {
+                    if (current.isSelected()) {
+                        xb.addAttribute("class", "selected");
+                    } else {
+                        xb.addAttribute("class", "path");
+                    }
+                    nextNavigationItem = current;
                 }
+                xb.writeAnchor(current.getPath(), current.getPage().getTitle());
+                xb.closeElement("li");
+            } else if (current.isInPath()) {
                 nextNavigationItem = current;
             }
-            xb.writeAnchor(current.getPath(), current.getPage().getTitle());
-            xb.closeElement("li");
         }
-        %></ul><%
-        if (nextNavigationItem != null) {
+        if(level >= startingLevel) {
+            %></ul><%
+        }
+        if (nextNavigationItem != null && level < maxLevel) {
             navigationItems = nextNavigationItem.getChildNavigationItems();
         } else {
             navigationItems = Collections.EMPTY_LIST;
         }
+        level++;
     }
 %>

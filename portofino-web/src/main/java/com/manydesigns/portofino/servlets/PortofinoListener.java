@@ -258,12 +258,12 @@ public class PortofinoListener
                     int pollInterval = portofinoConfiguration.getInt(PortofinoProperties.MAIL_SENDER_POLL_INTERVAL);
 
                     Trigger trigger = TriggerBuilder.newTrigger()
-                      .withIdentity("mail.sender.trigger", "portofino")
-                      .startNow()
-                      .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                              .withIntervalInMilliseconds(pollInterval)
-                              .repeatForever())
-                      .build();
+                        .withIdentity("mail.sender.trigger", "portofino")
+                        .startNow()
+                        .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                            .withIntervalInMilliseconds(pollInterval)
+                            .repeatForever())
+                        .build();
 
                     scheduler.getContext().put(MailSenderJob.MAIL_SENDER_KEY, mailSender);
                     scheduler.scheduleJob(job, trigger);

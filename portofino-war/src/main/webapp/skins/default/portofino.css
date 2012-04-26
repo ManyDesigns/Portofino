@@ -68,7 +68,37 @@ Header / footer
 *******************************************************************************/
 
 div#hd {
-    height: 3em;
+    min-height: 3em;
+}
+
+div#hd h1 {
+    margin-bottom: 0.5em;
+}
+
+.tab {
+    padding: 3px 1em 3px 1em;
+    font-weight: bold;
+}
+
+.tab-row {
+    border-top: solid 1px #808080;
+    padding-top: 0.5em;
+    margin-bottom: 0.5em;
+    margin-left: 1em;
+}
+
+.tab-row.first {
+    border-top: none;
+}
+
+.tab.path {
+    border: 1px dashed;
+    background-color: #ffffff;
+}
+
+.tab.selected {
+    border: 1px solid;
+    background-color: #ffffff;
 }
 
 div#ft {
@@ -183,6 +213,18 @@ div.contentBody {
 table.noBorder th,
 table.noBorder td {
     border: none;
+}
+
+.navigation ul {
+    margin: 0;
+}
+
+.navigation li {
+    list-style: none;
+}
+
+.navigation li.selected {
+    font-weight: bold;
 }
 
 /*******************************************************************************
