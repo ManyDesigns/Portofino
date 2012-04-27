@@ -15,9 +15,14 @@
 <%
     boolean admin = SecurityLogic.isAdministrator(request);
     int maxLevels = 1;
-    String param = request.getParameter("tabs.maxLevels");
+    String param = request.getParameter("tabsMaxLevels");
     if(param != null) {
         maxLevels = Integer.parseInt(param);
+    }
+    boolean includeAdminButtons = false;
+    param = request.getParameter("tabsIncludeAdminButtons");
+    if(param != null) {
+        includeAdminButtons = Boolean.valueOf(param);
     }
 
     Navigation navigation = new Navigation(app, dispatch, SecurityUtils.getSubject(), admin);
@@ -37,6 +42,7 @@
         if (first) {
             first = false;
             %><div class="tab-row first">
+<c:if test="<%= includeAdminButtons %>">
 <stripes:form action="/actions/admin/page" method="post" id="pageAdminForm">
     <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
     <!-- Admin buttons -->
@@ -52,7 +58,8 @@
             <portofino:page-move-button />
         </div>
     <% } %>
-</stripes:form><%
+</stripes:form>
+</c:if><%
         } else {
             %><div class="tab-row"><%
         }

@@ -23,8 +23,7 @@
 </script>
 
 
-<fieldset id="scriptFieldset" class="mde-form-fieldset"
-          style="position: relative; padding-top: 1em; margin-top: 1em; min-height: 20em;">
+<fieldset id="scriptFieldset" class="mde-form-fieldset">
     <legend>Script</legend>
     <textarea id="scriptEditorTextArea"
               name="script" style="min-height: 20em; width: 100%;"

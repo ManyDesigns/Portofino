@@ -30,7 +30,8 @@
             <jsp:include page="../../header.jsp"/>
             <div class="tabs">
                 <jsp:include page="tabs.jsp">
-                    <jsp:param name="" value="1" />
+                    <jsp:param name="tabsMaxLevels" value="1" />
+                    <jsp:param name="tabsIncludeAdminButtons" value="true" />
                 </jsp:include>
             </div>
         </div>

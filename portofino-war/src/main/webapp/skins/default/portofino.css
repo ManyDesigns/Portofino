@@ -641,6 +641,11 @@ fieldset.mde-form-fieldset legend {
     color: #333;
 }
 
+fieldset#scriptFieldset {
+    position: relative; padding-top: 1em; margin-top: 1em; min-height: 20em;
+    padding-left: 0;
+}
+
 table.mde-form-table td {
     border: 0 none;
 }

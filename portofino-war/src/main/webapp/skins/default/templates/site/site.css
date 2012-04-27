@@ -6,7 +6,7 @@
 }
 
 div.contentBody {
-    padding: 0;
+    padding: 1em 0 0;
 }
 
 .navigation {
@@ -20,11 +20,12 @@ div.contentBody {
 }
 
 .portlets {
-    padding: 1em;
+    padding: 0 1em 1em;
 }
 
 .portletWrapper {
     margin-bottom: 0;
+    padding-bottom: 1em;
     width: 100%;
 }
 
@@ -69,4 +70,15 @@ div.contentBody {
 
 #hd {
     margin-bottom: 1em;
+}
+
+.contentBarButtons .ui-button-text-only span.ui-button-text {
+    font-size: .8em;
+}
+
+.contentFooter {
+    bottom: auto;
+    left: 0;
+    position: absolute;
+    right: 0;
 }
