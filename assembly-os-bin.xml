@@ -25,5 +25,28 @@
       <fileMode>0644</fileMode>
     </file>
   </files>
+  <fileSets>
+    <fileSet>
+      <directory>elements/target/apidocs</directory>
+      <outputDirectory>javadocs/elements</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-core/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-core</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-web/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-web</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+  </fileSets>
 </assembly>
 
