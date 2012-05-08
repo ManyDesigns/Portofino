@@ -1,0 +1,87 @@
+.yui-t4 #yui-main div#content, .yui-t2 #yui-main div#content {
+    margin-left: 0;
+    border: none;
+    background-color: white;
+    position: relative;
+}
+
+div.contentBody {
+    padding: 1em 0 0;
+}
+
+.navigation {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    top: 0;
+    padding-top: 1em;
+    padding-left: 1em;
+    background-color: #F8F8FF;
+}
+
+.portlets {
+    padding: 0 1em 1em;
+}
+
+.portletWrapper {
+    margin-bottom: 0;
+    padding-bottom: 1em;
+    width: 100%;
+}
+
+.tab {
+    border-right: 2px solid white;
+    padding: .8em 1em .8em .8em;
+    font-weight: bold;
+    float: left;
+}
+
+.tab-row {
+    border-top: solid 1px #808080;
+    padding: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    background-color: #65A7DB;
+    overflow: hidden;
+    font-size: 1.2em;
+}
+
+.tab-row.first {
+    border-top: none;
+}
+
+.tab-row a, .tab-row a:visited {
+    color: white;
+}
+
+.tab.path {
+    border: none;
+    background-color: #65A7DB;
+}
+
+.tab.selected {
+    border: none;
+    border-right: 2px solid white;
+    background: #65A7DB url('../../images/tab-selected.png') no-repeat center bottom;
+}
+
+#pageAdminForm {
+    float: right;
+    margin-top: 0.6em;
+    margin-right: 0.5em;
+}
+
+#hd {
+    margin-bottom: 1em;
+}
+
+.contentBarButtons .ui-button-text-only span.ui-button-text {
+    font-size: .8em;
+}
+
+.contentFooter {
+    bottom: auto;
+    left: 0;
+    position: absolute;
+    right: 0;
+}
