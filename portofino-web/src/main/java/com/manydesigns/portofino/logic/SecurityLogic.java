@@ -45,10 +45,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -109,12 +106,13 @@ public class SecurityLogic {
             instance = instance.getParent();
         }
 
-        return calculateActualPermissions(pages);
+        return calculateActualPermissions(new Permissions(), pages);
     }
 
-    public static Permissions calculateActualPermissions(List<Page> pages) {
+    public static Permissions calculateActualPermissions(Permissions basePermissions, List<Page> pages) {
         Permissions result = new Permissions();
         Map<String, AccessLevel> resultLevels = result.getActualLevels();
+        resultLevels.putAll(basePermissions.getActualLevels());
         for (Page current : pages) {
             Permissions currentPerms = current.getPermissions();
 
@@ -135,6 +133,8 @@ public class SecurityLogic {
             Map<String, Set<String>> lastPermissions =
                     lastPage.getPermissions().getActualPermissions();
             result.getActualPermissions().putAll(lastPermissions);
+        } else {
+            result.getActualPermissions().putAll(basePermissions.getActualPermissions());
         }
 
         return result;

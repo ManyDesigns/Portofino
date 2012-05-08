@@ -100,6 +100,8 @@ public class Navigation {
         for(int i = 0; i <= rootPageIndex; i++) {
             pages.add(allInstances[i].getPage());
         }
+        Permissions basePermissions = SecurityLogic.calculateActualPermissions(new Permissions(), pages);
+        pages.clear();
         List<ChildPage> childPages;
         NavigationItem currentNavigationItem = rootNavigationItem;
         for (int i = 0, pageInstancesLength = pageInstances.length; i < pageInstancesLength; i++) {
@@ -145,7 +147,7 @@ public class Navigation {
                 }
                 pages.add(page);
                 if (!skipPermissions) {
-                    Permissions permissions = SecurityLogic.calculateActualPermissions(pages);
+                    Permissions permissions = SecurityLogic.calculateActualPermissions(basePermissions, pages);
                     if(!SecurityLogic.hasPermissions(application, permissions, subject, AccessLevel.VIEW)) {
                         pages.removeLast();
                         continue;
