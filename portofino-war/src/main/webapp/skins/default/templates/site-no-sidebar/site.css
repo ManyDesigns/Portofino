@@ -30,39 +30,39 @@ div.contentBody {
 }
 
 .tab {
-    border-right: 2px solid white;
     padding: .8em 1em .8em .8em;
     font-weight: bold;
     float: left;
 }
 
 .tab-row {
-    border-top: solid 1px #808080;
     padding: 0;
     margin-bottom: 0;
     margin-left: 0;
-    background-color: #65A7DB;
+    background-color: #166BBF;
     overflow: hidden;
-    font-size: 1.2em;
 }
 
-.tab-row.first {
-    border-top: none;
+.tab-row.level0 {
+    font-size: 1.2em;
+    background-color: #65A7DB;
 }
 
 .tab-row a, .tab-row a:visited {
     color: white;
 }
 
-.tab.path {
-    border: none;
-    background-color: #65A7DB;
+.tab-row.level0 a, .tab-row.level0 a:visited,
+.tab.selected a, .tab.selected a:visited{
+    color: white;
 }
 
-.tab.selected {
-    border: none;
-    border-right: 2px solid white;
-    background: #65A7DB url('../../images/tab-selected.png') no-repeat center bottom;
+.tab.path, .tab.selected {
+    background: #65A7DB url('../../images/tab-path.png') no-repeat center bottom;
+}
+
+.last .tab.selected {
+    background: url('../../images/tab-selected.png') no-repeat center bottom;
 }
 
 #pageAdminForm {
@@ -71,7 +71,7 @@ div.contentBody {
     margin-right: 0.5em;
 }
 
-#hd {
+div#hd {
     margin-bottom: 1em;
 }
 

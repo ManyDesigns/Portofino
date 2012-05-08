@@ -24,6 +24,7 @@ package com.manydesigns.portofino.breadcrumbs;
 
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.pages.NavigationRoot;
 import com.manydesigns.portofino.pages.Page;
 
 import java.util.ArrayList;
@@ -70,15 +71,19 @@ public class Breadcrumbs {
             BreadcrumbItem item = new BreadcrumbItem(
                     sb.toString(), page.getTitle(),
                     page.getDescription());
-            items.add(item);
+            if(page.getActualNavigationRoot() != NavigationRoot.GHOST_ROOT) {
+                items.add(item);
+            }
             if(!current.getParameters().isEmpty()) {
                 for(String param : current.getParameters()) {
                     sb.append("/").append(param);
                 }
-                String description = current.getDescription();
-                String title = String.format("%s (%s)", description, page.getTitle());
-                BreadcrumbItem item2 = new BreadcrumbItem(sb.toString(), description, title);
-                items.add(item2);
+                if(page.getActualNavigationRoot() != NavigationRoot.GHOST_ROOT) {
+                    String description = current.getDescription();
+                    String title = String.format("%s (%s)", description, page.getTitle());
+                    BreadcrumbItem item2 = new BreadcrumbItem(sb.toString(), description, title);
+                    items.add(item2);
+                }
             }
         }
     }

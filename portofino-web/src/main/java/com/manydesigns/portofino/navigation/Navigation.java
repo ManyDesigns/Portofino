@@ -96,7 +96,10 @@ public class Navigation {
         rootNavigationItem = new NavigationItem(
                 rootPage, prefix, true, rootSelected, rootGhost);
         LinkedList<Page> pages = new LinkedList<Page>();
-        pages.add(rootPage);
+        PageInstance[] allInstances = dispatch.getPageInstancePath();
+        for(int i = 0; i <= rootPageIndex; i++) {
+            pages.add(allInstances[i].getPage());
+        }
         List<ChildPage> childPages;
         NavigationItem currentNavigationItem = rootNavigationItem;
         for (int i = 0, pageInstancesLength = pageInstances.length; i < pageInstancesLength; i++) {

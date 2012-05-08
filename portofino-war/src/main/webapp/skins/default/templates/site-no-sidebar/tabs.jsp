@@ -37,31 +37,45 @@
     boolean first = true;
     int depth = 0;
     while (!navigationItems.isEmpty()) {
-        depth++;
         NavigationItem nextNavigationItem = null;
+        String cssClass = "tab-row level" + depth;
+        depth++;
+        if(first) {
+            cssClass += " first";
+        }
+        for (NavigationItem current : navigationItems) {
+            if (current.isInPath()) {
+                nextNavigationItem = current;
+            }
+        }
+        boolean last =
+                nextNavigationItem == null ||
+                nextNavigationItem.getChildNavigationItems().isEmpty() ||
+                depth >= maxLevels;
+        if(last) {
+            cssClass += " last";
+        }
+        out.print("<div class=\"" + cssClass + "\">");
         if (first) {
             first = false;
-            %><div class="tab-row first">
-<c:if test="<%= includeAdminButtons %>">
-<stripes:form action="/actions/admin/page" method="post" id="pageAdminForm">
-    <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
-    <!-- Admin buttons -->
-    <% if(SecurityLogic.isAdministrator(request)) { %>
-        <div class="contentBarButtons">
-            <portofino:page-layout-button />
-            <portofino:reload-model-button />
-            <portofino:page-children-button />
-            <portofino:page-permissions-button />
-            <portofino:page-copy-button />
-            <portofino:page-new-button />
-            <portofino:page-delete-button />
-            <portofino:page-move-button />
-        </div>
-    <% } %>
-</stripes:form>
-</c:if><%
-        } else {
-            %><div class="tab-row"><%
+            if(includeAdminButtons) { %>
+                <stripes:form action="/actions/admin/page" method="post" id="pageAdminForm">
+                    <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
+                    <!-- Admin buttons -->
+                    <% if(SecurityLogic.isAdministrator(request)) { %>
+                        <div class="contentBarButtons">
+                            <portofino:page-layout-button />
+                            <portofino:reload-model-button />
+                            <portofino:page-children-button />
+                            <portofino:page-permissions-button />
+                            <portofino:page-copy-button />
+                            <portofino:page-new-button />
+                            <portofino:page-delete-button />
+                            <portofino:page-move-button />
+                        </div>
+                    <% } %>
+                </stripes:form><%
+            }
         }
         for (NavigationItem current : navigationItems) {
             XhtmlBuffer xb = new XhtmlBuffer(out);
@@ -72,18 +86,17 @@
                 } else {
                     xb.addAttribute("class", "tab path");
                 }
-                nextNavigationItem = current;
             } else {
                 xb.addAttribute("class", "tab");
             }
             xb.writeAnchor(current.getPath(), current.getPage().getTitle());
             xb.closeElement("div");
         }
-        %></div><%
-        if (nextNavigationItem != null && depth < maxLevels) {
-            navigationItems = nextNavigationItem.getChildNavigationItems();
-        } else {
+        out.print("</div>");
+        if (last) {
             navigationItems = Collections.EMPTY_LIST;
+        } else {
+            navigationItems = nextNavigationItem.getChildNavigationItems();
         }
     }
 %>
