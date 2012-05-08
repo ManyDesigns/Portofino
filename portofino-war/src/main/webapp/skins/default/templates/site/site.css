@@ -30,6 +30,7 @@ div.contentBody {
 }
 
 .tab {
+    border-right: 2px solid white;
     padding: .8em 1em .8em .8em;
     font-weight: bold;
     float: left;
@@ -42,6 +43,7 @@ div.contentBody {
     margin-left: 0;
     background-color: #65A7DB;
     overflow: hidden;
+    font-size: 1.2em;
 }
 
 .tab-row.first {
@@ -59,6 +61,7 @@ div.contentBody {
 
 .tab.selected {
     border: none;
+    border-right: 2px solid white;
     background: #65A7DB url('../../images/tab-selected.png') no-repeat center bottom;
 }
 
@@ -81,4 +84,22 @@ div.contentBody {
     left: 0;
     position: absolute;
     right: 0;
+}
+
+div#sidebar #navigation {
+    border: 1px dashed #808080;
+    min-height: 125px;
+    margin-bottom: 1em;
+}
+
+div#sidebar #navigation > ul {
+    margin: .5em;
+}
+
+div#sidebar #navigation hr {
+    border: none;
+    border-top: 1px dashed black;
+    color: #F8F8FF;
+    margin-left: 1em;
+    margin-right: 1em;
 }

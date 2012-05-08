@@ -75,33 +75,6 @@ div#hd-title h1 {
     margin-bottom: 0.5em;
 }
 
-.tab {
-    padding: 3px 1em 3px 1em;
-    font-weight: bold;
-}
-
-.tab-row {
-    border-top: solid 1px #808080;
-    padding-top: 0.5em;
-    margin-bottom: 0.5em;
-    margin-left: 1em;
-    font-size: 1.2em;
-}
-
-.tab-row.first {
-    border-top: none;
-}
-
-.tab.path {
-    border: 1px dashed;
-    background-color: #ffffff;
-}
-
-.tab.selected {
-    border: 1px solid;
-    background-color: #ffffff;
-}
-
 div#ft {
     padding-top: .5em;
     border-top: 1px solid gray;

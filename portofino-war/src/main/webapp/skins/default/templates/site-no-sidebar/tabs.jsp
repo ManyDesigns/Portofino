@@ -1,4 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
+<%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <%@ page import="com.manydesigns.portofino.navigation.Navigation" %>
 <%@ page import="com.manydesigns.portofino.navigation.NavigationItem" %>
 <%@ page import="java.util.ArrayList" %>
@@ -12,10 +14,15 @@
 <jsp:useBean id="app" scope="request" type="com.manydesigns.portofino.application.Application" />
 <%
     boolean admin = SecurityLogic.isAdministrator(request);
-    int maxLevels = 2;
-    Object attribute = request.getAttribute("tab.maxLevels");
-    if(attribute instanceof Number) {
-        maxLevels = ((Number) attribute).intValue();
+    int maxLevels = 1;
+    String param = request.getParameter("tabsMaxLevels");
+    if(param != null) {
+        maxLevels = Integer.parseInt(param);
+    }
+    boolean includeAdminButtons = false;
+    param = request.getParameter("tabsIncludeAdminButtons");
+    if(param != null) {
+        includeAdminButtons = Boolean.valueOf(param);
     }
 
     Navigation navigation = new Navigation(app, dispatch, SecurityUtils.getSubject(), admin);
@@ -34,13 +41,31 @@
         NavigationItem nextNavigationItem = null;
         if (first) {
             first = false;
-            %><div class="tab-row first"><%
+            %><div class="tab-row first">
+<c:if test="<%= includeAdminButtons %>">
+<stripes:form action="/actions/admin/page" method="post" id="pageAdminForm">
+    <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
+    <!-- Admin buttons -->
+    <% if(SecurityLogic.isAdministrator(request)) { %>
+        <div class="contentBarButtons">
+            <portofino:page-layout-button />
+            <portofino:reload-model-button />
+            <portofino:page-children-button />
+            <portofino:page-permissions-button />
+            <portofino:page-copy-button />
+            <portofino:page-new-button />
+            <portofino:page-delete-button />
+            <portofino:page-move-button />
+        </div>
+    <% } %>
+</stripes:form>
+</c:if><%
         } else {
             %><div class="tab-row"><%
         }
         for (NavigationItem current : navigationItems) {
             XhtmlBuffer xb = new XhtmlBuffer(out);
-            xb.openElement("span");
+            xb.openElement("div");
             if (current.isInPath()) {
                 if (current.isSelected() || depth >= maxLevels) {
                     xb.addAttribute("class", "tab selected");
@@ -52,7 +77,7 @@
                 xb.addAttribute("class", "tab");
             }
             xb.writeAnchor(current.getPath(), current.getPage().getTitle());
-            xb.closeElement("span");
+            xb.closeElement("div");
         }
         %></div><%
         if (nextNavigationItem != null && depth < maxLevels) {

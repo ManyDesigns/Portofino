@@ -25,7 +25,7 @@
         <title><c:out value="${actionBean.dispatch.lastPageInstance.page.description}"/></title>
     </head>
     <body class="yui-skin-sam">
-    <div id="doc4" class="yui-t4">
+    <div id="doc4" class="yui-t2">
         <div id="hd">
             <jsp:include page="../../header.jsp"/>
             <div class="tabs">
@@ -53,18 +53,6 @@
                     </div>
                 </div>
             </div>
-            <div id="sidebar" class="yui-b">
-                <portofino:portlets list="aboveNavigation" />
-                <div id="navigation">
-                    <jsp:include page="../../navigation.jsp">
-                        <jsp:param name="navigation.startingLevel" value="1" />
-                    </jsp:include>
-                </div>
-                <portofino:portlets list="belowNavigation" />
-            </div>
-            <script type="text/javascript">
-                fixSideBar();
-            </script>
         </div>
         <div id="ft">
             <jsp:include page="../../footer.jsp"/>
