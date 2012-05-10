@@ -150,9 +150,13 @@ public class TextAction extends AbstractPageAction {
         try {
             long size = IOUtils.copyLarge(
                     new ByteArrayInputStream(contentByteArray), fileOutputStream);
+        } catch (IOException e) {
+            logger.error("Could not save content", e);
+            throw e;
         } finally {
             fileOutputStream.close();
         }
+        logger.info("Content saved to: {}", textFile.getAbsolutePath());
     }
 
     protected String processContentBeforeSave(String content) {
@@ -485,7 +489,7 @@ public class TextAction extends AbstractPageAction {
     public Resolution editContent() throws IOException {
         try {
             loadContent();
-            logger.info("Edit content");
+            logger.info("Edit content: {}", textFile.getAbsolutePath());
             return new ForwardResolution("/layouts/text/edit-content.jsp");
         } catch (IOException e) {
             logger.error("Could not load content", e);
@@ -496,9 +500,13 @@ public class TextAction extends AbstractPageAction {
 
     @Button(list = "edit-content", key = "commons.update")
     @RequiresPermissions(level = AccessLevel.EDIT)
-    public Resolution updateContent() throws IOException {
-        saveContent();
-        SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
+    public Resolution updateContent() {
+        try {
+            saveContent();
+            SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
+        } catch (IOException e) {
+            SessionMessages.addInfoMessage(getMessage("commons.update.failed"));
+        }
         return cancel();
     }
 
