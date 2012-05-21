@@ -30,15 +30,17 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
 import groovy.lang.GroovyShell;
+import groovy.util.GroovyScriptEngine;
+import groovy.util.ResourceException;
+import groovy.util.ScriptException;
 import ognl.OgnlContext;
-import org.apache.commons.io.IOUtils;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -74,27 +76,18 @@ public class ScriptingUtil {
         }
     }
 
-    public static GroovyObject getGroovyObject(File storageDir, String pageId) throws IOException {
+    public static GroovyObject getGroovyObject(File storageDir, String pageId)
+            throws IOException, ScriptException, ResourceException {
         File file = getGroovyScriptFile(storageDir, pageId);
         return getGroovyObject(file);
     }
 
-    public static GroovyObject getGroovyObject(File file) throws IOException {
+    public static GroovyObject getGroovyObject(File file) throws IOException, ScriptException, ResourceException {
         if(!file.exists()) {
             return null;
         }
 
-        Class groovyClass = GROOVY_CLASS_LOADER.parseClass(file);
-
-        try {
-            return (GroovyObject) groovyClass.newInstance();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static GroovyObject getGroovyObject(String text, String fileName) {
-        Class groovyClass = GROOVY_CLASS_LOADER.parseClass(text, fileName);
+        Class groovyClass = getGroovyClass(file);
 
         try {
             return (GroovyObject) groovyClass.newInstance();
@@ -107,41 +100,44 @@ public class ScriptingUtil {
         return RandomUtil.getCodeFile(storageDir, GROOVY_FILE_NAME_PATTERN, pageId);
     }
 
-    public static GroovyClassLoader GROOVY_CLASS_LOADER =
-            makeFallbackClassLoader();
+    public static GroovyScriptEngine GROOVY_SCRIPT_ENGINE =
+            new GroovyScriptEngine(new URL[0], ScriptingUtil.class.getClassLoader());
+            //makeFallbackClassLoader();
 
-    protected static GroovyClassLoader makeFallbackClassLoader() {
-        return new GroovyClassLoader(ScriptingUtil.class.getClassLoader());
-    }
-
-    public static Class<?> getGroovyClass(File scriptFile) throws IOException {
+    public static Class<?> getGroovyClass(File scriptFile) throws IOException, ScriptException, ResourceException {
         if(!scriptFile.exists()) {
             return null;
         }
-        FileReader fr = new FileReader(scriptFile);
-        String script = IOUtils.toString(fr);
-        IOUtils.closeQuietly(fr);
-        return getGroovyClass(script, scriptFile);
+        return GROOVY_SCRIPT_ENGINE.loadScriptByName(scriptFile.toURI().toString());
     }
 
-    public static Class<?> getGroovyClass(String script, File scriptFile) {
-        String path = scriptFile.getAbsolutePath();
-        return GROOVY_CLASS_LOADER.parseClass(script, path);
-    }
+    /*public static Class<?> getGroovyClass(String script, File scriptFile) {
+        //String path = scriptFile.getAbsolutePath();
+        return GROOVY_SCRIPT_ENGINE.loadScriptByName(scriptFile.toURI().toString());
+    }*/
 
+    //TODO mappa application -> classloader (multi-app)
     public static void initBaseClassLoader(Application application) {
         CompilerConfiguration cc = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
-        String classpath = new File(application.getAppScriptsDir(), "common").getAbsolutePath();
+        File classpathFile = new File(application.getAppScriptsDir(), "common");
+        String classpath = classpathFile.getAbsolutePath();
         logger.info("Base classpath for application " + application.getAppId() + " is " + classpath);
         cc.setClasspath(classpath);
         cc.setRecompileGroovySource(true);
         GroovyClassLoader gcl = new GroovyClassLoader(ScriptingUtil.class.getClassLoader(), cc);
         GroovyClassLoader defaultClassLoader = new GroovyClassLoader(gcl);
         defaultClassLoader.setShouldRecompile(true);
-        GROOVY_CLASS_LOADER = defaultClassLoader;
+        try {
+            GROOVY_SCRIPT_ENGINE =
+                    new GroovyScriptEngine(new URL[] { classpathFile.toURI().toURL() },
+                                           ScriptingUtil.class.getClassLoader());
+        } catch (IOException e) {
+            throw new Error(e);
+        }
+        GROOVY_SCRIPT_ENGINE.setConfig(cc);
     }
 
     public static void removeBaseClassLoader(Application application) {
-        GROOVY_CLASS_LOADER = makeFallbackClassLoader();
+        GROOVY_SCRIPT_ENGINE = new GroovyScriptEngine(new URL[0], ScriptingUtil.class.getClassLoader());
     }
 }

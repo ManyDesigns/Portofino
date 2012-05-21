@@ -39,9 +39,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -209,24 +210,24 @@ public class DispatcherLogic {
     }
 
     public static Class<? extends PageAction> getActionClass(Application application, File directory) {
+        return getActionClass(application, directory, true);
+    }
+
+    public static Class<? extends PageAction> getActionClass
+            (Application application, File directory, boolean fallback) {
         File scriptFile = ScriptingUtil.getGroovyScriptFile(directory, "action");
-        Class<? extends PageAction> actionClass = getCachedActionClass(scriptFile);
-        if(actionClass != null) {
+        Class<? extends PageAction> actionClass;
+        try {
+            actionClass = (Class<? extends PageAction>) ScriptingUtil.getGroovyClass(scriptFile);
+        } catch (Exception e) {
+            logger.error("Couldn't load action class for " + directory + ", returning safe-mode action", e);
+            return fallback ? getFallbackActionClass(application) : null;
+        }
+        if(isValidActionClass(actionClass)) {
             return actionClass;
         } else {
-            try {
-                actionClass = (Class<? extends PageAction>) ScriptingUtil.getGroovyClass(scriptFile);
-            } catch (Exception e) {
-                logger.error("Couldn't load action class for " + directory + ", returning safe-mode action", e);
-                return getFallbackActionClass(application);
-            }
-            if(isValidActionClass(actionClass)) {
-                cacheActionClass(scriptFile, actionClass);
-                return actionClass;
-            } else {
-                logger.error("Invalid action class for " + directory + ": " + actionClass);
-                return getFallbackActionClass(application);
-            }
+            logger.error("Invalid action class for " + directory + ": " + actionClass);
+            return fallback ? getFallbackActionClass(application) : null;
         }
     }
 
@@ -243,63 +244,6 @@ public class DispatcherLogic {
         } catch (Throwable e) {
             throw new Error("Configuration error, fallback action class not found: " + className, e);
         }
-    }
-
-    public static Class<? extends PageAction> setActionClass(File directory) throws IOException {
-        File groovyScriptFile =
-                ScriptingUtil.getGroovyScriptFile(directory, "action");
-        Class<?> scriptClass = ScriptingUtil.getGroovyClass(groovyScriptFile);
-        if(!isValidActionClass(scriptClass)) {
-            removeCachedActionClass(groovyScriptFile);
-            return null;
-        } else {
-            cacheActionClass(groovyScriptFile, (Class<? extends PageAction>) scriptClass);
-            return (Class<? extends PageAction>) scriptClass;
-        }
-    }
-
-    private static final ConcurrentMap<File, ActionClassInfo> actionClassCache =
-            new ConcurrentHashMap<File, ActionClassInfo>();
-
-    protected static class ActionClassInfo {
-        public final Class<? extends PageAction> actionClass;
-        public final long timestamp;
-        public ActionClassInfo(Class<? extends PageAction> actionClass, long timestamp) {
-            this.actionClass = actionClass;
-            this.timestamp = timestamp;
-        }
-    }
-
-    protected static Class<? extends PageAction> getCachedActionClass(File scriptFile) {
-        ActionClassInfo info = actionClassCache.get(scriptFile);
-        if(info != null) {
-            logger.debug("Action found in cache: {}", scriptFile);
-            if(info.timestamp < scriptFile.lastModified()) {
-                logger.debug("Reloading action from {}", scriptFile);
-                Class<? extends PageAction> actionClass;
-                try {
-                    actionClass = (Class<? extends PageAction>) ScriptingUtil.getGroovyClass(scriptFile);
-                    cacheActionClass(scriptFile, actionClass);
-                    return actionClass;
-                } catch (Exception e) {
-                    logger.error("Couldn't reload action class from " + scriptFile, e);
-                    cacheActionClass(scriptFile, null);
-                    return null;
-                }
-            } else {
-                return info.actionClass;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    protected static void cacheActionClass(File scriptFile, Class<? extends PageAction> scriptClass) {
-        actionClassCache.put(scriptFile, new ActionClassInfo(scriptClass, scriptFile.lastModified()));
-    }
-
-    protected static void removeCachedActionClass(File scriptFile) {
-        actionClassCache.remove(scriptFile);
     }
 
     public static boolean isValidActionClass(Class<?> actionClass) {

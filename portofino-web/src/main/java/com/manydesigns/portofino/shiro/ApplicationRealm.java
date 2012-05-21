@@ -29,7 +29,6 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.io.IOUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -41,9 +40,7 @@ import sun.misc.BASE64Encoder;
 
 import javax.servlet.ServletContext;
 import java.io.File;
-import java.io.FileReader;
 import java.security.MessageDigest;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -107,10 +104,7 @@ public class ApplicationRealm extends AuthorizingRealm implements UsersGroupsDAO
         Object groovyObject;
         if(file.exists()) {
             try {
-                FileReader fr = new FileReader(file);
-                String script = IOUtils.toString(fr);
-                IOUtils.closeQuietly(fr);
-                groovyObject = ScriptingUtil.getGroovyObject(script, file.getAbsolutePath());
+                groovyObject = ScriptingUtil.getGroovyObject(file);
             } catch (Exception e) {
                 logger.error("Couldn't load security script", e);
                 throw new Error("Security script missing or invalid: " + file.getAbsolutePath());

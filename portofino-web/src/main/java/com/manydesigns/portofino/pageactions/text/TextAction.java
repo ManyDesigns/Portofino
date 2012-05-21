@@ -199,6 +199,7 @@ public class TextAction extends AbstractPageAction {
         while (matcher.find()) {
             String attribute = matcher.group(1);
             String path = matcher.group(8 + hosts.size());
+            assert path.startsWith("/");
             String queryString = matcher.group(10 + hosts.size());
             String hostAndPort = matcher.group(5);
             if(!StringUtils.isBlank(hostAndPort) && !path.startsWith(contextPath)) {
