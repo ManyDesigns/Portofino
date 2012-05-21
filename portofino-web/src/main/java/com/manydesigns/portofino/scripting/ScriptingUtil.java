@@ -114,11 +114,6 @@ public class ScriptingUtil {
         return new GroovyClassLoader(ScriptingUtil.class.getClassLoader());
     }
 
-    public static Class<?> getGroovyClass(File storageDirFile, String id) throws IOException {
-        File scriptFile = getGroovyScriptFile(storageDirFile, id);
-        return getGroovyClass(scriptFile);
-    }
-
     public static Class<?> getGroovyClass(File scriptFile) throws IOException {
         if(!scriptFile.exists()) {
             return null;
