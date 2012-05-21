@@ -98,7 +98,11 @@ public class OgnlTextFormat
         if(locale == null) {
             HttpServletRequest req =
                 ElementsThreadLocals.getHttpServletRequest();
-            locale = req.getLocale();
+            if(req != null) {
+                locale = req.getLocale();
+            } else { //Not in a HTTP request.
+                locale = Locale.getDefault();
+            }
         }
         String result = new MessageFormat(getFormatString(), locale).format(argStrings);
 
