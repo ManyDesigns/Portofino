@@ -23,6 +23,7 @@
 package com.manydesigns.portofino.actions.forms;
 
 import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.RegExp;
 import com.manydesigns.elements.annotations.Required;
 
 /**
@@ -35,6 +36,7 @@ public class CopyPage {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
+    @RegExp(value = "[a-zA-Z0-9][a-zA-Z0-9_\\-]*", errorMessage = "page.invalid.fragment")
     @Required
     @Label("Fragment")
     public String fragment;

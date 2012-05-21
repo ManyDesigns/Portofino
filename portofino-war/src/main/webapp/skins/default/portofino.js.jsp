@@ -36,7 +36,7 @@ function copyFormAsHiddenFields(source, form) {
 
 function confirmDeletePage(pagePath, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/actions/admin/page/dialog?confirmDelete&pagePath=" + pagePath, function() {
+    dialogDiv.load(contextPath + "/actions/admin/page?confirmDelete&originalPath=" + pagePath, function() {
         dialogDiv.find("#dialog-confirm-delete-page").dialog({
             modal: true,
             width: 500,
@@ -59,7 +59,7 @@ function confirmDeletePage(pagePath, contextPath) {
 
 function showMovePageDialog(pagePath, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/actions/admin/page/dialog?chooseNewLocation&pagePath=" + pagePath, function() {
+    dialogDiv.load(contextPath + "/actions/admin/page?chooseNewLocation&originalPath=" + pagePath, function() {
         dialogDiv.find("#dialog-move-page").dialog({
             modal: true,
             width: 500,
@@ -82,7 +82,7 @@ function showMovePageDialog(pagePath, contextPath) {
 
 function showCopyPageDialog(pagePath, contextPath) {
     var dialogDiv = $(document.createElement("div"));
-    dialogDiv.load(contextPath + "/actions/admin/page/dialog?copyPageDialog&pagePath=" + pagePath, function() {
+    dialogDiv.load(contextPath + "/actions/admin/page?copyPageDialog&originalPath=" + pagePath, function() {
         dialogDiv.find("#dialog-copy-page").dialog({
             modal: true,
             width: 500,

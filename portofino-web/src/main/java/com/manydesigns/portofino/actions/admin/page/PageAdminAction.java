@@ -23,6 +23,7 @@
 package com.manydesigns.portofino.actions.admin.page;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
@@ -30,12 +31,15 @@ import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
+import com.manydesigns.portofino.actions.forms.CopyPage;
+import com.manydesigns.portofino.actions.forms.MovePage;
 import com.manydesigns.portofino.actions.forms.NewPage;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
@@ -108,8 +112,6 @@ public class PageAdminAction extends AbstractActionBean {
     protected static final String[][] NEW_PAGE_SETUP_FIELDS = {
             {"actionClassName", "fragment", "title", "description", "insertPositionName"}};
     protected Form newPageForm;
-    protected String destinationPagePath;
-    protected String fragment;
     protected String title;
 
     protected final PageActionRegistry registry = new PageActionRegistry();
@@ -422,15 +424,43 @@ public class PageAdminAction extends AbstractActionBean {
 
     @RequiresAdministrator
     public Resolution movePage() {
-        return copyPage(null, true);
+        buildMovePageForm();
+        moveForm.readFromRequest(context.getRequest());
+        if(moveForm.validate()) {
+            MovePage p = new MovePage();
+            moveForm.writeToObject(p);
+            return copyPage(p.destinationPagePath, null, true);
+        } else {
+            Field field = moveForm.get(0).get(0);
+            if(!field.getErrors().isEmpty()) {
+                SessionMessages.addErrorMessage(field.getLabel() + ": " + field.getErrors().get(0));
+            }
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
     }
 
     @RequiresAdministrator
     public Resolution copyPage() {
-        return copyPage(fragment, false);
+        buildCopyPageForm();
+        copyForm.readFromRequest(context.getRequest());
+        if(copyForm.validate()) {
+            CopyPage p = new CopyPage();
+            copyForm.writeToObject(p);
+            return copyPage(p.destinationPagePath, p.fragment, false);
+        } else {
+            Field field = copyForm.get(0).get(0);
+            if(!field.getErrors().isEmpty()) {
+                SessionMessages.addErrorMessage(field.getLabel() + ": " + field.getErrors().get(0));
+            }
+            field = copyForm.get(0).get(1);
+            if(!field.getErrors().isEmpty()) {
+                SessionMessages.addErrorMessage(field.getLabel() + ": " + field.getErrors().get(0));
+            }
+            return new RedirectResolution(dispatch.getOriginalPath());
+        }
     }
 
-    protected Resolution copyPage(String newName, boolean deleteOriginal) {
+    protected Resolution copyPage(String destinationPagePath, String newName, boolean deleteOriginal) {
         if(StringUtils.isEmpty(destinationPagePath)) {
             SessionMessages.addErrorMessage(getMessage("page.copyOrMove.noDestination"));
             return new RedirectResolution(dispatch.getOriginalPath());
@@ -522,17 +552,15 @@ public class PageAdminAction extends AbstractActionBean {
             } else {
                 String msg = getMessage("page.copyOrMove.destinationExists", newDirectory.getAbsolutePath());
                 SessionMessages.addErrorMessage(msg);
-            }
-            if(deleteOriginal) {
-                return new RedirectResolution("");
-            } else {
                 return new RedirectResolution(dispatch.getOriginalPath());
             }
+            return new RedirectResolution(
+                    destinationPagePath + (destinationPagePath.endsWith("/") ? "" : "/") + newName);
         } else {
             String msg = getMessage("page.copyOrMove.invalidDestination", destinationPagePath);
             SessionMessages.addErrorMessage(msg);
+            return new RedirectResolution(dispatch.getOriginalPath());
         }
-        return new RedirectResolution(dispatch.getOriginalPath());
     }
 
     protected class CopyVisitor extends ModelObjectVisitor {
@@ -976,6 +1004,60 @@ public class PageAdminAction extends AbstractActionBean {
     }
 
     //--------------------------------------------------------------------------
+    // Dialog
+    //--------------------------------------------------------------------------
+
+    protected Form moveForm;
+    protected Form copyForm;
+
+    @RequiresAdministrator
+    public Resolution confirmDelete() {
+        return new ForwardResolution("/layouts/admin/deletePageDialog.jsp");
+    }
+
+    @RequiresAdministrator
+    public Resolution chooseNewLocation() {
+        buildMovePageForm();
+        return new ForwardResolution("/layouts/admin/movePageDialog.jsp");
+    }
+
+    protected void buildMovePageForm() {
+        PageInstance pageInstance = dispatch.getLastPageInstance();
+        SelectionProvider pagesSelectionProvider =
+                DispatcherLogic.createPagesSelectionProvider
+                        (application, application.getPagesDir(), true, true, pageInstance.getDirectory());
+        moveForm = new FormBuilder(MovePage.class)
+                .configReflectiveFields()
+                .configSelectionProvider(pagesSelectionProvider, "destinationPagePath")
+                .build();
+    }
+
+    @RequiresAdministrator
+    public Resolution copyPageDialog() {
+        buildCopyPageForm();
+        return new ForwardResolution("/layouts/admin/copyPageDialog.jsp");
+    }
+
+    protected void buildCopyPageForm() {
+        PageInstance pageInstance = dispatch.getLastPageInstance();
+        SelectionProvider pagesSelectionProvider =
+                DispatcherLogic.createPagesSelectionProvider
+                        (application, application.getPagesDir(), true, true, pageInstance.getDirectory());
+        copyForm = new FormBuilder(CopyPage.class)
+                .configReflectiveFields()
+                .configSelectionProvider(pagesSelectionProvider, "destinationPagePath")
+                .build();
+    }
+
+    public Form getMoveForm() {
+        return moveForm;
+    }
+
+    public Form getCopyForm() {
+        return copyForm;
+    }
+
+    //--------------------------------------------------------------------------
     // Getters/Setters
     //--------------------------------------------------------------------------
 
@@ -1021,22 +1103,6 @@ public class PageAdminAction extends AbstractActionBean {
 
     public Form getNewPageForm() {
         return newPageForm;
-    }
-
-    public String getDestinationPagePath() {
-        return destinationPagePath;
-    }
-
-    public void setDestinationPagePath(String destinationPagePath) {
-        this.destinationPagePath = destinationPagePath;
-    }
-
-    public String getFragment() {
-        return fragment;
-    }
-
-    public void setFragment(String fragment) {
-        this.fragment = fragment;
     }
 
     public String getOriginalPath() {

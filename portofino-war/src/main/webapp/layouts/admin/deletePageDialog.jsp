@@ -5,7 +5,7 @@
 <%@ page import="com.manydesigns.portofino.pages.ChildPage" %>
 <%@ page import="java.util.ArrayList" %>
 <jsp:useBean id="actionBean" scope="request"
-             type="com.manydesigns.portofino.actions.admin.page.PageAdminDialogAction"/>
+             type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
 <div id="dialog-confirm-delete-page" title='<fmt:message key="layouts.admin.deletePageDialog.really_delete"/>'>
     <p><fmt:message key="layouts.admin.deletePageDialog.are_you_sure"/></p>
     <%
