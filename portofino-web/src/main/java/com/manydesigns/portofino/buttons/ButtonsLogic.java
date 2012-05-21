@@ -22,6 +22,7 @@
 
 package com.manydesigns.portofino.buttons;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
@@ -31,8 +32,10 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.RequiresPermissions;
+import ognl.OgnlContext;
 import org.apache.shiro.subject.Subject;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -101,10 +104,10 @@ public class ButtonsLogic {
         return doGuardsPass(actionBean, method, null);
     }
 
-    public static boolean doGuardsPass(Object actionBean, Method method, GuardType type) {
+    public static boolean doGuardsPass(Object actionBean, Method method, @Nullable GuardType type) {
         List<Guard> guards = getGuards(method, type);
         boolean pass = true;
-        HashMap ognlContext = new HashMap();
+        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
         for(Guard guard : guards) {
             Object result = OgnlUtils.getValueQuietly(guard.test(), ognlContext, actionBean);
             pass &= result instanceof Boolean && ((Boolean) result);
