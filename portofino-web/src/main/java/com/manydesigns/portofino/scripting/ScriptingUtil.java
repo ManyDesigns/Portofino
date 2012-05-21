@@ -119,7 +119,7 @@ public class ScriptingUtil {
     //TODO mappa application -> classloader (multi-app)
     public static void initBaseClassLoader(Application application) {
         CompilerConfiguration cc = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
-        File classpathFile = new File(application.getAppScriptsDir(), "common");
+        File classpathFile = application.getAppScriptsDir();
         String classpath = classpathFile.getAbsolutePath();
         logger.info("Base classpath for application " + application.getAppId() + " is " + classpath);
         cc.setClasspath(classpath);

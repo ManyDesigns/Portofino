@@ -78,7 +78,7 @@ public class DefaultApplication implements Application {
     public static final String APP_BLOBS_DIR = "blobs";
     public static final String APP_DBS_DIR = "dbs";
     public static final String APP_MODEL_FILE = "portofino-model.xml";
-    public static final String APP_SCRIPTS_DIR = "scripts";
+    public static final String APP_SCRIPTS_DIR = "groovy";
     public static final String APP_PAGES_DIR = "pages";
     public static final String APP_STORAGE_DIR = "storage";
     public static final String APP_WEB_DIR = "web";
