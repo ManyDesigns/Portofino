@@ -27,13 +27,9 @@
 *
 */
 
-package com.manydesigns.portofino.servlets;
+package com.manydesigns.portofino.starter.web;
 
-import com.manydesigns.portofino.scripting.ScriptingUtil;
-import com.manydesigns.portofino.starter.ApplicationStarter;
-import org.apache.commons.configuration.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.manydesigns.portofino.application.Application;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,33 +37,12 @@ import org.slf4j.LoggerFactory;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class WebApplicationStarter extends ApplicationStarter {
+public interface ApplicationListener {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    private final static Logger logger =
-            LoggerFactory.getLogger(WebApplicationStarter.class);
+    boolean applicationStarting(Application application);
 
-    public WebApplicationStarter(Configuration portofinoConfiguration) {
-        super(portofinoConfiguration);
-    }
+    void applicationDestroying(Application application);
 
-    @Override
-    public boolean setupApplication() {
-        boolean success = super.setupApplication();
-        if(success) {
-            logger.info("Initializing base classloader for application {}", tmpApplication.getAppId());
-            ScriptingUtil.initBaseClassLoader(tmpApplication);
-        }
-        return success;
-    }
-
-    @Override
-    public synchronized void destroy() {
-        super.destroy();
-        if(application != null) {
-            logger.info("Removing base classloader for application {}", application.getAppId());
-            ScriptingUtil.removeBaseClassLoader(application);
-        }
-    }
 }

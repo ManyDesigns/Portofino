@@ -126,10 +126,15 @@ public class ApplicationStarter {
         status = Status.DESTROYING;
 
         if (application != null) {
+            destroyApplication();
             application.shutdown();
         }
 
         status = Status.DESTROYED;
+    }
+
+    protected void destroyApplication() {
+        //Do nothing. Subclasses can provide their own behaviour.
     }
 
     public Status getStatus() {

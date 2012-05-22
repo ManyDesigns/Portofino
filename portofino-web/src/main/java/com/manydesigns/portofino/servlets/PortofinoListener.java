@@ -35,6 +35,7 @@ import com.manydesigns.portofino.liquibase.LiquibaseUtils;
 import com.manydesigns.portofino.quartz.MailSenderJob;
 import com.manydesigns.portofino.shiro.UsersGroupsDAO;
 import com.manydesigns.portofino.starter.ApplicationStarter;
+import com.manydesigns.portofino.starter.web.WebApplicationStarter;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -283,12 +284,12 @@ public class PortofinoListener
 
     public void sessionCreated(HttpSessionEvent httpSessionEvent) {
         HttpSession session = httpSessionEvent.getSession();
-        logger.info("Session created: id={}", session.getId());
+        logger.debug("Session created: id={}", session.getId());
     }
 
     public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
         HttpSession session = httpSessionEvent.getSession();
-        logger.info("Session destroyed: id={}", session.getId());
+        logger.debug("Session destroyed: id={}", session.getId());
     }
 
     //**************************************************************************
