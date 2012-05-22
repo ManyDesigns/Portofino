@@ -62,6 +62,7 @@
     </file>
   </files>
   <fileSets>
+    <!-- Source code -->
     <fileSet>
       <directory>elements/src/main</directory>
       <outputDirectory>elements/src/main</outputDirectory>
@@ -104,9 +105,17 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
+    <!-- Javadocs -->
     <fileSet>
       <directory>elements/target/apidocs</directory>
       <outputDirectory>javadocs/elements</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>elements-extras/target/apidocs</directory>
+      <outputDirectory>javadocs/elements-extras</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -121,6 +130,13 @@
     <fileSet>
       <directory>portofino-web/target/apidocs</directory>
       <outputDirectory>javadocs/portofino-web</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>mail/target/apidocs</directory>
+      <outputDirectory>javadocs/mail</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
