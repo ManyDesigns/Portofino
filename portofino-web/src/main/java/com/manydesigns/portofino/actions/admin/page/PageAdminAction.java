@@ -297,7 +297,7 @@ public class PageAdminAction extends AbstractActionBean {
                     directory = new File(parentDirectory, fragment);
                     parentPage = DispatcherLogic.getPage(parentDirectory);
                     parentLayout = parentPage.getLayout();
-                    configurePath = "";
+                    configurePath = "/";
                     break;
                 case CHILD:
                     PageInstance lastPageInstance = getPageInstance();
@@ -369,7 +369,7 @@ public class PageAdminAction extends AbstractActionBean {
             }
             logger.info("Page " + pageId + " created. Path: " + directory.getAbsolutePath());
             SessionMessages.addInfoMessage(getMessage("page.create.successful"));
-            String url = context.getRequest().getContextPath() + "/" + configurePath + "/" + fragment;
+            String url = context.getRequest().getContextPath() + configurePath + "/" + fragment;
             return new RedirectResolution(url, false)
                             .addParameter("configure").addParameter("cancelReturnUrl", url);
         } else {

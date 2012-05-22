@@ -50,7 +50,7 @@ public class ResourceBundleManager {
     protected final ConcurrentMap<Locale, ConfigurationResourceBundle> resourceBundles =
             new ConcurrentHashMap<Locale, ConfigurationResourceBundle>();
 
-    private static final Logger logger = LoggerFactory.getLogger(ResourceBundleManager.class);
+    public static final Logger logger = LoggerFactory.getLogger(ResourceBundleManager.class);
     protected final String resourceBundleName;
 
     public ResourceBundleManager(File dir) {

@@ -53,7 +53,7 @@ public class ApplicationRealm extends AuthorizingRealm implements UsersGroupsDAO
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    private static final Logger logger = LoggerFactory.getLogger(ApplicationRealm.class);
+    public static final Logger logger = LoggerFactory.getLogger(ApplicationRealm.class);
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {

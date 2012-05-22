@@ -54,7 +54,7 @@ public class SelectionProviderLogic {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    private static final Logger logger = LoggerFactory.getLogger(SelectionProviderLogic.class);
+    public static final Logger logger = LoggerFactory.getLogger(SelectionProviderLogic.class);
 
     public static DefaultSelectionProvider createSelectionProvider
             (String name, int fieldCount, Class[] fieldTypes, Collection<Object[]> objects) {

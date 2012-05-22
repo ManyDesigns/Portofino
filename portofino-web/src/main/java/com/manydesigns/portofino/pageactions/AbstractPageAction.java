@@ -137,7 +137,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Logging
     //**************************************************************************
 
-    private static final Logger logger =
+    public static final Logger logger =
             LoggerFactory.getLogger(AbstractPageAction.class);
 
     public boolean isEmbedded() {

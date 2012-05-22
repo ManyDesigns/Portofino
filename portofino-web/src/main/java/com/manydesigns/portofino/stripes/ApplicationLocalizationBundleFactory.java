@@ -46,7 +46,7 @@ public class ApplicationLocalizationBundleFactory implements LocalizationBundleF
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    private static final Logger logger = LoggerFactory.getLogger(ApplicationLocalizationBundleFactory.class);
+    public static final Logger logger = LoggerFactory.getLogger(ApplicationLocalizationBundleFactory.class);
 
     protected ServletContext servletContext;
 

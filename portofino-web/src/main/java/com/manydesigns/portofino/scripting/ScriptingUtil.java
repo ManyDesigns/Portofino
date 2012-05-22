@@ -52,7 +52,7 @@ public class ScriptingUtil {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    private static final Logger logger =
+    public static final Logger logger =
             LoggerFactory.getLogger(ScriptingUtil.class);
 
     public static final String GROOVY_FILE_NAME_PATTERN = "{0}.groovy";

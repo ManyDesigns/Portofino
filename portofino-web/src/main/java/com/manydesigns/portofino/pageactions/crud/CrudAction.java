@@ -188,7 +188,7 @@ public class CrudAction extends AbstractPageAction {
     // Logging
     //**************************************************************************
 
-    private static final Logger logger =
+    public static final Logger logger =
             LoggerFactory.getLogger(CrudAction.class);
 
     //**************************************************************************

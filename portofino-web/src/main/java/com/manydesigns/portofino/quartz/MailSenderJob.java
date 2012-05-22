@@ -52,7 +52,7 @@ public class MailSenderJob implements Job {
     public static final String MAIL_SENDER_KEY = "mail.sender";
     public static final String MAIL_IDS_TO_MARK_AS_SENT = "mail.sender.idsToMarkAsSent";
 
-    private static final Logger logger = LoggerFactory.getLogger(MailSenderJob.class);
+    public static final Logger logger = LoggerFactory.getLogger(MailSenderJob.class);
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();

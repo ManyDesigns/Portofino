@@ -54,7 +54,7 @@ public class DispatcherLogic {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    private static final Logger logger = LoggerFactory.getLogger(DispatcherLogic.class);
+    public static final Logger logger = LoggerFactory.getLogger(DispatcherLogic.class);
 
     public static SelectionProvider createPagesSelectionProvider
             (Application application, File baseDir, File... excludes) {

@@ -53,7 +53,7 @@ public class ModelActionResolver extends NameBasedActionResolver {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    private static final Logger logger = LoggerFactory.getLogger(ModelActionResolver.class);
+    public static final Logger logger = LoggerFactory.getLogger(ModelActionResolver.class);
 
     protected ServletContext servletContext;
 

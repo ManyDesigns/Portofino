@@ -27,8 +27,6 @@ import com.manydesigns.portofino.model.database.ForeignKey;
 import com.manydesigns.portofino.model.database.ModelSelectionProvider;
 import com.manydesigns.portofino.model.database.Table;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -61,8 +59,6 @@ public class SelectionProviderReference {
     protected ForeignKey foreignKey;
     protected DisplayMode displayMode;
     protected ModelSelectionProvider selectionProvider;
-
-    private static final Logger logger = LoggerFactory.getLogger(SelectionProviderReference.class);
 
     public void init(Table table) {
         if(displayModeName != null) {

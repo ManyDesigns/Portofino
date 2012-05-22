@@ -46,7 +46,7 @@ public class GroupPermission implements Permission {
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
     protected final Collection<String> groups;
-    private static final Logger logger = LoggerFactory.getLogger(GroupPermission.class);
+    public static final Logger logger = LoggerFactory.getLogger(GroupPermission.class);
 
     public GroupPermission(Collection<String> groups) {
         this.groups = groups;
