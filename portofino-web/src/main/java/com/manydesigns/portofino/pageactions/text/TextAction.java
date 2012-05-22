@@ -167,15 +167,17 @@ public class TextAction extends AbstractPageAction {
 
     protected String processAttachmentUrls(String content) {
         String baseUrl = StringEscapeUtils.escapeHtml(generateViewAttachmentUrl("").replace("?", "\\?"));
-        String patternString = "src\\s*=\\s*\"\\s*" + baseUrl + "([^\"]+)\"";
+        String patternString = "([^\\s\"]+)\\s*=\\s*\"\\s*" + baseUrl + "([^\"]+)\"";
         Pattern pattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(content);
         int lastEnd = 0;
         StringBuilder sb = new StringBuilder();
         while (matcher.find()) {
-            String attachmentId = matcher.group(1);
+            String hrefAttribute = matcher.group(1);
+            String attachmentId = matcher.group(2);
             sb.append(content.substring(lastEnd, matcher.start()));
-            sb.append("portofino:attachment=\"").append(attachmentId).append("\"");
+            sb.append("portofino:attachment=\"").append(attachmentId).append("\" ");
+            sb.append("portofino:hrefAttribute=\"").append(hrefAttribute).append("\"");
             lastEnd = matcher.end();
         }
         sb.append(content.substring(lastEnd));
@@ -263,7 +265,7 @@ public class TextAction extends AbstractPageAction {
     }
 
     protected static final String PORTOFINO_ATTACHMENT_PATTERN =
-            "portofino:attachment=\"([^\"]+)\"";
+            "portofino:attachment=\"([^\"]+)\"( portofino:hrefAttribute=\"([^\"]+)\")?";
 
     protected String restoreAttachmentUrls(String content) {
         Pattern pattern = Pattern.compile(PORTOFINO_ATTACHMENT_PATTERN);
@@ -272,9 +274,13 @@ public class TextAction extends AbstractPageAction {
         StringBuilder sb = new StringBuilder();
         while (matcher.find()) {
             String attachmentId = matcher.group(1);
+            //Default to src for old texts
+            String hrefAttribute = matcher.groupCount() > 3 ? matcher.group(3) : "src";
 
-            sb.append(content.substring(lastEnd, matcher.start()));
-            sb.append("src=\"").append(generateViewAttachmentUrl(attachmentId)).append("\"");
+            sb.append(content.substring(lastEnd, matcher.start()))
+              .append(hrefAttribute).append("=\"")
+              .append(generateViewAttachmentUrl(attachmentId))
+              .append("\"");
 
             lastEnd = matcher.end();
         }
