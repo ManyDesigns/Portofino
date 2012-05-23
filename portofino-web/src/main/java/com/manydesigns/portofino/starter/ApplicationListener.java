@@ -27,9 +27,11 @@
 *
 */
 
-package com.manydesigns.portofino.starter.web;
+package com.manydesigns.portofino.starter;
 
 import com.manydesigns.portofino.application.Application;
+
+import javax.servlet.ServletContext;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,8 +43,8 @@ public interface ApplicationListener {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    boolean applicationStarting(Application application);
+    boolean applicationStarting(Application application, ServletContext servletContext);
 
-    void applicationDestroying(Application application);
+    void applicationDestroying(Application application, ServletContext servletContext);
 
 }

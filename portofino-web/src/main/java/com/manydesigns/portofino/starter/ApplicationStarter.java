@@ -28,6 +28,7 @@ import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.DefaultApplication;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.scripting.ScriptingUtil;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -35,6 +36,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -79,6 +81,9 @@ public class ApplicationStarter {
 
     protected File appDir;
 
+    protected final ServletContext servletContext;
+    protected ApplicationListener applicationListener;
+
     //--------------------------------------------------------------------------
     // Logging
     //--------------------------------------------------------------------------
@@ -90,13 +95,14 @@ public class ApplicationStarter {
     // Contructor
     //--------------------------------------------------------------------------
 
-    public ApplicationStarter(Configuration portofinoConfiguration) {
-        this(portofinoConfiguration, portofinoConfiguration.getString(PortofinoProperties.APP_ID));
+    public ApplicationStarter(ServletContext servletContext, Configuration portofinoConfiguration) {
+        this(servletContext, portofinoConfiguration, portofinoConfiguration.getString(PortofinoProperties.APP_ID));
     }
 
-    public ApplicationStarter(Configuration portofinoConfiguration, String appId) {
+    public ApplicationStarter(ServletContext servletContext, Configuration portofinoConfiguration, String appId) {
         this.appId = appId;
         this.portofinoConfiguration = portofinoConfiguration;
+        this.servletContext = servletContext;
         this.status = Status.UNINITIALIZED;
 
         String appsDirPath =
@@ -174,7 +180,15 @@ public class ApplicationStarter {
     }
 
     protected void destroyApplication() {
-        //Do nothing. Subclasses can provide their own behaviour.
+        if(applicationListener != null) {
+            try {
+                applicationListener.applicationDestroying(application, servletContext);
+            } catch (Throwable t) {
+                logger.error("Application listener threw an exception during shutdown", t);
+            }
+        }
+        logger.info("Removing base classloader for application {}", application.getAppId());
+        ScriptingUtil.removeBaseClassLoader(application);
     }
 
     public Status getStatus() {
@@ -244,11 +258,40 @@ public class ApplicationStarter {
                     portofinoConfiguration, appConfiguration, databasePlatformsManager,
                     appDir);
             tmpApplication.loadXmlModel();
-            return true;
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
             return false;
         }
+
+        logger.info("Initializing base classloader for application {}", tmpApplication.getAppId());
+        ScriptingUtil.initBaseClassLoader(tmpApplication);
+        File appListenerFile = new File(tmpApplication.getAppScriptsDir(), "AppListener.groovy");
+        boolean success = true;
+        try {
+            Object o = ScriptingUtil.getGroovyObject(appListenerFile);
+            if(o != null) {
+                if(o instanceof ApplicationListener) {
+                    applicationListener = (ApplicationListener) o;
+                    logger.info("Invoking application listener defined in {}", appListenerFile.getAbsolutePath());
+                    success = applicationListener.applicationStarting(tmpApplication, servletContext);
+                } else {
+                    logger.error("Candidate app listener " + o +
+                                 " is not an instance of " + ApplicationListener.class);
+                    success = false;
+                }
+            } else {
+                logger.debug("No app listener present");
+            }
+        } catch (Throwable e) {
+            logger.error("Could not invoke app listener", e);
+            success = false;
+        }
+        if(!success) {
+            //Clean up
+            logger.info("Removing base classloader for application {}", tmpApplication.getAppId());
+            ScriptingUtil.removeBaseClassLoader(tmpApplication);
+        }
+        return success;
     }
 
 
