@@ -49,4 +49,6 @@ public class AppProperties {
             "skin";
     public static final String APPLICATION_NAME =
             "app.name";
+    public static final String INIT_AT_STARTUP =
+            "init-at-startup";
 }

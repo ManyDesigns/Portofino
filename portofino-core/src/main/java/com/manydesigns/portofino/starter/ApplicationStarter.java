@@ -24,15 +24,19 @@ package com.manydesigns.portofino.starter;
 
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.DefaultApplication;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -64,6 +68,7 @@ public class ApplicationStarter {
     //--------------------------------------------------------------------------
 
     protected final Configuration portofinoConfiguration;
+    protected Configuration appConfiguration;
 
     protected Status status;
 
@@ -86,8 +91,43 @@ public class ApplicationStarter {
     //--------------------------------------------------------------------------
 
     public ApplicationStarter(Configuration portofinoConfiguration) {
+        this(portofinoConfiguration, portofinoConfiguration.getString(PortofinoProperties.APP_ID));
+    }
+
+    public ApplicationStarter(Configuration portofinoConfiguration, String appId) {
+        this.appId = appId;
         this.portofinoConfiguration = portofinoConfiguration;
-        status = Status.UNINITIALIZED;
+        this.status = Status.UNINITIALIZED;
+
+        String appsDirPath =
+            portofinoConfiguration.getString(
+                PortofinoProperties.APPS_DIR_PATH);
+        File appsDir = new File(appsDirPath);
+        logger.info("Apps dir: {}", appsDir.getAbsolutePath());
+        logger.info("App id: {}", appId);
+        appDir = new File(appsDir, appId);
+        try {
+            loadAppConfiguration();
+            boolean initNow = appConfiguration.getBoolean(AppProperties.INIT_AT_STARTUP, false);
+            if(initNow) {
+                logger.info("Trying to initialize the application (init-at-startup = true)");
+                initializeApplication();
+            }
+        } catch (ConfigurationException e) {
+            logger.error("Couldn't load app configuration", e);
+        } catch (FileNotFoundException e) {
+            logger.warn("Application configuration file not found", e);
+        }
+    }
+
+    protected void loadAppConfiguration() throws ConfigurationException, FileNotFoundException {
+        File appConfigurationFile =
+                new File(appDir, AppProperties.PROPERTIES_RESOURCE);
+        if(appConfigurationFile.exists()) {
+            appConfiguration = new PropertiesConfiguration(appConfigurationFile);
+        } else {
+            throw new FileNotFoundException(appConfigurationFile.getAbsolutePath());
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -151,27 +191,26 @@ public class ApplicationStarter {
 
 
     public boolean initializeApplication() {
-        return initializeApplication(
-                portofinoConfiguration.getString(PortofinoProperties.APP_ID));
-    }
-
-    public boolean initializeApplication(String appId) {
         tmpApplication = null;
-
-        this.appId = appId;
-        logger.info("Application id: {}", appId);
 
         String appsDirPath =
         portofinoConfiguration.getString(
                 PortofinoProperties.APPS_DIR_PATH);
         File appsDir = new File(appsDirPath);
-        logger.info("Apps dir: {}", appsDir.getAbsolutePath());
         boolean success = ElementsFileUtils.ensureDirectoryExistsAndWritable(appsDir);
 
         appDir = new File(appsDir, appId);
         logger.info("Application dir: {}", appDir.getAbsolutePath());
-        success &= ElementsFileUtils.ensureDirectoryExistsAndWritable(appsDir);
+        success &= ElementsFileUtils.ensureDirectoryExistsAndWritable(appDir);
 
+        if(success) {
+            try {
+                loadAppConfiguration();
+            } catch (Exception e) {
+                success = false;
+                logger.error("Couldn't load app configuration", e);
+            }
+        }
 
         if (success) {
             success = setupDatabasePlatformsManager();
@@ -202,7 +241,7 @@ public class ApplicationStarter {
         logger.info("Creating application instance...");
         try {
             tmpApplication = new DefaultApplication(appId,
-                    portofinoConfiguration, databasePlatformsManager,
+                    portofinoConfiguration, appConfiguration, databasePlatformsManager,
                     appDir);
             tmpApplication.loadXmlModel();
             return true;

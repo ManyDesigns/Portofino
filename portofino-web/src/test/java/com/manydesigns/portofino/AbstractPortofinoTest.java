@@ -85,8 +85,8 @@ public abstract class AbstractPortofinoTest extends AbstractElementsTest {
             // ElementsThreadLocals è già stato impostato da AbstractElementsTest
 
             applicationStarter =
-                    new ApplicationStarter(portofinoConfiguration);
-            applicationStarter.initializeApplication(appId);
+                    new ApplicationStarter(portofinoConfiguration, appId);
+            applicationStarter.initializeApplication();
             application = applicationStarter.getApplication();
             model = application.getModel();
 

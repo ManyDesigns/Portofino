@@ -37,7 +37,6 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.Session;
@@ -121,6 +120,7 @@ public class DefaultApplication implements Application {
 
     public DefaultApplication(String appId,
                               org.apache.commons.configuration.Configuration portofinoConfiguration,
+                              org.apache.commons.configuration.Configuration appConfiguration,
                               DatabasePlatformsManager databasePlatformsManager,
                               File appDir
     ) throws Exception {
@@ -130,9 +130,7 @@ public class DefaultApplication implements Application {
         this.appDir = appDir;
 
         resourceBundleManager = new ResourceBundleManager(appDir);
-        File appConfigurationFile =
-                new File(appDir, AppProperties.PROPERTIES_RESOURCE);
-        appConfiguration = new PropertiesConfiguration(appConfigurationFile);
+        this.appConfiguration = appConfiguration;
 
         appBlobsDir = new File(appDir, APP_BLOBS_DIR);
         logger.info("Application blobs dir: {}", appBlobsDir.getAbsolutePath());
