@@ -58,7 +58,7 @@ public class DefaultMailSender implements MailSender {
     protected String login;
     protected String password;
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultMailSender.class);
+    public static final Logger logger = LoggerFactory.getLogger(DefaultMailSender.class);
 
     public DefaultMailSender(MailQueue queue) {
         this.queue = queue;

@@ -50,7 +50,7 @@ public class MailSenderRunnable implements Runnable {
     protected boolean alive;
     protected int pollInterval = 1000;
 
-    private static final Logger logger = LoggerFactory.getLogger(MailSenderRunnable.class);
+    public static final Logger logger = LoggerFactory.getLogger(MailSenderRunnable.class);
 
     public MailSenderRunnable(MailSender sender) {
         this.sender = sender;
