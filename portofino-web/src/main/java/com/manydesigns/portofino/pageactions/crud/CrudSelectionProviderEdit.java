@@ -47,4 +47,8 @@ public class CrudSelectionProviderEdit {
 
     @InSummary(false) //Per non includere in TableForm
     public String[] fieldNames;
+
+    public String createNewHref;
+
+    public String createNewText;
 }

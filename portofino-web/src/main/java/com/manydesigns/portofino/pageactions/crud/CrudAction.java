@@ -236,9 +236,7 @@ public class CrudAction extends AbstractPageAction {
             CrudSelectionProvider sp = it.next();
             if(sp.getSelectionProvider() == null) {
                 it.remove();
-                for(String fieldName : sp.getFieldNames()) {
-                    configuredSPs.add(fieldName);
-                }
+                Collections.addAll(configuredSPs, sp.getFieldNames());
             }
         }
 
@@ -284,17 +282,20 @@ public class CrudAction extends AbstractPageAction {
 
         if(ref == null || ref.isEnabled()) {
             DisplayMode dm = ref != null ? ref.getDisplayMode() : DisplayMode.DROPDOWN;
+            String newHref = ref != null ? ref.getCreateNewValueHref() : null;
+            String newText = ref != null ? ref.getCreateNewValueText() : null;
             SelectionProvider selectionProvider = createSelectionProvider
-                    (current, fieldNames, fieldTypes, dm);
+                    (current, fieldNames, fieldTypes, dm, newHref, newText);
+
             CrudSelectionProvider crudSelectionProvider =
-                new CrudSelectionProvider(selectionProvider, fieldNames);
+                new CrudSelectionProvider(selectionProvider, fieldNames, newHref, newText);
             crudSelectionProviders.add(crudSelectionProvider);
             Collections.addAll(configuredSPs, fieldNames);
             return true;
         } else {
             //To avoid automatically adding a FK later
             CrudSelectionProvider crudSelectionProvider =
-                new CrudSelectionProvider(null, fieldNames);
+                new CrudSelectionProvider(null, fieldNames, null, null);
             crudSelectionProviders.add(crudSelectionProvider);
             return false;
         }
@@ -302,7 +303,7 @@ public class CrudAction extends AbstractPageAction {
 
     protected SelectionProvider createSelectionProvider
             (DatabaseSelectionProvider current, String[] fieldNames,
-             Class[] fieldTypes, DisplayMode dm) {
+             Class[] fieldTypes, DisplayMode dm, String newHref, String newText) {
         DefaultSelectionProvider selectionProvider = null;
         String name = current.getName();
         String databaseName = current.getToDatabase();
@@ -324,6 +325,17 @@ public class CrudAction extends AbstractPageAction {
         } else {
             logger.warn("ModelSelection provider '{}':" +
                     " both 'hql' and 'sql' are null", name);
+        }
+        if(selectionProvider != null) {
+            if(newHref != null) {
+                OgnlTextFormat tf = new OgnlTextFormat(newHref);
+                newHref = tf.format(this);
+                if(newHref.startsWith("/") && !newHref.startsWith(context.getRequest().getContextPath())) {
+                    newHref = context.getRequest().getContextPath() + newHref;
+                }
+            }
+            selectionProvider.setCreateNewValueHref(newHref);
+            selectionProvider.setCreateNewValueText(newText);
         }
         return selectionProvider;
     }
@@ -2072,6 +2084,8 @@ public class CrudAction extends AbstractPageAction {
                     if(selectionProvider != null) {
                         selectionProviderEdits[i].selectionProvider = selectionProvider.getName();
                         selectionProviderEdits[i].displayMode = selectionProvider.getDisplayMode();
+                        selectionProviderEdits[i].createNewHref = cp.getCreateNewValueHref();
+                        selectionProviderEdits[i].createNewText = cp.getCreateNewValueText();
                     } else {
                         selectionProviderEdits[i].selectionProvider = null;
                         selectionProviderEdits[i].displayMode = DisplayMode.DROPDOWN;
@@ -2152,6 +2166,8 @@ public class CrudAction extends AbstractPageAction {
                     if(sp.selectionProvider.equals(dsp.getName())) {
                         SelectionProviderReference sel = makeSelectionProviderReference(dsp);
                         sel.setDisplayMode(sp.displayMode);
+                        sel.setCreateNewValueHref(sp.createNewHref);
+                        sel.setCreateNewValueText(sp.createNewText);
                         break;
                     }
                 }

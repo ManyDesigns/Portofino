@@ -114,6 +114,8 @@ public class SelectField extends AbstractField {
         if(selectionProvider != null) {
             selectionModel = selectionProvider.createSelectionModel();
             selectionModelIndex = 0;
+            createNewValueHref = selectionProvider.getCreateNewValueHref();
+            createNewValueText = selectionProvider.getCreateNewValueText();
         }
 
         if(nullOption) {

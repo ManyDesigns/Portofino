@@ -52,6 +52,9 @@ public class SelectionProviderReference {
     protected String displayModeName;
     protected String selectionProviderName;
 
+    protected String createNewValueHref;
+    protected String createNewValueText;
+
     //**************************************************************************
     // Fields for wire-up
     //**************************************************************************
@@ -135,5 +138,23 @@ public class SelectionProviderReference {
 
     public ModelSelectionProvider getActualSelectionProvider() {
         return foreignKey != null ? foreignKey : selectionProvider;
+    }
+
+    @XmlAttribute(name = "createNewValueHref")
+    public String getCreateNewValueHref() {
+        return createNewValueHref;
+    }
+
+    public void setCreateNewValueHref(String createNewValueHref) {
+        this.createNewValueHref = createNewValueHref;
+    }
+
+    @XmlAttribute(name = "createNewValueText")
+    public String getCreateNewValueText() {
+        return createNewValueText;
+    }
+
+    public void setCreateNewValueText(String createNewValueText) {
+        this.createNewValueText = createNewValueText;
     }
 }

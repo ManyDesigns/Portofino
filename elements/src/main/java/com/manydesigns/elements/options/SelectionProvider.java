@@ -40,4 +40,7 @@ public interface SelectionProvider {
     SelectionModel createSelectionModel();
 
     void ensureActive(Object... values);
+
+    String getCreateNewValueHref();
+    String getCreateNewValueText();
 }

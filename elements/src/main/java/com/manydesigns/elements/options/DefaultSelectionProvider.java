@@ -51,6 +51,9 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
     protected DisplayMode displayMode;
 
+    protected String createNewValueHref;
+    protected String createNewValueText;
+
     public final static Logger logger =
             LoggerFactory.getLogger(DefaultSelectionProvider.class);
     public static final String NON_WORD_CHARACTERS =
@@ -312,6 +315,22 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
     public void setDisplayMode(DisplayMode displayMode) {
         this.displayMode = displayMode;
+    }
+
+    public String getCreateNewValueHref() {
+        return createNewValueHref;
+    }
+
+    public void setCreateNewValueHref(String createNewValueHref) {
+        this.createNewValueHref = createNewValueHref;
+    }
+
+    public String getCreateNewValueText() {
+        return createNewValueText;
+    }
+
+    public void setCreateNewValueText(String createNewValueText) {
+        this.createNewValueText = createNewValueText;
     }
 
     public static class Row {
