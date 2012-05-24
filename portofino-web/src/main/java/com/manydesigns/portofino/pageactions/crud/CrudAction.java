@@ -456,6 +456,7 @@ public class CrudAction extends AbstractPageAction {
         try {
             PlainSelect plainSelect =
                 (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
+            logger.debug("Query string {} contains select");
             List items = plainSelect.getSelectItems();
             if(items.size() != 1) {
                 logger.error("I don't know how to generate a count query for {}", queryString);
@@ -466,7 +467,7 @@ public class CrudAction extends AbstractPageAction {
             function.setName("count");
             function.setParameters(new ExpressionList(Arrays.asList(item.getExpression())));
             item.setExpression(function);
-            logger.debug("Query string {} contains select");
+            plainSelect.setOrderByElements(null);
             return plainSelect.toString();
         } catch(Exception e) {
             logger.debug("Query string {} does not contain select");
