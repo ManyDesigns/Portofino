@@ -1682,7 +1682,7 @@ public class CrudAction extends AbstractPageAction {
         return getXsltStream(templateFop);
     }
 
-    private InputStream getXsltStream(String templateFop) throws FileNotFoundException {
+    protected InputStream getXsltStream(String templateFop) throws FileNotFoundException {
         File fopFile = new File(pageInstance.getDirectory(), templateFop);
         if(fopFile.exists()) {
             logger.debug("Custom FOP template found: {}", fopFile);
@@ -1702,6 +1702,43 @@ public class CrudAction extends AbstractPageAction {
         xb.write(crudConfiguration.getSearchTitle());
         xb.closeElement("table");
 
+        double[] columnSizes = setupXmlSearchColumnSizes();
+
+        for (double columnSize : columnSizes) {
+            xb.openElement("column");
+            xb.openElement("width");
+            xb.write(columnSize + "em");
+            xb.closeElement("width");
+            xb.closeElement("column");
+        }
+
+        for (TableForm.Column col : tableForm.getColumns()) {
+            xb.openElement("header");
+            xb.openElement("nameColumn");
+            xb.write(col.getLabel());
+            xb.closeElement("nameColumn");
+            xb.closeElement("header");
+        }
+
+
+        for (TableForm.Row row : tableForm.getRows()) {
+            xb.openElement("rows");
+            for (Field field : row) {
+                xb.openElement("row");
+                xb.openElement("value");
+                xb.write(field.getStringValue());
+                xb.closeElement("value");
+                xb.closeElement("row");
+            }
+            xb.closeElement("rows");
+        }
+
+        xb.closeElement("class");
+
+        return xb;
+    }
+
+    protected double[] setupXmlSearchColumnSizes() {
         double[] headerSizes = new double[tableForm.getColumns().length];
         for(int i = 0; i < headerSizes.length; i++) {
             TableForm.Column col = tableForm.getColumns()[i];
@@ -1749,41 +1786,8 @@ public class CrudAction extends AbstractPageAction {
             columnSizes[minIndex] += 1;
             totalSize += 1;
         }
-
-        for (int i = 0; i < columnSizes.length; i++) {
-            xb.openElement("column");
-            xb.openElement("width");
-            xb.write(columnSizes[i] + "em");
-            xb.closeElement("width");
-            xb.closeElement("column");
-        }
-
-        for (TableForm.Column col : tableForm.getColumns()) {
-            xb.openElement("header");
-            xb.openElement("nameColumn");
-            xb.write(col.getLabel());
-            xb.closeElement("nameColumn");
-            xb.closeElement("header");
-        }
-
-
-        for (TableForm.Row row : tableForm.getRows()) {
-            xb.openElement("rows");
-            for (Field field : row) {
-                xb.openElement("row");
-                xb.openElement("value");
-                xb.write(field.getStringValue());
-                xb.closeElement("value");
-                xb.closeElement("row");
-            }
-            xb.closeElement("rows");
-        }
-
-        xb.closeElement("class");
-
-        return xb;
+        return columnSizes;
     }
-
 
     //**************************************************************************
     // ExportRead
