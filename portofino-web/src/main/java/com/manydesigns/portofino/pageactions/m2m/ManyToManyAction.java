@@ -95,6 +95,8 @@ public class ManyToManyAction extends AbstractPageAction {
 
     protected boolean correctlyConfigured;
 
+    protected Session session;
+
     //Checkboxes view
     protected Map<Object, Boolean> booleanRelation;
     protected List<String> selectedPrimaryKeys = new ArrayList<String>();
@@ -111,6 +113,10 @@ public class ManyToManyAction extends AbstractPageAction {
             return new ErrorResolution(404);
         }
         m2mConfiguration = (ManyToManyConfiguration) pageInstance.getConfiguration();
+        if(m2mConfiguration != null && m2mConfiguration.getActualRelationDatabase() != null) {
+            String databaseName = m2mConfiguration.getActualRelationDatabase().getDatabaseName();
+            session = pageInstance.getApplication().getSession(databaseName);
+        }
         return null;
     }
 
@@ -236,17 +242,18 @@ public class ManyToManyAction extends AbstractPageAction {
         criteria = criteria.eq(onePropertyAccessor, onePk);
         QueryStringWithParameters queryString =
                 QueryUtils.mergeQuery(m2mConfiguration.getQuery(), criteria, this);
-        Session session = application.getSession(m2mConfiguration.getDatabase());
         existingAssociations =
                 QueryUtils.runHqlQuery(session, queryString.getQueryString(), queryString.getParameters());
         availableAssociations = new ArrayList<Object>();
-        String manyQuery = ((DatabaseSelectionProvider) manySelectionProvider.getActualSelectionProvider()).getHql();
-        if(manyQuery == null) {
+        String manyQueryString = ((DatabaseSelectionProvider) manySelectionProvider.getActualSelectionProvider()).getHql();
+        if(manyQueryString == null) {
             logger.error("Couldn't determine many query");
             return;
         }
+        QueryStringWithParameters manyQuery =
+                QueryUtils.mergeQuery(manyQueryString, null, this);
         potentiallyAvailableAssociations =
-                QueryUtils.runHqlQuery(session, manyQuery, null);
+                QueryUtils.runHqlQuery(session, manyQuery.getQueryString(), manyQuery.getParameters());
         PropertyAccessor[] manyKeyProperties = manyTableAccessor.getKeyProperties();
         //TODO handle manyKeyProperties.length > 1
         PropertyAccessor manyPkAccessor = manyTableAccessor.getProperty(manyKeyProperties[0].getName());
@@ -286,7 +293,6 @@ public class ManyToManyAction extends AbstractPageAction {
         String manyPropertyName = m2mConfiguration.getManySelectionProvider().getActualSelectionProvider().getReferences().get(0).getActualFromColumn().getActualPropertyName();
         PropertyAccessor manyPropertyAccessor =
                 relationTableAccessor.getProperty(manyPropertyName);
-        Session session = application.getSession(m2mConfiguration.getActualRelationDatabase().getDatabaseName());
         PropertyAccessor[] manyKeyProperties = manyTableAccessor.getKeyProperties();
         //TODO handle manyKeyProperties.length > 1
         PropertyAccessor manyPkAccessor = manyTableAccessor.getProperty(manyKeyProperties[0].getName());
@@ -294,7 +300,7 @@ public class ManyToManyAction extends AbstractPageAction {
             Serializable pkObject = pkHelper.getPrimaryKey(pkString.split("/"));
             Object pk = manyPkAccessor.get(pkObject);
             if(!isExistingAssociation(manyPropertyAccessor, pk)) {
-                Object newRelation = saveNewRelation(session, pk, onePropertyAccessor, manyPropertyAccessor);
+                Object newRelation = saveNewRelation(pk, onePropertyAccessor, manyPropertyAccessor);
                 existingAssociations.add(newRelation);
             }
         }
@@ -306,7 +312,7 @@ public class ManyToManyAction extends AbstractPageAction {
             String pkString =
                     (String) OgnlUtils.convertValue(pkObject, String.class);
             if(!selectedPrimaryKeys.contains(pkString)) {
-                deleteRelation(session, o);
+                deleteRelation(o);
                 it.remove();
             }
         }
@@ -321,11 +327,11 @@ public class ManyToManyAction extends AbstractPageAction {
         }
     }
 
-    protected void deleteRelation(Session session, Object rel) {
+    protected void deleteRelation(Object rel) {
         session.delete(m2mConfiguration.getActualRelationTable().getActualEntityName(), rel);
     }
 
-    protected Object saveNewRelation(Session session, Object pk, PropertyAccessor onePropertyAccessor, PropertyAccessor manyPropertyAccessor) {
+    protected Object saveNewRelation(Object pk, PropertyAccessor onePropertyAccessor, PropertyAccessor manyPropertyAccessor) {
         Object newRelation = relationTableAccessor.newInstance();
         onePropertyAccessor.set(newRelation, onePk);
         manyPropertyAccessor.set(newRelation, pk);

@@ -333,7 +333,7 @@ public class QueryUtils {
     }
 
     public static QueryStringWithParameters mergeQuery
-            (String queryString, TableCriteria criteria, Object rootObject) {
+            (String queryString, @Nullable TableCriteria criteria, Object rootObject) {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
         String formatString = sqlFormat.getFormatString();
         Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);

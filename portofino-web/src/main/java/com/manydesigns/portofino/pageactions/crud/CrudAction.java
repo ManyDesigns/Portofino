@@ -1290,8 +1290,6 @@ public class CrudAction extends AbstractPageAction {
             if(searchForm != null) {
                 searchForm.configureCriteria(criteria);
             }
-            String databaseName = crudConfiguration.getActualTable().getDatabaseName();
-            Session session = application.getSession(databaseName);
             if(!StringUtils.isBlank(sortProperty) && !StringUtils.isBlank(sortDirection)) {
                 try {
                     PropertyAccessor orderByProperty = classAccessor.getProperty(sortProperty);
