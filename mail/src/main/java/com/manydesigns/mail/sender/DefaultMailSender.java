@@ -96,11 +96,11 @@ public class DefaultMailSender implements MailSender {
                 continue;
             }
             if(email != null) {
+                boolean sent = false;
                 try {
                     logger.info("Sending email with id {}", id);
                     send(email);
-                    logger.info("Email with id {} sent, marking", id);
-                    queue.markSent(id);
+                    sent = true;
                 } catch (EmailException e) {
                     Throwable cause = e.getCause();
                     if(cause instanceof ParseException ||
@@ -113,6 +113,12 @@ public class DefaultMailSender implements MailSender {
                     } else {
                         markFailed(id, e);
                     }
+                } catch (Throwable e) {
+                    markFailed(id, e);
+                }
+                if(sent) try {
+                    logger.info("Email with id {} sent, marking", id);
+                    queue.markSent(id);
                 } catch (Throwable e) {
                     logger.error("Couldn't mark mail as sent", e);
                     idsToMarkAsSent.add(id);

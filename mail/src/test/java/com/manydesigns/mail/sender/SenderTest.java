@@ -24,6 +24,7 @@ package com.manydesigns.mail.sender;
 import com.dumbster.smtp.SimpleSmtpServer;
 import com.dumbster.smtp.SmtpMessage;
 import com.manydesigns.elements.util.ElementsFileUtils;
+import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.mail.queue.FileSystemMailQueue;
 import com.manydesigns.mail.queue.LockingMailQueue;
 import com.manydesigns.mail.queue.MailQueue;
@@ -102,6 +103,26 @@ public class SenderTest extends TestCase {
             String[] to = msg.getHeaderValues("To");
             assertEquals(1, to.length);
         }
+    }
+
+    public void testNullFrom() throws QueueException {
+        Email myEmail = new Email();
+        myEmail.setFrom(null);
+        myEmail.getRecipients().add(new Recipient(Recipient.Type.TO, "alessio.stalla@manydesigns.com"));
+        myEmail.setSubject("subj");
+        myEmail.setTextBody("body");
+        String id = queue.enqueue(myEmail);
+        try {
+            Thread.sleep(runnable.getPollInterval() * 2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        assertTrue(queue.getEnqueuedEmailIds().isEmpty());
+        File failedEmailFile =
+                RandomUtil.getCodeFile(fsQueue.getFailedDirectory(), "email-{0}.xml", id);
+        assertTrue(failedEmailFile.exists());
+
+        assertEquals(0, server.getReceivedEmailSize());
     }
 
     public void testSimpleMultiRecipient() throws QueueException {
