@@ -99,7 +99,13 @@ public class LoginAction extends AbstractActionBean {
     public Resolution execute () {
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
-            return new ForwardResolution("/layouts/user/alreadyLoggedIn.jsp");
+            if(StringUtils.isEmpty(returnUrl)) {
+                logger.debug("Already logged in");
+                return new ForwardResolution("/layouts/user/alreadyLoggedIn.jsp");
+            } else {
+                logger.debug("Already logged in, redirecting to {}", returnUrl);
+                return new RedirectResolution(returnUrl);
+            }
         }
 
         recoverPwd = portofinoConfiguration.getBoolean(
