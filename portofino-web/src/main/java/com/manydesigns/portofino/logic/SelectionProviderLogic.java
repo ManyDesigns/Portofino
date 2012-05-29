@@ -38,6 +38,7 @@ import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.hibernate.Session;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +85,7 @@ public class SelectionProviderLogic {
             String name,
             Collection objects,
             PropertyAccessor[] propertyAccessors,
-            TextFormat[] textFormats
+            @Nullable TextFormat[] textFormats
     ) {
         int fieldsCount = propertyAccessors.length;
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider(name, propertyAccessors.length);
@@ -123,7 +124,7 @@ public class SelectionProviderLogic {
 
     public static DefaultSelectionProvider createSelectionProvider
             (String name, Collection objects, Class objectClass,
-             TextFormat[] textFormats, String[] propertyNames) {
+             @Nullable TextFormat[] textFormats, String[] propertyNames) {
         ClassAccessor classAccessor =
                 JavaClassAccessor.getClassAccessor(objectClass);
         PropertyAccessor[] propertyAccessors =

@@ -376,27 +376,9 @@ public class ManyToManyAction extends AbstractPageAction {
     protected void prepareConfigurationForms() {
         super.prepareConfigurationForms();
         FormBuilder formBuilder = new FormBuilder(ConfigurationForm.class);
-        formBuilder
-            .configFields("viewType", "database", "query", "oneExpression", "onePropertyName", "oneSpName", "manySpName")
-            .configFieldSetNames("Many to many");
-
-        DefaultSelectionProvider viewTypeSelectionProvider = new DefaultSelectionProvider("viewType");
-        String label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.CHECKBOXES");
-        viewTypeSelectionProvider.appendRow(ViewType.CHECKBOXES.name(), label, true);
-        label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.LISTS");
-        viewTypeSelectionProvider.appendRow(ViewType.LISTS.name(), label, true);
-        formBuilder.configSelectionProvider(viewTypeSelectionProvider, "viewType");
-
-        SelectionProvider databaseSelectionProvider =
-                SelectionProviderLogic.createSelectionProvider(
-                        "database",
-                        model.getDatabases(),
-                        Database.class,
-                        null,
-                        new String[]{ "databaseName" });
-        formBuilder.configSelectionProvider(databaseSelectionProvider, "database");
-
         if(m2mConfiguration != null && m2mConfiguration.getActualRelationTable() != null) {
+            formBuilder.configFields(
+                    "viewType", "database", "query", "oneExpression", "onePropertyName", "oneSpName", "manySpName");
             List<ModelSelectionProvider> sps = new ArrayList<ModelSelectionProvider>();
             sps.addAll(m2mConfiguration.getActualRelationTable().getForeignKeys());
             sps.addAll(m2mConfiguration.getActualRelationTable().getSelectionProviders());
@@ -417,7 +399,27 @@ public class ManyToManyAction extends AbstractPageAction {
                             null,
                             new String[]{ "name" });
             formBuilder.configSelectionProvider(manySp, "manySpName");
+        } else {
+            formBuilder.configFields(
+                    "viewType", "database", "query", "oneExpression", "onePropertyName");
         }
+        formBuilder.configFieldSetNames("Many to many");
+
+        DefaultSelectionProvider viewTypeSelectionProvider = new DefaultSelectionProvider("viewType");
+        String label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.CHECKBOXES");
+        viewTypeSelectionProvider.appendRow(ViewType.CHECKBOXES.name(), label, true);
+        label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.LISTS");
+        viewTypeSelectionProvider.appendRow(ViewType.LISTS.name(), label, true);
+        formBuilder.configSelectionProvider(viewTypeSelectionProvider, "viewType");
+
+        SelectionProvider databaseSelectionProvider =
+                SelectionProviderLogic.createSelectionProvider(
+                        "database",
+                        model.getDatabases(),
+                        Database.class,
+                        null,
+                        new String[]{ "databaseName" });
+        formBuilder.configSelectionProvider(databaseSelectionProvider, "database");
 
         configurationForm = formBuilder.build();
         configurationForm.readFromObject(new ConfigurationForm(m2mConfiguration));
