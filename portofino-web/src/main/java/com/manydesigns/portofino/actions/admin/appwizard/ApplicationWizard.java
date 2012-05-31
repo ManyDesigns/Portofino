@@ -61,6 +61,7 @@ import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguratio
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Page;
+import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
@@ -88,6 +89,7 @@ import java.util.*;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @UrlBinding("/actions/admin/wizard")
+@RequiresAdministrator
 public class ApplicationWizard extends AbstractActionBean implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
@@ -402,18 +404,22 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     @Button(list = "select-user-fields", key="wizard.next")
     public Resolution selectUserFields() {
         selectTables();
-        userIdPropertyField.readFromRequest(context.getRequest());
-        userNamePropertyField.readFromRequest(context.getRequest());
-        userPasswordPropertyField.readFromRequest(context.getRequest());
-        if(userIdPropertyField.validate() &&
-           userNamePropertyField.validate() &&
-           userPasswordPropertyField.validate()) {
-            userIdPropertyField.writeToObject(this);
-            userNamePropertyField.writeToObject(this);
-            userPasswordPropertyField.writeToObject(this);
-            return buildAppForm();
+        if(userTable != null) {
+            userIdPropertyField.readFromRequest(context.getRequest());
+            userNamePropertyField.readFromRequest(context.getRequest());
+            userPasswordPropertyField.readFromRequest(context.getRequest());
+            if(userIdPropertyField.validate() &&
+               userNamePropertyField.validate() &&
+               userPasswordPropertyField.validate()) {
+                userIdPropertyField.writeToObject(this);
+                userNamePropertyField.writeToObject(this);
+                userPasswordPropertyField.writeToObject(this);
+                return buildAppForm();
+            } else {
+                return selectUserFieldsForm();
+            }
         } else {
-            return selectUserFieldsForm();
+            return buildAppForm();
         }
     }
 
@@ -463,6 +469,12 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     }
 
     protected void setupUsers(List<ChildPage> childPages, String scriptTemplate) throws Exception {
+        if(!roots.contains(userTable)) {
+            File dir = new File(application.getPagesDir(), userTable.getActualEntityName());
+            depth = 1;
+            createCrudPage(dir, userTable, childPages, scriptTemplate);
+        }
+
         List<Reference> references = (List<Reference>) children.get(userTable);
         if(references != null) {
             for(Reference ref : references) {
