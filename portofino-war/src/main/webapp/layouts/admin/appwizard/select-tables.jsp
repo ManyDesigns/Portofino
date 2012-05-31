@@ -8,22 +8,18 @@
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
-        Step 4. Build the application!
+        Step 3. Customize
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="build-app" cssClass="contentButton" />
+        <portofino:buttons list="select-tables" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Step 4. Build the application!
+        Step 3. Customize
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
-        Press Finish to build the application.
+        <mde:write name="actionBean" property="userTableField"/>
         <div style="display: none;">
-            <mde:write name="actionBean" property="userIdPropertyField"/>
-            <mde:write name="actionBean" property="userNamePropertyField"/>
-            <mde:write name="actionBean" property="userPasswordPropertyField"/>
-            <mde:write name="actionBean" property="userTableField"/>
             <mde:write name="actionBean" property="schemasForm"/>
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
             <mde:write name="actionBean" property="jndiCPForm"/>
@@ -31,6 +27,6 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="build-app" cssClass="contentButton" />
+        <portofino:buttons list="select-tables" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>
