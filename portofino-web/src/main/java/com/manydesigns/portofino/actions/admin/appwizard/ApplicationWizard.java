@@ -56,6 +56,7 @@ import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
+import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
 import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
@@ -76,11 +77,14 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.text.MessageFormat;
 import java.util.*;
+import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -283,7 +287,14 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 if(selectableSchema.selected) {
                     Schema schema = DatabaseLogic.findSchemaByName(
                             connectionProvider.getDatabase(), selectableSchema.schemaName);
-                    for(Table table : schema.getTables()) {
+
+                    List<Table> tables = new ArrayList<Table>(schema.getTables());
+                    Collections.sort(tables, new Comparator<Table>() {
+                        public int compare(Table o1, Table o2) {
+                            return o1.getActualEntityName().compareToIgnoreCase(o2.getActualEntityName());
+                        }
+                    });
+                    for(Table table : tables) {
                         selectionProvider.appendRow(
                                 table.getQualifiedName(),
                                 schema.getSchemaName() + "." + table.getActualEntityName(),
@@ -448,6 +459,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             if(userTable != null) {
                 setupUsers(childPages, scriptTemplate);
             }
+            setupCalendar(childPages);
             Page rootPage = DispatcherLogic.getPage(application.getPagesDir());
             Collections.sort(childPages, new Comparator<ChildPage>() {
                 public int compare(ChildPage o1, ChildPage o2) {
@@ -465,7 +477,102 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             application.initModel();
             return buildAppForm();
         }
+        SessionMessages.addInfoMessage(getMessage("appwizard.finished"));
         return new RedirectResolution("/");
+    }
+
+    protected String getMessage(String key, Object... args) {
+        Locale locale = context.getLocale();
+        ResourceBundle resourceBundle = application.getBundle(locale);
+        String msg = resourceBundle.getString(key);
+        return MessageFormat.format(msg, args);
+    }
+
+    protected void setupCalendar(List<ChildPage> childPages) throws Exception {
+        List<List<String>> calendarDefinitions = new ArrayList<List<String>>();
+        Color[] colors = {
+                Color.RED, Color.BLUE, Color.CYAN, Color.GRAY, Color.GREEN.darker(),
+                Color.MAGENTA.darker(), Color.ORANGE, Color.YELLOW.darker()
+            };
+        int colorIndex = 0;
+        List<Table> allTables = new ArrayList<Table>();
+        for(Schema schema : connectionProvider.getDatabase().getSchemas()) {
+            allTables.addAll(schema.getTables());
+        }
+        Collections.sort(allTables, new Comparator<Table>() {
+            public int compare(Table o1, Table o2) {
+                return o1.getActualEntityName().compareToIgnoreCase(o2.getActualEntityName());
+            }
+        });
+        for(Table table : allTables) {
+            List<Column> dateColumns = new ArrayList<Column>();
+            for(Column column : table.getColumns()) {
+                if(Date.class.isAssignableFrom(column.getActualJavaType())) {
+                    dateColumns.add(column);
+                }
+            }
+            if(!dateColumns.isEmpty()) {
+                //["Cal 1", "db1.schema1.table1", ["column1", "column2"], Color.RED]
+                Color color = colors[colorIndex++ % colors.length];
+                List<String> calDef = new ArrayList();
+                calDef.add('"' + Util.guessToWords(table.getActualEntityName()) + '"');
+                calDef.add('"' + table.getQualifiedName() + '"');
+                String cols = "[";
+                boolean first = true;
+                for(Column column : dateColumns) {
+                    if(first) {
+                        first = false;
+                    } else {
+                        cols += ", ";
+                    }
+                    cols += '"' + column.getActualPropertyName() + '"';
+                }
+                cols += "]";
+                calDef.add(cols);
+                calDef.add("new java.awt.Color(" + color.getRed() + ", " + color.getGreen() +
+                           ", " + color.getBlue() + ")");
+                calendarDefinitions.add(calDef);
+            }
+        }
+        if(!calendarDefinitions.isEmpty()) {
+            String calendarDefinitionsStr = "[";
+            calendarDefinitionsStr += StringUtils.join(calendarDefinitions, ", ");
+            calendarDefinitionsStr += "]";
+            File dir = new File(application.getPagesDir(), "calendar"); //TODO gestire exists()
+            if(dir.mkdirs()) {
+                CalendarConfiguration configuration = new CalendarConfiguration();
+                DispatcherLogic.saveConfiguration(dir, configuration);
+
+                Page page = new Page();
+                page.setId(RandomUtil.createRandomId());
+                page.setTitle("Calendar (generated)");
+                page.setDescription("Calendar (generated)");
+
+                DispatcherLogic.savePage(dir, page);
+                File actionFile = new File(dir, "action.groovy");
+                try {
+                    TemplateEngine engine = new SimpleTemplateEngine();
+                    Template template = engine.createTemplate(getClass().getResource("CalendarPage.groovy.template"));
+                    Map<String, Object> bindings = new HashMap<String, Object>();
+                    bindings.put("calendarDefinitions", calendarDefinitionsStr);
+                    FileWriter fw = new FileWriter(actionFile);
+                    template.make(bindings).writeTo(fw);
+                    IOUtils.closeQuietly(fw);
+                } catch (Exception e) {
+                    logger.warn("Couldn't create calendar", e);
+                    SessionMessages.addWarningMessage("Couldn't create calendar: " + e);
+                    return;
+                }
+
+                ChildPage childPage = new ChildPage();
+                childPage.setName(dir.getName());
+                childPage.setShowInNavigation(true);
+                childPages.add(childPage);
+            } else {
+                logger.warn("Couldn't create directory {}", dir.getAbsolutePath());
+                SessionMessages.addWarningMessage("Couldn't create directory " + dir.getAbsolutePath());
+            }
+        }
     }
 
     protected void setupUsers(List<ChildPage> childPages, String scriptTemplate) throws Exception {
@@ -489,6 +596,10 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                         " = %{#securityUtils.getPrincipal(1)}";
                 String dirName = "my-" + entityName;
                 File dir = new File(application.getPagesDir(), dirName);
+                if(dir.exists()) {
+                    dirName += "-as-" + fromColumn.getActualPropertyName();
+                    dir = new File(application.getPagesDir(), dirName);
+                }
                 String title = Util.guessToWords(dirName);
                 createCrudPage(
                         dir, fromTable, childQuery,
@@ -560,11 +671,15 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                             " where " + fromColumn.getActualPropertyName() +
                             " = %{#" + variable + "." + propertyName + "}";
                     String childDirName = entityName;
-                    if(table.getPrimaryKey().getColumns().size() == 1 &&
+                    /*if(table.getPrimaryKey().getColumns().size() == 1 &&
                        !table.getPrimaryKey().getColumns().contains(ref.getActualToColumn())) {
                         childDirName += "-by-" + propertyName;
-                    }
+                    }*/
                     File childDir = new File(new File(dir, "_detail"), childDirName);
+                    if(childDir.exists()) {
+                        childDirName += "-as-" + fromColumn.getActualPropertyName();
+                        childDir = new File(new File(dir, "_detail"), childDirName);
+                    }
                     String childTitle = Util.guessToWords(childDirName);
                     createCrudPage(
                             childDir, fromTable, childQuery,
