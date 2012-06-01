@@ -19,9 +19,17 @@
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
         <mde:write name="actionBean" property="userTableField"/>
+        <c:if test="${actionBean.advanced}">
+            <h3>Select roots</h3>
+            <mde:write name="actionBean" property="rootsForm"/>
+        </c:if>
         <div style="display: none;">
+            <c:if test="${!actionBean.advanced}">
+                <mde:write name="actionBean" property="rootsForm"/>
+            </c:if>
             <mde:write name="actionBean" property="schemasForm"/>
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
+            <input type="hidden" name="advanced" value="${actionBean.advanced}" />
             <mde:write name="actionBean" property="jndiCPForm"/>
             <mde:write name="actionBean" property="jdbcCPForm"/>
         </div>

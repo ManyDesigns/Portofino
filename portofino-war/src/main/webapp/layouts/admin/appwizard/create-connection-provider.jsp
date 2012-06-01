@@ -45,6 +45,7 @@
             <mde:write name="actionBean" property="jdbcCPForm"/>
         </div>
 
+        <label for="advanced_checkbox">Show advanced options</label> <input id="advanced_checkbox" type="checkbox" name="advanced" />
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
         <portofino:buttons list="create-connection-provider" cssClass="contentButton" />

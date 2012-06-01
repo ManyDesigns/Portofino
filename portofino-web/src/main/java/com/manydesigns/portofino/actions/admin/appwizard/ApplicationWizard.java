@@ -108,10 +108,12 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
 
     protected String connectionProviderType;
     protected ConnectionProvider connectionProvider;
+    protected boolean advanced;
 
     public TableForm schemasForm;
     protected List<SelectableSchema> selectableSchemas;
-    protected List<String> excludedTables = new ArrayList<String>();
+    public TableForm rootsForm;
+    protected List<SelectableRoot> selectableRoots = new ArrayList<SelectableRoot>();
     protected String userTableName;
     protected String userNameProperty;
     protected String userIdProperty;
@@ -124,7 +126,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     protected int maxDepth = 5;
     protected int depth;
 
-//**************************************************************************
+    //**************************************************************************
     // Injections
     //**************************************************************************
 
@@ -225,6 +227,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 )
                 .configMode(Mode.EDIT)
                 .configNRows(selectableSchemas.size())
+                .configPrefix("schemas_")
                 .build();
         schemasForm.readFromObject(selectableSchemas);
     }
@@ -243,6 +246,9 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 }
             }
             if(atLeastOneSelected) {
+                if (!addSchemasToModel()) {
+                    return selectSchemasForm();
+                }
                 return afterSelectSchemas();
             } else {
                 SessionMessages.addErrorMessage("Select at least a schema");
@@ -252,7 +258,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         return selectSchemasForm();
     }
 
-    public Resolution afterSelectSchemas() {
+    protected boolean addSchemasToModel() {
         Database database = connectionProvider.getDatabase();
         for(SelectableSchema schema : selectableSchemas) {
             if(schema.selected) {
@@ -269,15 +275,28 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             SessionMessages.addErrorMessage(e.toString());
-            return selectSchemasForm();
+            return false;
         }
         connectionProvider.setDatabase(targetDatabase);
         connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
         Model model = new Model();
         model.getDatabases().add(targetDatabase);
         model.init();
+        return true;
+    }
+
+    public Resolution afterSelectSchemas() {
         children = new MultiHashMap();
         roots = determineRoots(children);
+        rootsForm = new TableFormBuilder(SelectableRoot.class)
+                .configFields(
+                        "selected", "tableName"
+                )
+                .configMode(Mode.EDIT)
+                .configNRows(selectableRoots.size())
+                .configPrefix("roots_")
+                .build();
+        rootsForm.readFromObject(selectableRoots);
 
         try {
             ClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(getClass());
@@ -326,17 +345,28 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         for(Iterator<Table> it = roots.iterator(); it.hasNext();) {
             Table table = it.next();
 
-            if(excludedTables.contains(table.getQualifiedName())) {
+            /*TODO if(excludedTables.contains(table.getQualifiedName())) {
                 it.remove();
                 continue;
-            }
+            }*/
 
             if(table.getPrimaryKey() == null) {
+                logger.warn("Table " + table.getQualifiedName() + " has no primaery key, skipping");
                 it.remove();
                 continue;
             }
 
             boolean removed = false;
+            boolean selected = true;
+            boolean known = false;
+
+            for(SelectableRoot root : selectableRoots) {
+                if(root.tableName.equals(table.getQualifiedName())) {
+                    selected = root.selected;
+                    known = true;
+                    break;
+                }
+            }
 
             if(!table.getForeignKeys().isEmpty()) {
                 for(ForeignKey fk : table.getForeignKeys()) {
@@ -345,7 +375,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                         if(column.getTable() != table) {
                             children.put(column.getTable(), ref);
                             //TODO potrebbe essere un ciclo nel grafo...
-                            if(!removed) {
+                            if(!(known && selected) && !removed) {
                                 it.remove();
                                 removed = true;
                             }
@@ -360,7 +390,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                         if(column.getTable() != table) {
                             children.put(column.getTable(), ref);
                             //TODO potrebbe essere un ciclo nel grafo...
-                            if(!removed) {
+                            if(!(known && selected) && !removed) {
                                 it.remove();
                                 removed = true;
                             }
@@ -368,13 +398,48 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                     }
                 }
             }
+
+            if(!known) {
+                SelectableRoot root = new SelectableRoot(table.getQualifiedName(), !removed);
+                selectableRoots.add(root);
+            }
         }
         return roots;
     }
 
     @Button(list = "select-tables", key="wizard.next")
     public Resolution selectTables() {
-        selectSchemas();
+        //Schemas
+        createConnectionProvider();
+        schemasForm.readFromRequest(context.getRequest());
+        schemasForm.writeToObject(selectableSchemas);
+        addSchemasToModel();
+
+        //Roots
+        for(SelectableSchema selectableSchema : selectableSchemas) {
+            if(selectableSchema.selected) {
+                Schema schema = DatabaseLogic.findSchemaByName(
+                        connectionProvider.getDatabase(), selectableSchema.schemaName);
+                for(Table table : schema.getTables()) {
+                    selectableRoots.add(new SelectableRoot(table.getQualifiedName(), false));
+                }
+            }
+        }
+
+        rootsForm = new TableFormBuilder(SelectableRoot.class)
+                .configFields(
+                        "selected", "tableName"
+                )
+                .configMode(Mode.EDIT)
+                .configNRows(selectableRoots.size())
+                .build();
+        rootsForm.readFromObject(selectableRoots);
+        rootsForm.readFromRequest(context.getRequest());
+        rootsForm.writeToObject(selectableRoots);
+
+        //Recalc roots
+        afterSelectSchemas();
+
         userTableField.readFromRequest(context.getRequest());
         userTableField.writeToObject(this);
         if(!StringUtils.isEmpty(userTableName)) {
@@ -758,14 +823,6 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         return selectableSchemas;
     }
 
-    public List<String> getExcludedTables() {
-        return excludedTables;
-    }
-
-    public void setExcludedTables(List<String> excludedTables) {
-        this.excludedTables = excludedTables;
-    }
-
     public String getUserTableName() {
         return userTableName;
     }
@@ -812,5 +869,13 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
 
     public void setUserPasswordProperty(String userPasswordProperty) {
         this.userPasswordProperty = userPasswordProperty;
+    }
+
+    public boolean isAdvanced() {
+        return advanced;
+    }
+
+    public void setAdvanced(boolean advanced) {
+        this.advanced = advanced;
     }
 }

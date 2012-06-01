@@ -22,6 +22,7 @@
         <mde:write name="actionBean" property="schemasForm"/>
         <div style="display: none;">
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
+            <input type="hidden" name="advanced" value="${actionBean.advanced}" />
             <mde:write name="actionBean" property="jndiCPForm"/>
             <mde:write name="actionBean" property="jdbcCPForm"/>
         </div>
