@@ -491,8 +491,8 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     protected void setupCalendar(List<ChildPage> childPages) throws Exception {
         List<List<String>> calendarDefinitions = new ArrayList<List<String>>();
         Color[] colors = {
-                Color.RED, Color.BLUE, Color.CYAN, Color.GRAY, Color.GREEN.darker(),
-                Color.MAGENTA.darker(), Color.ORANGE, Color.YELLOW.darker()
+                Color.RED, Color.BLUE, Color.CYAN.darker(), Color.GRAY, Color.GREEN.darker(),
+                Color.ORANGE, Color.YELLOW.darker(), Color.MAGENTA.darker(), Color.PINK
             };
         int colorIndex = 0;
         List<Table> allTables = new ArrayList<Table>();
@@ -595,11 +595,17 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                         " where " + fromColumn.getActualPropertyName() +
                         " = %{#securityUtils.getPrincipal(1)}";
                 String dirName = "my-" + entityName;
-                File dir = new File(application.getPagesDir(), dirName);
-                if(dir.exists()) {
-                    dirName += "-as-" + fromColumn.getActualPropertyName();
-                    dir = new File(application.getPagesDir(), dirName);
+                boolean multipleRoles = false;
+                for(Reference ref2 : references) {
+                    if(ref2 != ref && ref2.getActualFromColumn().getTable().equals(fromTable)) {
+                        multipleRoles = true;
+                        break;
+                    }
                 }
+                if(multipleRoles) {
+                    dirName += "-as-" + fromColumn.getActualPropertyName();
+                }
+                File dir = new File(application.getPagesDir(), dirName);
                 String title = Util.guessToWords(dirName);
                 createCrudPage(
                         dir, fromTable, childQuery,
