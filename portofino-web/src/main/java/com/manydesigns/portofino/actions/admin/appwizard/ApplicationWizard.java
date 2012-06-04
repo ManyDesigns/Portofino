@@ -50,6 +50,7 @@ import com.manydesigns.portofino.actions.forms.ConnectionProviderForm;
 import com.manydesigns.portofino.actions.forms.SelectableSchema;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
@@ -97,6 +98,8 @@ import java.util.List;
 public class ApplicationWizard extends AbstractActionBean implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
+    public static final String JDBC = "JDBC";
+    public static final String JNDI = "JNDI";
 
     protected Form jndiCPForm;
     protected Form jdbcCPForm;
@@ -136,6 +139,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     public static final Logger logger = LoggerFactory.getLogger(ApplicationWizard.class);
 
     @DefaultHandler
+    @Button(list = "select-schemas", key="wizard.prev")
     public Resolution start() {
         buildCPForms();
         return createSelectionProviderForm();
@@ -156,15 +160,22 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                             .configPrefix("jdbc")
                             .configMode(Mode.CREATE)
                             .build();
+
+        //Handle back
+        jndiCPForm.readFromRequest(context.getRequest());
+        jdbcCPForm.readFromRequest(context.getRequest());
     }
 
-    @Button(list = "create-connection-provider", key="commons.next")
+    @Buttons({
+        @Button(list = "create-connection-provider", key="wizard.next"),
+        @Button(list = "select-tables", key="wizard.prev")
+    })
     public Resolution createConnectionProvider() {
         buildCPForms();
-        if("JDBC".equals(connectionProviderType)) {
+        if(JDBC.equals(connectionProviderType)) {
             connectionProvider = new JdbcConnectionProvider();
             connectionProviderForm = jdbcCPForm;
-        } else if("JNDI".equals(connectionProviderType)) {
+        } else if(JNDI.equals(connectionProviderType)) {
             connectionProvider = new JndiConnectionProvider();
             connectionProviderForm = jndiCPForm;
         } else {
@@ -187,8 +198,8 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         try {
             configureEditSchemas();
         } catch (Exception e) {
-            logger.error("Coulnd't read schema names from db", e);
-            SessionMessages.addErrorMessage("Coulnd't read schema names from db: " + e);
+            logger.error("Couldn't read schema names from db", e);
+            SessionMessages.addErrorMessage("Couldn't read schema names from db: " + e);
             return createSelectionProviderForm();
         }
         return selectSchemasForm();
@@ -230,9 +241,14 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 .configPrefix("schemas_")
                 .build();
         schemasForm.readFromObject(selectableSchemas);
+        //Handle back
+        schemasForm.readFromRequest(context.getRequest());
     }
 
-    @Button(list = "select-schemas", key="commons.next")
+    @Buttons({
+        @Button(list = "select-schemas", key="wizard.next"),
+        @Button(list = "select-user-fields", key="wizard.prev")
+    })
     public Resolution selectSchemas() {
         createConnectionProvider();
         schemasForm.readFromRequest(context.getRequest());
@@ -357,7 +373,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             }
 
             boolean removed = false;
-            boolean selected = true;
+            boolean selected = false; //Così che selected == true => known
             boolean known = false;
 
             for(SelectableRoot root : selectableRoots) {
@@ -368,6 +384,11 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 }
             }
 
+            if(known && !selected) {
+                it.remove();
+                removed = true;
+            }
+
             if(!table.getForeignKeys().isEmpty()) {
                 for(ForeignKey fk : table.getForeignKeys()) {
                     for(Reference ref : fk.getReferences()) {
@@ -375,7 +396,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                         if(column.getTable() != table) {
                             children.put(column.getTable(), ref);
                             //TODO potrebbe essere un ciclo nel grafo...
-                            if(!(known && selected) && !removed) {
+                            if(!selected && !removed) {
                                 it.remove();
                                 removed = true;
                             }
@@ -390,7 +411,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                         if(column.getTable() != table) {
                             children.put(column.getTable(), ref);
                             //TODO potrebbe essere un ciclo nel grafo...
-                            if(!(known && selected) && !removed) {
+                            if(!selected && !removed) {
                                 it.remove();
                                 removed = true;
                             }
@@ -432,6 +453,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 )
                 .configMode(Mode.EDIT)
                 .configNRows(selectableRoots.size())
+                .configPrefix("roots_")
                 .build();
         rootsForm.readFromObject(selectableRoots);
         rootsForm.readFromRequest(context.getRequest());
@@ -439,6 +461,10 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
 
         //Recalc roots
         afterSelectSchemas();
+
+        if(roots.isEmpty()) {
+            SessionMessages.addWarningMessage("No root table selected");
+        }
 
         userTableField.readFromRequest(context.getRequest());
         userTableField.writeToObject(this);
@@ -505,6 +531,16 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
 
     protected Resolution buildAppForm() {
         return new ForwardResolution("/layouts/admin/appwizard/build-app.jsp");
+    }
+
+    @Button(list = "build-app", key="wizard.prev")
+    public Resolution goBackFromBuildApplication() {
+        selectUserFields();
+        if(userTable == null) {
+            return selectTablesForm();
+        } else {
+            return selectUserFieldsForm();
+        }
     }
 
     @Button(list = "build-app", key="wizard.finish")
@@ -792,11 +828,11 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     }
 
     public boolean isJdbc() {
-        return connectionProvider == null || connectionProvider instanceof JdbcConnectionProvider;
+        return connectionProviderType == null || connectionProviderType.equals(JDBC);
     }
 
     public boolean isJndi() {
-        return connectionProvider instanceof JndiConnectionProvider;
+        return StringUtils.equals(connectionProviderType, JNDI);
     }
 
     public String getActionPath() {
