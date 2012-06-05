@@ -581,6 +581,9 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             return buildAppForm();
         }
         SessionMessages.addInfoMessage(getMessage("appwizard.finished"));
+        if(userTable != null) {
+            SessionMessages.addWarningMessage(getMessage("appwizard.warning.userTable.created"));
+        }
         return new RedirectResolution("/");
     }
 
