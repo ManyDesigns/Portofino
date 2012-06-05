@@ -11,7 +11,7 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld" %>
 <%@taglib prefix="mde" uri="/manydesigns-elements" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="/skins/${skin}/modal-page.jsp">
+<stripes:layout-render name="/skins/${skin}/${actionBean.pageTemplate}/modal.jsp">
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.pageactions.timesheet.TimesheetAction"/>
     <stripes:layout-component name="contentHeader">
