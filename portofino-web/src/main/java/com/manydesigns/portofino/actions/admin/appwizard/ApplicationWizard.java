@@ -338,6 +338,8 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 }
             }
             userTableField = new SelectField(propertyAccessor, selectionProvider, Mode.CREATE, "");
+            //Handle back
+            userTableField.readFromRequest(context.getRequest());
         } catch (NoSuchFieldException e) {
             throw new Error(e);
         }
@@ -361,23 +363,18 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         for(Iterator<Table> it = roots.iterator(); it.hasNext();) {
             Table table = it.next();
 
-            /*TODO if(excludedTables.contains(table.getQualifiedName())) {
-                it.remove();
-                continue;
-            }*/
-
             if(table.getPrimaryKey() == null) {
-                logger.warn("Table " + table.getQualifiedName() + " has no primaery key, skipping");
+                SessionMessages.addWarningMessage("Table " + table.getQualifiedName() + " has no primary key and has been skipped.");
                 it.remove();
                 continue;
             }
 
             boolean removed = false;
-            boolean selected = false; //Così che selected == true => known
+            boolean selected = false; //Così che selected => known
             boolean known = false;
 
             for(SelectableRoot root : selectableRoots) {
-                if(root.tableName.equals(table.getQualifiedName())) {
+                if(root.tableName.equals(table.getSchemaName() + "." + table.getTableName())) {
                     selected = root.selected;
                     known = true;
                     break;
@@ -421,7 +418,8 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             }
 
             if(!known) {
-                SelectableRoot root = new SelectableRoot(table.getQualifiedName(), !removed);
+                SelectableRoot root =
+                        new SelectableRoot(table.getSchemaName() + "." + table.getTableName(), !removed);
                 selectableRoots.add(root);
             }
         }
@@ -442,7 +440,8 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 Schema schema = DatabaseLogic.findSchemaByName(
                         connectionProvider.getDatabase(), selectableSchema.schemaName);
                 for(Table table : schema.getTables()) {
-                    selectableRoots.add(new SelectableRoot(table.getQualifiedName(), false));
+                    selectableRoots.add(
+                            new SelectableRoot(table.getSchemaName() + "." + table.getTableName(), false));
                 }
             }
         }
@@ -461,6 +460,9 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
 
         //Recalc roots
         afterSelectSchemas();
+        if(!advanced) {
+            SessionMessages.consumeWarningMessages(); //Per non rivedere gli stessi messaggi di prima
+        }
 
         if(roots.isEmpty()) {
             SessionMessages.addWarningMessage("No root table selected");
