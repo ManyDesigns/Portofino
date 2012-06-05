@@ -17,10 +17,10 @@
 <%@ taglib prefix="stripes"
            uri="http://stripes.sourceforge.net/stripes-dynattr.tld" %>
 <%@ taglib prefix="mde" uri="/manydesigns-elements" %>
-<%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="/skins/${skin}/modal-page.jsp">
-<jsp:useBean id="actionBean" scope="request"
-             type="com.manydesigns.portofino.pageactions.timesheet.TimesheetAction"/>
+<%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
+%><jsp:useBean id="actionBean" scope="request"
+             type="com.manydesigns.portofino.pageactions.timesheet.TimesheetAction"
+/><stripes:layout-render name="/skins/${skin}/${actionBean.pageTemplate}/modal.jsp">
 <stripes:layout-component name="contentHeader">
     <portofino:buttons list="timesheet-week-entry" cssClass="contentButton"/>
     <jsp:include page="/skins/${skin}/breadcrumbs.jsp"/>
