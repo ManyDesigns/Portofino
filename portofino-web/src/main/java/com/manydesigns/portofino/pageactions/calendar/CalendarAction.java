@@ -35,7 +35,10 @@ import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConf
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
@@ -94,9 +97,9 @@ public class CalendarAction extends CustomAction {
     //**************************************************************************
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        this.pageInstance = pageInstance;
-        if(!pageInstance.getParameters().isEmpty()) {
-            return new ErrorResolution(404);
+        Resolution resolution = super.prepare(pageInstance, context);
+        if(resolution != null) {
+            return resolution;
         }
         if(pageInstance.getConfiguration() == null) {
             pageInstance.setConfiguration(new CalendarConfiguration());

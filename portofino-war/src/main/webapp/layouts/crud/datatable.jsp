@@ -120,7 +120,7 @@
             if(maxResults) {
                 url += "&maxResults=" + maxResults;
             }
-            <c:if test="${not empty actionBean.searchString}">
+            <c:if test="${(not actionBean.embedded) && (not empty actionBean.searchString)}">
                 url = url + "&searchString=" + encodeURIComponent(
                     '<%= StringEscapeUtils.escapeJavaScript(actionBean.getSearchString()) %>');
             </c:if>

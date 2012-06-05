@@ -146,7 +146,10 @@ public class MonthReportAction extends AbstractPageAction {
     //**************************************************************************
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        this.pageInstance = pageInstance;
+        Resolution resolution = super.prepare(pageInstance, context);
+        if(resolution != null) {
+            return resolution;
+        }
         if (!pageInstance.getParameters().isEmpty()) {
             return new ErrorResolution(404);
         }
