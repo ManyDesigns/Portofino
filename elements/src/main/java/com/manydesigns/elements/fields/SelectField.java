@@ -307,7 +307,13 @@ public class SelectField extends AbstractField {
 
         boolean checked = (value == null);
         if (comboLabel != null && !options.isEmpty()) {
-            xb.writeOption("", checked, comboLabel);
+            SelectionModel.Option option = options.remove(null);
+            if(options.isEmpty()) {
+                //Uh-oh, wrong decision
+                options.put(null, option);
+            } else {
+                xb.writeOption("", checked, comboLabel);
+            }
         }
 
         for (Map.Entry<Object,SelectionModel.Option> option :
