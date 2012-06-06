@@ -23,6 +23,9 @@
                 </div>
             </div>
         </c:if>
+        <c:if test="${not empty actionBean.searchString}">
+            <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
+        </c:if>
         <div class="search_results">
             <%@include file="datatable.jsp"%>
             <portofino:buttons list="crud-search" cssClass="portletButton" />

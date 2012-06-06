@@ -716,6 +716,7 @@ public class CrudAction extends AbstractPageAction {
         if (selection.length == 1) {
             pk = selection[0].split("/");
             String url = dispatch.getOriginalPath() + "/" + getPkForUrl(pk);
+            url = appendSearchStringParamIfNecessary(url);
             return new RedirectResolution(url)
                     .addParameter("cancelReturnUrl", cancelReturnUrl)
                     .addParameter("edit");

@@ -54,11 +54,12 @@ public class ConnectionProviderForm {
         }
     }
 
-    @Updatable(false)
     public void setDatabaseName(String databaseName) {
         database.setDatabaseName(databaseName);
     }
 
+    @Updatable(false)
+    @Required(true)
     public String getDatabaseName() {
         return database.getDatabaseName();
     }

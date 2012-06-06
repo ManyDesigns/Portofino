@@ -297,7 +297,7 @@ public class PageAdminAction extends AbstractActionBean {
                     directory = new File(parentDirectory, fragment);
                     parentPage = DispatcherLogic.getPage(parentDirectory);
                     parentLayout = parentPage.getLayout();
-                    configurePath = "/";
+                    configurePath = "";
                     break;
                 case CHILD:
                     PageInstance lastPageInstance = getPageInstance();
