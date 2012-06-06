@@ -41,6 +41,7 @@ public abstract class AbstractTextField extends AbstractField {
 
     protected String stringValue;
     protected boolean autoCapitalize = false;
+    protected boolean replaceBadUnicodeCharacters = true;
     protected Integer maxLength = null;
 
     protected Integer size;
@@ -154,5 +155,13 @@ public abstract class AbstractTextField extends AbstractField {
 
     public void setSize(Integer size) {
         this.size = size;
+    }
+
+    public boolean isReplaceBadUnicodeCharacters() {
+        return replaceBadUnicodeCharacters;
+    }
+
+    public void setReplaceBadUnicodeCharacters(boolean replaceBadUnicodeCharacters) {
+        this.replaceBadUnicodeCharacters = replaceBadUnicodeCharacters;
     }
 }

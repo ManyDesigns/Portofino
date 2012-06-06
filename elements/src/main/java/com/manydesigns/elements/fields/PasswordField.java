@@ -67,23 +67,25 @@ public class PasswordField extends TextField {
     //**************************************************************************
     @Override
     public void readFromRequest(HttpServletRequest req) {
-        super.readFromRequest(req);
-
         if (mode.isView(insertable, updatable)) {
             return;
         }
 
+        String reqValue = req.getParameter(inputName);
+        if (reqValue == null) {
+            return;
+        }
+
+        stringValue = reqValue.trim();
+
         String confirmationInputName = inputName + "_confirm";
 
-        String reqValue = req.getParameter(confirmationInputName);
+        reqValue = req.getParameter(confirmationInputName);
         if (reqValue == null) {
             return;
         }
 
         confirmationValue = reqValue.trim();
-        if (autoCapitalize) {
-            confirmationValue = confirmationValue.toUpperCase();
-        }
     }
 
     @Override

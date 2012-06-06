@@ -28,6 +28,7 @@ import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.RichText;
 import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -120,6 +121,9 @@ public class TextField extends AbstractTextField {
         }
 
         stringValue = reqValue.trim();
+        if(replaceBadUnicodeCharacters) {
+            stringValue = Util.replaceBadUnicodeCharacters(stringValue);
+        }
         if (autoCapitalize) {
             stringValue = stringValue.toUpperCase();
         }
