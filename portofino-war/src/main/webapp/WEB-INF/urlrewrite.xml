@@ -5,15 +5,21 @@
 
 <urlrewrite>
 
-    <!-- Allow only apps/web -->
+    <!-- Allow only /app/web -->
     <rule>
-        <from>^/apps/[^/]+/(?!web).*$</from>
+        <from>^/app/(?!web).*$</from>
+        <to type="forward">/404.jsp</to>
+    </rule>
+
+    <!-- Forbid /apps -->
+    <rule>
+        <from>^/apps/.*$</from>
         <to type="forward">/404.jsp</to>
     </rule>
 
     <!-- Do not allow URLs with ../ -->
     <rule>
-        <from>^/apps/(?=.*(\.|%2e)(\.|%2e)).*$</from>
+        <from>^(?=.*(\.|%2e)(\.|%2e)).*$</from>
         <to type="forward">/404.jsp</to>
     </rule>
 

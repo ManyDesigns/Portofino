@@ -97,14 +97,14 @@ class Security implements ApplicationRealmDelegate {
     //From LoginAction
     private void updateFailedUser(Application application, String username) {
         User user;
-        user = findUserByUserName(username);
+        Session session = application.getSession("portofino");
+        user = findUserByUserName(session, username);
         if (user == null) {
             return;
         }
         user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
         int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
         user.setFailedLoginAttempts(failedAttempts+1);
-        Session session = application.getSession("portofino");
         session.update(user);
         session.getTransaction().commit();
     }
