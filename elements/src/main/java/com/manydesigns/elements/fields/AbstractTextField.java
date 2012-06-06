@@ -103,6 +103,12 @@ public abstract class AbstractTextField extends AbstractField {
     protected void valueToXhtmlEdit(XhtmlBuffer xb) {
         xb.writeInputText(id, inputName, stringValue,
                 fieldCssClass, size, maxLength);
+        if(mode.isBulk()) {
+            xb.writeJavaScript(
+                    "$(function() { " +
+                        "configureBulkEditTextField('" + id + "', '" + bulkCheckboxName + "'); " +
+                    "});");
+        }
     }
 
     protected void valueToXhtmlPreview(XhtmlBuffer xb) {

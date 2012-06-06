@@ -242,6 +242,12 @@ public class SelectField extends AbstractField {
             case DROPDOWN:
                 valueToXhtmlEditDropDown(xb);
                 addCreateNewLink(xb);
+                if(mode.isBulk()) {
+                    xb.writeJavaScript(
+                            "$(function() { " +
+                                "configureBulkEditField('" + id + "', '" + bulkCheckboxName + "'); " +
+                            "});");
+                }
                 break;
             case RADIO:
                 valueToXhtmlEditRadio(xb);

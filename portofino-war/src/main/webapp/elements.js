@@ -125,3 +125,18 @@ $(function() {
         }
     });
 });
+
+function configureBulkEditTextField(id, checkboxName) {
+    $("#" + id).focusin(function() {
+        $("input[name=" + checkboxName + "]").prop("checked", true);
+    })
+}
+
+function configureBulkEditField(id, checkboxName) {
+    $("#" + id).change(function() {
+        if($(this).val()) {
+            $("input[name=" + checkboxName + "]").prop("checked", true);
+        }
+    })
+}
+

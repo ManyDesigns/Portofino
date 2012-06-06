@@ -156,6 +156,12 @@ public class BooleanField extends AbstractField {
                     getText(FALSE_LABEL_I18N));
             xb.closeElement("select");
         }
+        if(mode.isBulk()) {
+            xb.writeJavaScript(
+                    "$(function() { " +
+                        "configureBulkEditField('" + id + "', '" + bulkCheckboxName + "'); " +
+                    "});");
+        }
     }
 
     protected void valueToXhtmlHidden(XhtmlBuffer xb) {
