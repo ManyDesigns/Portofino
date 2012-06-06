@@ -310,7 +310,19 @@ public class CrudAction extends AbstractPageAction {
         String sql = current.getSql();
         String hql = current.getHql();
 
-        if (sql != null) {
+        boolean anyActiveProperty = false;
+        for(String propertyName : fieldNames) {
+            CrudProperty crudProperty = findProperty(propertyName, crudConfiguration.getProperties());
+            if(crudProperty != null && crudProperty.isEnabled()) {
+                anyActiveProperty = true;
+                break;
+            }
+        }
+        if(!anyActiveProperty) {
+            //Dummy
+            selectionProvider = SelectionProviderLogic.createSelectionProvider(
+                    name, 0, new Class[0], Collections.<Object[]>emptyList());
+        } else if (sql != null) {
             Session session = application.getSession(databaseName);
             Collection<Object[]> objects = QueryUtils.runSql(session, sql);
             selectionProvider = SelectionProviderLogic.createSelectionProvider(name, fieldNames.length, fieldTypes, objects);
