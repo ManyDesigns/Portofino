@@ -15,15 +15,15 @@
       href="<stripes:url value="/yui-2.9.0/build/paginator/assets/skins/sam/paginator.css"/>">
 
 <link rel="stylesheet" type="text/css"
-      href="<stripes:url value="/jquery-ui-1.8.9/css/smoothness/jquery-ui-1.8.9.custom.css"/>"/>
+      href="<stripes:url value="/jquery-ui-1.8.21/css/smoothness/jquery-ui-1.8.21.custom.css"/>"/>
 
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/skins/default/portofino.css"/>"/>
 
 <script type="text/javascript"
-        src="<stripes:url value="/jquery-ui-1.8.9/js/jquery-1.4.4.min.js"/>"></script>
+        src="<stripes:url value="/jquery-ui-1.8.21/js/jquery-1.7.2.min.js"/>"></script>
 <script type="text/javascript"
-        src="<stripes:url value="/jquery-ui-1.8.9/js/jquery-ui-1.8.9.custom.min.js"/>"></script>
+        src="<stripes:url value="/jquery-ui-1.8.21/js/jquery-ui-1.8.21.custom.min.js"/>"></script>
 
 <script type="text/javascript"
         src="<stripes:url value="/yui-2.9.0/build/yahoo-dom-event/yahoo-dom-event.js"/>"></script>
