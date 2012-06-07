@@ -524,14 +524,14 @@ public class CrudAction extends AbstractPageAction {
 
     protected void refreshBlobDownloadHref() {
         for (FieldSet fieldSet : form) {
-            for (Field field : fieldSet) {
+            for (Field field : fieldSet.fields()) {
                 if (field instanceof FileBlobField) {
                     FileBlobField fileBlobField = (FileBlobField) field;
                     Blob blob = fileBlobField.getValue();
                     if (blob != null) {
                         String url = getBlobDownloadUrl(
                                 fileBlobField.getPropertyAccessor());
-                        field.setHref(url);
+                        ((FileBlobField)field).setHref(url);
                     }
                 }
             }
@@ -945,7 +945,7 @@ public class CrudAction extends AbstractPageAction {
 
         FieldSet fieldSet = form.get(0);
         //Ensure the value is actually read from the request
-        for(Field field : fieldSet) {
+        for(Field field : fieldSet.fields()) {
             field.setUpdatable(true);
         }
         form.readFromRequest(context.getRequest());
@@ -1467,7 +1467,7 @@ public class CrudAction extends AbstractPageAction {
             int i = 1;
             for (FieldSet fieldset : form) {
                 int j = 0;
-                for (Field field : fieldset) {
+                for (Field field : fieldset.fields()) {
                     addFieldToCell(sheet, i, j, field);
                     j++;
                 }
@@ -1548,7 +1548,7 @@ public class CrudAction extends AbstractPageAction {
         WritableCellFormat formatCell = headerExcel();
         int i = 0;
         for (FieldSet fieldset : form) {
-            for (Field field : fieldset) {
+            for (Field field : fieldset.fields()) {
                 sheet.addCell(new jxl.write.Label(i, 0, field.getLabel(), formatCell));
                 i++;
             }
@@ -1832,7 +1832,7 @@ public class CrudAction extends AbstractPageAction {
             xb.openElement("tableData");
             xb.openElement("rows");
 
-            for (Field field : fieldset) {
+            for (Field field : fieldset.fields()) {
                 xb.openElement("row");
                 xb.openElement("nameColumn");
                 xb.write(field.getLabel());

@@ -28,7 +28,7 @@ package com.manydesigns.elements.fields;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public interface MultipartRequestField {
+public interface MultipartRequestField extends Field {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 

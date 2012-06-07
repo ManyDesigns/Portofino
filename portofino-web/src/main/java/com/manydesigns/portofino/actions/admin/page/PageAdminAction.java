@@ -431,7 +431,7 @@ public class PageAdminAction extends AbstractActionBean {
             moveForm.writeToObject(p);
             return copyPage(p.destinationPagePath, null, true);
         } else {
-            Field field = moveForm.get(0).get(0);
+            Field field = (Field) moveForm.get(0).get(0);
             if(!field.getErrors().isEmpty()) {
                 SessionMessages.addErrorMessage(field.getLabel() + ": " + field.getErrors().get(0));
             }
@@ -448,11 +448,11 @@ public class PageAdminAction extends AbstractActionBean {
             copyForm.writeToObject(p);
             return copyPage(p.destinationPagePath, p.fragment, false);
         } else {
-            Field field = copyForm.get(0).get(0);
+            Field field = (Field) copyForm.get(0).get(0);
             if(!field.getErrors().isEmpty()) {
                 SessionMessages.addErrorMessage(field.getLabel() + ": " + field.getErrors().get(0));
             }
-            field = copyForm.get(0).get(1);
+            field = (Field) copyForm.get(0).get(1);
             if(!field.getErrors().isEmpty()) {
                 SessionMessages.addErrorMessage(field.getLabel() + ": " + field.getErrors().get(0));
             }

@@ -249,11 +249,20 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
     public void writeInputText(@Nullable String id, @Nullable String name, String value,
                                String htmlClass, @Nullable Integer size,
                                @Nullable Integer maxLength) {
+        writeInputText(id, name, value, null, htmlClass, size, maxLength);
+    }
+
+    public void writeInputText(@Nullable String id, @Nullable String name, String value,
+                               @Nullable String placeholder, String htmlClass, @Nullable Integer size,
+                               @Nullable Integer maxLength) {
         openElement("input");
         addAttribute("id", id);
         addAttribute("type", "text");
         addAttribute("name", name);
         addAttribute("value", value);
+        if(placeholder != null) {
+            addAttribute("placeholder", placeholder);
+        }
         addAttribute("class", htmlClass);
         if (size != null) {
             addAttribute("size", Integer.toString(size));

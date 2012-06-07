@@ -227,7 +227,7 @@ public abstract class AbstractField implements Field {
         xb.openElement("label");
         xb.addAttribute("for", id);
         xb.addAttribute("class", FORM_LABEL_CLASS);
-        if (isRequiredField()) {
+        if (hasRequiredFields()) {
             xb.openElement("span");
             xb.addAttribute("class", "required");
             xb.write("*");
@@ -375,7 +375,7 @@ public abstract class AbstractField implements Field {
         this.title = title;
     }
 
-    public boolean isRequiredField() {
+    public boolean hasRequiredFields() {
         return required && !mode.isView(insertable, updatable);
     }
 
