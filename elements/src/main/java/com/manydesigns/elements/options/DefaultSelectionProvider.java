@@ -301,8 +301,14 @@ public class DefaultSelectionProvider implements SelectionProvider {
         labelSearch2 = labelSearch2.toLowerCase();
         String[] cellLabelArray =
                 StringUtils.split(cellLabel, NON_WORD_CHARACTERS);
-        for (String current : cellLabelArray) {
-            if (current.startsWith(labelSearch2)) {
+        String[] searchLabelArray =
+                StringUtils.split(labelSearch2, NON_WORD_CHARACTERS);
+        for (int i = 0; i <= cellLabelArray.length - searchLabelArray.length; i++) {
+            boolean allMatch = true;
+            for(int j = 0; j < searchLabelArray.length; j++) {
+                allMatch &= cellLabelArray[i + j].startsWith(searchLabelArray[j]);
+            }
+            if(allMatch) {
                 return true;
             }
         }
