@@ -62,7 +62,6 @@ import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.shiro.UsersGroupsDAO;
 import net.sourceforge.stripes.action.*;
-import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.util.HttpUtil;
 import ognl.OgnlContext;
 import org.apache.commons.beanutils.BeanUtils;
@@ -116,14 +115,15 @@ public class PageAdminAction extends AbstractActionBean {
 
     protected final PageActionRegistry registry = new PageActionRegistry();
 
-    @After(stages = LifecycleStage.BindingAndValidation) //Cosi' puo' influenzare SecurityInterceptor (dispatch)
+    @Before
     public void prepare() {
-        Application application =
-                //l'injection interceptor non e' ancora stato chiamato
-                (Application) context.getRequest().getAttribute(RequestAttributes.APPLICATION);
         Dispatcher dispatcher = new Dispatcher(application);
         String contextPath = context.getRequest().getContextPath();
         dispatch = dispatcher.createDispatch(contextPath, originalPath);
+        /* TODO ora tutte le operazioni richiedono administrator.
+           Se in futuro non sarà così, qui bisognerà controllare che l'utente abbia
+           i permessi sulla pagina di destinazione.
+        */
         try {
             PageInstance pageInstance = dispatch.getLastPageInstance();
             PageAction actionBean = pageInstance.getActionClass().newInstance();
@@ -554,8 +554,14 @@ public class PageAdminAction extends AbstractActionBean {
                 SessionMessages.addErrorMessage(msg);
                 return new RedirectResolution(dispatch.getOriginalPath());
             }
-            return new RedirectResolution(
-                    destinationPagePath + (destinationPagePath.endsWith("/") ? "" : "/") + newName);
+            if(newParent.getParameters().isEmpty()) {
+                return new RedirectResolution(
+                        destinationPagePath + (destinationPagePath.endsWith("/") ? "" : "/") + newName);
+            } else {
+                //Detail
+                newParent.getParameters().clear();
+                return new RedirectResolution(newParent.getPath());
+            }
         } else {
             String msg = getMessage("page.copyOrMove.invalidDestination", destinationPagePath);
             SessionMessages.addErrorMessage(msg);

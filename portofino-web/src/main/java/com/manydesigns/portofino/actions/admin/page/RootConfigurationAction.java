@@ -25,7 +25,6 @@ package com.manydesigns.portofino.actions.admin.page;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.actions.admin.SettingsAction;
-import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.Dispatch;
@@ -34,10 +33,9 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.safemode.SafeModeAction;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import net.sourceforge.stripes.action.After;
+import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.controller.LifecycleStage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,10 +64,9 @@ public abstract class RootConfigurationAction extends PageAdminAction implements
     //--------------------------------------------------------------------------
 
     @Override
-    @After(stages = LifecycleStage.BindingAndValidation)
+    @Before
     public void prepare() {
         originalPath = "/";
-        application = (Application) context.getRequest().getAttribute(RequestAttributes.APPLICATION);
         File rootDir = application.getPagesDir();
         Page rootPage;
         try {
