@@ -276,8 +276,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         setupSearchForm();
         loadObjects();
 
-        long totalRecords = 0;
-        totalRecords = getTotalSearchRecords();
+        long totalRecords = getTotalSearchRecords();
 
         setupTableForm(Mode.VIEW);
         JSONStringer js = new JSONStringer();

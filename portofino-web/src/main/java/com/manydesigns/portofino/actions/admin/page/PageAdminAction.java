@@ -122,7 +122,7 @@ public class PageAdminAction extends AbstractActionBean {
         dispatch = dispatcher.createDispatch(contextPath, originalPath);
         /* TODO ora tutte le operazioni richiedono administrator.
            Se in futuro non sarà così, qui bisognerà controllare che l'utente abbia
-           i permessi sulla pagina di destinazione.
+           i permessi sulla pagina di origine.
         */
         try {
             PageInstance pageInstance = dispatch.getLastPageInstance();

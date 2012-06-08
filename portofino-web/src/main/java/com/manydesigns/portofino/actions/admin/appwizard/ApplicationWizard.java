@@ -124,6 +124,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
 
     protected List<Table> roots;
     protected MultiMap children;
+    protected List<Table> allTables;
     protected Table userTable;
     protected int columnsInSummary = 5;
     protected int maxDepth = 5;
@@ -303,7 +304,13 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
 
     public Resolution afterSelectSchemas() {
         children = new MultiHashMap();
-        roots = determineRoots(children);
+        allTables = new ArrayList<Table>();
+        roots = determineRoots(children, allTables);
+        Collections.sort(allTables, new Comparator<Table>() {
+            public int compare(Table o1, Table o2) {
+                return o1.getActualEntityName().compareToIgnoreCase(o2.getActualEntityName());
+            }
+        });
         rootsForm = new TableFormBuilder(SelectableRoot.class)
                 .configFields(
                         "selected", "tableName"
@@ -351,7 +358,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         return new ForwardResolution("/layouts/admin/appwizard/select-tables.jsp");
     }
 
-    protected List<Table> determineRoots(MultiMap children) {
+    protected List<Table> determineRoots(MultiMap children, List<Table> allTables) {
         List<Table> roots = new ArrayList<Table>();
         for(SelectableSchema selectableSchema : selectableSchemas) {
             if(selectableSchema.selected) {
@@ -368,6 +375,8 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 it.remove();
                 continue;
             }
+
+            allTables.add(table);
 
             boolean removed = false;
             boolean selected = false; //Così che selected => known
@@ -535,7 +544,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         return new ForwardResolution("/layouts/admin/appwizard/build-app.jsp");
     }
 
-    @Button(list = "build-app", key="wizard.prev")
+    @Button(list = "build-app", key="wizard.prev", order = 1)
     public Resolution goBackFromBuildApplication() {
         selectUserFields();
         if(userTable == null) {
@@ -545,7 +554,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         }
     }
 
-    @Button(list = "build-app", key="wizard.finish")
+    @Button(list = "build-app", key="wizard.finish", order = 2)
     public Resolution buildApplication() {
         selectUserFields();
         application.getModel().getDatabases().add(connectionProvider.getDatabase());
@@ -601,15 +610,6 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 Color.ORANGE, Color.YELLOW.darker(), Color.MAGENTA.darker(), Color.PINK
             };
         int colorIndex = 0;
-        List<Table> allTables = new ArrayList<Table>();
-        for(Schema schema : connectionProvider.getDatabase().getSchemas()) {
-            allTables.addAll(schema.getTables());
-        }
-        Collections.sort(allTables, new Comparator<Table>() {
-            public int compare(Table o1, Table o2) {
-                return o1.getActualEntityName().compareToIgnoreCase(o2.getActualEntityName());
-            }
-        });
         for(Table table : allTables) {
             List<Column> dateColumns = new ArrayList<Column>();
             for(Column column : table.getColumns()) {
@@ -692,10 +692,13 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         if(references != null) {
             for(Reference ref : references) {
                 depth = 1;
-                //TODO prendere solo i riferimenti all'ID, non ad altre colonne
                 Column fromColumn = ref.getActualFromColumn();
                 Table fromTable = fromColumn.getTable();
                 String entityName = fromTable.getActualEntityName();
+                List<Column> pkColumns = fromTable.getPrimaryKey().getColumns();
+                if(pkColumns.size() != 1 || !pkColumns.contains(fromColumn)) {
+                    continue;
+                }
                 String childQuery =
                         "from " + entityName +
                         " where " + fromColumn.getActualPropertyName() +
@@ -756,7 +759,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             for(Column column : table.getColumns()) {
                 CrudProperty crudProperty = new CrudProperty();
                 crudProperty.setEnabled(true);
-                crudProperty.setName(column.getColumnName());
+                crudProperty.setName(column.getActualPropertyName());
                 crudProperty.setUpdatable(!column.isAutoincrement());
                 if(table.getPrimaryKey().getColumns().contains(column) || summ < columnsInSummary) {
                     crudProperty.setInSummary(true);
