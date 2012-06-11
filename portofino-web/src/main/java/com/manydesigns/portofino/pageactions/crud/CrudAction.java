@@ -27,8 +27,6 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.application.QueryUtils;
-import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.database.Database;
@@ -42,7 +40,6 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
-import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
@@ -50,9 +47,6 @@ import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -166,70 +160,6 @@ public class CrudAction extends AbstractCrudAction<Object> {
     protected void doDelete(Object object) {
         session.delete(baseTable.getActualEntityName(), object);
     }
-
-    //**************************************************************************
-    // Return to parent
-    //**************************************************************************
-
-    @Override
-    public String getDescription() {
-        if(pageInstance.getParameters().isEmpty()) {
-            return crudConfiguration.getSearchTitle();
-        } else {
-            return ShortNameUtils.getName(classAccessor, object);
-        }
-    }
-
-    @Override
-    public void setupReturnToParentTarget() {
-        if(!StringUtils.isBlank(searchString)) {
-            returnToParentParams.put(SEARCH_STRING_PARAM, searchString);
-        }
-        if (pk != null) {
-            returnToParentTarget = "search";
-        } else {
-            super.setupReturnToParentTarget();
-        }
-    }
-
-    public Resolution returnToParent() throws Exception {
-        RedirectResolution resolution;
-        if (pk != null) {
-            resolution = new RedirectResolution(
-                    appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
-        } else {
-            PageInstance[] pageInstancePath =
-                    dispatch.getPageInstancePath();
-            int previousPos = pageInstancePath.length - 2;
-            if (previousPos >= 0) {
-                PageInstance previousPageInstance = pageInstancePath[previousPos];
-                String url = previousPageInstance.getPath();
-                resolution = new RedirectResolution(url, true);
-            } else {
-                resolution = new RedirectResolution(
-                        appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
-            }
-        }
-
-        return resolution;
-    }
-
-    @Override
-    @Buttons({
-        @Button(list = "crud-edit", key = "commons.cancel", order = 99),
-        @Button(list = "crud-create", key = "commons.cancel", order = 99),
-        @Button(list = "crud-bulk-edit", key = "commons.cancel", order = 99),
-        @Button(list = "configuration", key = "commons.cancel", order = 99)
-    })
-    public Resolution cancel() {
-        if(popup) {
-            popupCloseCallback += "(false)";
-            return new ForwardResolution("/layouts/crud/popup/close.jsp");
-        } else {
-            return super.cancel();
-        }
-    }
-
 
     //**************************************************************************
     // Setup

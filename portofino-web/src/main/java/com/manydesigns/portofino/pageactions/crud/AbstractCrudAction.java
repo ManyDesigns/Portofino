@@ -1058,6 +1058,69 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 .build();
     }
 
+    //**************************************************************************
+    // Return to parent
+    //**************************************************************************
+
+    @Override
+    public String getDescription() {
+        if(pageInstance.getParameters().isEmpty()) {
+            return crudConfiguration.getSearchTitle();
+        } else {
+            return ShortNameUtils.getName(classAccessor, object);
+        }
+    }
+
+    @Override
+    public void setupReturnToParentTarget() {
+        if(!StringUtils.isBlank(searchString)) {
+            returnToParentParams.put(SEARCH_STRING_PARAM, searchString);
+        }
+        if (pk != null) {
+            returnToParentTarget = "search";
+        } else {
+            super.setupReturnToParentTarget();
+        }
+    }
+
+    public Resolution returnToParent() throws Exception {
+        RedirectResolution resolution;
+        if (pk != null) {
+            resolution = new RedirectResolution(
+                    appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
+        } else {
+            PageInstance[] pageInstancePath =
+                    dispatch.getPageInstancePath();
+            int previousPos = pageInstancePath.length - 2;
+            if (previousPos >= 0) {
+                PageInstance previousPageInstance = pageInstancePath[previousPos];
+                String url = previousPageInstance.getPath();
+                resolution = new RedirectResolution(url, true);
+            } else {
+                resolution = new RedirectResolution(
+                        appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
+            }
+        }
+
+        return resolution;
+    }
+
+    @Override
+    @Buttons({
+        @Button(list = "crud-edit", key = "commons.cancel", order = 99),
+        @Button(list = "crud-create", key = "commons.cancel", order = 99),
+        @Button(list = "crud-bulk-edit", key = "commons.cancel", order = 99),
+        @Button(list = "configuration", key = "commons.cancel", order = 99)
+    })
+    public Resolution cancel() {
+        if(popup) {
+            popupCloseCallback += "(false)";
+            return new ForwardResolution("/layouts/crud/popup/close.jsp");
+        } else {
+            return super.cancel();
+        }
+    }
+
     //--------------------------------------------------------------------------
     // Blob management
     //--------------------------------------------------------------------------
