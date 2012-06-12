@@ -199,7 +199,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             configureEditSchemas();
         } catch (Exception e) {
             logger.error("Couldn't read schema names from db", e);
-            SessionMessages.addErrorMessage("Couldn't read schema names from db: " + e);
+            SessionMessages.addErrorMessage(getMessage("appwizard.error.schemas", e));
             return createSelectionProviderForm();
         }
         return selectSchemasForm();
@@ -267,7 +267,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 }
                 return afterSelectSchemas();
             } else {
-                SessionMessages.addErrorMessage("Select at least a schema");
+                SessionMessages.addErrorMessage(getMessage("appwizard.error.schemas.noneSelected"));
                 return selectSchemasForm();
             }
         }
@@ -290,7 +290,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             targetDatabase = dbSyncer.syncDatabase(new Model());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            SessionMessages.addErrorMessage(e.toString());
+            SessionMessages.addErrorMessage(getMessage("appwizard.error.sync", e));
             return false;
         }
         connectionProvider.setDatabase(targetDatabase);
@@ -483,7 +483,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         }
 
         if(roots.isEmpty()) {
-            SessionMessages.addWarningMessage("No root table selected");
+            SessionMessages.addWarningMessage(getMessage("appwizard.warning.noRoot"));
         }
 
         userTableField.readFromRequest(context.getRequest());
@@ -502,22 +502,21 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             }
 
             DefaultSelectionProvider algoSelectionProvider = new DefaultSelectionProvider("");
-            //TODO I18n
             algoSelectionProvider.appendRow(
                     "md5Base64",
-                    "MD5 (Base64 encoded)",
+                    getMessage("appwizard.userTable.encryption.md5Base64"),
                     true);
             algoSelectionProvider.appendRow(
                     "md5Hex",
-                    "MD5 (Hex encoded)",
+                    getMessage("appwizard.userTable.encryption.md5Hex"),
                     true);
             algoSelectionProvider.appendRow(
                     "sha1Base64",
-                    "SHA-1 (Base64 encoded)",
+                    getMessage("appwizard.userTable.encryption.sha1Base64"),
                     true);
             algoSelectionProvider.appendRow(
                     "sha1Hex",
-                    "SHA-1 (Hex encoded)",
+                    getMessage("appwizard.userTable.encryption.sha1Hex"),
                     true);
             try {
                 ClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(getClass());
@@ -539,7 +538,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 encryptionAlgorithmField.setRequired(true);
 
                 userForm = new Form(Mode.CREATE);
-                FieldSet fieldSet = new FieldSet("userTable", 1, userForm.getMode());
+                FieldSet fieldSet = new FieldSet(getMessage("appwizard.userTable"), 1, userForm.getMode());
                 fieldSet.add(userIdPropertyField);
                 fieldSet.add(userNamePropertyField);
                 fieldSet.add(userPasswordPropertyField);
@@ -596,10 +595,17 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         application.initModel();
         try {
             application.saveXmlModel();
-
+        } catch (Exception e) {
+            logger.error("Could not save model", e);
+            SessionMessages.addErrorMessage(
+                    getMessage("appwizard.error.saveModelFailed", ExceptionUtils.getRootCauseMessage(e)));
+            application.getModel().getDatabases().remove(connectionProvider.getDatabase());
+            application.initModel();
+            return buildAppForm();
+        }
+        try {
             TemplateEngine engine = new SimpleTemplateEngine();
             Template template = engine.createTemplate(getClass().getResource("CrudPage.groovy"));
-
             List<ChildPage> childPages = new ArrayList<ChildPage>();
             for(Table table : roots) {
                 File dir = new File(application.getPagesDir(), table.getActualEntityName());
@@ -619,12 +625,8 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             rootPage.getLayout().getChildPages().addAll(childPages);
             DispatcherLogic.savePage(application.getPagesDir(), rootPage);
         } catch (Exception e) {
-            logger.error("Errore in sincronizzazione", e);
-            SessionMessages.addErrorMessage(
-                    "Synchronization error: " +
-                            ExceptionUtils.getRootCauseMessage(e));
-            application.getModel().getDatabases().remove(connectionProvider.getDatabase());
-            application.initModel();
+            logger.error("Error while creating pages", e);
+            SessionMessages.addErrorMessage(getMessage("appwizard.error.createPagesFailed", e));
             return buildAppForm();
         }
         SessionMessages.addInfoMessage(getMessage("appwizard.finished"));
@@ -715,7 +717,8 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 childPages.add(childPage);
             } else {
                 logger.warn("Couldn't create directory {}", dir.getAbsolutePath());
-                SessionMessages.addWarningMessage("Couldn't create directory " + dir.getAbsolutePath());
+                SessionMessages.addWarningMessage(
+                        getMessage("appwizard.error.createDirectoryFailed", dir.getAbsolutePath()));
             }
         }
     }
@@ -782,7 +785,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             IOUtils.closeQuietly(fw);
         } catch (Exception e) {
             logger.warn("Couldn't configure users", e);
-            SessionMessages.addWarningMessage("Couldn't configure users: " + e);
+            SessionMessages.addWarningMessage(getMessage("appwizard.error.userSetupFailed", e));
         }
     }
 
@@ -833,7 +836,11 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 crudProperty.setName(column.getActualPropertyName());
                 crudProperty.setUpdatable(propertyEditable);
                 crudProperty.setInsertable(propertyEditable);
-                if(table.getPrimaryKey().getColumns().contains(column) || summ < columnsInSummary) {
+                boolean inSummary =
+                        (table.getPrimaryKey().getColumns().contains(column) || summ < columnsInSummary) &&
+                        !(table.getTableName().equals(userTableName) &&
+                          column.getActualPropertyName().equals(userPasswordProperty));
+                if(inSummary) {
                     crudProperty.setInSummary(true);
                     summ++;
                 }
@@ -872,7 +879,8 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             childPages.add(childPage);
         } else {
             logger.warn("Couldn't create directory {}", dir.getAbsolutePath());
-            SessionMessages.addWarningMessage("Couldn't create directory " + dir.getAbsolutePath());
+            SessionMessages.addWarningMessage(
+                    getMessage("appwizard.error.createDirectoryFailed", dir.getAbsolutePath()));
         }
     }
 
