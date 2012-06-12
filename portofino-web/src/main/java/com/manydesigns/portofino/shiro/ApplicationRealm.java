@@ -144,4 +144,8 @@ public class ApplicationRealm extends AuthorizingRealm implements UsersGroupsDAO
         }
     }
 
+    @Override
+    public void clearCache(PrincipalCollection principals) {
+        super.clearCache(principals);
+    }
 }

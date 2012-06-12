@@ -22,9 +22,9 @@
 
 package com.manydesigns.elements.forms;
 
+import com.manydesigns.elements.FormElement;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.composites.AbstractCompositeElement;
-import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.MultipartRequestField;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +35,7 @@ import org.jetbrains.annotations.NotNull;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class FieldSet extends AbstractCompositeElement<Field> {
+public class FieldSet extends AbstractCompositeElement<FormElement> {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
@@ -55,7 +55,7 @@ public class FieldSet extends AbstractCompositeElement<Field> {
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         if (mode.isHidden()) {
-            for (Field current : this) {
+            for (FormElement current : this) {
                 current.toXhtml(xb);
             }
         } else {
@@ -72,7 +72,7 @@ public class FieldSet extends AbstractCompositeElement<Field> {
             currentColumn = 0;
             trOpened = false;
 
-            for (Field current : this) {
+            for (FormElement current : this) {
                 if (current.isForceNewRow()
                         || currentColumn + current.getColSpan() > nColumns) {
                     closeCurrentRow(xb);
@@ -126,8 +126,8 @@ public class FieldSet extends AbstractCompositeElement<Field> {
     }
 
     public boolean isRequiredFieldsPresent() {
-        for (Field current : this) {
-            if (current.isRequiredField()) {
+        for (FormElement current : this) {
+            if (current.hasRequiredFields()) {
                 return true;
             }
         }
@@ -135,11 +135,13 @@ public class FieldSet extends AbstractCompositeElement<Field> {
     }
 
     public boolean isMultipartRequest() {
-        for (Field current : this) {
-            if (current instanceof MultipartRequestField &&
-                !current.getMode().isView
-                        (current.isInsertable(), current.isUpdatable())) {
-                return true;
+        for (FormElement current : this) {
+            if (current instanceof MultipartRequestField) {
+                MultipartRequestField field = (MultipartRequestField) current;
+                if(!field.getMode().isView
+                        (field.isInsertable(), field.isUpdatable())) {
+                    return true;
+                }
             }
         }
         return false;

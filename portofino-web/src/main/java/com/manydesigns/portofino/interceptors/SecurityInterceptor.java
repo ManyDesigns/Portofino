@@ -129,7 +129,7 @@ public class
         return context.proceed();
     }
 
-    private Resolution handleAnonymousOrUnauthorized(
+    protected static Resolution handleAnonymousOrUnauthorized(
             String userId, HttpServletRequest request) {
         if (userId == null){
             logger.info("Anonymous user not allowed. Redirecting to login.");

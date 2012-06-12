@@ -18,11 +18,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
-        <ul>
-            <li><mde:write name="actionBean" property="userIdPropertyField"/></li>
-            <li><mde:write name="actionBean" property="userNamePropertyField"/></li>
-            <li><mde:write name="actionBean" property="userPasswordPropertyField"/></li>
-        </ul>
+            <mde:write name="actionBean" property="userForm"/>
         <div style="display: none;">
             <mde:write name="actionBean" property="userTableField"/>
             <mde:write name="actionBean" property="rootsForm"/>

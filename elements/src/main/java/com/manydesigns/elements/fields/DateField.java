@@ -212,6 +212,13 @@ public class DateField extends AbstractTextField {
                     StringEscapeUtils.escapeJavaScript(jsDatePattern));
             xb.writeJavaScript(js);
         }
+
+        if(mode.isBulk()) {
+            xb.writeJavaScript(
+                    "$(function() { " +
+                        "configureBulkEditTextField('" + id + "', '" + bulkCheckboxName + "'); " +
+                    "});");
+        }
     }
 
     //**************************************************************************

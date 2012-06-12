@@ -1,29 +1,28 @@
 package com.manydesigns.portofino.actions.admin.appwizard
 
 import com.manydesigns.elements.reflection.ClassAccessor
+import com.manydesigns.elements.util.Util
 import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.model.database.Table
+import com.manydesigns.portofino.pageactions.calendar.Calendar
 import com.manydesigns.portofino.pageactions.calendar.CalendarAction
 import com.manydesigns.portofino.pageactions.calendar.Event
 import com.manydesigns.portofino.reflection.TableAccessor
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.util.ShortNameUtils
-import java.awt.Color
 import org.hibernate.Criteria
 import org.hibernate.Session
+import org.hibernate.criterion.Order
 import org.hibernate.criterion.Restrictions
 import org.joda.time.DateTime
-import org.joda.time.Interval
-import com.manydesigns.portofino.pageactions.calendar.Calendar
-import org.hibernate.criterion.Order
 import org.joda.time.DateTimeZone
-import com.manydesigns.elements.util.Util
+import org.joda.time.Interval
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class CalendarPage extends CalendarAction {
 
-    def calDefs = <%= calendarDefinitions %>; //Es. [["Cal 1", "db1.schema1.table1", ["column1", "column2"], Color.RED], ["Cal 2", "db1.schema1.table2", ["column1", "column2"], Color.BLUE]]
+    def calDefs = $calendarDefinitions; //Es. [["Cal 1", "db1.schema1.table1", ["column1", "column2"], Color.RED], ["Cal 2", "db1.schema1.table2", ["column1", "column2"], Color.BLUE]]
 
     @Override
     void loadObjects(Interval interval) {
@@ -60,7 +59,7 @@ class CalendarPage extends CalendarAction {
         def evtInterval = new Interval(eventStart, eventStart.toDateMidnight().plusDays(1));
         def prettyProperty = Util.guessToWords(property);
         def event = new Event(
-                calendar, object.id + "_" + property,
+                calendar, object.id + "_" + property + "_" + events.size(),
                 name + " - " + prettyProperty,
                 evtInterval, null, null);
         events.add(event)

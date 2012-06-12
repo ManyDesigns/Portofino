@@ -108,8 +108,8 @@ public class ApplicationInterceptor implements Interceptor {
                 try {
                     Resolution resolution = actionBean.prepare(page, actionContext);
                     if(resolution != null) {
+                        logger.debug("PageAction prepare returned a resolution: {}", resolution);
                         request.setAttribute(INVALID_PAGE_INSTANCE, page);
-                        logger.error("PageAction prepare failed for {}", page);
                         return resolution;
                     }
                 } catch (Throwable t) {

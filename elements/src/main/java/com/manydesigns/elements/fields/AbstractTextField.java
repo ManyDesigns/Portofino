@@ -41,7 +41,9 @@ public abstract class AbstractTextField extends AbstractField {
 
     protected String stringValue;
     protected boolean autoCapitalize = false;
+    protected boolean replaceBadUnicodeCharacters = true;
     protected Integer maxLength = null;
+    protected boolean labelPlaceholder;
 
     protected Integer size;
 
@@ -85,6 +87,14 @@ public abstract class AbstractTextField extends AbstractField {
     //**************************************************************************
     // Field implementation
     //**************************************************************************
+
+    @Override
+    public void labelToXhtml(XhtmlBuffer xb) {
+        if(mode.isBulk() || !labelPlaceholder) {
+            super.labelToXhtml(xb);
+        }
+    }
+
     public void valueToXhtml(XhtmlBuffer xb) {
         if (mode.isView(insertable, updatable)) {
             valueToXhtmlView(xb);
@@ -100,8 +110,14 @@ public abstract class AbstractTextField extends AbstractField {
     }
 
     protected void valueToXhtmlEdit(XhtmlBuffer xb) {
-        xb.writeInputText(id, inputName, stringValue,
+        xb.writeInputText(id, inputName, stringValue, labelPlaceholder ? label : null,
                 fieldCssClass, size, maxLength);
+        if(mode.isBulk()) {
+            xb.writeJavaScript(
+                    "$(function() { " +
+                        "configureBulkEditTextField('" + id + "', '" + bulkCheckboxName + "'); " +
+                    "});");
+        }
     }
 
     protected void valueToXhtmlPreview(XhtmlBuffer xb) {
@@ -154,5 +170,21 @@ public abstract class AbstractTextField extends AbstractField {
 
     public void setSize(Integer size) {
         this.size = size;
+    }
+
+    public boolean isReplaceBadUnicodeCharacters() {
+        return replaceBadUnicodeCharacters;
+    }
+
+    public void setReplaceBadUnicodeCharacters(boolean replaceBadUnicodeCharacters) {
+        this.replaceBadUnicodeCharacters = replaceBadUnicodeCharacters;
+    }
+
+    public boolean isLabelPlaceholder() {
+        return labelPlaceholder;
+    }
+
+    public void setLabelPlaceholder(boolean labelPlaceholder) {
+        this.labelPlaceholder = labelPlaceholder;
     }
 }

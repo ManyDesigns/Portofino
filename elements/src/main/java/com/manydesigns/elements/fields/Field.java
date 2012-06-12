@@ -22,12 +22,9 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.Element;
-import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.FormElement;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
-
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -35,12 +32,11 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public interface Field extends Element {
+public interface Field extends FormElement {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
     PropertyAccessor getPropertyAccessor();
-    Mode getMode();
 
     void valueToXhtml(XhtmlBuffer xb);
     void labelToXhtml(XhtmlBuffer xb);
@@ -50,34 +46,17 @@ public interface Field extends Element {
     public String  getId();
     void setId(String id);
 
-    String getLabel();
-    void setLabel(String label);
-
     String getInputName();
     void setInputName(String inputName);
 
     boolean isRequired();
     void setRequired(boolean required);
 
-    boolean isForceNewRow();
-    void setForceNewRow(boolean forceNewRow);
-
-    int getColSpan();
-    void setColSpan(int colSpan);
-
-    String getHelp();
-    void setHelp(String help);
-
-    List<String> getErrors();
-
-
     String getHref();
     void setHref(String href);
 
     String getTitle();
     void setTitle(String alt);
-
-    boolean isRequiredField();
 
     String getStringValue();
 

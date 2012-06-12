@@ -44,9 +44,7 @@ import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.stripes.ModelActionResolver;
 import groovy.lang.GroovyObject;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.StripesConstants;
 import net.sourceforge.stripes.controller.StripesFilter;
 import org.apache.commons.collections.MultiHashMap;
@@ -112,6 +110,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     public final MultiMap portlets = new MultiHashMap();
     public String returnToParentTarget;
     public final Map<String, String> returnToParentParams = new HashMap<String, String>();
+    protected boolean embedded;
 
     //--------------------------------------------------------------------------
     // Navigation
@@ -141,8 +140,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             LoggerFactory.getLogger(AbstractPageAction.class);
 
     public boolean isEmbedded() {
-        return getContext().getRequest().getAttribute(
-                StripesConstants.REQ_ATTR_INCLUDE_PATH) != null;
+        return embedded;
     }
 
     /*protected void dereferencePageInstance() {
@@ -150,6 +148,12 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             pageInstance = pageInstance.dereference();
         }
     }*/
+
+    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
+        this.pageInstance = pageInstance;
+        embedded = context.getRequest().getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH) != null;
+        return null;
+    }
 
     public String getDescription() {
         return pageInstance.getName();

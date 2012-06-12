@@ -24,11 +24,13 @@ package com.manydesigns.elements.messages;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -62,7 +64,7 @@ public class SessionMessages {
     }
 
     public static void addInfoMessage(XhtmlFragment xml) {
-        getInfoQueue().add(xml);
+        getInfoQueue().add(new Message(xml));
     }
 
     public static void addWarningMessage(String msg) {
@@ -71,7 +73,7 @@ public class SessionMessages {
     }
 
     public static void addWarningMessage(XhtmlFragment xml) {
-        getWarningQueue().add(xml);
+        getWarningQueue().add(new Message(xml));
     }
 
     public static void addErrorMessage(String msg) {
@@ -80,7 +82,7 @@ public class SessionMessages {
     }
 
     public static void addErrorMessage(XhtmlFragment xml) {
-        getErrorQueue().add(xml);
+        getErrorQueue().add(new Message(xml));
     }
 
     public static List<XhtmlFragment> consumeInfoMessages() {
@@ -130,5 +132,28 @@ public class SessionMessages {
             }
         }
         return infoQueue;
+    }
+
+    /**
+     * Guscio amichevole verso sessioni persistenti (es. in Tomcat).
+     * Contiene un XhtmlFragment transient.
+     */
+    public static class Message implements XhtmlFragment, Serializable {
+
+        protected final transient XhtmlFragment delegate;
+
+        public Message(XhtmlFragment delegate) {
+            this.delegate = delegate;
+        }
+
+        public void toXhtml(@NotNull XhtmlBuffer xb) {
+            if(delegate != null) {
+                delegate.toXhtml(xb);
+            }
+        }
+
+        public XhtmlFragment getDelegate() {
+            return delegate;
+        }
     }
 }

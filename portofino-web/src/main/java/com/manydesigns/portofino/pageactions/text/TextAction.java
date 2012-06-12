@@ -23,6 +23,7 @@ package com.manydesigns.portofino.pageactions.text;
 
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.util.RandomUtil;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
@@ -99,7 +100,10 @@ public class TextAction extends AbstractPageAction {
     //**************************************************************************
 
     public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        this.pageInstance = pageInstance;
+        Resolution resolution = super.prepare(pageInstance, context);
+        if(resolution != null) {
+            return resolution;
+        }
         if(!pageInstance.getParameters().isEmpty()) {
             return new ErrorResolution(404);
         }
@@ -162,6 +166,7 @@ public class TextAction extends AbstractPageAction {
     protected String processContentBeforeSave(String content) {
         content = processAttachmentUrls(content);
         content = processLocalUrls(content);
+        content = Util.replaceBadUnicodeCharactersWithHtmlEntities(content);
         return content;
     }
 

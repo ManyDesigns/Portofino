@@ -22,22 +22,13 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.i18n.SimpleTextProvider;
-import com.manydesigns.elements.i18n.TextProvider;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.i18n.MultipleTextProvider;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.starter.ApplicationStarter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.jstl.core.Config;
-import javax.servlet.jsp.jstl.fmt.LocalizationContext;
 import java.io.IOException;
 import java.util.*;
 
@@ -68,40 +59,7 @@ public class DispatcherFilter implements Filter {
     ) throws IOException, ServletException {
         // cast to http type
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-
-        logger.debug("Retrieving application starter");
-        ApplicationStarter applicationStarter =
-                (ApplicationStarter) servletContext.getAttribute(
-                        ApplicationAttributes.APPLICATION_STARTER);
-
-        logger.debug("Retrieving application");
-        Application application;
-        try {
-            application = applicationStarter.getApplication();
-        } catch (Exception e) {
-            throw new ServletException(e);
-        }
-        request.setAttribute(RequestAttributes.APPLICATION, application);
-        if (application != null) {
-            Model model = application.getModel();
-            request.setAttribute(RequestAttributes.MODEL, model);
-
-            //I18n
-            Locale locale = request.getLocale();
-            LocalizationContext localizationContext =
-                    new LocalizationContext(application.getBundle(locale), locale);
-            request.setAttribute(Config.FMT_LOCALIZATION_CONTEXT + ".request", localizationContext);
-
-            //Setup Elements I18n
-            ResourceBundle elementsResourceBundle =
-                    ResourceBundle.getBundle(SimpleTextProvider.DEFAULT_MESSAGE_RESOURCE, locale);
-            ResourceBundle portofinoResourceBundle = application.getBundle(locale);
-
-            TextProvider textProvider =
-                    new MultipleTextProvider(
-                            portofinoResourceBundle, elementsResourceBundle);
-            ElementsThreadLocals.setTextProvider(textProvider);
-        }
+        Application application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
 
         logger.debug("Invoking the dispatcher to create a dispatch");
         Dispatcher dispatcher = new Dispatcher(application);

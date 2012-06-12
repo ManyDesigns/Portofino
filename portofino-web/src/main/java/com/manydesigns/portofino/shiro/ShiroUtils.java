@@ -22,6 +22,10 @@
 
 package com.manydesigns.portofino.shiro;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 
@@ -51,6 +55,18 @@ public class ShiroUtils {
                 return principal;
             } else {
                 throw new IndexOutOfBoundsException("The subject has only 1 principal, index " + i + " is not valid");
+            }
+        }
+    }
+    
+    public static void clearCache(PrincipalCollection principals) {
+        SecurityManager securityManager = SecurityUtils.getSecurityManager();
+        if(securityManager instanceof RealmSecurityManager) {
+            RealmSecurityManager rsm = (RealmSecurityManager) securityManager;
+            for(Realm realm : rsm.getRealms()) {
+                if(realm instanceof ApplicationRealm) {
+                    ((ApplicationRealm) realm).clearCache(principals);
+                }
             }
         }
     }

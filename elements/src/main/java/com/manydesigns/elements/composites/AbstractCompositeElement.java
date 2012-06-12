@@ -23,10 +23,13 @@
 package com.manydesigns.elements.composites;
 
 import com.manydesigns.elements.Element;
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -84,6 +87,37 @@ public abstract class AbstractCompositeElement<T extends Element>
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Field findFieldByPropertyName(String propertyName) {
+        for(T element : this) {
+            if(element instanceof Field) {
+                Field field = (Field) element;
+                PropertyAccessor accessor = field.getPropertyAccessor();
+                if (accessor.getName().equals(propertyName)) {
+                    return field;
+                }
+            } else if(element instanceof AbstractCompositeElement) {
+                Field field = ((AbstractCompositeElement) element).findFieldByPropertyName(propertyName);
+                if(field != null) {
+                    return field;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Collection<Field> fields() {
+        List<Field> fields = new ArrayList<Field>();
+        for(T element : this) {
+            if(element instanceof Field) {
+                Field field = (Field) element;
+                fields.add(field);
+            } else if(element instanceof AbstractCompositeElement) {
+                fields.addAll(((AbstractCompositeElement) element).fields());
+            }
+        }
+        return fields;
     }
 
 }

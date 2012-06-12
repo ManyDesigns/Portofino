@@ -62,7 +62,6 @@ import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.shiro.UsersGroupsDAO;
 import net.sourceforge.stripes.action.*;
-import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.util.HttpUtil;
 import ognl.OgnlContext;
 import org.apache.commons.beanutils.BeanUtils;
@@ -116,14 +115,15 @@ public class PageAdminAction extends AbstractActionBean {
 
     protected final PageActionRegistry registry = new PageActionRegistry();
 
-    @After(stages = LifecycleStage.BindingAndValidation) //Cosi' puo' influenzare SecurityInterceptor (dispatch)
+    @Before
     public void prepare() {
-        Application application =
-                //l'injection interceptor non e' ancora stato chiamato
-                (Application) context.getRequest().getAttribute(RequestAttributes.APPLICATION);
         Dispatcher dispatcher = new Dispatcher(application);
         String contextPath = context.getRequest().getContextPath();
         dispatch = dispatcher.createDispatch(contextPath, originalPath);
+        /* TODO ora tutte le operazioni richiedono administrator.
+           Se in futuro non sarà così, qui bisognerà controllare che l'utente abbia
+           i permessi sulla pagina di origine.
+        */
         try {
             PageInstance pageInstance = dispatch.getLastPageInstance();
             PageAction actionBean = pageInstance.getActionClass().newInstance();
@@ -431,7 +431,7 @@ public class PageAdminAction extends AbstractActionBean {
             moveForm.writeToObject(p);
             return copyPage(p.destinationPagePath, null, true);
         } else {
-            Field field = moveForm.get(0).get(0);
+            Field field = (Field) moveForm.get(0).get(0);
             if(!field.getErrors().isEmpty()) {
                 SessionMessages.addErrorMessage(field.getLabel() + ": " + field.getErrors().get(0));
             }
@@ -448,11 +448,11 @@ public class PageAdminAction extends AbstractActionBean {
             copyForm.writeToObject(p);
             return copyPage(p.destinationPagePath, p.fragment, false);
         } else {
-            Field field = copyForm.get(0).get(0);
+            Field field = (Field) copyForm.get(0).get(0);
             if(!field.getErrors().isEmpty()) {
                 SessionMessages.addErrorMessage(field.getLabel() + ": " + field.getErrors().get(0));
             }
-            field = copyForm.get(0).get(1);
+            field = (Field) copyForm.get(0).get(1);
             if(!field.getErrors().isEmpty()) {
                 SessionMessages.addErrorMessage(field.getLabel() + ": " + field.getErrors().get(0));
             }
@@ -554,8 +554,14 @@ public class PageAdminAction extends AbstractActionBean {
                 SessionMessages.addErrorMessage(msg);
                 return new RedirectResolution(dispatch.getOriginalPath());
             }
-            return new RedirectResolution(
-                    destinationPagePath + (destinationPagePath.endsWith("/") ? "" : "/") + newName);
+            if(newParent.getParameters().isEmpty()) {
+                return new RedirectResolution(
+                        destinationPagePath + (destinationPagePath.endsWith("/") ? "" : "/") + newName);
+            } else {
+                //Detail
+                newParent.getParameters().clear();
+                return new RedirectResolution(newParent.getPath());
+            }
         } else {
             String msg = getMessage("page.copyOrMove.invalidDestination", destinationPagePath);
             SessionMessages.addErrorMessage(msg);

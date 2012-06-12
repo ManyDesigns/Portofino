@@ -57,6 +57,10 @@ public class Util {
 
     protected final static Pattern pattern = Pattern.compile("\\p{Alpha}*:");
 
+    protected final static Pattern BAD_UNICODE_CHARS_PATTERN = Pattern.compile(
+            "[\u2013\u2014\u2018\u2019\u0092\u201C\u201D\u2022\u2026\u0093\u0094]",
+            Pattern.CASE_INSENSITIVE);
+
     public static final Logger logger = LoggerFactory.getLogger(Util.class);
 
     public static String getAbsoluteUrl(HttpServletRequest req,
@@ -272,5 +276,75 @@ public class Util {
         System.arraycopy(original, from, copy, 0,
                 Math.min(original.length - from, newLength));
         return copy;
+    }
+
+    public static StringBuilder replaceBadUnicodeCharacters(String source, StringBuilder dest) {
+        Matcher m = BAD_UNICODE_CHARS_PATTERN.matcher(source);
+        int index = 0;
+        while (m.find()) {
+            String g = m.group();
+            dest.append(source.substring(index, m.end() - 1));
+            index = m.end();
+            if (g.equals("\u2013") || g.equals("\u2014")) {
+                dest.append('-');
+            } else if (g.equals("\u2018") || g.equals("\u2019")|| g.equals("\u0092")) {
+                dest.append('\'');
+            } else if (g.equals("\u201C") || g.equals("\u201D")) {
+                dest.append('"');
+            } else if (g.equals("\u2022")) {
+                dest.append('*');
+            } else if (g.equals("\u2026")) {
+                dest.append("...");
+            } else if (g.equals("\u0093")) {
+                dest.append("<<");
+            } else if (g.equals("\u0094")) {
+                dest.append(">>");
+            }
+        }
+        dest.append(source.substring(index, source.length()));
+        return dest;
+    }
+
+    public static StringBuilder replaceBadUnicodeCharactersWithHtmlEntities(String source, StringBuilder dest) {
+        Matcher m = BAD_UNICODE_CHARS_PATTERN.matcher(source);
+        int index = 0;
+        while (m.find()) {
+            String g = m.group();
+            dest.append(source.substring(index, m.end() - 1));
+            index = m.end();
+            if(g.equals("\u2013")) {
+                dest.append("&ndash;");
+            } else if(g.equals("\u2014")) {
+                dest.append("&mdash;");
+            } else if(g.equals("\u2018")) {
+                dest.append("&lsquo;");
+            } else if(g.equals("\u2019")) {
+                dest.append("&rsquo;");
+            } else if(g.equals("\u0092")) {
+                dest.append("'");
+            } else if (g.equals("\u201C")) {
+                dest.append("&ldquo;");
+            } else if(g.equals("\u201D")) {
+                dest.append("&rdquo;");
+            } else if (g.equals("\u2022")) {
+                dest.append("&bull;");
+            } else if (g.equals("\u2026")) {
+                dest.append("&hellip;");
+            } else if (g.equals("\u0093")) {
+                dest.append("&lt;&lt;");
+            } else if (g.equals("\u0094")) {
+                dest.append("&gt;&gt;");
+            }
+        }
+        dest.append(source.substring(index, source.length()));
+        return dest;
+    }
+
+    public static String replaceBadUnicodeCharacters(String source) {
+        return replaceBadUnicodeCharacters(source, new StringBuilder()).toString();
+    }
+
+    public static String replaceBadUnicodeCharactersWithHtmlEntities(String source) {
+        return replaceBadUnicodeCharactersWithHtmlEntities(source, new StringBuilder()).toString();
     }
 }

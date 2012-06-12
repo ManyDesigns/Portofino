@@ -212,4 +212,14 @@ public class UtilTest extends AbstractElementsTest {
         assertEquals(target, OgnlUtils.convertValue(date, Timestamp.class));
     }
 
+    public void testCleanBadUnicodeChars() {
+        String bad = "\u2013\u2014\u2018\u2019\u0092\u201C\u201D\u2022\u2026\u0093\u0094 abc " +
+                     "\u2019\u0092\u201C\u201D\u2013\u2014\u2018\u2022\u2026\u0094\u0093 def";
+        String good = Util.replaceBadUnicodeCharacters(bad);
+        assertEquals("--'''\"\"*...<<>> abc ''\"\"--'*...>><< def", good);
+
+        good = Util.replaceBadUnicodeCharactersWithHtmlEntities(bad);
+        assertEquals("&ndash;&mdash;&lsquo;&rsquo;'&ldquo;&rdquo;&bull;&hellip;&lt;&lt;&gt;&gt; abc &rsquo;'&ldquo;&rdquo;&ndash;&mdash;&lsquo;&bull;&hellip;&gt;&gt;&lt;&lt; def", good);
+    }
+
 }
