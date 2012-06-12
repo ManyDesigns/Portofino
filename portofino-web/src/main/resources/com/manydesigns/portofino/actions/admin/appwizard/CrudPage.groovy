@@ -11,13 +11,6 @@ import org.apache.commons.lang.StringUtils
 @RequiresPermissions(level = AccessLevel.VIEW)
 class CrudPage extends CrudAction {
 
-    //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino
-    //Write your code here
-
-    //**************************************************************************
-    // Extension hooks
-    //**************************************************************************
-
     String linkToParentProperty = "$linkToParentProperty";
     String parentName = "$parentName";
 
