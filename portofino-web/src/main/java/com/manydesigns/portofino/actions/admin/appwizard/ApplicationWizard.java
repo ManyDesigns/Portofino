@@ -457,6 +457,12 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 }
             }
         }
+        //Order is important! (to read correctly from the request)
+        Collections.sort(selectableRoots, new Comparator<SelectableRoot>() {
+            public int compare(SelectableRoot o1, SelectableRoot o2) {
+                return o1.tableName.compareTo(o2.tableName);
+            }
+        });
 
         rootsForm = new TableFormBuilder(SelectableRoot.class)
                 .configFields(
