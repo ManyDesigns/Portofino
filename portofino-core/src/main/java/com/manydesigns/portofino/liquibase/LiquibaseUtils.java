@@ -23,11 +23,17 @@
 package com.manydesigns.portofino.liquibase;
 
 import com.manydesigns.portofino.liquibase.databases.*;
+import com.manydesigns.portofino.liquibase.databasesnapshotgenerators.PortofinoOracleDatabaseSnapshotGenerator;
 import com.manydesigns.portofino.liquibase.sqlgenerators.*;
 import liquibase.database.DatabaseFactory;
+import liquibase.snapshot.DatabaseSnapshotGenerator;
+import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
+import liquibase.snapshot.jvm.*;
 import liquibase.sqlgenerator.SqlGeneratorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -70,6 +76,12 @@ public class LiquibaseUtils {
                 openingQuoteString, objectName, closingQuoteString);
     }
 
+    public static void setup() {
+        setupDatabaseFactory();
+        setupDatabaseSnapshotGeneratorFactory();
+        setupSqlGeneratorFactory();
+    }
+
     public static void setupDatabaseFactory() {
         DatabaseFactory databaseFactory = DatabaseFactory.getInstance();
 
@@ -96,6 +108,37 @@ public class LiquibaseUtils {
 
         logger.debug("Registering Postgres");
         databaseFactory.register(new PortofinoPostgresDatabase());
+    }
+
+    public static void setupDatabaseSnapshotGeneratorFactory() {
+        DatabaseSnapshotGeneratorFactory dsgf =
+                DatabaseSnapshotGeneratorFactory.getInstance();
+
+        List<DatabaseSnapshotGenerator> registry = dsgf.getRegistry();
+
+        logger.debug("Clearing Liquibase database snapshot generator factory registry");
+        registry.clear();
+
+        logger.debug("Registering DB2");
+        dsgf.register(new DB2DatabaseSnapshotGenerator());
+
+        logger.debug("Registering Derby");
+        dsgf.register(new DerbyDatabaseSnapshotGenerator());
+
+        logger.debug("Registering H2");
+        dsgf.register(new H2DatabaseSnapshotGenerator());
+
+        logger.debug("Registering MSSQL");
+        dsgf.register(new MSSQLDatabaseSnapshotGenerator());
+
+        logger.debug("Registering MySQL");
+        dsgf.register(new MySQLDatabaseSnapshotGenerator());
+
+        logger.debug("Registering Oracle");
+        dsgf.register(new PortofinoOracleDatabaseSnapshotGenerator());
+
+        logger.debug("Registering Postgres");
+        dsgf.register(new PostgresDatabaseSnapshotGenerator());
     }
 
     public static void setupSqlGeneratorFactory() {

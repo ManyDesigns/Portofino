@@ -125,8 +125,7 @@ public class PortofinoListener
 
         setupCommonsConfiguration();
 
-        LiquibaseUtils.setupDatabaseFactory();
-        LiquibaseUtils.setupSqlGeneratorFactory();
+        LiquibaseUtils.setup();
 
         elementsConfiguration = ElementsProperties.getConfiguration();
         servletContext.setAttribute(
