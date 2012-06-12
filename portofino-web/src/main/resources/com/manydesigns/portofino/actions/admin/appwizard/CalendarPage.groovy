@@ -23,7 +23,7 @@ import com.manydesigns.elements.util.Util
 @RequiresPermissions(level = AccessLevel.VIEW)
 class CalendarPage extends CalendarAction {
 
-    def calDefs = <%= calendarDefinitions %>; //Es. [["Cal 1", "db1.schema1.table1", ["column1", "column2"], Color.RED], ["Cal 2", "db1.schema1.table2", ["column1", "column2"], Color.BLUE]]
+    def calDefs = $calendarDefinitions; //Es. [["Cal 1", "db1.schema1.table1", ["column1", "column2"], Color.RED], ["Cal 2", "db1.schema1.table2", ["column1", "column2"], Color.BLUE]]
 
     @Override
     void loadObjects(Interval interval) {

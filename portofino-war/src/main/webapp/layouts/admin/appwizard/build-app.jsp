@@ -20,9 +20,7 @@
         <mde:sessionMessages />
         Press Finish to build the application.
         <div style="display: none;">
-            <mde:write name="actionBean" property="userIdPropertyField"/>
-            <mde:write name="actionBean" property="userNamePropertyField"/>
-            <mde:write name="actionBean" property="userPasswordPropertyField"/>
+            <mde:write name="actionBean" property="userForm"/>
             <mde:write name="actionBean" property="userTableField"/>
             <mde:write name="actionBean" property="rootsForm"/>
             <mde:write name="actionBean" property="schemasForm"/>

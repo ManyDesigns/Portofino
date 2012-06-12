@@ -32,10 +32,7 @@ package com.manydesigns.portofino.actions.admin.appwizard;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
-import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.forms.TableForm;
-import com.manydesigns.elements.forms.TableFormBuilder;
+import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -56,14 +53,13 @@ import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.pageactions.PageActionLogic;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
-import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.security.RequiresAdministrator;
+import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
@@ -75,6 +71,7 @@ import org.apache.commons.collections.MultiMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,14 +97,15 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             "Copyright (c) 2005-2012, ManyDesigns srl";
     public static final String JDBC = "JDBC";
     public static final String JNDI = "JNDI";
+    @SuppressWarnings({"RedundantStringConstructorCall"})
+    public static final String NO_LINK_TO_PARENT = new String();
 
     protected Form jndiCPForm;
     protected Form jdbcCPForm;
     protected Form connectionProviderForm;
+
     protected Field userTableField;
-    protected Field userNamePropertyField;
-    protected Field userIdPropertyField;
-    protected Field userPasswordPropertyField;
+    protected Form userForm;
 
     protected String connectionProviderType;
     protected ConnectionProvider connectionProvider;
@@ -121,6 +119,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     protected String userNameProperty;
     protected String userIdProperty;
     protected String userPasswordProperty;
+    protected String encryptionAlgorithm;
 
     protected List<Table> roots;
     protected MultiMap children;
@@ -140,7 +139,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     public static final Logger logger = LoggerFactory.getLogger(ApplicationWizard.class);
 
     @DefaultHandler
-    @Button(list = "select-schemas", key="wizard.prev")
+    @Button(list = "select-schemas", key="wizard.prev", order = 1)
     public Resolution start() {
         buildCPForms();
         return createSelectionProviderForm();
@@ -168,8 +167,8 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     }
 
     @Buttons({
-        @Button(list = "create-connection-provider", key="wizard.next"),
-        @Button(list = "select-tables", key="wizard.prev")
+        @Button(list = "create-connection-provider", key="wizard.next", order = 2),
+        @Button(list = "select-tables", key="wizard.prev", order = 1)
     })
     public Resolution createConnectionProvider() {
         buildCPForms();
@@ -247,8 +246,8 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     }
 
     @Buttons({
-        @Button(list = "select-schemas", key="wizard.next"),
-        @Button(list = "select-user-fields", key="wizard.prev")
+        @Button(list = "select-schemas", key="wizard.next", order = 2),
+        @Button(list = "select-user-fields", key="wizard.prev", order = 1)
     })
     public Resolution selectSchemas() {
         createConnectionProvider();
@@ -371,7 +370,6 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             Table table = it.next();
 
             if(table.getPrimaryKey() == null) {
-                SessionMessages.addWarningMessage("Table " + table.getQualifiedName() + " has no primary key and has been skipped.");
                 it.remove();
                 continue;
             }
@@ -432,10 +430,15 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 selectableRoots.add(root);
             }
         }
+        Collections.sort(selectableRoots, new Comparator<SelectableRoot>() {
+            public int compare(SelectableRoot o1, SelectableRoot o2) {
+                return o1.tableName.compareTo(o2.tableName);
+            }
+        });
         return roots;
     }
 
-    @Button(list = "select-tables", key="wizard.next")
+    @Button(list = "select-tables", key="wizard.next", order = 2)
     public Resolution selectTables() {
         //Schemas
         createConnectionProvider();
@@ -491,20 +494,52 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                         column.getActualPropertyName(),
                         true);
             }
+
+            DefaultSelectionProvider algoSelectionProvider = new DefaultSelectionProvider("");
+            //TODO I18n
+            algoSelectionProvider.appendRow(
+                    "md5Base64",
+                    "MD5 (Base64 encoded)",
+                    true);
+            algoSelectionProvider.appendRow(
+                    "md5Hex",
+                    "MD5 (Hex encoded)",
+                    true);
+            algoSelectionProvider.appendRow(
+                    "sha1Base64",
+                    "SHA-1 (Base64 encoded)",
+                    true);
+            algoSelectionProvider.appendRow(
+                    "sha1Hex",
+                    "SHA-1 (Hex encoded)",
+                    true);
             try {
                 ClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(getClass());
+
                 PropertyAccessor propertyAccessor = classAccessor.getProperty("userIdProperty");
-                userIdPropertyField = new SelectField(propertyAccessor, selectionProvider, Mode.CREATE, "");
+                Field userIdPropertyField = new SelectField(propertyAccessor, selectionProvider, Mode.CREATE, "");
                 userIdPropertyField.setRequired(true);
-                userIdPropertyField.readFromObject(this);
+
                 propertyAccessor = classAccessor.getProperty("userNameProperty");
-                userNamePropertyField = new SelectField(propertyAccessor, selectionProvider, Mode.CREATE, "");
+                Field userNamePropertyField = new SelectField(propertyAccessor, selectionProvider, Mode.CREATE, "");
                 userNamePropertyField.setRequired(true);
-                userNamePropertyField.readFromObject(this);
+
                 propertyAccessor = classAccessor.getProperty("userPasswordProperty");
-                userPasswordPropertyField = new SelectField(propertyAccessor, selectionProvider, Mode.CREATE, "");
+                Field userPasswordPropertyField = new SelectField(propertyAccessor, selectionProvider, Mode.CREATE, "");
                 userPasswordPropertyField.setRequired(true);
-                userPasswordPropertyField.readFromObject(this);
+
+                propertyAccessor = classAccessor.getProperty("encryptionAlgorithm");
+                Field encryptionAlgorithmField = new SelectField(propertyAccessor, algoSelectionProvider, Mode.CREATE, "");
+                encryptionAlgorithmField.setRequired(true);
+
+                userForm = new Form(Mode.CREATE);
+                FieldSet fieldSet = new FieldSet("userTable", 1, userForm.getMode());
+                fieldSet.add(userIdPropertyField);
+                fieldSet.add(userNamePropertyField);
+                fieldSet.add(userPasswordPropertyField);
+                fieldSet.add(encryptionAlgorithmField);
+                userForm.add(fieldSet);
+                userForm.readFromObject(this);
             } catch (NoSuchFieldException e) {
                 throw new Error(e);
             }
@@ -514,19 +549,13 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         }
     }
 
-    @Button(list = "select-user-fields", key="wizard.next")
+    @Button(list = "select-user-fields", key="wizard.next", order = 2)
     public Resolution selectUserFields() {
         selectTables();
         if(userTable != null) {
-            userIdPropertyField.readFromRequest(context.getRequest());
-            userNamePropertyField.readFromRequest(context.getRequest());
-            userPasswordPropertyField.readFromRequest(context.getRequest());
-            if(userIdPropertyField.validate() &&
-               userNamePropertyField.validate() &&
-               userPasswordPropertyField.validate()) {
-                userIdPropertyField.writeToObject(this);
-                userNamePropertyField.writeToObject(this);
-                userPasswordPropertyField.writeToObject(this);
+            userForm.readFromRequest(context.getRequest());
+            if(userForm.validate()) {
+                userForm.writeToObject(this);
                 return buildAppForm();
             } else {
                 return selectUserFieldsForm();
@@ -561,15 +590,18 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         application.initModel();
         try {
             application.saveXmlModel();
-            String scriptTemplate = PageActionLogic.getScriptTemplate(CrudAction.class);
+
+            TemplateEngine engine = new SimpleTemplateEngine();
+            Template template = engine.createTemplate(getClass().getResource("CrudPage.groovy"));
+
             List<ChildPage> childPages = new ArrayList<ChildPage>();
             for(Table table : roots) {
                 File dir = new File(application.getPagesDir(), table.getActualEntityName());
                 depth = 1;
-                createCrudPage(dir, table, childPages, scriptTemplate);
+                createCrudPage(dir, table, childPages, template);
             }
             if(userTable != null) {
-                setupUsers(childPages, scriptTemplate);
+                setupUsers(childPages, template);
             }
             setupCalendar(childPages);
             Page rootPage = DispatcherLogic.getPage(application.getPagesDir());
@@ -592,6 +624,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         SessionMessages.addInfoMessage(getMessage("appwizard.finished"));
         if(userTable != null) {
             SessionMessages.addWarningMessage(getMessage("appwizard.warning.userTable.created"));
+            ShiroUtils.clearCache(SecurityUtils.getSubject().getPrincipals());
         }
         return new RedirectResolution("/");
     }
@@ -620,7 +653,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             if(!dateColumns.isEmpty()) {
                 //["Cal 1", "db1.schema1.table1", ["column1", "column2"], Color.RED]
                 Color color = colors[colorIndex++ % colors.length];
-                List<String> calDef = new ArrayList();
+                List<String> calDef = new ArrayList<String>();
                 calDef.add('"' + Util.guessToWords(table.getActualEntityName()) + '"');
                 calDef.add('"' + table.getQualifiedName() + '"');
                 String cols = "[";
@@ -658,7 +691,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 File actionFile = new File(dir, "action.groovy");
                 try {
                     TemplateEngine engine = new SimpleTemplateEngine();
-                    Template template = engine.createTemplate(getClass().getResource("CalendarPage.groovy.template"));
+                    Template template = engine.createTemplate(getClass().getResource("CalendarPage.groovy"));
                     Map<String, Object> bindings = new HashMap<String, Object>();
                     bindings.put("calendarDefinitions", calendarDefinitionsStr);
                     FileWriter fw = new FileWriter(actionFile);
@@ -681,11 +714,11 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         }
     }
 
-    protected void setupUsers(List<ChildPage> childPages, String scriptTemplate) throws Exception {
+    protected void setupUsers(List<ChildPage> childPages, Template template) throws Exception {
         if(!roots.contains(userTable)) {
             File dir = new File(application.getPagesDir(), userTable.getActualEntityName());
             depth = 1;
-            createCrudPage(dir, userTable, childPages, scriptTemplate);
+            createCrudPage(dir, userTable, childPages, template);
         }
 
         List<Reference> references = (List<Reference>) children.get(userTable);
@@ -693,45 +726,53 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             for(Reference ref : references) {
                 depth = 1;
                 Column fromColumn = ref.getActualFromColumn();
+                Column toColumn = ref.getActualToColumn();
                 Table fromTable = fromColumn.getTable();
+                Table toTable = toColumn.getTable();
                 String entityName = fromTable.getActualEntityName();
-                List<Column> pkColumns = fromTable.getPrimaryKey().getColumns();
-                if(pkColumns.size() != 1 || !pkColumns.contains(fromColumn)) {
+                List<Column> pkColumns = toTable.getPrimaryKey().getColumns();
+                if(!pkColumns.contains(toColumn)) {
                     continue;
                 }
+                String linkToUserProperty = fromColumn.getActualPropertyName();
                 String childQuery =
                         "from " + entityName +
-                        " where " + fromColumn.getActualPropertyName() +
+                        " where " + linkToUserProperty +
                         " = %{#securityUtils.getPrincipal(1)}";
                 String dirName = "my-" + entityName;
-                boolean multipleRoles = false;
-                for(Reference ref2 : references) {
-                    if(ref2 != ref && ref2.getActualFromColumn().getTable().equals(fromTable)) {
-                        multipleRoles = true;
-                        break;
-                    }
-                }
+                boolean multipleRoles = isMultipleRoles(fromTable, ref, references);
                 if(multipleRoles) {
-                    dirName += "-as-" + fromColumn.getActualPropertyName();
+                    dirName += "-as-" + linkToUserProperty;
                 }
                 File dir = new File(application.getPagesDir(), dirName);
                 String title = Util.guessToWords(dirName);
+
+                Map<String, String> bindings = new HashMap<String, String>();
+                bindings.put("parentName", "securityUtils");
+                bindings.put("parentProperty", "getPrincipal(1)");
+                bindings.put("linkToParentProperty", linkToUserProperty);
+
                 createCrudPage(
                         dir, fromTable, childQuery,
-                        childPages, scriptTemplate, title);
+                        childPages, template, bindings, title);
             }
         }
         try {
             TemplateEngine engine = new SimpleTemplateEngine();
-            Template template = engine.createTemplate(getClass().getResource("security.groovy"));
+            Template secTemplate = engine.createTemplate(getClass().getResource("security.groovy"));
             Map<String, String> bindings = new HashMap<String, String>();
             bindings.put("databaseName", connectionProvider.getDatabase().getDatabaseName());
             bindings.put("userTableEntityName", userTable.getActualEntityName());
             bindings.put("userIdProperty", userIdProperty);
             bindings.put("userNameProperty", userNameProperty);
             bindings.put("passwordProperty", userPasswordProperty);
+
+            bindings.put("groupTableEntityName", ""); //TODO
+            bindings.put("groupIdProperty", ""); //TODO
+
+            bindings.put("encryptionAlgorithm", encryptionAlgorithm);
             FileWriter fw = new FileWriter(new File(application.getAppScriptsDir(), "security.groovy"));
-            template.make(bindings).writeTo(fw);
+            secTemplate.make(bindings).writeTo(fw);
             IOUtils.closeQuietly(fw);
         } catch (Exception e) {
             logger.warn("Couldn't configure users", e);
@@ -739,14 +780,31 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         }
     }
 
-    protected void createCrudPage(File dir, Table table, List<ChildPage> childPages, String scriptTemplate) throws Exception {
+    private boolean isMultipleRoles(Table fromTable, Reference ref, List<Reference> references) {
+        boolean multipleRoles = false;
+        for(Reference ref2 : references) {
+            if(ref2 != ref && ref2.getActualFromColumn().getTable().equals(fromTable)) {
+                multipleRoles = true;
+                break;
+            }
+        }
+        return multipleRoles;
+    }
+
+    protected void createCrudPage(File dir, Table table, List<ChildPage> childPages, Template template)
+            throws Exception {
         String query = "from " + table.getActualEntityName();
         String title = Util.guessToWords(table.getActualEntityName());
-        createCrudPage(dir, table, query, childPages, scriptTemplate, title);
+        HashMap<String, String> bindings = new HashMap<String, String>();
+        bindings.put("parentName", "");
+        bindings.put("parentProperty", "nothing");
+        bindings.put("linkToParentProperty", NO_LINK_TO_PARENT);
+        createCrudPage(dir, table, query, childPages, template, bindings, title);
     }
 
     protected void createCrudPage(
-            File dir, Table table, String query, List<ChildPage> childPages, String scriptTemplate, String title)
+            File dir, Table table, String query, List<ChildPage> childPages,
+            Template template, Map<String, String> bindings, String title)
             throws Exception {
         if(dir.mkdirs()) {
             CrudConfiguration configuration = new CrudConfiguration();
@@ -756,11 +814,19 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             String variable = table.getActualEntityName();
             configuration.setVariable(variable);
             int summ = 0;
+            String linkToParentProperty = bindings.get("linkToParentProperty");
             for(Column column : table.getColumns()) {
+                @SuppressWarnings({"StringEquality"})
+                boolean propertyEditable =
+                        !column.isAutoincrement() &&
+                        !(linkToParentProperty != NO_LINK_TO_PARENT &&
+                          column.getActualPropertyName().equals(linkToParentProperty));
+
                 CrudProperty crudProperty = new CrudProperty();
                 crudProperty.setEnabled(true);
                 crudProperty.setName(column.getActualPropertyName());
-                crudProperty.setUpdatable(!column.isAutoincrement());
+                crudProperty.setUpdatable(propertyEditable);
+                crudProperty.setInsertable(propertyEditable);
                 if(table.getPrimaryKey().getColumns().contains(column) || summ < columnsInSummary) {
                     crudProperty.setInSummary(true);
                     summ++;
@@ -775,32 +841,12 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
 
             List<Reference> references = (List<Reference>) children.get(table);
             if(references != null && depth < maxDepth) {
+                ArrayList<ChildPage> pages = page.getDetailLayout().getChildPages();
                 depth++;
                 for(Reference ref : references) {
-                    Column fromColumn = ref.getActualFromColumn();
-                    Table fromTable = fromColumn.getTable();
-                    String entityName = fromTable.getActualEntityName();
-                    String propertyName = ref.getActualToColumn().getActualPropertyName();
-                    String childQuery =
-                            "from " + entityName +
-                            " where " + fromColumn.getActualPropertyName() +
-                            " = %{#" + variable + "." + propertyName + "}";
-                    String childDirName = entityName;
-                    /*if(table.getPrimaryKey().getColumns().size() == 1 &&
-                       !table.getPrimaryKey().getColumns().contains(ref.getActualToColumn())) {
-                        childDirName += "-by-" + propertyName;
-                    }*/
-                    File childDir = new File(new File(dir, "_detail"), childDirName);
-                    if(childDir.exists()) {
-                        childDirName += "-as-" + fromColumn.getActualPropertyName();
-                        childDir = new File(new File(dir, "_detail"), childDirName);
-                    }
-                    String childTitle = Util.guessToWords(childDirName);
-                    createCrudPage(
-                            childDir, fromTable, childQuery,
-                            page.getDetailLayout().getChildPages(), scriptTemplate, childTitle);
+                    createChildCrudPage(dir, template, variable, references, ref, pages);
                 }
-                Collections.sort(page.getDetailLayout().getChildPages(), new Comparator<ChildPage>() {
+                Collections.sort(pages, new Comparator<ChildPage>() {
                     public int compare(ChildPage o1, ChildPage o2) {
                         return o1.getName().compareToIgnoreCase(o2.getName());
                     }
@@ -810,7 +856,8 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             DispatcherLogic.savePage(dir, page);
             File actionFile = new File(dir, "action.groovy");
             FileWriter fileWriter = new FileWriter(actionFile);
-            IOUtils.write(scriptTemplate, fileWriter);
+
+            template.make(bindings).writeTo(fileWriter);
             IOUtils.closeQuietly(fileWriter);
 
             ChildPage childPage = new ChildPage();
@@ -821,6 +868,37 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             logger.warn("Couldn't create directory {}", dir.getAbsolutePath());
             SessionMessages.addWarningMessage("Couldn't create directory " + dir.getAbsolutePath());
         }
+    }
+
+    protected void createChildCrudPage(
+            File dir, Template template, String parentName, List<Reference> references,
+            Reference ref, ArrayList<ChildPage> pages)
+            throws Exception {
+        Column fromColumn = ref.getActualFromColumn();
+        Table fromTable = fromColumn.getTable();
+        String entityName = fromTable.getActualEntityName();
+        String parentProperty = ref.getActualToColumn().getActualPropertyName();
+        String linkToParentProperty = fromColumn.getActualPropertyName();
+        String childQuery =
+                "from " + entityName +
+                " where " + linkToParentProperty +
+                " = %{#" + parentName + "." + parentProperty + "}";
+        String childDirName = entityName;
+        boolean multipleRoles = isMultipleRoles(fromTable, ref, references);
+        if(multipleRoles) {
+            childDirName += "-as-" + linkToParentProperty;
+        }
+        File childDir = new File(new File(dir, "_detail"), childDirName);
+        String childTitle = Util.guessToWords(childDirName);
+
+        Map<String, String> bindings = new HashMap<String, String>();
+        bindings.put("parentName", parentName);
+        bindings.put("parentProperty", parentProperty);
+        bindings.put("linkToParentProperty", linkToParentProperty);
+
+        createCrudPage(
+                childDir, fromTable, childQuery,
+                pages, template, bindings, childTitle);
     }
 
     public Form getJndiCPForm() {
@@ -879,16 +957,8 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         return userTableField;
     }
 
-    public Field getUserNamePropertyField() {
-        return userNamePropertyField;
-    }
-
-    public Field getUserIdPropertyField() {
-        return userIdPropertyField;
-    }
-
-    public Field getUserPasswordPropertyField() {
-        return userPasswordPropertyField;
+    public Form getUserForm() {
+        return userForm;
     }
 
     public String getUserNameProperty() {
@@ -921,5 +991,13 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
 
     public void setAdvanced(boolean advanced) {
         this.advanced = advanced;
+    }
+
+    public String getEncryptionAlgorithm() {
+        return encryptionAlgorithm;
+    }
+
+    public void setEncryptionAlgorithm(String encryptionAlgorithm) {
+        this.encryptionAlgorithm = encryptionAlgorithm;
     }
 }

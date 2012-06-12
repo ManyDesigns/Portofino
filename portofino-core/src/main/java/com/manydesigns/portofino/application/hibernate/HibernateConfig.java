@@ -819,7 +819,7 @@ public class HibernateConfig {
         } else if (javaType == Boolean.class) {
             if(jdbcType == Types.BIT || jdbcType == Types.BOOLEAN) {
                 typeName = BooleanType.INSTANCE.getName();
-            } else if(jdbcType == Types.NUMERIC || jdbcType == Types.DECIMAL) {
+            } else if(jdbcType == Types.NUMERIC || jdbcType == Types.DECIMAL || jdbcType == Types.INTEGER) {
                 typeName = DbUtil.NUMERIC_BOOLEAN.getName();
             } else if(jdbcType == Types.CHAR || jdbcType == Types.VARCHAR) {
                 typeName = StringBooleanType.class.getName();
