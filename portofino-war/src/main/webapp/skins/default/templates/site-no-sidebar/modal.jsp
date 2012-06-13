@@ -18,10 +18,10 @@
     <head>
         <jsp:include page="../../head.jsp"/>
         <link rel="stylesheet" type="text/css"
-              href="<stripes:url value="/skins/${skin}/templates/site/site.css"/>"/>
+              href="<stripes:url value="/skins/${skin}/templates/site-no-sidebar/site.css"/>"/>
         <stripes:layout-component name="customScripts"/>
         <jsp:useBean id="actionBean" scope="request"
-             type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
+                     type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
         <title><c:out value="${actionBean.dispatch.lastPageInstance.page.description}"/></title>
     </head>
     <body class="yui-skin-sam">
