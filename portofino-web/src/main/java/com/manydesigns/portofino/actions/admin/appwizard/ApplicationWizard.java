@@ -826,20 +826,22 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             String linkToParentProperty = bindings.get("linkToParentProperty");
             for(Column column : table.getColumns()) {
                 @SuppressWarnings({"StringEquality"})
-                boolean propertyEditable =
-                        !column.isAutoincrement() &&
+                boolean propertyEnabled =
                         !(linkToParentProperty != NO_LINK_TO_PARENT &&
-                          column.getActualPropertyName().equals(linkToParentProperty));
+                        column.getActualPropertyName().equals(linkToParentProperty));
+                boolean propertyEditable = !column.isAutoincrement();
+                boolean propertyIsUserPassword =
+                        table.getTableName().equals(userTableName) &&
+                        column.getActualPropertyName().equals(userPasswordProperty);
 
                 CrudProperty crudProperty = new CrudProperty();
-                crudProperty.setEnabled(true);
+                crudProperty.setEnabled(propertyEnabled);
                 crudProperty.setName(column.getActualPropertyName());
                 crudProperty.setUpdatable(propertyEditable);
                 crudProperty.setInsertable(propertyEditable);
                 boolean inSummary =
                         (table.getPrimaryKey().getColumns().contains(column) || summ < columnsInSummary) &&
-                        !(table.getTableName().equals(userTableName) &&
-                          column.getActualPropertyName().equals(userPasswordProperty));
+                        !propertyIsUserPassword;
                 if(inSummary) {
                     crudProperty.setInSummary(true);
                     summ++;
