@@ -28,6 +28,9 @@ class Security implements ApplicationRealmDelegate {
 
     private static final Logger logger = LoggerFactory.getLogger(Security.class);
 
+    private static final String ADMIN_LOGIN = "admin";
+    private static final String ADMIN_PASSWORD = "admin";
+
     AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, Object userName) {
         Application application = realm.getApplication();
         Set<String> groups = new HashSet<String>();
@@ -36,17 +39,10 @@ class Security implements ApplicationRealmDelegate {
         if (userName == null) {
             groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
         } else {
-            Session session = application.getSession("portofino");
-            org.hibernate.Criteria criteria = session.createCriteria("users");
-            criteria.add(Restrictions.eq("userName", userName));
-            User u = criteria.uniqueResult();
-
             groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
 
-            for (UsersGroups ug : u.getGroups()) {
-                if (ug.getDeletionDate() == null) {
-                    groups.add(ug.getGroup().getGroupId());
-                }
+            if (ADMIN_LOGIN.equals(userName)) {
+                groups.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS));
             }
         }
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(groups);
@@ -56,90 +52,29 @@ class Security implements ApplicationRealmDelegate {
     }
 
     AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, String userName, String password) {
-        Application application = realm.application;
-        Session session = application.getSession("portofino");
-        org.hibernate.Criteria criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("userName", userName));
-        criteria.add(Restrictions.eq(UserConstants.PASSWORD, password));
-
-        List<Object> result = (List<Object>) criteria.list();
-
-        User user;
-        if (result.size() == 1) {
-            user = (User) result.get(0);
-            if(!user.getState().equals(UserConstants.ACTIVE)) {
-                throw new DisabledAccountException("User " + user.userId + " is not active");
-            }
+        if (ADMIN_LOGIN.equals(userName) && ADMIN_PASSWORD.equals(password)) {
             SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(user.userName, password.toCharArray(), realm.name);
-            updateUser(application, user);
+                    new SimpleAuthenticationInfo(userName, password.toCharArray(), realm.name);
             return info;
         } else {
-            updateFailedUser(application, userName);
             throw new AuthenticationException("Login failed");
         }
     }
 
     Set<String> getUsers(ApplicationRealm realm) {
-        Application application = realm.application;
-        Session session = application.getSession("portofino");
-        SQLQuery query = session.createSQLQuery("select userName from \"USERS\"");
-        return new LinkedHashSet<String>(query.list());
+        Set<String> result = new LinkedHashSet<String>();
+        result.add(ADMIN_LOGIN);
+        return result;
     }
 
     Set<String> getGroups(ApplicationRealm realm) {
-        Application application = realm.application;
-        Session session = application.getSession("portofino");
-        SQLQuery query = session.createSQLQuery("select name from \"GROUPS\"");
-        return new LinkedHashSet<String>(query.list()); //TODO verificare
+        Application application = realm.getApplication();
+        Configuration conf = application.getPortofinoProperties();
+        Set<String> result = new LinkedHashSet<String>();
+        result.add(conf.getString(PortofinoProperties.GROUP_ALL));
+        result.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
+        result.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
+        result.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS));
+        return result;
     }
-
-    //From LoginAction
-    private void updateFailedUser(Application application, String username) {
-        User user;
-        Session session = application.getSession("portofino");
-        user = findUserByUserName(session, username);
-        if (user == null) {
-            return;
-        }
-        user.setLastFailedLoginDate(new Timestamp(new Date().getTime()));
-        int failedAttempts = (null==user.getFailedLoginAttempts())?0:1;
-        user.setFailedLoginAttempts(failedAttempts+1);
-        session.update(user);
-        session.getTransaction().commit();
-    }
-
-    private void updateUser(Application application, User user) {
-        user.setFailedLoginAttempts(0);
-        user.setLastLoginDate(new Timestamp(new Date().getTime()));
-        user.setToken(null);
-        Session session = application.getSession("portofino");
-        Transaction tx = session.getTransaction();
-        try {
-            User existingUser = findUserByUserName(session, user.getUserName());
-            if(existingUser != null) {
-                logger.debug("Updating existing user {} (userId: {})",
-                        existingUser.getUserName(), existingUser.getUserId());
-                user.setUserId(existingUser.getUserId());
-                session.merge(UserConstants.USER_ENTITY_NAME, user);
-            } else {
-                user.setUserId(RandomUtil.createRandomId(20));
-                logger.debug("Importing user {} (userId: {})",
-                        user.getUserName(), user.getUserId());
-                session.save(UserConstants.USER_ENTITY_NAME, user);
-            }
-            session.flush();
-            tx.commit();
-        } catch (RuntimeException e) {
-            //Session will be closed by the filter
-            throw e;
-        }
-    }
-
-    private User findUserByUserName(Session session, String username) {
-        org.hibernate.Criteria criteria = session.createCriteria(UserConstants.USER_ENTITY_NAME);
-        criteria.add(Restrictions.eq("userName", username));
-        return (User) criteria.uniqueResult();
-    }
-
 }
