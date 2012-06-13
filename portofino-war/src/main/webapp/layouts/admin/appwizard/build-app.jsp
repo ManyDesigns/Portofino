@@ -20,8 +20,8 @@
         <mde:sessionMessages />
         Press Finish to build the application.
         <div style="display: none;">
-            <mde:write name="actionBean" property="userForm"/>
-            <mde:write name="actionBean" property="userTableField"/>
+            <mde:write name="actionBean" property="userManagementSetupForm"/>
+            <mde:write name="actionBean" property="userAndGroupTablesForm"/>
             <mde:write name="actionBean" property="rootsForm"/>
             <mde:write name="actionBean" property="schemasForm"/>
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />

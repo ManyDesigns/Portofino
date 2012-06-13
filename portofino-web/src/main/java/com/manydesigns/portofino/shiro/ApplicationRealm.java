@@ -24,11 +24,9 @@ package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.starter.ApplicationStarter;
-import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -36,11 +34,9 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.BASE64Encoder;
 
 import javax.servlet.ServletContext;
 import java.io.File;
-import java.security.MessageDigest;
 import java.util.Set;
 
 /**
@@ -77,16 +73,6 @@ public class ApplicationRealm extends AuthorizingRealm implements UsersGroupsDAO
         String username = upToken.getUsername();
         String password = new String(upToken.getPassword());
 
-        Application application = getApplication();
-        Configuration portofinoConfiguration = application.getPortofinoProperties();
-
-        boolean enc = portofinoConfiguration.getBoolean(
-                PortofinoProperties.PWD_ENCRYPTED, true);
-
-        if (enc) {
-            password = encryptPassword(password);
-        }
-
         return ensureDelegate().getAuthenticationInfo(this, username, password);
     }
 
@@ -107,12 +93,12 @@ public class ApplicationRealm extends AuthorizingRealm implements UsersGroupsDAO
                 groovyObject = ScriptingUtil.getGroovyObject(file);
             } catch (Exception e) {
                 logger.error("Couldn't load security script", e);
-                throw new Error("Security script missing or invalid: " + file.getAbsolutePath());
+                throw new Error("Security script missing or invalid: " + file.getAbsolutePath(), e);
             }
             if(groovyObject instanceof ApplicationRealmDelegate) {
                 return (ApplicationRealmDelegate) groovyObject;
             } else {
-                throw new Error("Security object is not an instance of " + ApplicationRealmDelegate.class +
+                 throw new Error("Security object is not an instance of " + ApplicationRealmDelegate.class +
                                 ": " + groovyObject);
             }
         } else {
@@ -131,17 +117,6 @@ public class ApplicationRealm extends AuthorizingRealm implements UsersGroupsDAO
             throw new AuthenticationException("Couldn't get application", e);
         }
         return application;
-    }
-
-    public static String encryptPassword(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
-            md.update(password.getBytes("UTF-8"));
-            byte raw[] = md.digest();
-            return (new BASE64Encoder()).encode(raw);
-        } catch (Exception e) {
-            throw new Error(e);
-        }
     }
 
     @Override

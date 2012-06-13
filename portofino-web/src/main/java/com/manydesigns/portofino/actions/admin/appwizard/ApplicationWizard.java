@@ -32,6 +32,7 @@ package com.manydesigns.portofino.actions.admin.appwizard;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
+import com.manydesigns.elements.fields.TextField;
 import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
@@ -40,6 +41,7 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
@@ -57,7 +59,9 @@ import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConf
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pages.ChildPage;
+import com.manydesigns.portofino.pages.Group;
 import com.manydesigns.portofino.pages.Page;
+import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
@@ -68,6 +72,7 @@ import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -104,8 +109,8 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     protected Form jdbcCPForm;
     protected Form connectionProviderForm;
 
-    protected Field userTableField;
-    protected Form userForm;
+    protected Form userAndGroupTablesForm;
+    protected Form userManagementSetupForm;
 
     protected String connectionProviderType;
     protected ConnectionProvider connectionProvider;
@@ -115,16 +120,28 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     protected List<SelectableSchema> selectableSchemas;
     public TableForm rootsForm;
     protected List<SelectableRoot> selectableRoots = new ArrayList<SelectableRoot>();
+
+    //Users
     protected String userTableName;
+    protected String groupTableName;
+    protected String userGroupTableName;
+
     protected String userNameProperty;
     protected String userIdProperty;
     protected String userPasswordProperty;
     protected String encryptionAlgorithm;
+    protected String groupIdProperty;
+    protected String groupNameProperty;
+    protected String groupLinkProperty;
+    protected String userLinkProperty;
+    protected String adminGroupName;
 
     protected List<Table> roots;
     protected MultiMap children;
     protected List<Table> allTables;
     protected Table userTable;
+    protected Table groupTable;
+    protected Table userGroupTable;
     protected int columnsInSummary = 5;
     protected int maxDepth = 5;
     protected int depth;
@@ -322,8 +339,11 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
 
         try {
             ClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(getClass());
-            PropertyAccessor propertyAccessor = classAccessor.getProperty("userTableName");
-            DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("userTableName");
+            PropertyAccessor userPropertyAccessor = classAccessor.getProperty("userTableName");
+            PropertyAccessor groupPropertyAccessor = classAccessor.getProperty("groupTableName");
+            PropertyAccessor userGroupPropertyAccessor = classAccessor.getProperty("userGroupTableName");
+
+            DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("tableName");
             for(SelectableSchema selectableSchema : selectableSchemas) {
                 if(selectableSchema.selected) {
                     Schema schema = DatabaseLogic.findSchemaByName(
@@ -343,9 +363,20 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                     }
                 }
             }
-            userTableField = new SelectField(propertyAccessor, selectionProvider, Mode.CREATE, "");
+            Mode mode = Mode.CREATE;
+
+            Field userTableField = new SelectField(userPropertyAccessor, selectionProvider, mode, "");
+            Field groupTableField = new SelectField(groupPropertyAccessor, selectionProvider, mode, "");
+            Field userGroupTableField = new SelectField(userGroupPropertyAccessor, selectionProvider, mode, "");
+
+            userAndGroupTablesForm = new Form(mode);
+            FieldSet fieldSet = new FieldSet("User and group tables", 1, mode);//TODO
+            fieldSet.add(userTableField);
+            fieldSet.add(groupTableField);
+            fieldSet.add(userGroupTableField);
+            userAndGroupTablesForm.add(fieldSet);
             //Handle back
-            userTableField.readFromRequest(context.getRequest());
+            userAndGroupTablesForm.readFromRequest(context.getRequest());
         } catch (NoSuchFieldException e) {
             throw new Error(e);
         }
@@ -486,71 +517,146 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             SessionMessages.addWarningMessage(getMessage("appwizard.warning.noRoot"));
         }
 
-        userTableField.readFromRequest(context.getRequest());
-        userTableField.writeToObject(this);
+        userAndGroupTablesForm.readFromRequest(context.getRequest());
+        userAndGroupTablesForm.writeToObject(this);
         if(!StringUtils.isEmpty(userTableName)) {
             Model tmpModel = new Model();
             tmpModel.getDatabases().add(connectionProvider.getDatabase());
             userTable = DatabaseLogic.findTableByQualifiedName(tmpModel, userTableName);
 
-            DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("");
-            for(Column column : userTable.getColumns()) {
-                selectionProvider.appendRow(
-                        column.getActualPropertyName(),
-                        column.getActualPropertyName(),
-                        true);
+            if(!StringUtils.isEmpty(groupTableName)) {
+                groupTable = DatabaseLogic.findTableByQualifiedName(tmpModel, groupTableName);
             }
 
-            DefaultSelectionProvider algoSelectionProvider = new DefaultSelectionProvider("");
-            algoSelectionProvider.appendRow(
-                    "md5Base64",
-                    getMessage("appwizard.userTable.encryption.md5Base64"),
-                    true);
-            algoSelectionProvider.appendRow(
-                    "md5Hex",
-                    getMessage("appwizard.userTable.encryption.md5Hex"),
-                    true);
-            algoSelectionProvider.appendRow(
-                    "sha1Base64",
-                    getMessage("appwizard.userTable.encryption.sha1Base64"),
-                    true);
-            algoSelectionProvider.appendRow(
-                    "sha1Hex",
-                    getMessage("appwizard.userTable.encryption.sha1Hex"),
-                    true);
-            try {
-                ClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(getClass());
-
-                PropertyAccessor propertyAccessor = classAccessor.getProperty("userIdProperty");
-                Field userIdPropertyField = new SelectField(propertyAccessor, selectionProvider, Mode.CREATE, "");
-                userIdPropertyField.setRequired(true);
-
-                propertyAccessor = classAccessor.getProperty("userNameProperty");
-                Field userNamePropertyField = new SelectField(propertyAccessor, selectionProvider, Mode.CREATE, "");
-                userNamePropertyField.setRequired(true);
-
-                propertyAccessor = classAccessor.getProperty("userPasswordProperty");
-                Field userPasswordPropertyField = new SelectField(propertyAccessor, selectionProvider, Mode.CREATE, "");
-                userPasswordPropertyField.setRequired(true);
-
-                propertyAccessor = classAccessor.getProperty("encryptionAlgorithm");
-                Field encryptionAlgorithmField = new SelectField(propertyAccessor, algoSelectionProvider, Mode.CREATE, "");
-                encryptionAlgorithmField.setRequired(true);
-
-                userForm = new Form(Mode.CREATE);
-                FieldSet fieldSet = new FieldSet(getMessage("appwizard.userTable"), 1, userForm.getMode());
-                fieldSet.add(userIdPropertyField);
-                fieldSet.add(userNamePropertyField);
-                fieldSet.add(userPasswordPropertyField);
-                fieldSet.add(encryptionAlgorithmField);
-                userForm.add(fieldSet);
-                userForm.readFromObject(this);
-            } catch (NoSuchFieldException e) {
-                throw new Error(e);
+            if(!StringUtils.isEmpty(userGroupTableName)) {
+                userGroupTable = DatabaseLogic.findTableByQualifiedName(tmpModel, userGroupTableName);
+                userGroupTable.setManyToMany(true);
             }
+
+            createUserManagementSetupForm();
             return selectUserFieldsForm();
         } else {
             return buildAppForm();
+        }
+    }
+
+    protected void createUserManagementSetupForm() {
+        DefaultSelectionProvider userSelectionProvider = new DefaultSelectionProvider("");
+        for(Column column : userTable.getColumns()) {
+            userSelectionProvider.appendRow(
+                    column.getActualPropertyName(),
+                    column.getActualPropertyName(),
+                    true);
+        }
+
+        DefaultSelectionProvider algoSelectionProvider = new DefaultSelectionProvider("");
+        algoSelectionProvider.appendRow(
+                "md5Base64",
+                getMessage("appwizard.userTable.encryption.md5Base64"),
+                true);
+        algoSelectionProvider.appendRow(
+                "md5Hex",
+                getMessage("appwizard.userTable.encryption.md5Hex"),
+                true);
+        algoSelectionProvider.appendRow(
+                "sha1Base64",
+                getMessage("appwizard.userTable.encryption.sha1Base64"),
+                true);
+        algoSelectionProvider.appendRow(
+                "sha1Hex",
+                getMessage("appwizard.userTable.encryption.sha1Hex"),
+                true);
+        try {
+            ClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(getClass());
+            Mode mode = Mode.CREATE;
+
+            userManagementSetupForm = new Form(mode);
+
+            PropertyAccessor propertyAccessor = classAccessor.getProperty("userIdProperty");
+            Field userIdPropertyField = new SelectField(propertyAccessor, userSelectionProvider, mode, "");
+            userIdPropertyField.setRequired(true);
+
+            propertyAccessor = classAccessor.getProperty("userNameProperty");
+            Field userNamePropertyField = new SelectField(propertyAccessor, userSelectionProvider, mode, "");
+            userNamePropertyField.setRequired(true);
+
+            propertyAccessor = classAccessor.getProperty("userPasswordProperty");
+            Field userPasswordPropertyField = new SelectField(propertyAccessor, userSelectionProvider, mode, "");
+            userPasswordPropertyField.setRequired(true);
+
+            propertyAccessor = classAccessor.getProperty("encryptionAlgorithm");
+            Field encryptionAlgorithmField = new SelectField(propertyAccessor, algoSelectionProvider, mode, "");
+            encryptionAlgorithmField.setRequired(true);
+
+            FieldSet uFieldSet = new FieldSet(getMessage("appwizard.userTable"), 1, mode);
+            uFieldSet.add(userIdPropertyField);
+            uFieldSet.add(userNamePropertyField);
+            uFieldSet.add(userPasswordPropertyField);
+            uFieldSet.add(encryptionAlgorithmField);
+            userManagementSetupForm.add(uFieldSet);
+
+            userIdProperty = userTable.getPrimaryKey().getColumns().get(0).getActualPropertyName();
+
+            if(groupTable != null && userGroupTable != null) {
+                DefaultSelectionProvider groupSelectionProvider = new DefaultSelectionProvider("");
+                for(Column column : groupTable.getColumns()) {
+                    groupSelectionProvider.appendRow(
+                            column.getActualPropertyName(),
+                            column.getActualPropertyName(),
+                            true);
+                }
+
+                DefaultSelectionProvider userGroupSelectionProvider = new DefaultSelectionProvider("");
+                for(Column column : userGroupTable.getColumns()) {
+                    userGroupSelectionProvider.appendRow(
+                            column.getActualPropertyName(),
+                            column.getActualPropertyName(),
+                            true);
+                }
+
+                propertyAccessor = classAccessor.getProperty("groupIdProperty");
+                Field groupIdPropertyField = new SelectField(propertyAccessor, groupSelectionProvider, mode, "");
+                groupIdPropertyField.setRequired(true);
+
+                propertyAccessor = classAccessor.getProperty("groupNameProperty");
+                Field groupNamePropertyField = new SelectField(propertyAccessor, groupSelectionProvider, mode, "");
+                groupNamePropertyField.setRequired(true);
+
+                propertyAccessor = classAccessor.getProperty("groupLinkProperty");
+                Field groupLinkPropertyField = new SelectField(propertyAccessor, userGroupSelectionProvider, mode, "");
+                groupLinkPropertyField.setRequired(true);
+
+                propertyAccessor = classAccessor.getProperty("userLinkProperty");
+                Field userLinkPropertyField = new SelectField(propertyAccessor, userGroupSelectionProvider, mode, "");
+                userLinkPropertyField.setRequired(true);
+
+                propertyAccessor = classAccessor.getProperty("adminGroupName");
+                Field adminGroupNameField = new TextField(propertyAccessor, mode);
+
+                FieldSet gFieldSet = new FieldSet("appwizard.groupTable", 1, mode); //TODO
+                gFieldSet.add(groupIdPropertyField);
+                gFieldSet.add(groupNamePropertyField);
+                gFieldSet.add(groupLinkPropertyField);
+                gFieldSet.add(userLinkPropertyField);
+                gFieldSet.add(adminGroupNameField);
+                userManagementSetupForm.add(gFieldSet);
+
+                groupIdProperty = groupTable.getPrimaryKey().getColumns().get(0).getActualPropertyName();
+
+                for(ForeignKey fk : userGroupTable.getForeignKeys()) {
+                    for(Reference ref : fk.getReferences()) {
+                        if(ref.getActualToColumn().getTable().equals(userTable)) {
+                            userLinkProperty = ref.getActualFromColumn().getActualPropertyName();
+                        } else if(ref.getActualToColumn().getTable().equals(groupTable)) {
+                            groupLinkProperty = ref.getActualFromColumn().getActualPropertyName();
+                        }
+                    }
+                }
+            }
+
+            userManagementSetupForm.readFromObject(this);
+        } catch (NoSuchFieldException e) {
+            throw new Error(e);
         }
     }
 
@@ -558,9 +664,9 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     public Resolution selectUserFields() {
         selectTables();
         if(userTable != null) {
-            userForm.readFromRequest(context.getRequest());
-            if(userForm.validate()) {
-                userForm.writeToObject(this);
+            userManagementSetupForm.readFromRequest(context.getRequest());
+            if(userManagementSetupForm.validate()) {
+                userManagementSetupForm.writeToObject(this);
                 return buildAppForm();
             } else {
                 return selectUserFieldsForm();
@@ -730,6 +836,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             createCrudPage(dir, userTable, childPages, template);
         }
 
+        Configuration conf = application.getPortofinoProperties();
         List<Reference> references = (List<Reference>) children.get(userTable);
         if(references != null) {
             for(Reference ref : references) {
@@ -761,9 +868,14 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 bindings.put("parentProperty", "getPrincipal(1)");
                 bindings.put("linkToParentProperty", linkToUserProperty);
 
-                createCrudPage(
+                Page page = createCrudPage(
                         dir, fromTable, childQuery,
                         childPages, template, bindings, title);
+                Group group = new Group();
+                group.setName(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
+                group.setAccessLevel(AccessLevel.DENY.name());
+                page.getPermissions().getGroups().add(group);
+                DispatcherLogic.savePage(dir, page);
             }
         }
         try {
@@ -776,8 +888,16 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             bindings.put("userNameProperty", userNameProperty);
             bindings.put("passwordProperty", userPasswordProperty);
 
-            bindings.put("groupTableEntityName", ""); //TODO
-            bindings.put("groupIdProperty", ""); //TODO
+            bindings.put("groupTableEntityName",
+                    groupTable != null ? groupTable.getActualEntityName() : "");
+            bindings.put("groupIdProperty", StringUtils.defaultString(groupIdProperty));
+            bindings.put("groupNameProperty", StringUtils.defaultString(groupNameProperty));
+
+            bindings.put("userGroupTableEntityName",
+                    userGroupTable != null ? userGroupTable.getActualEntityName() : "");
+            bindings.put("groupLinkProperty", StringUtils.defaultString(groupLinkProperty));
+            bindings.put("userLinkProperty", StringUtils.defaultString(userLinkProperty));
+            bindings.put("adminGroupName", StringUtils.defaultString(adminGroupName));
 
             bindings.put("encryptionAlgorithm", encryptionAlgorithm);
             FileWriter fw = new FileWriter(new File(application.getAppScriptsDir(), "security.groovy"));
@@ -800,7 +920,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         return multipleRoles;
     }
 
-    protected void createCrudPage(File dir, Table table, List<ChildPage> childPages, Template template)
+    protected Page createCrudPage(File dir, Table table, List<ChildPage> childPages, Template template)
             throws Exception {
         String query = "from " + table.getActualEntityName();
         String title = Util.guessToWords(table.getActualEntityName());
@@ -808,10 +928,10 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         bindings.put("parentName", "");
         bindings.put("parentProperty", "nothing");
         bindings.put("linkToParentProperty", NO_LINK_TO_PARENT);
-        createCrudPage(dir, table, query, childPages, template, bindings, title);
+        return createCrudPage(dir, table, query, childPages, template, bindings, title);
     }
 
-    protected void createCrudPage(
+    protected Page createCrudPage(
             File dir, Table table, String query, List<ChildPage> childPages,
             Template template, Map<String, String> bindings, String title)
             throws Exception {
@@ -879,10 +999,13 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
             childPage.setName(dir.getName());
             childPage.setShowInNavigation(true);
             childPages.add(childPage);
+
+            return page;
         } else {
             logger.warn("Couldn't create directory {}", dir.getAbsolutePath());
             SessionMessages.addWarningMessage(
                     getMessage("appwizard.error.createDirectoryFailed", dir.getAbsolutePath()));
+            return null;
         }
     }
 
@@ -969,12 +1092,20 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         this.userTableName = userTableName;
     }
 
-    public Field getUserTableField() {
-        return userTableField;
+    public String getGroupTableName() {
+        return groupTableName;
     }
 
-    public Form getUserForm() {
-        return userForm;
+    public void setGroupTableName(String groupTableName) {
+        this.groupTableName = groupTableName;
+    }
+
+    public Form getUserAndGroupTablesForm() {
+        return userAndGroupTablesForm;
+    }
+
+    public Form getUserManagementSetupForm() {
+        return userManagementSetupForm;
     }
 
     public String getUserNameProperty() {
@@ -999,6 +1130,54 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
 
     public void setUserPasswordProperty(String userPasswordProperty) {
         this.userPasswordProperty = userPasswordProperty;
+    }
+
+    public String getGroupIdProperty() {
+        return groupIdProperty;
+    }
+
+    public void setGroupIdProperty(String groupIdProperty) {
+        this.groupIdProperty = groupIdProperty;
+    }
+
+    public String getUserGroupTableName() {
+        return userGroupTableName;
+    }
+
+    public void setUserGroupTableName(String userGroupTableName) {
+        this.userGroupTableName = userGroupTableName;
+    }
+
+    public String getGroupNameProperty() {
+        return groupNameProperty;
+    }
+
+    public void setGroupNameProperty(String groupNameProperty) {
+        this.groupNameProperty = groupNameProperty;
+    }
+
+    public String getGroupLinkProperty() {
+        return groupLinkProperty;
+    }
+
+    public void setGroupLinkProperty(String groupLinkProperty) {
+        this.groupLinkProperty = groupLinkProperty;
+    }
+
+    public String getUserLinkProperty() {
+        return userLinkProperty;
+    }
+
+    public void setUserLinkProperty(String userLinkProperty) {
+        this.userLinkProperty = userLinkProperty;
+    }
+
+    public String getAdminGroupName() {
+        return adminGroupName;
+    }
+
+    public void setAdminGroupName(String adminGroupName) {
+        this.adminGroupName = adminGroupName;
     }
 
     public boolean isAdvanced() {

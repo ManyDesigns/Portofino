@@ -18,7 +18,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
-        <mde:write name="actionBean" property="userTableField"/>
+        <mde:write name="actionBean" property="userAndGroupTablesForm"/>
         <c:if test="${actionBean.advanced}">
             <h3>Select roots</h3>
             <mde:write name="actionBean" property="rootsForm"/>

@@ -18,9 +18,9 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
-            <mde:write name="actionBean" property="userForm"/>
+            <mde:write name="actionBean" property="userManagementSetupForm"/>
         <div style="display: none;">
-            <mde:write name="actionBean" property="userTableField"/>
+            <mde:write name="actionBean" property="userAndGroupTablesForm"/>
             <mde:write name="actionBean" property="rootsForm"/>
             <mde:write name="actionBean" property="schemasForm"/>
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
