@@ -58,6 +58,12 @@ public class CustomTypeConverter implements TypeConverter {
             } catch (Exception e) {
                 return throwFailedConversion(value, toType, e);
             }
+        } else if ((toType == java.sql.Date.class) && (value instanceof String)) {
+            try {
+                return java.sql.Date.valueOf((String) value);
+            } catch (Exception e) {
+                return throwFailedConversion(value, toType, e);
+            }
         } else if ((toType == Time.class) && (value instanceof Date)) {
             Date thisValue = (Date) value;
             return new Time(thisValue.getTime());

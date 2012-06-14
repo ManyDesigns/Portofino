@@ -30,7 +30,6 @@ import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.Date;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -143,7 +142,7 @@ public class Type {
             case Types.VARCHAR:
                 return String.class;
             case Types.DATE:
-                return Date.class;
+                return java.sql.Date.class;
             case Types.TIME:
                 return Time.class;
             case Types.TIMESTAMP:

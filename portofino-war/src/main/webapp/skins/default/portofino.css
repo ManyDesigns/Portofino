@@ -148,12 +148,8 @@ div.contentBody {
 
 .contentHeader, .contentFooter {
     background-color: #eef;
-    padding: 0.5em 0;
+    padding: 0.5em 1em;
     clear: both;
-}
-
-.contentHeader button, .contentFooter button {
-    margin-left: 1em; margin-right: -0.9em;
 }
 
 .contentFooter {
@@ -724,6 +720,7 @@ Wizard
 
 .contentHeader.wizard {
     overflow-y: hidden;
+    padding-left: 0;
 }
 
 .wizard-step {

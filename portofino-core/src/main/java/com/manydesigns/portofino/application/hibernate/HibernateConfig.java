@@ -653,6 +653,7 @@ public class HibernateConfig {
 
         for (Reference ref : relationship.getReferences()) {
             String colToName = ref.getToColumn();
+            String colToPropertyName = ref.getActualToColumn().getActualPropertyName();
             String colFromName = ref.getFromColumn();
             Iterator it = tableMany.getColumnIterator();
             while (it.hasNext()) {
@@ -673,7 +674,7 @@ public class HibernateConfig {
                 }
             }
             Property refProp;
-            refProp = getRefProperty(clazzOne, colToName);
+            refProp = getRefProperty(clazzOne, colToPropertyName);
             component.addProperty(refProp);
         }
         return dv;
@@ -686,9 +687,11 @@ public class HibernateConfig {
         DependantValue dv;
         Property refProp;
 
-        String colFromName = refs.get(0).getFromColumn();
-        String colToName = refs.get(0).getToColumn();
-        refProp = getRefProperty(clazzOne, colToName);
+        Reference reference = refs.get(0);
+        String colFromName = reference.getFromColumn();
+        String colToName = reference.getToColumn();
+        String colToPropertyName = reference.getActualToColumn().getActualPropertyName();
+        refProp = getRefProperty(clazzOne, colToPropertyName);
         dv = new DependantValue(mappings, clazzMany.getTable(),
                 refProp.getPersistentClass().getKey());
         dv.setNullable(true);

@@ -409,6 +409,13 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
             if(table.getPrimaryKey() == null) {
                 it.remove();
+                /*for(Iterator<SelectableRoot> isr = selectableRoots.iterator(); isr.hasNext();) {
+                    SelectableRoot sr = isr.next();
+                    if(sr.tableName.equals(table.getSchemaName() + "." + table.getTableName())) {
+                        isr.remove();
+                        break;
+                    }
+                }*/
                 continue;
             }
 
@@ -484,7 +491,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         schemasForm.writeToObject(selectableSchemas);
         addSchemasToModel();
 
-        //Roots
+        /*//Roots
         for(SelectableSchema selectableSchema : selectableSchemas) {
             if(selectableSchema.selected) {
                 Schema schema = DatabaseLogic.findSchemaByName(
@@ -500,7 +507,9 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             public int compare(SelectableRoot o1, SelectableRoot o2) {
                 return o1.tableName.compareTo(o2.tableName);
             }
-        });
+        });*/
+
+        selectableRoots = new ArrayList<SelectableRoot>();
 
         rootsForm = new TableFormBuilder(SelectableRoot.class)
                 .configFields(
