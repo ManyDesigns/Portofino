@@ -43,7 +43,6 @@ import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderForm;
 import com.manydesigns.portofino.actions.forms.SelectableSchema;
@@ -51,16 +50,17 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
+import com.manydesigns.portofino.pageactions.wizard.AbstractWizardPageAction;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Group;
 import com.manydesigns.portofino.pages.Page;
+import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.shiro.ShiroUtils;
@@ -68,7 +68,10 @@ import com.manydesigns.portofino.sync.DatabaseSyncer;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
-import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ActionResolver;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
@@ -95,15 +98,16 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@UrlBinding("/actions/admin/wizard")
 @RequiresAdministrator
-public class ApplicationWizard extends AbstractActionBean implements AdminAction {
+public class ApplicationWizard extends AbstractWizardPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
     public static final String JDBC = "JDBC";
     public static final String JNDI = "JNDI";
     @SuppressWarnings({"RedundantStringConstructorCall"})
     public static final String NO_LINK_TO_PARENT = new String();
+
+    protected int step = 0;
 
     protected Form jndiCPForm;
     protected Form jdbcCPForm;
@@ -163,6 +167,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     }
 
     protected Resolution createSelectionProviderForm() {
+        step = 0;
         return new ForwardResolution("/layouts/admin/appwizard/create-connection-provider.jsp");
     }
 
@@ -223,6 +228,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     }
 
     protected Resolution selectSchemasForm() {
+        step = 1;
         return new ForwardResolution("/layouts/admin/appwizard/select-schemas.jsp");
     }
 
@@ -385,6 +391,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     }
 
     protected Resolution selectTablesForm() {
+        step = 2;
         return new ForwardResolution("/layouts/admin/appwizard/select-tables.jsp");
     }
 
@@ -677,10 +684,12 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
     }
 
     protected Resolution selectUserFieldsForm() {
+        step = 3;
         return new ForwardResolution("/layouts/admin/appwizard/select-user-fields.jsp");
     }
 
     protected Resolution buildAppForm() {
+        step = (userTable == null) ? 3 : 4;
         return new ForwardResolution("/layouts/admin/appwizard/build-app.jsp");
     }
 
@@ -711,7 +720,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
         }
         try {
             TemplateEngine engine = new SimpleTemplateEngine();
-            Template template = engine.createTemplate(getClass().getResource("CrudPage.groovy"));
+            Template template = engine.createTemplate(ApplicationWizard.class.getResource("CrudPage.groovy"));
             List<ChildPage> childPages = new ArrayList<ChildPage>();
             for(Table table : roots) {
                 File dir = new File(application.getPagesDir(), table.getActualEntityName());
@@ -805,7 +814,7 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 File actionFile = new File(dir, "action.groovy");
                 try {
                     TemplateEngine engine = new SimpleTemplateEngine();
-                    Template template = engine.createTemplate(getClass().getResource("CalendarPage.groovy"));
+                    Template template = engine.createTemplate(ApplicationWizard.class.getResource("CalendarPage.groovy"));
                     Map<String, Object> bindings = new HashMap<String, Object>();
                     bindings.put("calendarDefinitions", calendarDefinitionsStr);
                     FileWriter fw = new FileWriter(actionFile);
@@ -871,16 +880,20 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
                 Page page = createCrudPage(
                         dir, fromTable, childQuery,
                         childPages, template, bindings, title);
-                Group group = new Group();
-                group.setName(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
-                group.setAccessLevel(AccessLevel.DENY.name());
-                page.getPermissions().getGroups().add(group);
-                DispatcherLogic.savePage(dir, page);
+                if(page != null) {
+                    Group group = new Group();
+                    group.setName(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
+                    group.setAccessLevel(AccessLevel.DENY.name());
+                    Permissions permissions = new Permissions();
+                    permissions.getGroups().add(group);
+                    page.setPermissions(permissions);
+                    DispatcherLogic.savePage(dir, page);
+                }
             }
         }
         try {
             TemplateEngine engine = new SimpleTemplateEngine();
-            Template secTemplate = engine.createTemplate(getClass().getResource("security.groovy"));
+            Template secTemplate = engine.createTemplate(ApplicationWizard.class.getResource("security.groovy"));
             Map<String, String> bindings = new HashMap<String, String>();
             bindings.put("databaseName", connectionProvider.getDatabase().getDatabaseName());
             bindings.put("userTableEntityName", userTable.getActualEntityName());
@@ -1194,5 +1207,25 @@ public class ApplicationWizard extends AbstractActionBean implements AdminAction
 
     public void setEncryptionAlgorithm(String encryptionAlgorithm) {
         this.encryptionAlgorithm = encryptionAlgorithm;
+    }
+
+    //Wizard implementation
+
+    @Override
+    public List<Step> getSteps() {
+        List<Step> steps = new ArrayList<Step>();
+        steps.add(new Step(getMessage("appwizard.step1"), getMessage("appwizard.step1.title")));
+        steps.add(new Step(getMessage("appwizard.step2"), getMessage("appwizard.step2.title")));
+        steps.add(new Step(getMessage("appwizard.step3"), getMessage("appwizard.step3.title")));
+        if(userTable != null) {
+            steps.add(new Step(getMessage("appwizard.step3a"), getMessage("appwizard.step3a.title")));
+        }
+        steps.add(new Step(getMessage("appwizard.step4"), getMessage("appwizard.step4.title")));
+        return steps;
+    }
+
+    @Override
+    public int getCurrentStepIndex() {
+        return step;
     }
 }

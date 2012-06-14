@@ -5,16 +5,15 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="/skins/default/admin-page.jsp">
+<stripes:layout-render name="/skins/default/wizard-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
-        Step 1. Connect to your database
+        <fmt:message key="appwizard.step1.title" />
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="create-connection-provider" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Step 1. Connect to your database
+        <fmt:message key="appwizard.step1.title" />
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
@@ -45,7 +44,8 @@
             <mde:write name="actionBean" property="jdbcCPForm"/>
         </div>
 
-        <label for="advanced_checkbox">Show advanced options</label> <input id="advanced_checkbox" type="checkbox" name="advanced" />
+        <label for="advanced_checkbox">Show advanced options</label>
+        <input id="advanced_checkbox" type="checkbox" name="advanced" />
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
         <portofino:buttons list="create-connection-provider" cssClass="contentButton" />

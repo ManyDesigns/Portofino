@@ -148,8 +148,12 @@ div.contentBody {
 
 .contentHeader, .contentFooter {
     background-color: #eef;
-    padding: 0.5em 1em;
+    padding: 0.5em 0;
     clear: both;
+}
+
+.contentHeader button, .contentFooter button {
+    margin-left: 1em; margin-right: -0.9em;
 }
 
 .contentFooter {
@@ -712,4 +716,30 @@ table#userPermissionTestResults th,
 table#userPermissionTestResults td {
     border: none;
     text-align: left;
+}
+
+/*******************************************************************************
+Wizard
+*******************************************************************************/
+
+.wizard-step {
+    font-weight: bold;
+    font-size: 1.2em;
+    background-color: #F8F8FF;
+    padding: 0.4em 1em;
+    border-radius: 3px 0 0 0;
+    border-right: 1px solid #166BBF;
+}
+
+.wizard-step.before {
+    color: #555555;
+}
+
+.wizard-step.current {
+    color: #166BBF;
+    background-color: white;
+}
+
+wizard-step.after {
+    color: black;
 }

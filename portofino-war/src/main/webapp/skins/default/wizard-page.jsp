@@ -30,11 +30,29 @@
         <div id="bd">
             <div id="yui-main">
                 <div id="content" class="yui-b">
-                    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.AdminAction"/>
-                    <stripes:form action="${actionBean.actionPath}" method="post" enctype="multipart/form-data">
+                    <jsp:useBean id="actionBean" scope="request"
+                                 type="com.manydesigns.portofino.pageactions.wizard.AbstractWizardPageAction"/>
+                    <stripes:form action="${actionBean.dispatch.originalPath}"
+                                  method="post" enctype="multipart/form-data">
                         <div class="contentHeader">
+                            <c:forEach items="${actionBean.steps}" var="step" varStatus="status">
+                                <c:if test="${status.index eq actionBean.currentStepIndex}">
+                                    <span class="wizard-step current">
+                                        <c:out value="${step.title}" />
+                                    </span>
+                                </c:if>
+                                <c:if test="${status.index < actionBean.currentStepIndex}">
+                                    <span class="wizard-step before">
+                                        <c:out value="${step.number}" />
+                                    </span>
+                                </c:if>
+                                <c:if test="${status.index > actionBean.currentStepIndex}">
+                                    <span class="wizard-step after">
+                                        <c:out value="${step.number}" />
+                                    </span>
+                                </c:if>
+                            </c:forEach>
                             <stripes:layout-component name="contentHeader">
-                                Content header
                             </stripes:layout-component>
                         </div>
                         <div class="contentBody">
@@ -77,53 +95,8 @@
                     </stripes:form>
                 </div>
             </div>
-            <div id="sidebar" class="yui-b adminSidebar">
-                <ul>
-                    <%--<li>
-                        <div class="navigationHeader first">Site content</div>
-                        <ul>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
-                                                   text="Recent site activity"
-                                                   link="/"/>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
-                                                   text="Pages"
-                                                   link="/"/>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
-                                                   text="Attachments"
-                                                   link="/"/>
-                        </ul>
-                    </li>--%>
-                    <li>
-                        <div class="navigationHeader">Security</div>
-                        <ul>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
-                                                   text="Root permissions"
-                                                   link="/actions/admin/root-page/permissions"/>
-                        </ul>
-                    </li>
-                    <li>
-                        <div class="navigationHeader">Configuration</div>
-                        <ul>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
-                                                   text="Settings"
-                                                   link="/actions/admin/settings"/>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
-                                                   text="Top-level pages"
-                                                   link="/actions/admin/root-page/children"/>
-                        </ul>
-                    </li>
-                    <li>
-                        <div class="navigationHeader">Data modeling</div>
-                        <ul>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
-                                                   text="Connection providers"
-                                                   link="/actions/admin/connection-providers"/>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
-                                                   text="Tables"
-                                                   link="/actions/admin/tables"/>
-                        </ul>
-                    </li>
-                </ul>
+            <div id="sidebar" class="yui-b">
+                <jsp:include page="navigation.jsp"/>
             </div>
             <script type="text/javascript">
                 fixSideBar();
