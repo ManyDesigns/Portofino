@@ -34,22 +34,31 @@
                                  type="com.manydesigns.portofino.pageactions.wizard.AbstractWizardPageAction"/>
                     <stripes:form action="${actionBean.dispatch.originalPath}"
                                   method="post" enctype="multipart/form-data">
-                        <div class="contentHeader">
+                        <div class="contentHeader wizard">
                             <c:forEach items="${actionBean.steps}" var="step" varStatus="status">
+                                <c:set var="baseClass"
+                                       value="wizard-step ${status.first ? 'first' : ''} ${status.last ? 'last' : ''}"
+                                />
                                 <c:if test="${status.index eq actionBean.currentStepIndex}">
-                                    <span class="wizard-step current">
+                                    <span class="${baseClass} current">
                                         <c:out value="${step.title}" />
                                     </span>
+                                    <c:if test="${status.last}">
+                                        <span class="wizard-step immediately-after-current" style="background-color: transparent;">&nbsp;</span>
+                                    </c:if>
                                 </c:if>
                                 <c:if test="${status.index < actionBean.currentStepIndex}">
-                                    <span class="wizard-step before">
+                                    <span class="${baseClass} before">
                                         <c:out value="${step.number}" />
                                     </span>
                                 </c:if>
                                 <c:if test="${status.index > actionBean.currentStepIndex}">
-                                    <span class="wizard-step after">
+                                    <span class="${baseClass} after ${status.index eq actionBean.currentStepIndex + 1 ? 'immediately-after-current' : ''}">
                                         <c:out value="${step.number}" />
                                     </span>
+                                    <c:if test="${status.last}">
+                                        <span class="wizard-step" style="background-color: transparent;">&nbsp;</span>
+                                    </c:if>
                                 </c:if>
                             </c:forEach>
                             <stripes:layout-component name="contentHeader">

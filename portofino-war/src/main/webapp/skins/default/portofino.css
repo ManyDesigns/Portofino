@@ -722,13 +722,22 @@ table#userPermissionTestResults td {
 Wizard
 *******************************************************************************/
 
+.contentHeader.wizard {
+    overflow-y: hidden;
+}
+
 .wizard-step {
     font-weight: bold;
     font-size: 1.2em;
-    background-color: #F8F8FF;
-    padding: 0.4em 1em;
+    background: #F8F8FF url('images/wizard-arrow.png') left center no-repeat;
+    padding: 1em 0 1em 2em;
+    /*border-right: 1px solid #166BBF;*/
+}
+
+.wizard-step.first {
     border-radius: 3px 0 0 0;
-    border-right: 1px solid #166BBF;
+    background-image: none;
+    padding: 1em 0 1em 1em;
 }
 
 .wizard-step.before {
@@ -738,6 +747,10 @@ Wizard
 .wizard-step.current {
     color: #166BBF;
     background-color: white;
+}
+
+.wizard-step.immediately-after-current {
+    background: #F8F8FF url('images/wizard-current-arrow.png') left center no-repeat;
 }
 
 wizard-step.after {
