@@ -1,26 +1,15 @@
-import com.manydesigns.elements.util.RandomUtil
 import com.manydesigns.portofino.PortofinoProperties
 import com.manydesigns.portofino.application.Application
-import com.manydesigns.portofino.application.QueryUtils
 import com.manydesigns.portofino.shiro.ApplicationRealm
 import com.manydesigns.portofino.shiro.ApplicationRealmDelegate
 import com.manydesigns.portofino.shiro.GroupPermission
-import com.manydesigns.portofino.system.model.users.User
-import com.manydesigns.portofino.system.model.users.UserConstants
-import com.manydesigns.portofino.system.model.users.UsersGroups
-import java.sql.Timestamp
 import org.apache.commons.configuration.Configuration
 import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.AuthenticationInfo
-import org.apache.shiro.authc.DisabledAccountException
 import org.apache.shiro.authc.SimpleAuthenticationInfo
 import org.apache.shiro.authz.AuthorizationInfo
 import org.apache.shiro.authz.Permission
 import org.apache.shiro.authz.SimpleAuthorizationInfo
-import org.hibernate.SQLQuery
-import org.hibernate.Session
-import org.hibernate.Transaction
-import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

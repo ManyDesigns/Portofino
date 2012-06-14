@@ -55,7 +55,7 @@ public class Type {
     protected final String typeName;
     protected final int jdbcType;
     protected final boolean autoincrement;
-    protected final int maximumPrecision;
+    protected final Long maximumPrecision;
     protected final String literalPrefix;
     protected final String literalSuffix;
     protected final boolean nullable;
@@ -71,7 +71,7 @@ public class Type {
     // Constructors
     //**************************************************************************
 
-    public Type(String typeName, int jdbcType, int maximumPrecision,
+    public Type(String typeName, int jdbcType, Long maximumPrecision,
                 String literalPrefix, String literalSuffix,
                 boolean nullable, boolean caseSensitive, boolean searchable,
                 boolean autoincrement, short minimumScale, short maximumScale) {
@@ -92,7 +92,7 @@ public class Type {
 
     }
 
-    public Type(String typeName, int jdbcType, int maximumPrecision,
+    public Type(String typeName, int jdbcType, Long maximumPrecision,
                 String literalPrefix, String literalSuffix,
                 boolean nullable, boolean caseSensitive, boolean searchable,
                 boolean autoincrement, short minimumScale, short maximumScale,
@@ -200,7 +200,7 @@ public class Type {
         return autoincrement;
     }
 
-    public int getMaximumPrecision() {
+    public Long getMaximumPrecision() {
         return maximumPrecision;
     }
 
