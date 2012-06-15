@@ -924,6 +924,12 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             configuration.setVariable(variable);
             detectLargeResultSet(table, configuration);
 
+            configuration.setName(table.getActualEntityName());
+            configuration.setSearchTitle("Search " + title);
+            configuration.setCreateTitle("Create " + title);
+            configuration.setEditTitle("Edit " + title);
+            configuration.setReadTitle(title);
+
             int summ = 0;
             String linkToParentProperty = bindings.get("linkToParentProperty");
             for(Column column : table.getColumns()) {

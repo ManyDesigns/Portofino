@@ -277,7 +277,7 @@ public class SelectField extends AbstractField {
             }
             onclick += "popupCloseCallback=popupCloseCallback_" + id;
             onclick = "window.open('" + StringEscapeUtils.escapeJavaScript(onclick) + "', '_blank', " +
-                      "'width=700, height=500, location=0'); return false;";
+                      "'width=700, height=500, location=0, scrollbars=1'); return false;";
             xb.write(" ");
             xb.openElement("a");
             xb.addAttribute("href", "#");

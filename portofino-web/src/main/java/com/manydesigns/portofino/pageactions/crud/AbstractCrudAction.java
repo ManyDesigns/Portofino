@@ -156,7 +156,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Popup
     //--------------------------------------------------------------------------
 
-    protected boolean popup;
     protected String popupCloseCallback;
 
     //--------------------------------------------------------------------------
@@ -389,7 +388,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     SessionMessages.addErrorMessage(rootCauseMessage);
                     return getCreateView();
                 }
-                if(popup) {
+                if(isPopup()) {
                     popupCloseCallback += "(true)";
                     return new ForwardResolution("/layouts/crud/popup/close.jsp");
                 } else {
@@ -608,7 +607,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected Resolution getCreateView() {
-        if(popup) {
+        if(isPopup()) {
             return new ForwardResolution("/layouts/crud/popup/create.jsp");
         } else {
             return new ForwardResolution("/layouts/crud/create.jsp");
@@ -1114,7 +1113,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         @Button(list = "configuration", key = "commons.cancel", order = 99)
     })
     public Resolution cancel() {
-        if(popup) {
+        if(isPopup()) {
             popupCloseCallback += "(false)";
             return new ForwardResolution("/layouts/crud/popup/close.jsp");
         } else {
@@ -2364,11 +2363,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     public boolean isPopup() {
-        return popup;
-    }
-
-    public void setPopup(boolean popup) {
-        this.popup = popup;
+        return !StringUtils.isEmpty(popupCloseCallback);
     }
 
     public String getPopupCloseCallback() {

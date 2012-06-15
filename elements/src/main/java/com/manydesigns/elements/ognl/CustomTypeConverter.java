@@ -52,17 +52,25 @@ public class CustomTypeConverter implements TypeConverter {
         } else if ((toType == Timestamp.class) && (value instanceof Date)) {
             Date thisValue = (Date) value;
             return new Timestamp(thisValue.getTime());
-        } else if ((toType == Timestamp.class) && (value instanceof String)) {
-            try {
-                return Timestamp.valueOf((String) value);
-            } catch (Exception e) {
-                return throwFailedConversion(value, toType, e);
+        } else if (toType == Timestamp.class) {
+            if(value instanceof String) {
+                try {
+                    return Timestamp.valueOf((String) value);
+                } catch (Exception e) {
+                    return throwFailedConversion(value, toType, e);
+                }
+            } else if(value instanceof Date) {
+                return new Timestamp(((Date) value).getTime());
             }
-        } else if ((toType == java.sql.Date.class) && (value instanceof String)) {
-            try {
-                return java.sql.Date.valueOf((String) value);
-            } catch (Exception e) {
-                return throwFailedConversion(value, toType, e);
+        } else if (toType == java.sql.Date.class) {
+            if (value instanceof String) {
+                try {
+                    return java.sql.Date.valueOf((String) value);
+                } catch (Exception e) {
+                    return throwFailedConversion(value, toType, e);
+                }
+            } else if(value instanceof Date) {
+                return new java.sql.Date(((Date) value).getTime());
             }
         } else if ((toType == Time.class) && (value instanceof Date)) {
             Date thisValue = (Date) value;
@@ -75,9 +83,8 @@ public class CustomTypeConverter implements TypeConverter {
             } catch (Exception e) {
                 return throwFailedConversion(value, toType, e);
             }
-        } else {
-            return conv.convertValue(context, target, member, propertyName, value, toType);
         }
+        return conv.convertValue(context, target, member, propertyName, value, toType);
     }
 
     private Object throwFailedConversion(Object value, Class toType, Exception e) {
