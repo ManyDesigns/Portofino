@@ -727,8 +727,7 @@ Wizard
     font-weight: bold;
     font-size: 1.2em;
     background: #F8F8FF url('images/wizard-arrow.png') left center no-repeat;
-    padding: 1em 0 1em 2em;
-    /*border-right: 1px solid #166BBF;*/
+    padding: 1em 0 1em 2.5em;
 }
 
 .wizard-step.first {

@@ -490,7 +490,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                         "selected", "tableName"
                 )
                 .configMode(Mode.EDIT)
-//                .configNRows(selectableRoots.size())
+                .configNRows(selectableRoots.size())
                 .configPrefix("roots_")
                 .build();
         //rootsForm.readFromObject(selectableRoots);
