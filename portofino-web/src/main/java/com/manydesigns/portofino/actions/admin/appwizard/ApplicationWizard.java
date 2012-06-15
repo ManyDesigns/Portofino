@@ -86,12 +86,10 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -694,16 +692,6 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         application.getModel().getDatabases().add(connectionProvider.getDatabase());
         application.initModel();
         try {
-            application.saveXmlModel();
-        } catch (Exception e) {
-            logger.error("Could not save model", e);
-            SessionMessages.addErrorMessage(
-                    getMessage("appwizard.error.saveModelFailed", ExceptionUtils.getRootCauseMessage(e)));
-            application.getModel().getDatabases().remove(connectionProvider.getDatabase());
-            application.initModel();
-            return buildAppForm();
-        }
-        try {
             TemplateEngine engine = new SimpleTemplateEngine();
             Template template = engine.createTemplate(ApplicationWizard.class.getResource("CrudPage.groovy"));
             List<ChildPage> childPages = new ArrayList<ChildPage>();
@@ -727,6 +715,17 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         } catch (Exception e) {
             logger.error("Error while creating pages", e);
             SessionMessages.addErrorMessage(getMessage("appwizard.error.createPagesFailed", e));
+            return buildAppForm();
+        }
+        try {
+            application.initModel();
+            application.saveXmlModel();
+        } catch (Exception e) {
+            logger.error("Could not save model", e);
+            SessionMessages.addErrorMessage(
+                    getMessage("appwizard.error.saveModelFailed", ExceptionUtils.getRootCauseMessage(e)));
+            application.getModel().getDatabases().remove(connectionProvider.getDatabase());
+            application.initModel();
             return buildAppForm();
         }
         SessionMessages.addInfoMessage(getMessage("appwizard.finished"));
@@ -940,6 +939,8 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             configuration.setQuery(query);
             String variable = table.getActualEntityName();
             configuration.setVariable(variable);
+            detectLargeResultSet(table, configuration);
+
             int summ = 0;
             String linkToParentProperty = bindings.get("linkToParentProperty");
             for(Column column : table.getColumns()) {
@@ -962,33 +963,14 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                 crudProperty.setInsertable(propertyEditable);
                 if(inSummary) {
                     crudProperty.setInSummary(true);
+                    crudProperty.setSearchable(true);
                     summ++;
                 }
                 configuration.getProperties().add(crudProperty);
-            }
 
-            //Large result set?
-            Connection connection = connectionProvider.acquireConnection();
-            String sql = "select count(*) from \"" + table.getSchemaName() + "\".\"" + table.getTableName() + "\"";
-            try {
-                PreparedStatement statement =
-                        connection.prepareStatement(
-                                sql);
-                statement.setQueryTimeout(1);
-                ResultSet rs = statement.executeQuery();
-                if(rs.next()) {
-                    Object object = rs.getObject(1);
-                    if(object instanceof Number) {
-                        long count = ((Number) object).longValue();
-                        if(count > LARGE_RESULT_SET_THRESHOLD) {
-                            configuration.setLargeResultSet(true);
-                        }
-                    }
+                if(!configuration.isLargeResultSet()) {
+                    detectBooleanColumn(table, column);
                 }
-            } catch (Exception e) {
-                logger.error("Could not determine count (" + sql + ")", e);
-            } finally {
-                connection.close();
             }
 
             DispatcherLogic.saveConfiguration(dir, configuration);
@@ -1028,6 +1010,92 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             logger.warn("Couldn't create directory {}", dir.getAbsolutePath());
             SessionMessages.addWarningMessage(
                     getMessage("appwizard.error.createDirectoryFailed", dir.getAbsolutePath()));
+            return null;
+        }
+    }
+
+    protected void detectBooleanColumn(Table table, Column column) {
+        if(column.getJdbcType() == Types.INTEGER ||
+           column.getJdbcType() == Types.DECIMAL ||
+           column.getJdbcType() == Types.NUMERIC) {
+            //Detect booleans
+            Connection connection = null;
+            String sql =
+                    "select distinct(\"" + column.getColumnName() + "\") " +
+                    "from \"" + table.getSchemaName() + "\".\"" + table.getTableName() + "\"";
+            try {
+                connection = connectionProvider.acquireConnection();
+                PreparedStatement statement =
+                        connection.prepareStatement(
+                                sql);
+                statement.setQueryTimeout(1);
+                statement.setMaxRows(3);
+                ResultSet rs = statement.executeQuery();
+                int count = 0;
+                boolean only0and1 = true;
+                while(rs.next()) {
+                    count++;
+                    if(count > 2) {
+                        only0and1 = false;
+                        break;
+                    }
+                    Long value = safeGetLong(rs, 1);
+                    only0and1 &= value != null && (value == 0 || value == 1);
+                }
+                if(only0and1 && count == 2) {
+                    column.setJavaType(Boolean.class.getName());
+                }
+                statement.close();
+            } catch (Exception e) {
+                logger.error("Could not determine count (" + sql + ")", e);
+            } finally {
+                try {
+                    if(connection != null) {
+                        connection.close();
+                    }
+                } catch (SQLException e) {
+                    logger.error("Could not close connection", e);
+                }
+            }
+        }
+    }
+
+    protected void detectLargeResultSet(Table table, CrudConfiguration configuration) {
+        Connection connection = null;
+        String sql = "select count(*) from \"" + table.getSchemaName() + "\".\"" + table.getTableName() + "\"";
+        try {
+            connection = connectionProvider.acquireConnection();
+            PreparedStatement statement =
+                    connection.prepareStatement(
+                            sql);
+            statement.setQueryTimeout(1);
+            statement.setMaxRows(1);
+            ResultSet rs = statement.executeQuery();
+            if(rs.next()) {
+                Long count = safeGetLong(rs, 1);
+                if(count != null && count > LARGE_RESULT_SET_THRESHOLD) {
+                    configuration.setLargeResultSet(true);
+                }
+            }
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Could not determine count (" + sql + ")", e);
+        } finally {
+            try {
+                if(connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                logger.error("Could not close connection", e);
+            }
+        }
+    }
+
+    public static Long safeGetLong(ResultSet rs, int index) throws SQLException {
+        Object object = rs.getObject(index);
+        if(object instanceof Number) {
+            return ((Number) object).longValue();
+        } else {
             return null;
         }
     }

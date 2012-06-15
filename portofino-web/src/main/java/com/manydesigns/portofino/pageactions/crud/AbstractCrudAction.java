@@ -242,6 +242,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public Resolution search() {
         //If embedded, search is always closed by default
         searchVisible = !isEmbedded();
+        searchString = null;
         return doSearch();
     }
 

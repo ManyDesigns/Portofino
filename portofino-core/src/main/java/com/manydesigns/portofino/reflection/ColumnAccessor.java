@@ -70,8 +70,10 @@ public class ColumnAccessor
         if(String.class.equals(column.getActualJavaType())) {
             annotations.put(MaxLength.class, new MaxLengthImpl(column.getLength()));
         }
-        annotations.put(PrecisionScale.class,
-                new PrecisionScaleImpl(column.getLength(), column.getScale()));
+        if(column.getLength() > 0 && column.getScale() >= 0) {
+            annotations.put(PrecisionScale.class,
+                    new PrecisionScaleImpl(column.getLength(), column.getScale()));
+        }
         annotations.put(Enabled.class, new EnabledImpl(true));
         annotations.put(Updatable.class, new UpdatableImpl(!inPk));
         annotations.put(Insertable.class,

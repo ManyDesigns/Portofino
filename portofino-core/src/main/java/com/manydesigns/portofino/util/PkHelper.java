@@ -74,7 +74,7 @@ public class PkHelper {
             if (first) {
                 first = false;
             } else {
-                sb.append(",");
+                sb.append("/");
             }
             sb.append("%{");
             sb.append(property.getName());
