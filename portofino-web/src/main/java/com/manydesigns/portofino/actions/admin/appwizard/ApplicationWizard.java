@@ -88,6 +88,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.List;
@@ -106,6 +108,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     public static final String JNDI = "JNDI";
     @SuppressWarnings({"RedundantStringConstructorCall"})
     public static final String NO_LINK_TO_PARENT = new String();
+    public static final int LARGE_RESULT_SET_THRESHOLD = 100000;
 
     protected int step = 0;
 
@@ -493,7 +496,6 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                 .configNRows(selectableRoots.size())
                 .configPrefix("roots_")
                 .build();
-        //rootsForm.readFromObject(selectableRoots);
         rootsForm.readFromRequest(context.getRequest());
         rootsForm.writeToObject(selectableRoots);
 
@@ -945,25 +947,50 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                 boolean propertyEnabled =
                         !(linkToParentProperty != NO_LINK_TO_PARENT &&
                         column.getActualPropertyName().equals(linkToParentProperty));
-                boolean propertyEditable = !column.isAutoincrement();
+                boolean propertyEditable = propertyEnabled && !column.isAutoincrement();
                 boolean propertyIsUserPassword =
                         table.getTableName().equals(userTableName) &&
                         column.getActualPropertyName().equals(userPasswordProperty);
+                boolean inSummary =
+                        (table.getPrimaryKey().getColumns().contains(column) || summ < columnsInSummary) &&
+                        !propertyIsUserPassword;
 
                 CrudProperty crudProperty = new CrudProperty();
                 crudProperty.setEnabled(propertyEnabled);
                 crudProperty.setName(column.getActualPropertyName());
                 crudProperty.setUpdatable(propertyEditable);
                 crudProperty.setInsertable(propertyEditable);
-                boolean inSummary =
-                        (table.getPrimaryKey().getColumns().contains(column) || summ < columnsInSummary) &&
-                        !propertyIsUserPassword;
                 if(inSummary) {
                     crudProperty.setInSummary(true);
                     summ++;
                 }
                 configuration.getProperties().add(crudProperty);
             }
+
+            //Large result set?
+            Connection connection = connectionProvider.acquireConnection();
+            String sql = "select count(*) from \"" + table.getSchemaName() + "\".\"" + table.getTableName() + "\"";
+            try {
+                PreparedStatement statement =
+                        connection.prepareStatement(
+                                sql);
+                statement.setQueryTimeout(1);
+                ResultSet rs = statement.executeQuery();
+                if(rs.next()) {
+                    Object object = rs.getObject(1);
+                    if(object instanceof Number) {
+                        long count = ((Number) object).longValue();
+                        if(count > LARGE_RESULT_SET_THRESHOLD) {
+                            configuration.setLargeResultSet(true);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("Could not determine count (" + sql + ")", e);
+            } finally {
+                connection.close();
+            }
+
             DispatcherLogic.saveConfiguration(dir, configuration);
             Page page = new Page();
             page.setId(RandomUtil.createRandomId());
