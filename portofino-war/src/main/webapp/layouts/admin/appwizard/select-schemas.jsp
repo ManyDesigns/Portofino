@@ -5,16 +5,15 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="/skins/default/admin-page.jsp">
+<stripes:layout-render name="/skins/default/wizard-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
-        Step 2. Select the database schema(s) to import
+        <fmt:message key="appwizard.step2.title" />
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="select-schemas" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Step 2. Select the database schema(s) to import
+        <fmt:message key="appwizard.step2.title" />
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />

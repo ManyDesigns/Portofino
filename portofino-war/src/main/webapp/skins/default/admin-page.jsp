@@ -94,14 +94,6 @@
                         </ul>
                     </li>--%>
                     <li>
-                        <div class="navigationHeader">Application wizard</div>
-                        <ul>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
-                                                   text="Start"
-                                                   link="/actions/admin/wizard"/>
-                        </ul>
-                    </li>
-                    <li>
                         <div class="navigationHeader">Security</div>
                         <ul>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"

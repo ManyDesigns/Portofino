@@ -6,8 +6,8 @@ function fixSideBar() {
         function() {
             var contentNode = $('#content');
             var sideBarNode = $('#sidebar');
-            var contentOffsetHeight = contentNode.attr('offsetHeight');
-            var sideBarOffsetHeight = sideBarNode.attr('offsetHeight');
+            var contentOffsetHeight = contentNode.prop('offsetHeight');
+            var sideBarOffsetHeight = sideBarNode.prop('offsetHeight');
             if (contentOffsetHeight < sideBarOffsetHeight) {
                 contentNode.css('min-height', (sideBarOffsetHeight + 5) + 'px')
             }

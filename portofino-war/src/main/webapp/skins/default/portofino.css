@@ -713,3 +713,42 @@ table#userPermissionTestResults td {
     border: none;
     text-align: left;
 }
+
+/*******************************************************************************
+Wizard
+*******************************************************************************/
+
+.contentHeader.wizard {
+    overflow-y: hidden;
+    padding-left: 0;
+}
+
+.wizard-step {
+    font-weight: bold;
+    font-size: 1.2em;
+    background: #F8F8FF url('images/wizard-arrow.png') left center no-repeat;
+    padding: 1em 0 1em 2.5em;
+}
+
+.wizard-step.first {
+    border-radius: 3px 0 0 0;
+    background-image: none;
+    padding: 1em 0 1em 1em;
+}
+
+.wizard-step.before {
+    color: #555555;
+}
+
+.wizard-step.current {
+    color: #166BBF;
+    background-color: white;
+}
+
+.wizard-step.immediately-after-current {
+    background: #F8F8FF url('images/wizard-current-arrow.png') left center no-repeat;
+}
+
+wizard-step.after {
+    color: black;
+}

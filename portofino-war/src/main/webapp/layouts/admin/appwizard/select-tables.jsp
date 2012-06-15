@@ -5,20 +5,19 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="/skins/default/admin-page.jsp">
+<stripes:layout-render name="/skins/default/wizard-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
-        Step 3. Customize
+        <fmt:message key="appwizard.step3.title" />
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="select-tables" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Step 3. Customize
+        <fmt:message key="appwizard.step3.title" />
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
-        <mde:write name="actionBean" property="userTableField"/>
+        <mde:write name="actionBean" property="userAndGroupTablesForm"/>
         <c:if test="${actionBean.advanced}">
             <h3>Select roots</h3>
             <mde:write name="actionBean" property="rootsForm"/>
