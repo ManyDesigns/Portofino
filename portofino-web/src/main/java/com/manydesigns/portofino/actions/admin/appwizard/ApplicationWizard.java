@@ -479,29 +479,12 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     @Button(list = "select-tables", key="wizard.next", order = 2)
     public Resolution selectTables() {
-        //Schemas
-        createConnectionProvider();
-        schemasForm.readFromRequest(context.getRequest());
-        schemasForm.writeToObject(selectableSchemas);
-        addSchemasToModel();
+        selectSchemas();
 
-        selectableRoots = new ArrayList<SelectableRoot>();
-        rootsForm = new TableFormBuilder(SelectableRoot.class)
-                .configFields(
-                        "selected", "tableName"
-                )
-                .configMode(Mode.EDIT)
-                .configNRows(selectableRoots.size())
-                .configPrefix("roots_")
-                .build();
         rootsForm.readFromRequest(context.getRequest());
         rootsForm.writeToObject(selectableRoots);
-
         //Recalc roots
         afterSelectSchemas();
-        if(!advanced) {
-            SessionMessages.consumeWarningMessages(); //Per non rivedere gli stessi messaggi di prima
-        }
 
         if(roots.isEmpty()) {
             SessionMessages.addWarningMessage(getMessage("appwizard.warning.noRoot"));

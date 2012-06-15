@@ -22,13 +22,14 @@
             <h3>Select roots</h3>
             <mde:write name="actionBean" property="rootsForm"/>
         </c:if>
+        <label class="mde-form-label" for="advanced_checkbox"><fmt:message key="appwizard.showAdvancedOptions" /></label>
+        <input id="advanced_checkbox" type="checkbox" name="advanced" <%= actionBean.isAdvanced() ? "checked='checked'" : "" %> />
         <div style="display: none;">
             <c:if test="${!actionBean.advanced}">
                 <mde:write name="actionBean" property="rootsForm"/>
             </c:if>
             <mde:write name="actionBean" property="schemasForm"/>
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
-            <input type="hidden" name="advanced" value="${actionBean.advanced}" />
             <mde:write name="actionBean" property="jndiCPForm"/>
             <mde:write name="actionBean" property="jdbcCPForm"/>
         </div>

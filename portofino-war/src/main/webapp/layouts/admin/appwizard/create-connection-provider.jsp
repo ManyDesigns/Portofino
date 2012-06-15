@@ -44,7 +44,7 @@
             <mde:write name="actionBean" property="jdbcCPForm"/>
         </div>
 
-        <label for="advanced_checkbox">Show advanced options</label>
+        <label class="mde-form-label" for="advanced_checkbox"><fmt:message key="appwizard.showAdvancedOptions" /></label>
         <input id="advanced_checkbox" type="checkbox" name="advanced" />
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">

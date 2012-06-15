@@ -17,13 +17,14 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
-            <mde:write name="actionBean" property="userManagementSetupForm"/>
+        <mde:write name="actionBean" property="userManagementSetupForm"/>
+        <label class="mde-form-label" for="advanced_checkbox"><fmt:message key="appwizard.showAdvancedOptions" /></label>
+        <input id="advanced_checkbox" type="checkbox" name="advanced" <%= actionBean.isAdvanced() ? "checked='checked'" : "" %> />
         <div style="display: none;">
             <mde:write name="actionBean" property="userAndGroupTablesForm"/>
             <mde:write name="actionBean" property="rootsForm"/>
             <mde:write name="actionBean" property="schemasForm"/>
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
-            <input type="hidden" name="advanced" value="${actionBean.advanced}" />
             <mde:write name="actionBean" property="jndiCPForm"/>
             <mde:write name="actionBean" property="jdbcCPForm"/>
         </div>
