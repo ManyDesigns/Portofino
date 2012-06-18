@@ -23,10 +23,9 @@
 package com.manydesigns.portofino.sync;
 
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
-import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.Annotated;
 import com.manydesigns.portofino.model.Annotation;
+import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.DatabaseFactory;

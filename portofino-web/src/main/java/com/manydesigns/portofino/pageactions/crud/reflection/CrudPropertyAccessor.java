@@ -152,4 +152,9 @@ public class CrudPropertyAccessor
     public CrudProperty getCrudProperty() {
         return crudProperty;
     }
+
+    @Override
+    public String toString() {
+        return crudProperty.getName() + " (" + nestedAccessor.getName() + ")";
+    }
 }

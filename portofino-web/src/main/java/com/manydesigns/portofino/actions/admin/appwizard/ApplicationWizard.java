@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.actions.admin.appwizard;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.TextField;
@@ -106,7 +107,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     public static final String JNDI = "JNDI";
     @SuppressWarnings({"RedundantStringConstructorCall"})
     public static final String NO_LINK_TO_PARENT = new String();
-    public static final int LARGE_RESULT_SET_THRESHOLD = 100000;
+    public static final int LARGE_RESULT_SET_THRESHOLD = 10000;
 
     protected int step = 0;
 
@@ -377,7 +378,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             Field userGroupTableField = new SelectField(userGroupPropertyAccessor, selectionProvider, mode, "");
 
             userAndGroupTablesForm = new Form(mode);
-            FieldSet fieldSet = new FieldSet("User and group tables", 1, mode);//TODO
+            FieldSet fieldSet = new FieldSet(getMessage("appwizard.userAndGroupTables"), 1, mode);//TODO
             fieldSet.add(userTableField);
             fieldSet.add(groupTableField);
             fieldSet.add(userGroupTableField);
@@ -606,7 +607,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                 propertyAccessor = classAccessor.getProperty("adminGroupName");
                 Field adminGroupNameField = new TextField(propertyAccessor, mode);
 
-                FieldSet gFieldSet = new FieldSet("appwizard.groupTable", 1, mode); //TODO
+                FieldSet gFieldSet = new FieldSet(getMessage("appwizard.groupTable"), 1, mode);
                 gFieldSet.add(groupIdPropertyField);
                 gFieldSet.add(groupNamePropertyField);
                 gFieldSet.add(groupLinkPropertyField);
@@ -936,7 +937,8 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                 @SuppressWarnings({"StringEquality"})
                 boolean propertyEnabled =
                         !(linkToParentProperty != NO_LINK_TO_PARENT &&
-                        column.getActualPropertyName().equals(linkToParentProperty));
+                        column.getActualPropertyName().equals(linkToParentProperty))
+                        && !isUnsupportedProperty(column);
                 boolean propertyEditable = propertyEnabled && !column.isAutoincrement();
                 boolean propertyIsUserPassword =
                         table.getTableName().equals(userTableName) &&
@@ -1001,6 +1003,11 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                     getMessage("appwizard.error.createDirectoryFailed", dir.getAbsolutePath()));
             return null;
         }
+    }
+
+    protected boolean isUnsupportedProperty(Column column) {
+        //I blob su db non sono supportati al momento
+        return column.getJdbcType() == Types.BLOB || column.getJdbcType() == Types.LONGVARBINARY;
     }
 
     protected void detectBooleanColumn(Table table, Column column) {
@@ -1164,6 +1171,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         return selectableSchemas;
     }
 
+    @LabelI18N("appwizard.userTable.name")
     public String getUserTableName() {
         return userTableName;
     }
@@ -1172,6 +1180,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.userTableName = userTableName;
     }
 
+    @LabelI18N("appwizard.groupTable.name")
     public String getGroupTableName() {
         return groupTableName;
     }
@@ -1188,6 +1197,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         return userManagementSetupForm;
     }
 
+    @LabelI18N("appwizard.userTable.nameProperty")
     public String getUserNameProperty() {
         return userNameProperty;
     }
@@ -1196,6 +1206,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.userNameProperty = userNameProperty;
     }
 
+    @LabelI18N("appwizard.userTable.idProperty")
     public String getUserIdProperty() {
         return userIdProperty;
     }
@@ -1220,6 +1231,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.groupIdProperty = groupIdProperty;
     }
 
+    @LabelI18N("appwizard.userGroupTable.name")
     public String getUserGroupTableName() {
         return userGroupTableName;
     }
@@ -1236,6 +1248,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.groupNameProperty = groupNameProperty;
     }
 
+    @LabelI18N("appwizard.userGroupTable.groupLinkProperty")
     public String getGroupLinkProperty() {
         return groupLinkProperty;
     }
@@ -1244,6 +1257,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.groupLinkProperty = groupLinkProperty;
     }
 
+    @LabelI18N("appwizard.userGroupTable.userLinkProperty")
     public String getUserLinkProperty() {
         return userLinkProperty;
     }
@@ -1252,6 +1266,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.userLinkProperty = userLinkProperty;
     }
 
+    @LabelI18N("appwizard.groupTable.adminGroupName")
     public String getAdminGroupName() {
         return adminGroupName;
     }
@@ -1268,6 +1283,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.advanced = advanced;
     }
 
+    @LabelI18N("appwizard.userTable.encryption")
     public String getEncryptionAlgorithm() {
         return encryptionAlgorithm;
     }

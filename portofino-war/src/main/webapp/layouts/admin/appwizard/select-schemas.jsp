@@ -17,7 +17,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
-        <h2>Found schemas:</h2>
+        <h2><fmt:message key="appwizard.schemas.found" /></h2>
         <mde:write name="actionBean" property="schemasForm"/>
         <label class="mde-form-label" for="advanced_checkbox"><fmt:message key="appwizard.showAdvancedOptions" /></label>
         <input id="advanced_checkbox" type="checkbox" name="advanced" <%= actionBean.isAdvanced() ? "checked='checked'" : "" %> />

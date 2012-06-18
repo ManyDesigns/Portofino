@@ -17,7 +17,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
-        Press Finish to build the application.
+        <fmt:message key="appwizard.finish.description" />
         <div style="display: none;">
             <mde:write name="actionBean" property="userManagementSetupForm"/>
             <mde:write name="actionBean" property="userAndGroupTablesForm"/>

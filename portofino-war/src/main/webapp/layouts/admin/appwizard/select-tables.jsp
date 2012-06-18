@@ -19,7 +19,7 @@
         <mde:sessionMessages />
         <mde:write name="actionBean" property="userAndGroupTablesForm"/>
         <c:if test="${actionBean.advanced}">
-            <h3>Select roots</h3>
+            <h3><fmt:message key="appwizard.roots.select" /></h3>
             <mde:write name="actionBean" property="rootsForm"/>
         </c:if>
         <label class="mde-form-label" for="advanced_checkbox"><fmt:message key="appwizard.showAdvancedOptions" /></label>
