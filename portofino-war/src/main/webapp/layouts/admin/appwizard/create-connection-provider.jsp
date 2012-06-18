@@ -23,7 +23,7 @@
                 $("#jdbcCPForm").toggle();
             }
         </script>
-        Connection type:
+        <fmt:message key="appwizard.connectionType" />
         <ul>
             <li><input id="jdbc_radio" type="radio" value="JDBC"
                        name="connectionProviderType"
@@ -44,8 +44,7 @@
             <mde:write name="actionBean" property="jdbcCPForm"/>
         </div>
 
-        <label class="mde-form-label" for="advanced_checkbox"><fmt:message key="appwizard.showAdvancedOptions" /></label>
-        <input id="advanced_checkbox" type="checkbox" name="advanced" />
+        <mde:write name="actionBean" property="advancedOptionsForm" />
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
         <portofino:buttons list="create-connection-provider" cssClass="contentButton" />

@@ -18,8 +18,7 @@
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
         <mde:write name="actionBean" property="userManagementSetupForm"/>
-        <label class="mde-form-label" for="advanced_checkbox"><fmt:message key="appwizard.showAdvancedOptions" /></label>
-        <input id="advanced_checkbox" type="checkbox" name="advanced" <%= actionBean.isAdvanced() ? "checked='checked'" : "" %> />
+        <mde:write name="actionBean" property="advancedOptionsForm" />
         <div style="display: none;">
             <mde:write name="actionBean" property="userAndGroupTablesForm"/>
             <mde:write name="actionBean" property="rootsForm"/>

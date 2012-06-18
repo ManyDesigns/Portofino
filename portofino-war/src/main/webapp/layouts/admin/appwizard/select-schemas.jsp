@@ -19,8 +19,7 @@
         <mde:sessionMessages />
         <h2><fmt:message key="appwizard.schemas.found" /></h2>
         <mde:write name="actionBean" property="schemasForm"/>
-        <label class="mde-form-label" for="advanced_checkbox"><fmt:message key="appwizard.showAdvancedOptions" /></label>
-        <input id="advanced_checkbox" type="checkbox" name="advanced" <%= actionBean.isAdvanced() ? "checked='checked'" : "" %> />
+        <mde:write name="actionBean" property="advancedOptionsForm" />
         <div style="display: none;">
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
             <mde:write name="actionBean" property="jndiCPForm"/>

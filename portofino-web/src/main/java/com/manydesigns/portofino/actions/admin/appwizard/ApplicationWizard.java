@@ -31,6 +31,7 @@ package com.manydesigns.portofino.actions.admin.appwizard;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.LabelI18N;
+import com.manydesigns.elements.fields.BooleanField;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.TextField;
@@ -69,10 +70,7 @@ import com.manydesigns.portofino.sync.DatabaseSyncer;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
@@ -121,6 +119,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     protected String connectionProviderType;
     protected ConnectionProvider connectionProvider;
     protected boolean advanced;
+    protected Form advancedOptionsForm;
 
     public TableForm schemasForm;
     protected List<SelectableSchema> selectableSchemas;
@@ -171,6 +170,25 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     protected Resolution createSelectionProviderForm() {
         step = 0;
         return new ForwardResolution("/layouts/admin/appwizard/create-connection-provider.jsp");
+    }
+
+    @Before
+    public void prepare() {
+        ClassAccessor selfAccessor = JavaClassAccessor.getClassAccessor(ApplicationWizard.class);
+        PropertyAccessor propertyAccessor;
+        try {
+            propertyAccessor = selfAccessor.getProperty("advanced");
+        } catch (NoSuchFieldException e) {
+            throw new Error(e);
+        }
+        Field advancedOptionsField = new BooleanField(propertyAccessor, Mode.EDIT, "advanced_");
+        advancedOptionsForm = new Form(Mode.EDIT);
+        FieldSet fieldSet = new FieldSet(null, 1, Mode.EDIT);
+        fieldSet.add(advancedOptionsField);
+        advancedOptionsForm.add(fieldSet);
+        advancedOptionsForm.readFromObject(this);
+        advancedOptionsForm.readFromRequest(context.getRequest());
+        advancedOptionsForm.writeToObject(this);
     }
 
     protected void buildCPForms() {
@@ -1275,6 +1293,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.adminGroupName = adminGroupName;
     }
 
+    @LabelI18N("appwizard.showAdvancedOptions")
     public boolean isAdvanced() {
         return advanced;
     }
@@ -1290,6 +1309,10 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     public void setEncryptionAlgorithm(String encryptionAlgorithm) {
         this.encryptionAlgorithm = encryptionAlgorithm;
+    }
+
+    public Form getAdvancedOptionsForm() {
+        return advancedOptionsForm;
     }
 
     //Wizard implementation

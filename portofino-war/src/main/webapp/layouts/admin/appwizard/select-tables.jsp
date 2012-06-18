@@ -22,8 +22,7 @@
             <h3><fmt:message key="appwizard.roots.select" /></h3>
             <mde:write name="actionBean" property="rootsForm"/>
         </c:if>
-        <label class="mde-form-label" for="advanced_checkbox"><fmt:message key="appwizard.showAdvancedOptions" /></label>
-        <input id="advanced_checkbox" type="checkbox" name="advanced" <%= actionBean.isAdvanced() ? "checked='checked'" : "" %> />
+        <mde:write name="actionBean" property="advancedOptionsForm" />
         <div style="display: none;">
             <c:if test="${!actionBean.advanced}">
                 <mde:write name="actionBean" property="rootsForm"/>

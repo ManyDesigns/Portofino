@@ -17,14 +17,14 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
-        <fmt:message key="appwizard.finish.description" />
+        <fmt:message key="appwizard.finish.text" />
         <div style="display: none;">
             <mde:write name="actionBean" property="userManagementSetupForm"/>
             <mde:write name="actionBean" property="userAndGroupTablesForm"/>
             <mde:write name="actionBean" property="rootsForm"/>
             <mde:write name="actionBean" property="schemasForm"/>
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
-            <input type="hidden" name="advanced" value="${actionBean.advanced}" />
+            <mde:write name="actionBean" property="advancedOptionsForm" />
             <mde:write name="actionBean" property="jndiCPForm"/>
             <mde:write name="actionBean" property="jdbcCPForm"/>
         </div>
