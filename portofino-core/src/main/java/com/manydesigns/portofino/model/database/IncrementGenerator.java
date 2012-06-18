@@ -52,8 +52,4 @@ public class IncrementGenerator extends Generator{
     public void init(Model model) {
         super.init(model);
     }
-
-    public String getQualifiedName() {
-        return "increment";
-    }
 }
