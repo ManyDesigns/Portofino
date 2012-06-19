@@ -788,8 +788,11 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             String calendarDefinitionsStr = "[";
             calendarDefinitionsStr += StringUtils.join(calendarDefinitions, ", ");
             calendarDefinitionsStr += "]";
-            File dir = new File(application.getPagesDir(), "calendar"); //TODO gestire exists()
-            if(dir.mkdirs()) {
+            File dir = new File(application.getPagesDir(), "calendar");
+            if(dir.exists()) {
+                SessionMessages.addWarningMessage(
+                        getMessage("appwizard.error.directoryExists", dir.getAbsolutePath()));
+            } else if(dir.mkdirs()) {
                 CalendarConfiguration configuration = new CalendarConfiguration();
                 DispatcherLogic.saveConfiguration(dir, configuration);
 
@@ -936,7 +939,11 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             File dir, Table table, String query, List<ChildPage> childPages,
             Template template, Map<String, String> bindings, String title)
             throws Exception {
-        if(dir.mkdirs()) {
+        if(dir.exists()) {
+            SessionMessages.addWarningMessage(
+                        getMessage("appwizard.error.directoryExists", dir.getAbsolutePath()));
+            return null;
+        } else if(dir.mkdirs()) {
             CrudConfiguration configuration = new CrudConfiguration();
             configuration.setDatabase(connectionProvider.getDatabase().getDatabaseName());
 
