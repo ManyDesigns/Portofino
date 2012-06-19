@@ -17,11 +17,11 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
-        <h2>Found schemas:</h2>
+        <h2><fmt:message key="appwizard.schemas.found" /></h2>
         <mde:write name="actionBean" property="schemasForm"/>
+        <mde:write name="actionBean" property="advancedOptionsForm" />
         <div style="display: none;">
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
-            <input type="hidden" name="advanced" value="${actionBean.advanced}" />
             <mde:write name="actionBean" property="jndiCPForm"/>
             <mde:write name="actionBean" property="jdbcCPForm"/>
         </div>

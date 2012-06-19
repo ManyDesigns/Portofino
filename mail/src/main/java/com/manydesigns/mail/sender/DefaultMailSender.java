@@ -55,6 +55,7 @@ public class DefaultMailSender implements MailSender {
     protected String server = "localhost";
     protected int port = 25;
     protected boolean ssl = false;
+    protected boolean tls = false;
     protected String login;
     protected String password;
 
@@ -205,6 +206,7 @@ public class DefaultMailSender implements MailSender {
             }
         }
         email.setSSL(ssl);
+        email.setTLS(tls);
         email.setSslSmtpPort(port + "");
         email.setCharset("UTF-8");
         email.send();
@@ -233,6 +235,14 @@ public class DefaultMailSender implements MailSender {
 
     public void setSsl(boolean ssl) {
         this.ssl = ssl;
+    }
+
+    public boolean isTls() {
+        return tls;
+    }
+
+    public void setTls(boolean tls) {
+        this.tls = tls;
     }
 
     public String getLogin() {

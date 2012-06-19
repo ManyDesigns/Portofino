@@ -44,6 +44,7 @@ public class ColumnAccessor
         implements PropertyAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
+    public static final int MULTILINE_THRESHOLD = 100;
 
     //**************************************************************************
     // Fields
@@ -73,6 +74,10 @@ public class ColumnAccessor
         if(column.getLength() > 0 && column.getScale() >= 0) {
             annotations.put(PrecisionScale.class,
                     new PrecisionScaleImpl(column.getLength(), column.getScale()));
+        }
+        if(String.class.equals(column.getActualJavaType()) &&
+           column.getLength() > MULTILINE_THRESHOLD) {
+            annotations.put(Multiline.class, new MultilineImpl(true));
         }
         annotations.put(Enabled.class, new EnabledImpl(true));
         annotations.put(Updatable.class, new UpdatableImpl(!inPk));

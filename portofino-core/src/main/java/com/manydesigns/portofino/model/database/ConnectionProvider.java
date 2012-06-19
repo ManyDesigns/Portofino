@@ -213,7 +213,14 @@ public abstract class ConnectionProvider implements ModelObject {
             throws SQLException {
         String typeName = typeRs.getString("TYPE_NAME");
         int dataType = typeRs.getInt("DATA_TYPE");
-        int maximumPrecision = typeRs.getInt("PRECISION");
+        Long maximumPrecision;
+        Object maximumPrecisionObj = typeRs.getObject("PRECISION");
+        if (maximumPrecisionObj instanceof Number) {
+            maximumPrecision = ((Number)maximumPrecisionObj).longValue();
+        } else {
+            maximumPrecision = null;
+            logger.warn("Cannot get maximum precision for type: {} value: {}", typeName, maximumPrecisionObj);
+        }
         String literalPrefix = typeRs.getString("LITERAL_PREFIX");
         String literalSuffix = typeRs.getString("LITERAL_SUFFIX");
         boolean nullable =

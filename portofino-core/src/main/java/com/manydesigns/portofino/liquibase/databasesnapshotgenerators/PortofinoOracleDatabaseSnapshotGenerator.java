@@ -20,44 +20,27 @@
  *
  */
 
-package com.manydesigns.mail.sender;
+package com.manydesigns.portofino.liquibase.databasesnapshotgenerators;
 
-import java.util.Set;
+import liquibase.snapshot.jvm.OracleDatabaseSnapshotGenerator;
 
-/**
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
- * @author Angelo Lupo          - angelo.lupo@manydesigns.com
- * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
- * @author Alessio Stalla       - alessio.stalla@manydesigns.com
- */
-public interface MailSender {
+/*
+* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+* @author Angelo Lupo          - angelo.lupo@manydesigns.com
+* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+*/
+public class PortofinoOracleDatabaseSnapshotGenerator extends OracleDatabaseSnapshotGenerator {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    int runOnce(Set<String> idsToMarkAsSent);
+    @Override
+    protected String convertTableNameToDatabaseTableName(String tableName) {
+        return tableName;
+    }
 
-    String getServer();
-
-    void setServer(String server);
-
-    int getPort();
-
-    void setPort(int port);
-
-    boolean isSsl();
-
-    void setSsl(boolean ssl);
-
-    boolean isTls();
-
-    void setTls(boolean tls);
-
-    String getLogin();
-
-    void setLogin(String login);
-
-    String getPassword();
-
-    void setPassword(String password);
-
+    @Override
+    protected String convertColumnNameToDatabaseTableName(String columnName) {
+        return columnName;
+    }
 }

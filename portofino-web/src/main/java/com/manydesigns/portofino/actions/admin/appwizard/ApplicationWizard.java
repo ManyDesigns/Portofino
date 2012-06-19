@@ -30,6 +30,8 @@
 package com.manydesigns.portofino.actions.admin.appwizard;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.LabelI18N;
+import com.manydesigns.elements.fields.BooleanField;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.TextField;
@@ -63,15 +65,11 @@ import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
@@ -79,7 +77,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +103,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     public static final String JNDI = "JNDI";
     @SuppressWarnings({"RedundantStringConstructorCall"})
     public static final String NO_LINK_TO_PARENT = new String();
-    public static final int LARGE_RESULT_SET_THRESHOLD = 100000;
+    public static final int LARGE_RESULT_SET_THRESHOLD = 10000;
 
     protected int step = 0;
 
@@ -120,6 +117,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     protected String connectionProviderType;
     protected ConnectionProvider connectionProvider;
     protected boolean advanced;
+    protected Form advancedOptionsForm;
 
     public TableForm schemasForm;
     protected List<SelectableSchema> selectableSchemas;
@@ -170,6 +168,25 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     protected Resolution createSelectionProviderForm() {
         step = 0;
         return new ForwardResolution("/layouts/admin/appwizard/create-connection-provider.jsp");
+    }
+
+    @Before
+    public void prepare() {
+        ClassAccessor selfAccessor = JavaClassAccessor.getClassAccessor(ApplicationWizard.class);
+        PropertyAccessor propertyAccessor;
+        try {
+            propertyAccessor = selfAccessor.getProperty("advanced");
+        } catch (NoSuchFieldException e) {
+            throw new Error(e);
+        }
+        Field advancedOptionsField = new BooleanField(propertyAccessor, Mode.EDIT, "advanced_");
+        advancedOptionsForm = new Form(Mode.EDIT);
+        FieldSet fieldSet = new FieldSet(null, 1, Mode.EDIT);
+        fieldSet.add(advancedOptionsField);
+        advancedOptionsForm.add(fieldSet);
+        advancedOptionsForm.readFromObject(this);
+        advancedOptionsForm.readFromRequest(context.getRequest());
+        advancedOptionsForm.writeToObject(this);
     }
 
     protected void buildCPForms() {
@@ -246,6 +263,10 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
         selectableSchemas = new ArrayList<SelectableSchema>(schemaNamesFromDb.size());
         for(String schemaName : schemaNamesFromDb) {
+            if (DatabaseSyncer.INFORMATION_SCHEMA.equalsIgnoreCase(schemaName)) {
+                logger.info("Skipping information schema: {}", schemaName);
+                continue;
+            }
             boolean selected = false;
             for(Schema schema : selectedSchemas) {
                 if(schemaName.equalsIgnoreCase(schema.getSchemaName())) {
@@ -377,7 +398,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             Field userGroupTableField = new SelectField(userGroupPropertyAccessor, selectionProvider, mode, "");
 
             userAndGroupTablesForm = new Form(mode);
-            FieldSet fieldSet = new FieldSet("User and group tables", 1, mode);//TODO
+            FieldSet fieldSet = new FieldSet(getMessage("appwizard.userAndGroupTables"), 1, mode);
             fieldSet.add(userTableField);
             fieldSet.add(groupTableField);
             fieldSet.add(userGroupTableField);
@@ -479,29 +500,12 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     @Button(list = "select-tables", key="wizard.next", order = 2)
     public Resolution selectTables() {
-        //Schemas
-        createConnectionProvider();
-        schemasForm.readFromRequest(context.getRequest());
-        schemasForm.writeToObject(selectableSchemas);
-        addSchemasToModel();
+        selectSchemas();
 
-        selectableRoots = new ArrayList<SelectableRoot>();
-        rootsForm = new TableFormBuilder(SelectableRoot.class)
-                .configFields(
-                        "selected", "tableName"
-                )
-                .configMode(Mode.EDIT)
-                .configNRows(selectableRoots.size())
-                .configPrefix("roots_")
-                .build();
         rootsForm.readFromRequest(context.getRequest());
         rootsForm.writeToObject(selectableRoots);
-
         //Recalc roots
         afterSelectSchemas();
-        if(!advanced) {
-            SessionMessages.consumeWarningMessages(); //Per non rivedere gli stessi messaggi di prima
-        }
 
         if(roots.isEmpty()) {
             SessionMessages.addWarningMessage(getMessage("appwizard.warning.noRoot"));
@@ -623,7 +627,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                 propertyAccessor = classAccessor.getProperty("adminGroupName");
                 Field adminGroupNameField = new TextField(propertyAccessor, mode);
 
-                FieldSet gFieldSet = new FieldSet("appwizard.groupTable", 1, mode); //TODO
+                FieldSet gFieldSet = new FieldSet(getMessage("appwizard.groupTable"), 1, mode);
                 gFieldSet.add(groupIdPropertyField);
                 gFieldSet.add(groupNamePropertyField);
                 gFieldSet.add(groupLinkPropertyField);
@@ -731,7 +735,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         SessionMessages.addInfoMessage(getMessage("appwizard.finished"));
         if(userTable != null) {
             SessionMessages.addWarningMessage(getMessage("appwizard.warning.userTable.created"));
-            ShiroUtils.clearCache(SecurityUtils.getSubject().getPrincipals());
+            //ShiroUtils.clearCache(SecurityUtils.getSubject().getPrincipals());
         }
         return new RedirectResolution("/");
     }
@@ -784,8 +788,11 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             String calendarDefinitionsStr = "[";
             calendarDefinitionsStr += StringUtils.join(calendarDefinitions, ", ");
             calendarDefinitionsStr += "]";
-            File dir = new File(application.getPagesDir(), "calendar"); //TODO gestire exists()
-            if(dir.mkdirs()) {
+            File dir = new File(application.getPagesDir(), "calendar");
+            if(dir.exists()) {
+                SessionMessages.addWarningMessage(
+                        getMessage("appwizard.error.directoryExists", dir.getAbsolutePath()));
+            } else if(dir.mkdirs()) {
                 CalendarConfiguration configuration = new CalendarConfiguration();
                 DispatcherLogic.saveConfiguration(dir, configuration);
 
@@ -932,7 +939,11 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             File dir, Table table, String query, List<ChildPage> childPages,
             Template template, Map<String, String> bindings, String title)
             throws Exception {
-        if(dir.mkdirs()) {
+        if(dir.exists()) {
+            SessionMessages.addWarningMessage(
+                        getMessage("appwizard.error.directoryExists", dir.getAbsolutePath()));
+            return null;
+        } else if(dir.mkdirs()) {
             CrudConfiguration configuration = new CrudConfiguration();
             configuration.setDatabase(connectionProvider.getDatabase().getDatabaseName());
 
@@ -941,13 +952,20 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             configuration.setVariable(variable);
             detectLargeResultSet(table, configuration);
 
+            configuration.setName(table.getActualEntityName());
+            configuration.setSearchTitle("Search " + title);
+            configuration.setCreateTitle("Create " + title);
+            configuration.setEditTitle("Edit " + title);
+            configuration.setReadTitle(title);
+
             int summ = 0;
             String linkToParentProperty = bindings.get("linkToParentProperty");
             for(Column column : table.getColumns()) {
                 @SuppressWarnings({"StringEquality"})
                 boolean propertyEnabled =
                         !(linkToParentProperty != NO_LINK_TO_PARENT &&
-                        column.getActualPropertyName().equals(linkToParentProperty));
+                        column.getActualPropertyName().equals(linkToParentProperty))
+                        && !isUnsupportedProperty(column);
                 boolean propertyEditable = propertyEnabled && !column.isAutoincrement();
                 boolean propertyIsUserPassword =
                         table.getTableName().equals(userTableName) &&
@@ -1012,6 +1030,11 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                     getMessage("appwizard.error.createDirectoryFailed", dir.getAbsolutePath()));
             return null;
         }
+    }
+
+    protected boolean isUnsupportedProperty(Column column) {
+        //I blob su db non sono supportati al momento
+        return column.getJdbcType() == Types.BLOB || column.getJdbcType() == Types.LONGVARBINARY;
     }
 
     protected void detectBooleanColumn(Table table, Column column) {
@@ -1175,6 +1198,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         return selectableSchemas;
     }
 
+    @LabelI18N("appwizard.userTable.name")
     public String getUserTableName() {
         return userTableName;
     }
@@ -1183,6 +1207,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.userTableName = userTableName;
     }
 
+    @LabelI18N("appwizard.groupTable.name")
     public String getGroupTableName() {
         return groupTableName;
     }
@@ -1199,6 +1224,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         return userManagementSetupForm;
     }
 
+    @LabelI18N("appwizard.userTable.nameProperty")
     public String getUserNameProperty() {
         return userNameProperty;
     }
@@ -1207,6 +1233,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.userNameProperty = userNameProperty;
     }
 
+    @LabelI18N("appwizard.userTable.idProperty")
     public String getUserIdProperty() {
         return userIdProperty;
     }
@@ -1231,6 +1258,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.groupIdProperty = groupIdProperty;
     }
 
+    @LabelI18N("appwizard.userGroupTable.name")
     public String getUserGroupTableName() {
         return userGroupTableName;
     }
@@ -1247,6 +1275,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.groupNameProperty = groupNameProperty;
     }
 
+    @LabelI18N("appwizard.userGroupTable.groupLinkProperty")
     public String getGroupLinkProperty() {
         return groupLinkProperty;
     }
@@ -1255,6 +1284,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.groupLinkProperty = groupLinkProperty;
     }
 
+    @LabelI18N("appwizard.userGroupTable.userLinkProperty")
     public String getUserLinkProperty() {
         return userLinkProperty;
     }
@@ -1263,6 +1293,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.userLinkProperty = userLinkProperty;
     }
 
+    @LabelI18N("appwizard.groupTable.adminGroupName")
     public String getAdminGroupName() {
         return adminGroupName;
     }
@@ -1271,6 +1302,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.adminGroupName = adminGroupName;
     }
 
+    @LabelI18N("appwizard.showAdvancedOptions")
     public boolean isAdvanced() {
         return advanced;
     }
@@ -1279,12 +1311,17 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.advanced = advanced;
     }
 
+    @LabelI18N("appwizard.userTable.encryption")
     public String getEncryptionAlgorithm() {
         return encryptionAlgorithm;
     }
 
     public void setEncryptionAlgorithm(String encryptionAlgorithm) {
         this.encryptionAlgorithm = encryptionAlgorithm;
+    }
+
+    public Form getAdvancedOptionsForm() {
+        return advancedOptionsForm;
     }
 
     //Wizard implementation

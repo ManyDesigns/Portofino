@@ -429,23 +429,20 @@ public class HibernateConfig {
 
         Generator generator = pkcol.getGenerator();
 
-        if (null!=generator && generator instanceof SequenceGenerator) {
-            manageSequenceGenerator(mappings, tab, id, (SequenceGenerator) generator);
-        }
-
-        if (null!=generator && generator instanceof
-                com.manydesigns.portofino.model.database.TableGenerator) {
-            manageTableGenerator(mappings, tab, id,
-                    (com.manydesigns.portofino.model.database.TableGenerator) generator);
-        }
-
         if (column.isAutoincrement()) {
             manageIdentityGenerator(mappings, tab, id);
-        }
+        } else if (generator != null) {
+            if (generator instanceof SequenceGenerator) {
+                manageSequenceGenerator(mappings, tab, id, (SequenceGenerator) generator);
+            } else if (generator instanceof
+                                com.manydesigns.portofino.model.database.TableGenerator) {
+                manageTableGenerator(mappings, tab, id,
+                        (com.manydesigns.portofino.model.database.TableGenerator) generator);
+            } else if (generator instanceof
+                                com.manydesigns.portofino.model.database.IncrementGenerator){
+                manageIncrementGenerator(mappings, tab, id, clazz.getEntityName());
+            }
 
-        if (null!=generator && generator instanceof
-                com.manydesigns.portofino.model.database.IncrementGenerator){
-            manageAutoIncrementType(mappings, id, clazz.getEntityName());
         }
 
         tab.setIdentifierValue(id);
@@ -504,11 +501,12 @@ public class HibernateConfig {
         id.setNullValue(null);
     }
 
-    private void manageAutoIncrementType(Mappings mappings, SimpleValue id, String entityName) {
+    private void manageIncrementGenerator(Mappings mappings, Table tab, SimpleValue id, String entityName) {
         id.setIdentifierGeneratorStrategy("increment");
         Properties params = new Properties();
         params.put(PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER,
                 mappings.getObjectNameNormalizer());
+        params.setProperty(PersistentIdentifierGenerator.SCHEMA, escapeName(tab.getSchema()));
         params.put(IncrementGenerator.ENTITY_NAME,
                 entityName);
         id.setIdentifierGeneratorProperties(params);
