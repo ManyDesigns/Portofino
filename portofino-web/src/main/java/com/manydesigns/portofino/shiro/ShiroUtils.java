@@ -71,4 +71,8 @@ public class ShiroUtils {
         }
     }
 
+    public static void clearCacheForCurrentSubject() {
+        clearCache(SecurityUtils.getSubject().getPrincipals());
+    }
+
 }

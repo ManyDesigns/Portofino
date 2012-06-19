@@ -65,7 +65,6 @@ import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
@@ -78,7 +77,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -400,7 +398,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             Field userGroupTableField = new SelectField(userGroupPropertyAccessor, selectionProvider, mode, "");
 
             userAndGroupTablesForm = new Form(mode);
-            FieldSet fieldSet = new FieldSet(getMessage("appwizard.userAndGroupTables"), 1, mode);//TODO
+            FieldSet fieldSet = new FieldSet(getMessage("appwizard.userAndGroupTables"), 1, mode);
             fieldSet.add(userTableField);
             fieldSet.add(groupTableField);
             fieldSet.add(userGroupTableField);
@@ -737,7 +735,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         SessionMessages.addInfoMessage(getMessage("appwizard.finished"));
         if(userTable != null) {
             SessionMessages.addWarningMessage(getMessage("appwizard.warning.userTable.created"));
-            ShiroUtils.clearCache(SecurityUtils.getSubject().getPrincipals());
+            //ShiroUtils.clearCache(SecurityUtils.getSubject().getPrincipals());
         }
         return new RedirectResolution("/");
     }
