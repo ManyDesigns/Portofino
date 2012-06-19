@@ -1094,32 +1094,52 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             //Detect booleans
             Connection connection = null;
 
-            String sql = null;
             try {
                 connection = connectionProvider.acquireConnection();
                 liquibase.database.Database implementation =
-                        DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
-                sql =
-                    "select distinct(" + implementation.escapeDatabaseObject(column.getColumnName()) + ") " +
+                        DatabaseFactory.getInstance().findCorrectDatabaseImplementation(
+                                new JdbcConnection(connection));
+                String sql =
+                    "select count(" + implementation.escapeDatabaseObject(column.getColumnName()) + ") " +
                     "from " + implementation.escapeTableName(table.getSchemaName(), table.getTableName());
                 PreparedStatement statement =
                         connection.prepareStatement(
                                 sql);
-                statement.setQueryTimeout(1);
-                statement.setMaxRows(3);
+                setQueryTimeout(statement, 1);
+                statement.setMaxRows(1);
                 ResultSet rs = statement.executeQuery();
-                int count = 0;
+                Long count = null;
+                if(rs.next()) {
+                    count = safeGetLong(rs, 1);
+                }
+
+                if(count == null || count < 10) {
+                    logger.info("Cannot determine if numeric column {} is boolean, count is {}",
+                                column.getQualifiedName(), count);
+                    return;
+                }
+
+                sql =
+                    "select distinct(" + implementation.escapeDatabaseObject(column.getColumnName()) + ") " +
+                    "from " + implementation.escapeTableName(table.getSchemaName(), table.getTableName());
+                statement =
+                        connection.prepareStatement(
+                                sql);
+                setQueryTimeout(statement, 1);
+                statement.setMaxRows(3);
+                rs = statement.executeQuery();
+                int valueCount = 0;
                 boolean only0and1 = true;
                 while(rs.next()) {
-                    count++;
-                    if(count > 2) {
+                    valueCount++;
+                    if(valueCount > 2) {
                         only0and1 = false;
                         break;
                     }
                     Long value = safeGetLong(rs, 1);
                     only0and1 &= value != null && (value == 0 || value == 1);
                 }
-                if(only0and1 && count == 2) {
+                if(only0and1 && valueCount == 2) {
                     column.setJavaType(Boolean.class.getName());
                 }
                 statement.close();
@@ -1148,7 +1168,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             PreparedStatement statement =
                     connection.prepareStatement(
                             sql);
-            statement.setQueryTimeout(1);
+            setQueryTimeout(statement, 1);
             statement.setMaxRows(1);
             ResultSet rs = statement.executeQuery();
             if(rs.next()) {
@@ -1168,6 +1188,14 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             } catch (SQLException e) {
                 logger.error("Could not close connection", e);
             }
+        }
+    }
+
+    protected void setQueryTimeout(PreparedStatement statement, int seconds) {
+        try {
+            statement.setQueryTimeout(seconds);
+        } catch (Exception e) {
+            logger.debug("setQueryTimeout not supported", e);
         }
     }
 
