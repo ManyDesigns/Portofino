@@ -48,6 +48,10 @@ public interface MailSender {
 
     void setSsl(boolean ssl);
 
+    boolean isTls();
+
+    void setTls(boolean tls);
+
     String getLogin();
 
     void setLogin(String login);

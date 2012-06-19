@@ -227,6 +227,8 @@ public class PortofinoListener
                         PortofinoProperties.MAIL_SMTP_PORT, 25);
                 boolean ssl = portofinoConfiguration.getBoolean(
                         PortofinoProperties.MAIL_SMTP_SSL_ENABLED, false);
+                boolean tls = portofinoConfiguration.getBoolean(
+                        PortofinoProperties.MAIL_SMTP_TLS_ENABLED, false);
                 String login = portofinoConfiguration.getString(
                         PortofinoProperties.MAIL_SMTP_LOGIN);
                 String password = portofinoConfiguration.getString(
@@ -246,6 +248,7 @@ public class PortofinoListener
                 mailSender.setPassword(password);
                 mailSender.setPort(port);
                 mailSender.setSsl(ssl);
+                mailSender.setTls(tls);
 
                 try {
                     Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
