@@ -104,7 +104,7 @@ public class DatabaseLogic {
     public static @Nullable Database findDatabaseByName(
             Model model, String databaseName) {
         for (Database database : model.getDatabases()) {
-            if (database.getDatabaseName().equalsIgnoreCase(databaseName)) {
+            if (database.getDatabaseName().equals(databaseName)) {
                 return database;
             }
         }
@@ -115,7 +115,7 @@ public class DatabaseLogic {
     public static @Nullable Schema findSchemaByName(
             Database database, String schemaName) {
         for (Schema schema : database.getSchemas()) {
-            if (schema.getSchemaName().equalsIgnoreCase(schemaName)) {
+            if (schema.getSchemaName().equals(schemaName)) {
                 return schema;
             }
         }
@@ -150,11 +150,7 @@ public class DatabaseLogic {
         String tableName = qualifiedTableName.substring(lastDot + 1);
         Schema schema = findSchemaByQualifiedName(model, qualifiedSchemaName);
         if (schema != null) {
-            for (Table table : schema.getTables()) {
-                if (table.getTableName().equalsIgnoreCase(tableName)) {
-                    return table;
-                }
-            }
+            return findTableByName(schema, tableName);
         }
         logger.debug("Table not found: {}", qualifiedTableName);
         return null;
@@ -162,7 +158,7 @@ public class DatabaseLogic {
 
     public static @Nullable Table findTableByName(Schema schema, String tableName) {
         for (Table table : schema.getTables()) {
-            if (table.getTableName().equalsIgnoreCase(tableName)) {
+            if (table.getTableName().equals(tableName)) {
                 return table;
             }
         }
@@ -173,7 +169,7 @@ public class DatabaseLogic {
     public static @Nullable Column findColumnByName(
             Table table, String columnName) {
         for (Column column : table.getColumns()) {
-            if (column.getColumnName().equalsIgnoreCase(columnName)) {
+            if (column.getColumnName().equals(columnName)) {
                 return column;
             }
         }
@@ -199,7 +195,7 @@ public class DatabaseLogic {
         Table table = findTableByQualifiedName(model, qualifiedTableName);
         if (table != null) {
             for (Column column : table.getColumns()) {
-                if (column.getColumnName().equalsIgnoreCase(columnName)) {
+                if (column.getColumnName().equals(columnName)) {
                     return column;
                 }
             }
@@ -228,7 +224,7 @@ public class DatabaseLogic {
     public static Table findTableByEntityName(Database database, String entityName) {
         for(Schema schema : database.getSchemas()) {
             for(Table table : schema.getTables()) {
-                if(entityName.equalsIgnoreCase(table.getActualEntityName())) {
+                if(entityName.equals(table.getActualEntityName())) {
                     return table;
                 }
             }
