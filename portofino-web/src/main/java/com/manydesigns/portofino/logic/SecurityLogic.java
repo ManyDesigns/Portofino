@@ -173,6 +173,11 @@ public class SecurityLogic {
     public static boolean hasPermissions
             (Application application, Permissions configuration, Subject subject, AccessLevel level, String... permissions) {
         if(subject.isAuthenticated()) {
+            Configuration conf = application.getPortofinoProperties();
+            String administratorsGroup = conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
+            if(isUserInGroup(administratorsGroup)) {
+                return true;
+            }
             PagePermission pagePermission = new PagePermission(configuration, level, permissions);
             return subject.isPermitted(pagePermission);
         } else {
@@ -203,16 +208,20 @@ public class SecurityLogic {
         return new GroupPermission(groups).implies(pagePermission);
     }
 
-    public static boolean isUserInGroup(ServletRequest request, String groupId) {
+    public static boolean isUserInGroup(String groupId) {
         Subject subject = SecurityUtils.getSubject();
         return subject.hasRole(groupId);
     }
 
     public static boolean isAdministrator(ServletRequest request) {
         Application appl = (Application) request.getAttribute(RequestAttributes.APPLICATION);
-        Configuration portofinoConfiguration = appl.getPortofinoProperties();
+        return isAdministrator(appl);
+    }
+
+    public static boolean isAdministrator(Application application) {
+        Configuration portofinoConfiguration = application.getPortofinoProperties();
         String administratorsGroup = portofinoConfiguration.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
-        return isUserInGroup(request, administratorsGroup);
+        return isUserInGroup(administratorsGroup);
     }
 
     public static boolean satisfiesRequiresAdministrator(HttpServletRequest request, ActionBean actionBean, Method handler) {
