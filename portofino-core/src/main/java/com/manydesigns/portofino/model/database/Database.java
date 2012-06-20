@@ -156,56 +156,6 @@ public class Database implements ModelObject {
         return result;
     }
 
-
-    //**************************************************************************
-    // Search objects of a certain kind
-    //**************************************************************************
-
-    public Schema findSchemaByQualifiedName(String qualifiedSchemaName) {
-        int lastDot = qualifiedSchemaName.lastIndexOf(".");
-        String schemaName = qualifiedSchemaName.substring(lastDot + 1);
-        for (Schema schema : schemas) {
-            if (schema.getSchemaName().equalsIgnoreCase(schemaName)) {
-                return schema;
-            }
-        }
-        logger.debug("Schema not found: {}", qualifiedSchemaName);
-        return null;
-    }
-
-    public Table findTableByQualifiedName(String qualifiedTableName) {
-        int lastDot = qualifiedTableName.lastIndexOf(".");
-        String qualifiedSchemaName = qualifiedTableName.substring(0, lastDot);
-        String tableName = qualifiedTableName.substring(lastDot + 1);
-        Schema schema = findSchemaByQualifiedName(qualifiedSchemaName);
-        if (schema != null) {
-            for (Table table : schema.getTables()) {
-                if (table.getTableName().equalsIgnoreCase(tableName)) {
-                    return table;
-                }
-            }
-        }
-        logger.debug("Table not found: {}", qualifiedTableName);
-        return null;
-    }
-
-
-    public Column findColumnByQualifiedName(String qualifiedColumnName) {
-        int lastDot = qualifiedColumnName.lastIndexOf(".");
-        String qualifiedTableName = qualifiedColumnName.substring(0, lastDot);
-        String columnName = qualifiedColumnName.substring(lastDot + 1);
-        Table table = findTableByQualifiedName(qualifiedTableName);
-        if (table != null) {
-            for (Column column : table.getColumns()) {
-                if (column.getColumnName().equalsIgnoreCase(columnName)) {
-                    return column;
-                }
-            }
-        }
-        logger.debug("Column not found: {}", qualifiedColumnName);
-        return null;
-    }
-
     //**************************************************************************
     // toString() override
     //**************************************************************************

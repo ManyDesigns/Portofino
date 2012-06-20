@@ -133,15 +133,14 @@ public class ForeignKey extends DatabaseSelectionProvider
     @Override
     public void link(Model model) {
         super.link(model);
-        String qualifiedToTableName =
-                Table.composeQualifiedName(toDatabase, toSchema, toTableName);
-        toTable = DatabaseLogic.findTableByQualifiedName(model, qualifiedToTableName);
+        toTable = DatabaseLogic.findTableByName(model, toDatabase, toSchema, toTableName);
         if(toTable != null) {
             // wire up Table.oneToManyRelationships
             toTable.getOneToManyRelationships().add(this);
             hql = "from " + toTable.getActualEntityName();
         } else {
-            logger.warn("Cannot find destination table '{}'", qualifiedToTableName);
+            logger.warn("Cannot find destination table '{}'",
+                    Table.composeQualifiedName(toDatabase, toSchema, toTableName));
         }
     }
 

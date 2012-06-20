@@ -123,36 +123,22 @@ public class DatabaseLogic {
         return null;
     }
 
-    public static @Nullable Schema findSchemaByQualifiedName(Model model,
-                                            String qualifiedSchemaName) {
-        int lastDot = qualifiedSchemaName.lastIndexOf(".");
-        String databaseName = qualifiedSchemaName.substring(0, lastDot);
-        Database database = findDatabaseByName(model,  databaseName);
+    public static @Nullable Schema findSchemaByName(Model model, String databaseName, String schemaName) {
+        Database database = findDatabaseByName(model, databaseName);
         if (database != null) {
-            return database.findSchemaByQualifiedName(qualifiedSchemaName);
+            return findSchemaByName(database, schemaName);
         }
-        logger.debug("Schema not found: {}", qualifiedSchemaName);
+        logger.debug("Schema not found: {}", schemaName);
         return null;
     }
 
-    public static @Nullable Table findTableByQualifiedName(
-            Model model, String qualifiedTableName) {
-        if (qualifiedTableName == null) {
-            return null;
-        }
-
-        int lastDot = qualifiedTableName.lastIndexOf(".");
-        if(lastDot==-1) {
-            return null;
-        }
-
-        String qualifiedSchemaName = qualifiedTableName.substring(0, lastDot);
-        String tableName = qualifiedTableName.substring(lastDot + 1);
-        Schema schema = findSchemaByQualifiedName(model, qualifiedSchemaName);
+    public static @Nullable Table findTableByName(
+            Model model, String databaseName, String schemaName, String tableName) {
+        Schema schema = findSchemaByName(model, databaseName, schemaName);
         if (schema != null) {
             return findTableByName(schema, tableName);
         }
-        logger.debug("Table not found: {}", qualifiedTableName);
+        logger.debug("Table not found: {}", tableName);
         return null;
     }
 
@@ -187,12 +173,9 @@ public class DatabaseLogic {
         return null;
     }
 
-    public static @Nullable Column findColumnByQualifiedName(
-            Model model, String qualifiedColumnName) {
-        int lastDot = qualifiedColumnName.lastIndexOf(".");
-        String qualifiedTableName = qualifiedColumnName.substring(0, lastDot);
-        String columnName = qualifiedColumnName.substring(lastDot + 1);
-        Table table = findTableByQualifiedName(model, qualifiedTableName);
+    public static @Nullable Column findColumnByName(
+            Model model, String databaseName, String schemaName, String tableName, String columnName) {
+        Table table = findTableByName(model, databaseName, schemaName, tableName);
         if (table != null) {
             for (Column column : table.getColumns()) {
                 if (column.getColumnName().equals(columnName)) {
@@ -200,16 +183,8 @@ public class DatabaseLogic {
                 }
             }
         }
-        logger.debug("Column not found: {}", qualifiedColumnName);
+        logger.debug("Column not found: {}", columnName);
         return null;
-    }
-
-    public static @Nullable ForeignKey findOneToManyRelationship(Model model,
-                                                String qualifiedTableName,
-                                                String relationshipName) {
-        Table table = findTableByQualifiedName(model, qualifiedTableName);
-        assert table != null;
-        return table.findOneToManyRelationshipByName(relationshipName);
     }
 
     public static @Nullable ForeignKey findOneToManyRelationship(Model model,

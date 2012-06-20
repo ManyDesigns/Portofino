@@ -33,35 +33,29 @@ public class ApplicationTest extends AbstractPortofinoTest {
     }
 
     public void testFindSchemaByQualifiedName() {
-        String qualifiedName = "jpetstore.PUBLIC";
-        Schema schema = DatabaseLogic.findSchemaByQualifiedName(model, qualifiedName);
+        Schema schema = DatabaseLogic.findSchemaByName(model, "jpetstore", "PUBLIC");
         assertNotNull(schema);
-        assertEquals(qualifiedName, schema.getQualifiedName());
+        assertEquals("jpetstore.PUBLIC", schema.getQualifiedName());
 
-        String dummyName = "jpetstore.foo";
-        schema = DatabaseLogic.findSchemaByQualifiedName(model, dummyName);
+        schema = DatabaseLogic.findSchemaByName(model, "jpetstore", "foo");
         assertNull(schema);
     }
 
     public void testFindTableByQualifiedName() {
-        String qualifiedName = "jpetstore.PUBLIC.product";
-        Table table = DatabaseLogic.findTableByQualifiedName(model, qualifiedName);
+        Table table = DatabaseLogic.findTableByName(model, "jpetstore", "PUBLIC", "product");
         assertNotNull(table);
-        assertEquals(qualifiedName, table.getQualifiedName());
+        assertEquals("jpetstore.PUBLIC.product", table.getQualifiedName());
 
-        String dummyName = "jpetstore.PUBLIC.foo";
-        table = DatabaseLogic.findTableByQualifiedName(model, dummyName);
+        table = DatabaseLogic.findTableByName(model, "jpetstore", "PUBLIC", "foo");
         assertNull(table);
     }
 
     public void testFindColumnByQualifiedName() {
-        String qualifiedName = "jpetstore.PUBLIC.product.category";
-        Column column = DatabaseLogic.findColumnByQualifiedName(model, qualifiedName);
+        Column column = DatabaseLogic.findColumnByName(model, "jpetstore", "PUBLIC", "product", "category");
         assertNotNull(column);
-        assertEquals(qualifiedName, column.getQualifiedName());
+        assertEquals("jpetstore.PUBLIC.product.category", column.getQualifiedName());
 
-        String dummyName = "jpetstore.PUBLIC.product.foo";
-        column = DatabaseLogic.findColumnByQualifiedName(model, dummyName);
+        column = DatabaseLogic.findColumnByName(model, "jpetstore", "PUBLIC", "product", "foo");
         assertNull(column);
     }
 }
