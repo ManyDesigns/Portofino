@@ -56,10 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.text.MessageFormat;
 import java.util.*;
@@ -77,9 +74,9 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
-            {{"id", "navigationRoot", "description", "template", "detailTemplate"}};
+            {{"id", "navigationRoot", "description", "template", "detailTemplate", "applyTemplateRecursively"}};
     public static final String[][] PAGE_CONFIGURATION_FIELDS_NO_DETAIL =
-            {{"id", "navigationRoot", "description", "template" }};
+            {{"id", "navigationRoot", "description", "template", "applyTemplateRecursively"}};
     public static final String PAGE_PORTLET_NOT_CONFIGURED = "/layouts/portlet-not-configured.jsp";
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
@@ -461,8 +458,33 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             logger.error("Couldn't save page", e);
             return false; //TODO handle return value + script + session msg
         }
+        if(edit.applyTemplateRecursively) {
+            FileFilter filter = new FileFilter() {
+                public boolean accept(File pathname) {
+                    return pathname.isDirectory();
+                }
+            };
+            updateTemplate(pageInstance.getDirectory(), filter, edit);
+        }
         updateScript();
         return true;
+    }
+
+    protected void updateTemplate(File directory, FileFilter filter, EditPage edit) {
+        File[] children = directory.listFiles(filter);
+        for(File child : children) {
+            if(!child.getName().equals(PageInstance.DETAIL)) {
+                try {
+                    Page page = DispatcherLogic.loadPage(child);
+                    page.getLayout().setTemplate(edit.template);
+                    page.getDetailLayout().setTemplate(edit.detailTemplate);
+                    DispatcherLogic.savePage(child, page);
+                } catch (Exception e) {
+                    logger.warn("Could not set template of " + child.getAbsolutePath(), e);
+                }
+            }
+            updateTemplate(child, filter, edit);
+        }
     }
 
     public String getTitle() {

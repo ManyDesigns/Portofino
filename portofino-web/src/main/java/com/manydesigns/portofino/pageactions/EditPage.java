@@ -56,4 +56,8 @@ public class EditPage {
     @Required
     public String detailTemplate;
 
+    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.applyTemplateRecursively")
+    @Required
+    public boolean applyTemplateRecursively;
+
 }
