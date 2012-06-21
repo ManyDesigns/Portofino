@@ -126,6 +126,8 @@ public class MonthReportAction extends AbstractPageAction {
             new Font(Font.HELVETICA, 10, Font.BOLD, Color.BLACK);
     public Font tableBodyFont   =
             new Font(Font.HELVETICA, 7, Font.NORMAL, Color.BLACK);
+    public Font tableBodySmallFont =
+            new Font(Font.HELVETICA, 6, Font.NORMAL, Color.BLACK);
     public Font headerFont      =
             new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
 
@@ -312,7 +314,7 @@ public class MonthReportAction extends AbstractPageAction {
         for (int i = 0; i < daysCount; i++) {
             MonthReportModel.Day day = monthReportModel.getDay(i);
             String text = dayOfMonthFormatter.print(day.getDayStart());
-            PdfPCell cell = createCell(text, Element.ALIGN_CENTER);
+            PdfPCell cell = createCell(text, Element.ALIGN_CENTER, tableBodyFont);
             if (day.isNonWorking()) {
                 cell.setBackgroundColor(REPORT_NON_WORKING_COLOR);
             }
@@ -326,7 +328,7 @@ public class MonthReportAction extends AbstractPageAction {
         for (int i = 0; i < daysCount; i++) {
             MonthReportModel.Day day = monthReportModel.getDay(i);
             String text = dayOfWeekFormatter.print(day.getDayStart());
-            PdfPCell cell = createCell(text, Element.ALIGN_CENTER);
+            PdfPCell cell = createCell(text, Element.ALIGN_CENTER, tableBodyFont);
             if (day.isNonWorking()) {
                 cell.setBackgroundColor(REPORT_NON_WORKING_COLOR);
             }
@@ -415,9 +417,10 @@ public class MonthReportAction extends AbstractPageAction {
         List<MonthReportModel.Node> childNodes = node.getChildNodes();
         Color color = node.getColor();
         Color nonWorkingColor = ColorUtils.multiply(color, REPORT_NON_WORKING_COLOR);
+        int minutesTotal = node.getMinutesTotal();
         if (childNodes.isEmpty()) {
             logger.debug("Leaf node: {}", node.getId());
-            PdfPCell cell = createCell(node.getName(), Element.ALIGN_LEFT);
+            PdfPCell cell = createCell(node.getName(), Element.ALIGN_LEFT, tableBodyFont);
             float paddingLeft = cell.getPaddingLeft() + indentation * 2;
             cell.setPaddingLeft(paddingLeft);
             cell.setBackgroundColor(color);
@@ -425,12 +428,12 @@ public class MonthReportAction extends AbstractPageAction {
 
             printNodeMinutes(table, node, color, nonWorkingColor);
 
-            addCell(table, Integer.toString(node.getMinutesTotal()), totalAlignment);
+            addCell(table, formatMinutes(minutesTotal), totalAlignment);
             addCell(table, "", Element.ALIGN_CENTER);
         } else {
             logger.debug("Non-leaf node: {}", node.getId());
             logger.debug("Printing node header", node.getId());
-            PdfPCell cell = createCell(node.getName(), Element.ALIGN_LEFT);
+            PdfPCell cell = createCell(node.getName(), Element.ALIGN_LEFT, tableBodyFont);
             float paddingLeft = cell.getPaddingLeft() + indentation * 2;
             cell.setPaddingLeft(paddingLeft);
             cell.setBackgroundColor(color);
@@ -449,9 +452,13 @@ public class MonthReportAction extends AbstractPageAction {
             logger.debug("Printing node footer", node.getId());
             addCell(table, "Total (" + node.getName() + ")", Element.ALIGN_RIGHT);
             printNodeMinutes(table, node, null, REPORT_NON_WORKING_COLOR);
-            addCell(table, Integer.toString(node.getMinutesTotal()), totalAlignment);
+            addCell(table, formatMinutes(minutesTotal), totalAlignment);
             addCell(table, "", Element.ALIGN_CENTER);
         }
+    }
+
+    protected String formatMinutes(int minutesTotal) {
+        return String.format("%d:%02d", minutesTotal / 60, minutesTotal % 60);
     }
 
     public void printNodeMinutes(PdfPTable table, MonthReportModel.Node node,
@@ -463,7 +470,13 @@ public class MonthReportAction extends AbstractPageAction {
                     ? nonWorkingColor
                     : color;
             int minutes = node.getMinutes(i);
-            addCell(table, Integer.toString(minutes), Element.ALIGN_CENTER, actualBackgroundColor);
+            Font font;
+            if(minutes >= 600) {
+                font = tableBodySmallFont;
+            } else {
+                font = tableBodyFont;
+            }
+            addCell(table, formatMinutes(minutes), Element.ALIGN_CENTER, actualBackgroundColor, font);
         }
     }
 
@@ -486,12 +499,22 @@ public class MonthReportAction extends AbstractPageAction {
 
     public PdfPCell addCell(PdfPTable table, String text, int alignment)
             throws Exception {
-        return addCell(table, text, alignment, null);
+        return addCell(table, text, alignment, null, tableBodyFont);
+    }
+
+    public PdfPCell addCell(PdfPTable table, String text, int alignment, Font font)
+            throws Exception {
+        return addCell(table, text, alignment, null, font);
     }
 
     public PdfPCell addCell(PdfPTable table, String text, int alignment, Color backgroundColor)
             throws Exception {
-        PdfPCell cell = createCell(text, alignment);
+        return addCell(table, text, alignment, backgroundColor, tableBodyFont);
+    }
+
+    public PdfPCell addCell(PdfPTable table, String text, int alignment, Color backgroundColor, Font font)
+            throws Exception {
+        PdfPCell cell = createCell(text, alignment, font);
         if (backgroundColor != null) {
             cell.setBackgroundColor(backgroundColor);
         }
@@ -499,8 +522,8 @@ public class MonthReportAction extends AbstractPageAction {
         return cell;
     }
 
-    public PdfPCell createCell(String text, int alignment) throws Exception {
-        PdfPCell cell = new PdfPCell(new Phrase(text, tableBodyFont));
+    public PdfPCell createCell(String text, int alignment, Font font) throws Exception {
+        PdfPCell cell = new PdfPCell(new Phrase(text, font));
         cell.setHorizontalAlignment(alignment);
         cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         return cell;
