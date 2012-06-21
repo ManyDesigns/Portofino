@@ -126,8 +126,6 @@ public class MonthReportAction extends AbstractPageAction {
             new Font(Font.HELVETICA, 10, Font.BOLD, Color.BLACK);
     public Font tableBodyFont   =
             new Font(Font.HELVETICA, 7, Font.NORMAL, Color.BLACK);
-    public Font tableBodySmallFont =
-            new Font(Font.HELVETICA, 6, Font.NORMAL, Color.BLACK);
     public Font headerFont      =
             new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
 
@@ -293,14 +291,13 @@ public class MonthReportAction extends AbstractPageAction {
 
 
         int daysCount = monthReportModel.getDaysCount();
-        int columnCount = daysCount + 3;
+        int columnCount = daysCount + 2;
         float[] colsWidth = new float[columnCount];
         colsWidth[0] = 5f;
         for (int i = 0; i < daysCount; i++) {
-            colsWidth[i + 1] = 1f;
+            colsWidth[i + 1] = 1.2f;
         }
-        colsWidth[columnCount - 2] = 1.5f;
-        colsWidth[columnCount - 1] = 2.5f;
+        colsWidth[columnCount - 1] = 1.5f;
 
         PdfPTable table = new PdfPTable(colsWidth); // Code 1
         table.setSpacingBefore(10f);
@@ -321,7 +318,6 @@ public class MonthReportAction extends AbstractPageAction {
             table.addCell(cell);
         }
         addCell(table, "Total", totalAlignment);
-        addCell(table, "Notes", Element.ALIGN_CENTER);
 
         // Day of week row
         addCell(table, "Day", Element.ALIGN_LEFT);
@@ -335,8 +331,6 @@ public class MonthReportAction extends AbstractPageAction {
             table.addCell(cell);
         }
         addCell(table, "", totalAlignment);
-        addCell(table, "", Element.ALIGN_CENTER);
-
 
         // table body
         MonthReportModel.Node rootNode = monthReportModel.getRootNode();
@@ -429,7 +423,6 @@ public class MonthReportAction extends AbstractPageAction {
             printNodeMinutes(table, node, color, nonWorkingColor);
 
             addCell(table, formatMinutes(minutesTotal), totalAlignment);
-            addCell(table, "", Element.ALIGN_CENTER);
         } else {
             logger.debug("Non-leaf node: {}", node.getId());
             logger.debug("Printing node header", node.getId());
@@ -442,7 +435,6 @@ public class MonthReportAction extends AbstractPageAction {
             printNodeBlankMinutes(table, node, color, nonWorkingColor);
 
             addCell(table, "", Element.ALIGN_CENTER);
-            addCell(table, "", Element.ALIGN_CENTER);
 
             logger.debug("Printing child nodes", node.getId());
             for (MonthReportModel.Node current : childNodes) {
@@ -453,7 +445,6 @@ public class MonthReportAction extends AbstractPageAction {
             addCell(table, "Total (" + node.getName() + ")", Element.ALIGN_RIGHT);
             printNodeMinutes(table, node, null, REPORT_NON_WORKING_COLOR);
             addCell(table, formatMinutes(minutesTotal), totalAlignment);
-            addCell(table, "", Element.ALIGN_CENTER);
         }
     }
 
@@ -470,13 +461,7 @@ public class MonthReportAction extends AbstractPageAction {
                     ? nonWorkingColor
                     : color;
             int minutes = node.getMinutes(i);
-            Font font;
-            if(minutes >= 600) {
-                font = tableBodySmallFont;
-            } else {
-                font = tableBodyFont;
-            }
-            addCell(table, formatMinutes(minutes), Element.ALIGN_CENTER, actualBackgroundColor, font);
+            addCell(table, formatMinutes(minutes), Element.ALIGN_CENTER, actualBackgroundColor);
         }
     }
 
