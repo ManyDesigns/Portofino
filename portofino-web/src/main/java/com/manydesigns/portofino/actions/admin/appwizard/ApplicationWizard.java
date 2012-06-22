@@ -1330,6 +1330,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.userIdProperty = userIdProperty;
     }
 
+    @LabelI18N("appwizard.userTable.passwordProperty")
     public String getUserPasswordProperty() {
         return userPasswordProperty;
     }

@@ -132,9 +132,17 @@
             return url;
         };
 
+        var firstReqConf = {};
+        <% if(actionBean.getFirstResult() != null) { %>
+            firstReqConf['pagination'] = {
+                recordOffset: <%= actionBean.getFirstResult() %>,
+                rowsPerPage:  <%= actionBean.getMaxResults() %>
+            };
+        <% } %>
+
         var myConfigs = {
             generateRequest: generateRequest,
-            initialRequest: generateRequest(),
+            initialRequest: generateRequest(firstReqConf),
             dynamicData: true,
             MSG_EMPTY: '<fmt:message key="layouts.crud.datatable.msg_empty"/>'
         };
