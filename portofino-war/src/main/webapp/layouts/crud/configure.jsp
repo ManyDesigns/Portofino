@@ -28,19 +28,36 @@
         </fieldset>
         <c:if test="${not empty actionBean.propertiesTableForm}">
             <script type="text/javascript">
-                var inputs = $("#crudPropertiesFieldset tr").find("td:first input[type=checkbox]");
-                inputs.each(function(i, obj) {
-                    obj = $(obj);
-                    var rowInputs = obj.parent().siblings().find("input");
-                    function toggleRow() {
+                $(function() {
+                    function updateRow(obj) {
+                        var rowInputs = obj.parent().siblings().find("input");
                         if(!obj.is(':checked')) {
-                            rowInputs.attr('disabled', 'disabled');
+                            rowInputs.prop('disabled', 'disabled');
                         } else {
-                            rowInputs.removeAttr('disabled');
+                            rowInputs.removeProp('disabled');
                         }
                     }
-                    obj.click(toggleRow);
-                    toggleRow();
+
+                    var inputs = $("#crudPropertiesFieldset tr").find("td:first input[type=checkbox]");
+                    inputs.each(function() {
+                        var obj = $(this);
+                        obj.click(function() { updateRow(obj) });
+                        updateRow(obj);
+                    });
+
+                    var firstCell = $("#crudPropertiesFieldset tr:first th:first");
+                    firstCell.append("<input type='checkbox' />")
+                    var allCheckbox = firstCell.find("input")
+                    allCheckbox.click(function() {
+                        inputs.each(function() {
+                            if(!allCheckbox.is(':checked')) {
+                                $(this).removeProp('checked');
+                            } else {
+                                $(this).prop('checked', 'checked');
+                            }
+                            updateRow($(this));
+                        })
+                    });
                 });
             </script>
         </c:if>
