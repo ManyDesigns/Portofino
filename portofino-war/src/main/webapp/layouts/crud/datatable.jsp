@@ -28,6 +28,8 @@
 </div>
 <input type="hidden" name="sortProperty" value="${actionBean.sortProperty}" />
 <input type="hidden" name="sortDirection" value="${actionBean.sortDirection}" />
+<input type="hidden" name="firstResult" value="${actionBean.firstResult}" />
+<input type="hidden" name="maxResults" value="${actionBean.maxResults}" />
 <script type="text/javascript">
     var initDatatable_<c:out value="${pageId}" /> = function() {
         var elementsFormatter = function(elCell, oRecord, oColumn, sData) {
@@ -109,14 +111,14 @@
             oState = oState || { pagination: null, sortedBy: null };
             var sort = (oState.sortedBy) ? oState.sortedBy.key : "";
             var dir = (oState.sortedBy && oState.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc";
-            var startIndex = (oState.pagination) ? oState.pagination.recordOffset : 0;
+            var firstResult = (oState.pagination) ? oState.pagination.recordOffset : 0;
             var maxResults = null;
             <c:if test="${actionBean.crudConfiguration.paginated}">
                 maxResults = (oState.pagination) ? oState.pagination.rowsPerPage : ${actionBean.crudConfiguration.rowsPerPage};
             </c:if>
 
             // Build custom request
-            var url = "&firstResult=" + startIndex + "&sortProperty=" + sort + "&sortDirection=" + dir;
+            var url = "&firstResult=" + firstResult + "&sortProperty=" + sort + "&sortDirection=" + dir;
             if(maxResults) {
                 url += "&maxResults=" + maxResults;
             }
@@ -125,16 +127,26 @@
                     '<%= StringEscapeUtils.escapeJavaScript(actionBean.getSearchString()) %>');
             </c:if>
 
-            //Update sort input fields in the form
+            //Update pagination & sort input fields in the form
             $('#<c:out value="portlet_${pageId}" /> input[name=sortProperty]').val(sort);
             $('#<c:out value="portlet_${pageId}" /> input[name=sortDirection]').val(dir);
+            $('#<c:out value="portlet_${pageId}" /> input[name=firstResult]').val(firstResult);
+            $('#<c:out value="portlet_${pageId}" /> input[name=maxResults]').val(maxResults);
 
             return url;
         };
 
+        var firstReqConf = {};
+        <% if(actionBean.getFirstResult() != null) { %>
+            firstReqConf['pagination'] = {
+                recordOffset: <%= actionBean.getFirstResult() %>,
+                rowsPerPage:  <%= actionBean.getMaxResults() %>
+            };
+        <% } %>
+
         var myConfigs = {
             generateRequest: generateRequest,
-            initialRequest: generateRequest(),
+            initialRequest: generateRequest(firstReqConf),
             dynamicData: true,
             MSG_EMPTY: '<fmt:message key="layouts.crud.datatable.msg_empty"/>'
         };

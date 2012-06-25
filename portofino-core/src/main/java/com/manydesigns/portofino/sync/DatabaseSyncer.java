@@ -27,10 +27,15 @@ import com.manydesigns.portofino.model.Annotated;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.model.database.Column;
+import com.manydesigns.portofino.model.database.ForeignKey;
+import com.manydesigns.portofino.model.database.PrimaryKey;
+import com.manydesigns.portofino.model.database.Schema;
+import com.manydesigns.portofino.model.database.Table;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
-import liquibase.database.structure.ForeignKeyConstraintType;
+import liquibase.database.structure.*;
 import liquibase.snapshot.DatabaseSnapshot;
 import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
 import org.apache.commons.beanutils.BeanUtils;
@@ -147,7 +152,7 @@ public class DatabaseSyncer {
 
     protected void syncForeignKeys(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
         for(liquibase.database.structure.ForeignKey liquibaseFK : databaseSnapshot.getForeignKeys()) {
-            String fkTableName = liquibaseFK.getForeignKeyTable().getName();
+            String fkTableName = normalizeTableName(liquibaseFK.getForeignKeyTable().getName(), databaseSnapshot);
             Table sourceTable = DatabaseLogic.findTableByName(sourceSchema, fkTableName);
             String fkName = liquibaseFK.getName();
 
@@ -171,7 +176,7 @@ public class DatabaseSyncer {
             targetFK.setToDatabase(targetSchema.getDatabaseName());
 
             String pkSchemaName = liquibasePkTable.getSchema();
-            String pkTableName = liquibasePkTable.getName();
+            String pkTableName = normalizeTableName(liquibasePkTable.getName(), databaseSnapshot);
             targetFK.setToSchema(pkSchemaName);
             targetFK.setToTableName(pkTableName);
             if (pkSchemaName == null || pkTableName == null) {
@@ -231,8 +236,8 @@ public class DatabaseSyncer {
 
             boolean referencesHaveErrors = false;
             for(int i = 0; i < fromColumnNames.length; i++) {
-                String fromColumnName = fromColumnNames[i].trim();
-                String toColumnName = toColumnNames[i].trim();
+                String fromColumnName = normalizeColumnName(fromColumnNames[i], fkTableName, databaseSnapshot);
+                String toColumnName = normalizeColumnName(toColumnNames[i], pkTableName, databaseSnapshot);
 
                 Column fromColumn =
                         DatabaseLogic.findColumnByName(
@@ -254,7 +259,7 @@ public class DatabaseSyncer {
                             new Object[] {
                                     pkTable.getSchemaName(),
                                     pkTable.getTableName(),
-                                    toColumn
+                                    toColumnName
                             });
                     referencesHaveErrors = true;
                 }
@@ -294,10 +299,23 @@ public class DatabaseSyncer {
         }
     }
 
+    protected String normalizeColumnName
+            (String columnName, String tableName, DatabaseSnapshot databaseSnapshot) {
+        return databaseSnapshot.getColumn(tableName, columnName.trim()).getName();
+    }
+
+    protected String normalizeTableName(String tableName, DatabaseSnapshot databaseSnapshot) {
+        String fkTableName = tableName;
+        //Work around MySQL & case-insensitive dbs
+        liquibase.database.structure.Table fkTable = databaseSnapshot.getTable(fkTableName);
+        fkTableName = fkTable.getName();
+        return fkTableName;
+    }
+
     protected void syncPrimaryKeys(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
         logger.debug("Synchronizing primary keys");
         for(liquibase.database.structure.PrimaryKey liquibasePK : databaseSnapshot.getPrimaryKeys()) {
-            String pkTableName = liquibasePK.getTable().getName();
+            String pkTableName = normalizeTableName(liquibasePK.getTable().getName(), databaseSnapshot);
 
             Table sourceTable = DatabaseLogic.findTableByName(sourceSchema, pkTableName);
             PrimaryKey sourcePK;
@@ -387,8 +405,9 @@ public class DatabaseSyncer {
         logger.debug("Synchronizing tables");
         for (liquibase.database.structure.Table liquibaseTable
                 : databaseSnapshot.getTables()) {
-            logger.debug("Processing table: {}", liquibaseTable.getName());
-            Table sourceTable = DatabaseLogic.findTableByName(sourceSchema, liquibaseTable.getName());
+            String tableName = normalizeTableName(liquibaseTable.getName(), databaseSnapshot);
+            logger.debug("Processing table: {}", tableName);
+            Table sourceTable = DatabaseLogic.findTableByName(sourceSchema, tableName);
             if(sourceTable == null) {
                 sourceTable = new Table();
             }
@@ -396,7 +415,7 @@ public class DatabaseSyncer {
             Table targetTable = new Table(targetSchema);
             targetSchema.getTables().add(targetTable);
 
-            targetTable.setTableName(liquibaseTable.getName());
+            targetTable.setTableName(tableName);
 
             logger.debug("Merging table attributes and annotations");
             targetTable.setEntityName(sourceTable.getEntityName());

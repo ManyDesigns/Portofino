@@ -28,6 +28,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
@@ -42,6 +43,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -343,24 +346,34 @@ public class TextAction extends AbstractPageAction {
     }*/
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
-    @RequiresPermissions(level = AccessLevel.DEVELOP)
-    public Resolution configure() {
+    @RequiresPermissions(level = AccessLevel.EDIT)
+    public Resolution configure() throws IOException {
         prepareConfigurationForms();
+        loadContent();
         return new ForwardResolution("/layouts/text/configure.jsp");
     }
 
     @Button(list = "configuration", key = "commons.updateConfiguration")
-    @RequiresPermissions(level = AccessLevel.DEVELOP)
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updateConfiguration() throws IOException {
         prepareConfigurationForms();
         readPageConfigurationFromRequest();
         boolean valid = validatePageConfiguration();
         if (valid) {
             updatePageConfiguration();
+            saveContent();
             SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
             return cancel();
         } else {
             return new ForwardResolution("/layouts/text/configure.jsp");
+        }
+    }
+
+    @Override
+    protected void updateScript() {
+        Subject subject = SecurityUtils.getSubject();
+        if(SecurityLogic.hasPermissions(getPageInstance(), subject, AccessLevel.DEVELOP)) {
+            super.updateScript();
         }
     }
 

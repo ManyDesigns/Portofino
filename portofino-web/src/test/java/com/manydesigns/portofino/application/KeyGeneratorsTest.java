@@ -60,7 +60,6 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
 
     public void testAutoIncrementGenerator(){
         Map<String, Object> supplier = new HashMap<String, Object>();
-        String supplierTable = "jpetstore.PUBLIC.supplier";
         String supplierEntity = "jpetstore_public_supplier";
         supplier.put("$type$", supplierEntity);
         supplier.put("status", "99");
@@ -68,8 +67,8 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         Session session = application.getSession("jpetstore");
         session.save(supplierEntity, supplier);
         session.getTransaction().commit();
-        Table table = DatabaseLogic.findTableByQualifiedName(
-                model, supplierTable);
+        Table table = DatabaseLogic.findTableByName(
+                model, "jpetstore", "PUBLIC", "supplier");
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         final int expectedId = 3;
@@ -88,14 +87,13 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
 
     public void testSequenceGenerator(){
         Map<String, Object> supplier = new HashMap<String, Object>();
-        final String testTable = "hibernatetest.PUBLIC.test";
         final String testEntity = "hibernatetest_public_test";
         supplier.put("$type$", testEntity);
         Session session = application.getSession("hibernatetest");
         session.save(testEntity, supplier);
         session.getTransaction().commit();
-        Table table = DatabaseLogic.findTableByQualifiedName(
-                model, testTable);
+        Table table = DatabaseLogic.findTableByName(
+                model, "hibernatetest", "PUBLIC", "test");
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         final long expectedId = 1;
@@ -112,7 +110,6 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
     public void testTableGenerator(){
         Map<String, Object> order = new HashMap<String, Object>();
         final int expectedId = 1000;
-        final String ordersTable = "jpetstore.PUBLIC.orders";
         String ordersEntity = "jpetstore_public_orders";
         order.put("$type$", ordersEntity);
         order.put("userid", "99");
@@ -143,8 +140,8 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
         Session session = application.getSession("jpetstore");
         session.save(ordersEntity ,order);
         QueryUtils.commit(application, "jpetstore");
-        Table table = DatabaseLogic.findTableByQualifiedName(
-                model, ordersTable);
+        Table table = DatabaseLogic.findTableByName(
+                model, "jpetstore", "PUBLIC", "orders");
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria criteria = new TableCriteria(table);
         try {

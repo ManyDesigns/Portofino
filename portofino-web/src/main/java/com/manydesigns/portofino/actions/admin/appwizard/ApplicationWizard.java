@@ -31,6 +31,7 @@ package com.manydesigns.portofino.actions.admin.appwizard;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.LabelI18N;
+import com.manydesigns.elements.annotations.Password;
 import com.manydesigns.elements.fields.BooleanField;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
@@ -53,6 +54,7 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
@@ -69,6 +71,8 @@ import com.manydesigns.portofino.sync.DatabaseSyncer;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
+import liquibase.database.DatabaseFactory;
+import liquibase.database.jvm.JdbcConnection;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
 import org.apache.commons.collections.MultiHashMap;
@@ -145,7 +149,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     protected Table userTable;
     protected Table groupTable;
     protected Table userGroupTable;
-    protected int columnsInSummary = 5;
+    protected int maxColumnsInSummary = 5;
     protected int maxDepth = 5;
     protected int depth;
 
@@ -162,10 +166,10 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     @Button(list = "select-schemas", key="wizard.prev", order = 1)
     public Resolution start() {
         buildCPForms();
-        return createSelectionProviderForm();
+        return createConnectionProviderForm();
     }
 
-    protected Resolution createSelectionProviderForm() {
+    protected Resolution createConnectionProviderForm() {
         step = 0;
         return new ForwardResolution("/layouts/admin/appwizard/create-connection-provider.jsp");
     }
@@ -230,7 +234,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             connectionProviderForm.writeToObject(edit);
             return afterCreateConnectionProvider();
         } else {
-            return createSelectionProviderForm();
+            return createConnectionProviderForm();
         }
     }
 
@@ -240,7 +244,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         } catch (Exception e) {
             logger.error("Couldn't read schema names from db", e);
             SessionMessages.addErrorMessage(getMessage("appwizard.error.schemas", e));
-            return createSelectionProviderForm();
+            return createConnectionProviderForm();
         }
         return selectSchemasForm();
     }
@@ -352,7 +356,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         roots = determineRoots(children, allTables);
         Collections.sort(allTables, new Comparator<Table>() {
             public int compare(Table o1, Table o2) {
-                return o1.getActualEntityName().compareToIgnoreCase(o2.getActualEntityName());
+                return o1.getQualifiedName().compareToIgnoreCase(o2.getQualifiedName());
             }
         });
         rootsForm = new TableFormBuilder(SelectableRoot.class)
@@ -372,24 +376,24 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             PropertyAccessor userGroupPropertyAccessor = classAccessor.getProperty("userGroupTableName");
 
             DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("tableName");
-            for(SelectableSchema selectableSchema : selectableSchemas) {
-                if(selectableSchema.selected) {
-                    Schema schema = DatabaseLogic.findSchemaByName(
-                            connectionProvider.getDatabase(), selectableSchema.schemaName);
 
-                    List<Table> tables = new ArrayList<Table>(schema.getTables());
-                    Collections.sort(tables, new Comparator<Table>() {
-                        public int compare(Table o1, Table o2) {
-                            return o1.getActualEntityName().compareToIgnoreCase(o2.getActualEntityName());
-                        }
-                    });
-                    for(Table table : tables) {
-                        selectionProvider.appendRow(
-                                table.getQualifiedName(),
-                                schema.getSchemaName() + "." + table.getActualEntityName(),
-                                true);
-                    }
+            int schemaCount = 0;
+            for(SelectableSchema schema : selectableSchemas) {
+                if(schema.selected) {
+                    schemaCount++;
                 }
+            }
+            for(Table table : allTables) {
+                String tableName;
+                if(schemaCount > 1) {
+                    tableName = table.getSchemaName() + "." + table.getTableName();
+                } else {
+                    tableName = table.getTableName();
+                }
+                selectionProvider.appendRow(
+                        table.getQualifiedName(),
+                        tableName,
+                        true);
             }
             Mode mode = Mode.CREATE;
 
@@ -516,14 +520,17 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         if(!StringUtils.isEmpty(userTableName)) {
             Model tmpModel = new Model();
             tmpModel.getDatabases().add(connectionProvider.getDatabase());
-            userTable = DatabaseLogic.findTableByQualifiedName(tmpModel, userTableName);
+            String[] name = Table.splitQualifiedName(userTableName);
+            userTable = DatabaseLogic.findTableByName(tmpModel, name[0], name[1], name[2]);
 
             if(!StringUtils.isEmpty(groupTableName)) {
-                groupTable = DatabaseLogic.findTableByQualifiedName(tmpModel, groupTableName);
+                name = Table.splitQualifiedName(groupTableName);
+                groupTable = DatabaseLogic.findTableByName(tmpModel, name[0], name[1], name[2]);
             }
 
             if(!StringUtils.isEmpty(userGroupTableName)) {
-                userGroupTable = DatabaseLogic.findTableByQualifiedName(tmpModel, userGroupTableName);
+                name = Table.splitQualifiedName(userGroupTableName);
+                userGroupTable = DatabaseLogic.findTableByName(tmpModel, name[0], name[1], name[2]);
                 userGroupTable.setManyToMany(true);
             }
 
@@ -961,34 +968,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             int summ = 0;
             String linkToParentProperty = bindings.get("linkToParentProperty");
             for(Column column : table.getColumns()) {
-                @SuppressWarnings({"StringEquality"})
-                boolean propertyEnabled =
-                        !(linkToParentProperty != NO_LINK_TO_PARENT &&
-                        column.getActualPropertyName().equals(linkToParentProperty))
-                        && !isUnsupportedProperty(column);
-                boolean propertyEditable = propertyEnabled && !column.isAutoincrement();
-                boolean propertyIsUserPassword =
-                        table.getTableName().equals(userTableName) &&
-                        column.getActualPropertyName().equals(userPasswordProperty);
-                boolean inSummary =
-                        (table.getPrimaryKey().getColumns().contains(column) || summ < columnsInSummary) &&
-                        !propertyIsUserPassword;
-
-                CrudProperty crudProperty = new CrudProperty();
-                crudProperty.setEnabled(propertyEnabled);
-                crudProperty.setName(column.getActualPropertyName());
-                crudProperty.setUpdatable(propertyEditable);
-                crudProperty.setInsertable(propertyEditable);
-                if(inSummary) {
-                    crudProperty.setInSummary(true);
-                    crudProperty.setSearchable(true);
-                    summ++;
-                }
-                configuration.getProperties().add(crudProperty);
-
-                if(!configuration.isLargeResultSet()) {
-                    detectBooleanColumn(table, column);
-                }
+                summ = setupColumn(column, configuration, summ, linkToParentProperty);
             }
 
             DispatcherLogic.saveConfiguration(dir, configuration);
@@ -1032,6 +1012,79 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         }
     }
 
+    protected int setupColumn
+            (Column column, CrudConfiguration configuration, int columnsInSummary, String linkToParentProperty) {
+        Table table = column.getTable();
+        @SuppressWarnings({"StringEquality"})
+        boolean enabled =
+                !(linkToParentProperty != NO_LINK_TO_PARENT &&
+                column.getActualPropertyName().equals(linkToParentProperty))
+                && !isUnsupportedProperty(column);
+        boolean propertyIsUserPassword =
+                table.getQualifiedName().equals(userTableName) &&
+                column.getActualPropertyName().equals(userPasswordProperty);
+        boolean inPk = isInPk(column);
+        boolean inFk = isInFk(column);
+        boolean inSummary =
+                enabled &&
+                (inPk || columnsInSummary < maxColumnsInSummary) &&
+                !propertyIsUserPassword;
+        boolean updatable = enabled && !column.isAutoincrement() && !inPk;
+        boolean insertable = enabled && !column.isAutoincrement();
+
+        if(!configuration.isLargeResultSet()) {
+            detectBooleanColumn(table, column);
+        }
+
+        if(enabled && inPk && !inFk &&
+           Number.class.isAssignableFrom(column.getActualJavaType())) {
+            for(PrimaryKeyColumn pkc : table.getPrimaryKey().getPrimaryKeyColumns()) {
+                if(pkc.getActualColumn().equals(column)) {
+                    pkc.setGenerator(new IncrementGenerator(pkc));
+                    insertable = false;
+                    break;
+                }
+            }
+        }
+
+        if(propertyIsUserPassword) {
+            Annotation annotation = new Annotation(column, Password.class.getName());
+            column.getAnnotations().add(annotation);
+            insertable = false;
+            updatable = false;
+        }
+
+        CrudProperty crudProperty = new CrudProperty();
+        crudProperty.setEnabled(enabled);
+        crudProperty.setName(column.getActualPropertyName());
+        crudProperty.setInsertable(insertable);
+        crudProperty.setUpdatable(updatable);
+        if(inSummary) {
+            crudProperty.setInSummary(true);
+            crudProperty.setSearchable(true);
+            columnsInSummary++;
+        }
+        configuration.getProperties().add(crudProperty);
+
+        return columnsInSummary;
+    }
+
+    protected static boolean isInPk(Column column) {
+        return column.getTable().getPrimaryKey().getColumns().contains(column);
+    }
+
+    protected static boolean isInFk(Column column) {
+        Table table = column.getTable();
+        for(ForeignKey fk : table.getForeignKeys()) {
+            for(Reference ref : fk.getReferences()) {
+                if(ref.getActualFromColumn().equals(column)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     protected boolean isUnsupportedProperty(Column column) {
         //I blob su db non sono supportati al momento
         return column.getJdbcType() == Types.BLOB || column.getJdbcType() == Types.LONGVARBINARY;
@@ -1043,34 +1096,58 @@ public class ApplicationWizard extends AbstractWizardPageAction {
            column.getJdbcType() == Types.NUMERIC) {
             //Detect booleans
             Connection connection = null;
-            String sql =
-                    "select distinct(\"" + column.getColumnName() + "\") " +
-                    "from \"" + table.getSchemaName() + "\".\"" + table.getTableName() + "\"";
+
             try {
                 connection = connectionProvider.acquireConnection();
+                liquibase.database.Database implementation =
+                        DatabaseFactory.getInstance().findCorrectDatabaseImplementation(
+                                new JdbcConnection(connection));
+                String sql =
+                    "select count(" + implementation.escapeDatabaseObject(column.getColumnName()) + ") " +
+                    "from " + implementation.escapeTableName(table.getSchemaName(), table.getTableName());
                 PreparedStatement statement =
                         connection.prepareStatement(
                                 sql);
-                statement.setQueryTimeout(1);
-                statement.setMaxRows(3);
+                setQueryTimeout(statement, 1);
+                statement.setMaxRows(1);
                 ResultSet rs = statement.executeQuery();
-                int count = 0;
+                Long count = null;
+                if(rs.next()) {
+                    count = safeGetLong(rs, 1);
+                }
+
+                if(count == null || count < 10) {
+                    logger.info("Cannot determine if numeric column {} is boolean, count is {}",
+                                column.getQualifiedName(), count);
+                    return;
+                }
+
+                sql =
+                    "select distinct(" + implementation.escapeDatabaseObject(column.getColumnName()) + ") " +
+                    "from " + implementation.escapeTableName(table.getSchemaName(), table.getTableName());
+                statement =
+                        connection.prepareStatement(
+                                sql);
+                setQueryTimeout(statement, 1);
+                statement.setMaxRows(3);
+                rs = statement.executeQuery();
+                int valueCount = 0;
                 boolean only0and1 = true;
                 while(rs.next()) {
-                    count++;
-                    if(count > 2) {
+                    valueCount++;
+                    if(valueCount > 2) {
                         only0and1 = false;
                         break;
                     }
                     Long value = safeGetLong(rs, 1);
                     only0and1 &= value != null && (value == 0 || value == 1);
                 }
-                if(only0and1 && count == 2) {
+                if(only0and1 && valueCount == 2) {
                     column.setJavaType(Boolean.class.getName());
                 }
                 statement.close();
             } catch (Exception e) {
-                logger.error("Could not determine count (" + sql + ")", e);
+                logger.error("Could not whether column " + column.getQualifiedName() + " is boolean", e);
             } finally {
                 try {
                     if(connection != null) {
@@ -1085,13 +1162,16 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     protected void detectLargeResultSet(Table table, CrudConfiguration configuration) {
         Connection connection = null;
-        String sql = "select count(*) from \"" + table.getSchemaName() + "\".\"" + table.getTableName() + "\"";
         try {
             connection = connectionProvider.acquireConnection();
+            liquibase.database.Database implementation =
+                        DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
+            String sql =
+                    "select count(*) from " + implementation.escapeTableName(table.getSchemaName(), table.getTableName());
             PreparedStatement statement =
                     connection.prepareStatement(
                             sql);
-            statement.setQueryTimeout(1);
+            setQueryTimeout(statement, 1);
             statement.setMaxRows(1);
             ResultSet rs = statement.executeQuery();
             if(rs.next()) {
@@ -1102,7 +1182,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             }
             statement.close();
         } catch (Exception e) {
-            logger.error("Could not determine count (" + sql + ")", e);
+            logger.error("Could not determine count", e);
         } finally {
             try {
                 if(connection != null) {
@@ -1111,6 +1191,14 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             } catch (SQLException e) {
                 logger.error("Could not close connection", e);
             }
+        }
+    }
+
+    protected void setQueryTimeout(PreparedStatement statement, int seconds) {
+        try {
+            statement.setQueryTimeout(seconds);
+        } catch (Exception e) {
+            logger.debug("setQueryTimeout not supported", e);
         }
     }
 
@@ -1242,6 +1330,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         this.userIdProperty = userIdProperty;
     }
 
+    @LabelI18N("appwizard.userTable.passwordProperty")
     public String getUserPasswordProperty() {
         return userPasswordProperty;
     }

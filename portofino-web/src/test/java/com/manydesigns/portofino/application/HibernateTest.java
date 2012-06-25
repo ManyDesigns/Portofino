@@ -110,8 +110,8 @@ public class HibernateTest extends AbstractPortofinoTest {
         criteria = session.createCriteria("product");
         List resultProd = new ArrayList(criteria.list());
 
-        Table table = DatabaseLogic.findTableByQualifiedName(
-                application.getModel(), "jpetstore.PUBLIC.category");
+        Table table = DatabaseLogic.findTableByName(
+                application.getModel(), "jpetstore", "PUBLIC", "category");
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria tableCriteria = new TableCriteria(table);
         HashMap<String, String> category= findCategory(tableAccessor, tableCriteria);
@@ -141,8 +141,8 @@ public class HibernateTest extends AbstractPortofinoTest {
     }
 
     public void testSearchAndUpdateCategorie() {
-        Table table = DatabaseLogic.findTableByQualifiedName(
-                application.getModel(), "jpetstore.PUBLIC.category");
+        Table table = DatabaseLogic.findTableByName(
+                application.getModel(), "jpetstore", "PUBLIC", "category");
         TableAccessor tableAccessor = new TableAccessor(table);
         TableCriteria tableCriteria = new TableCriteria(table);
 
