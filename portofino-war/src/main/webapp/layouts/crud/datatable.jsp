@@ -28,8 +28,8 @@
 </div>
 <input type="hidden" name="sortProperty" value="${actionBean.sortProperty}" />
 <input type="hidden" name="sortDirection" value="${actionBean.sortDirection}" />
-<input type="hidden" name="firstResult" value="${actionBean.firstResult}" />
-<input type="hidden" name="maxResults" value="${actionBean.maxResults}" />
+<!--<input type="hidden" name="firstResult" value="${actionBean.firstResult}" />
+<input type="hidden" name="maxResults" value="${actionBean.maxResults}" />-->
 <script type="text/javascript">
     var initDatatable_<c:out value="${pageId}" /> = function() {
         var elementsFormatter = function(elCell, oRecord, oColumn, sData) {
@@ -130,8 +130,8 @@
             //Update pagination & sort input fields in the form
             $('#<c:out value="portlet_${pageId}" /> input[name=sortProperty]').val(sort);
             $('#<c:out value="portlet_${pageId}" /> input[name=sortDirection]').val(dir);
-            $('#<c:out value="portlet_${pageId}" /> input[name=firstResult]').val(firstResult);
-            $('#<c:out value="portlet_${pageId}" /> input[name=maxResults]').val(maxResults);
+            //$('#<c:out value="portlet_${pageId}" /> input[name=firstResult]').val(firstResult);
+            //$('#<c:out value="portlet_${pageId}" /> input[name=maxResults]').val(maxResults);
 
             return url;
         };

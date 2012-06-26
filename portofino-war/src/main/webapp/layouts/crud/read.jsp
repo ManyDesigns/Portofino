@@ -22,10 +22,10 @@
         </div>
         <!--<stripes:submit name="duplicate" value="Duplicate" disabled="true" class="portletButton"/>
         <stripes:submit name="print" value="Print" disabled="true" class="portletButton"/>-->
+        <script type="text/javascript">
+            $(".crudReadButtons button[name=delete]").click(function() {
+                return confirm ('<fmt:message key="commons.confirm" />');
+            });
+        </script>
     </stripes:layout-component>
-    <script type="text/javascript">
-        $(".crudReadButtons button[name=delete]").click(function() {
-            return confirm ('<fmt:message key="commons.confirm" />');
-        });
-    </script>
 </stripes:layout-render>

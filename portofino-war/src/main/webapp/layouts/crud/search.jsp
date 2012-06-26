@@ -30,26 +30,27 @@
             <%@include file="datatable.jsp"%>
             <portofino:buttons list="crud-search" cssClass="portletButton" />
         </div>
-    </stripes:layout-component>
-
-    <script type="text/javascript">
-        <c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
-        $("#portlet_${pageId} .search_results button[name=bulkDelete]").click(function() {
-            return confirm ('<fmt:message key="commons.confirm" />');
-        });
-        $("#portlet_${pageId} .search_form_toggle_link").click(makeToggleFunction());
-        function makeToggleFunction() {
-            var visible = ${actionBean.searchVisible};
-            return function(event) {
-                $(this).next().slideToggle(300);
-                visible = !visible;
-                if(visible) {
-                    $(event.target).html('<fmt:message key="layouts.crud.search.hideSearch" />');
-                } else {
-                    $(event.target).html('<fmt:message key="layouts.crud.search.showSearch" />');
+        <script type="text/javascript">
+            <c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
+            $(function() {
+                $("#portlet_${pageId} .search_results button[name=bulkDelete]").click(function() {
+                    return confirm ('<fmt:message key="commons.confirm" />');
+                });
+                $("#portlet_${pageId} .search_form_toggle_link").click(makeToggleFunction());
+                function makeToggleFunction() {
+                    var visible = ${actionBean.searchVisible};
+                    return function(event) {
+                        $(this).next().slideToggle(300);
+                        visible = !visible;
+                        if(visible) {
+                            $(event.target).html('<fmt:message key="layouts.crud.search.hideSearch" />');
+                        } else {
+                            $(event.target).html('<fmt:message key="layouts.crud.search.showSearch" />');
+                        }
+                        return false;
+                    };
                 }
-                return false;
-            };
-        }
-    </script>
+            });
+        </script>
+    </stripes:layout-component>
 </stripes:layout-render>
