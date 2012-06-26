@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<page id="users"
-      description="Users administration" fragment="actions/admin/users"
-      title="Users">
-</page>
