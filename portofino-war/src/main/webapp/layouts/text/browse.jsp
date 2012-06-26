@@ -21,7 +21,7 @@
 <% if(request.getParameter("images-only") == null) { %>
     <form action="${actionBean.dispatch.absoluteOriginalPath}">
         <input type="hidden" name="cancelReturnUrl"
-               value='<%= actionBean.dispatch.getAbsoluteOriginalPath() + "?" + request.getQueryString() %>' />
+               value='<%= actionBean.getDispatch().getAbsoluteOriginalPath() + "?" + request.getQueryString() %>' />
         <input type="hidden" name="CKEditorFuncNum" value='${actionBean.CKEditorFuncNum}' />
         Pagine: <button name="browsePages" type="submit">Browse</button> (TODO) 
     </form>

@@ -28,6 +28,7 @@ import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
@@ -106,8 +107,7 @@ public class
         boolean isNotAdmin = !SecurityLogic.isAdministrator(request);
         if (isNotAdmin) {
             Permissions permissions;
-            Dispatch dispatch =
-                (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
+            Dispatch dispatch = Dispatcher.getDispatchForRequest(request);
             String resource;
             boolean allowed;
             if(dispatch != null) {

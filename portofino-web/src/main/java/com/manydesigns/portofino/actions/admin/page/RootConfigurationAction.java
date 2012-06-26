@@ -22,7 +22,6 @@
 
 package com.manydesigns.portofino.actions.admin.page;
 
-import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.actions.admin.SettingsAction;
 import com.manydesigns.portofino.buttons.annotations.Button;
@@ -74,10 +73,9 @@ public abstract class RootConfigurationAction extends PageAdminAction implements
         } catch (Exception e) {
             throw new Error("Couldn't load root page", e);
         }
-        PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage);
-        rootPageInstance.setActionClass(SafeModeAction.class); //To avoid errors when accessing dispatch.actionClass
+        PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage, SafeModeAction.class);
         dispatch = new Dispatch(context.getRequest().getContextPath(), originalPath, rootPageInstance);
-        context.getRequest().setAttribute(RequestAttributes.DISPATCH, dispatch);
+        //context.getRequest().setAttribute(RequestAttributes.DISPATCH, dispatch);
     }
 
     @Buttons({

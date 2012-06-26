@@ -25,6 +25,7 @@ package com.manydesigns.portofino.logic;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.pages.Page;
@@ -60,10 +61,9 @@ public class SecurityLogic {
     public static final Logger logger = LoggerFactory.getLogger(SecurityLogic.class);
 
     public static boolean hasPermissions
-            (ServletRequest request, AccessLevel level, String... permissions) {
+            (HttpServletRequest request, AccessLevel level, String... permissions) {
         boolean isNotAdmin = !isAdministrator(request);
-        Dispatch dispatch =
-                (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
+        Dispatch dispatch = Dispatcher.getDispatchForRequest(request);
         if (isNotAdmin && dispatch != null) {
             Subject subject = SecurityUtils.getSubject();
             PageInstance pageInstance = dispatch.getLastPageInstance();

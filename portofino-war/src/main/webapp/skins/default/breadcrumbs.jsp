@@ -2,10 +2,12 @@
 <%@ page import="com.manydesigns.portofino.breadcrumbs.BreadcrumbItem" %>
 <%@ page import="com.manydesigns.portofino.breadcrumbs.Breadcrumbs" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.Dispatcher" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<jsp:useBean id="dispatch" scope="request" type="com.manydesigns.portofino.dispatcher.Dispatch" />
 <div class="breadcrumbs">
     <%
+        Dispatch dispatch = Dispatcher.getDispatchForRequest(request);
         Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
         List<BreadcrumbItem> items = breadcrumbs.getItems();
         for (int i = 0; i < items.size(); i++) {

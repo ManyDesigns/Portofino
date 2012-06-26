@@ -2,7 +2,7 @@
 <jsp:useBean id="actionBean" scope="request"
      type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
 <button onclick="showMovePageDialog(
-                    '<%= actionBean.dispatch.getLastPageInstance().getPathFromRoot() %>',
+                    '<%= actionBean.getDispatch().getLastPageInstance().getPathFromRoot() %>',
                     '<%= request.getContextPath() %>');
                 return false;"
         type="submit"

@@ -261,7 +261,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 return getEmbeddedSearchView();
             } else {
                 cancelReturnUrl = new UrlBuilder(
-                    context.getLocale(), dispatch.getAbsoluteOriginalPath(), false)
+                    context.getLocale(), getDispatch().getAbsoluteOriginalPath(), false)
                     .toString();
                 cancelReturnUrl = appendSearchStringParamIfNecessary(cancelReturnUrl);
                 setupReturnToParentTarget();
@@ -320,7 +320,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     @Button(list = "crud-search-form", key = "commons.resetSearch", order = 2)
     public Resolution resetSearch() {
-        return new RedirectResolution(dispatch.getOriginalPath()).addParameter("searchVisible", true);
+        return new RedirectResolution(getDispatch().getOriginalPath()).addParameter("searchVisible", true);
     }
 
     //**************************************************************************
@@ -339,7 +339,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         refreshBlobDownloadHref();
 
         cancelReturnUrl = new UrlBuilder(
-                Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
+                Locale.getDefault(), getDispatch().getAbsoluteOriginalPath(), false)
                 .toString();
 
         cancelReturnUrl = appendSearchStringParamIfNecessary(cancelReturnUrl);
@@ -394,10 +394,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     return new ForwardResolution("/layouts/crud/popup/close.jsp");
                 } else {
                     pk = pkHelper.generatePkStringArray(object);
-                    String url = dispatch.getOriginalPath() + "/" + getPkForUrl(pk);
+                    String url = getDispatch().getOriginalPath() + "/" + getPkForUrl(pk);
                     XhtmlBuffer buffer = new XhtmlBuffer();
                     buffer.write(getMessage("commons.save.successful") + ". ");
-                    String createUrl = dispatch.getAbsoluteOriginalPath();
+                    String createUrl = getDispatch().getAbsoluteOriginalPath();
                     if(!createUrl.contains("?")) {
                         createUrl += "?";
                     } else {
@@ -453,7 +453,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 }
                 SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
                 return new RedirectResolution(
-                        appendSearchStringParamIfNecessary(dispatch.getOriginalPath()));
+                        appendSearchStringParamIfNecessary(getDispatch().getOriginalPath()));
             }
         }
         return getEditView();
@@ -473,7 +473,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         if (selection.length == 1) {
             pk = selection[0].split("/");
-            String url = dispatch.getOriginalPath() + "/" + getPkForUrl(pk);
+            String url = getDispatch().getOriginalPath() + "/" + getPkForUrl(pk);
             url = appendSearchStringParamIfNecessary(url);
             return new RedirectResolution(url)
                     .addParameter("cancelReturnUrl", cancelReturnUrl)
@@ -512,7 +512,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     "commons.bulkUpdate.successful",
                     selection.length));
             return new RedirectResolution(
-                    appendSearchStringParamIfNecessary(dispatch.getOriginalPath()));
+                    appendSearchStringParamIfNecessary(getDispatch().getOriginalPath()));
         } else {
             return new ForwardResolution("/layouts/crud/bulk-edit.jsp");
         }
@@ -550,7 +550,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         int deleted = 0;
         if (selection == null) {
             SessionMessages.addWarningMessage(getMessage("commons.bulkDelete.nothingSelected"));
-            return new RedirectResolution(appendSearchStringParamIfNecessary(dispatch.getOriginalPath()));
+            return new RedirectResolution(appendSearchStringParamIfNecessary(getDispatch().getOriginalPath()));
         }
         for (String current : selection) {
             String[] pkArr = current.split("/");
@@ -570,7 +570,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
         }
 
-        return new RedirectResolution(appendSearchStringParamIfNecessary(dispatch.getOriginalPath()));
+        return new RedirectResolution(appendSearchStringParamIfNecessary(getDispatch().getOriginalPath()));
     }
 
     //**************************************************************************
@@ -878,7 +878,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     protected String calculateBaseSearchUrl() {
         assert pk != null; //Ha senso solo in modalita' read/detail
-        String baseUrl = dispatch.getAbsoluteOriginalPath();
+        String baseUrl = getDispatch().getAbsoluteOriginalPath();
         for(int i = 0; i < pk.length; i++) {
             int lastSlashIndex = baseUrl.lastIndexOf('/');
             baseUrl = baseUrl.substring(0, lastSlashIndex);
@@ -1091,7 +1091,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
         } else {
             PageInstance[] pageInstancePath =
-                    dispatch.getPageInstancePath();
+                    getDispatch().getPageInstancePath();
             int previousPos = pageInstancePath.length - 2;
             if (previousPos >= 0) {
                 PageInstance previousPageInstance = pageInstancePath[previousPos];
@@ -1173,7 +1173,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public String getBlobDownloadUrl(PropertyAccessor propertyAccessor) {
         UrlBuilder urlBuilder = new UrlBuilder(
-                Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
+                Locale.getDefault(), getDispatch().getAbsoluteOriginalPath(), false)
                 .addParameter("downloadBlob","")
                 .addParameter("propertyName", propertyAccessor.getName());
         return urlBuilder.toString();
@@ -1216,7 +1216,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         } catch (Exception e) {
             logger.error("Excel export failed", e);
             SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
-            return new RedirectResolution(dispatch.getOriginalPath());
+            return new RedirectResolution(getDispatch().getOriginalPath());
         }
     }
 
@@ -1291,7 +1291,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         } catch (Exception e) {
             logger.error("Excel export failed", e);
             SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
-            return new RedirectResolution(dispatch.getOriginalPath());
+            return new RedirectResolution(getDispatch().getOriginalPath());
         }
     }
 
@@ -1490,7 +1490,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         } catch (Exception e) {
             logger.error("PDF export failed", e);
             SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
-            return new RedirectResolution(dispatch.getOriginalPath());
+            return new RedirectResolution(getDispatch().getOriginalPath());
         }
     }
 
@@ -1782,7 +1782,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         } catch (Exception e) {
             logger.error("PDF export failed", e);
             SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
-            return new RedirectResolution(dispatch.getOriginalPath());
+            return new RedirectResolution(getDispatch().getOriginalPath());
         }
     }
 
@@ -2114,7 +2114,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     protected String getReadLinkExpression() {
         StringBuilder sb = new StringBuilder();
-        sb.append(dispatch.getOriginalPath());
+        sb.append(getDispatch().getOriginalPath());
         sb.append("/");
         boolean first = true;
 

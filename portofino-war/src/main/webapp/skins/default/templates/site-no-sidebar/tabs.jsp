@@ -1,16 +1,17 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
+<%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.Dispatcher" %>
+<%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
 <%@ page import="com.manydesigns.portofino.navigation.Navigation" %>
 <%@ page import="com.manydesigns.portofino.navigation.NavigationItem" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Collections" %>
-<%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
-<%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="org.apache.shiro.SecurityUtils" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<jsp:useBean id="dispatch" scope="request" type="com.manydesigns.portofino.dispatcher.Dispatch" />
 <jsp:useBean id="app" scope="request" type="com.manydesigns.portofino.application.Application" />
 <%
     boolean admin = SecurityLogic.isAdministrator(request);
@@ -25,6 +26,7 @@
         includeAdminButtons = Boolean.valueOf(param);
     }
 
+    Dispatch dispatch = Dispatcher.getDispatchForRequest(request);
     Navigation navigation = new Navigation(app, dispatch, SecurityUtils.getSubject(), admin);
     List<NavigationItem> navigationItems;
     NavigationItem rootNavigationItem = navigation.getRootNavigationItem();

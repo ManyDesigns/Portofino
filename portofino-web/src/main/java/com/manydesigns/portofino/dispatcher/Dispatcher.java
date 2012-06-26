@@ -23,6 +23,7 @@
 package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.elements.servlet.ServletUtils;
+import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Page;
@@ -32,10 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -51,46 +50,94 @@ public class Dispatcher {
             LoggerFactory.getLogger(Dispatcher.class);
 
     protected final Application application;
+    protected final Map<String, Dispatch> cache = new ConcurrentHashMap<String, Dispatch>();
 
-    public Dispatcher(Application application) {
-        this.application = application;
+    public static Dispatcher forRequest(HttpServletRequest request) {
+        Dispatcher dispatcher = (Dispatcher) request.getAttribute(RequestAttributes.DISPATCHER);
+        if(dispatcher != null) {
+            return dispatcher;
+        } else {
+            dispatcher = new Dispatcher(request);
+            request.setAttribute(RequestAttributes.DISPATCHER, dispatcher);
+            return dispatcher;
+        }
     }
 
-    public Dispatch createDispatch(HttpServletRequest request) {
+    protected Dispatcher(HttpServletRequest request) {
+        this.application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
+    }
+
+    public static Dispatch getDispatchForRequest(HttpServletRequest request) {
+        return forRequest(request).getDispatch(request);
+    }
+
+    public Dispatch getDispatch(HttpServletRequest request) {
         String originalPath = ServletUtils.getOriginalPath(request);
-
-        return createDispatch(request.getContextPath(), originalPath);
+        return getDispatch(request.getContextPath(), originalPath);
     }
 
-    public Dispatch createDispatch(String contextPath, String path) {
+    public Dispatch getDispatch(String contextPath, String path) {
         if(path.endsWith(".jsp")) {
             logger.debug("Path is a JSP page ({}), not dispatching.", path);
             return null;
         }
 
-        List<PageInstance> pagePath = new ArrayList<PageInstance>();
+        path = normalizePath(path);
 
-        String[] fragments = StringUtils.split(path, '/');
-
-        List<String> fragmentsAsList = Arrays.asList(fragments);
-        ListIterator<String> fragmentsIterator = fragmentsAsList.listIterator();
-
-        File rootDir = application.getPagesDir();
-        Page rootPage;
-        try {
-            rootPage = DispatcherLogic.getPage(rootDir);
-        } catch (Exception e) {
-            logger.error("Cannot load root page", e);
-            return null;
+        Dispatch dispatch = cache.get(path);
+        if(dispatch != null) {
+            return dispatch;
         }
 
-        PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage);
-        pagePath.add(rootPageInstance);
+        int index;
+        String subPath = path;
+        while((index = subPath.lastIndexOf('/')) != -1) {
+            subPath = path.substring(0, index);
+            dispatch = cache.get(subPath);
+            if(dispatch != null) {
+                break;
+            }
+        }
+        if(dispatch == null) {
+            List<PageInstance> pagePath = new ArrayList<PageInstance>();
+            String[] fragments = StringUtils.split(path, '/');
 
-        return createDispatch(contextPath, path, pagePath, fragmentsIterator);
+            List<String> fragmentsAsList = Arrays.asList(fragments);
+            ListIterator<String> fragmentsIterator = fragmentsAsList.listIterator();
+
+            File rootDir = application.getPagesDir();
+            Page rootPage;
+            try {
+                rootPage = DispatcherLogic.getPage(rootDir);
+            } catch (Exception e) {
+                logger.error("Cannot load root page", e);
+                return null;
+            }
+
+            PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage, null);
+            pagePath.add(rootPageInstance);
+
+            dispatch = getDispatch(contextPath, path, pagePath, fragmentsIterator);
+            if(dispatch != null) {
+                cache.put(path, dispatch);
+            }
+            return dispatch;
+        } else {
+            List<PageInstance> pagePath = new ArrayList<PageInstance>(Arrays.asList(dispatch.getPageInstancePath()));
+            String[] fragments = StringUtils.split(path.substring(subPath.length()), '/');
+
+            List<String> fragmentsAsList = Arrays.asList(fragments);
+            ListIterator<String> fragmentsIterator = fragmentsAsList.listIterator();
+
+            dispatch = getDispatch(contextPath, path, pagePath, fragmentsIterator);
+            if(dispatch != null) {
+                cache.put(path, dispatch);
+            }
+            return dispatch;
+        }
     }
 
-    protected Dispatch createDispatch(
+    protected Dispatch getDispatch(
             String contextPath, String path, List<PageInstance> initialPath,
             ListIterator<String> fragmentsIterator) {
         PageInstance rootPageInstance = initialPath.get(initialPath.size() - 1);
@@ -144,7 +191,9 @@ public class Dispatcher {
                 }
 
                 Page page = DispatcherLogic.getPage(childDirectory);
-                PageInstance pageInstance = new PageInstance(parentPageInstance, childDirectory, application, page);
+                Class<? extends PageAction> actionClass =
+                        DispatcherLogic.getActionClass(application, childDirectory);
+                PageInstance pageInstance = new PageInstance(parentPageInstance, childDirectory, application, page, actionClass);
                 pagePath.add(pageInstance);
                 makePageInstancePath(pagePath, fragmentsIterator, pageInstance);
                 return;

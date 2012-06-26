@@ -24,13 +24,13 @@ package com.manydesigns.portofino.pageactions.pagereference;
 
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.pageactions.pagereference.configuration.PageReferenceConfiguration;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.pagereference.configuration.PageReferenceConfiguration;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import net.sourceforge.stripes.action.*;
@@ -56,8 +56,8 @@ public class PageReferenceAction extends AbstractPageAction {
     public static final Logger logger =
             LoggerFactory.getLogger(PageReferenceAction.class);
 
-    @Inject(RequestAttributes.DISPATCH)
-    public Dispatch dispatch;
+    @Inject(RequestAttributes.DISPATCHER)
+    public Dispatcher dispatcher;
 
     /*@Override
     protected void dereferencePageInstance() {

@@ -1,3 +1,5 @@
+<%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.Dispatcher" %>
 <%
     // Avoid caching of dynamic pages
     response.setHeader("Pragma", "no-cache");
@@ -15,8 +17,10 @@
     <head>
         <jsp:include page="head.jsp"/>
         <stripes:layout-component name="customScripts"/>
-        <jsp:useBean id="dispatch" scope="request"
-                     type="com.manydesigns.portofino.dispatcher.Dispatch"/>
+        <%
+            Dispatch dispatch = Dispatcher.getDispatchForRequest(request);
+            pageContext.setAttribute("dispatch", dispatch);
+        %>
         <title><c:out value="${dispatch.lastPageInstance.page.description}"/></title>
     </head>
     <body class="yui-skin-sam">

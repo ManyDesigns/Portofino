@@ -117,9 +117,9 @@ public class PageAdminAction extends AbstractActionBean {
 
     @Before
     public void prepare() {
-        Dispatcher dispatcher = new Dispatcher(application);
+        Dispatcher dispatcher = Dispatcher.forRequest(context.getRequest());
         String contextPath = context.getRequest().getContextPath();
-        dispatch = dispatcher.createDispatch(contextPath, originalPath);
+        dispatch = dispatcher.getDispatch(contextPath, originalPath);
         /* TODO ora tutte le operazioni richiedono administrator.
            Se in futuro non sarà così, qui bisognerà controllare che l'utente abbia
            i permessi sulla pagina di origine.
@@ -131,7 +131,6 @@ public class PageAdminAction extends AbstractActionBean {
         } catch (Exception e) {
             throw new Error("Couldn't instantiate action", e);
         }
-        context.getRequest().setAttribute(RequestAttributes.DISPATCH, dispatch);
 
         List<String> knownPageActions = application.getPortofinoProperties().getList("pageactions");
         for(String pageAction : knownPageActions) {
@@ -384,10 +383,10 @@ public class PageAdminAction extends AbstractActionBean {
         if(parentPageInstance == null) {
             SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.root"));
         } else {
-            Dispatcher dispatcher = new Dispatcher(application);
+            Dispatcher dispatcher = Dispatcher.forRequest(context.getRequest());
             String contextPath = context.getRequest().getContextPath();
             String landingPagePath = application.getAppConfiguration().getString(AppProperties.LANDING_PAGE);
-            Dispatch landingPageDispatch = dispatcher.createDispatch(contextPath, landingPagePath);
+            Dispatch landingPageDispatch = dispatcher.getDispatch(contextPath, landingPagePath);
             if(landingPageDispatch != null &&
                landingPageDispatch.getLastPageInstance().getDirectory().equals(pageInstance.getDirectory())) {
                 SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.landing"));
@@ -475,20 +474,20 @@ public class PageAdminAction extends AbstractActionBean {
         if("/".equals(destinationPagePath)) {
             File dir = application.getPagesDir();
             try {
-                newParent = new PageInstance(null, dir, application, DispatcherLogic.getPage(dir));
+                newParent = new PageInstance(null, dir, application, DispatcherLogic.getPage(dir), null);
             } catch (Exception e) {
                 throw new Error("Couldn't load root page", e);
             }
         } else {
-            Dispatcher dispatcher = new Dispatcher(application);
+            Dispatcher dispatcher = Dispatcher.forRequest(context.getRequest());
             Dispatch destinationDispatch =
-                    dispatcher.createDispatch(context.getRequest().getContextPath(), destinationPagePath);
+                    dispatcher.getDispatch(context.getRequest().getContextPath(), destinationPagePath);
             //TODO gestione eccezioni
             newParent = destinationDispatch.getLastPageInstance();
         }
         if(newParent.getDirectory().equals(oldParent.getDirectory())) {
             List<String> params = newParent.getParameters();
-            newParent = new PageInstance(newParent.getParent(), newParent.getDirectory(), application, oldParent.getPage());
+            newParent = new PageInstance(newParent.getParent(), newParent.getDirectory(), application, oldParent.getPage(), null);
             newParent.getParameters().addAll(params);
         }
         if(!SecurityLogic.isAdministrator(context.getRequest())) {

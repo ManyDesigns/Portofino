@@ -23,7 +23,6 @@
 package com.manydesigns.portofino.dispatcher;
 
 import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.application.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,11 +58,10 @@ public class DispatcherFilter implements Filter {
     ) throws IOException, ServletException {
         // cast to http type
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        Application application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
+        //Application application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
 
         logger.debug("Invoking the dispatcher to create a dispatch");
-        Dispatcher dispatcher = new Dispatcher(application);
-        Dispatch dispatch = dispatcher.createDispatch(httpRequest);
+        Dispatch dispatch = Dispatcher.getDispatchForRequest(httpRequest);
 
         if (dispatch == null) {
             logger.debug("We can't handle this path ({})." +
@@ -75,7 +73,7 @@ public class DispatcherFilter implements Filter {
 
         Map<String, Object> savedAttributes =
                 saveAndResetRequestAttributes(request);
-        request.setAttribute(RequestAttributes.DISPATCH, dispatch);
+        //request.setAttribute(RequestAttributes.DISPATCH, dispatch);
         try {
             //Handle through the ModelActionResolver
             chain.doFilter(request, response);

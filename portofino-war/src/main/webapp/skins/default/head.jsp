@@ -1,7 +1,7 @@
 <%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
-<%@ page import="com.manydesigns.portofino.RequestAttributes" %>
-<%@ page import="java.net.URL" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.Dispatcher" %>
 <%@ page import="java.net.MalformedURLException" %>
+<%@ page import="java.net.URL" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
@@ -47,7 +47,7 @@
 <script type="text/javascript"
         src="<stripes:url value="/skins/default/portofino.js.jsp"/>"></script>
 <%
-    Dispatch dispatch = (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
+    Dispatch dispatch = Dispatcher.getDispatchForRequest(request);
     if(dispatch != null) {
         String baseHref = dispatch.getAbsoluteOriginalPath();
         while (baseHref.length() > 1 && baseHref.endsWith("/")) {

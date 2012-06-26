@@ -46,8 +46,8 @@ public class PageInstance {
     protected final File directory;
     protected final List<String> parameters;
     protected final PageInstance parent;
+    protected final Class<? extends PageAction> actionClass;
     protected Object configuration;
-    protected Class<? extends PageAction> actionClass;
     protected PageAction actionBean;
     protected String description;
 
@@ -59,12 +59,14 @@ public class PageInstance {
 
     public static final Logger logger = LoggerFactory.getLogger(PageInstance.class);
 
-    public PageInstance(PageInstance parent, File directory, Application application, Page page) {
+    public PageInstance(PageInstance parent, File directory, Application application,
+                        Page page, Class<? extends PageAction> actionClass) {
         this.parent = parent;
         this.directory = directory;
         this.application = application;
         this.page = page;
-        this.parameters = new ArrayList<String>();
+        this.actionClass = actionClass;
+        parameters = new ArrayList<String>();
     }
 
     public Page getPage() {
@@ -111,14 +113,7 @@ public class PageInstance {
         this.configuration = configuration;
     }
 
-    public void setActionClass(Class<? extends PageAction> actionClass) {
-        this.actionClass = actionClass;
-    }
-
     public Class<? extends PageAction> getActionClass() {
-        if(actionClass == null) {
-            actionClass = DispatcherLogic.getActionClass(application, directory);
-        }
         return actionClass;
     }
 

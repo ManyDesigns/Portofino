@@ -23,11 +23,7 @@
 package com.manydesigns.portofino.stripes;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.*;
-import com.manydesigns.portofino.starter.ApplicationStarter;
 import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -87,8 +83,9 @@ public class ModelActionResolver extends NameBasedActionResolver {
     }
 
     @Override
-    protected ActionBean makeNewActionBean(Class<? extends ActionBean> type, ActionBeanContext context) throws Exception {
-        Dispatch dispatch = (Dispatch) context.getRequest().getAttribute(RequestAttributes.DISPATCH);
+    protected ActionBean makeNewActionBean(
+            Class<? extends ActionBean> type, ActionBeanContext context) throws Exception {
+        Dispatch dispatch = Dispatcher.getDispatchForRequest(context.getRequest());
         if(dispatch != null) {
             PageInstance pageInstance = dispatch.getLastPageInstance();
             if(type.equals(pageInstance.getActionClass())) {
@@ -120,28 +117,8 @@ public class ModelActionResolver extends NameBasedActionResolver {
 
     protected Dispatch getDispatch(String path) {
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-        Dispatch dispatch = (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
-        if(dispatch != null && path.equals(dispatch.getOriginalPath())) {
-            return dispatch;
-        } else {
-            return getDispatcher().createDispatch(request.getContextPath(), path);
-        }
-    }
-
-    protected Dispatcher getDispatcher() {
-        logger.debug("Retrieving application starter");
-        ApplicationStarter applicationStarter =
-                (ApplicationStarter) servletContext.getAttribute(
-                        ApplicationAttributes.APPLICATION_STARTER);
-
-        logger.debug("Retrieving application");
-        Application application;
-        try {
-            application = applicationStarter.getApplication();
-            return new Dispatcher(application);
-        } catch (Exception e) {
-            throw new Error("Couldn't get application", e);
-        }
+        Dispatcher dispatcher = Dispatcher.forRequest(request);
+        return dispatcher.getDispatch(request.getContextPath(), path);
     }
 
     @Override

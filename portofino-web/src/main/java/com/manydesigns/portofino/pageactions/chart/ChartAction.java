@@ -130,7 +130,7 @@ public class ChartAction extends AbstractPageAction {
 
             chartId = RandomUtil.createRandomId();
 
-            String actionurl = dispatch.getAbsoluteOriginalPath();
+            String actionurl = getDispatch().getAbsoluteOriginalPath();
             UrlBuilder chartResolution =
                     new UrlBuilder(actionurl, false)
                             .addParameter("chartId", chartId)
@@ -190,7 +190,7 @@ public class ChartAction extends AbstractPageAction {
 
     public Resolution returnToParent() {
         PageInstance[] pageInstancePath =
-                dispatch.getPageInstancePath();
+                getDispatch().getPageInstancePath();
         int previousPos = pageInstancePath.length - 2;
         RedirectResolution resolution;
         if (previousPos >= 0) {

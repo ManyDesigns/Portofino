@@ -86,8 +86,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Properties
     //--------------------------------------------------------------------------
 
-    @Inject(RequestAttributes.DISPATCH)
-    public Dispatch dispatch;
+    @Inject(RequestAttributes.DISPATCHER)
+    public Dispatcher dispatcher;
 
     public PageInstance pageInstance;
 
@@ -158,7 +158,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     public void setupReturnToParentTarget() {
         PageInstance[] pageInstancePath =
-                dispatch.getPageInstancePath();
+                dispatcher.getDispatch(context.getRequest()).getPageInstancePath();
         boolean hasPrevious = getPage().getActualNavigationRoot() == NavigationRoot.INHERIT;
         hasPrevious = hasPrevious && pageInstancePath.length > 1;
         if(hasPrevious) {
@@ -204,7 +204,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     //--------------------------------------------------------------------------
 
     public Dispatch getDispatch() {
-        return dispatch;
+        return dispatcher.getDispatch(context.getRequest());
     }
 
     public String getReturnToParentTarget() {
@@ -257,7 +257,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         for(ChildPage page : layout.getChildPages()) {
             String layoutContainerInParent = page.getContainer();
             if(layoutContainerInParent != null) {
-                String newPath = dispatch.getOriginalPath() + "/" + page.getName();
+                String newPath = getDispatch().getOriginalPath() + "/" + page.getName();
                 PortletInstance portletInstance =
                         new PortletInstance(
                                 "c" + page.getName(),
@@ -349,7 +349,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     }
 
     protected String getDefaultCancelReturnUrl() {
-        return dispatch.getAbsoluteOriginalPath();
+        return getDispatch().getAbsoluteOriginalPath();
     }
 
     public void setCancelReturnUrl(String cancelReturnUrl) {

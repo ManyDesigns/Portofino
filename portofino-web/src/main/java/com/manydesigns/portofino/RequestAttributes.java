@@ -32,7 +32,7 @@ public class RequestAttributes {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    public final static String DISPATCH = "dispatch";
+    public final static String DISPATCHER = "portofino.dispatcher";
     public final static String STOP_WATCH = "stopWatch";
     public static final String MODEL = "model";
     public static final String PAGE_INSTANCE = "pageInstance";

@@ -154,7 +154,7 @@ public class ChangePasswordAction extends AbstractPageAction {
 
     @Override
     protected String getDefaultCancelReturnUrl() {
-        PageInstance parent = dispatch.getLastPageInstance().getParent();
+        PageInstance parent = getDispatch().getLastPageInstance().getParent();
         if(parent != null) {
             return context.getRequest().getContextPath() + "/" +
                    parent.getPath();

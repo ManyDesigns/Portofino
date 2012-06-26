@@ -93,8 +93,7 @@ public class ApplicationInterceptor implements Interceptor {
         BlobManager blobManager = ElementsThreadLocals.getBlobManager();
         blobManager.setBlobsDir(application.getAppBlobsDir());
 
-        Dispatch dispatch =
-                (Dispatch) request.getAttribute(RequestAttributes.DISPATCH);
+        Dispatch dispatch = Dispatcher.getDispatchForRequest(request);
         if (dispatch != null) {
             logger.debug("Preparing PageActions");
             for(PageInstance page : dispatch.getPageInstancePath()) {
