@@ -111,7 +111,7 @@ public class DatabaseSyncer {
             for (String schemaName : schemaNames) {
                 logger.info("Processing schema: {}", schemaName);
                 Schema sourceSchema =
-                        DatabaseLogic.findSchemaByName(
+                        DatabaseLogic.findSchemaByNameIgnoreCase(
                                 sourceDatabase, schemaName);
                 if (sourceSchema == null) {
                     logger.debug("Source schema not found. Creating an empty one.");
@@ -152,11 +152,11 @@ public class DatabaseSyncer {
 
     protected void syncForeignKeys(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
         for(liquibase.database.structure.ForeignKey liquibaseFK : databaseSnapshot.getForeignKeys()) {
-            String fkTableName = normalizeTableName(liquibaseFK.getForeignKeyTable().getName(), databaseSnapshot);
-            Table sourceTable = DatabaseLogic.findTableByName(sourceSchema, fkTableName);
+            String fkTableName = liquibaseFK.getForeignKeyTable().getName();
+            Table sourceTable = DatabaseLogic.findTableByNameIgnoreCase(sourceSchema, fkTableName);
             String fkName = liquibaseFK.getName();
 
-            Table targetFromTable = DatabaseLogic.findTableByName(targetSchema, fkTableName);
+            Table targetFromTable = DatabaseLogic.findTableByNameIgnoreCase(targetSchema, fkTableName);
             if (targetFromTable == null) {
                 logger.error("Table '{}' not found in schema '{}'. Skipping foreign key: {}",
                         new Object[] {
@@ -195,14 +195,14 @@ public class DatabaseSyncer {
             }
 
             Database targetDatabase = targetSchema.getDatabase();
-            Schema pkSchema = DatabaseLogic.findSchemaByName(
+            Schema pkSchema = DatabaseLogic.findSchemaByNameIgnoreCase(
                     targetDatabase, pkSchemaName);
             if (pkSchema == null) {
                 logger.error("Cannot find referenced schema: {}. Skipping foreign key.", pkSchemaName);
                 continue;
             }
             Table pkTable =
-                    DatabaseLogic.findTableByName(pkSchema, pkTableName);
+                    DatabaseLogic.findTableByNameIgnoreCase(pkSchema, pkTableName);
             if (pkTable == null) {
                 logger.error("Cannot find referenced table (schema: {}, table: {}). Skipping foreign key.",
                         pkSchemaName, pkTableName);
@@ -236,11 +236,11 @@ public class DatabaseSyncer {
 
             boolean referencesHaveErrors = false;
             for(int i = 0; i < fromColumnNames.length; i++) {
-                String fromColumnName = normalizeColumnName(fromColumnNames[i], fkTableName, databaseSnapshot);
-                String toColumnName = normalizeColumnName(toColumnNames[i], pkTableName, databaseSnapshot);
+                String fromColumnName = fromColumnNames[i];
+                String toColumnName = toColumnNames[i];
 
                 Column fromColumn =
-                        DatabaseLogic.findColumnByName(
+                        DatabaseLogic.findColumnByNameIgnoreCase(
                                 targetFromTable, fromColumnName);
                 if (fromColumn == null) {
                     logger.error("Cannot find from column (schema: {}, table: {}, column: {}).",
@@ -250,10 +250,11 @@ public class DatabaseSyncer {
                                     fromColumnName
                             });
                     referencesHaveErrors = true;
+                    break;
                 }
 
                 Column toColumn =
-                        DatabaseLogic.findColumnByName(pkTable, toColumnName);
+                        DatabaseLogic.findColumnByNameIgnoreCase(pkTable, toColumnName);
                 if (toColumn == null) {
                     logger.error("Cannot find to column (schema: {}, table: {}, column: {}).",
                             new Object[] {
@@ -262,12 +263,13 @@ public class DatabaseSyncer {
                                     toColumnName
                             });
                     referencesHaveErrors = true;
+                    break;
                 }
 
                 Reference reference = new Reference();
                 reference.setOwner(targetFK);
-                reference.setFromColumn(fromColumnName);
-                reference.setToColumn(toColumnName);
+                reference.setFromColumn(fromColumn.getColumnName());
+                reference.setToColumn(toColumn.getColumnName());
                 targetFK.getReferences().add(reference);
             }
 
@@ -286,7 +288,7 @@ public class DatabaseSyncer {
             if (sourceTable == null) {
                 sourceFK = null;
             } else {
-                sourceFK = sourceTable.findForeignKeyByName(fkName);
+                sourceFK = DatabaseLogic.findForeignKeyByNameIgnoreCase(sourceTable, fkName);
             }
 
             if(sourceFK != null) {
@@ -297,11 +299,6 @@ public class DatabaseSyncer {
             logger.debug("FK creation successfull. Adding FK to table.");
             targetFromTable.getForeignKeys().add(targetFK);
         }
-    }
-
-    protected String normalizeColumnName
-            (String columnName, String tableName, DatabaseSnapshot databaseSnapshot) {
-        return databaseSnapshot.getColumn(tableName, columnName.trim()).getName();
     }
 
     protected String normalizeTableName(String tableName, DatabaseSnapshot databaseSnapshot) {
@@ -315,9 +312,9 @@ public class DatabaseSyncer {
     protected void syncPrimaryKeys(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
         logger.debug("Synchronizing primary keys");
         for(liquibase.database.structure.PrimaryKey liquibasePK : databaseSnapshot.getPrimaryKeys()) {
-            String pkTableName = normalizeTableName(liquibasePK.getTable().getName(), databaseSnapshot);
+            String pkTableName = liquibasePK.getTable().getName();
 
-            Table sourceTable = DatabaseLogic.findTableByName(sourceSchema, pkTableName);
+            Table sourceTable = DatabaseLogic.findTableByNameIgnoreCase(sourceSchema, pkTableName);
             PrimaryKey sourcePK;
             if (sourceTable == null) {
                 sourcePK = null;
@@ -325,11 +322,12 @@ public class DatabaseSyncer {
                 sourcePK = sourceTable.getPrimaryKey();
             }
 
-            Table targetTable = DatabaseLogic.findTableByName(targetSchema, pkTableName);
+            Table targetTable = DatabaseLogic.findTableByNameIgnoreCase(targetSchema, pkTableName);
             if (targetTable == null) {
                 logger.error("Coud not find table: {}. Skipping PK.",
                         pkTableName
                 );
+                continue;
             }
 
             PrimaryKey targetPK = new PrimaryKey(targetTable);
@@ -348,9 +346,8 @@ public class DatabaseSyncer {
             boolean pkColumnsHaveErrors = false;
             for(String columnName : columnNamesAsList) {
                 PrimaryKeyColumn targetPKColumn = new PrimaryKeyColumn(targetPK);
-                targetPKColumn.setColumnName(columnName);
 
-                Column pkColumn = targetTable.findColumnByName(columnName);
+                Column pkColumn = DatabaseLogic.findColumnByNameIgnoreCase(targetTable, columnName);
                 if (pkColumn == null) {
                     logger.error("Primary key (table: {}, pk: {}) has invalid column: {}",
                             new Object[] {
@@ -360,11 +357,13 @@ public class DatabaseSyncer {
                             }
                     );
                     pkColumnsHaveErrors = true;
+                    break;
                 }
+                targetPKColumn.setColumnName(pkColumn.getColumnName());
 
                 if(sourcePK != null) {
                     PrimaryKeyColumn sourcePKColumn =
-                            sourcePK.findPrimaryKeyColumnByName(columnName);
+                            sourcePK.findPrimaryKeyColumnByNameIgnoreCase(columnName);
                     if(sourcePKColumn != null) {
                         logger.debug("Found source PK column: {}", columnName);
                         Generator sourceGenerator = sourcePKColumn.getGenerator();
@@ -405,9 +404,9 @@ public class DatabaseSyncer {
         logger.debug("Synchronizing tables");
         for (liquibase.database.structure.Table liquibaseTable
                 : databaseSnapshot.getTables()) {
-            String tableName = normalizeTableName(liquibaseTable.getName(), databaseSnapshot);
+            String tableName = liquibaseTable.getName();
             logger.debug("Processing table: {}", tableName);
-            Table sourceTable = DatabaseLogic.findTableByName(sourceSchema, tableName);
+            Table sourceTable = DatabaseLogic.findTableByNameIgnoreCase(sourceSchema, tableName);
             if(sourceTable == null) {
                 sourceTable = new Table();
             }
@@ -469,7 +468,7 @@ public class DatabaseSyncer {
             targetColumn.setScale(liquibaseColumn.getDecimalDigits());
             //TODO liquibaseColumn.getLengthSemantics()
 
-            Column sourceColumn = DatabaseLogic.findColumnByName(sourceTable, liquibaseColumn.getName());
+            Column sourceColumn = DatabaseLogic.findColumnByNameIgnoreCase(sourceTable, liquibaseColumn.getName());
             if(sourceColumn != null) {
                 targetColumn.setPropertyName(sourceColumn.getPropertyName());
                 targetColumn.setJavaType(sourceColumn.getJavaType());
@@ -543,8 +542,5 @@ public class DatabaseSyncer {
         }
         return result;
     }
-
-
-
 
 }

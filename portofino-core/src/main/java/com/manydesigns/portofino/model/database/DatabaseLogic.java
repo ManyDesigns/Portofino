@@ -123,6 +123,17 @@ public class DatabaseLogic {
         return null;
     }
 
+    public static @Nullable Schema findSchemaByNameIgnoreCase(
+            Database database, String schemaName) {
+        for (Schema schema : database.getSchemas()) {
+            if (schema.getSchemaName().equalsIgnoreCase(schemaName)) {
+                return schema;
+            }
+        }
+        logger.debug("Schema not found: {}", schemaName);
+        return null;
+    }
+
     public static @Nullable Schema findSchemaByName(Model model, String databaseName, String schemaName) {
         Database database = findDatabaseByName(model, databaseName);
         if (database != null) {
@@ -152,10 +163,31 @@ public class DatabaseLogic {
         return null;
     }
 
+    public static @Nullable Table findTableByNameIgnoreCase(Schema schema, String tableName) {
+        for (Table table : schema.getTables()) {
+            if (table.getTableName().equalsIgnoreCase(tableName)) {
+                return table;
+            }
+        }
+        logger.debug("Table {} not found in {}", tableName, schema);
+        return null;
+    }
+
     public static @Nullable Column findColumnByName(
             Table table, String columnName) {
         for (Column column : table.getColumns()) {
             if (column.getColumnName().equals(columnName)) {
+                return column;
+            }
+        }
+        logger.debug("Column {} not found in {}", columnName, table);
+        return null;
+    }
+
+    public static @Nullable Column findColumnByNameIgnoreCase(
+            Table table, String columnName) {
+        for (Column column : table.getColumns()) {
+            if (column.getColumnName().equalsIgnoreCase(columnName)) {
                 return column;
             }
         }
@@ -193,7 +225,7 @@ public class DatabaseLogic {
         Database database = findDatabaseByName(model, databaseName);
         Table table = findTableByEntityName(database, entityName);
         assert table != null;
-        return table.findOneToManyRelationshipByName(relationshipName);
+        return findOneToManyRelationshipByName(table, relationshipName);
     }
 
     public static Table findTableByEntityName(Database database, String entityName) {
@@ -204,6 +236,46 @@ public class DatabaseLogic {
                 }
             }
         }
+        return null;
+    }
+
+    public static ForeignKey findForeignKeyByName(Table table, String fkName) {
+        for (ForeignKey current : table.foreignKeys) {
+            if (current.getName().equals(fkName)) {
+                return current;
+            }
+        }
+        logger.debug("Foreign key not found: {}", fkName);
+        return null;
+    }
+
+    public static ForeignKey findForeignKeyByNameIgnoreCase(Table table, String fkName) {
+        for (ForeignKey current : table.foreignKeys) {
+            if (current.getName().equalsIgnoreCase(fkName)) {
+                return current;
+            }
+        }
+        logger.debug("Foreign key not found: {}", fkName);
+        return null;
+    }
+
+    public static ModelSelectionProvider findSelectionProviderByName(Table table, String selectionProviderName) {
+        for (ModelSelectionProvider current : table.selectionProviders) {
+            if (current.getName().equalsIgnoreCase(selectionProviderName)) {
+                return current;
+            }
+        }
+        logger.debug("Selection provider not found: {}", selectionProviderName);
+        return null;
+    }
+
+    public static ForeignKey findOneToManyRelationshipByName(Table table, String relationshipName) {
+        for (ForeignKey current : table.getOneToManyRelationships()) {
+            if (current.getName().equalsIgnoreCase(relationshipName)) {
+                return current;
+            }
+        }
+        Table.logger.debug("One to many relationship not found: {}", relationshipName);
         return null;
     }
 }

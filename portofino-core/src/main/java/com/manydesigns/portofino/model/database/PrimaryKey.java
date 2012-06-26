@@ -138,7 +138,7 @@ public class PrimaryKey implements ModelObject {
     // Find methods
     //**************************************************************************
 
-    public PrimaryKeyColumn findPrimaryKeyColumnByName(String columnName) {
+    public PrimaryKeyColumn findPrimaryKeyColumnByNameIgnoreCase(String columnName) {
         for (PrimaryKeyColumn primaryKeyColumn : primaryKeyColumns) {
             if (primaryKeyColumn.getColumnName().equalsIgnoreCase(columnName)) {
                 return primaryKeyColumn;

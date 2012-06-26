@@ -286,61 +286,6 @@ public class Table implements ModelObject, Annotated {
     }
 
     //**************************************************************************
-    // Search objects of a certain kind
-    //**************************************************************************
-
-    public Column findColumnByName(String columnName) {
-        for (Column column : columns) {
-            if (column.getColumnName().equalsIgnoreCase(columnName)) {
-                return column;
-            }
-        }
-        logger.debug("Column not found: {}", columnName);
-        return null;
-    }
-
-    public ForeignKey findForeignKeyByName(String fkName) {
-        for (ForeignKey current : foreignKeys) {
-            if (current.getName().equalsIgnoreCase(fkName)) {
-                return current;
-            }
-        }
-        logger.debug("Foreign key not found: {}", fkName);
-        return null;
-    }
-
-    public ModelSelectionProvider findSelectionProviderByName(String selectionProviderName) {
-        for (ModelSelectionProvider current : selectionProviders) {
-            if (current.getName().equalsIgnoreCase(selectionProviderName)) {
-                return current;
-            }
-        }
-        logger.debug("Selection provider not found: {}", selectionProviderName);
-        return null;
-    }
-
-    public ForeignKey findOneToManyRelationshipByName(String relationshipName) {
-        for (ForeignKey current : getOneToManyRelationships()) {
-            if (current.getName().equalsIgnoreCase(relationshipName)) {
-                return current;
-            }
-        }
-        logger.debug("One to many relationship not found: {}", relationshipName);
-        return null;
-    }
-
-    public Annotation findModelAnnotationByType(String annotationType) {
-        for (Annotation annotation : annotations) {
-            if (annotation.getType().equalsIgnoreCase(annotationType)) {
-                return annotation;
-            }
-        }
-        logger.debug("Model annotation not found: {}", annotationType);
-        return null;
-    }
-
-
-    //**************************************************************************
     // toString() override
     //**************************************************************************
 
@@ -404,7 +349,7 @@ public class Table implements ModelObject, Annotated {
             normalizedName = "_" + normalizedName;
         }
         if(!name.equals(normalizedName)) {
-            logger.warn("Entity name " + name + " normalized to " + normalizedName);
+            logger.info("Entity name " + name + " normalized to " + normalizedName);
         }
         return normalizedName;
     }

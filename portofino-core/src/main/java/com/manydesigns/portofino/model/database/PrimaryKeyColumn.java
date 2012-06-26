@@ -94,7 +94,7 @@ public class PrimaryKeyColumn implements ModelObject {
         assert primaryKey != null;
         assert columnName != null;
 
-        actualColumn = primaryKey.getTable().findColumnByName(columnName);
+        actualColumn = DatabaseLogic.findColumnByName(primaryKey.getTable(), columnName);
         if (actualColumn == null) {
             logger.warn("Cannor wire primary key column '{}' to primary key '{}'",
                     columnName, primaryKey);

@@ -89,14 +89,14 @@ public class Reference implements ModelObject {
 
     public void link(Model model) {
         actualFromColumn =
-                owner.getFromTable().findColumnByName(fromColumn);
+                DatabaseLogic.findColumnByName(owner.getFromTable(), fromColumn);
         if (actualFromColumn == null) {
             throw new InternalError("Cannot resolve column: " + fromColumn);
         }
 
         Table toTable = owner.getToTable();
         if (toTable != null) {
-            actualToColumn = toTable.findColumnByName(toColumn);
+            actualToColumn = DatabaseLogic.findColumnByName(toTable, toColumn);
         }
     }
 

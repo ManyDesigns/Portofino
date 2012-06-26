@@ -23,6 +23,7 @@
 package com.manydesigns.portofino.pageactions.crud.configuration;
 
 import com.manydesigns.elements.options.DisplayMode;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.ForeignKey;
 import com.manydesigns.portofino.model.database.ModelSelectionProvider;
 import com.manydesigns.portofino.model.database.Table;
@@ -71,9 +72,9 @@ public class SelectionProviderReference {
         }
 
         if(!StringUtils.isEmpty(foreignKeyName)) {
-            foreignKey = table.findForeignKeyByName(foreignKeyName);
+            foreignKey = DatabaseLogic.findForeignKeyByName(table, foreignKeyName);
         } else if(!StringUtils.isEmpty(selectionProviderName)) {
-            selectionProvider = table.findSelectionProviderByName(selectionProviderName);
+            selectionProvider = DatabaseLogic.findSelectionProviderByName(table, selectionProviderName);
         } else {
             throw new Error("foreignKey and selectionProvider are both null");
         }

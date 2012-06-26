@@ -369,8 +369,8 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 row.writeToObject(currCol);
                 if (ArrayUtils.contains(cols_selection, currCol.getColumnName())){
                     table.getColumns().remove(
-                            table.findColumnByName(
-                                    currCol.getColumnName()));
+                            DatabaseLogic.findColumnByName(
+                                    table, currCol.getColumnName()));
                 } else {
                     columnNames.add(currCol.getColumnName());
                 }
