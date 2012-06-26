@@ -86,8 +86,16 @@ public class Dispatcher {
 
         PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage);
         pagePath.add(rootPageInstance);
+
+        return createDispatch(contextPath, path, pagePath, fragmentsIterator);
+    }
+
+    protected Dispatch createDispatch(
+            String contextPath, String path, List<PageInstance> initialPath,
+            ListIterator<String> fragmentsIterator) {
+        PageInstance rootPageInstance = initialPath.get(initialPath.size() - 1);
         try {
-            makePageInstancePath(pagePath, fragmentsIterator, rootPageInstance);
+            makePageInstancePath(initialPath, fragmentsIterator, rootPageInstance);
         } catch (PageNotActiveException e) {
             logger.debug("Page not active, not creating dispatch");
             return null;
@@ -102,13 +110,13 @@ public class Dispatcher {
         }
 
         // check path contains root page and some child page at least
-        if (pagePath.size() <= 1) {
+        if (initialPath.size() <= 1) {
             return null;
         }
 
         PageInstance[] pageArray =
-                new PageInstance[pagePath.size()];
-        pagePath.toArray(pageArray);
+                new PageInstance[initialPath.size()];
+        initialPath.toArray(pageArray);
 
         Dispatch dispatch = new Dispatch(contextPath, path, pageArray);
         return dispatch;

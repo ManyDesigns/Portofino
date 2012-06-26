@@ -67,6 +67,7 @@ import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import jxl.Workbook;
+import jxl.WorkbookSettings;
 import jxl.write.DateFormat;
 import jxl.write.*;
 import jxl.write.Number;
@@ -1230,7 +1231,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     private void writeFileSearchExcel(File fileTemp) {
         WritableWorkbook workbook = null;
         try {
-            workbook = Workbook.createWorkbook(fileTemp);
+            WorkbookSettings workbookSettings = new WorkbookSettings();
+            workbookSettings.setUseTemporaryFileDuringWrite(true);
+            workbook = Workbook.createWorkbook(fileTemp, workbookSettings);
             String title = crudConfiguration.getSearchTitle();
             if(StringUtils.isBlank(title)) {
                 title = "export";
@@ -1308,7 +1311,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             throws IOException, WriteException {
         WritableWorkbook workbook = null;
         try {
-            workbook = Workbook.createWorkbook(fileTemp);
+            WorkbookSettings workbookSettings = new WorkbookSettings();
+            workbookSettings.setUseTemporaryFileDuringWrite(true);
+            workbook = Workbook.createWorkbook(fileTemp, workbookSettings);
             WritableSheet sheet =
                 workbook.createSheet(crudConfiguration.getReadTitle(),
                         workbook.getNumberOfSheets());
@@ -1518,8 +1523,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             transformer.setParameter("versionParam", "2.0");
 
             // Setup input for XSLT transformation
-            Source src = new StreamSource(new StringReader(
-                    composeXmlSearch().toString()));
+            Reader reader = composeXmlSearch();
+            Source src = new StreamSource(reader);
 
             // Resulting SAX events (the generated FO) must be piped through to
             // FOP
@@ -1527,6 +1532,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
             // Start XSLT transformation and FOP processing
             transformer.transform(src, res);
+            reader.close();
 
             out.flush();
         } catch (Exception e) {
@@ -1562,7 +1568,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    public XmlBuffer composeXmlSearch() {
+    public Reader composeXmlSearch() throws IOException {
         XmlBuffer xb = new XmlBuffer();
         xb.writeXmlHeader("UTF-8");
         xb.openElement("class");
@@ -1603,7 +1609,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         xb.closeElement("class");
 
-        return xb;
+        return new StringReader(xb.toString());
     }
 
     protected double[] setupXmlSearchColumnSizes() {
@@ -1661,7 +1667,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // ExportRead
     //**************************************************************************
 
-    private XmlBuffer composeXmlPort()
+    protected Reader composeXmlPort()
             throws IOException, WriteException {
         setupSearchForm();
 
@@ -1700,7 +1706,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
 
         xb.closeElement("class");
-        return xb;
+
+        return new StringReader(xb.toString());
     }
 
      public void exportReadPdf(File tempPdfFile) throws FOPException,
@@ -1731,8 +1738,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             transformer.setParameter("versionParam", "2.0");
 
             // Setup input for XSLT transformation
-            Source src = new StreamSource(new StringReader(
-                    composeXmlPort().toString()));
+            Reader reader = composeXmlPort();
+            Source src = new StreamSource(reader);
 
             // Resulting SAX events (the generated FO) must be piped through to
             // FOP
@@ -1741,6 +1748,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             // Start XSLT transformation and FOP processing
             transformer.transform(src, res);
 
+            reader.close();
             out.flush();
         } catch (Exception e) {
             logger.warn("IOException", e);

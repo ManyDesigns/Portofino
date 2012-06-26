@@ -64,16 +64,7 @@ public class ApplicationRealm extends AuthorizingRealm implements UsersGroupsDAO
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-        UsernamePasswordToken upToken = (UsernamePasswordToken) token;
-
-        if(upToken.getUsername() == null || upToken.getPassword() == null) {
-            throw new IncorrectCredentialsException("Username or password is null");
-        }
-
-        String username = upToken.getUsername();
-        String password = new String(upToken.getPassword());
-
-        return ensureDelegate().getAuthenticationInfo(this, username, password);
+        return ensureDelegate().getAuthenticationInfo(this, token);
     }
 
     public Set<String> getUsers() {

@@ -67,15 +67,20 @@
                                                 <portofino:buttons list="login-buttons" cssClass="portletButton" />
                                             </td>
                                         </tr>
-                                        <c:if test="recoverPwd">
+                                        <!--<c:if test="recoverPwd">
                                             <tr>
                                                 <td colspan="2">
                                                     <fmt:message key="skins.default.login.forgot_pwd"/> <a href="PwdRecovery.action"><fmt:message key="skins.default.login.retrieve_pwd"/></a>
                                                 </td>
                                             </tr>
-                                        </c:if>
+                                        </c:if>-->
                                         </tbody>
                                     </table>
+                                    Login with <stripes:link beanclass="com.manydesigns.portofino.actions.user.LoginAction"
+                                                             event="showOpenIDForm">
+                                        <stripes:param name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
+                                        <stripes:param name="returnUrl" value="${actionBean.returnUrl}" />
+                                    OpenID</stripes:link>
                                 </stripes:layout-component>
                             </div>
                             <div class="portletFooter" style="border-top: 1px solid #ddd; padding-top: 0.5em">

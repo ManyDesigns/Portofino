@@ -1,7 +1,7 @@
 import com.manydesigns.portofino.PortofinoProperties
 import com.manydesigns.portofino.application.Application
+import com.manydesigns.portofino.shiro.AbstractApplicationRealmDelegate
 import com.manydesigns.portofino.shiro.ApplicationRealm
-import com.manydesigns.portofino.shiro.ApplicationRealmDelegate
 import com.manydesigns.portofino.shiro.GroupPermission
 import java.security.MessageDigest
 import org.apache.commons.configuration.Configuration
@@ -24,7 +24,7 @@ import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class Security implements ApplicationRealmDelegate {
+class Security extends AbstractApplicationRealmDelegate {
 
     public static final Logger logger = LoggerFactory.getLogger(Security.class);
 
