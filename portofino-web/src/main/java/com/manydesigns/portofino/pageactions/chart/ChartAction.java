@@ -171,7 +171,7 @@ public class ChartAction extends AbstractPageAction {
         chartGenerator.setBorderVisible(borderVisible);
         chartGenerator.setHeight(height);
         chartGenerator.setWidth(width);
-        chart = chartGenerator.generate(chartConfiguration, application);
+        chart = chartGenerator.generate(chartConfiguration, application, context.getLocale());
     }
 
     public Resolution chart() throws FileNotFoundException {

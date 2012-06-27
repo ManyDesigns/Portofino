@@ -41,6 +41,8 @@ import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.VerticalAlignment;
 
 import java.awt.*;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -60,7 +62,7 @@ public abstract class Chart1DGenerator extends AbstractChartGenerator {
     private final Font legendItemFont = new Font("SansSerif", Font.PLAIN, 10);
     private final Color transparentColor = new Color(0, true);
 
-    public JFreeChart generate(ChartDefinition chartDefinition, Application application) {
+    public JFreeChart generate(ChartDefinition chartDefinition, Application application, Locale locale) {
         DefaultPieDataset dataset = new DefaultPieDataset();
         java.util.List<Object[]> result;
         String query = chartDefinition.getQuery();
@@ -114,7 +116,8 @@ public abstract class Chart1DGenerator extends AbstractChartGenerator {
 //        plot.setLabelGenerator(new MyPieSectionLabelGenerator());
 
         // imposta il messaggio se non ci sono dati
-        plot.setNoDataMessage("TODO i18n: No_data_available");
+        ResourceBundle bundle = application.getBundle(locale);
+        plot.setNoDataMessage(bundle.getString("chart.noDataMessage"));
 
         plot.setCircular(true);
 

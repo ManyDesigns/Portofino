@@ -26,6 +26,8 @@ package com.manydesigns.portofino.chart;
 import com.manydesigns.portofino.application.Application;
 import org.jfree.chart.JFreeChart;
 
+import java.util.Locale;
+
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -36,7 +38,7 @@ public interface ChartGenerator {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    JFreeChart generate(ChartDefinition chartDefinition, Application application);
+    JFreeChart generate(ChartDefinition chartDefinition, Application application, Locale locale);
 
     boolean isAntiAlias();
     void setAntiAlias(boolean antiAlias);

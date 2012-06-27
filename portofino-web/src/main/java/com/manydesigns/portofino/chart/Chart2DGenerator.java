@@ -44,6 +44,8 @@ import org.jfree.text.TextBlockAnchor;
 import org.jfree.ui.*;
 
 import java.awt.*;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -64,7 +66,7 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
     private final Font legendItemFont = new Font("SansSerif", Font.PLAIN, 10);
     private final Color transparentColor = new Color(0, true);
 
-    public JFreeChart generate(ChartDefinition chartDefinition, Application application) {
+    public JFreeChart generate(ChartDefinition chartDefinition, Application application, Locale locale) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         java.util.List<Object[]> result;
         String query = chartDefinition.getQuery();
@@ -133,7 +135,8 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
 //        plot.setToolTipGenerator(new StandardPieToolTipGenerator("{0} = {1} ({2})"));
 
         // imposta il messaggio se non ci sono dati
-        plot.setNoDataMessage("TODO i18n: No_data_available");
+        ResourceBundle bundle = application.getBundle(locale);
+        plot.setNoDataMessage(bundle.getString("chart.noDataMessage"));
         plot.setRangeGridlinesVisible(true);
         plot.setRangeGridlinePaint(Color.GRAY);
         plot.setAxisOffset(new RectangleInsets(0,0,0,0));
