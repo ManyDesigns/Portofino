@@ -61,24 +61,32 @@ public class DispatcherFilter implements Filter {
         //Application application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
 
         logger.debug("Invoking the dispatcher to create a dispatch");
-        Dispatch dispatch = Dispatcher.getDispatchForRequest(httpRequest);
+        String oldPath = (String) request.getAttribute(Dispatcher.DISPATCH_PATH);
+        request.removeAttribute(Dispatcher.DISPATCH_PATH);
+        Dispatcher dispatcher = Dispatcher.forRequest(httpRequest);
+        Dispatch dispatch = dispatcher.getDispatch(httpRequest);
 
         if (dispatch == null) {
-            logger.debug("We can't handle this path ({})." +
+            if(oldPath != null) {
+                dispatch = dispatcher.getDispatch(httpRequest.getContextPath(), oldPath);
+            } else {
+                logger.debug("We can't handle this path ({})." +
                     " Let's do the normal filter chain",
                     httpRequest.getServletPath());
-            chain.doFilter(request, response);
-            return;
+                chain.doFilter(request, response);
+                return;
+            }
         }
 
-        Map<String, Object> savedAttributes =
-                saveAndResetRequestAttributes(request);
-        //request.setAttribute(RequestAttributes.DISPATCH, dispatch);
+        //Map<String, Object> savedAttributes =
+        //        saveAndResetRequestAttributes(request);
+        request.setAttribute(Dispatcher.DISPATCH_PATH, dispatch.getOriginalPath());
         try {
             //Handle through the ModelActionResolver
             chain.doFilter(request, response);
         } finally {
-            restoreRequestAttributes(request, savedAttributes);
+            //restoreRequestAttributes(request, savedAttributes);
+            request.setAttribute(Dispatcher.DISPATCH_PATH, oldPath);
         }
     }
 

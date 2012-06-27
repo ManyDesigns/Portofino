@@ -101,6 +101,9 @@ public class ApplicationInterceptor implements Interceptor {
                     logger.debug("Not preparing root");
                     continue;
                 }
+                if(page.isPrepared()) {
+                    continue;
+                }
                 logger.debug("Preparing PageAction {}", page);
                 PageAction actionBean = ensureActionBean(page);
                 configureActionBean(actionBean, page, application);
@@ -111,6 +114,7 @@ public class ApplicationInterceptor implements Interceptor {
                         request.setAttribute(INVALID_PAGE_INSTANCE, page);
                         return resolution;
                     }
+                    page.setPrepared(true);
                 } catch (Throwable t) {
                     request.setAttribute(INVALID_PAGE_INSTANCE, page);
                     logger.error("PageAction prepare failed for " + page, t);

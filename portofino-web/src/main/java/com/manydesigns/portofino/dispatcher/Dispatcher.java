@@ -72,8 +72,17 @@ public class Dispatcher {
     }
 
     public Dispatch getDispatch(HttpServletRequest request) {
-        String originalPath = ServletUtils.getOriginalPath(request);
+        String originalPath = getDispatchPath(request);
+        if(originalPath == null) {
+            originalPath = ServletUtils.getOriginalPath(request);
+        }
         return getDispatch(request.getContextPath(), originalPath);
+    }
+
+    public static final String DISPATCH_PATH = Dispatcher.class.getName() + ".DISPATCH_PATH";
+
+    public String getDispatchPath(HttpServletRequest request) {
+        return (String) request.getAttribute(DISPATCH_PATH);
     }
 
     public Dispatch getDispatch(String contextPath, String path) {
@@ -173,8 +182,8 @@ public class Dispatcher {
     protected void makePageInstancePath
             (List<PageInstance> pagePath, ListIterator<String> fragmentsIterator, PageInstance parentPageInstance)
             throws Exception {
-        File currentDirectory = parentPageInstance.getDirectory();
-        boolean params = false;
+        File currentDirectory = parentPageInstance.getChildrenDirectory();
+        boolean params = !parentPageInstance.getParameters().isEmpty();
         while(fragmentsIterator.hasNext()) {
             String nextFragment = fragmentsIterator.next();
             File childDirectory = new File(currentDirectory, nextFragment);

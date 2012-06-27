@@ -50,6 +50,7 @@ public class PageInstance {
     protected Object configuration;
     protected PageAction actionBean;
     protected String description;
+    protected boolean prepared;
 
     public static final String DETAIL = "_detail";
 
@@ -177,5 +178,13 @@ public class PageInstance {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isPrepared() {
+        return prepared;
+    }
+
+    public void setPrepared(boolean prepared) {
+        this.prepared = prepared;
     }
 }
