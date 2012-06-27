@@ -145,6 +145,10 @@ public class ApplicationInterceptor implements Interceptor {
     protected void configureActionBean
             (PageAction actionBean, PageInstance pageInstance, Application application)
             throws JAXBException, IOException {
+        if(pageInstance.getConfiguration() != null) {
+            logger.debug("Page instance {} is already configured");
+            return;
+        }
         File configurationFile = new File(pageInstance.getDirectory(), "configuration.xml");
         Object configuration = getConfigurationFromCache(configurationFile);
         if(configuration != null) {
