@@ -86,8 +86,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Properties
     //--------------------------------------------------------------------------
 
-    @Inject(RequestAttributes.DISPATCHER)
-    public Dispatcher dispatcher;
+    //@Inject(RequestAttributes.DISPATCHER)
+    //public Dispatcher dispatcher;
 
     public PageInstance pageInstance;
 
@@ -158,7 +158,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     public void setupReturnToParentTarget() {
         PageInstance[] pageInstancePath =
-                dispatcher.getDispatch(context.getRequest()).getPageInstancePath();
+                Dispatcher.getDispatchForRequest(context.getRequest()).getPageInstancePath();
         boolean hasPrevious = getPage().getActualNavigationRoot() == NavigationRoot.INHERIT;
         hasPrevious = hasPrevious && pageInstancePath.length > 1;
         if(hasPrevious) {
@@ -204,7 +204,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     //--------------------------------------------------------------------------
 
     public Dispatch getDispatch() {
-        return dispatcher.getDispatch(context.getRequest());
+        return Dispatcher.getDispatchForRequest(context.getRequest());
     }
 
     public String getReturnToParentTarget() {

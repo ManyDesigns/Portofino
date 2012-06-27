@@ -57,14 +57,15 @@ public class Dispatcher {
         if(dispatcher != null) {
             return dispatcher;
         } else {
-            dispatcher = new Dispatcher(request);
+            Application app = (Application) request.getAttribute(RequestAttributes.APPLICATION);
+            dispatcher = new Dispatcher(app);
             request.setAttribute(RequestAttributes.DISPATCHER, dispatcher);
             return dispatcher;
         }
     }
 
-    protected Dispatcher(HttpServletRequest request) {
-        this.application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
+    protected Dispatcher(Application application) {
+        this.application = application;
     }
 
     public static Dispatch getDispatchForRequest(HttpServletRequest request) {
