@@ -60,13 +60,13 @@ public class DispatcherFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         //Application application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
 
-        logger.debug("Invoking the dispatcher to create a dispatch");
-        String oldPath = (String) request.getAttribute(Dispatcher.DISPATCH_PATH);
-        request.removeAttribute(Dispatcher.DISPATCH_PATH);
-        Dispatcher dispatcher = Dispatcher.forRequest(httpRequest);
-        Dispatch dispatch = dispatcher.getDispatch(httpRequest);
+        logger.debug("Installing the dispatcher in the http current request");
+        //String oldPath = (String) request.getAttribute(Dispatcher.DISPATCH_PATH);
+        //request.removeAttribute(Dispatcher.DISPATCH_PATH);
+        DispatcherUtil.install(httpRequest);
+        //Dispatch dispatch = DispatcherUtil.getDispatch(dispatcher, httpRequest);
 
-        if (dispatch == null) {
+        /*if (dispatch == null) {
             if(oldPath != null) {
                 dispatch = dispatcher.getDispatch(httpRequest.getContextPath(), oldPath);
             } else {
@@ -87,7 +87,8 @@ public class DispatcherFilter implements Filter {
         } finally {
             //restoreRequestAttributes(request, savedAttributes);
             request.setAttribute(Dispatcher.DISPATCH_PATH, oldPath);
-        }
+        }*/
+        chain.doFilter(request, response);
     }
 
     private void restoreRequestAttributes(ServletRequest request,

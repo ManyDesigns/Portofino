@@ -1,7 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.Dispatcher" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.DispatcherUtil" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.PageAction" %>
 <%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
 <%@ page import="com.manydesigns.portofino.navigation.Navigation" %>
 <%@ page import="com.manydesigns.portofino.navigation.NavigationItem" %>
@@ -11,7 +12,9 @@
 <%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <jsp:useBean id="app" scope="request" type="com.manydesigns.portofino.application.Application" />
+<jsp:useBean id="actionBean" scope="request" type="net.sourceforge.stripes.action.ActionBean" />
 <%
+    Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);
     boolean admin = SecurityLogic.isAdministrator(request);
     int startingLevel = 0;
     int maxLevel = 10000;
@@ -24,7 +27,6 @@
         maxLevel = Integer.parseInt(param);
     }
 
-    Dispatch dispatch = Dispatcher.getDispatchForRequest(request);
     Navigation navigation = new Navigation(app, dispatch, SecurityUtils.getSubject(), admin);
     List<NavigationItem> navigationItems;
     NavigationItem rootNavigationItem = navigation.getRootNavigationItem();

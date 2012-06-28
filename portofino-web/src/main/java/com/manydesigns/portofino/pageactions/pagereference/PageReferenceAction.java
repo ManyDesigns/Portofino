@@ -25,7 +25,6 @@ package com.manydesigns.portofino.pageactions.pagereference;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.pagereference.configuration.PageReferenceConfiguration;
 import com.manydesigns.portofino.security.AccessLevel;
@@ -164,8 +163,8 @@ public class PageReferenceAction extends AbstractPageAction {
         return form;
     }
 
-    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        Resolution resolution = super.prepare(pageInstance, context);
+    public Resolution preparePage() {
+        Resolution resolution = super.preparePage();
         if(resolution != null) {
             return resolution;
         }

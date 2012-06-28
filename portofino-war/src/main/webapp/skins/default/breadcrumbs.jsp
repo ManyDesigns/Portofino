@@ -1,13 +1,15 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="com.manydesigns.portofino.breadcrumbs.BreadcrumbItem" %>
 <%@ page import="com.manydesigns.portofino.breadcrumbs.Breadcrumbs" %>
-<%@ page import="java.util.List" %>
 <%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.Dispatcher" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.DispatcherUtil" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.PageAction" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <div class="breadcrumbs">
+<jsp:useBean id="actionBean" scope="request" type="net.sourceforge.stripes.action.ActionBean" />
     <%
-        Dispatch dispatch = Dispatcher.getDispatchForRequest(request);
+        Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);
         Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
         List<BreadcrumbItem> items = breadcrumbs.getItems();
         for (int i = 0; i < items.size(); i++) {

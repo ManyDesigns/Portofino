@@ -87,7 +87,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     //--------------------------------------------------------------------------
 
     //@Inject(RequestAttributes.DISPATCHER)
-    //public Dispatcher dispatcher;
+    public Dispatch dispatch;
 
     public PageInstance pageInstance;
 
@@ -146,8 +146,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
     }*/
 
-    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        this.pageInstance = pageInstance;
+    public Resolution preparePage() {
         embedded = context.getRequest().getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH) != null;
         return null;
     }
@@ -158,7 +157,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     public void setupReturnToParentTarget() {
         PageInstance[] pageInstancePath =
-                Dispatcher.getDispatchForRequest(context.getRequest()).getPageInstancePath();
+                dispatch.getPageInstancePath();
         boolean hasPrevious = getPage().getActualNavigationRoot() == NavigationRoot.INHERIT;
         hasPrevious = hasPrevious && pageInstancePath.length > 1;
         if(hasPrevious) {
@@ -204,7 +203,11 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     //--------------------------------------------------------------------------
 
     public Dispatch getDispatch() {
-        return Dispatcher.getDispatchForRequest(context.getRequest());
+        return dispatch;
+    }
+
+    public void setDispatch(Dispatch dispatch) {
+        this.dispatch = dispatch;
     }
 
     public String getReturnToParentTarget() {
@@ -319,12 +322,12 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return pageInstance;
     }
 
-    public Page getPage() {
-        return getPageInstance().getPage();
-    }
-
     public void setPageInstance(PageInstance pageInstance) {
         this.pageInstance = pageInstance;
+    }
+
+    public Page getPage() {
+        return getPageInstance().getPage();
     }
 
     public Application getApplication() {
@@ -475,7 +478,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         for(File child : children) {
             if(!child.getName().equals(PageInstance.DETAIL)) {
                 try {
-                    Page page = DispatcherLogic.loadPage(child);
+                    Page page = DispatcherLogic.getPage(child);
                     page.getLayout().setTemplate(edit.template);
                     page.getDetailLayout().setTemplate(edit.detailTemplate);
                     DispatcherLogic.savePage(child, page);

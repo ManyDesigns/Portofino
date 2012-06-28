@@ -24,13 +24,14 @@ package com.manydesigns.portofino.pageactions.custom;
 
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.action.ErrorResolution;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,8 +71,8 @@ public class CustomAction extends AbstractPageAction {
         return cancel();
     }
 
-    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        Resolution resolution = super.prepare(pageInstance, context);
+    public Resolution preparePage() {
+        Resolution resolution = super.preparePage();
         if(resolution != null) {
             return resolution;
         }

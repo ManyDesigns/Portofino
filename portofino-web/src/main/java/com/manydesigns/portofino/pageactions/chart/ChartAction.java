@@ -330,8 +330,8 @@ public class ChartAction extends AbstractPageAction {
         }
     }
 
-    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        Resolution resolution = super.prepare(pageInstance, context);
+    public Resolution preparePage() {
+        Resolution resolution = super.preparePage();
         if(resolution != null) {
             return resolution;
         }

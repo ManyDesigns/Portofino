@@ -27,7 +27,6 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
@@ -37,7 +36,10 @@ import com.manydesigns.portofino.pageactions.jsgantt.model.Task;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
-import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ErrorResolution;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -83,8 +85,8 @@ public class JsGanttAction extends AbstractPageAction {
     // Setup & configuration
     //**************************************************************************
 
-    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        Resolution resolution = super.prepare(pageInstance, context);
+    public Resolution preparePage() {
+        Resolution resolution = super.preparePage();
         if(resolution != null) {
             return resolution;
         }

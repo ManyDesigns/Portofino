@@ -22,8 +22,6 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.elements.servlet.ServletUtils;
-import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Page;
@@ -31,7 +29,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,38 +49,8 @@ public class Dispatcher {
     protected final Application application;
     protected final Map<String, Dispatch> cache = new ConcurrentHashMap<String, Dispatch>();
 
-    public static Dispatcher forRequest(HttpServletRequest request) {
-        Dispatcher dispatcher = (Dispatcher) request.getAttribute(RequestAttributes.DISPATCHER);
-        if(dispatcher != null) {
-            return dispatcher;
-        } else {
-            Application app = (Application) request.getAttribute(RequestAttributes.APPLICATION);
-            dispatcher = new Dispatcher(app);
-            request.setAttribute(RequestAttributes.DISPATCHER, dispatcher);
-            return dispatcher;
-        }
-    }
-
-    protected Dispatcher(Application application) {
+    public Dispatcher(Application application) {
         this.application = application;
-    }
-
-    public static Dispatch getDispatchForRequest(HttpServletRequest request) {
-        return forRequest(request).getDispatch(request);
-    }
-
-    public Dispatch getDispatch(HttpServletRequest request) {
-        String originalPath = getDispatchPath(request);
-        if(originalPath == null) {
-            originalPath = ServletUtils.getOriginalPath(request);
-        }
-        return getDispatch(request.getContextPath(), originalPath);
-    }
-
-    public static final String DISPATCH_PATH = Dispatcher.class.getName() + ".DISPATCH_PATH";
-
-    public String getDispatchPath(HttpServletRequest request) {
-        return (String) request.getAttribute(DISPATCH_PATH);
     }
 
     public Dispatch getDispatch(String contextPath, String path) {
@@ -133,7 +100,8 @@ public class Dispatcher {
             }
             return dispatch;
         } else {
-            List<PageInstance> pagePath = new ArrayList<PageInstance>(Arrays.asList(dispatch.getPageInstancePath()));
+            List<PageInstance> pagePath =
+                    new ArrayList<PageInstance>(Arrays.asList(dispatch.getPageInstancePath()));
             String[] fragments = StringUtils.split(path.substring(subPath.length()), '/');
 
             List<String> fragmentsAsList = Arrays.asList(fragments);
@@ -203,7 +171,8 @@ public class Dispatcher {
                 Page page = DispatcherLogic.getPage(childDirectory);
                 Class<? extends PageAction> actionClass =
                         DispatcherLogic.getActionClass(application, childDirectory);
-                PageInstance pageInstance = new PageInstance(parentPageInstance, childDirectory, application, page, actionClass);
+                PageInstance pageInstance =
+                        new PageInstance(parentPageInstance, childDirectory, application, page, actionClass);
                 pagePath.add(pageInstance);
                 makePageInstancePath(pagePath, fragmentsIterator, pageInstance);
                 return;

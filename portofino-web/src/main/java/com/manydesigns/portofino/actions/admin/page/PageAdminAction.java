@@ -89,7 +89,7 @@ import java.util.*;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @UrlBinding("/actions/admin/page")
-public class PageAdminAction extends AbstractActionBean {
+public class PageAdminAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
@@ -117,7 +117,7 @@ public class PageAdminAction extends AbstractActionBean {
 
     @Before
     public void prepare() {
-        Dispatcher dispatcher = Dispatcher.forRequest(context.getRequest());
+        Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
         String contextPath = context.getRequest().getContextPath();
         dispatch = dispatcher.getDispatch(contextPath, originalPath);
         /* TODO ora tutte le operazioni richiedono administrator.
@@ -383,7 +383,7 @@ public class PageAdminAction extends AbstractActionBean {
         if(parentPageInstance == null) {
             SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.root"));
         } else {
-            Dispatcher dispatcher = Dispatcher.forRequest(context.getRequest());
+            Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
             String contextPath = context.getRequest().getContextPath();
             String landingPagePath = application.getAppConfiguration().getString(AppProperties.LANDING_PAGE);
             Dispatch landingPageDispatch = dispatcher.getDispatch(contextPath, landingPagePath);
@@ -479,7 +479,7 @@ public class PageAdminAction extends AbstractActionBean {
                 throw new Error("Couldn't load root page", e);
             }
         } else {
-            Dispatcher dispatcher = Dispatcher.forRequest(context.getRequest());
+            Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
             Dispatch destinationDispatch =
                     dispatcher.getDispatch(context.getRequest().getContextPath(), destinationPagePath);
             //TODO gestione eccezioni

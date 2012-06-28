@@ -85,7 +85,7 @@ public class ModelActionResolver extends NameBasedActionResolver {
     @Override
     protected ActionBean makeNewActionBean(
             Class<? extends ActionBean> type, ActionBeanContext context) throws Exception {
-        Dispatch dispatch = Dispatcher.getDispatchForRequest(context.getRequest());
+        Dispatch dispatch = DispatcherUtil.getDispatch(context.getRequest());
         if(dispatch != null) {
             PageInstance pageInstance = dispatch.getLastPageInstance();
             if(type.equals(pageInstance.getActionClass())) {
@@ -117,7 +117,7 @@ public class ModelActionResolver extends NameBasedActionResolver {
 
     protected Dispatch getDispatch(String path) {
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-        Dispatcher dispatcher = Dispatcher.forRequest(request);
+        Dispatcher dispatcher = DispatcherUtil.get(request);
         return dispatcher.getDispatch(request.getContextPath(), path);
     }
 

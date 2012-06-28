@@ -38,7 +38,7 @@
             <div id="yui-main">
                 <div id="content" class="yui-b" style="margin-left: 0;">
                     <c:if test="${empty formActionUrl}">
-                        <c:set var="formActionUrl" value="${dispatch.originalPath}" />
+                        <c:set var="formActionUrl" value="${actionBean.dispatch.originalPath}" />
                     </c:if>
                     <stripes:form action="${formActionUrl}" method="post" enctype="multipart/form-data">
                         <div class="contentHeader">

@@ -93,7 +93,7 @@ public class ApplicationInterceptor implements Interceptor {
         BlobManager blobManager = ElementsThreadLocals.getBlobManager();
         blobManager.setBlobsDir(application.getAppBlobsDir());
 
-        Dispatch dispatch = Dispatcher.getDispatchForRequest(request);
+        Dispatch dispatch = DispatcherUtil.getDispatch(request);
         if (dispatch != null) {
             logger.debug("Preparing PageActions");
             for(PageInstance page : dispatch.getPageInstancePath()) {
@@ -108,7 +108,10 @@ public class ApplicationInterceptor implements Interceptor {
                 PageAction actionBean = ensureActionBean(page);
                 configureActionBean(actionBean, page, application);
                 try {
-                    Resolution resolution = actionBean.prepare(page, actionContext);
+                    actionBean.setContext(actionContext);
+                    actionBean.setDispatch(dispatch);
+                    actionBean.setPageInstance(page);
+                    Resolution resolution = actionBean.preparePage();
                     if(resolution != null) {
                         logger.debug("PageAction prepare returned a resolution: {}", resolution);
                         request.setAttribute(INVALID_PAGE_INSTANCE, page);
@@ -150,37 +153,14 @@ public class ApplicationInterceptor implements Interceptor {
             return;
         }
         File configurationFile = new File(pageInstance.getDirectory(), "configuration.xml");
-        Object configuration = getConfigurationFromCache(configurationFile);
-        if(configuration != null) {
+        Class<?> configurationClass = PageActionLogic.getConfigurationClass(actionBean.getClass());
+        try {
+            Object configuration =
+                    DispatcherLogic.getConfiguration(configurationFile, application, configurationClass);
             pageInstance.setConfiguration(configuration);
-        } else {
-            try {
-                Class<?> configurationClass = PageActionLogic.getConfigurationClass(actionBean.getClass());
-                configuration = DispatcherLogic.loadConfiguration
-                        (pageInstance.getDirectory(), configurationClass);
-
-                if(configuration instanceof PageActionConfiguration) {
-                    ((PageActionConfiguration) configuration).init(application);
-                }
-                if(configuration != null) {
-                    putConfigurationInCache(configurationFile, configuration);
-                    pageInstance.setConfiguration(configuration);
-                }
-            } catch (Throwable t) {
-                logger.error("Couldn't load configuration from " + configurationFile.getAbsolutePath(), t);
-            }
+        } catch (Throwable t) {
+            logger.error("Couldn't load configuration from " + configurationFile.getAbsolutePath(), t);
         }
-    }
-
-    //TODO!!!
-    //private ConcurrentMap<File, Object> configurationCache = new ConcurrentHashMap<File, Object>();
-
-    private void putConfigurationInCache(File pageFile, Object configuration) {
-        //configurationCache.put(pageFile, configuration);
-    }
-
-    private Object getConfigurationFromCache(File pageFile) {
-        return null; //configurationCache.get(pageFile);
     }
 
 }

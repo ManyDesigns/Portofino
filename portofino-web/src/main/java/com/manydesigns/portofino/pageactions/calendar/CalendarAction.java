@@ -26,7 +26,6 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
@@ -35,7 +34,6 @@ import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConf
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -96,8 +94,8 @@ public class CalendarAction extends CustomAction {
     // Setup and configuration
     //**************************************************************************
 
-    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        Resolution resolution = super.prepare(pageInstance, context);
+    public Resolution preparePage() {
+        Resolution resolution = super.preparePage();
         if(resolution != null) {
             return resolution;
         }

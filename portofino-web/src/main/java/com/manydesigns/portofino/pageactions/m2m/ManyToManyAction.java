@@ -40,7 +40,6 @@ import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.database.TableCriteria;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
@@ -107,8 +106,8 @@ public class ManyToManyAction extends AbstractPageAction {
     //Logging
     private  static final Logger logger = LoggerFactory.getLogger(ManyToManyAction.class);
 
-    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        Resolution resolution = super.prepare(pageInstance, context);
+    public Resolution preparePage() {
+        Resolution resolution = super.preparePage();
         if(resolution != null) {
             return resolution;
         }

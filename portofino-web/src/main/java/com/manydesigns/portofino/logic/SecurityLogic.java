@@ -23,11 +23,10 @@
 package com.manydesigns.portofino.logic;
 
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.Dispatcher;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
@@ -46,7 +45,10 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -59,22 +61,6 @@ public class SecurityLogic {
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(SecurityLogic.class);
-
-    public static boolean hasPermissions
-            (HttpServletRequest request, AccessLevel level, String... permissions) {
-        boolean isNotAdmin = !isAdministrator(request);
-        Dispatch dispatch = Dispatcher.getDispatchForRequest(request);
-        if (isNotAdmin && dispatch != null) {
-            Subject subject = SecurityUtils.getSubject();
-            PageInstance pageInstance = dispatch.getLastPageInstance();
-            Page page = pageInstance.getPage();
-            return hasPermissions
-                    (dispatch.getLastPageInstance().getApplication(), page.getPermissions(),
-                     subject, level, permissions);
-        } else {
-            return true;
-        }
-    }
 
     public static boolean hasPermissions(Dispatch dispatch, Subject subject, Method handler) {
         logger.debug("Checking action permissions");

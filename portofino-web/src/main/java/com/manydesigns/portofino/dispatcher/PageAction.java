@@ -23,7 +23,6 @@
 package com.manydesigns.portofino.dispatcher;
 
 import net.sourceforge.stripes.action.ActionBean;
-import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Resolution;
 
 /**
@@ -36,10 +35,16 @@ public interface PageAction extends ActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    Resolution prepare(PageInstance pageInstance, ActionBeanContext context);
+    Resolution preparePage();
 
     String getDescription();
 
     PageInstance getPageInstance();
+
+    void setPageInstance(PageInstance pageInstance);
+
+    void setDispatch(Dispatch dispatch);
+
+    Dispatch getDispatch();
     
 }

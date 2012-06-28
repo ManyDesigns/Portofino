@@ -22,6 +22,11 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.ElementsFileUtils;
@@ -43,6 +48,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -65,7 +71,7 @@ public class DispatcherLogic {
             (Application application, File baseDir, boolean includeRoot, boolean includeDetailChildren,
              File... excludes) {
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("pages");
-        if(includeRoot) {
+        if (includeRoot) {
             Page rootPage;
             try {
                 rootPage = getPage(baseDir);
@@ -96,14 +102,14 @@ public class DispatcherLogic {
     private static void appendToPagesSelectionProvider
             (Application application, File baseDir, File file, String breadcrumb,
              DefaultSelectionProvider selectionProvider, boolean includeDetailChildren, File... excludes) {
-        if(ArrayUtils.contains(excludes, file)) {
+        if (ArrayUtils.contains(excludes, file)) {
             return;
         }
-        if(PageInstance.DETAIL.equals(file.getName())) {
-            if(includeDetailChildren) {
+        if (PageInstance.DETAIL.equals(file.getName())) {
+            if (includeDetailChildren) {
                 breadcrumb += " (detail)"; //TODO I18n
                 selectionProvider.appendRow
-                    ("/" + ElementsFileUtils.getRelativePath(baseDir, file), breadcrumb, true);
+                        ("/" + ElementsFileUtils.getRelativePath(baseDir, file), breadcrumb, true);
                 appendChildrenToPagesSelectionProvider
                         (application, baseDir, file, breadcrumb, selectionProvider, includeDetailChildren, excludes);
             }
@@ -141,21 +147,113 @@ public class DispatcherLogic {
     }
 
     public static File savePage(File directory, Page page) throws Exception {
-        File pageFile = new File(directory, "page.xml");
+        File pageFile = getPageFile(directory);
         Marshaller marshaller = pagesJaxbContext.createMarshaller();
         marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         marshaller.marshal(page, pageFile);
         return pageFile;
     }
 
-    public static Page loadPage(File directory) throws Exception {
-        File pageFile = new File(directory, "page.xml");
-        FileInputStream fileInputStream = new FileInputStream(pageFile);
-        try {
-            return loadPage(fileInputStream);
-        } finally {
-            IOUtils.closeQuietly(fileInputStream);
+    protected static class FileCacheEntry<T> {
+        public final T object;
+        public final long lastModified;
+        public final Application application;
+
+        public FileCacheEntry(T object, long lastModified, Application application) {
+            this.object = object;
+            this.lastModified = lastModified;
+            this.application = application;
         }
+    }
+
+    protected static final LoadingCache<File, FileCacheEntry<Page>> pageCache =
+            CacheBuilder.newBuilder()
+                    .maximumSize(1000) //TODO conf
+                    .refreshAfterWrite(5, TimeUnit.SECONDS)
+                    .build(new CacheLoader<File, FileCacheEntry<Page>>() {
+
+                        protected Page doLoad(File key) throws Exception {
+                            FileInputStream fileInputStream = new FileInputStream(key);
+                            try {
+                                Page page = loadPage(fileInputStream);
+                                page.init();
+                                return page;
+                            } finally {
+                                IOUtils.closeQuietly(fileInputStream);
+                            }
+                        }
+
+                        @Override
+                        public FileCacheEntry<Page> load(File key) throws Exception {
+                            return new FileCacheEntry<Page>(doLoad(key), key.lastModified(), null);
+                        }
+
+                        @Override
+                        public ListenableFuture<FileCacheEntry<Page>> reload(
+                                final File key, FileCacheEntry<Page> oldValue)
+                                throws Exception {
+                            if (key.lastModified() > oldValue.lastModified) {
+                                /*return ListenableFutureTask.create(new Callable<PageCacheEntry>() {
+                                    public PageCacheEntry call() throws Exception {
+                                        return doLoad(key);
+                                    }
+                                });*/
+                                //TODO async?
+                                return Futures.immediateFuture(
+                                        new FileCacheEntry<Page>(doLoad(key), key.lastModified(), null));
+                            } else {
+                                return Futures.immediateFuture(oldValue);
+                            }
+                        }
+
+                    });
+
+    protected static final LoadingCache<File, FileCacheEntry<Object>> configurationCache =
+            CacheBuilder.newBuilder()
+                    .maximumSize(1000) //TODO conf
+                    .refreshAfterWrite(5, TimeUnit.SECONDS)
+                    .build(new CacheLoader<File, FileCacheEntry<Object>>() {
+
+                        protected Object doLoad(File key) throws Exception {
+                            FileInputStream fileInputStream = new FileInputStream(key);
+                            try {
+                                Page page = loadPage(fileInputStream);
+                                page.init();
+                                return page;
+                            } finally {
+                                IOUtils.closeQuietly(fileInputStream);
+                            }
+                        }
+
+                        @Override
+                        public FileCacheEntry<Object> load(File key) throws Exception {
+                            throw new UnsupportedOperationException();
+                        }
+
+                        @Override
+                        public ListenableFuture<FileCacheEntry<Object>> reload(
+                                final File key, FileCacheEntry<Object> oldValue)
+                                throws Exception {
+                            if (key.lastModified() > oldValue.lastModified) {
+                                /*return ListenableFutureTask.create(new Callable<PageCacheEntry>() {
+                                    public PageCacheEntry call() throws Exception {
+                                        return doLoad(key);
+                                    }
+                                });*/
+                                //TODO async?
+                                Object newConf = loadConfiguration(
+                                        key, oldValue.application, oldValue.object.getClass());
+                                return Futures.immediateFuture(
+                                        new FileCacheEntry<Object>(newConf, key.lastModified(), null));
+                            } else {
+                                return Futures.immediateFuture(oldValue);
+                            }
+                        }
+
+                    });
+
+    protected static File getPageFile(File directory) {
+        return new File(directory, "page.xml");
     }
 
     public static Page loadPage(InputStream inputStream) throws JAXBException {
@@ -164,9 +262,7 @@ public class DispatcherLogic {
     }
 
     public static Page getPage(File directory) throws Exception {
-        Page page = loadPage(directory);
-        page.init();
-        return page;
+        return pageCache.get(getPageFile(directory)).object;
     }
 
     public static File saveConfiguration(File directory, Object configuration) throws Exception {
@@ -179,22 +275,34 @@ public class DispatcherLogic {
         return configurationFile;
     }
 
-    public static <T> T loadConfiguration(File directory, Class<? extends T> configurationClass) throws Exception {
-        if(configurationClass == null) {
+    public static <T> T getConfiguration(
+            File configurationFile, Application application, Class<? extends T> configurationClass)
+            throws Exception {
+        FileCacheEntry<Object> entry = configurationCache.getIfPresent(configurationFile);
+        if(entry == null) {
+            T conf = loadConfiguration(configurationFile, application, configurationClass);
+            entry = new FileCacheEntry<Object>(conf, configurationFile.lastModified(), application);
+            configurationCache.put(configurationFile, entry);
+        }
+        return (T) entry.object;
+    }
+
+    protected static <T> T loadConfiguration(
+            File configurationFile, Application application, Class<? extends T> configurationClass) throws Exception {
+        if (configurationClass == null) {
             return null;
         }
-        File configurationFile = new File(directory, "configuration.xml");
         InputStream inputStream = new FileInputStream(configurationFile);
         try {
-            return loadConfiguration(inputStream, configurationClass);
+            return loadConfiguration(inputStream, application, configurationClass);
         } finally {
             IOUtils.closeQuietly(inputStream);
         }
     }
 
-    public static <T> T loadConfiguration
-            (InputStream inputStream, Class<? extends T> configurationClass) throws Exception {
-        if(configurationClass == null) {
+    protected static <T> T loadConfiguration
+            (InputStream inputStream, Application application, Class<? extends T> configurationClass) throws Exception {
+        if (configurationClass == null) {
             return null;
         }
         Object configuration;
@@ -202,9 +310,12 @@ public class DispatcherLogic {
         JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         configuration = unmarshaller.unmarshal(inputStream);
-        if(!configurationClass.isInstance(configuration)) {
+        if (!configurationClass.isInstance(configuration)) {
             logger.error("Invalid configuration: expected " + configurationClass + ", got " + configuration);
             return null;
+        }
+        if(configuration instanceof PageActionConfiguration) {
+            ((PageActionConfiguration) configuration).init(application);
         }
         return (T) configuration;
     }
@@ -223,7 +334,7 @@ public class DispatcherLogic {
             logger.error("Couldn't load action class for " + directory + ", returning safe-mode action", e);
             return fallback ? getFallbackActionClass(application) : null;
         }
-        if(isValidActionClass(actionClass)) {
+        if (isValidActionClass(actionClass)) {
             return actionClass;
         } else {
             logger.error("Invalid action class for " + directory + ": " + actionClass);
@@ -236,7 +347,7 @@ public class DispatcherLogic {
         String className = configuration.getString(PortofinoProperties.FALLBACK_ACTION_CLASS);
         try {
             Class<?> aClass = Class.forName(className);
-            if(isValidActionClass(aClass)) {
+            if (isValidActionClass(aClass)) {
                 return (Class<? extends PageAction>) aClass;
             } else {
                 throw new Error("Configuration error, invalid fallback action class: " + className);
@@ -247,10 +358,10 @@ public class DispatcherLogic {
     }
 
     public static boolean isValidActionClass(Class<?> actionClass) {
-        if(actionClass == null) {
+        if (actionClass == null) {
             return false;
         }
-        if(!PageAction.class.isAssignableFrom(actionClass)) {
+        if (!PageAction.class.isAssignableFrom(actionClass)) {
             logger.error("Action " + actionClass + " must implement " + PageAction.class);
             return false;
         }

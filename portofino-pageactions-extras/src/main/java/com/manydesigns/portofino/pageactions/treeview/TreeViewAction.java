@@ -26,7 +26,6 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
@@ -35,7 +34,10 @@ import com.manydesigns.portofino.pageactions.treeview.model.Node;
 import com.manydesigns.portofino.pageactions.treeview.model.TreeModel;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ErrorResolution;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,8 +81,8 @@ public class TreeViewAction extends AbstractPageAction {
     // Setup & configuration
     //**************************************************************************
 
-    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        Resolution resolution = super.prepare(pageInstance, context);
+    public Resolution preparePage() {
+        Resolution resolution = super.preparePage();
         if(resolution != null) {
             return resolution;
         }
@@ -92,9 +94,6 @@ public class TreeViewAction extends AbstractPageAction {
         }
         return null;
     }
-
-
-
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
     @RequiresPermissions(level = AccessLevel.DEVELOP)

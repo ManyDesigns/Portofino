@@ -27,7 +27,6 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
@@ -102,8 +101,8 @@ public class TextAction extends AbstractPageAction {
     // Setup
     //**************************************************************************
 
-    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        Resolution resolution = super.prepare(pageInstance, context);
+    public Resolution preparePage() {
+        Resolution resolution = super.preparePage();
         if(resolution != null) {
             return resolution;
         }

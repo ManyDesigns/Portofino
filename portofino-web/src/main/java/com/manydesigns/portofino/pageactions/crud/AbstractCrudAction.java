@@ -644,14 +644,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    public Resolution prepare(PageInstance pageInstance, ActionBeanContext context) {
-        Resolution resolution = super.prepare(pageInstance, context);
+    public Resolution preparePage() {
+        Resolution resolution = super.preparePage();
         if(resolution != null) {
             return resolution;
         }
         this.crudConfiguration = (CrudConfiguration) pageInstance.getConfiguration();
 
-        if (crudConfiguration == null) {
+        if (crudConfiguration == null || crudConfiguration.getActualDatabase() == null) {
             logger.warn("Crud is not configured: " + pageInstance.getPath());
             return null;
         }

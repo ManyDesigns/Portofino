@@ -1,5 +1,6 @@
 <%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.Dispatcher" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.DispatcherUtil" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.PageAction" %>
 <%
     // Avoid caching of dynamic pages
     response.setHeader("Pragma", "no-cache");
@@ -17,8 +18,9 @@
     <head>
         <jsp:include page="../../head.jsp"/>
         <stripes:layout-component name="customScripts"/>
+        <jsp:useBean id="actionBean" scope="request" type="net.sourceforge.stripes.action.ActionBean" />
         <%
-            Dispatch dispatch = Dispatcher.getDispatchForRequest(request);
+            Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);
             pageContext.setAttribute("dispatch", dispatch);
         %>
         <title><c:out value="${dispatch.lastPageInstance.page.description}"/></title>

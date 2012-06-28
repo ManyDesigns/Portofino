@@ -11,9 +11,12 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.DispatcherUtil" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <jsp:useBean id="app" scope="request" type="com.manydesigns.portofino.application.Application" />
+<jsp:useBean id="actionBean" scope="request" type="net.sourceforge.stripes.action.ActionBean" />
 <%
+    Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);
     boolean admin = SecurityLogic.isAdministrator(request);
     int maxLevels = 1;
     String param = request.getParameter("tabsMaxLevels");
@@ -26,7 +29,6 @@
         includeAdminButtons = Boolean.valueOf(param);
     }
 
-    Dispatch dispatch = Dispatcher.getDispatchForRequest(request);
     Navigation navigation = new Navigation(app, dispatch, SecurityUtils.getSubject(), admin);
     List<NavigationItem> navigationItems;
     NavigationItem rootNavigationItem = navigation.getRootNavigationItem();
