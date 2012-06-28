@@ -2100,7 +2100,7 @@ JSGantt.formatDateStr = function(pDate,pFormatStr) {
 * @return {void}
 */
 JSGantt.parseXML = function(ThisFile,pGanttVar){
-	var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;   // Is this Chrome 
+	var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1 || navigator.userAgent.toLowerCase().indexOf('safari') > -1; //modifica Giampiero
 	
 	try { //Internet Explorer  
 		xmlDoc=new ActiveXObject("Microsoft.XMLDOM");
