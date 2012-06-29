@@ -305,15 +305,6 @@ public class Table implements ModelObject, Annotated {
                 "{0}.{1}.{2}", databaseName, schemaName, tableName);
     }
 
-    public static String[] splitQualifiedName(String qualifiedName) {
-        String[] name = qualifiedName.split("\\.");
-        if(name.length == 3) {
-            return name;
-        } else {
-            throw new IllegalArgumentException("Not a qualified table name: " + qualifiedName);
-        }
-    }
-
     public static final String[] KEYWORDS = { "member", "order", "group", "select", "update", "from" };
 
     //**************************************************************************

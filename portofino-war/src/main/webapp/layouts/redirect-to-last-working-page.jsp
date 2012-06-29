@@ -11,6 +11,14 @@
     private static Logger logger = LoggerFactory.getLogger("redirect-to-last-working-page.jsp");
 %><%
 
+    PageInstance invalidPage =
+            (PageInstance) request.getAttribute(ApplicationInterceptor.INVALID_PAGE_INSTANCE);
+
+    if(invalidPage.getActionBean().isEmbedded()) {
+        request.getRequestDispatcher("/layouts/safemode/safemode.jsp").include(request, response);
+        return;
+    }
+
     response.setStatus(404);
 
     // Avoid caching of dynamic pages
@@ -20,8 +28,6 @@
     response.addHeader("Cache-Control", "no-store");
     response.setDateHeader("Expires", 0);
 
-    PageInstance invalidPage =
-            (PageInstance) request.getAttribute(ApplicationInterceptor.INVALID_PAGE_INSTANCE);
     if(!invalidPage.getParameters().isEmpty()) {
         logger.debug("Page instance with parameters failed, trying without parameters");
         invalidPage.getParameters().clear();

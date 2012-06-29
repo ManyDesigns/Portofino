@@ -278,4 +278,13 @@ public class DatabaseLogic {
         Table.logger.debug("One to many relationship not found: {}", relationshipName);
         return null;
     }
+
+    public static String[] splitQualifiedTableName(String qualifiedName) {
+        String[] name = qualifiedName.split("\\.");
+        if(name.length == 3) {
+            return name;
+        } else {
+            throw new IllegalArgumentException("Not a qualified table name: " + qualifiedName);
+        }
+    }
 }

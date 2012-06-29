@@ -98,17 +98,18 @@ public class ApplicationFilter implements Filter {
                     new MultipleTextProvider(
                             portofinoResourceBundle, elementsResourceBundle);
             ElementsThreadLocals.setTextProvider(textProvider);
+
+            String appPathPrefix = httpRequest.getContextPath() + "/app/";
+            if(httpRequest.getRequestURI().startsWith(appPathPrefix)) {
+                String internalPath =
+                        "/apps/" + application.getAppId() + "/" +
+                        httpRequest.getRequestURI().substring(appPathPrefix.length());
+                RequestDispatcher requestDispatcher = request.getRequestDispatcher(internalPath);
+                requestDispatcher.forward(request, response);
+                return;
+            }
         }
 
-        String appPathPrefix = httpRequest.getContextPath() + "/app/";
-        if(httpRequest.getRequestURI().startsWith(appPathPrefix)) {
-            String internalPath =
-                    "/apps/" + application.getAppId() + "/" +
-                    httpRequest.getRequestURI().substring(appPathPrefix.length());
-            RequestDispatcher requestDispatcher = request.getRequestDispatcher(internalPath);
-            requestDispatcher.forward(request, response);
-            return;
-        }
         chain.doFilter(request, response);
     }
 

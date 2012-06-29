@@ -27,7 +27,8 @@ class CalendarPage extends CalendarAction {
     @Override
     void loadObjects(Interval interval) {
         for(cal in calDefs) {
-            Table table = DatabaseLogic.findTableByQualifiedName(model, cal[1])
+            def qname = DatabaseLogic.splitQualifiedTableName((cal[1]))
+            Table table = DatabaseLogic.findTableByName(application.model, qname[0], qname[1], qname[2])
             Session session = application.getSession(table.schema.databaseName)
             def objects = []
             for(col in cal[2]) {

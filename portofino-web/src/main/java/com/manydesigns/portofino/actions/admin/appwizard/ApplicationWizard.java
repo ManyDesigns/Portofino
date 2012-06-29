@@ -520,16 +520,16 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         if(!StringUtils.isEmpty(userTableName)) {
             Model tmpModel = new Model();
             tmpModel.getDatabases().add(connectionProvider.getDatabase());
-            String[] name = Table.splitQualifiedName(userTableName);
+            String[] name = DatabaseLogic.splitQualifiedTableName(userTableName);
             userTable = DatabaseLogic.findTableByName(tmpModel, name[0], name[1], name[2]);
 
             if(!StringUtils.isEmpty(groupTableName)) {
-                name = Table.splitQualifiedName(groupTableName);
+                name = DatabaseLogic.splitQualifiedTableName(groupTableName);
                 groupTable = DatabaseLogic.findTableByName(tmpModel, name[0], name[1], name[2]);
             }
 
             if(!StringUtils.isEmpty(userGroupTableName)) {
-                name = Table.splitQualifiedName(userGroupTableName);
+                name = DatabaseLogic.splitQualifiedTableName(userGroupTableName);
                 userGroupTable = DatabaseLogic.findTableByName(tmpModel, name[0], name[1], name[2]);
                 userGroupTable.setManyToMany(true);
             }

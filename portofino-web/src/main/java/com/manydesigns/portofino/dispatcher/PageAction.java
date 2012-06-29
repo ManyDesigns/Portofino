@@ -46,5 +46,7 @@ public interface PageAction extends ActionBean {
     void setDispatch(Dispatch dispatch);
 
     Dispatch getDispatch();
+
+    boolean isEmbedded();
     
 }

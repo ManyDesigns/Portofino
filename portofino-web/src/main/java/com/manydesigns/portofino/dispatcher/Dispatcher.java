@@ -204,5 +204,4 @@ public class Dispatcher {
         return withoutTrailingSlashes;
     }
 
-    protected static class PageNotActiveException extends Exception {}
 }

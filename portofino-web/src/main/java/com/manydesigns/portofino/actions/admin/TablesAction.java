@@ -252,7 +252,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     //**************************************************************************
 
     public Table setupTable() {
-        String[] name = Table.splitQualifiedName(qualifiedTableName);
+        String[] name = DatabaseLogic.splitQualifiedTableName(qualifiedTableName);
         Table table = DatabaseLogic.findTableByName(
                 model, name[0], name[1], name[2]);
         if (table == null) {

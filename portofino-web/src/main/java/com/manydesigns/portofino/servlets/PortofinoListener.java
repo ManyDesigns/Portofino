@@ -31,6 +31,7 @@ import com.manydesigns.mail.sender.DefaultMailSender;
 import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
 import com.manydesigns.portofino.quartz.MailSenderJob;
 import com.manydesigns.portofino.shiro.UsersGroupsDAO;
@@ -115,6 +116,15 @@ public class PortofinoListener
     //**************************************************************************
 
     public void contextInitialized(ServletContextEvent servletContextEvent) {
+        try {
+            init(servletContextEvent);
+        } catch (Throwable e) {
+            logger.error("Could not start ManyDesigns Portofino", e);
+            throw new Error(e);
+        }
+    }
+
+    private void init(ServletContextEvent servletContextEvent) {
         // clear the Mapping Diagnostic Context for logging
         MDC.clear();
 
@@ -136,6 +146,8 @@ public class PortofinoListener
         addConfiguration(PortofinoProperties.PROPERTIES_RESOURCE, false);
         servletContext.setAttribute(
                 ApplicationAttributes.PORTOFINO_CONFIGURATION, portofinoConfiguration);
+
+        DispatcherLogic.init(portofinoConfiguration);
 
         logger.info("Checking servlet API version...");
         if (serverInfo.getServletApiMajor() < 2 ||

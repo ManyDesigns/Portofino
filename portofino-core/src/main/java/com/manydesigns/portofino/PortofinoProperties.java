@@ -101,6 +101,11 @@ public final class PortofinoProperties {
     public static final String HIBERNATE_C3P0_TIMEOUT = "hibernate.c3p0.timeout";
     public static final String HIBERNATE_C3P0_IDLE_TEST_PERIOD = "hibernate.c3p0.idle_test_period";
 
+    //Cache configuration properties
+    public static final String PAGE_CACHE_SIZE = "page.cache.size";
+    public static final String PAGE_CACHE_CHECK_FREQUENCY = "page.cache.check.frequency";
+    public static final String CONFIGURATION_CACHE_SIZE = "configuration.cache.size";
+    public static final String CONFIGURATION_CACHE_CHECK_FREQUENCY = "configuration.cache.check.frequency";
 
     private PortofinoProperties() {}
 }

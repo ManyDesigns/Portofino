@@ -22,6 +22,9 @@
 
 package com.manydesigns.portofino.buttons;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.portofino.buttons.annotations.Button;
@@ -38,7 +41,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -58,8 +65,19 @@ public class ButtonsLogic {
 
     public static List<ButtonInfo> getButtonsForClass
             (Class<?> someClass, String list) {
+        try {
+            return classButtons.get(new MCKey(someClass, list));
+        } catch (ExecutionException e) {
+            throw new Error(e);
+        }
+    }
+
+    public static List<ButtonInfo> computeButtonsForClass(Class<?> someClass, String list) {
         List<ButtonInfo> buttons = new ArrayList<ButtonInfo>();
         for(Method method : someClass.getMethods()) {
+            if(method.isBridge() || method.isSynthetic()) {
+                continue;
+            }
             Button button = getButtonForMethod(method, list);
             if(button != null) {
                 ButtonInfo buttonInfo = new ButtonInfo(button, method, someClass);
@@ -69,6 +87,47 @@ public class ButtonsLogic {
         Collections.sort(buttons, new ButtonComparatorByOrder());
         return buttons;
     }
+
+    protected static class MCKey {
+        public final Class<?> theClass;
+        public final String list;
+
+        public MCKey(Class<?> theClass, String list) {
+            this.theClass = theClass;
+            this.list = list;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            MCKey mcKey = (MCKey) o;
+
+            if (!list.equals(mcKey.list)) return false;
+            if (!theClass.equals(mcKey.theClass)) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = theClass.hashCode();
+            result = 31 * result + list.hashCode();
+            return result;
+        }
+    }
+
+    protected static LoadingCache<MCKey, List<ButtonInfo>> classButtons =
+            CacheBuilder
+                    .newBuilder()
+                    .maximumSize(1000)
+                    .build(new CacheLoader<MCKey, List<ButtonInfo>>() {
+                        @Override
+                        public List<ButtonInfo> load(MCKey key) throws Exception {
+                            return computeButtonsForClass(key.theClass, key.list);
+                        }
+                    });
 
     public static Button getButtonForMethod(Method method, String list) {
         Button button = method.getAnnotation(Button.class);
