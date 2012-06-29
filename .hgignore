@@ -11,6 +11,7 @@
 ^mail/target
 ^out/
 ^[.]idea/
+^[.]iml/
 ^.*/overlays/[^/]+[.]info$
 derby.log
 syntax: glob
