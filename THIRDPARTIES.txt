@@ -9,79 +9,94 @@ OpenSymphony Group (http://www.opensymphony.com/).
 This product includes software developed by the
 Visigoth Software Society (http://www.visigoths.org/).
 
+This software contains unmodified binary redistributions for H2 database engine (http://www.h2database.com/),
+which is dual licensed and available under a modified version of the MPL 1.1 (Mozilla Public License)
+or under the (unmodified) EPL 1.0 (Eclipse Public License).
+An original copy of the license agreement can be found at: http://www.h2database.com/html/license.html
 
 All trademarks belong to their respective owners.
 
+ANTLR Parser Generator
+Site: http://www.antlr.org/
+File: antlr-2.7.7.jar
+License: BSD
 
-JavaBeans Activation Framework 1.1.1
-Site: http://java.sun.com/javase/technologies/desktop/javabeans/jaf/
-File: activation-1.1.jar
-License: Sun Microsystems JavaBeans Activation Framework 1.1.1 license
+Apache Avalon
+Site: http://avalon.apache.org/
+Files: avalon-framework-api-4.3.1.jar, avalon-framework-impl-4.3.1.jar
+License: Apache License v2.0
 
-Apache Struts 2.1.6
-Site: http://struts.apache.org/
-File: struts2-core-2.1.6.jar
-License: Apache License v2
+Apache Batik
+Site: http://xmlgraphics.apache.org/batik/
+Files: batik-anim-1.7.jar, batik-awt-util-1.7.jar, batik-bridge-1.7.jar, batik-css-1.7.jar, batik-dom-1.7.jar,
+       batik-ext-1.7.jar, batik-extension-1.7.jar, batik-gvt-1.7.jar, batik-parser-1.7.jar,
+       batik-script-1.7.jar, batik-svg-dom-1.7.jar, batik-svggen-1.7.jar, batik-transcoder-1.7.jar,
+       batik-util-1.7.jar, batik-xml-1.7.jar
+License: Apache License v2.0
+
+Apache FOP
+Site: http://xmlgraphics.apache.org/fop/
+File: fop-1.0.jar
+License: Apache License v2.0
+
+Apache Shiro
+Site: http://shiro.apache.org
+Files: shiro-core-1.2.0.jar, shiro-web-1.2.0.jar
+License: Apache License v2.0
+
+Apache XML-commons
+Site: http://xml.apache.org/commons/
+Files: xml-apis-1.3.04.jar, xml-apis-ext-1.3.04.jar
+License: Apache License v2 and W3C License on applicable parts
+
+Apache XML Graphics Commons
+Site: http://xmlgraphics.apache.org/commons/
+File: xmlgraphics-commons-1.4.jar
+License: Apache License v2.0
+
+ASM
+Site: http://asm.ow2.org/
+Files: asm-3.2.jar, asm-analysis-3.2.jar, asm-commons-3.2.jar, asm-tree-3.2.jar, asm-util-3.2.jar
+License: BSD
+
+Bouncy Castle
+Site: http://www.bouncycastle.org/java.html
+Files: bcmail-jdk14-1.38.jar, bcprov-jdk14-1.38.jar, bctsp-jdk14-1.38.jar
+License: MIT
 
 OpenSymphony ognl
 Site: http://www.opensymphony.com/ognl
-File: ognl-2.6.11.jar
+File: ognl-3.0.jar
 License: http://www.opensymphony.com/ognl/license.action
 
-OpenSymphony xwork
-Site: http://www.opensymphony.com/xwork
-File: xwork-2.1.2.jar
-License: http://www.opensymphony.com/xwork/license.action
-
-spring-test
-Site: http://www.springframework.org
-File: spring-test-2.5.6.jar
-License: Apache License v2
-
-JUnit
-Site: http://junit.sourceforge.net
-File: junit-3.8.1.jar
-License: Common Public License - v 1.0
-
-FreeMarker
-Site: http://freemarker.org/
-File: freemarker-2.3.13.jar
-License: http://freemarker.org/docs/app_license.html
-
-
-bcmail-jdk14-136
-Site: http://www.bouncycastle.org
-File: bcmail-jdk14-136.jar
-License: http://www.bouncycastle.org/licence.html
-
-bcprov-jdk14-136
-Site: http://www.bouncycastle.org
-File: bcprov-jdk14-136.jar
-License: http://www.bouncycastle.org/licence.html
-
-BeanShell
-Site: http://www.beanshell.org/
-File: bsh-2.0b4.jar
-License: Dual license: Sun Public License / LGPL
+c3p0 - JDBC3 Connection and Statement Pooling
+Site: http://www.mchange.com/projects/c3p0/
+File: c3p0-0.9.1.2.jar
+License: LGPL
 
 Commons BeanUtils
 Site: http://commons.apache.org/beanutils/
-File: commons-beanutils1-1.7.0.jar
+File: commons-beanutils-1.8.3.jar
 License: Apache License v2
 
-Commons BeanUtils Core
-Site: http://commons.apache.org/beanutils/
-File: commons-beanutils-core-1.7.0.jar
+Commons Codec
+Site: http://commons.apache.org/codec/
+File: commons-codec-1.3.jar
 License: Apache License v2
 
 Commons Collections
 Site: http://commons.apache.org/collections/
-File: commons-collections-3.2.1.jar
+File: commons-collections-3.1.jar
 License: Apache License v2
 
 Commons Configuration
 Site: http://commons.apache.org/configuration/
-File: commons-configuration-1.5.jar
+File: commons-configuration-1.6.jar
+License: Apache License v2
+
+Commons DbUtils
+Site: http://commons.apache.org/dbutils/
+File: commons-dbutils-1.3.jar
 License: Apache License v2
 
 Commons Digester
@@ -89,45 +104,168 @@ Site: http://commons.apache.org/digester/
 File: commons-digester-1.8.jar
 License: Apache License v2
 
+Commons Email
+Site: http://commons.apache.org/email/
+File: commons-email-1.2.jar
+License: Apache License v2
+
 Commons FileUpload
 Site: http://commons.apache.org/fileupload/
-File: commons-fileupload-1.2.jar
+File: commons-fileupload-1.2.1.jar
 License: Apache License v2
 
 Commons IO
 Site: http://commons.apache.org/io/
-File: commons-io-1.4.1.jar
+File: commons-io-2.0.1.jar
 License: Apache License v2
 
 Commons Lang
 Site: http://commons.apache.org/lang/
-File: commons-lang-2.4.jar
+File: commons-lang-2.5.jar
 License: Apache License v2
 
-Commons Logging
-Site: http://commons.apache.org/logging/
-File: commons-logging-1.1.jar
+dom4j
+Site: http://dom4j.sourceforge.net/
+File: dom4j-1.6.1.jar
+License: BSD
+
+Dumbster
+Site: http://quintanasoft.com/dumbster/
+File: dumbster-1.5.jar
 License: Apache License v2
 
-Commons Logging
-Site: http://commons.apache.org/logging/
-File: commons-logging-api-1.1.jar
+FindBugs JSR-305
+Site: http://findbugs.sourceforge.net/
+File: jsr305-1.3.9.jar
 License: Apache License v2
 
-LALR Parser Generator in Java
-Site: http://www2.cs.tum.edu/projects/cup/
-File: cup.jar
-License: Standard ML of New Jersey
+Google Guava
+Site: http://code.google.com/p/guava-libraries/
+File: guava-11.0.2.jar
+License: Apache License v2
 
-Netbeans CVS Client Library
-Site: http://javacvs.netbeans.org/library/
-File: org-netbeans-lib-cvsclient.jar
-License: Dual license: CDDL/GPL w/classpath exception
+Groovy
+Site: http://groovy.codehaus.org/
+File: groovy-1.8.0.jar
+License: Apache License v2
 
-FontBox
-Site: http://sourceforge.net/projects/fontbox/
-File: FontBox-0.1.0.jar
-License: BSD (new)
+H2 Database Engine
+Site: http://www.h2database.com
+File: h2-1.2.126.jar
+License: Eclipse Public License v1.0
+
+Hibernate ORM
+Site: http://www.hibernate.org/
+Files: hibernate-core-3.6.9.Final.jar,
+       hibernate-commons-annotations-3.2.0.Final.jar,
+       hibernate-jpa-2.0-api-1.0.1.Final.jar,
+       hibernate-c3p0-3.6.9.Final.jar
+License: LGPL v2.1
+
+HttpUnit
+Site: http://httpunit.sourceforge.net/
+File: httpunit-1.7.1.jar 
+License: MIT
+
+Intellij Annotations
+Site: http://www.jetbrains.com/idea
+File: annotations-7.0.3.jar
+License: Apache License
+
+iText
+Site: http://itextpdf.com/
+File: itext-2.1.7.jar
+License: LGPL
+
+Java Excel API
+Site: http://jexcelapi.sourceforge.net/
+File: jxl-2.6.10.jar
+License: LGPLv2
+
+Java Standard Tag Library (JSTL)
+Site: http://jstl.java.net/
+File: jstl-1.1.2.jar
+Licenses: Common Development and Distribution License (CDDL) version 1.0 + GNU General Public License (GPL) version 2
+
+Java Transaction API (JTA)
+Site: http://www.oracle.com/technetwork/java/javaee/jta/index.html
+File: jta-1.1.jar
+License: Java Transaction API Classes 1.1 Software License Agreement
+
+JavaBeans Activation Framework
+Site: http://www.oracle.com/technetwork/java/javase/downloads/index-135046.html
+File: activation-1.1.jar
+License: Oracle Binary Code License Agreement for Java SE
+
+Javassist
+Site: http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/
+File: javassist-3.8.0.GA.jar
+License: Apache License
+
+JAXB API
+Site: http://jaxb.java.net/
+Files: jaxb-api-2.1.jar, jaxb-impl-2.1.13.jar
+License: CDDL v1.1 and GPL v2
+
+Jcommon
+Site: http://www.jfree.org/jcommon/index.php
+File: jcommon-1.0.15.jar
+License: LGPL
+
+Joda Time
+Site: http://joda-time.sourceforge.net/
+File: joda-time-1.6.2.jar
+License: Apache License v2
+
+JSON
+Site: http://www.json.org
+File: json-20111031.jar
+License: JSON License (http://www.json.org/license.html)
+
+JSqlParser
+Site: http://jsqlparser.sourceforge.net/home.php
+File: jsqlparser-0.7.0.jar
+License: LGPL
+
+jTidy
+Site: http://jtidy.sourceforge.net
+File: Tidy-1.0.jar
+License: MIT
+
+JUnit
+Site: http://junit.sourceforge.net
+File: junit-3.8.1.jar
+License: Common Public License - v 1.0
+
+Liquibase
+Site: http://www.liquibase.org/
+File: liquibase-core-2.0.1.jar
+License: Apache License v2.0
+
+LOGBack
+Site: http://logback.qos.ch/
+Files: logback-classic-0.9.26.jar, logback-core-0.9.26.jar
+License: Eclipse Public License v1.0
+
+Quartz Scheduler
+Site: http://quartz-scheduler.org/
+File: quartz-2.1.3.jar
+License: Apache License v2.0
+
+Standard: An Implementation of the JSP™ Standard Tag Library (JSTL)
+Site: http://jakarta.apache.org/taglibs/doc/standard-doc/ReleaseNotes.html
+File: standard-1.1.2.jar
+License: Apache License v2.0
+
+Stripes
+Site: http://www.stripesframework.org
+File: stripes-1.5.7.jar
+License: Apache License v2.0
+
+Tuckey UrlRewriteFilter
+Site: http://tuckey.org/urlrewrite/
+File: urlrewritefilter-3.1.0.jar
+License: BSD
 
 iText
 Site: http://www.lowagie.com/iText/
@@ -139,21 +277,6 @@ Site: http://www.jasperforge.org/jaspersoft/opensource/business_intelligence/jas
 File: jasperreports-3.5.0.jar
 License: LGPL
 
-Jcommon
-Site: http://www.jfree.org/jcommon/index.php
-File: jcommon-1.0.15.jar
-License: LGPL
-
-Eclipse JDT Core
-Site: http://www.eclipse.org/jdt/core/
-File: jdtcore-3.1.0.jar
-License: Eclipse Public License v1
-
-JempBox
-Site: http://jempbox.org/
-File: jempbox-0.2.0.jar
-License: BSD (new)
-
 JFreeChart
 Site: http://www.jfree.org/jfreechart/
 File: jfreechart-1.0.12.jar
@@ -162,36 +285,19 @@ License: LGPL
 JavaMail API 1.4.1
 http://java.sun.com/products/javamail/
 File: mail-1.4.jar
-File: mailapi-1.3.jar
-File: smtp.jar
 License: Sun Microsystems JavaBeans Activation Framework 1.1.1 license
 
-Mime Type Detection Utility 1.0
-http://sourceforge.net/projects/mime-util/
-File: mime-util-1.0.jar
-License: Apache License V2.0
+Simple Logging Facade for Java
+Site: http://www.slf4j.org/
+Files: slf4j-api-1.6.1.jar, jcl-over-slf4j-1.6.1.jar, log4j-over-slf4j-1.6.1.jar
+License: MIT
 
-Jakarta ORO
-Site: http://jakarta.apache.org/oro/
-File: oro-2.0.8.jar
+StAX API
+Site: http://stax.codehaus.org/
+File: stax-api-1.0-2.jar
 License: Apache License v2
 
-Apache PDFBox
-Site: http://www.pdfbox.org/
-File: pdfbox-0.7.3.jar
-License: BSD (new)
-
-Apache POI
-Site: http://poi.apache.org/
-File: poi-3.2-FINAL.jar
+Xalan-Java
+Site: http://xml.apache.org/xalan-j/
+File: xalan-2.6.0.jar
 License: Apache License v2
-
-Apache XML-commons
-Site: http://xml.apache.org/commons/
-File: xml-apis-1.3.02.jar
-License: Apache License v2 and W3C License on applicable parts
-
-Popup Calendar
-Site: http://www.mojavelinux.com/projects/popupcalendar/
-Files: "calendar" directory
-License: LGPL
