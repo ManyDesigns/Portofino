@@ -44,9 +44,19 @@ Site: http://xmlgraphics.apache.org/fop/
 File: fop-1.0.jar
 License: Apache License v2.0
 
+Apache HttpClient
+Site: http://hc.apache.org/index.html
+Files: httpclient-4.0.jar, httpcore-4.0.1.jar
+License: Apache License v2.0
+
 Apache Shiro
 Site: http://shiro.apache.org
 Files: shiro-core-1.2.0.jar, shiro-web-1.2.0.jar
+License: Apache License v2.0
+
+Apache Xerces
+Site: http://xerces.apache.org
+File: xercesImpl-2.8.1.jar
 License: Apache License v2.0
 
 Apache XML-commons
@@ -149,6 +159,11 @@ Site: http://code.google.com/p/guava-libraries/
 File: guava-11.0.2.jar
 License: Apache License v2
 
+Google Guice
+Site: http://code.google.com/p/google-guice/
+File: guice-2.0.jar
+License: Apache License v2
+
 Groovy
 Site: http://groovy.codehaus.org/
 File: groovy-1.8.0.jar
@@ -202,6 +217,11 @@ Site: http://www.oracle.com/technetwork/java/javase/downloads/index-135046.html
 File: activation-1.1.jar
 License: Oracle Binary Code License Agreement for Java SE
 
+JavaMail API 1.4.1
+http://java.sun.com/products/javamail/
+File: mail-1.4.jar
+License: Sun Microsystems JavaBeans Activation Framework 1.1.1 license
+
 Javassist
 Site: http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/
 File: javassist-3.8.0.GA.jar
@@ -212,9 +232,19 @@ Site: http://jaxb.java.net/
 Files: jaxb-api-2.1.jar, jaxb-impl-2.1.13.jar
 License: CDDL v1.1 and GPL v2
 
+JCiP Annotations
+Site: http://jcip.net
+File: jcip-annotations-1.0.jar
+License: Creative Commons Attribution License 2.5
+
 Jcommon
 Site: http://www.jfree.org/jcommon/index.php
 File: jcommon-1.0.15.jar
+License: LGPL
+
+JFreeChart
+Site: http://www.jfree.org/jfreechart/
+File: jfreechart-1.0.12.jar
 License: LGPL
 
 Joda Time
@@ -257,6 +287,21 @@ Site: http://logback.qos.ch/
 Files: logback-classic-0.9.26.jar, logback-core-0.9.26.jar
 License: Eclipse Public License v1.0
 
+NekoHTML
+Site: http://nekohtml.sourceforge.net/
+File: nekohtml-1.9.10.jar
+License: Apache License v2.0
+
+openid-selector
+Site: https://code.google.com/p/openid-selector/
+Files: openid-selector directory
+License: BSD
+
+openid4java
+Site: http://code.google.com/p/openid4java/
+File: openid4java-nodeps-0.9.6.jar
+License: Apache License v2.0
+
 Quartz Scheduler
 Site: http://quartz-scheduler.org/
 File: quartz-2.1.3.jar
@@ -266,31 +311,6 @@ Standard: An Implementation of the JSP™ Standard Tag Library (JSTL)
 Site: http://jakarta.apache.org/taglibs/doc/standard-doc/ReleaseNotes.html
 File: standard-1.1.2.jar
 License: Apache License v2.0
-
-Stripes
-Site: http://www.stripesframework.org
-File: stripes-1.5.7.jar
-License: Apache License v2.0
-
-Tuckey UrlRewriteFilter
-Site: http://tuckey.org/urlrewrite/
-File: urlrewritefilter-3.1.0.jar
-License: BSD
-
-iText
-Site: http://www.lowagie.com/iText/
-File: itext-2.1.0.jar
-License: Dual: Mozilla Public License 1.1 / LGPL
-
-JFreeChart
-Site: http://www.jfree.org/jfreechart/
-File: jfreechart-1.0.12.jar
-License: LGPL
-
-JavaMail API 1.4.1
-http://java.sun.com/products/javamail/
-File: mail-1.4.jar
-License: Sun Microsystems JavaBeans Activation Framework 1.1.1 license
 
 Simple Logging Facade for Java
 Site: http://www.slf4j.org/
@@ -302,10 +322,20 @@ Site: http://stax.codehaus.org/
 File: stax-api-1.0-2.jar
 License: Apache License v2
 
+Stripes
+Site: http://www.stripesframework.org
+File: stripes-1.5.7.jar
+License: Apache License v2.0
+
 SweetiePlus Icon Set
 Site: http://sublink.ca/icons/sweetieplus/
 Files: SweetiePlus-v2-SublinkInteractive directory
 License: Creative Commons Attribution-ShareAlike 3.0 Unported
+
+Tuckey UrlRewriteFilter
+Site: http://tuckey.org/urlrewrite/
+File: urlrewritefilter-3.1.0.jar
+License: BSD
 
 Xalan-Java
 Site: http://xml.apache.org/xalan-j/

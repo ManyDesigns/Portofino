@@ -115,6 +115,12 @@
             <!--artifactId>openid4java-full</artifactId-->
             <version>0.9.6</version>
             <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
