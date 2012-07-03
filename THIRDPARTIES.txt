@@ -16,6 +16,11 @@ An original copy of the license agreement can be found at: http://www.h2database
 
 All trademarks belong to their respective owners.
 
+Ace (Ajax.org Cloud9 Editor)
+Site: https://github.com/ajaxorg/ace/
+Files: ace-0.2.0 directory
+License: Mozilla Public License
+
 ANTLR Parser Generator
 Site: http://www.antlr.org/
 File: antlr-2.7.7.jar
@@ -217,6 +222,11 @@ Site: http://joda-time.sourceforge.net/
 File: joda-time-1.6.2.jar
 License: Apache License v2
 
+JQuery UI
+Site: http://jqueryui.com
+Files: jquery-ui-1.8.21 directory
+License: MIT
+
 JSON
 Site: http://www.json.org
 File: json-20111031.jar
@@ -272,11 +282,6 @@ Site: http://www.lowagie.com/iText/
 File: itext-2.1.0.jar
 License: Dual: Mozilla Public License 1.1 / LGPL
 
-JasperReports
-Site: http://www.jasperforge.org/jaspersoft/opensource/business_intelligence/jasperreports/
-File: jasperreports-3.5.0.jar
-License: LGPL
-
 JFreeChart
 Site: http://www.jfree.org/jfreechart/
 File: jfreechart-1.0.12.jar
@@ -297,7 +302,17 @@ Site: http://stax.codehaus.org/
 File: stax-api-1.0-2.jar
 License: Apache License v2
 
+SweetiePlus Icon Set
+Site: http://sublink.ca/icons/sweetieplus/
+Files: SweetiePlus-v2-SublinkInteractive directory
+License: Creative Commons Attribution-ShareAlike 3.0 Unported
+
 Xalan-Java
 Site: http://xml.apache.org/xalan-j/
 File: xalan-2.6.0.jar
 License: Apache License v2
+
+YUI Library
+Site: http://yuilibrary.com/projects/yui2/
+Files: yui-2.9.0 directory
+License: BSD
