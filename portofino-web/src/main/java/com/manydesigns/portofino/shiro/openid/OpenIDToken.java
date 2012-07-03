@@ -47,6 +47,8 @@ public class OpenIDToken implements HostAuthenticationToken, RememberMeAuthentic
     protected boolean rememberMe;
     protected VerificationResult verificationResult;
 
+    public static final String NO_CREDENTIALS = "OpenID does not require authentication credentials.";
+
     public OpenIDToken(VerificationResult verificationResult, boolean rememberMe, String host) {
         this.verificationResult = verificationResult;
         this.rememberMe = rememberMe;
@@ -70,6 +72,6 @@ public class OpenIDToken implements HostAuthenticationToken, RememberMeAuthentic
     }
 
     public Object getCredentials() {
-        return null;
+        return NO_CREDENTIALS;
     }
 }

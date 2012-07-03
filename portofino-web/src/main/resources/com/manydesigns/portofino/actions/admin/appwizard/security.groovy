@@ -1,18 +1,14 @@
+import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.portofino.PortofinoProperties
 import com.manydesigns.portofino.application.Application
 import com.manydesigns.portofino.shiro.AbstractApplicationRealmDelegate
 import com.manydesigns.portofino.shiro.ApplicationRealm
-import com.manydesigns.portofino.shiro.GroupPermission
 import java.security.MessageDigest
 import org.apache.commons.configuration.Configuration
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.authc.AuthenticationInfo
 import org.apache.shiro.authc.IncorrectCredentialsException
 import org.apache.shiro.authc.SimpleAuthenticationInfo
-import org.apache.shiro.authz.AuthorizationException
-import org.apache.shiro.authz.AuthorizationInfo
-import org.apache.shiro.authz.Permission
-import org.apache.shiro.authz.SimpleAuthorizationInfo
 import org.apache.shiro.codec.Base64
 import org.apache.shiro.codec.Hex
 import org.apache.shiro.subject.PrincipalCollection
@@ -45,79 +41,74 @@ class Security extends AbstractApplicationRealmDelegate {
 
     protected String adminGroupName = "$adminGroupName";
 
-    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, principal) {
-        Application application = realm.getApplication();
-        Set<String> groups = new HashSet<String>();
-        Configuration conf = application.getPortofinoProperties();
-        groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
-        if (principal == null) {
-            groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
-        } else if(principal instanceof PrincipalCollection) {
-            groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
-            if(StringUtils.isEmpty(userGroupTableEntityName) || StringUtils.isEmpty(groupTableEntityName)) {
-                /////////////////////////////////////////////////////////////////
-                //NB admin is hardcoded for the wizard to work - remove it in production!
-                /////////////////////////////////////////////////////////////////
-                if("admin".equals(principal.asList().get(0))) {
-                    logger.warn("Generated security.groovy is using the hardcoded 'admin' user; " +
-                                "remember to disable it in production!")
-                    groups.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS));
-                }
-                /////////////////////////////////////////////////////////////////
-            } else {
-                Session session = application.getSession(databaseName)
-                def queryString = """
-                    select distinct g.${groupNameProperty}
-                    from ${groupTableEntityName} g, ${userGroupTableEntityName} ug
-                    where g.${groupIdProperty} = ug.${groupLinkProperty}
-                    and ug.${userLinkProperty} = :userId
-                """
-                def query = session.createQuery(queryString)
-                query.setParameter("userId", principal.asList().get(1))
-                groups.addAll(query.list())
-
-                if(!StringUtils.isEmpty(adminGroupName) && groups.contains(adminGroupName)) {
-                    groups.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS))
-                }
+    @Override
+    protected Collection<String> loadAuthorizationInfo(
+            ApplicationRealm realm, PrincipalCollection principalCollection) {
+        def groups = []
+        if(StringUtils.isEmpty(userGroupTableEntityName) || StringUtils.isEmpty(groupTableEntityName)) {
+            /////////////////////////////////////////////////////////////////
+            //NB admin is hardcoded for the wizard to work - remove it in production!
+            /////////////////////////////////////////////////////////////////
+            if("admin".equals(principalCollection.asList().get(0))) {
+                logger.warn("Generated security.groovy is using the hardcoded 'admin' user; " +
+                            "remember to disable it in production!")
+                SessionMessages.addWarningMessage("Generated security.groovy is using the hardcoded 'admin' user; " +
+                                                  "remember to disable it in production!")
+                groups.add(getAdministratorsGroup(realm))
             }
-        } else if(principal instanceof String) {
-            groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
-
-            if(StringUtils.isEmpty(userGroupTableEntityName) || StringUtils.isEmpty(groupTableEntityName)) {
-                /////////////////////////////////////////////////////////////////
-                //NB admin is hardcoded for the wizard to work - remove it in production!
-                /////////////////////////////////////////////////////////////////
-                if("admin".equals(principal)) {
-                    logger.warn("Generated security.groovy is using the hardcoded 'admin' user; " +
-                                "remember to disable it in production!")
-                    groups.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS));
-                }
-                /////////////////////////////////////////////////////////////////
-            } else {
-                Session session = application.getSession(databaseName)
-                def queryString = """
-                    select distinct g.${groupNameProperty}
-                    from ${groupTableEntityName} g, ${userGroupTableEntityName} ug, ${userTableEntityName} u
-                    where g.${groupIdProperty} = ug.${groupLinkProperty}
-                    and ug.${userLinkProperty} = u.${userIdProperty}
-                    and u.${userNameProperty} = :principal
-                """
-                def query = session.createQuery(queryString)
-                query.setParameter("principal", principal)
-                groups.addAll(query.list())
-
-                if(!StringUtils.isEmpty(adminGroupName) && groups.contains(adminGroupName)) {
-                    groups.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS))
-                }
-            }
+            /////////////////////////////////////////////////////////////////
         } else {
-            throw new AuthorizationException("Invalid principal: " + principal);
-        }
+            Session session = realm.application.getSession(databaseName)
+            def queryString = """
+                select distinct g.${groupNameProperty}
+                from ${groupTableEntityName} g, ${userGroupTableEntityName} ug
+                where g.${groupIdProperty} = ug.${groupLinkProperty}
+                and ug.${userLinkProperty} = :userId
+            """
+            def query = session.createQuery(queryString)
+            query.setParameter("userId", principalCollection.asList().get(1))
+            groups.addAll(query.list())
 
-        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(groups);
-        Permission permission = new GroupPermission(groups);
-        info.setObjectPermissions((Set<Permission>) Collections.singleton(permission));
-        return info;
+            if(!StringUtils.isEmpty(adminGroupName) && groups.contains(adminGroupName)) {
+                groups.add(getAdministratorsGroup(realm))
+            }
+        }
+        return groups
+    }
+
+    @Override
+    protected Collection<String> loadAuthorizationInfo(ApplicationRealm realm, String principal) {
+        def groups = []
+        if(StringUtils.isEmpty(userGroupTableEntityName) || StringUtils.isEmpty(groupTableEntityName)) {
+            /////////////////////////////////////////////////////////////////
+            //NB admin is hardcoded for the wizard to work - remove it in production!
+            /////////////////////////////////////////////////////////////////
+            if("admin".equals(principal)) {
+                logger.warn("Generated security.groovy is using the hardcoded 'admin' user; " +
+                            "remember to disable it in production!")
+                SessionMessages.addWarningMessage("Generated security.groovy is using the hardcoded 'admin' user; " +
+                                                  "remember to disable it in production!")
+                groups.add(getAdministratorsGroup(realm));
+            }
+            /////////////////////////////////////////////////////////////////
+        } else {
+            Session session = realm.application.getSession(databaseName)
+            def queryString = """
+                select distinct g.${groupNameProperty}
+                from ${groupTableEntityName} g, ${userGroupTableEntityName} ug, ${userTableEntityName} u
+                where g.${groupIdProperty} = ug.${groupLinkProperty}
+                and ug.${userLinkProperty} = u.${userIdProperty}
+                and u.${userNameProperty} = :principal
+            """
+            def query = session.createQuery(queryString)
+            query.setParameter("principal", principal)
+            groups.addAll(query.list())
+
+            if(!StringUtils.isEmpty(adminGroupName) && groups.contains(adminGroupName)) {
+                groups.add(getAdministratorsGroup(realm));
+            }
+        }
+        return groups
     }
 
     AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, String userName, String password) {

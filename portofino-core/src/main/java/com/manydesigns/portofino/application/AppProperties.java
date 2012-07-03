@@ -51,4 +51,6 @@ public class AppProperties {
             "app.name";
     public static final String INIT_AT_STARTUP =
             "init-at-startup";
+    public static final String OPENID_ENABLED =
+            "openId.enabled";
 }

@@ -351,6 +351,9 @@ public class DispatcherLogic {
     public static <T> T getConfiguration(
             File configurationFile, Application application, Class<? extends T> configurationClass)
             throws Exception {
+        if (configurationClass == null) {
+            return null;
+        }
         ConfigurationCacheEntry entry = configurationCache.getIfPresent(configurationFile);
         if(entry == null || !configurationClass.isInstance(entry.object) || entry.error) {
             if(entry != null && entry.error) {

@@ -31,14 +31,18 @@ package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.shiro.openid.OpenIDToken;
 import org.apache.commons.configuration.Configuration;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.*;
+import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.openid4java.consumer.VerificationResult;
+import org.openid4java.discovery.Identifier;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -64,9 +68,67 @@ public abstract class AbstractApplicationRealmDelegate implements ApplicationRea
             String username = upToken.getUsername();
             String password = new String(upToken.getPassword());
             return getAuthenticationInfo(realm, username, password);
+        } else if(token instanceof OpenIDToken) {
+            if(realm.isOpenIDEnabled()) {
+                return getAuthenticationInfo(realm, ((OpenIDToken) token).getPrincipal());
+            } else {
+                throw new UnsupportedOperationException("OpenID authentication not supported");
+            }
         } else {
             return doGetAuthenticationInfo(realm, token);
         }
+    }
+
+    public AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, Object principal) {
+        Application application = realm.getApplication();
+        Set<String> groups = new HashSet<String>();
+        Configuration conf = application.getPortofinoProperties();
+        groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
+        if (principal == null) {
+            groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
+        } else if(principal instanceof PrincipalCollection) {
+            groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
+            groups.addAll(loadAuthorizationInfo(realm, (PrincipalCollection) principal));
+        } else if(principal instanceof String) {
+            groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
+            groups.addAll(loadAuthorizationInfo(realm, (String) principal));
+        } else if(realm.isOpenIDEnabled() && (principal instanceof Identifier)) {
+            groups.add(conf.getString(PortofinoProperties.GROUP_EXTERNALLY_AUTHENTICATED));
+            groups.addAll(loadAuthorizationInfo(realm, (Identifier) principal));
+        } else {
+            groups.addAll(loadAuthorizationInfo(realm, principal));
+        }
+
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(groups);
+        Permission permission = new GroupPermission(groups);
+        info.setObjectPermissions(Collections.singleton(permission));
+        return info;
+    }
+
+    protected Collection<String> loadAuthorizationInfo(
+            ApplicationRealm realm, PrincipalCollection principalCollection) {
+        return Collections.emptySet();
+    }
+
+    protected Collection<String> loadAuthorizationInfo(ApplicationRealm realm, String principal) {
+        return Collections.emptySet();
+    }
+
+    protected Collection<String> loadAuthorizationInfo(ApplicationRealm realm, Identifier principal) {
+        return Collections.emptySet();
+    }
+
+    protected Collection<String> loadAuthorizationInfo(ApplicationRealm realm, Object principal) {
+        throw new AuthorizationException("Invalid principal: " + principal);
+    }
+
+    protected String getAdministratorsGroup(ApplicationRealm realm) {
+        return realm.getApplication().getPortofinoProperties().getString(PortofinoProperties.GROUP_ADMINISTRATORS);
+    }
+
+    protected AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, VerificationResult principal) {
+        return new SimpleAuthenticationInfo(
+                principal.getVerifiedId(), OpenIDToken.NO_CREDENTIALS, realm.getName());
     }
 
     protected AuthenticationInfo doGetAuthenticationInfo(ApplicationRealm realm, AuthenticationToken token) {
@@ -85,6 +147,9 @@ public abstract class AbstractApplicationRealmDelegate implements ApplicationRea
         groups.add(group);
         group = conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
         groups.add(group);
+        if(realm.isOpenIDEnabled()) {
+            groups.add(conf.getString(PortofinoProperties.GROUP_EXTERNALLY_AUTHENTICATED));
+        }
         return groups;
     }
 }

@@ -25,12 +25,12 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
+import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 import com.manydesigns.portofino.shiro.openid.OpenIDToken;
-import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.configuration.Configuration;
@@ -60,6 +60,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /*
@@ -72,7 +73,7 @@ import java.util.ResourceBundle;
 public class LoginAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
-    public static final String LOGIN_ACTION_NAME = "loginAction";
+
     public static final String URL_BINDING = "/actions/user/login";
 
     //**************************************************************************
@@ -91,13 +92,9 @@ public class LoginAction extends AbstractActionBean {
 
     public String userName;
     public String pwd;
-
-    //**************************************************************************
-    // Scripting
-    //**************************************************************************
-
-    protected GroovyObject groovyObject;
-    protected String script;
+    public String openIdUrl;
+    public String openIdDestinationUrl;
+    public Map openIdParameterMap;
 
     //**************************************************************************
     // Presentation elements
@@ -186,13 +183,15 @@ public class LoginAction extends AbstractActionBean {
         return new RedirectResolution("/");
     }
 
-    public Resolution showOpenIDForm() throws ConsumerException, MessageException, DiscoveryException, MalformedURLException { //TODO
-        String openIDUrl = "https://www.google.com/accounts/o8/id"; //TODO
-
+    public Resolution showOpenIDForm()
+            throws ConsumerException, MessageException, DiscoveryException, MalformedURLException {
+        if(!isOpenIdEnabled()) {
+            return new ErrorResolution(403);
+        }
         ConsumerManager manager = new ConsumerManager();
 
         // perform discovery on the user-supplied identifier
-        List discoveries = manager.discover(openIDUrl);
+        List discoveries = manager.discover(openIdUrl);
 
         // attempt to associate with the OpenID provider
         // and retrieve one service endpoint for authentication
@@ -217,23 +216,37 @@ public class LoginAction extends AbstractActionBean {
         session.setAttribute("discovered", discovered);
         session.setAttribute("consumerManager", manager);
 
-        return new RedirectResolution(authReq.getDestinationUrl(true));
+        String destinationUrl = authReq.getDestinationUrl(true);
+
+        if(destinationUrl.length() > 2000) {
+            if(authReq.isVersion2()) {
+                openIdDestinationUrl = authReq.getDestinationUrl(false);
+                openIdParameterMap = authReq.getParameterMap();
+                return new ForwardResolution("/layouts/user/openIDFormRedirect.jsp");
+            } else {
+                SessionMessages.addErrorMessage("Cannot login, payload too big and OpenID version 2 not supported.");
+                return new ForwardResolution("/layouts/user/login.jsp");
+            }
+        } else {
+            return new RedirectResolution(destinationUrl, false);
+        }
     }
 
     public Resolution handleOpenIDLogin() throws DiscoveryException, AssociationException, MessageException {
-    // extract the parameters from the authentication response
-    // (which comes in as a HTTP request from the OpenID provider)
+        if(!isOpenIdEnabled()) {
+            return new ErrorResolution(403);
+        }
+        // extract the parameters from the authentication response
+        // (which comes in as a HTTP request from the OpenID provider)
         HttpServletRequest request = context.getRequest();
         ParameterList openidResp = new ParameterList(request.getParameterMap());
 
-    // retrieve the previously stored discovery information
+        // retrieve the previously stored discovery information
         HttpSession session = request.getSession();
         DiscoveryInformation discovered =
             (DiscoveryInformation) session.getAttribute("discovered");
-        session.removeAttribute("discovered");
         ConsumerManager manager =
                 (ConsumerManager) session.getAttribute("consumerManager");
-        session.removeAttribute("consumerManager");
 
         // extract the receiving URL from the HTTP request
         StringBuffer receivingURL = request.getRequestURL();
@@ -263,6 +276,8 @@ public class LoginAction extends AbstractActionBean {
                 if (StringUtils.isEmpty(returnUrl)) {
                     returnUrl = "/";
                 }
+                session.removeAttribute("discovered");
+                session.removeAttribute("consumerManager");
                 logger.debug("Redirecting to: {}", returnUrl);
                 return new RedirectResolution(returnUrl);
             } catch (AuthenticationException e) {
@@ -281,6 +296,10 @@ public class LoginAction extends AbstractActionBean {
     // do not expose this method publicly
     protected HttpSession getSession() {
         return context.getRequest().getSession(false);
+    }
+
+    public boolean isOpenIdEnabled() {
+        return getApplication().getAppConfiguration().getBoolean(AppProperties.OPENID_ENABLED, false);
     }
 
     //**************************************************************************
@@ -309,5 +328,26 @@ public class LoginAction extends AbstractActionBean {
 
     public Configuration getPortofinoConfiguration() {
         return portofinoConfiguration;
+    }
+
+    public String getOpenIdUrl() {
+        return openIdUrl;
+    }
+
+    public void setOpenIdUrl(String openIdUrl) {
+        this.openIdUrl = openIdUrl;
+    }
+
+    public String getOpenIdDestinationUrl() {
+        return openIdDestinationUrl;
+    }
+
+    public Map getOpenIdParameterMap() {
+        return openIdParameterMap;
+    }
+
+    //For openID selector
+    public void setOpenid_identifier(String openIdUrl) {
+        this.openIdUrl = openIdUrl;
     }
 }

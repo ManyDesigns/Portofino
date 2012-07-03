@@ -17,6 +17,44 @@
     <head>
         <jsp:include page="head.jsp"/>
         <stripes:layout-component name="customScripts"/>
+        <!-- Simple OpenID Selector -->
+        <link type="text/css" rel="stylesheet" href="<stripes:url value="/openid-selector/css/openid.css" />" />
+        <style type="text/css">
+            #openid_form { width: auto; }
+            #openid_username { margin-right: .5em; }
+            div#openid_highlight { padding: 0; }
+        </style>
+        <script type="text/javascript" src="<stripes:url value="/openid-selector/js/openid-jquery.js" />"></script>
+        <script type="text/javascript" src="<stripes:url value="/skins/default/openid-custom.js"/>"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                openid.img_path = '<stripes:url value="/openid-selector/images/" />';
+                openid.useInputBox = function(provider) {
+                    var input_area = $('#openid_input_area');
+                    var html = '';
+                    var id = 'openid_username';
+                    var value = '';
+                    var label = provider['label'];
+                    var style = '';
+                    if (label) {
+                        html = '<p>' + label + '</p>';
+                    }
+                    if (provider['name'] == 'OpenID') {
+                        id = this.input_id;
+                        value = 'http://';
+                        style = 'background: #FFF url(' + openid.img_path + 'openid-inputicon.gif) no-repeat scroll 0 50%; padding-left:18px;';
+                    }
+                    html += '<input id="' + id + '" type="text" style="' + style + '" name="' + id + '" value="' + value + '" />' +
+                            '<button id="openid_submit" type="submit" class="ui-button ui-widget ui-state-default ui-corner-all portletButton ui-button-text-only">' +
+                            '<span class="ui-button-text">' + openid.signin_text + '</span></button>';
+                    input_area.empty();
+                    input_area.append(html);
+                    $('#' + id).focus();
+                };
+                openid.init('openid_identifier');
+            });
+        </script>
+        <!-- /Simple OpenID Selector -->
         <jsp:useBean id="model" scope="request"
                      type="com.manydesigns.portofino.model.Model"/>
         <jsp:useBean id="app" scope="request"
@@ -29,27 +67,26 @@
         <div id="hd"></div>
         <div id="bd">
         <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
-        <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction" method="post">
-            <div id="content-login">
-                <div class="contentBody">
-                    <div class="portletWrapper noSpacing">
-                        <div class="portlet">
-                            <div class="portletHeader">
-                                <div>
-                                    <div class="portletTitle">
-                                        <h1><fmt:message key="skins.default.login.login_to"/>: <c:out value="${applicationName}"/></h1>
-                                    </div>
-                                    <div class="portletHeaderButtons">
-                                        <stripes:layout-component name="portletHeaderButtons">
-                                            <portofino:buttons list="portletHeaderButtons" />
-                                        </stripes:layout-component>
-                                    </div>
+        <div id="content-login">
+            <div class="contentBody">
+                <div class="portletWrapper noSpacing">
+                    <div class="portlet">
+                        <div class="portletHeader">
+                            <div>
+                                <div class="portletTitle">
+                                    <h1><fmt:message key="skins.default.login.login_to"/>: <c:out value="${applicationName}"/></h1>
                                 </div>
-                                <div class="portletHeaderSeparator"></div>
+                                <div class="portletHeaderButtons">
+                                    <stripes:layout-component name="portletHeaderButtons">
+                                    </stripes:layout-component>
+                                </div>
                             </div>
-                            <div class="portletBody">
-                                <stripes:layout-component name="portletBody">
-                                    <mde:sessionMessages/>
+                            <div class="portletHeaderSeparator"></div>
+                        </div>
+                        <div class="portletBody">
+                            <stripes:layout-component name="portletBody">
+                                <mde:sessionMessages/>
+                                <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction" method="post">
                                     <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
                                     <table class="mde-form-table loginTable">
                                         <tbody>
@@ -76,11 +113,29 @@
                                         </c:if>-->
                                         </tbody>
                                     </table>
-                                    Login with <stripes:link beanclass="com.manydesigns.portofino.actions.user.LoginAction"
-                                                             event="showOpenIDForm">
-                                        <stripes:param name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
-                                        <stripes:param name="returnUrl" value="${actionBean.returnUrl}" />
-                                    OpenID</stripes:link>
+                                    <stripes:hidden name="returnUrl"/>
+                                </stripes:form>
+                                <c:if test="${actionBean.openIdEnabled}">
+                                    <div style="border-top: 1px solid #ddd; padding-top: 0.5em">
+                                        <fmt:message key="skins.default.login.openId"/>:
+                                        <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction" method="post"
+                                                      id="openid_form">
+                                            <stripes:hidden name="returnUrl"/>
+                                            <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
+                                            <input type="hidden" name="showOpenIDForm" value="do" />
+                                            <div id="openid_choice">
+                                                <div id="openid_btns"></div>
+                                            </div>
+                                            <div id="openid_input_area">
+                                                <input id="openid_identifier" name="openIdUrl" type="text" value="http://" />
+                                                <button id="openid_submit" type="submit"
+                                                        class="ui-button ui-widget ui-state-default ui-corner-all portletButton ui-button-text-only">
+                                                    <span class="ui-button-text">Sign in</span>
+                                                </button>
+                                            </div>
+                                        </stripes:form>
+                                    </div>
+                                </c:if>
                                 </stripes:layout-component>
                             </div>
                             <div class="portletFooter" style="border-top: 1px solid #ddd; padding-top: 0.5em">
@@ -93,8 +148,6 @@
             <script type="text/javascript">
                 $('#userName').focus();
             </script>
-            <stripes:hidden name="returnUrl"/>
-        </stripes:form>
         </div>
     </div>
  </body>

@@ -91,6 +91,7 @@ public final class PortofinoProperties {
     public static final String GROUP_ALL = "group.all";
     public static final String GROUP_ANONYMOUS = "group.anonymous";
     public static final String GROUP_REGISTERED = "group.registered";
+    public static final String GROUP_EXTERNALLY_AUTHENTICATED = "group.externallyAuthenticated";
     public static final String GROUP_ADMINISTRATORS = "group.administrators";
 
     //Hibernate properties

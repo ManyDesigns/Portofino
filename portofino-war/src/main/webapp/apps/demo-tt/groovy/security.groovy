@@ -20,45 +20,12 @@ import org.hibernate.Session
 import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.openid4java.consumer.VerificationResult
+import org.openid4java.discovery.Identifier
 
 class Security extends AbstractApplicationRealmDelegate {
 
     private static final Logger logger = LoggerFactory.getLogger(Security.class);
-
-    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, principal) {
-        Application application = realm.getApplication();
-        Set<String> groups = new HashSet<String>();
-        Configuration conf = application.getPortofinoProperties();
-        groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
-        def user = null;
-        if (principal == null) {
-            groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
-        } else if(principal instanceof PrincipalCollection) {
-            groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
-            Session session = application.getSession("redmine");
-            def userId = (Integer) principal.asList().get(1);
-            logger.debug("Loading user with id = {}", userId);
-            user = session.load("users", userId);
-        } else if(principal instanceof String) {
-            groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
-            Session session = application.getSession("redmine");
-            logger.debug("Loading user with login = {}", principal);
-            org.hibernate.Criteria criteria = session.createCriteria("users");
-            criteria.add(Restrictions.eq("login", principal));
-            user = criteria.uniqueResult();
-        } else {
-            throw new AuthorizationException("Invalid principal: " + principal);
-        }
-
-        //TODO
-        if(user != null && "admin".equals(user.login)) {
-            groups.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS));
-        }
-        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(groups);
-        Permission permission = new GroupPermission(groups);
-        info.setObjectPermissions(Collections.singleton(permission));
-        return info;
-    }
 
     AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, String userName, String password) {
         MessageDigest md = MessageDigest.getInstance("SHA-1");
@@ -97,25 +64,32 @@ class Security extends AbstractApplicationRealmDelegate {
         return new LinkedHashSet<String>(query.list());
     }
 
-    Set<String> getGroups(ApplicationRealm realm) {
-        Application application = realm.application;
-        def groups = new LinkedHashSet<String>();
-        Configuration conf = application.getPortofinoProperties();
-        def group = conf.getString(PortofinoProperties.GROUP_ALL);
-        groups.add(group);
-        group = conf.getString(PortofinoProperties.GROUP_ANONYMOUS);
-        groups.add(group);
-        group = conf.getString(PortofinoProperties.GROUP_REGISTERED);
-        groups.add(group);
-        group = conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
-        groups.add(group);
-        return groups;
+    @Override
+    protected Collection<String> loadAuthorizationInfo(
+            ApplicationRealm realm, PrincipalCollection principalCollection) {
+        Session session = realm.application.getSession("redmine");
+        def userId = (Integer) principalCollection.asList().get(1);
+        logger.debug("Loading user with id = {}", userId);
+        def user = session.load("users", userId);
+        if("admin".equals(user.login)) {
+            return [realm.application.portofinoProperties.getString(PortofinoProperties.GROUP_ADMINISTRATORS)]
+        } else {
+            return []
+        }
     }
 
-    private User findUserByUserName(Session session, String username) {
+    @Override
+    protected Collection<String> loadAuthorizationInfo(ApplicationRealm realm, String principal) {
+        Session session = realm.application.getSession("redmine");
+        logger.debug("Loading user with login = {}", principal);
         org.hibernate.Criteria criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("login", username));
-        return (User) criteria.uniqueResult();
+        criteria.add(Restrictions.eq("login", principal));
+        def user = criteria.uniqueResult();
+        if("admin".equals(user.login)) {
+            return [realm.application.portofinoProperties.getString(PortofinoProperties.GROUP_ADMINISTRATORS)]
+        } else {
+            return []
+        }
     }
 
 }

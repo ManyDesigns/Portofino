@@ -24,8 +24,10 @@ package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
+import com.manydesigns.portofino.shiro.openid.OpenIDToken;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationException;
@@ -95,6 +97,15 @@ public class ApplicationRealm extends AuthorizingRealm implements UsersGroupsDAO
         } else {
             throw new Error("Security object file not found: " + file.getAbsolutePath());
         }
+    }
+
+    @Override
+    public boolean supports(AuthenticationToken token) {
+        return super.supports(token) || (isOpenIDEnabled() && token instanceof OpenIDToken);
+    }
+
+    public boolean isOpenIDEnabled() {
+        return getApplication().getAppConfiguration().getBoolean(AppProperties.OPENID_ENABLED, false);
     }
 
     public Application getApplication() {

@@ -20,24 +20,13 @@ class Security extends AbstractApplicationRealmDelegate {
     private static final String ADMIN_LOGIN = "admin";
     private static final String ADMIN_PASSWORD = "admin";
 
-    AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, Object userName) {
-        Application application = realm.getApplication();
-        Set<String> groups = new HashSet<String>();
-        Configuration conf = application.getPortofinoProperties();
-        groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
-        if (userName == null) {
-            groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
+    @Override
+    protected Collection<String> loadAuthorizationInfo(ApplicationRealm realm, String principal) {
+        if (ADMIN_LOGIN.equals(principal)) {
+            return [ getAdministratorsGroup(realm) ]
         } else {
-            groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
-
-            if (ADMIN_LOGIN.equals(userName)) {
-                groups.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS));
-            }
+            return []
         }
-        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(groups);
-        Permission permission = new GroupPermission(groups);
-        info.setObjectPermissions(Collections.singleton(permission));
-        return info;
     }
 
     AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, String userName, String password) {
@@ -56,14 +45,4 @@ class Security extends AbstractApplicationRealmDelegate {
         return result;
     }
 
-    Set<String> getGroups(ApplicationRealm realm) {
-        Application application = realm.getApplication();
-        Configuration conf = application.getPortofinoProperties();
-        Set<String> result = new LinkedHashSet<String>();
-        result.add(conf.getString(PortofinoProperties.GROUP_ALL));
-        result.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
-        result.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
-        result.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS));
-        return result;
-    }
 }
