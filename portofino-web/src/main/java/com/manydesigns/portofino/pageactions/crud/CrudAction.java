@@ -22,15 +22,23 @@
 
 package com.manydesigns.portofino.pageactions.crud;
 
+import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.text.OgnlSqlFormat;
+import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
+import com.manydesigns.elements.text.TextFormat;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.application.QueryUtils;
+import com.manydesigns.portofino.cache.Cache;
 import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.model.database.Database;
-import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.logic.SelectionProviderLogic;
+import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
@@ -49,6 +57,7 @@ import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
+import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +65,7 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /*
@@ -148,12 +158,22 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     @Override
     protected void doSave(Object object) {
-        session.save(baseTable.getActualEntityName(), object);
+        try {
+            session.save(baseTable.getActualEntityName(), object);
+        } catch(ConstraintViolationException e) {
+            logger.warn("Constraint violation in save", e);
+            throw new RuntimeException(getMessage("crud.constraintViolation"));
+        }
     }
 
     @Override
     protected void doUpdate(Object object) {
-        session.update(baseTable.getActualEntityName(), object);
+        try {
+            session.update(baseTable.getActualEntityName(), object);
+        } catch(ConstraintViolationException e) {
+            logger.warn("Constraint violation in update", e);
+            throw new RuntimeException(getMessage("crud.constraintViolation"));
+        }
     }
 
     @Override
@@ -222,6 +242,81 @@ public class CrudAction extends AbstractCrudAction<Object> {
                 baseTable, pkObject,
                 crudConfiguration.getQuery(), this);
         //return QueryUtils.getObjectByPk(application, baseTable, pkObject);
+    }
+
+    protected DefaultSelectionProvider createSelectionProvider(
+            DatabaseSelectionProvider current, String[] fieldNames, Class[] fieldTypes, DisplayMode dm) {
+        DefaultSelectionProvider selectionProvider = null;
+        String name = current.getName();
+        String databaseName = current.getToDatabase();
+        String sql = current.getSql();
+        String hql = current.getHql();
+        if (sql != null) {
+            Session session = application.getSession(databaseName);
+            OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
+            String formatString = sqlFormat.getFormatString();
+            Object[] parameters = sqlFormat.evaluateOgnlExpressions(this);
+            QueryStringWithParameters cacheKey = new QueryStringWithParameters(formatString, parameters);
+            Collection<Object[]> objects = getFromQueryCache(current, cacheKey);
+            if(objects == null) {
+                logger.debug("Query not in cache: {}", formatString);
+                objects = QueryUtils.runSql(session, formatString, parameters);
+                putInQueryCache(current, cacheKey, objects);
+            }
+            selectionProvider =
+                    SelectionProviderLogic.createSelectionProvider(name, fieldNames.length, fieldTypes, objects);
+            selectionProvider.setDisplayMode(dm);
+        } else if (hql != null) {
+            Database database = DatabaseLogic.findDatabaseByName(model, databaseName);
+            Table table = QueryUtils.getTableFromQueryString(database, hql);
+            String entityName = table.getActualEntityName();
+            Session session = application.getSession(databaseName);
+            QueryStringWithParameters queryWithParameters = QueryUtils.mergeQuery(hql, null, this);
+
+            Collection<Object> objects = getFromQueryCache(current, queryWithParameters);
+            if(objects == null) {
+                String queryString = queryWithParameters.getQueryString();
+                Object[] parameters = queryWithParameters.getParameters();
+                logger.debug("Query not in cache: {}", queryString);
+                objects = QueryUtils.runHqlQuery(session, queryString, parameters);
+                putInQueryCache(current, queryWithParameters, objects);
+            }
+
+            TableAccessor tableAccessor =
+                    application.getTableAccessor(databaseName, entityName);
+            ShortName shortNameAnnotation =
+                    tableAccessor.getAnnotation(ShortName.class);
+            TextFormat[] textFormats = null;
+            //L'ordinamento e' usato solo in caso di chiave singola
+            if (shortNameAnnotation != null && tableAccessor.getKeyProperties().length == 1) {
+                textFormats = new TextFormat[] {
+                    OgnlTextFormat.create(shortNameAnnotation.value())
+                };
+            }
+
+            selectionProvider = SelectionProviderLogic.createSelectionProvider
+                    (name, objects, tableAccessor.getKeyProperties(), textFormats);
+            selectionProvider.setDisplayMode(dm);
+
+            if(current instanceof ForeignKey) {
+                selectionProvider.sortByLabel();
+            }
+        } else {
+            logger.warn("ModelSelection provider '{}': both 'hql' and 'sql' are null", name);
+        }
+        return selectionProvider;
+    }
+
+    protected void putInQueryCache(
+            DatabaseSelectionProvider sp, QueryStringWithParameters queryWithParameters, Collection objects) {
+        Cache cache = (Cache) context.getServletContext().getAttribute(ApplicationAttributes.CACHE);
+        cache.put(application, queryWithParameters, (Serializable) objects);
+    }
+
+    protected Collection getFromQueryCache(
+            DatabaseSelectionProvider sp, QueryStringWithParameters queryWithParameters) {
+        Cache cache = (Cache) context.getServletContext().getAttribute(ApplicationAttributes.CACHE);
+        return (Collection) cache.get(application, queryWithParameters);
     }
 
     //--------------------------------------------------------------------------

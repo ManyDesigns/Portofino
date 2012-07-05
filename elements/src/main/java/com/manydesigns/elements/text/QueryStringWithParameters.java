@@ -22,13 +22,16 @@
 
 package com.manydesigns.elements.text;
 
+import java.io.Serializable;
+import java.util.Arrays;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class QueryStringWithParameters {
+public class QueryStringWithParameters implements Serializable {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
@@ -48,4 +51,24 @@ public class QueryStringWithParameters {
         return paramaters;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        QueryStringWithParameters that = (QueryStringWithParameters) o;
+
+        // Probably incorrect - comparing Object[] arrays with Arrays.equals
+        if (!Arrays.equals(paramaters, that.paramaters)) return false;
+        if (queryString != null ? !queryString.equals(that.queryString) : that.queryString != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = queryString != null ? queryString.hashCode() : 0;
+        result = 31 * result + (paramaters != null ? Arrays.hashCode(paramaters) : 0);
+        return result;
+    }
 }

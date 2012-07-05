@@ -31,6 +31,8 @@ import com.manydesigns.mail.sender.DefaultMailSender;
 import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.cache.Cache;
+import com.manydesigns.portofino.cache.NullCache;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
 import com.manydesigns.portofino.quartz.MailSenderJob;
@@ -103,6 +105,8 @@ public class PortofinoListener
     protected MailSender mailSender;
 
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
+
+    protected Cache cache;
 
     //**************************************************************************
     // Logging
@@ -193,6 +197,17 @@ public class PortofinoListener
             }
         }
 
+        String cacheImplClass = portofinoConfiguration.getString(
+                PortofinoProperties.CACHE_IMPLEMENTATION, NullCache.class.getName());
+        logger.info("Initializing cache service, implementation class: {}", cacheImplClass);
+        try {
+            cache = (Cache) Class.forName(cacheImplClass, true, getClass().getClassLoader()).newInstance();
+        } catch (Exception e) {
+            logger.error("Could not create cache instance of class " + cacheImplClass + ", falling back to null cache", e);
+            cache = new NullCache();
+        }
+        servletContext.setAttribute(ApplicationAttributes.CACHE, cache);
+
         setupEmailScheduler();
 
         String lineSeparator = System.getProperty("line.separator", "\n");
@@ -201,7 +216,7 @@ public class PortofinoListener
                 lineSeparator + "--- Context path: {}" +
                 lineSeparator + "--- Real path: {}" +
                 lineSeparator + SEPARATOR,
-                new String[] {
+                new String[]{
                         portofinoConfiguration.getString(
                                 PortofinoProperties.PORTOFINO_VERSION),
                         serverInfo.getContextPath(),
@@ -214,8 +229,10 @@ public class PortofinoListener
         MDC.clear();
         logger.info("ManyDesigns Portofino stopping...");
         applicationStarter.destroy();
-        logger.info("Destroying Shiro environment");
+        logger.info("Destroying Shiro environment...");
         environmentLoader.destroyEnvironment(servletContext);
+        logger.info("Shutting down cache...");
+        cache.shutdown();
         logger.info("ManyDesigns Portofino stopped.");
     }
 

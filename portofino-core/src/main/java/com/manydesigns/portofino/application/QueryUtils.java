@@ -79,14 +79,18 @@ public class QueryUtils {
 
     public static List<Object[]> runSql(Session session, String sql) {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
-        final String formatString = sqlFormat.getFormatString();
-        final Object[] parameters = sqlFormat.evaluateOgnlExpressions(null);
+        String formatString = sqlFormat.getFormatString();
+        Object[] parameters = sqlFormat.evaluateOgnlExpressions(null);
+        return runSql(session, formatString, parameters);
+    }
+
+    public static List<Object[]> runSql(Session session, final String queryString, final Object[] parameters) {
         final List<Object[]> result = new ArrayList<Object[]>();
 
         try {
             session.doWork(new Work() {
                 public void execute(Connection connection) throws SQLException {
-                    PreparedStatement stmt = connection.prepareStatement(formatString);
+                    PreparedStatement stmt = connection.prepareStatement(queryString);
                     try {
                         for (int i = 0; i < parameters.length; i++) {
                             stmt.setObject(i + 1, parameters[i]);

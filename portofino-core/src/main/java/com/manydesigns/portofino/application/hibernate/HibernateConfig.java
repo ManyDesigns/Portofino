@@ -116,6 +116,13 @@ public class HibernateConfig {
             configuration.setProperty("hibernate.c3p0.idle_test_period",
                     portofinoConfiguration.getString(
                             PortofinoProperties.HIBERNATE_C3P0_IDLE_TEST_PERIOD));
+            /* Per abilitare 2nd-level cache
+            configuration.setProperty("hibernate.cache.region.factory_class",
+                    portofinoConfiguration.getString("hibernate.cache.region.factory_class"));
+            configuration.setProperty("hibernate.cache.use_second_level_cache",
+                    portofinoConfiguration.getString("hibernate.cache.use_second_level_cache"));
+            configuration.setProperty("hibernate.cache.use_query_cache",
+                    portofinoConfiguration.getString("hibernate.cache.use_query_cache"));*/
 
             Mappings mappings = configuration.createMappings();
 

@@ -108,5 +108,7 @@ public final class PortofinoProperties {
     public static final String CONFIGURATION_CACHE_SIZE = "configuration.cache.size";
     public static final String CONFIGURATION_CACHE_CHECK_FREQUENCY = "configuration.cache.check.frequency";
 
+    public static final String CACHE_IMPLEMENTATION = "cache.implementation";
+
     private PortofinoProperties() {}
 }

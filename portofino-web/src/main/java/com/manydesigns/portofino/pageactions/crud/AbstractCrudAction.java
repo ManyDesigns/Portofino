@@ -48,7 +48,6 @@ import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -85,8 +84,6 @@ import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
-import org.hibernate.Session;
-import org.hibernate.exception.ConstraintViolationException;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONStringer;
@@ -380,9 +377,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     doSave(object);
                     createPostProcess(object);
                     commitTransaction();
-                } catch(ConstraintViolationException e) {
-                    SessionMessages.addErrorMessage(getMessage("crud.constraintViolation"));
-                    return getCreateView();
                 } catch (Throwable e) {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
@@ -442,9 +436,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     doUpdate(object);
                     editPostProcess(object);
                     commitTransaction();
-                } catch(ConstraintViolationException e) {
-                    SessionMessages.addErrorMessage(getMessage("crud.constraintViolation"));
-                    return getEditView();
                 } catch (Throwable e) {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
@@ -802,11 +793,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected SelectionProvider createSelectionProvider
             (DatabaseSelectionProvider current, String[] fieldNames,
              Class[] fieldTypes, DisplayMode dm, String newHref, String newText) {
-        DefaultSelectionProvider selectionProvider = null;
-        String name = current.getName();
-        String databaseName = current.getToDatabase();
-        String sql = current.getSql();
-        String hql = current.getHql();
+        DefaultSelectionProvider selectionProvider;
 
         boolean anyActiveProperty = false;
         for(String propertyName : fieldNames) {
@@ -819,22 +806,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         if(!anyActiveProperty) {
             //Dummy
             selectionProvider = SelectionProviderLogic.createSelectionProvider(
-                    name, 0, new Class[0], Collections.<Object[]>emptyList());
-        } else if (sql != null) {
-            Session session = application.getSession(databaseName);
-            Collection<Object[]> objects = QueryUtils.runSql(session, sql);
-            selectionProvider = SelectionProviderLogic.createSelectionProvider(name, fieldNames.length, fieldTypes, objects);
-            selectionProvider.setDisplayMode(dm);
-        } else if (hql != null) {
-            selectionProvider =
-                    SelectionProviderLogic.createSelectionProviderFromHql(name, application, databaseName, hql, dm);
-
-            if(current instanceof ForeignKey) {
-                selectionProvider.sortByLabel();
-            }
+                    current.getName(), 0, new Class[0], Collections.<Object[]>emptyList());
         } else {
-            logger.warn("ModelSelection provider '{}':" +
-                    " both 'hql' and 'sql' are null", name);
+            selectionProvider = createSelectionProvider(current, fieldNames, fieldTypes, dm);
         }
         if(selectionProvider != null) {
             if(newHref != null) {
@@ -849,6 +823,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
         return selectionProvider;
     }
+
+    protected abstract DefaultSelectionProvider createSelectionProvider(
+            DatabaseSelectionProvider current, String[] fieldNames, Class[] fieldTypes, DisplayMode dm);
 
     public boolean isConfigured() {
         return (classAccessor != null);
