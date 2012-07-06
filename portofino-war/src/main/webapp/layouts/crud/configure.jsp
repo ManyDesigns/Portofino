@@ -50,12 +50,14 @@
                     var allCheckbox = firstCell.find("input")
                     allCheckbox.click(function() {
                         inputs.each(function() {
+                            var checkbox = $(this);
+                            checkbox.click();
                             if(!allCheckbox.is(':checked')) {
-                                $(this).removeProp('checked');
+                                checkbox.removeProp('checked');
                             } else {
-                                $(this).prop('checked', 'checked');
+                                checkbox.prop('checked', 'checked');
                             }
-                            updateRow($(this));
+                            updateRow(checkbox);
                         })
                     });
                 });
