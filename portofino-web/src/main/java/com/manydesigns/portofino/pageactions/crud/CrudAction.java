@@ -34,8 +34,8 @@ import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.application.QueryUtils;
-import com.manydesigns.portofino.cache.Cache;
 import com.manydesigns.portofino.database.TableCriteria;
+import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.*;
@@ -48,6 +48,7 @@ import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
+import net.sf.ehcache.CacheManager;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
@@ -308,15 +309,11 @@ public class CrudAction extends AbstractCrudAction<Object> {
     }
 
     protected void putInQueryCache(
-            DatabaseSelectionProvider sp, QueryStringWithParameters queryWithParameters, Collection objects) {
-        Cache cache = (Cache) context.getServletContext().getAttribute(ApplicationAttributes.CACHE);
-        cache.put(application, queryWithParameters, (Serializable) objects);
-    }
+            DatabaseSelectionProvider sp, QueryStringWithParameters queryWithParameters, Collection objects) {}
 
     protected Collection getFromQueryCache(
             DatabaseSelectionProvider sp, QueryStringWithParameters queryWithParameters) {
-        Cache cache = (Cache) context.getServletContext().getAttribute(ApplicationAttributes.CACHE);
-        return (Collection) cache.get(application, queryWithParameters);
+        return null;
     }
 
     //--------------------------------------------------------------------------

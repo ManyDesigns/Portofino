@@ -552,13 +552,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
     }
 
-    protected String getMessage(String key, Object... args) {
-        Locale locale = context.getLocale();
-        ResourceBundle resourceBundle = application.getBundle(locale);
-        String msg = resourceBundle.getString(key);
-        return MessageFormat.format(msg, args);
-    }
-
     public Map getOgnlContext() {
         return ElementsThreadLocals.getOgnlContext();
     }
@@ -574,6 +567,13 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     //--------------------------------------------------------------------------
     // Utitilities
     //--------------------------------------------------------------------------
+
+    protected String getMessage(String key, Object... args) {
+        Locale locale = context.getLocale();
+        ResourceBundle resourceBundle = application.getBundle(locale);
+        String msg = resourceBundle.getString(key);
+        return MessageFormat.format(msg, args);
+    }
 
     public String getAppJsp(String jsp) {
         return "/apps/" + application.getAppId() + "/web" + jsp;

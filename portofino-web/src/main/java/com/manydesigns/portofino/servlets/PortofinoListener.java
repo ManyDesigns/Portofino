@@ -31,13 +31,12 @@ import com.manydesigns.mail.sender.DefaultMailSender;
 import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.cache.Cache;
-import com.manydesigns.portofino.cache.NullCache;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
 import com.manydesigns.portofino.quartz.MailSenderJob;
 import com.manydesigns.portofino.shiro.UsersGroupsDAO;
 import com.manydesigns.portofino.starter.ApplicationStarter;
+import net.sf.ehcache.CacheManager;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -106,7 +105,7 @@ public class PortofinoListener
 
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
 
-    protected Cache cache;
+    protected CacheManager cacheManager;
 
     //**************************************************************************
     // Logging
@@ -197,16 +196,9 @@ public class PortofinoListener
             }
         }
 
-        String cacheImplClass = portofinoConfiguration.getString(
-                PortofinoProperties.CACHE_IMPLEMENTATION, NullCache.class.getName());
-        logger.info("Initializing cache service, implementation class: {}", cacheImplClass);
-        try {
-            cache = (Cache) Class.forName(cacheImplClass, true, getClass().getClassLoader()).newInstance();
-        } catch (Exception e) {
-            logger.error("Could not create cache instance of class " + cacheImplClass + ", falling back to null cache", e);
-            cache = new NullCache();
-        }
-        servletContext.setAttribute(ApplicationAttributes.CACHE, cache);
+        logger.info("Initializing ehcache service");
+        cacheManager = CacheManager.newInstance();
+        servletContext.setAttribute(ApplicationAttributes.EHCACHE_MANAGER, cacheManager);
 
         setupEmailScheduler();
 
@@ -232,7 +224,7 @@ public class PortofinoListener
         logger.info("Destroying Shiro environment...");
         environmentLoader.destroyEnvironment(servletContext);
         logger.info("Shutting down cache...");
-        cache.shutdown();
+        cacheManager.shutdown();
         logger.info("ManyDesigns Portofino stopped.");
     }
 

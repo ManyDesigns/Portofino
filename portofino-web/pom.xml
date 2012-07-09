@@ -35,6 +35,13 @@
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
             <version>${quartz.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+           <groupId>net.sf.ehcache</groupId>
+           <artifactId>ehcache-core</artifactId>
+           <version>${ehcache.version}</version>
+           <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>

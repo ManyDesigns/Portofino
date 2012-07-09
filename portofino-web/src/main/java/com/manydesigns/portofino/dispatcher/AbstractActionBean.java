@@ -36,9 +36,6 @@ public abstract class AbstractActionBean implements ActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    public final static String INPUT = "input";
-    public final static String SUCCESS = "success";
-
     protected ActionBeanContext context;
     protected String originalPath;
 

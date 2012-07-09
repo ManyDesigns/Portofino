@@ -38,5 +38,5 @@ public class ApplicationAttributes {
     public final static String APPLICATION_STARTER = "applicationStarter";
     public final static String MAIL_QUEUE = "mailQueue";
     public static final String USERS_GROUPS_DAO = "usersGroupDAO";
-    public static final String CACHE = "portofino.cache";
+    public static final String EHCACHE_MANAGER = "portofino.cache";
 }

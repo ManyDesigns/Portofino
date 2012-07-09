@@ -149,6 +149,11 @@ Site: http://quintanasoft.com/dumbster/
 File: dumbster-1.5.jar
 License: Apache License v2
 
+Ehcache
+Site: http://ehcache.org/
+File: ehcache-core-2.5.2.jar
+License: Apache License v2
+
 FindBugs JSR-305
 Site: http://findbugs.sourceforge.net/
 File: jsr305-1.3.9.jar
