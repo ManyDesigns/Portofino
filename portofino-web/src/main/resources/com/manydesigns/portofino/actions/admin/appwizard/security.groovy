@@ -1,10 +1,8 @@
 import com.manydesigns.elements.messages.SessionMessages
-import com.manydesigns.portofino.PortofinoProperties
 import com.manydesigns.portofino.application.Application
 import com.manydesigns.portofino.shiro.AbstractApplicationRealmDelegate
 import com.manydesigns.portofino.shiro.ApplicationRealm
 import java.security.MessageDigest
-import org.apache.commons.configuration.Configuration
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.authc.AuthenticationInfo
 import org.apache.shiro.authc.IncorrectCredentialsException
@@ -160,16 +158,7 @@ class Security extends AbstractApplicationRealmDelegate {
 
     Set<String> getGroups(ApplicationRealm realm) {
         Application application = realm.application;
-        def groups = new HashSet<String>();
-        Configuration conf = application.getPortofinoProperties();
-        def group = conf.getString(PortofinoProperties.GROUP_ALL);
-        groups.add(group);
-        group = conf.getString(PortofinoProperties.GROUP_ANONYMOUS);
-        groups.add(group);
-        group = conf.getString(PortofinoProperties.GROUP_REGISTERED);
-        groups.add(group);
-        group = conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
-        groups.add(group);
+        def groups = super.getGroups(realm)
 
         if(!StringUtils.isEmpty(groupTableEntityName)) {
             Session session = application.getSession(databaseName)
