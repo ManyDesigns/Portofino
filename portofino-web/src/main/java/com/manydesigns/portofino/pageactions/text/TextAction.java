@@ -346,9 +346,15 @@ public class TextAction extends AbstractPageAction {
 
     @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
     @RequiresPermissions(level = AccessLevel.EDIT)
-    public Resolution configure() throws IOException {
+    public Resolution configure() {
         prepareConfigurationForms();
-        loadContent();
+        logger.info("Edit content: {}", textFile.getAbsolutePath());
+        try {
+            loadContent();
+        } catch (IOException e) {
+            logger.error("Could not load content", e);
+            SessionMessages.addErrorMessage("Could not load content: " + e);
+        }
         return new ForwardResolution("/layouts/text/configure.jsp");
     }
 
@@ -506,20 +512,6 @@ public class TextAction extends AbstractPageAction {
     public Resolution manageAttachments() {
         logger.info("Manage attachments");
         return new ForwardResolution("/layouts/text/manage-attachments.jsp");
-    }
-
-    @Button(list = "portletHeaderButtons", key = "layouts.text.edit", order = 2, icon = "ui-icon-document")
-    @RequiresPermissions(level = AccessLevel.EDIT)
-    public Resolution editContent() throws IOException {
-        try {
-            loadContent();
-            logger.info("Edit content: {}", textFile.getAbsolutePath());
-            return new ForwardResolution("/layouts/text/edit-content.jsp");
-        } catch (IOException e) {
-            logger.error("Could not load content", e);
-            SessionMessages.addErrorMessage("Could not load content: " + e);
-            return execute();
-        }
     }
 
     @Button(list = "edit-content", key = "commons.update")
