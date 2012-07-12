@@ -348,9 +348,9 @@ public class TextAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configure() {
         prepareConfigurationForms();
-        logger.info("Edit content: {}", textFile.getAbsolutePath());
         try {
             loadContent();
+            logger.info("Edit content: {}", textFile.getAbsolutePath());
         } catch (IOException e) {
             logger.error("Could not load content", e);
             SessionMessages.addErrorMessage("Could not load content: " + e);
