@@ -61,6 +61,7 @@ import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.shiro.UsersGroupsDAO;
+import com.manydesigns.portofino.stripes.ForbiddenAccessResolution;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.HttpUtil;
 import ognl.OgnlContext;
@@ -116,25 +117,21 @@ public class PageAdminAction extends AbstractPageAction {
     protected final PageActionRegistry registry = new PageActionRegistry();
 
     @Before
-    public void prepare() {
+    public Resolution prepare() {
         Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
         String contextPath = context.getRequest().getContextPath();
         dispatch = dispatcher.getDispatch(contextPath, originalPath);
-        /* TODO ora tutte le operazioni richiedono administrator.
-           Se in futuro non sarà così, qui bisognerà controllare che l'utente abbia
-           i permessi sulla pagina di origine.
-        */
-        try {
-            PageInstance pageInstance = dispatch.getLastPageInstance();
-            PageAction actionBean = pageInstance.getActionClass().newInstance();
-            pageInstance.setActionBean(actionBean);
-        } catch (Exception e) {
-            throw new Error("Couldn't instantiate action", e);
-        }
+        pageInstance = dispatch.getLastPageInstance();
 
         List<String> knownPageActions = application.getPortofinoProperties().getList("pageactions");
         for(String pageAction : knownPageActions) {
             tryToRegisterPageAction(pageAction);
+        }
+
+        if(!SecurityLogic.hasPermissions(pageInstance, SecurityUtils.getSubject(), AccessLevel.EDIT)) {
+            return new ForbiddenAccessResolution();
+        } else {
+            return null;
         }
     }
 
@@ -166,7 +163,6 @@ public class PageAdminAction extends AbstractPageAction {
         return new RedirectResolution(dispatch.getOriginalPath());
     }
 
-    @RequiresAdministrator
     public Resolution updateLayout() {
         HttpServletRequest request = context.getRequest();
         Enumeration parameters = request.getParameterNames();
@@ -221,13 +217,11 @@ public class PageAdminAction extends AbstractPageAction {
         }
     }
 
-    @RequiresAdministrator
-    public Resolution newPage() {
+    public Resolution newPage() throws Exception {
         prepareNewPageForm();
         return new ForwardResolution("/layouts/page-crud/new-page.jsp");
     }
 
-    @RequiresAdministrator
     @Button(list = "page-create", key = "commons.create", order = 1)
     public Resolution createPage() {
         try {
@@ -254,7 +248,6 @@ public class PageAdminAction extends AbstractPageAction {
 
     private Resolution doCreateNewPage() throws Exception {
         prepareNewPageForm();
-        newPageForm.readFromRequest(context.getRequest());
         if(newPageForm.validate()) {
             NewPage newPage = new NewPage();
             newPageForm.writeToObject(newPage);
@@ -289,6 +282,7 @@ public class PageAdminAction extends AbstractPageAction {
             File directory;
             File parentDirectory;
             Page parentPage;
+            PageInstance parentPageInstance;
             Layout parentLayout;
             switch (insertPosition) {
                 case TOP:
@@ -297,17 +291,18 @@ public class PageAdminAction extends AbstractPageAction {
                     parentPage = DispatcherLogic.getPage(parentDirectory);
                     parentLayout = parentPage.getLayout();
                     configurePath = "";
+                    parentPageInstance = new PageInstance(null, parentDirectory, application, parentPage, null);
                     break;
                 case CHILD:
-                    PageInstance lastPageInstance = getPageInstance();
-                    parentPage = lastPageInstance.getPage();
-                    parentLayout = lastPageInstance.getLayout();
-                    parentDirectory = lastPageInstance.getDirectory();
-                    directory = lastPageInstance.getChildPageDirectory(fragment);
+                    parentPageInstance = getPageInstance();
+                    parentPage = parentPageInstance.getPage();
+                    parentLayout = parentPageInstance.getLayout();
+                    parentDirectory = parentPageInstance.getDirectory();
+                    directory = parentPageInstance.getChildPageDirectory(fragment);
                     configurePath = dispatch.getOriginalPath();
                     break;
                 case SIBLING:
-                    PageInstance parentPageInstance = dispatch.getPageInstance(-2);
+                    parentPageInstance = dispatch.getPageInstance(-2);
                     parentPage = parentPageInstance.getPage();
                     parentLayout = parentPageInstance.getLayout();
                     parentDirectory = parentPageInstance.getDirectory();
@@ -316,6 +311,13 @@ public class PageAdminAction extends AbstractPageAction {
                     break;
                 default:
                     throw new IllegalStateException("Don't know how to add page " + page + " at position " + insertPosition);
+            }
+
+            //Check permissions on target parent
+            Subject subject = SecurityUtils.getSubject();
+            if(!SecurityLogic.hasPermissions(parentPageInstance, subject, AccessLevel.EDIT)) {
+                logger.warn("User not authorized to create page.");
+                return new ForbiddenAccessResolution("You are not authorized to create a new page here.");
             }
 
             if(directory.exists()) {
@@ -376,7 +378,6 @@ public class PageAdminAction extends AbstractPageAction {
         }
     }
 
-    @RequiresAdministrator
     public Resolution deletePage() {
         PageInstance pageInstance = getPageInstance();
         PageInstance parentPageInstance = pageInstance.getParent();
@@ -421,7 +422,6 @@ public class PageAdminAction extends AbstractPageAction {
         return dispatch.getLastPageInstance();
     }
 
-    @RequiresAdministrator
     public Resolution movePage() {
         buildMovePageForm();
         moveForm.readFromRequest(context.getRequest());
@@ -438,7 +438,6 @@ public class PageAdminAction extends AbstractPageAction {
         }
     }
 
-    @RequiresAdministrator
     public Resolution copyPage() {
         buildCopyPageForm();
         copyForm.readFromRequest(context.getRequest());
@@ -490,13 +489,14 @@ public class PageAdminAction extends AbstractPageAction {
             newParent = new PageInstance(newParent.getParent(), newParent.getDirectory(), application, oldParent.getPage(), null);
             newParent.getParameters().addAll(params);
         }
-        if(!SecurityLogic.isAdministrator(context.getRequest())) {
-            Subject subject = SecurityUtils.getSubject();
-            if(!SecurityLogic.hasPermissions(newParent, subject, AccessLevel.DEVELOP)) {
-                SessionMessages.addErrorMessage(getMessage("page.copyOrMove.forbidden.accessLevel"));
-                return new RedirectResolution(dispatch.getOriginalPath());
-            }
+
+        //Check permissions on target parent page
+        Subject subject = SecurityUtils.getSubject();
+        if(!SecurityLogic.hasPermissions(newParent, subject, AccessLevel.EDIT)) {
+            SessionMessages.addErrorMessage(getMessage("page.copyOrMove.forbidden.accessLevel"));
+            return new RedirectResolution(dispatch.getOriginalPath());
         }
+
         if(newParent != null) { //TODO vedi sopra
             newName = StringUtils.isEmpty(newName) ? pageInstance.getName() : newName;
             File newDirectory = newParent.getChildPageDirectory(newName);
@@ -602,28 +602,39 @@ public class PageAdminAction extends AbstractPageAction {
 
     }
 
-    private void prepareNewPageForm() {
+    private void prepareNewPageForm() throws Exception {
         application.getPortofinoProperties().getProperties("");
         DefaultSelectionProvider classSelectionProvider = new DefaultSelectionProvider("actionClassName");
         for(PageActionInfo info : registry) {
             classSelectionProvider.appendRow(info.actionClass.getName(), info.description, true);
         }
+        Subject subject = SecurityUtils.getSubject();
+
         //root + at least 1 child
-        boolean includeSiblingOption = dispatch.getPageInstancePath().length > 2;
-        int fieldCount = includeSiblingOption ? 3 : 2;
-        String[] insertPositions = new String[fieldCount];
-        String[] labels =  new String[fieldCount];
-        insertPositions[0] =  InsertPosition.TOP.name();
-        labels[0] = "at the top level";
-        insertPositions[1] = InsertPosition.CHILD.name();
-        labels[1] = "as a child of " + getPage().getTitle();
+        boolean includeSiblingOption =
+                dispatch.getPageInstancePath().length > 2 &&
+                SecurityLogic.hasPermissions(dispatch.getPageInstance(-2), subject, AccessLevel.EDIT);
+        List<String[]> insertPositions = new ArrayList<String[]>();
+
+        //TODO I18n
+
+        //Check permissions on target parent
+        File rootDirectory = application.getPagesDir();
+        Page rootPage = DispatcherLogic.getPage(rootDirectory);
+        PageInstance rootPageInstance = new PageInstance(null, rootDirectory, application, rootPage, null);
+        if(SecurityLogic.hasPermissions(rootPageInstance, subject, AccessLevel.EDIT)) {
+            insertPositions.add(new String[] {InsertPosition.TOP.name(), "at the top level"});
+        }
+
+        //Assumiamo che l'utente abbia almeno i permessi per creare una pagina figlia, altrimenti non sarebbe qui.
+        //In ogni caso, la verifica sui permessi viene ripetuta alla creazione vera e propria.
+        insertPositions.add(new String[] {InsertPosition.CHILD.name(), "as a child of " + getPage().getTitle()});
         if(includeSiblingOption) {
-            insertPositions[2] = InsertPosition.SIBLING.name();
-            labels[2] = "as a sibling of " + getPage().getTitle();
+            insertPositions.add(new String[] {InsertPosition.SIBLING.name(), "as a sibling of " + getPage().getTitle()});
         }
         DefaultSelectionProvider insertPositionSelectionProvider = new DefaultSelectionProvider("insertPositionName");
-        for(int i = 0; i < insertPositions.length; i++) {
-            insertPositionSelectionProvider.appendRow(insertPositions[i], labels[i], true);
+        for(String[] posAndLabel : insertPositions) {
+            insertPositionSelectionProvider.appendRow(posAndLabel[0], posAndLabel[1], true);
         }
         newPageForm = new FormBuilder(NewPage.class)
                 .configFields(NEW_PAGE_SETUP_FIELDS)
@@ -632,6 +643,7 @@ public class PageAdminAction extends AbstractPageAction {
                 .configSelectionProvider(insertPositionSelectionProvider, "insertPositionName")
                 .build();
         ((SelectField) newPageForm.findFieldByPropertyName("insertPositionName")).setValue(InsertPosition.CHILD.name());
+        newPageForm.readFromRequest(context.getRequest());
     }
 
     //--------------------------------------------------------------------------
@@ -643,7 +655,6 @@ public class PageAdminAction extends AbstractPageAction {
     protected TableForm childPagesForm;
     protected TableForm detailChildPagesForm;
 
-    @RequiresAdministrator
     public Resolution pageChildren() {
         setupChildPages();
         return forwardToPageChildren();
@@ -735,7 +746,6 @@ public class PageAdminAction extends AbstractPageAction {
         return new String[] { "active", "name", "title", "showInNavigation", "embedded" };
     }
 
-    @RequiresAdministrator
     @Button(list = "page-children-edit", key = "commons.update", order = 1)
     public Resolution updatePageChildren() {
         setupChildPages();
@@ -859,7 +869,7 @@ public class PageAdminAction extends AbstractPageAction {
     protected AccessLevel testedAccessLevel;
     protected Set<String> testedPermissions;
 
-    @RequiresAdministrator
+    @RequiresAdministrator //Altrimenti un utente può cambiare i propri permessi
     public Resolution pagePermissions() {
         setupGroups();
 
@@ -1015,12 +1025,10 @@ public class PageAdminAction extends AbstractPageAction {
     protected Form moveForm;
     protected Form copyForm;
 
-    @RequiresAdministrator
     public Resolution confirmDelete() {
         return new ForwardResolution("/layouts/admin/deletePageDialog.jsp");
     }
 
-    @RequiresAdministrator
     public Resolution chooseNewLocation() {
         buildMovePageForm();
         return new ForwardResolution("/layouts/admin/movePageDialog.jsp");
@@ -1037,7 +1045,6 @@ public class PageAdminAction extends AbstractPageAction {
                 .build();
     }
 
-    @RequiresAdministrator
     public Resolution copyPageDialog() {
         buildCopyPageForm();
         return new ForwardResolution("/layouts/admin/copyPageDialog.jsp");

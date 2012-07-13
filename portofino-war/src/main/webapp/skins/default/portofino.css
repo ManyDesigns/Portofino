@@ -624,6 +624,10 @@ fieldset#scriptFieldset {
     padding-left: 0;
 }
 
+fieldset.radio {
+    margin-bottom: 0;
+}
+
 table.mde-form-table td {
     border: 0 none;
 }

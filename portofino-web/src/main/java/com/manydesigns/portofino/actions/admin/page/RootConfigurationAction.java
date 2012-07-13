@@ -64,7 +64,7 @@ public abstract class RootConfigurationAction extends PageAdminAction implements
 
     @Override
     @Before
-    public void prepare() {
+    public Resolution prepare() {
         originalPath = "/";
         File rootDir = application.getPagesDir();
         Page rootPage;
@@ -73,9 +73,9 @@ public abstract class RootConfigurationAction extends PageAdminAction implements
         } catch (Exception e) {
             throw new Error("Couldn't load root page", e);
         }
-        PageInstance rootPageInstance = new PageInstance(null, rootDir, application, rootPage, SafeModeAction.class);
-        dispatch = new Dispatch(context.getRequest().getContextPath(), originalPath, rootPageInstance);
-        //context.getRequest().setAttribute(RequestAttributes.DISPATCH, dispatch);
+        pageInstance = new PageInstance(null, rootDir, application, rootPage, SafeModeAction.class);
+        dispatch = new Dispatch(context.getRequest().getContextPath(), originalPath, pageInstance);
+        return null;
     }
 
     @Buttons({

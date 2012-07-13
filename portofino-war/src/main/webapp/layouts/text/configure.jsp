@@ -1,7 +1,3 @@
-<%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
-<%@ page import="com.manydesigns.portofino.security.AccessLevel" %>
-<%@ page import="org.apache.shiro.SecurityUtils" %>
-<%@ page import="org.apache.shiro.subject.Subject" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -55,11 +51,7 @@
             </script>
         </fieldset>
 
-        <%
-            Subject subject = SecurityUtils.getSubject();
-            if(SecurityLogic.hasPermissions(actionBean.getPageInstance(), subject, AccessLevel.DEVELOP)) { %>
-            <%@include file="../script-configuration.jsp" %>
-        <% } %>
+        <%@include file="../script-configuration.jsp" %>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">

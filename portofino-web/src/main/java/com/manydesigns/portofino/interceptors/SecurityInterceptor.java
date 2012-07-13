@@ -23,21 +23,21 @@
 package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.DispatcherUtil;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
-import net.sourceforge.stripes.action.*;
+import com.manydesigns.portofino.stripes.ForbiddenAccessResolution;
+import net.sourceforge.stripes.action.ActionBean;
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
-import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlContext;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -47,8 +47,6 @@ import org.slf4j.MDC;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -61,8 +59,6 @@ public class
         SecurityInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
-
-    private static final int UNAUTHORIZED = 403;
 
     public final static Logger logger =
             LoggerFactory.getLogger(SecurityInterceptor.class);
@@ -100,7 +96,7 @@ public class
         MDC.put("userId", userId);
 
         if (!SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler)) {
-            return handleAnonymousOrUnauthorized(userId, request);
+            return new ForbiddenAccessResolution();
         }
 
         logger.debug("Checking page permissions");
@@ -121,7 +117,7 @@ public class
             }
             if(!allowed) {
                 logger.info("User {} is not allowed for {}", userId, resource);
-                return handleAnonymousOrUnauthorized(userId, request);
+                return new ForbiddenAccessResolution();
             }
         }
 
@@ -129,23 +125,4 @@ public class
         return context.proceed();
     }
 
-    protected static Resolution handleAnonymousOrUnauthorized(
-            String userId, HttpServletRequest request) {
-        if (userId == null){
-            logger.info("Anonymous user not allowed. Redirecting to login.");
-            String originalPath = ServletUtils.getOriginalPath(request);
-            UrlBuilder urlBuilder =
-                    new UrlBuilder(Locale.getDefault(), originalPath, false);
-            Map parameters = request.getParameterMap();
-            urlBuilder.addParameters(parameters);
-            String returnUrl = urlBuilder.toString();
-
-            return new RedirectResolution(LoginAction.class)
-                    .addParameter("returnUrl", returnUrl)
-                    .addParameter("cancelReturnUrl", "/");
-        } else {
-            logger.warn("User {} not authorized.", userId);
-            return new ErrorResolution(UNAUTHORIZED);
-        }
-    }
 }

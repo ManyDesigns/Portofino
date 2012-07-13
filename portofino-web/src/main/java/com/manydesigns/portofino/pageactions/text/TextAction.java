@@ -106,10 +106,15 @@ public class TextAction extends AbstractPageAction {
         if(resolution != null) {
             return resolution;
         }
-        if(!pageInstance.getParameters().isEmpty()) {
-            return new ErrorResolution(404);
-        }
         textConfiguration = (TextConfiguration) pageInstance.getConfiguration();
+        if(!pageInstance.getParameters().isEmpty()) {
+            if(pageInstance.getParameters().size() == 1 &&
+               SecurityLogic.hasPermissions(pageInstance, SecurityUtils.getSubject(), AccessLevel.EDIT)) {
+                return new ForwardResolution("/layouts/text/create-page.jsp");
+            } else {
+                return new ErrorResolution(404);
+            }
+        }
         return null;
     }
 

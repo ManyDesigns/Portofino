@@ -5,7 +5,6 @@
     response.addHeader("Cache-Control", "no-cache");
     response.addHeader("Cache-Control", "no-store");
     response.setDateHeader("Expires", 0);
-%><%@ page import="com.manydesigns.portofino.logic.SecurityLogic"
 %><%@ page import="java.util.Map"
 %><%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -52,18 +51,16 @@
                                     <stripes:form action="/actions/admin/page" method="post" id="pageAdminForm">
                                         <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
                                         <!-- Admin buttons -->
-                                        <% if(SecurityLogic.isAdministrator(request)) { %>
-                                            <div class="contentBarButtons">
-                                                <portofino:page-layout-button />
-                                                <portofino:reload-model-button />
-                                                <portofino:page-children-button />
-                                                <portofino:page-permissions-button />
-                                                <portofino:page-copy-button />
-                                                <portofino:page-new-button />
-                                                <portofino:page-delete-button />
-                                                <portofino:page-move-button />
-                                            </div>
-                                        <% } %>
+                                        <div class="contentBarButtons">
+                                            <portofino:page-layout-button />
+                                            <portofino:reload-model-button />
+                                            <portofino:page-children-button />
+                                            <portofino:page-permissions-button />
+                                            <portofino:page-copy-button />
+                                            <portofino:page-new-button />
+                                            <portofino:page-delete-button />
+                                            <portofino:page-move-button />
+                                        </div>
                                     </stripes:form>
                                     <!-- End admin buttons -->
                                     <portofino:result-set-navigation />
