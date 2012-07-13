@@ -74,7 +74,6 @@ import jxl.write.biff.RowsExceededException;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlContext;
-import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -104,6 +103,34 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * <p>A generic PageAction offering CRUD functionality, independently on the underlying data source.</p>
+ * <p>Out of the box, instances of this class are capable of the following:
+ *   <ul>
+ *      <li>Presenting search, create, read, delete, update operations (the last two also in bulk mode) to the user,
+ *          while delegating the actual implementation (e.g. accessing a database table, calling a web service,
+ *          querying a JSON data source, etc.) to concrete subclasses;
+ *      </li>
+ *      <li>Performing exports to various formats (Pdf, Excel) of the Read view and the Search view,
+ *          with the possibility for subclasses to customize the exports;</li>
+ *      <li>Managing selection providers to constrain certain properties to values taken from a list, and aid
+ *          the user in inserting those values (e.g. picking colours from a combo box, or cities with an
+ *          autocompleted input field);</li>
+ *      <li>Handling permissions so that only enabled users may create, edit or delete objects;</li>
+ *      <li>Offering hooks for subclasses to easily customize certain key functions (e.g. execute custom code
+ *          before or after saving an object).</li>
+ *   </ul>
+ * </p>
+ * <p>This PageAction can handle a varying number of URL path parameters. Each parameter is assumed to be part
+ * of an object identifier - for example, a database primary key (single or multi-valued). When no parameter is
+ * specified, the page is in search mode. When the correct number of parameters is provided, the action attempts
+ * to load an object with the appropriate identifier (for example, by loading a row from a database table with
+ * the corresponding primary key). As any other page, crud pages can have children, and they always prevail over
+ * the object key: a crud page with a child named &quot;child&quot; will never attempt to load an object with key
+ * &quot;child&quot;.</p>
+ * <!-- TODO popup mode -->
+ *
+ * @param <T> the types of objects that this crud can handle.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -121,9 +148,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Permissions
     //**************************************************************************
 
-    public static final String PERMISSION_CREATE = "crud-create";
-    public static final String PERMISSION_EDIT = "crud-edit";
-    public static final String PERMISSION_DELETE = "crud-delete";
+    /**
+     * Constants for the permissions supported by instances of this class. Subclasses are recommended to
+     * support at least the permissions defined here.
+     */
+    public static final String
+            PERMISSION_CREATE = "crud-create",
+            PERMISSION_EDIT = "crud-edit",
+            PERMISSION_DELETE = "crud-delete";
 
     public static final Logger logger =
             LoggerFactory.getLogger(AbstractCrudAction.class);
@@ -192,26 +224,49 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public CrudConfiguration crudConfiguration;
     public Form crudConfigurationForm;
     public TableForm propertiesTableForm;
-    public CrudPropertyEdit[] edits;
+    public CrudPropertyEdit[] propertyEdits;
     public TableForm selectionProvidersForm;
     public CrudSelectionProviderEdit[] selectionProviderEdits;
-    public static final String[][] CRUD_CONFIGURATION_FIELDS =
-                {{"name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
-                  "largeResultSet", "paginated", "rowsPerPage"}};
 
 
     //--------------------------------------------------------------------------
     // Crud operations
     //--------------------------------------------------------------------------
 
+    /**
+     * Loads a list of objects filtered using the current search criteria and limited by the current
+     * first and max results parameters. If the load is successful, the implementation must assign
+     * the result to the <code>objects</code> field.
+     */
     public abstract void loadObjects();
 
+    /**
+     * Loads an object by its identifier and returns it. The object must satisfy the current search criteria.
+     * @param pkObject the object used as an identifier; the actual implementation is regulated by subclasses.
+     * The only constraint is that it is serializable.
+     * @return the loaded object, or null if it couldn't be found or it didn't satisfy the search criteria.
+     */
     protected abstract T loadObjectByPrimaryKey(Serializable pkObject);
 
+    /**
+     * Saves a new object to the persistent storage. The actual implementation is left to subclasses.
+     * @param object the object to save.
+     * @throws RuntimeException if the object could not be saved.
+     */
     protected abstract void doSave(T object);
 
+    /**
+     * Saves an existing object to the persistent storage. The actual implementation is left to subclasses.
+     * @param object the object to update.
+     * @throws RuntimeException if the object could not be saved.
+     */
     protected abstract void doUpdate(T object);
 
+    /**
+     * Deletes an object from the persistent storage. The actual implementation is left to subclasses.
+     * @param object the object to delete.
+     * @throws RuntimeException if the object could not be deleted.
+     */
     protected abstract void doDelete(T object);
 
     @DefaultHandler
@@ -223,8 +278,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    protected void loadObject(String... pk) {
-        Serializable pkObject = pkHelper.getPrimaryKey(pk);
+    /**
+     * @see #loadObjectByPrimaryKey(java.io.Serializable)
+     * @param identifier the object identifier in String form
+     */
+    protected void loadObject(String... identifier) {
+        Serializable pkObject = pkHelper.getPrimaryKey(identifier);
         object = loadObjectByPrimaryKey(pkObject);
     }
 
@@ -313,6 +372,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return new NoCacheStreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
     }
 
+    /**
+     * Returns the number of objects matching the current search criteria, not considering set limits
+     * (first and max results).
+     * @return the number of objects.
+     */
     protected abstract long getTotalSearchRecords();
 
     @Button(list = "crud-search-form", key = "commons.resetSearch", order = 2)
@@ -497,7 +561,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.warn(rootCauseMessage, e);
                 SessionMessages.addErrorMessage(rootCauseMessage);
-                return new ForwardResolution("/layouts/crud/bulk-edit.jsp");
+                return getBulkEditView();
             }
             SessionMessages.addInfoMessage(getMessage(
                     "commons.bulkUpdate.successful",
@@ -505,7 +569,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             return new RedirectResolution(
                     appendSearchStringParamIfNecessary(getDispatch().getOriginalPath()));
         } else {
-            return new ForwardResolution("/layouts/crud/bulk-edit.jsp");
+            return getBulkEditView();
         }
     }
 
@@ -568,37 +632,87 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Hooks/scripting
     //**************************************************************************
 
+    /**
+     * Hook method called just after a new object has been created.
+     * @param object the new object.
+     */
     protected void createSetup(T object) {}
 
+    /**
+     * Hook method called after values from the create form have been propagated to the new object.
+     * @param object the new object.
+     * @return true if the object is to be considered valid, false otherwise. In the latter case, the
+     * object will not be saved; it is suggested that the cause of the validation failure be displayed
+     * to the user (e.g. by using SessionMessages).
+     */
     protected boolean createValidate(T object) {
         return true;
     }
 
+    /**
+     * Hook method called just before a new object is actually saved to persistent storage.
+     * @param object the new object.
+     */
     protected void createPostProcess(T object) {}
 
+    /**
+     * Executes any pending updates on persistent objects. E.g. saves them to the database, or calls the
+     * appropriate operation of a web service, etc.
+     */
     protected void commitTransaction() {}
 
+    /**
+     * Hook method called just before an object is used to populate the edit form.
+     * @param object the object.
+     */
     protected void editSetup(T object) {}
 
+    /**
+     * Hook method called after values from the edit form have been propagated to the object.
+     * @param object the object.
+     * @return true if the object is to be considered valid, false otherwise. In the latter case, the
+     * object will not be saved; it is suggested that the cause of the validation failure be displayed
+     * to the user (e.g. by using SessionMessages).
+     */
     protected boolean editValidate(T object) {
         return true;
     }
 
+    /**
+     * Hook method called just before an existing object is actually saved to persistent storage.
+     * @param object the object just edited.
+     */
     protected void editPostProcess(T object) {}
 
-
+    /**
+     * Hook method called before an object is deleted.
+     * @param object the object.
+     * @return true if the delete operation is to be performed, false otherwise. In the latter case,
+     * it is suggested that the cause of the validation failure be displayed to the user
+     * (e.g. by using SessionMessages).
+     */
     protected boolean deleteValidate(T object) {
         return true;
     }
 
+    /**
+     * Hook method called just before an object is deleted from persistent storage, but after the doDelete
+     * method has been called.
+     * @param object the object.
+     */
     protected void deletePostProcess(T object) {}
 
-
+    /**
+     * Returns the Resolution used to show the Bulk Edit page.
+     */
     protected Resolution getBulkEditView() {
         return new ForwardResolution("/layouts/crud/bulk-edit.jsp");
     }
 
-    protected Resolution getCreateView() {
+    /**
+     * Returns the Resolution used to show the Create page.
+     */
+    protected Resolution getCreateView() { //TODO spezzare in popup/non-popup?
         if(isPopup()) {
             return new ForwardResolution("/layouts/crud/popup/create.jsp");
         } else {
@@ -606,18 +720,30 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
+    /**
+     * Returns the Resolution used to show the Edit page.
+     */
     protected Resolution getEditView() {
         return new ForwardResolution("/layouts/crud/edit.jsp");
     }
 
+    /**
+     * Returns the Resolution used to show the Read page.
+     */
     protected Resolution getReadView() {
         return forwardToPortletPage("/layouts/crud/read.jsp");
     }
 
+    /**
+     * Returns the Resolution used to show the Search page.
+     */
     protected Resolution getSearchView() {
         return forwardToPortletPage("/layouts/crud/search.jsp");
     }
 
+    /**
+     * Returns the Resolution used to show the Search page when this page is embedded in its parent.
+     */
     protected Resolution getEmbeddedSearchView() {
         return new ForwardResolution("/layouts/crud/search.jsp");
     }
@@ -625,15 +751,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //--------------------------------------------------------------------------
     // Setup
     //--------------------------------------------------------------------------
-
-    @Before
-    public void prepare() {
-        availableSelectionProviders = new MultiHashMap();
-        if(crudConfiguration != null && crudConfiguration.getActualDatabase() != null) {
-            crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
-            setupSelectionProviders();
-        }
-    }
 
     public Resolution preparePage() {
         Resolution resolution = super.preparePage();
@@ -697,52 +814,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return new ForwardResolution("/layouts/redirect-to-last-working-page.jsp");
     }
 
+    /**
+     * <p>Builds the ClassAccessor used to create, manipulate and introspect persistent objects.</p>
+     * <p>This method is called during the prepare phase.</p>
+     * @param pageInstance the PageInstance corresponding to this action in the current dispatch.
+     * @return the ClassAccessor.
+     */
     protected abstract ClassAccessor prepare(PageInstance pageInstance);
-
-    protected void setupSelectionProviders() {
-        Set<String> configuredSPs = new HashSet<String>();
-        for(SelectionProviderReference ref : crudConfiguration.getSelectionProviders()) {
-            boolean added;
-            if(ref.getForeignKey() != null) {
-                added = setupSelectionProvider(ref, ref.getForeignKey(), configuredSPs);
-            } else if(ref.getSelectionProvider() instanceof DatabaseSelectionProvider) {
-                DatabaseSelectionProvider dsp = (DatabaseSelectionProvider) ref.getSelectionProvider();
-                added = setupSelectionProvider(ref, dsp, configuredSPs);
-            } else {
-                logger.error("Unsupported selection provider: " + ref.getSelectionProvider());
-                continue;
-            }
-            if(ref.isEnabled() && !added) {
-                logger.warn("Selection provider {} not added; check whether the fields on which it is configured " +
-                        "overlap with some other selection provider", ref);
-            }
-        }
-
-
-        //Remove disabled selection providers and mark them as configured to avoid re-adding them
-        Iterator<CrudSelectionProvider> it = crudSelectionProviders.iterator();
-        while (it.hasNext()) {
-            CrudSelectionProvider sp = it.next();
-            if(sp.getSelectionProvider() == null) {
-                it.remove();
-                Collections.addAll(configuredSPs, sp.getFieldNames());
-            }
-        }
-
-        Table table = crudConfiguration.getActualTable();
-        if(table != null) {
-            for(ForeignKey fk : table.getForeignKeys()) {
-                setupSelectionProvider(null, fk, configuredSPs);
-            }
-            for(ModelSelectionProvider dsp : table.getSelectionProviders()) {
-                if(dsp instanceof DatabaseSelectionProvider) {
-                    setupSelectionProvider(null, (DatabaseSelectionProvider) dsp, configuredSPs);
-                } else {
-                    logger.error("Unsupported selection provider: " + dsp);
-                }
-            }
-        }
-    }
 
     protected boolean setupSelectionProvider(
             @Nullable SelectionProviderReference ref,
@@ -1187,7 +1265,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 @Override
                 protected void stream(HttpServletResponse response) throws Exception {
                     super.stream(response);
-                    tmpFile.delete();
+                    if(!tmpFile.delete()) {
+                        logger.warn("Temporary file {} could not be deleted", tmpFile.getAbsolutePath());
+                    }
                 }
             }.setFilename(crudConfiguration.getSearchTitle() + ".xls");
         } catch (Exception e) {
@@ -1262,7 +1342,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 @Override
                 protected void stream(HttpServletResponse response) throws Exception {
                     super.stream(response);
-                    tmpFile.delete();
+                    if(!tmpFile.delete()) {
+                        logger.warn("Temporary file {} could not be deleted", tmpFile.getAbsolutePath());
+                    }
                 }
             }.setFilename(crudConfiguration.getReadTitle() + ".xls");
         } catch (Exception e) {
@@ -1461,7 +1543,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 @Override
                 protected void stream(HttpServletResponse response) throws Exception {
                     super.stream(response);
-                    tmpFile.delete();
+                    if(!tmpFile.delete()) {
+                        logger.warn("Temporary file {} could not be deleted", tmpFile.getAbsolutePath());
+                    }
                 }
             }.setFilename(crudConfiguration.getSearchTitle() + ".pdf");
         } catch (Exception e) {
@@ -1753,7 +1837,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 @Override
                 protected void stream(HttpServletResponse response) throws Exception {
                     super.stream(response);
-                    tmpFile.delete();
+                    if(!tmpFile.delete()) {
+                        logger.warn("Temporary file {} could not be deleted", tmpFile.getAbsolutePath());
+                    }
                 }
             }.setFilename(crudConfiguration.getReadTitle() + ".pdf");
         } catch (Exception e) {
@@ -1762,8 +1848,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             return new RedirectResolution(getDispatch().getOriginalPath());
         }
     }
-
-
 
     //**************************************************************************
     // Configuration
@@ -1775,40 +1859,32 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         prepareConfigurationForms();
 
         crudConfigurationForm.readFromObject(crudConfiguration);
-        if(edits != null) {
-            propertiesTableForm.readFromObject(edits);
+        if(propertyEdits != null) {
+            propertiesTableForm.readFromObject(propertyEdits);
         }
 
         if(selectionProviderEdits != null) {
             selectionProvidersForm.readFromObject(selectionProviderEdits);
         }
 
-        return new ForwardResolution("/layouts/crud/configure.jsp");
+        return getConfigurationView();
     }
+
+    /**
+     * Returns the Resolution used to show the configuration page.
+     */
+    protected abstract Resolution getConfigurationView();
 
     @Override
     protected void prepareConfigurationForms() {
         super.prepareConfigurationForms();
 
-        SelectionProvider databaseSelectionProvider =
-                SelectionProviderLogic.createSelectionProvider(
-                        "database",
-                        model.getDatabases(),
-                        Database.class,
-                        null,
-                        new String[]{"databaseName"});
-        crudConfigurationForm = new FormBuilder(CrudConfiguration.class)
-                .configFields(CRUD_CONFIGURATION_FIELDS)
-                .configFieldSetNames("Crud")
-                .configSelectionProvider(databaseSelectionProvider, "database")
-                .build();
+        setupPropertyEdits();
 
-        setupEdits();
-
-        if(edits != null) {
+        if(propertyEdits != null) {
             TableFormBuilder tableFormBuilder =
                     new TableFormBuilder(CrudPropertyEdit.class)
-                        .configNRows(edits.length);
+                        .configNRows(propertyEdits.length);
             propertiesTableForm = tableFormBuilder.build();
         }
 
@@ -1836,12 +1912,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    private void setupEdits() {
+    protected void setupPropertyEdits() {
         if(classAccessor == null) {
             return;
         }
         PropertyAccessor[] propertyAccessors = classAccessor.getProperties();
-        edits = new CrudPropertyEdit[propertyAccessors.length];
+        propertyEdits = new CrudPropertyEdit[propertyAccessors.length];
         for (int i = 0; i < propertyAccessors.length; i++) {
             CrudPropertyEdit edit = new CrudPropertyEdit();
             PropertyAccessor propertyAccessor = propertyAccessors[i];
@@ -1858,11 +1934,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             edit.updatable = updatableAnn != null && updatableAnn.value();
             Searchable searchableAnn = propertyAccessor.getAnnotation(Searchable.class);
             edit.searchable = searchableAnn != null && searchableAnn.value();
-            edits[i] = edit;
+            propertyEdits[i] = edit;
         }
     }
 
-    private void setupSelectionProviderEdits() {
+    protected void setupSelectionProviderEdits() {
         selectionProviderEdits = new CrudSelectionProviderEdit[availableSelectionProviders.size()];
         int i = 0;
         for(Map.Entry entry : (Set<Map.Entry>) availableSelectionProviders.entrySet()) {
@@ -1903,7 +1979,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         valid = validatePageConfiguration() && valid;
 
         if(propertiesTableForm != null) {
-            propertiesTableForm.readFromObject(edits);
+            propertiesTableForm.readFromObject(propertyEdits);
             propertiesTableForm.readFromRequest(context.getRequest());
             valid = propertiesTableForm.validate() && valid;
         }
@@ -1934,11 +2010,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             return cancel();
         } else {
             SessionMessages.addErrorMessage(getMessage("commons.configuration.notUpdated"));
-            return new ForwardResolution("/layouts/crud/configure.jsp");
+            return getConfigurationView();
         }
     }
 
-    private void updateSelectionProviders() {
+    protected void updateSelectionProviders() {
         selectionProvidersForm.writeToObject(selectionProviderEdits);
         crudConfiguration.getSelectionProviders().clear();
         for(CrudSelectionProviderEdit sp : selectionProviderEdits) {
@@ -1968,10 +2044,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     private void updateProperties() {
-        propertiesTableForm.writeToObject(edits);
+        propertiesTableForm.writeToObject(propertyEdits);
 
         List<CrudProperty> newProperties = new ArrayList<CrudProperty>();
-        for (CrudPropertyEdit edit : edits) {
+        for (CrudPropertyEdit edit : propertyEdits) {
             CrudProperty crudProperty = findProperty(edit.name, crudConfiguration.getProperties());
             if(crudProperty == null) {
                 crudProperty = new CrudProperty();
@@ -2071,6 +2147,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Utilities
     //--------------------------------------------------------------------------
 
+    /**
+     * Searches in a list of properties for a property with a given name.
+     * @param name the name of the properties.
+     * @param properties the list to search.
+     * @return the property with the given name, or null if it couldn't be found.
+     */
     protected CrudProperty findProperty(String name, List<CrudProperty> properties) {
         for(CrudProperty p : properties) {
             if(p.getName().equals(name)) {
@@ -2080,6 +2162,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return null;
     }
 
+    /**
+     * Encodes the exploded object indentifier to include it in a URL.
+     * @param pk the object identifier as a String array.
+     * @return the string to append to the URL.
+     */
     protected String getPkForUrl(String[] pk) {
         String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
         try {
@@ -2089,6 +2176,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
+    /**
+     * Returns an OGNL expression that, when evaluated against a persistent object, produces a
+     * URL path suitable to be used as a link to that object.
+     */
     protected String getReadLinkExpression() {
         StringBuilder sb = new StringBuilder();
         sb.append(getDispatch().getOriginalPath());
@@ -2109,10 +2200,22 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return sb.toString();
     }
 
+    /**
+     * If a search has been executed, appends a URL-encoded String representation of the search criteria
+     * to the given string, as a GET parameter.
+     * @param s the base string.
+     * @return the base string with the search criteria appended
+     */
     protected String appendSearchStringParamIfNecessary(String s) {
         return appendSearchStringParamIfNecessary(new StringBuilder(s)).toString();
     }
 
+    /**
+     * If a search has been executed, appends a URL-encoded String representation of the search criteria
+     * to the given StringBuilder, as a GET parameter. The StringBuilder's contents are modified.
+     * @param sb the base string.
+     * @return sb.
+     */
     protected StringBuilder appendSearchStringParamIfNecessary(StringBuilder sb) {
         String searchStringParam = getEncodedSearchStringParam();
         if(searchStringParam != null) {
@@ -2126,6 +2229,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return sb;
     }
 
+    /**
+     * Encodes the current search string (a representation of the current search criteria as a series of GET
+     * parameters) to an URL-encoded GET parameter.
+     * @return the encoded search string.
+     */
     protected String getEncodedSearchStringParam() {
         if(StringUtils.isBlank(searchString)) {
             return null;

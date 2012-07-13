@@ -23,19 +23,19 @@
 package com.manydesigns.portofino.pageactions.crud;
 
 import com.manydesigns.elements.annotations.ShortName;
+import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.DisplayMode;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.database.TableCriteria;
-import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.*;
@@ -44,11 +44,11 @@ import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
+import com.manydesigns.portofino.pageactions.crud.configuration.SelectionProviderReference;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
-import net.sf.ehcache.CacheManager;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Function;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
@@ -56,6 +56,10 @@ import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+import net.sourceforge.stripes.action.Before;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
+import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
@@ -64,10 +68,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -84,6 +85,10 @@ import java.util.List;
 public class CrudAction extends AbstractCrudAction<Object> {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
+
+    public static final String[][] CRUD_CONFIGURATION_FIELDS =
+                {{"name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
+                  "largeResultSet", "paginated", "rowsPerPage"}};
 
     public Table baseTable;
 
@@ -185,6 +190,79 @@ public class CrudAction extends AbstractCrudAction<Object> {
     //**************************************************************************
     // Setup
     //**************************************************************************
+
+    @Before
+    public void prepare() {
+        availableSelectionProviders = new MultiHashMap();
+        if(crudConfiguration != null && crudConfiguration.getActualDatabase() != null) {
+            crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
+            setupSelectionProviders();
+        }
+    }
+
+    protected void setupSelectionProviders() {
+        Set<String> configuredSPs = new HashSet<String>();
+        for(SelectionProviderReference ref : crudConfiguration.getSelectionProviders()) {
+            boolean added;
+            if(ref.getForeignKey() != null) {
+                added = setupSelectionProvider(ref, ref.getForeignKey(), configuredSPs);
+            } else if(ref.getSelectionProvider() instanceof DatabaseSelectionProvider) {
+                DatabaseSelectionProvider dsp = (DatabaseSelectionProvider) ref.getSelectionProvider();
+                added = setupSelectionProvider(ref, dsp, configuredSPs);
+            } else {
+                AbstractCrudAction.logger.error("Unsupported selection provider: " + ref.getSelectionProvider());
+                continue;
+            }
+            if(ref.isEnabled() && !added) {
+                AbstractCrudAction.logger.warn("Selection provider {} not added; check whether the fields on which it is configured " +
+                        "overlap with some other selection provider", ref);
+            }
+        }
+
+
+        //Remove disabled selection providers and mark them as configured to avoid re-adding them
+        Iterator<CrudSelectionProvider> it = crudSelectionProviders.iterator();
+        while (it.hasNext()) {
+            CrudSelectionProvider sp = it.next();
+            if(sp.getSelectionProvider() == null) {
+                it.remove();
+                Collections.addAll(configuredSPs, sp.getFieldNames());
+            }
+        }
+
+        Table table = crudConfiguration.getActualTable();
+        if(table != null) {
+            for(ForeignKey fk : table.getForeignKeys()) {
+                setupSelectionProvider(null, fk, configuredSPs);
+            }
+            for(ModelSelectionProvider dsp : table.getSelectionProviders()) {
+                if(dsp instanceof DatabaseSelectionProvider) {
+                    setupSelectionProvider(null, (DatabaseSelectionProvider) dsp, configuredSPs);
+                } else {
+                    AbstractCrudAction.logger.error("Unsupported selection provider: " + dsp);
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void prepareConfigurationForms() {
+        super.prepareConfigurationForms();
+
+        SelectionProvider databaseSelectionProvider =
+                SelectionProviderLogic.createSelectionProvider(
+                        "database",
+                        model.getDatabases(),
+                        Database.class,
+                        null,
+                        new String[]{"databaseName"});
+        crudConfigurationForm = new FormBuilder(CrudConfiguration.class)
+                .configFields(CRUD_CONFIGURATION_FIELDS)
+                .configFieldSetNames("Crud")
+                .configSelectionProvider(databaseSelectionProvider, "database")
+                .build();
+
+    }
 
     @Override
     protected ClassAccessor prepare(PageInstance pageInstance) {
@@ -314,6 +392,14 @@ public class CrudAction extends AbstractCrudAction<Object> {
     protected Collection getFromQueryCache(
             DatabaseSelectionProvider sp, QueryStringWithParameters queryWithParameters) {
         return null;
+    }
+
+    //**************************************************************************
+    // Configuration
+    //**************************************************************************
+
+    protected Resolution getConfigurationView() {
+        return new ForwardResolution("/layouts/crud/configure.jsp");
     }
 
     //--------------------------------------------------------------------------
