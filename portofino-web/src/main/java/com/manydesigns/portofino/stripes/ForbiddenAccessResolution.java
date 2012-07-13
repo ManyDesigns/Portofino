@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.stripes;
 
 import com.manydesigns.elements.servlet.ServletUtils;
-import com.manydesigns.portofino.actions.user.LoginAction;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -83,7 +82,7 @@ public class ForbiddenAccessResolution implements Resolution {
             urlBuilder.addParameters(parameters);
             String returnUrl = urlBuilder.toString();
 
-            new RedirectResolution(LoginAction.class)
+            new RedirectResolution("/actions/user/login")
                     .addParameter("returnUrl", returnUrl)
                     .addParameter("cancelReturnUrl", "/")
                     .execute(request, response);
