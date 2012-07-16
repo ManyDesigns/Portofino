@@ -31,6 +31,7 @@ package com.manydesigns.portofino.actions.admin.appwizard;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.LabelI18N;
+import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Password;
 import com.manydesigns.elements.fields.BooleanField;
 import com.manydesigns.elements.fields.Field;
@@ -747,7 +748,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         return new RedirectResolution("/");
     }
 
-    protected String getMessage(String key, Object... args) {
+    public String getMessage(String key, Object... args) {
         Locale locale = context.getLocale();
         ResourceBundle resourceBundle = application.getBundle(locale);
         String msg = resourceBundle.getString(key);
@@ -951,6 +952,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                         getMessage("appwizard.error.directoryExists", dir.getAbsolutePath()));
             return null;
         } else if(dir.mkdirs()) {
+            logger.info("Creating CRUD page {}", dir.getAbsolutePath());
             CrudConfiguration configuration = new CrudConfiguration();
             configuration.setDatabase(connectionProvider.getDatabase().getDatabaseName());
 
@@ -1012,6 +1014,8 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         }
     }
 
+    public static final int MULTILINE_THRESHOLD = 200;
+
     protected int setupColumn
             (Column column, CrudConfiguration configuration, int columnsInSummary, String linkToParentProperty) {
         Table table = column.getTable();
@@ -1054,6 +1058,14 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             updatable = false;
         }
 
+        if(!propertyIsUserPassword &&
+           column.getActualJavaType() == String.class &&
+           column.getLength() > MULTILINE_THRESHOLD) {
+            Annotation annotation = new Annotation(column, Multiline.class.getName());
+            annotation.getValues().add("true");
+            column.getAnnotations().add(annotation);
+        }
+
         CrudProperty crudProperty = new CrudProperty();
         crudProperty.setEnabled(enabled);
         crudProperty.setName(column.getActualPropertyName());
@@ -1094,6 +1106,10 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         if(column.getJdbcType() == Types.INTEGER ||
            column.getJdbcType() == Types.DECIMAL ||
            column.getJdbcType() == Types.NUMERIC) {
+            logger.info(
+                    "Detecting whether numeric column " + column.getQualifiedName() + " is boolean by examining " +
+                    "its values...");
+
             //Detect booleans
             Connection connection = null;
 
@@ -1143,11 +1159,14 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                     only0and1 &= value != null && (value == 0 || value == 1);
                 }
                 if(only0and1 && valueCount == 2) {
+                    logger.info("Column appears to be of boolean type.");
                     column.setJavaType(Boolean.class.getName());
+                } else {
+                    logger.info("Column appears not to be of boolean type.");
                 }
                 statement.close();
             } catch (Exception e) {
-                logger.error("Could not whether column " + column.getQualifiedName() + " is boolean", e);
+                logger.error("Could not determine whether column " + column.getQualifiedName() + " is boolean", e);
             } finally {
                 try {
                     if(connection != null) {
@@ -1163,21 +1182,34 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     protected void detectLargeResultSet(Table table, CrudConfiguration configuration) {
         Connection connection = null;
         try {
+            logger.info("Trying to detect whether table {} has many records...", table.getQualifiedName());
             connection = connectionProvider.acquireConnection();
             liquibase.database.Database implementation =
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
             String sql =
                     "select count(*) from " + implementation.escapeTableName(table.getSchemaName(), table.getTableName());
-            PreparedStatement statement =
-                    connection.prepareStatement(
-                            sql);
+            PreparedStatement statement = connection.prepareStatement(sql);
             setQueryTimeout(statement, 1);
             statement.setMaxRows(1);
             ResultSet rs = statement.executeQuery();
             if(rs.next()) {
                 Long count = safeGetLong(rs, 1);
-                if(count != null && count > LARGE_RESULT_SET_THRESHOLD) {
-                    configuration.setLargeResultSet(true);
+                if(count != null) {
+                    if(count > LARGE_RESULT_SET_THRESHOLD) {
+                        logger.info(
+                                "Table " + table.getQualifiedName() + " currently has " + count + " rows, which is bigger than " +
+                                "the threshold (" + LARGE_RESULT_SET_THRESHOLD + ") for large result sets. It will be " +
+                                "marked as largeResultSet = true and no autodetection based on table data will be " +
+                                "attempted, in order to keep the processing time reasonable.");
+                        configuration.setLargeResultSet(true);
+                    } else {
+                        logger.info(
+                                "Table " + table.getQualifiedName() + " currently has " + count + " rows, which is smaller than " +
+                                "the threshold (" + LARGE_RESULT_SET_THRESHOLD + ") for large result sets. It will be " +
+                                "analyzed normally.");
+                    }
+                } else {
+                    logger.warn("Could not determine number of records");
                 }
             }
             statement.close();

@@ -143,7 +143,7 @@ public class PageAdminAction extends AbstractPageAction {
         }
     }
 
-    protected String getMessage(String key, Object... args) {
+    public String getMessage(String key, Object... args) {
         Locale locale = context.getLocale();
         ResourceBundle resourceBundle = application.getBundle(locale);
         String msg = resourceBundle.getString(key);

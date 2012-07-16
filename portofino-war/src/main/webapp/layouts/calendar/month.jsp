@@ -232,6 +232,8 @@
         <% } %>
     </div>
 </div><%!
+    protected int maxExtraEvents = 30;
+
     protected DateTimeFormatter getHoursMinutesFormatter(ResourceBundle resourceBundle) {
         return new DateTimeFormatterBuilder()
                 .appendHourOfDay(2)
@@ -260,7 +262,8 @@
             xhtmlBuffer.openElement("div");
             xhtmlBuffer.addAttribute("id", dialogId);
             xhtmlBuffer.addAttribute("class", "event-dialog");
-            for(int i = maxEventsPerCell - 1; i < eventsOfTheDay.size(); i++) {
+            int howMany = Math.min(eventsOfTheDay.size(), maxExtraEvents);
+            for(int i = maxEventsPerCell - 1; i < howMany; i++) {
                 writeEventDiv(monthView, day, dayOfWeek, i, xhtmlBuffer, resourceBundle);
             }
             xhtmlBuffer.closeElement("div");

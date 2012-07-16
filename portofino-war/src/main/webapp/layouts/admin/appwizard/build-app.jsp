@@ -8,16 +8,16 @@
 <stripes:layout-render name="/skins/default/wizard-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="appwizard.step4.title" />
+        <%= actionBean.getMessage("appwizard.step4.title") %>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        <fmt:message key="appwizard.step4.title" />
+        <%= actionBean.getMessage("appwizard.step4.title") %>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
-        <fmt:message key="appwizard.finish.text" />
+        <%= actionBean.getMessage("appwizard.finish.text") %>
         <div style="display: none;">
             <mde:write name="actionBean" property="userManagementSetupForm"/>
             <mde:write name="actionBean" property="userAndGroupTablesForm"/>
