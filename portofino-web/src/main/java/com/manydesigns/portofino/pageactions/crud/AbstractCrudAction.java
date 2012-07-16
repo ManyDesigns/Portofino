@@ -1612,16 +1612,30 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    protected InputStream getSearchPdfXsltStream() throws FileNotFoundException {
+    /**
+     * Returns a stream producing the contents of a XSLT document to produce the PDF export of the
+     * current search results.
+     */
+    protected InputStream getSearchPdfXsltStream() {
         String templateFop = TEMPLATE_FOP_SEARCH;
         return getXsltStream(templateFop);
     }
 
-    protected InputStream getXsltStream(String templateFop) throws FileNotFoundException {
+    /**
+     * Returns a XSLT stream by searching for a file first in this action's directory, then at
+     * the root of the classpath.
+     * @param templateFop the file to search for
+     * @return the stream
+     */
+    protected InputStream getXsltStream(String templateFop) {
         File fopFile = new File(pageInstance.getDirectory(), templateFop);
         if(fopFile.exists()) {
             logger.debug("Custom FOP template found: {}", fopFile);
-            return new FileInputStream(fopFile);
+            try {
+                return new FileInputStream(fopFile);
+            } catch (FileNotFoundException e) {
+                throw new Error(e);
+            }
         } else {
             logger.debug("Using default FOP template: {}", templateFop);
             ClassLoader cl = getClass().getClassLoader();
@@ -1629,7 +1643,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    public Reader composeXmlSearch() throws IOException {
+    /**
+     * Composes an XML document representing the current search results.
+     * @return
+     * @throws IOException
+     */
+    protected Reader composeXmlSearch() throws IOException {
         XmlBuffer xb = new XmlBuffer();
         xb.writeXmlHeader("UTF-8");
         xb.openElement("class");
@@ -1673,6 +1692,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return new StringReader(xb.toString());
     }
 
+    /**
+     * <p>Returns an array of column sizes (in characters) for the search export.<br />
+     * By default, sizes are computed comparing the relative sizes of each column,
+     * consisting of the header and the values produced by the search.</p>
+     * <p>Users can override this method to compute the sizes using a different algorithm,
+     * or hard-coding them for a particular CRUD instance.</p>
+     */
     protected double[] setupXmlSearchColumnSizes() {
         double[] headerSizes = new double[tableForm.getColumns().length];
         for(int i = 0; i < headerSizes.length; i++) {
@@ -1728,6 +1754,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // ExportRead
     //**************************************************************************
 
+    /**
+     * Composes an XML document representing the current object.
+     * @return
+     * @throws IOException
+     */
     protected Reader composeXmlPort()
             throws IOException, WriteException {
         setupSearchForm();
@@ -2043,7 +2074,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    private void updateProperties() {
+    protected void updateProperties() {
         propertiesTableForm.writeToObject(propertyEdits);
 
         List<CrudProperty> newProperties = new ArrayList<CrudProperty>();
@@ -2102,6 +2133,15 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return jsonOptions(searchPrefix, false);
     }
 
+    /**
+     * Returns values to update multiple related select fields or a single autocomplete
+     * text field, in JSON form.
+     * @param prefix form prefix, to read values from the request.
+     * @param includeSelectPrompt controls if the first option is a label with no value indicating
+     * what field is being selected. For combo boxes you would generally pass true as the value of
+     * this parameter; for autocomplete fields, you would likely pass false.
+     * @return a Resolution to produce the JSON.
+     */
     protected Resolution jsonOptions(String prefix, boolean includeSelectPrompt) {
         CrudSelectionProvider crudSelectionProvider = null;
         for (CrudSelectionProvider current : crudSelectionProviders) {

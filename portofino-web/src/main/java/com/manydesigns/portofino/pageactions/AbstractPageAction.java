@@ -67,11 +67,16 @@ import java.text.MessageFormat;
 import java.util.*;
 
 /**
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+ * Convenient abstract base class for PageActions. It has fields to hold values of properties specified by the
+ * PageAction interface as well as other useful objects injected by the framework. It provides standard
+ * implementations of many of the PageAction methods, as well as important utility methods to handle hierarchical
+ * relations among pages, such as embedding.
+ *
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 @RequiresPermissions(level = AccessLevel.VIEW)
 public abstract class AbstractPageAction extends AbstractActionBean implements PageAction {
     public static final String copyright =
@@ -91,17 +96,31 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Properties
     //--------------------------------------------------------------------------
 
-    //@Inject(RequestAttributes.DISPATCHER)
+    /**
+     * The dispatch property. Injected.
+     */
     public Dispatch dispatch;
 
+    /**
+     * The PageInstance property. Injected.
+     */
     public PageInstance pageInstance;
 
+    /**
+     * The application object. Injected.
+     */
     @Inject(RequestAttributes.APPLICATION)
     public Application application;
 
+    /**
+     * The model object. Injected.
+     */
     @Inject(RequestAttributes.MODEL)
     public Model model;
 
+    /**
+     * The global configuration object. Injected.
+     */
     @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
 
@@ -151,6 +170,11 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
     }*/
 
+    /**
+     * Detects whether the page is embedded. Subclasses are expected to override and extend
+     * this method.
+     * {@inheritDoc}
+     */
     public Resolution preparePage() {
         embedded = context.getRequest().getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH) != null;
         return null;
@@ -160,7 +184,12 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return pageInstance.getName();
     }
 
-    public void setupReturnToParentTarget() {
+    /**
+     * <p>Detects the parent page to return to (using the return to... button). This can be another PageAction,
+     * or, at the discretion of subclasses, a different view of the same action.</p>
+     * <p>This method assigns a value to the returnToParentTarget field.</p>
+     */
+    protected void setupReturnToParentTarget() {
         PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
         boolean hasPrevious = getPage().getActualNavigationRoot() == NavigationRoot.INHERIT;
@@ -191,6 +220,11 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Admin methods
     //--------------------------------------------------------------------------
 
+    /**
+     * Utility method to save the configuration object to a file in this page's directory.
+     * @param configuration the object to save. It must be in a state that will produce a valid XML document.
+     * @return true if the object was correctly saved, false otherwise.
+     */
     protected boolean saveConfiguration(Object configuration) {
         try {
             File confFile = DispatcherLogic.saveConfiguration(pageInstance.getDirectory(), configuration);
@@ -576,7 +610,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Utitilities
     //--------------------------------------------------------------------------
 
-    protected String getMessage(String key, Object... args) {
+    public String getMessage(String key, Object... args) {
         Locale locale = context.getLocale();
         ResourceBundle resourceBundle = application.getBundle(locale);
         String msg = resourceBundle.getString(key);
@@ -595,7 +629,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
     }
 
-    protected Resolution forwardToPortletNotConfigured() {
+    public Resolution forwardToPortletNotConfigured() {
         if (isEmbedded()) {
             return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
         } else {
@@ -604,7 +638,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
     }
 
-    protected Resolution forwardToPortletError(Throwable e) {
+    public Resolution forwardToPortletError(Throwable e) {
         context.getRequest().setAttribute(PORTOFINO_PORTLET_EXCEPTION, e);
         return forwardTo("/layouts/portlet-error.jsp");
     }
