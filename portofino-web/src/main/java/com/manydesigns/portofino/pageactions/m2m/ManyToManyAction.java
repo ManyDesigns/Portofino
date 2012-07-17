@@ -225,6 +225,9 @@ public class ManyToManyAction extends AbstractPageAction {
                 }
                 return forwardTo("/layouts/m2m/checkboxes.jsp");
             default:
+                SessionMessages.addErrorMessage(
+                        "View type " + m2mConfiguration.getActualViewType() +
+                        " is not implemented in the present version, sorry");
                 return forwardToPortletNotConfigured(); //TODO
         }
     }
@@ -410,8 +413,8 @@ public class ManyToManyAction extends AbstractPageAction {
         DefaultSelectionProvider viewTypeSelectionProvider = new DefaultSelectionProvider("viewType");
         String label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.CHECKBOXES");
         viewTypeSelectionProvider.appendRow(ViewType.CHECKBOXES.name(), label, true);
-        label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.LISTS");
-        viewTypeSelectionProvider.appendRow(ViewType.LISTS.name(), label, true);
+        //label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.LISTS");
+        //viewTypeSelectionProvider.appendRow(ViewType.LISTS.name(), label, true);
         formBuilder.configSelectionProvider(viewTypeSelectionProvider, "viewType");
 
         SelectionProvider databaseSelectionProvider =
