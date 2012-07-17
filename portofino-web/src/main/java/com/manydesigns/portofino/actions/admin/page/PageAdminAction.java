@@ -127,6 +127,12 @@ public class PageAdminAction extends AbstractPageAction {
         for(String pageAction : knownPageActions) {
             tryToRegisterPageAction(pageAction);
         }
+        knownPageActions = application.getAppConfiguration().getList("pageactions");
+        if(knownPageActions != null) {
+            for(String pageAction : knownPageActions) {
+                tryToRegisterPageAction(pageAction);
+            }
+        }
 
         if(!SecurityLogic.hasPermissions(pageInstance, SecurityUtils.getSubject(), AccessLevel.EDIT)) {
             return new ForbiddenAccessResolution();
@@ -137,10 +143,14 @@ public class PageAdminAction extends AbstractPageAction {
 
     protected void tryToRegisterPageAction(String className) {
         try {
-            registry.register(Class.forName(className));
+            registry.register(getActionClass(className));
         } catch (Exception e) {
             logger.warn("{} class not found, page not available", className);
         }
+    }
+
+    protected Class<?> getActionClass(String className) throws ClassNotFoundException {
+        return Class.forName(className, true, ScriptingUtil.GROOVY_SCRIPT_ENGINE.getGroovyClassLoader());
     }
 
     public String getMessage(String key, Object... args) {
@@ -254,7 +264,7 @@ public class PageAdminAction extends AbstractPageAction {
             InsertPosition insertPosition =
                     InsertPosition.valueOf(newPage.getInsertPositionName());
             String pageClassName = newPage.getActionClassName();
-            Class actionClass = Class.forName(pageClassName);
+            Class actionClass = getActionClass(pageClassName);
             PageActionInfo info = registry.getInfo(actionClass);
             String pageId = RandomUtil.createRandomId();
 
