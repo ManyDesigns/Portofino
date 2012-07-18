@@ -402,6 +402,9 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Page configuration
     //--------------------------------------------------------------------------
 
+    /**
+     * Sets up the Elements form(s) 
+     */
     protected void prepareConfigurationForms() {
         Page page = pageInstance.getPage();
 
@@ -466,11 +469,20 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return selectionProvider;
     }
 
+    /**
+     * Reads the page configuration form values from the request. Can be called to re-use the standard page
+     * configuration form.
+     */
     protected void readPageConfigurationFromRequest() {
         pageConfigurationForm.readFromRequest(context.getRequest());
         title = context.getRequest().getParameter("title");
     }
 
+    /**
+     * Validates the page configuration form values. Can be called to re-use the standard page
+     * configuration form.
+     * @return true iff the form was valid.
+     */
     protected boolean validatePageConfiguration() {
         boolean valid = true;
         title = StringUtils.trimToNull(title);
@@ -484,6 +496,11 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return valid;
     }
 
+    /**
+     * Updates the page with values from the page configuration. Can be called to re-use the standard page
+     * configuration form. Should be called only after validatePageConfiguration() returned true.
+     * @return true iff the page was correctly saved.
+     */
     protected boolean updatePageConfiguration() {
         EditPage edit = new EditPage();
         pageConfigurationForm.writeToObject(edit);
@@ -515,6 +532,12 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return true;
     }
 
+    /**
+     * Recursively applies a template to a subtree of pages.
+     * @param directory the starting page directory (root of the subtree).
+     * @param filter the filter for selecting pages.
+     * @param edit the object holding template configuration.
+     */
     protected void updateTemplate(File directory, FileFilter filter, EditPage edit) {
         File[] children = directory.listFiles(filter);
         for(File child : children) {
@@ -532,10 +555,18 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
     }
 
+    /**
+     * Accessor for the page title.
+     * @return the title.
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Accessor for the page title.
+     * @param title the new page title.
+     */
     public void setTitle(String title) {
         this.title = title;
     }
@@ -610,6 +641,13 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Utitilities
     //--------------------------------------------------------------------------
 
+    /**
+     * <p>Returns a string corresponding to a key in the resource bundle for the request locale.</p>
+     * <p>The string can contain placeholders (see the {@link MessageFormat} class for details) that will
+     * be substituted with values from the <code>args</code> array.</p>
+     * @param key the key to search in the resource bundle.
+     * @param args the arguments to be interpolated in the message string.
+     */
     public String getMessage(String key, Object... args) {
         Locale locale = context.getLocale();
         ResourceBundle resourceBundle = application.getBundle(locale);
@@ -617,10 +655,20 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return MessageFormat.format(msg, args);
     }
 
+    /**
+     * Returns the path to a jsp file inside the current application's web directory.
+     * @param jsp the relative path to the file, starting from the web directory. Must start with a slash.
+     * @return
+     */
     public String getAppJsp(String jsp) {
         return "/apps/" + application.getAppId() + "/web" + jsp;
     }
 
+    /**
+     * Returns a ForwardResolution to the given page, taking into account whether this page is embedded in its parent
+     * (the Resolution is different in that case).
+     * @param page the path to the page, from the root of the webapp.
+     */
     public Resolution forwardTo(String page) {
         if(isEmbedded()) {
             return new ForwardResolution(page);
@@ -629,6 +677,10 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
     }
 
+    /**
+     * Returns a ForwardResolution to a standard page with an error message saying that the portlet is not properly
+     * configured.
+     */
     public Resolution forwardToPortletNotConfigured() {
         if (isEmbedded()) {
             return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
@@ -638,6 +690,10 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
     }
 
+    /**
+      * Returns a ForwardResolution to a standard page that reports an exception with an error message saying that the portlet is not properly
+      * configured.
+      */
     public Resolution forwardToPortletError(Throwable e) {
         context.getRequest().setAttribute(PORTOFINO_PORTLET_EXCEPTION, e);
         return forwardTo("/layouts/portlet-error.jsp");

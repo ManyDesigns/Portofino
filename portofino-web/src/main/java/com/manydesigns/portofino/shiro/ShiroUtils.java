@@ -32,6 +32,8 @@ import org.apache.shiro.subject.Subject;
 import java.util.List;
 
 /**
+ * Contains a few utility methods for Shiro.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -41,10 +43,24 @@ public class ShiroUtils {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
+    /**
+     * Returns the primary principal for a Subject - that is, in Portofino, the username.
+     * @param s the subject
+     * @return the username.
+     */
     public static Object getPrimaryPrincipal(Subject s) {
         return getPrincipal(s, 0);
     }
 
+    /**
+     * Returns the nth principal of the given Subject. Custom security.groovy implementations might assign
+     * more than one principal to a Subject.
+     * @param s the subject
+     * @param i the zero-based index of the principal
+     * @return the principal
+     * @throws IndexOutOfBoundsException if the index is greather than the number of principals associated with the
+     * subject.
+     */
     public static Object getPrincipal(Subject s, int i) {
         Object principal = s.getPrincipal();
         if(principal instanceof PrincipalCollection) {
@@ -58,7 +74,12 @@ public class ShiroUtils {
             }
         }
     }
-    
+
+    /**
+     * Clears the cache for a list of principals identifying a user. The cache typically contains authentication and
+     * authorization information.
+     * @param principals the principals associated with a user.
+     */
     public static void clearCache(PrincipalCollection principals) {
         SecurityManager securityManager = SecurityUtils.getSecurityManager();
         if(securityManager instanceof RealmSecurityManager) {
@@ -71,6 +92,9 @@ public class ShiroUtils {
         }
     }
 
+    /**
+     * Clears the Shiro cache for the current Subject.
+     */
     public static void clearCacheForCurrentSubject() {
         clearCache(SecurityUtils.getSubject().getPrincipals());
     }

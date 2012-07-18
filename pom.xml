@@ -136,6 +136,12 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.8.1</version>
+                <configuration>
+                    <links>
+                        <link>http://shiro.apache.org/static/current/apidocs/</link>
+                        <link>http://stripes.sourceforge.net/docs/current/javadoc/</link>
+                    </links>
+                </configuration>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>

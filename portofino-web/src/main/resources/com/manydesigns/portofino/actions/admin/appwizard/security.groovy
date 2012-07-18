@@ -50,8 +50,6 @@ class Security extends AbstractApplicationRealmDelegate {
             if("admin".equals(principalCollection.asList().get(0))) {
                 logger.warn("Generated security.groovy is using the hardcoded 'admin' user; " +
                             "remember to disable it in production!")
-                SessionMessages.addWarningMessage("Generated security.groovy is using the hardcoded 'admin' user; " +
-                                                  "remember to disable it in production!")
                 groups.add(getAdministratorsGroup(realm))
             }
             /////////////////////////////////////////////////////////////////
@@ -84,8 +82,6 @@ class Security extends AbstractApplicationRealmDelegate {
             if("admin".equals(principal)) {
                 logger.warn("Generated security.groovy is using the hardcoded 'admin' user; " +
                             "remember to disable it in production!")
-                SessionMessages.addWarningMessage("Generated security.groovy is using the hardcoded 'admin' user; " +
-                                                  "remember to disable it in production!")
                 groups.add(getAdministratorsGroup(realm));
             }
             /////////////////////////////////////////////////////////////////
@@ -134,6 +130,8 @@ class Security extends AbstractApplicationRealmDelegate {
             if("admin".equals(userName) && "admin".equals(password)) {
                 logger.warn("Generated security.groovy is using the hardcoded 'admin' user; " +
                             "remember to disable it in production!")
+                SessionMessages.addWarningMessage("Generated security.groovy is using the hardcoded 'admin' user; " +
+                                                  "remember to disable it in production!")
                 SimpleAuthenticationInfo info =
                         new SimpleAuthenticationInfo(userName, password.toCharArray(), realm.name);
                 return info;

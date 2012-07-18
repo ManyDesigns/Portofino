@@ -27,11 +27,13 @@ import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 
 /**
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+ * Basic ActionBean implementation.
+ *
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public abstract class AbstractActionBean implements ActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
@@ -48,6 +50,9 @@ public abstract class AbstractActionBean implements ActionBean {
         return context;
     }
 
+    /**
+     * Returns the original request path that led to the invocation of this ActionBean.
+     */
     public String getOriginalPath() {
         return originalPath;
     }

@@ -101,7 +101,10 @@ public class ApplicationRealm extends AuthorizingRealm implements UsersGroupsDAO
 
     @Override
     public boolean supports(AuthenticationToken token) {
-        return super.supports(token) || (isOpenIDEnabled() && token instanceof OpenIDToken);
+        if(token instanceof OpenIDToken) {
+            return isOpenIDEnabled();
+        }
+        return true;
     }
 
     public boolean isOpenIDEnabled() {

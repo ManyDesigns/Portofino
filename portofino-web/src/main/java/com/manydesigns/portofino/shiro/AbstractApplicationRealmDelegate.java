@@ -45,6 +45,8 @@ import org.openid4java.discovery.Identifier;
 import java.util.*;
 
 /**
+ * Default implementation of ApplicationRealmDelegate. Provides convenient implementations of the interface methods.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -54,9 +56,26 @@ public abstract class AbstractApplicationRealmDelegate implements ApplicationRea
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
+    /**
+     * Handles the typical login with a username and a password. This method is called by the default implementation
+     * of getAuthenticationInfo when the authentication token is a UsernamePasswordToken.
+     * @param realm the ApplicationRealm that is delegating to this object.
+     * @param userName the username.
+     * @param password the password.
+     * @return
+     */
     protected abstract AuthenticationInfo getAuthenticationInfo(
             ApplicationRealm realm, String userName, String password);
 
+    /**
+     * Performs authentication. This method knows how to handle typical authentication tokens, validating them
+     * and then handling them to the appropriate getAuthenticationInfo overload.<br />
+     * Handling of unknown token types is delegated to doGetAuthenticationToken.
+     *
+     * @param realm the ApplicationRealm that is calling this method.
+     * @param token the authentication token. Typical examples are a UsernamePasswordToken or a OpenIDToken.
+     * @return
+     */
     public AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, AuthenticationToken token) {
         if(token instanceof UsernamePasswordToken) {
             UsernamePasswordToken upToken = (UsernamePasswordToken) token;
@@ -79,6 +98,15 @@ public abstract class AbstractApplicationRealmDelegate implements ApplicationRea
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>This default implementation handles built-in groups (all, anonymous, registered, etc.), delegating
+     * to loadAuthorizationInfo methods the actual loading of application-specific groups.</p>
+     *
+     * @param realm the ApplicationRealm that is calling this method.
+     * @param principal
+     * @return
+     */
     public AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, Object principal) {
         Application application = realm.getApplication();
         Set<String> groups = new HashSet<String>();
@@ -105,36 +133,89 @@ public abstract class AbstractApplicationRealmDelegate implements ApplicationRea
         return info;
     }
 
+    /**
+     * Loads the groups associated to a PrincipalCollection. This might include, besides the username, other
+     * principals like an internal user ID.
+     * @param realm
+     * @param principalCollection
+     * @return
+     */
     protected Collection<String> loadAuthorizationInfo(
             ApplicationRealm realm, PrincipalCollection principalCollection) {
         return Collections.emptySet();
     }
 
+    /**
+     * Loads the groups associated to a given username.
+     * @param realm
+     * @param principal
+     * @return
+     */
     protected Collection<String> loadAuthorizationInfo(ApplicationRealm realm, String principal) {
         return Collections.emptySet();
     }
 
+    /**
+     * Loads the groups associated to an OpenID identifier.
+     * @param realm
+     * @param principal
+     * @return
+     */
     protected Collection<String> loadAuthorizationInfo(ApplicationRealm realm, Identifier principal) {
         return Collections.emptySet();
     }
 
+    /**
+     * Loads the groups associated to a principal of an unknown type. This implementation throws an
+     * AuthorizationException, but you can override it to handle your custom principal type.
+     * @param realm
+     * @param principal
+     * @return
+     */
     protected Collection<String> loadAuthorizationInfo(ApplicationRealm realm, Object principal) {
         throw new AuthorizationException("Invalid principal: " + principal);
     }
 
+    /**
+     * Returns the name of the administrators group as defined in portofino.properties.
+     * @param realm
+     * @return
+     */
     protected String getAdministratorsGroup(ApplicationRealm realm) {
         return realm.getApplication().getPortofinoProperties().getString(PortofinoProperties.GROUP_ADMINISTRATORS);
     }
 
+    /**
+     * Returns the AuthenticationInfo for a user who logged in with OpenID. You can override this method if you want
+     * to associate OpenID users with internal users with more information than just a identifier URL.
+     * @param realm
+     * @param principal
+     * @return
+     */
     protected AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, VerificationResult principal) {
         return new SimpleAuthenticationInfo(
                 principal.getVerifiedId(), OpenIDToken.NO_CREDENTIALS, realm.getName());
     }
 
+    /**
+     * Authenticates a user with a token of unknown type. This method throws an AuthenticationException, but
+     * you can override it to handle your custom tokens.
+     * @param realm
+     * @param token
+     * @return
+     */
     protected AuthenticationInfo doGetAuthenticationInfo(ApplicationRealm realm, AuthenticationToken token) {
-        throw new UnsupportedOperationException("Authentication token " + token + " not supported");
+        throw new AuthenticationException("Authentication token " + token + " not supported");
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>This default implementation returns the built-in groups
+     * (all, anonymous, registered, administrators, externally authenticated).
+     * You can override it to add custom groups for your application.</p>
+     * @param realm the ApplicationRealm that is calling this method.
+     * @return
+     */
     public Set<String> getGroups(ApplicationRealm realm) {
         Application application = realm.getApplication();
         Set<String> groups = new LinkedHashSet<String>();
