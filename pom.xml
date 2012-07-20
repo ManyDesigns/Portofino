@@ -140,6 +140,7 @@
                     <links>
                         <link>http://shiro.apache.org/static/current/apidocs/</link>
                         <link>http://stripes.sourceforge.net/docs/current/javadoc/</link>
+                        <link>http://commons.apache.org/configuration/apidocs/</link>
                     </links>
                 </configuration>
 				<executions>
