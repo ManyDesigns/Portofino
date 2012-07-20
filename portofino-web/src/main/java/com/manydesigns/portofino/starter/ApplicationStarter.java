@@ -22,6 +22,7 @@
 
 package com.manydesigns.portofino.starter;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.AppProperties;
@@ -117,7 +118,10 @@ public class ApplicationStarter {
             boolean initNow = appConfiguration.getBoolean(AppProperties.INIT_AT_STARTUP, false);
             if(initNow) {
                 logger.info("Trying to initialize the application (init-at-startup = true)");
+                logger.debug("Setting up default OGNL context");
+                ElementsThreadLocals.setupDefaultElementsContext();
                 initializeApplication();
+                ElementsThreadLocals.removeElementsContext();
             }
         } catch (ConfigurationException e) {
             logger.error("Couldn't load app configuration", e);
