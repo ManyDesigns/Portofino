@@ -60,7 +60,6 @@ public class DatabaseSyncer {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    public static final String TABLE_SCHEM = "TABLE_SCHEM";
     public static final String INFORMATION_SCHEMA = "INFORMATION_SCHEMA";
 
     public static final Logger logger =
@@ -138,7 +137,7 @@ public class DatabaseSyncer {
     }
 
     public Schema syncSchema(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
-        logger.debug("Synchronizing schema: {}", sourceSchema.getSchemaName());
+        logger.info("Synchronizing schema: {}", sourceSchema.getSchemaName());
         targetSchema.setSchemaName(sourceSchema.getSchemaName());
 
         syncTables(databaseSnapshot, sourceSchema, targetSchema);
@@ -151,10 +150,12 @@ public class DatabaseSyncer {
     }
 
     protected void syncForeignKeys(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
+        logger.info("Synchronizing foreign keys");
         for(liquibase.database.structure.ForeignKey liquibaseFK : databaseSnapshot.getForeignKeys()) {
+            String fkName = liquibaseFK.getName();
+            logger.info("Synchronizing foreign key {}", fkName);
             String fkTableName = liquibaseFK.getForeignKeyTable().getName();
             Table sourceTable = DatabaseLogic.findTableByNameIgnoreCase(sourceSchema, fkTableName);
-            String fkName = liquibaseFK.getName();
 
             Table targetFromTable = DatabaseLogic.findTableByNameIgnoreCase(targetSchema, fkTableName);
             if (targetFromTable == null) {
@@ -292,6 +293,7 @@ public class DatabaseSyncer {
             }
 
             if(sourceFK != null) {
+                logger.debug("Found a foreign key with the same name in the previous version of the schema");
                 targetFK.setManyPropertyName(sourceFK.getManyPropertyName());
                 targetFK.setOnePropertyName(sourceFK.getOnePropertyName());
             }
@@ -310,7 +312,7 @@ public class DatabaseSyncer {
     }
 
     protected void syncPrimaryKeys(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
-        logger.debug("Synchronizing primary keys");
+        logger.info("Synchronizing primary keys");
         for(liquibase.database.structure.PrimaryKey liquibasePK : databaseSnapshot.getPrimaryKeys()) {
             String pkTableName = liquibasePK.getTable().getName();
 
@@ -401,7 +403,7 @@ public class DatabaseSyncer {
     }
 
     protected void syncTables(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
-        logger.debug("Synchronizing tables");
+        logger.info("Synchronizing tables");
         for (liquibase.database.structure.Table liquibaseTable
                 : databaseSnapshot.getTables()) {
             String tableName = liquibaseTable.getName();
