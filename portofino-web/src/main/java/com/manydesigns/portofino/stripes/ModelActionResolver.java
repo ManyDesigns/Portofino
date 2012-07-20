@@ -131,7 +131,7 @@ public class ModelActionResolver extends NameBasedActionResolver {
         String urlBinding = super.getUrlBinding(clazz);
         if(GroovyObject.class.isAssignableFrom(clazz) && !urlBinding.endsWith("__groovy__")) {
             //Meglio evitare conflitti con action configurate normalmente
-            return urlBinding + "__groovy__";
+            return urlBinding + clazz.hashCode() + "__groovy__";
         } else {
             return urlBinding;
         }

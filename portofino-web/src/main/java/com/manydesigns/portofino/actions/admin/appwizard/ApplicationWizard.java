@@ -1209,7 +1209,8 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                                 "analyzed normally.");
                     }
                 } else {
-                    logger.warn("Could not determine number of records");
+                    logger.warn("Could not determine number of records, assuming large result set");
+                    configuration.setLargeResultSet(true);
                 }
             }
             statement.close();
