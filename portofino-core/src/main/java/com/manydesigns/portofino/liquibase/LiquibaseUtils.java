@@ -24,6 +24,7 @@ package com.manydesigns.portofino.liquibase;
 
 import com.manydesigns.portofino.liquibase.databases.*;
 import com.manydesigns.portofino.liquibase.databasesnapshotgenerators.PortofinoOracleDatabaseSnapshotGenerator;
+import com.manydesigns.portofino.liquibase.databasesnapshotgenerators.PortofinoPostgresDatabaseSnapshotGenerator;
 import com.manydesigns.portofino.liquibase.sqlgenerators.*;
 import liquibase.database.DatabaseFactory;
 import liquibase.snapshot.DatabaseSnapshotGenerator;
@@ -138,7 +139,7 @@ public class LiquibaseUtils {
         dsgf.register(new PortofinoOracleDatabaseSnapshotGenerator());
 
         logger.debug("Registering Postgres");
-        dsgf.register(new PostgresDatabaseSnapshotGenerator());
+        dsgf.register(new PortofinoPostgresDatabaseSnapshotGenerator());
     }
 
     public static void setupSqlGeneratorFactory() {
