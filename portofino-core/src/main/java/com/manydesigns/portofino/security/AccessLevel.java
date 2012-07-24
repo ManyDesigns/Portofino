@@ -23,6 +23,19 @@
 package com.manydesigns.portofino.security;
 
 /**
+ * Enumerates the possible <i>access levels</i> to a page. In order of priority:
+ * <ul>
+ *     <li><strong><code>NONE</code></strong> - neither grants, nor forbids access.</li>
+ *     <li><strong><code>VIEW</code></strong> - grants access to the page in read-only mode.</li>
+ *     <li><strong><code>EDIT</code></strong> - grants access to the page in edit mode: some operations are permitted
+ *     (depending on the type of page), but at least modifying the Groovy source code of the page is forbidden.</li>
+ *     <li><strong><code>DEVELOP</code></strong> - grants every permissions except those reserved for the administrator
+ *     (superuser), including that of editing the Groovy source code of the page.</li>
+ *     <li><strong><code>DENY</code></strong> - denies access to the page.</li>
+ * </ul>
+ *
+ * The level with the greatest priority wins over the others.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com

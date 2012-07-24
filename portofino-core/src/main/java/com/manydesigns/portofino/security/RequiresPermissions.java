@@ -22,14 +22,15 @@
 
 package com.manydesigns.portofino.security;
 
-import com.manydesigns.portofino.security.AccessLevel;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Declares the minimum set of permissions that the user must have in order to invoke a specific method
+ * (handler) or any method on a class (action).
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com

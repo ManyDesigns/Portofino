@@ -60,12 +60,13 @@ import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.*;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * Default {@link Application} implementation based on Hibernate and Liquibase.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public class DefaultApplication implements Application {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
