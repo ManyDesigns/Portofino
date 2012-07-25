@@ -30,7 +30,6 @@ import com.manydesigns.portofino.database.StringBooleanType;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.ForeignKey;
 import liquibase.database.structure.ForeignKeyConstraintType;
-import org.apache.commons.lang.BooleanUtils;
 import org.hibernate.FetchMode;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Mappings;
@@ -68,8 +67,8 @@ public class HibernateConfig {
             LoggerFactory.getLogger(HibernateConfig.class);
 
     //String values for the mapping of boolean values to CHAR/VARCHAR columns
-    private static String trueString = "T";
-    private static String falseString = "F";
+    private String trueString = "T";
+    private String falseString = "F";
 
     public HibernateConfig(ConnectionProvider connectionProvider,
                            org.apache.commons.configuration.Configuration portofinoConfiguration) {
@@ -175,11 +174,9 @@ public class HibernateConfig {
             for (com.manydesigns.portofino.model.database.Table aTable :
                     schema.getTables()) {
                 for (ForeignKey rel : aTable.getForeignKeys()) {
-                    if (BooleanUtils.isTrue(aTable.getManyToMany())) {
-                        logger.debug(MessageFormat.format("Many to one - {0} {1}",
-                                aTable.getQualifiedName(), rel.getName()));
-                        createM2O(configuration, mappings, rel);
-                    }
+                    logger.debug(MessageFormat.format("Many to one - {0} {1}",
+                            aTable.getQualifiedName(), rel.getName()));
+                    createM2O(configuration, mappings, rel);
                 }
             }
         }
@@ -229,7 +226,7 @@ public class HibernateConfig {
             
             //First param = null ==> doesn't really set anything, just check
             boolean hibernateTypeOk =
-                    HibernateConfig.setHibernateType(null, modelColumn, javaType, jdbcType);
+                    setHibernateType(null, modelColumn, javaType, jdbcType);
             if (hibernateTypeOk) {
                 columnList.add(modelColumn);
             } else {
@@ -785,7 +782,7 @@ public class HibernateConfig {
         return "`"+name+"`";
     }
 
-    public static boolean setHibernateType(@Nullable SimpleValue value,
+    public boolean setHibernateType(@Nullable SimpleValue value,
                                  com.manydesigns.portofino.model.database.Column column,
                                  Class javaType,
                                  final int jdbcType) {

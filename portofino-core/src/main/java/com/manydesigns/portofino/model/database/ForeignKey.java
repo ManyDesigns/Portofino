@@ -121,13 +121,6 @@ public class ForeignKey extends DatabaseSelectionProvider
                     getQualifiedName()));
         }
 
-        actualManyPropertyName = (manyPropertyName == null)
-                ? name
-                : manyPropertyName;
-
-        actualOnePropertyName = (onePropertyName == null)
-                ? name
-                : onePropertyName;
     }
 
     @Override
@@ -138,10 +131,23 @@ public class ForeignKey extends DatabaseSelectionProvider
             // wire up Table.oneToManyRelationships
             toTable.getOneToManyRelationships().add(this);
             hql = "from " + toTable.getActualEntityName();
+
+            actualManyPropertyName = (manyPropertyName == null)
+                ? DatabaseLogic.getUniquePropertyName(toTable, name)
+                : manyPropertyName;
+
         } else {
             logger.warn("Cannot find destination table '{}'",
                     Table.composeQualifiedName(toDatabase, toSchema, toTableName));
+
+            actualManyPropertyName = (manyPropertyName == null)
+                ? name
+                : manyPropertyName;
         }
+
+        actualOnePropertyName = (onePropertyName == null)
+                ? DatabaseLogic.getUniquePropertyName(fromTable, name)
+                : onePropertyName;
     }
 
     //**************************************************************************

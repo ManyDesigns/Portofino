@@ -23,6 +23,7 @@ package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.Model;
 import junit.framework.TestCase;
+import org.apache.commons.lang.StringUtils;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -102,6 +103,7 @@ public class TableTest extends TestCase {
     public void testActualColumnNames() {
         Model model = new Model();
         Database db = new Database();
+        db.setConnectionProvider(new JdbcConnectionProvider());
         db.setDatabaseName("portofino");
         Schema schema = new Schema();
         schema.setDatabase(db);
@@ -141,5 +143,70 @@ public class TableTest extends TestCase {
         column.setColumnName("ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ");
         model.init();
         assertEquals("ĖĔĕĘĘŜŞŝōŎľĿʛʋʊɪɩɨɷ", column.getActualPropertyName());
+    }
+
+    public void testDuplicatePropertyNames() {
+        Model model = new Model();
+        Database db = new Database();
+        db.setDatabaseName("portofino");
+        db.setConnectionProvider(new JdbcConnectionProvider());
+        Schema schema = new Schema();
+        schema.setDatabase(db);
+        db.getSchemas().add(schema);
+        schema.setSchemaName("meta");
+
+        Table table = new Table();
+        table.setSchema(schema);
+        table.setTableName("ignore");
+        schema.getTables().add(table);
+
+        Column column = new Column();
+        column.setTable(table);
+        column.setColumnName("dup");
+        table.getColumns().add(column);
+
+        Column column2 = new Column();
+        column2.setTable(table);
+        column2.setColumnName("dup");
+        table.getColumns().add(column2);
+
+        model.getDatabases().add(db);
+        model.init();
+
+        assertFalse(StringUtils.equals(column.getActualPropertyName(), column2.getActualPropertyName()));
+
+        Table table2 = new Table();
+        table2.setSchema(schema);
+        table2.setTableName("ignore2");
+        schema.getTables().add(table2);
+
+        Column column3 = new Column();
+        column3.setTable(table2);
+        column3.setColumnName("dup");
+        table2.getColumns().add(column3);
+
+        ForeignKey fk = new ForeignKey(table);
+        fk.setToSchema("meta");
+        fk.setToTableName("ignore2");
+        fk.setToDatabase("portofino");
+        fk.setName("dup");
+        Reference ref = new Reference(fk);
+        ref.setFromColumn("dup");
+        ref.setToColumn("dup");
+        fk.getReferences().add(ref);
+        table.getForeignKeys().add(fk);
+
+        model.init();
+
+        assertFalse(StringUtils.equals(column.getActualPropertyName(), column2.getActualPropertyName()));
+        assertFalse(StringUtils.equals(column.getActualPropertyName(), fk.getActualOnePropertyName()));
+        assertFalse(StringUtils.equals(column3.getActualPropertyName(), fk.getActualManyPropertyName()));
+
+        fk.setName("dup_2");
+        model.init();
+
+        assertFalse(StringUtils.equals(column.getActualPropertyName(), column2.getActualPropertyName()));
+        assertFalse(StringUtils.equals(column.getActualPropertyName(), fk.getActualOnePropertyName()));
+        assertFalse(StringUtils.equals(column3.getActualPropertyName(), fk.getActualManyPropertyName()));
     }
 }

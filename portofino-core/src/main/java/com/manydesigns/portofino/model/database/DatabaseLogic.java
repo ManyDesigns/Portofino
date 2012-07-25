@@ -23,6 +23,7 @@
 package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.Model;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -286,5 +287,50 @@ public class DatabaseLogic {
         } else {
             throw new IllegalArgumentException("Not a qualified table name: " + qualifiedName);
         }
+    }
+
+    //**************************************************************************
+    // Disambiguate names
+    //**************************************************************************
+
+    public static String getUniquePropertyName(Table table, String initialName) {
+        String prefix = initialName;
+        int prog = 2;
+        boolean changed = true;
+        while(changed) {
+            changed = false;
+            for(Column column : table.getColumns()) {
+                if(StringUtils.equals(initialName, column.getActualPropertyName())) {
+                    initialName = prefix + "_" + prog;
+                    logger.warn("Duplicate property found, renaming to {}", initialName);
+                    prog++;
+                    changed = true;
+                    break;
+                }
+            }
+            if(!changed) {
+                for(ForeignKey fk : table.getForeignKeys()) {
+                    if(StringUtils.equals(initialName, fk.getActualOnePropertyName())) {
+                        initialName = prefix + "_" + prog;
+                        logger.warn("Duplicate property found, renaming to {}", initialName);
+                        prog++;
+                        changed = true;
+                        break;
+                    }
+                }
+            }
+            if(!changed) {
+                for(ForeignKey fk : table.getOneToManyRelationships()) {
+                    if(StringUtils.equals(initialName, fk.getActualManyPropertyName())) {
+                        initialName = prefix + "_" + prog;
+                        logger.warn("Duplicate property found, renaming to {}", initialName);
+                        prog++;
+                        changed = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return initialName;
     }
 }
