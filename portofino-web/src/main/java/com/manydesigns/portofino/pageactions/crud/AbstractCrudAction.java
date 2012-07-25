@@ -51,13 +51,10 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.logic.SelectionProviderLogic;
-import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
-import com.manydesigns.portofino.pageactions.crud.configuration.SelectionProviderReference;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
@@ -74,7 +71,6 @@ import jxl.write.biff.RowsExceededException;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlContext;
-import org.apache.commons.collections.MultiMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -83,7 +79,6 @@ import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
-import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONStringer;
 import org.slf4j.Logger;
@@ -200,8 +195,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Selection providers
     //--------------------------------------------------------------------------
 
-    public List<CrudSelectionProvider> crudSelectionProviders;
-    public MultiMap availableSelectionProviders; //List<String> -> DatabaseSelectionProvider
+    protected SelectionProviderSupport selectionProviderSupport;
+    
     protected String relName;
     protected int selectionProviderIndex;
     protected String selectFieldMode;
@@ -822,89 +817,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     protected abstract ClassAccessor prepare(PageInstance pageInstance);
 
-    protected boolean setupSelectionProvider(
-            @Nullable SelectionProviderReference ref,
-            DatabaseSelectionProvider current,
-            Set<String> configuredSPs) {
-        List<Reference> references = current.getReferences();
-
-        String[] fieldNames = new String[references.size()];
-        Class[] fieldTypes = new Class[references.size()];
-
-        int i = 0;
-        for (Reference reference : references) {
-            Column column = reference.getActualFromColumn();
-            fieldNames[i] = column.getActualPropertyName();
-            fieldTypes[i] = column.getActualJavaType();
-            i++;
-        }
-
-        availableSelectionProviders.put(Arrays.asList(fieldNames), current);
-        for(String fieldName : fieldNames) {
-            //If another SP is configured for the same field, stop
-            if(configuredSPs.contains(fieldName)) {
-                return false;
-            }
-        }
-
-        if(ref == null || ref.isEnabled()) {
-            DisplayMode dm = ref != null ? ref.getDisplayMode() : DisplayMode.DROPDOWN;
-            String newHref = ref != null ? ref.getCreateNewValueHref() : null;
-            String newText = ref != null ? ref.getCreateNewValueText() : null;
-            SelectionProvider selectionProvider = createSelectionProvider
-                    (current, fieldNames, fieldTypes, dm, newHref, newText);
-
-            CrudSelectionProvider crudSelectionProvider =
-                new CrudSelectionProvider(selectionProvider, fieldNames, newHref, newText);
-            crudSelectionProviders.add(crudSelectionProvider);
-            Collections.addAll(configuredSPs, fieldNames);
-            return true;
-        } else {
-            //To avoid automatically adding a FK later
-            CrudSelectionProvider crudSelectionProvider =
-                new CrudSelectionProvider(null, fieldNames, null, null);
-            crudSelectionProviders.add(crudSelectionProvider);
-            return false;
-        }
-    }
-
-    protected SelectionProvider createSelectionProvider
-            (DatabaseSelectionProvider current, String[] fieldNames,
-             Class[] fieldTypes, DisplayMode dm, String newHref, String newText) {
-        DefaultSelectionProvider selectionProvider;
-
-        boolean anyActiveProperty = false;
-        for(String propertyName : fieldNames) {
-            CrudProperty crudProperty = findProperty(propertyName, crudConfiguration.getProperties());
-            if(crudProperty != null && crudProperty.isEnabled()) {
-                anyActiveProperty = true;
-                break;
-            }
-        }
-        if(!anyActiveProperty) {
-            //Dummy
-            selectionProvider = SelectionProviderLogic.createSelectionProvider(
-                    current.getName(), 0, new Class[0], Collections.<Object[]>emptyList());
-        } else {
-            selectionProvider = createSelectionProvider(current, fieldNames, fieldTypes, dm);
-        }
-        if(selectionProvider != null) {
-            if(newHref != null) {
-                OgnlTextFormat tf = new OgnlTextFormat(newHref);
-                newHref = tf.format(this);
-                if(newHref.startsWith("/") && !newHref.startsWith(context.getRequest().getContextPath())) {
-                    newHref = context.getRequest().getContextPath() + newHref;
-                }
-            }
-            selectionProvider.setCreateNewValueHref(newHref);
-            selectionProvider.setCreateNewValueText(newText);
-        }
-        return selectionProvider;
-    }
-
-    protected abstract DefaultSelectionProvider createSelectionProvider(
-            DatabaseSelectionProvider current, String[] fieldNames, Class[] fieldTypes, DisplayMode dm);
-
     public boolean isConfigured() {
         return (classAccessor != null);
     }
@@ -959,7 +871,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 new SearchFormBuilder(classAccessor);
 
         // setup option providers
-        for (CrudSelectionProvider current : crudSelectionProviders) {
+        for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider =
                     current.getSelectionProvider();
             if(selectionProvider == null) {
@@ -1020,7 +932,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         TableFormBuilder tableFormBuilder = new TableFormBuilder(classAccessor);
 
         // setup option providers
-        for (CrudSelectionProvider current : crudSelectionProviders) {
+        for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider =
                     current.getSelectionProvider();
             if(selectionProvider == null) {
@@ -1081,7 +993,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         FormBuilder formBuilder = new FormBuilder(classAccessor);
 
         // setup option providers
-        for (CrudSelectionProvider current : crudSelectionProviders) {
+        for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider =
                     current.getSelectionProvider();
             if(selectionProvider == null) {
@@ -1919,14 +1831,16 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             propertiesTableForm = tableFormBuilder.build();
         }
 
-        if(!availableSelectionProviders.isEmpty()) {
+        Map<List<String>, Collection<String>> selectionProviderNames =
+                selectionProviderSupport.getAvailableSelectionProviderNames();
+        if(!selectionProviderNames.isEmpty()) {
             setupSelectionProviderEdits();
             TableFormBuilder tableFormBuilder =
                     new TableFormBuilder(CrudSelectionProviderEdit.class);
-            tableFormBuilder.configNRows(availableSelectionProviders.size());
+            tableFormBuilder.configNRows(selectionProviderNames.size());
             for(int i = 0; i < selectionProviderEdits.length; i++) {
-                Collection<ModelSelectionProvider> availableProviders =
-                        (Collection) availableSelectionProviders.get
+                Collection<String> availableProviders =
+                        selectionProviderNames.get
                                 (Arrays.asList(selectionProviderEdits[i].fieldNames));
                 if(availableProviders == null || availableProviders.size() == 0) {
                     continue;
@@ -1934,8 +1848,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 DefaultSelectionProvider selectionProvider =
                         new DefaultSelectionProvider(selectionProviderEdits[i].columns);
                 selectionProvider.appendRow(null, "None", true);
-                for(ModelSelectionProvider sp : availableProviders) {
-                    selectionProvider.appendRow(sp.getName(), sp.getName(), true);
+                for(String spName : availableProviders) {
+                    selectionProvider.appendRow(spName, spName, true);
                 }
                 tableFormBuilder.configSelectionProvider(i, selectionProvider, "selectionProvider");
             }
@@ -1970,14 +1884,16 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected void setupSelectionProviderEdits() {
+        Map<List<String>, Collection<String>> availableSelectionProviders =
+                selectionProviderSupport.getAvailableSelectionProviderNames();
         selectionProviderEdits = new CrudSelectionProviderEdit[availableSelectionProviders.size()];
         int i = 0;
-        for(Map.Entry entry : (Set<Map.Entry>) availableSelectionProviders.entrySet()) {
+        for(List<String> key : availableSelectionProviders.keySet()) {
             selectionProviderEdits[i] = new CrudSelectionProviderEdit();
-            String[] fieldNames = (String[]) ((Collection) entry.getKey()).toArray(new String[0]);
+            String[] fieldNames = key.toArray(new String[key.size()]);
             selectionProviderEdits[i].fieldNames = fieldNames;
             selectionProviderEdits[i].columns = StringUtils.join(fieldNames, ", ");
-            for(CrudSelectionProvider cp : crudSelectionProviders) {
+            for(CrudSelectionProvider cp : selectionProviderSupport.getCrudSelectionProviders()) {
                 if(Arrays.equals(cp.fieldNames, fieldNames)) {
                     SelectionProvider selectionProvider = cp.getSelectionProvider();
                     if(selectionProvider != null) {
@@ -2031,7 +1947,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 updateProperties();
             }
 
-            if(!availableSelectionProviders.isEmpty()) {
+            if(!selectionProviderSupport.getAvailableSelectionProviderNames().isEmpty()) {
                 updateSelectionProviders();
             }
 
@@ -2049,27 +1965,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         selectionProvidersForm.writeToObject(selectionProviderEdits);
         crudConfiguration.getSelectionProviders().clear();
         for(CrudSelectionProviderEdit sp : selectionProviderEdits) {
+            List<String> key = Arrays.asList(sp.fieldNames);
             if(sp.selectionProvider == null) {
-                //TODO this is a shortcut: takes the first available selection provider and disables it
-                List<String> key = Arrays.asList(sp.fieldNames);
-                Collection<ModelSelectionProvider> selectionProviders =
-                        (Collection<ModelSelectionProvider>) availableSelectionProviders.get(key);
-                ModelSelectionProvider dsp = selectionProviders.iterator().next();
-                SelectionProviderReference sel = makeSelectionProviderReference(dsp);
-                sel.setEnabled(false);
+                selectionProviderSupport.disableSelectionProvider(key);
             } else {
-                List<String> key = Arrays.asList(sp.fieldNames);
-                Collection<ModelSelectionProvider> selectionProviders =
-                        (Collection<ModelSelectionProvider>) availableSelectionProviders.get(key);
-                for(ModelSelectionProvider dsp : selectionProviders) {
-                    if(sp.selectionProvider.equals(dsp.getName())) {
-                        SelectionProviderReference sel = makeSelectionProviderReference(dsp);
-                        sel.setDisplayMode(sp.displayMode);
-                        sel.setCreateNewValueHref(sp.createNewHref);
-                        sel.setCreateNewValueText(sp.createNewText);
-                        break;
-                    }
-                }
+                selectionProviderSupport.configureSelectionProvider(
+                        key, sp.selectionProvider, sp.displayMode, sp.createNewHref, sp.createNewText);
             }
         }
     }
@@ -2096,17 +1997,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
         crudConfiguration.getProperties().clear();
         crudConfiguration.getProperties().addAll(newProperties);
-    }
-
-    protected SelectionProviderReference makeSelectionProviderReference(ModelSelectionProvider dsp) {
-        SelectionProviderReference sel = new SelectionProviderReference();
-        if(dsp instanceof ForeignKey) {
-            sel.setForeignKeyName(dsp.getName());
-        } else {
-            sel.setSelectionProviderName(dsp.getName());
-        }
-        crudConfiguration.getSelectionProviders().add(sel);
-        return sel;
     }
 
     public boolean isRequiredFieldsPresent() {
@@ -2144,7 +2034,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     protected Resolution jsonOptions(String prefix, boolean includeSelectPrompt) {
         CrudSelectionProvider crudSelectionProvider = null;
-        for (CrudSelectionProvider current : crudSelectionProviders) {
+        for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider =
                     current.getSelectionProvider();
             if (selectionProvider.getName().equals(relName)) {
@@ -2324,11 +2214,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     public List<CrudSelectionProvider> getCrudSelectionProviders() {
-        return crudSelectionProviders;
-    }
-
-    public void setCrudSelectionProviders(List<CrudSelectionProvider> crudSelectionProviders) {
-        this.crudSelectionProviders = crudSelectionProviders;
+        return selectionProviderSupport.getCrudSelectionProviders();
     }
 
     public String[] getSelection() {

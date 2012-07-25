@@ -22,29 +22,23 @@
 
 package com.manydesigns.portofino.pageactions.crud;
 
-import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.text.OgnlSqlFormat;
-import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
-import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
-import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.model.database.Database;
+import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
-import com.manydesigns.portofino.pageactions.crud.configuration.SelectionProviderReference;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
@@ -59,7 +53,6 @@ import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
-import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
@@ -68,7 +61,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -193,56 +188,14 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     @Before
     public void prepare() {
-        availableSelectionProviders = new MultiHashMap();
         if(crudConfiguration != null && crudConfiguration.getActualDatabase() != null) {
-            crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
-            setupSelectionProviders();
+            selectionProviderSupport = createSelectionProviderSupport();
+            selectionProviderSupport.setup();
         }
     }
 
-    protected void setupSelectionProviders() {
-        Set<String> configuredSPs = new HashSet<String>();
-        for(SelectionProviderReference ref : crudConfiguration.getSelectionProviders()) {
-            boolean added;
-            if(ref.getForeignKey() != null) {
-                added = setupSelectionProvider(ref, ref.getForeignKey(), configuredSPs);
-            } else if(ref.getSelectionProvider() instanceof DatabaseSelectionProvider) {
-                DatabaseSelectionProvider dsp = (DatabaseSelectionProvider) ref.getSelectionProvider();
-                added = setupSelectionProvider(ref, dsp, configuredSPs);
-            } else {
-                AbstractCrudAction.logger.error("Unsupported selection provider: " + ref.getSelectionProvider());
-                continue;
-            }
-            if(ref.isEnabled() && !added) {
-                AbstractCrudAction.logger.warn("Selection provider {} not added; check whether the fields on which it is configured " +
-                        "overlap with some other selection provider", ref);
-            }
-        }
-
-
-        //Remove disabled selection providers and mark them as configured to avoid re-adding them
-        Iterator<CrudSelectionProvider> it = crudSelectionProviders.iterator();
-        while (it.hasNext()) {
-            CrudSelectionProvider sp = it.next();
-            if(sp.getSelectionProvider() == null) {
-                it.remove();
-                Collections.addAll(configuredSPs, sp.getFieldNames());
-            }
-        }
-
-        Table table = crudConfiguration.getActualTable();
-        if(table != null) {
-            for(ForeignKey fk : table.getForeignKeys()) {
-                setupSelectionProvider(null, fk, configuredSPs);
-            }
-            for(ModelSelectionProvider dsp : table.getSelectionProviders()) {
-                if(dsp instanceof DatabaseSelectionProvider) {
-                    setupSelectionProvider(null, (DatabaseSelectionProvider) dsp, configuredSPs);
-                } else {
-                    AbstractCrudAction.logger.error("Unsupported selection provider: " + dsp);
-                }
-            }
-        }
+    protected ModelSelectionProviderSupport createSelectionProviderSupport() {
+        return new ModelSelectionProviderSupport(application, crudConfiguration);
     }
 
     @Override
@@ -321,77 +274,6 @@ public class CrudAction extends AbstractCrudAction<Object> {
                 baseTable, pkObject,
                 crudConfiguration.getQuery(), this);
         //return QueryUtils.getObjectByPk(application, baseTable, pkObject);
-    }
-
-    protected DefaultSelectionProvider createSelectionProvider(
-            DatabaseSelectionProvider current, String[] fieldNames, Class[] fieldTypes, DisplayMode dm) {
-        DefaultSelectionProvider selectionProvider = null;
-        String name = current.getName();
-        String databaseName = current.getToDatabase();
-        String sql = current.getSql();
-        String hql = current.getHql();
-        if (sql != null) {
-            Session session = application.getSession(databaseName);
-            OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
-            String formatString = sqlFormat.getFormatString();
-            Object[] parameters = sqlFormat.evaluateOgnlExpressions(this);
-            QueryStringWithParameters cacheKey = new QueryStringWithParameters(formatString, parameters);
-            Collection<Object[]> objects = getFromQueryCache(current, cacheKey);
-            if(objects == null) {
-                logger.debug("Query not in cache: {}", formatString);
-                objects = QueryUtils.runSql(session, formatString, parameters);
-                putInQueryCache(current, cacheKey, objects);
-            }
-            selectionProvider =
-                    SelectionProviderLogic.createSelectionProvider(name, fieldNames.length, fieldTypes, objects);
-            selectionProvider.setDisplayMode(dm);
-        } else if (hql != null) {
-            Database database = DatabaseLogic.findDatabaseByName(model, databaseName);
-            Table table = QueryUtils.getTableFromQueryString(database, hql);
-            String entityName = table.getActualEntityName();
-            Session session = application.getSession(databaseName);
-            QueryStringWithParameters queryWithParameters = QueryUtils.mergeQuery(hql, null, this);
-
-            Collection<Object> objects = getFromQueryCache(current, queryWithParameters);
-            if(objects == null) {
-                String queryString = queryWithParameters.getQueryString();
-                Object[] parameters = queryWithParameters.getParameters();
-                logger.debug("Query not in cache: {}", queryString);
-                objects = QueryUtils.runHqlQuery(session, queryString, parameters);
-                putInQueryCache(current, queryWithParameters, objects);
-            }
-
-            TableAccessor tableAccessor =
-                    application.getTableAccessor(databaseName, entityName);
-            ShortName shortNameAnnotation =
-                    tableAccessor.getAnnotation(ShortName.class);
-            TextFormat[] textFormats = null;
-            //L'ordinamento e' usato solo in caso di chiave singola
-            if (shortNameAnnotation != null && tableAccessor.getKeyProperties().length == 1) {
-                textFormats = new TextFormat[] {
-                    OgnlTextFormat.create(shortNameAnnotation.value())
-                };
-            }
-
-            selectionProvider = SelectionProviderLogic.createSelectionProvider
-                    (name, objects, tableAccessor.getKeyProperties(), textFormats);
-            selectionProvider.setDisplayMode(dm);
-
-            if(current instanceof ForeignKey) {
-                selectionProvider.sortByLabel();
-            }
-        } else {
-            logger.warn("ModelSelection provider '{}': both 'hql' and 'sql' are null", name);
-        }
-        return selectionProvider;
-    }
-
-    protected void putInQueryCache(
-            DatabaseSelectionProvider sp, QueryStringWithParameters queryWithParameters, Collection objects) {}
-
-    protected Collection getFromQueryCache(
-            DatabaseSelectionProvider sp, QueryStringWithParameters queryWithParameters) {
-        return null;
     }
 
     //**************************************************************************
