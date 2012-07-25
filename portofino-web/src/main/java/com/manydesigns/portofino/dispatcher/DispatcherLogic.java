@@ -303,6 +303,10 @@ public class DispatcherLogic {
                         });
     }
 
+    public static void clearConfigurationCache() {
+        configurationCache.invalidateAll();
+    }
+
     protected static File getPageFile(File directory) {
         return new File(directory, "page.xml");
     }

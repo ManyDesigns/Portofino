@@ -177,7 +177,7 @@ public class DefaultApplication implements Application {
     // Model loading
     //**************************************************************************
 
-    public synchronized void loadXmlModel() {
+    public synchronized void loadXmlModel(boolean executeUserScripts) {
         logger.info("Loading xml model from file: {}",
                 appModelFile.getAbsolutePath());
 
@@ -187,7 +187,9 @@ public class DefaultApplication implements Application {
             model = (Model) um.unmarshal(appModelFile);
             boolean syncOnStart = false;
             initModel();
-            runLiquibaseScripts();
+            if(executeUserScripts) {
+                runLiquibaseScripts();
+            }
             if (syncOnStart) {
                 List<String> databaseNames = new ArrayList<String>();
                 for (Database sourceDatabase : model.getDatabases()) {

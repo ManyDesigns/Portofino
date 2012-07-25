@@ -102,8 +102,10 @@ public interface Application {
 
     /**
      * Loads the model from its XML file.
+     * @param executeUserScripts if true, user scripts (e.g. to update the database)
+     * are executed.
      */
-    void loadXmlModel();
+    void loadXmlModel(boolean executeUserScripts);
     /**
      * Saves the model to its XML file.
      * @throws IOException if there is an error writing to the file
