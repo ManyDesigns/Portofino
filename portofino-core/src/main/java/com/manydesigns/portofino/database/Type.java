@@ -139,8 +139,9 @@ public class Type {
             case Types.BOOLEAN:
                 return Boolean.class;
             case Types.CHAR:
-                return String.class;
             case Types.VARCHAR:
+            case Types.NCHAR:
+            case Types.NVARCHAR:
                 return String.class;
             case Types.DATE:
                 return java.sql.Date.class;
@@ -173,7 +174,7 @@ public class Type {
             case Types.BLOB:
                  return java.sql.Blob.class;
             case Types.CLOB:
-                return java.sql.Clob.class;
+                return String.class;
             case Types.LONGVARBINARY:
                 return byte[].class;
             case Types.LONGVARCHAR:

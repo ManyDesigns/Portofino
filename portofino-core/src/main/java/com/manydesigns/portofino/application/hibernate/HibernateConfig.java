@@ -160,11 +160,11 @@ public class HibernateConfig {
                             aTable.getQualifiedName());
                     continue;
                 }
-                RootClass clazz = createTableMapping(
-                        mappings, aTable);
-                mappings.addClass(clazz);
-                mappings.addImport(clazz.getEntityName(),
-                        clazz.getEntityName());
+                RootClass clazz = createTableMapping(mappings, aTable);
+                if(clazz != null) {
+                    mappings.addClass(clazz);
+                    mappings.addImport(clazz.getEntityName(), clazz.getEntityName());
+                }
             }
         }
         return mappings;
@@ -235,7 +235,7 @@ public class HibernateConfig {
                                 aTable.getTableName(),
                                 modelColumn.getColumnName(),
                                 jdbcType,
-                                javaType.getName()
+                                javaType != null ? javaType.getName() : null
                         });
             }
         }
@@ -243,6 +243,11 @@ public class HibernateConfig {
         //Primary keys
         List<com.manydesigns.portofino.model.database.Column> columnPKList
                 = aTable.getPrimaryKey().getColumns();
+
+        if(!columnList.containsAll(columnPKList)) {
+            logger.error("Primary key refers to some invalid columns, skipping class");
+            return null;
+        }
 
         if (columnPKList.size() > 1) {
             createPKComposite(mappings, aTable, aTable.getPrimaryKey().getPrimaryKeyName(),
@@ -732,6 +737,12 @@ public class HibernateConfig {
 
         RootClass clazz =
                 (RootClass) mappings.getClass(manyMDQualifiedTableName);
+        if(clazz == null) {
+            logger.error("Cannot find table '{}' as 'many' side of foreign key '{}'. Skipping relationship.",
+                    manyMDQualifiedTableName, relationship.getName());
+            return;
+        }
+
         Table tab = clazz.getTable();
         List<String> columnNames = new ArrayList<String>();
 
