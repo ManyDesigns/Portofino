@@ -765,7 +765,8 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         for(Table table : allTables) {
             List<Column> dateColumns = new ArrayList<Column>();
             for(Column column : table.getColumns()) {
-                if(Date.class.isAssignableFrom(column.getActualJavaType())) {
+                if(column.getActualJavaType() != null &&
+                   Date.class.isAssignableFrom(column.getActualJavaType())) {
                     dateColumns.add(column);
                 }
             }
@@ -1018,6 +1019,12 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     protected int setupColumn
             (Column column, CrudConfiguration configuration, int columnsInSummary, String linkToParentProperty) {
+
+        if(column.getActualJavaType() == null) {
+            logger.debug("Column without a javaType, skipping: {}", column.getQualifiedName());
+            return columnsInSummary;
+        }
+
         Table table = column.getTable();
         @SuppressWarnings({"StringEquality"})
         boolean enabled =
