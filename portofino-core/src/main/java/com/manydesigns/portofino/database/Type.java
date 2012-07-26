@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -126,10 +127,10 @@ public class Type {
     }
 
     public Class getDefaultJavaType() {
-        return getDefaultJavaType(jdbcType);
+        return getDefaultJavaType(jdbcType, maximumPrecision, maximumScale);
     }
 
-    public static @Nullable Class getDefaultJavaType(int jdbcType) {
+    public static @Nullable Class getDefaultJavaType(int jdbcType, long precision, int scale) {
         switch (jdbcType) {
             case Types.BIGINT:
                 return Long.class;
@@ -158,7 +159,11 @@ public class Type {
             case Types.FLOAT:
                 return Float.class;
             case Types.INTEGER:
-                return Integer.class;
+                if(precision < Math.log10(Integer.MAX_VALUE)) {
+                    return Integer.class;
+                } else {
+                    return BigInteger.class;
+                }
             case Types.SMALLINT:
                 return Short.class;
             case Types.TINYINT:

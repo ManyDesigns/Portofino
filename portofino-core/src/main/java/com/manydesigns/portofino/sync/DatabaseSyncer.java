@@ -42,9 +42,11 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -463,7 +465,18 @@ public class DatabaseSyncer {
 
             logger.debug("Merging column attributes and annotations");
             targetColumn.setAutoincrement(liquibaseColumn.isAutoIncrement());
-            targetColumn.setJdbcType(liquibaseColumn.getDataType());
+            int jdbcType = liquibaseColumn.getDataType();
+            if(jdbcType == Types.OTHER) {
+                logger.debug("jdbcType = OTHER, trying to determine more specific type from type name");
+                String jdbcTypeName = liquibaseColumn.getTypeName();
+                try {
+                    Field field = Types.class.getField(jdbcTypeName);
+                    jdbcType = (Integer) field.get(null);
+                } catch (Exception e) {
+                    logger.debug("Could not determine type (type name = {})", jdbcTypeName);
+                }
+            }
+            targetColumn.setJdbcType(jdbcType);
             targetColumn.setColumnType(liquibaseColumn.getTypeName());
             targetColumn.setLength(liquibaseColumn.getColumnSize());
             targetColumn.setNullable(liquibaseColumn.isNullable());
