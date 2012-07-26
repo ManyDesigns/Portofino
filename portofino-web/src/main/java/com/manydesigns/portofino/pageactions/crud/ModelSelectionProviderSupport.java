@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /**
- * Support object for standard (model-based) selection providers.
+ * Support object for standard (model-based, i.e. HQL or SQL) selection providers.
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -281,7 +281,12 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
             Collection<Object[]> objects = getFromQueryCache(current, cacheKey);
             if(objects == null) {
                 logger.debug("Query not in cache: {}", formatString);
-                objects = QueryUtils.runSql(session, formatString, parameters);
+                try {
+                    objects = QueryUtils.runSql(session, formatString, parameters);
+                } catch (Exception e) {
+                    logger.error("Exception in populating selection provider " + name, e);
+                    return null;
+                }
                 putInQueryCache(current, cacheKey, objects);
             }
             selectionProvider =
@@ -290,6 +295,11 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
         } else if (hql != null) {
             Database database = DatabaseLogic.findDatabaseByName(application.getModel(), databaseName);
             Table table = QueryUtils.getTableFromQueryString(database, hql);
+            if(table == null) {
+                logger.error("Selection provider {} has a HQL query that " +
+                             "refers to an entity that does not exist ({})", name, hql);
+                return null;
+            }
             String entityName = table.getActualEntityName();
             Session session = application.getSession(databaseName);
             QueryStringWithParameters queryWithParameters = QueryUtils.mergeQuery(hql, null, this);
@@ -299,7 +309,12 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
                 String queryString = queryWithParameters.getQueryString();
                 Object[] parameters = queryWithParameters.getParameters();
                 logger.debug("Query not in cache: {}", queryString);
-                objects = QueryUtils.runHqlQuery(session, queryString, parameters);
+                try {
+                    objects = QueryUtils.runHqlQuery(session, queryString, parameters);
+                } catch (Exception e) {
+                    logger.error("Exception in populating selection provider " + name, e);
+                    return null;
+                }
                 putInQueryCache(current, queryWithParameters, objects);
             }
 
