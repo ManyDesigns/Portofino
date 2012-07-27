@@ -230,8 +230,8 @@ public class DatabaseSyncer {
             }
             targetFK.setOnDelete(deleteRule.name());
 
-            String[] fromColumnNames = liquibaseFK.getForeignKeyColumns().split(",");
-            String[] toColumnNames = liquibaseFK.getPrimaryKeyColumns().split(",");
+            String[] fromColumnNames = liquibaseFK.getForeignKeyColumns().split(",\\s+");
+            String[] toColumnNames = liquibaseFK.getPrimaryKeyColumns().split(",\\s+");
             if(fromColumnNames.length != toColumnNames.length) {
                 logger.error("Invalid foreign key {} - columns don't match", fkName);
                 continue;

@@ -18,20 +18,26 @@
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
         <mde:write name="actionBean" property="userAndGroupTablesForm"/>
-        <c:if test="${actionBean.advanced}">
+        <div id="advancedOptionsFormContainer">
+            <mde:write name="actionBean" property="advancedOptionsForm" />
+        </div>
+        <div id="rootsFormContainer" style="display: ${actionBean.advanced ? 'visible' : 'none'}">
             <h3><fmt:message key="appwizard.roots.select" /></h3>
             <mde:write name="actionBean" property="rootsForm"/>
-        </c:if>
-        <mde:write name="actionBean" property="advancedOptionsForm" />
+        </div>
         <div style="display: none;">
-            <c:if test="${!actionBean.advanced}">
-                <mde:write name="actionBean" property="rootsForm"/>
-            </c:if>
             <mde:write name="actionBean" property="schemasForm"/>
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
             <mde:write name="actionBean" property="jndiCPForm"/>
             <mde:write name="actionBean" property="jdbcCPForm"/>
         </div>
+        <script type="text/javascript">
+            $(function() {
+               $("#advancedOptionsFormContainer input").change(function () {
+                   $("#rootsFormContainer").toggle();
+               });
+            });
+        </script>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
         <portofino:buttons list="select-tables" cssClass="contentButton" />

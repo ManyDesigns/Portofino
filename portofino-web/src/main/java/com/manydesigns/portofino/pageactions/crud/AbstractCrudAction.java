@@ -1831,29 +1831,31 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             propertiesTableForm = tableFormBuilder.build();
         }
 
-        Map<List<String>, Collection<String>> selectionProviderNames =
-                selectionProviderSupport.getAvailableSelectionProviderNames();
-        if(!selectionProviderNames.isEmpty()) {
-            setupSelectionProviderEdits();
-            TableFormBuilder tableFormBuilder =
-                    new TableFormBuilder(CrudSelectionProviderEdit.class);
-            tableFormBuilder.configNRows(selectionProviderNames.size());
-            for(int i = 0; i < selectionProviderEdits.length; i++) {
-                Collection<String> availableProviders =
-                        selectionProviderNames.get
-                                (Arrays.asList(selectionProviderEdits[i].fieldNames));
-                if(availableProviders == null || availableProviders.size() == 0) {
-                    continue;
+        if(selectionProviderSupport != null) {
+            Map<List<String>, Collection<String>> selectionProviderNames =
+                    selectionProviderSupport.getAvailableSelectionProviderNames();
+            if(!selectionProviderNames.isEmpty()) {
+                setupSelectionProviderEdits();
+                TableFormBuilder tableFormBuilder =
+                        new TableFormBuilder(CrudSelectionProviderEdit.class);
+                tableFormBuilder.configNRows(selectionProviderNames.size());
+                for(int i = 0; i < selectionProviderEdits.length; i++) {
+                    Collection<String> availableProviders =
+                            selectionProviderNames.get
+                                    (Arrays.asList(selectionProviderEdits[i].fieldNames));
+                    if(availableProviders == null || availableProviders.size() == 0) {
+                        continue;
+                    }
+                    DefaultSelectionProvider selectionProvider =
+                            new DefaultSelectionProvider(selectionProviderEdits[i].columns);
+                    selectionProvider.appendRow(null, "None", true);
+                    for(String spName : availableProviders) {
+                        selectionProvider.appendRow(spName, spName, true);
+                    }
+                    tableFormBuilder.configSelectionProvider(i, selectionProvider, "selectionProvider");
                 }
-                DefaultSelectionProvider selectionProvider =
-                        new DefaultSelectionProvider(selectionProviderEdits[i].columns);
-                selectionProvider.appendRow(null, "None", true);
-                for(String spName : availableProviders) {
-                    selectionProvider.appendRow(spName, spName, true);
-                }
-                tableFormBuilder.configSelectionProvider(i, selectionProvider, "selectionProvider");
+                selectionProvidersForm = tableFormBuilder.build();
             }
-            selectionProvidersForm = tableFormBuilder.build();
         }
     }
 
@@ -1947,7 +1949,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 updateProperties();
             }
 
-            if(!selectionProviderSupport.getAvailableSelectionProviderNames().isEmpty()) {
+            if(selectionProviderSupport != null &&
+               !selectionProviderSupport.getAvailableSelectionProviderNames().isEmpty()) {
                 updateSelectionProviders();
             }
 

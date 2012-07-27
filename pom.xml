@@ -141,6 +141,7 @@
                         <link>http://shiro.apache.org/static/current/apidocs/</link>
                         <link>http://stripes.sourceforge.net/docs/current/javadoc/</link>
                         <link>http://commons.apache.org/configuration/apidocs/</link>
+                        <link>http://docs.jboss.org/hibernate/orm/3.5/api/</link>
                     </links>
                 </configuration>
 				<executions>

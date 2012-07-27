@@ -61,6 +61,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Utility class for running queries (SQL and HQL) against the database. Provides methods for many common cases,
+ * but you can always use the Hibernate {@link Session} directly.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -77,6 +80,13 @@ public class QueryUtils {
 
     protected static final Logger logger = LoggerFactory.getLogger(QueryUtils.class);
 
+    /**
+     * Runs a SQL query against a session. The query is processed with an {@link OgnlSqlFormat}, so it can
+     * access values from the OGNL context.
+     * @param session the session
+     * @param sql the query string
+     * @return the results of the query as an Object[] (an array cell per column)
+     */
     public static List<Object[]> runSql(Session session, String sql) {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
         String formatString = sqlFormat.getFormatString();
@@ -84,6 +94,14 @@ public class QueryUtils {
         return runSql(session, formatString, parameters);
     }
 
+    /**
+     * Runs a SQL query against a session. The query can contain placeholders for the parameters, as supported
+     * by {@link PreparedStatement}.
+     * @param session the session
+     * @param queryString the query
+     * @param parameters parameters to substitute in the query
+     * @return the results of the query as an Object[] (an array cell per column)
+     */
     public static List<Object[]> runSql(Session session, final String queryString, final Object[] parameters) {
         final List<Object[]> result = new ArrayList<Object[]>();
 
@@ -119,6 +137,14 @@ public class QueryUtils {
         return result;
     }
 
+    /**
+     * Runs a query, expressed as {@link TableCriteria}, against the database.
+     * @param session the session
+     * @param criteria the search criteria
+     * @param firstResult index of the first result to return
+     * @param maxResults maximum number of results to return
+     * @return at most <code>maxResults</code> results from the query
+     */
     public static List<Object> getObjects(
             Session session, TableCriteria criteria,
             @Nullable Integer firstResult, @Nullable Integer maxResults) {
@@ -134,7 +160,16 @@ public class QueryUtils {
         );
     }
 
-
+    /**
+     * Runs a query against the database. The query is processed with an {@link OgnlSqlFormat}, so it can
+     * access values from the OGNL context, as well as from an (optional) root object.
+     * @param session the session
+     * @param queryString the query
+     * @param rootObject the root object passed to the ognl evaluator (can be null).
+     * @param firstResult index of the first result to return
+     * @param maxResults maximum number of results to return
+     * @return at most <code>maxResults</code> results from the query
+     */
     public static List<Object> getObjects(
             Session session, String queryString,
             Object rootObject,
@@ -146,12 +181,26 @@ public class QueryUtils {
         return runHqlQuery(session, formatString, parameters, firstResult, maxResults);
     }
 
+    /**
+     * Runs a query against the database. The query is processed with an {@link OgnlSqlFormat}, so it can
+     * access values from the OGNL context.
+     * @param session the session
+     * @param queryString the query
+     * @param firstResult index of the first result to return
+     * @param maxResults maximum number of results to return
+     * @return at most <code>maxResults</code> results from the query
+     */
     public static List<Object> getObjects(
             Session session, String queryString,
             @Nullable Integer firstResult, @Nullable Integer maxResults) {
         return getObjects(session, queryString, (TableCriteria) null, null, firstResult, maxResults);
     }
 
+    /**
+     * Tranforms a {@link TableCriteria} to a query string with an associated array of parameters.
+     * @param criteria the criteria.
+     * @return the same criteria encoded as a HQL query with parameters.
+     */
     public static QueryStringWithParameters getQueryStringWithParametersForCriteria(
             TableCriteria criteria) {
         if (criteria == null) {
@@ -175,7 +224,7 @@ public class QueryUtils {
                 TableCriteria.InCriterion inCriterion =
                         (TableCriteria.InCriterion) criterion;
                 Object[] values = inCriterion.getValues();
-                StringBuffer params = new StringBuffer();
+                StringBuilder params = new StringBuilder();
                 if (values != null){
                     boolean first = true;
                     for (Object value : values){
@@ -311,6 +360,13 @@ public class QueryUtils {
         return pattern;
     }
 
+    /**
+     * Extracts the name of the main entity from a HQL query string, i.e. the first entity in the
+     * from clause.
+     * @param database the database containing the table.
+     * @param queryString the query to analyze.
+     * @return the main entity selected by the query
+     */
     public static Table getTableFromQueryString(Database database, String queryString) {
         Matcher matcher = FROM_PATTERN.matcher(queryString);
         String entityName;
@@ -324,6 +380,19 @@ public class QueryUtils {
         return table;
     }
 
+     /**
+      * Runs a query against the database. The query is expressed as a {@link TableCriteria} object plus a
+      * query string to be merged with it (the typical case of a search in a crud defined by a query).
+      * The query string is processed with an {@link OgnlSqlFormat}, so it can access values from the OGNL context,
+      * as well as from an (optional) root object.
+      * @param session the session
+      * @param queryString the query
+      * @param criteria the search criteria to merge with the query.
+      * @param rootObject the root object passed to the ognl evaluator (can be null).
+      * @param firstResult index of the first result to return
+      * @param maxResults maximum number of results to return
+      * @return at most <code>maxResults</code> results from the query
+     */
     public static List<Object> getObjects(
             Session session,
             String queryString,
@@ -336,6 +405,15 @@ public class QueryUtils {
         return runHqlQuery(session, result.getQueryString(), result.getParameters(), firstResult, maxResults);
     }
 
+    /**
+     * Merges a HQL query string with a {@link TableCriteria} object representing a search. The query string
+     * is processed with an {@link OgnlSqlFormat}, so it can access values from the OGNL context, as well as
+     * from an (optional) root object.
+     * @param queryString the base query
+     * @param criteria the criteria to merge with the query
+     * @param rootObject the OGNL root object (can be null)
+     * @return the merged query
+     */
     public static QueryStringWithParameters mergeQuery
             (String queryString, @Nullable TableCriteria criteria, Object rootObject) {
         OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
@@ -414,6 +492,14 @@ public class QueryUtils {
         return new QueryStringWithParameters(fullQueryString, mergedParameters);
     }
 
+    /**
+     * Runs a HQL query against the database.
+     * @see QueryUtils#runHqlQuery(Session, String, Object[], Integer, Integer)
+     * @param session the session
+     * @param queryString the query
+     * @param parameters the query parameters
+     * @return the results of the query
+     */
     public static List<Object> runHqlQuery(
             Session session,
             String queryString,
@@ -421,6 +507,16 @@ public class QueryUtils {
         return runHqlQuery(session, queryString, parameters, null, null);
     }
 
+    /**
+     * Runs a HQL query against the database.
+     * @see QueryUtils#runHqlQuery(Session, String, Object[], Integer, Integer)
+     * @param session the session
+     * @param queryString the query
+     * @param parameters the query parameters
+     * @param firstResult index of the first result to return
+     * @param maxResults maximum number of results to return
+     * @return the results of the query
+     */
     public static List<Object> runHqlQuery(
             Session session,
             String queryString,
@@ -455,6 +551,15 @@ public class QueryUtils {
         }
     }
 
+    /**
+     * Loads an object by primary key.
+     * @param application the application
+     * @param database the database (connection provider) to use
+     * @param entityName the name of the entity to load - usually the normalized (lowercased, etc.) table name.
+     * @param pk the primary key object. Might be an atomic value (String, Integer, etc.) for single-column primary
+     * keys, or a composite object for multi-column primary keys.
+     * @return the loaded object, or null if an object with that key does not exist.
+     */
     public static Object getObjectByPk(
             Application application, String database, String entityName, Serializable pk) {
         Session session = application.getSession(database);
@@ -473,16 +578,43 @@ public class QueryUtils {
         return result;
     }
 
+    /**
+     * Loads an object by primary key.
+     * @param application the application
+     * @param baseTable the table to query
+     * @param pkObject the primary key object.
+     * @return the loaded object, or null if an object with that key does not exist.
+     */
     public static Object getObjectByPk(Application application, Table baseTable, Serializable pkObject) {
         return getObjectByPk
                 (application, baseTable.getDatabaseName(), baseTable.getActualEntityName(), pkObject);
     }
 
-    public static Object getObjectByPk(Application application, Table baseTable, Serializable pkObject, String query, Object o) {
+    /**
+     * Loads an object by primary key. It also verifies that the object falls within the results of a given query.
+     * @param application the application
+     * @param baseTable the table to load from
+     * @param pkObject the primary key object
+     * @param query the query (where condition) that the object must fulfill
+     * @param rootObject the OGNL root object against which to evaluate the query string.
+     * @return the loaded object, or null if an object with that key does not exist or falls outside the query.
+     */
+    public static Object getObjectByPk(
+            Application application, Table baseTable, Serializable pkObject, String query, Object rootObject) {
         return getObjectByPk
-                (application, baseTable.getDatabaseName(), baseTable.getActualEntityName(), pkObject, query, o);
+                (application, baseTable.getDatabaseName(), baseTable.getActualEntityName(), pkObject, query, rootObject);
     }
 
+    /**
+     * Loads an object by primary key. It also verifies that the object falls within the results of a given query.
+     * @param application the application
+     * @param database the database (connection provider)
+     * @param entityName the name of the entity to load
+     * @param pk the primary key object
+     * @param hqlQueryString the query (where condition) that the object must fulfill
+     * @param rootObject the OGNL root object against which to evaluate the query string.
+     * @return the loaded object, or null if an object with that key does not exist or falls outside the query.
+     */
     public static Object getObjectByPk(
             Application application, String database, String entityName,
             Serializable pk, String hqlQueryString, Object rootObject) {
