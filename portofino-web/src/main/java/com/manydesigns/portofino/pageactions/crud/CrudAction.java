@@ -65,12 +65,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * Default AbstractCrudAction implementation. Implements a crud page over a database table, based on a HQL query.
+ *
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 @SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ScriptTemplate("script_template.groovy")

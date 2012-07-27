@@ -33,12 +33,17 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla - alessio.stalla@manydesigns.com
-*/
+/**
+ * <p>A PageInstance is the realization of a Portofino page on permanent storage (page.xml + configuration.xml +
+ * action.groovy) into a live object in the context of a single http request.<br />
+ * A PageInstance includes the parameters extracted from the decomposition of the URL in a sequence of
+ * <i>fragments</i> (not to be confused with query string parameters).</p>
+ *
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla - alessio.stalla@manydesigns.com
+ */
 public class PageInstance {
 
     protected final Application application;
@@ -74,6 +79,9 @@ public class PageInstance {
         return page;
     }
 
+    /**
+     * The application which the page belongs to.
+     */
     public Application getApplication() {
         return application;
     }
@@ -82,6 +90,9 @@ public class PageInstance {
     // Utility Methods
     //**************************************************************************
 
+    /**
+     * Returns the portion of the URL that identifies this PageInstance, including any parameters.
+     */
     public String getUrlFragment() {
         String fragment = directory.getName();
         for(String param : parameters) {
@@ -90,6 +101,10 @@ public class PageInstance {
         return fragment;
     }
 
+    /**
+     * Reconstructs the URL path to this PageInstance from the root of the application (not including the
+     * webapp's context path).
+     */
     public String getPath() {
         if(getParent() == null) {
             return "";
@@ -98,14 +113,23 @@ public class PageInstance {
         }
     }
 
+    /**
+     * Returns the directory from which this page was loaded.
+     */
     public File getDirectory() {
         return directory;
     }
 
+    /**
+     * Returns the parameters extracted from the URL for this page.
+     */
     public List<String> getParameters() {
         return parameters;
     }
 
+    /**
+     * Returns the configuration object for this page.
+     */
     public Object getConfiguration() {
         return configuration;
     }
@@ -114,10 +138,17 @@ public class PageInstance {
         this.configuration = configuration;
     }
 
+    /**
+     * Returns the class that implements this page.
+     */
     public Class<? extends PageAction> getActionClass() {
         return actionClass;
     }
 
+    /**
+     * Returns an object that implements this page.
+     * @see #getActionClass()
+     */
     public PageAction getActionBean() {
         return actionBean;
     }
@@ -126,10 +157,18 @@ public class PageInstance {
         this.actionBean = actionBean;
     }
 
+    /**
+     * Returns the page instance that precedes this one in the path, or null if this is an instance of the root page.
+     */
     public PageInstance getParent() {
         return parent;
     }
 
+    /**
+     * Returns the layout that drives the display of the embedded children of this page.
+     * If this page instance has parameters, the detail layout is returned; else, the regular layout is returned.
+     * @return the layout.
+     */
     public Layout getLayout() {
         if(getParameters().isEmpty()) {
             return getPage().getLayout();
@@ -138,6 +177,11 @@ public class PageInstance {
         }
     }
 
+    /**
+     * Sets the layout that drives the display of the embedded children of this page.
+     * If this page instance has parameters, the detail layout is set; else, the regular layout is set.
+     * @param layout the new layout.
+     */
     public void setLayout(Layout layout) {
         if(getParameters().isEmpty()) {
             getPage().setLayout(layout);

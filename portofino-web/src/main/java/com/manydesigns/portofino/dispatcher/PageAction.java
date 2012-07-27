@@ -27,6 +27,7 @@ import net.sourceforge.stripes.action.Resolution;
 
 /**
  * An extension of ActionBean from the Stripes framework to handle Portofino's hierarchical page structure.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com

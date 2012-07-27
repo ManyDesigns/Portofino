@@ -28,6 +28,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Declares that the method on which this annotation is placed is to be exposed as multiple buttons on one or
+ * more pages. Considerations regarding {@link Button} apply.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -39,6 +42,9 @@ public @interface Buttons {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
+    /**
+     * The list of buttons that will call this method when pressed.
+     */
     Button[] value();
 
 }

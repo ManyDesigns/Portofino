@@ -28,6 +28,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Allows to place multiple {@link Guard guards} on a method.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -39,6 +41,9 @@ public @interface Guards {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
+    /**
+     * The guards.
+     */
     Guard[] value();
 
 }

@@ -681,6 +681,11 @@ public class QueryUtils {
                !StringUtils.isBlank(fromItem.getAlias());
     }
 
+    /**
+     * Cleanly commits the current (for this thread) transaction of the given database.
+     * @param application the application
+     * @param databaseName the name of the database (connection provider)
+     */
     public static void commit(Application application, String databaseName) {
         Session session = application.getSession(databaseName);
         try {
@@ -691,6 +696,15 @@ public class QueryUtils {
         }
     }
 
+    /**
+     * Navigates a ...-to-many relationship returning the list of objects associated with a given entity.
+     * @param application the application
+     * @param databaseName the name of the database (connection provider)
+     * @param entityName the type (entity name) of the master object
+     * @param obj the master object
+     * @param oneToManyRelationshipName the name of the relationship to navigate
+     * @return the list of associated objects   
+     */
     @SuppressWarnings({"unchecked"})
     public static List<Object> getRelatedObjects(
             Application application, String databaseName, String entityName,

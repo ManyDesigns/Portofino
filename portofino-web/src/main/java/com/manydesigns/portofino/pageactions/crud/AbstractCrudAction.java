@@ -109,7 +109,9 @@ import java.util.regex.Pattern;
  *          with the possibility for subclasses to customize the exports;</li>
  *      <li>Managing selection providers to constrain certain properties to values taken from a list, and aid
  *          the user in inserting those values (e.g. picking colours from a combo box, or cities with an
- *          autocompleted input field);</li>
+ *          autocompleted input field); the actual handling of selection providers is delegated to a
+ *          companion object of type {@link SelectionProviderSupport} which must be provided by the concrete
+ *          subclasses;</li>
  *      <li>Handling permissions so that only enabled users may create, edit or delete objects;</li>
  *      <li>Offering hooks for subclasses to easily customize certain key functions (e.g. execute custom code
  *          before or after saving an object).</li>

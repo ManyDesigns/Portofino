@@ -26,12 +26,17 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.pages.NavigationRoot;
 import net.sourceforge.stripes.action.ActionBean;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * A <i>Dispatch</i> is an object representing a path of page instances from the root of the application,
+ * where each page except the first is an instance of a child (subdirectory) of the previous one.
+ * Additionally, a dispatch retains information about the path that was requested to the Web server
+ * and that generated the dispatch itself.
+ *
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public class Dispatch {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
@@ -48,30 +53,54 @@ public class Dispatch {
         this.pageInstancePath = pageInstancePath;
     }
 
+    /**
+     * Returns the context path.
+     * @see javax.servlet.http.HttpServletRequest#getContextPath()
+     */
     public String getContextPath() {
         return contextPath;
     }
 
+    /**
+     * Returns the path of pages that constitute the dispatch.
+     */
     public PageInstance[] getPageInstancePath() {
         return pageInstancePath;
     }
 
+    /**
+     * Returns a subpath of the page instance path.
+     * @param startIndex the index in the path that the subpath starts from.
+     */
     public PageInstance[] getPageInstancePath(int startIndex) {
         return Util.copyOfRange(pageInstancePath, startIndex, pageInstancePath.length);
     }
 
+    /**
+     * Returns the root page instance, the first in the path.
+     */
     public PageInstance getRootPageInstance() {
         return pageInstancePath[0];
     }
 
+    /**
+     * Returns the last page instance in the path.
+     */
     public PageInstance getLastPageInstance() {
         return pageInstancePath[pageInstancePath.length - 1];
     }
 
+    /**
+     * Returns the path that was requested to the web server to generate this dispatch. The path is internal to
+     * the web application, it does not include the context path.
+     */
     public String getOriginalPath() {
         return originalPath;
     }
 
+    /**
+     * Returns the path that was requested to the web server to generate this dispatch, including the context path.
+     */
     public String getAbsoluteOriginalPath() {
         if ("/".equals(contextPath)) {
             return getOriginalPath();

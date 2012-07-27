@@ -25,6 +25,8 @@ package com.manydesigns.portofino.dispatcher;
 import com.manydesigns.portofino.application.Application;
 
 /**
+ * Optional interface that configuration objects can implement to participate in a simple lifecycle.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -34,6 +36,10 @@ public interface PageActionConfiguration {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
+    /**
+     * Initializes the configuration.
+     * @param application the current application
+     */
     public void init(Application application);
 
 }

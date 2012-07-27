@@ -30,6 +30,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Guards a method with a condition. The method cannot be called by a web request if the condition is not met.
+ * Additionally, if the method is exposed as a {@link Button button}, this annotation will cause the button
+ * to be hidden or disabled if the condition is not met, depending on the type parameter.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -41,7 +45,17 @@ public @interface Guard {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
+    /**
+     * The test condition, an OGNL expression that must return a boolean. The root object for the expression
+     * is the action bean to which the method belongs; it is therefore easy to place the condition in a method
+     * and call it in the expression.
+     */
     String test();
+
+    /**
+     * The type of guard, determining what happens to the associated buttons when the guard condition is not
+     * fulfilled.
+     */
     GuardType type() default GuardType.ENABLED;
 
 }
