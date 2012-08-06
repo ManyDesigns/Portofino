@@ -25,6 +25,11 @@ package com.manydesigns.portofino.database.platforms;
 import com.manydesigns.portofino.model.database.ConnectionProvider;
 import org.hibernate.dialect.PostgreSQLDialect;
 
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -61,5 +66,18 @@ public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
 
     public boolean isApplicable(ConnectionProvider connectionProvider) {
         return "PostgreSQL".equals(connectionProvider.getDatabaseProductName());
+    }
+
+    @Override
+    public List<String> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
+        List<String> schemaNames = super.getSchemaNames(databaseMetaData);
+        Iterator<String> it = schemaNames.iterator();
+        while (it.hasNext()) {
+            String next = it.next();
+            if("information_schema".equalsIgnoreCase(next) || next.startsWith("pg_")) {
+                it.remove();
+            }
+        }
+        return schemaNames;
     }
 }

@@ -27,15 +27,10 @@ import com.manydesigns.portofino.model.Annotated;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.model.database.Column;
-import com.manydesigns.portofino.model.database.ForeignKey;
-import com.manydesigns.portofino.model.database.PrimaryKey;
-import com.manydesigns.portofino.model.database.Schema;
-import com.manydesigns.portofino.model.database.Table;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
-import liquibase.database.structure.*;
+import liquibase.database.structure.ForeignKeyConstraintType;
 import liquibase.snapshot.DatabaseSnapshot;
 import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
 import org.apache.commons.beanutils.BeanUtils;
@@ -45,9 +40,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -61,8 +54,6 @@ import java.util.List;
 public class DatabaseSyncer {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
-
-    public static final String INFORMATION_SCHEMA = "INFORMATION_SCHEMA";
 
     public static final Logger logger =
             LoggerFactory.getLogger(DatabaseSyncer.class);
@@ -99,8 +90,7 @@ public class DatabaseSyncer {
             }
 
             logger.debug("Reading schema names from metadata");
-            List<String> schemaNames =
-                    readSchemaNames(conn, connectionProvider, metadata);
+            List<String> schemaNames = connectionProvider.getDatabasePlatform().getSchemaNames(metadata);
             DatabaseSnapshotGeneratorFactory dsgf =
                     DatabaseSnapshotGeneratorFactory.getInstance();
 
@@ -532,30 +522,6 @@ public class DatabaseSyncer {
             }
             target.getAnnotations().add(annCopy);
         }
-    }
-
-    protected List<String> readSchemaNames(Connection conn,
-                                           ConnectionProvider connectionProvider,
-                                           DatabaseMetaData metadata)
-            throws SQLException {
-        logger.debug("Searching for schemas in: {}",
-                connectionProvider.getDatabase().getDatabaseName());
-
-        List<String> result = new ArrayList<String>();
-
-        List<String> schemaNamesFromDb =
-                connectionProvider.getDatabasePlatform().getSchemaNames(metadata);
-        List<Schema> schemas = connectionProvider.getDatabase().getSchemas();
-        for(Schema schema : schemas) {
-            String schemaName = schema.getSchemaName();
-            if (INFORMATION_SCHEMA.equalsIgnoreCase(schemaName)) {
-                logger.info("Skipping information schema: {}", schemaName);
-                continue;
-            }
-            logger.info("Found schema: {}", schemaName);
-            result.add(schemaName);
-        }
-        return result;
     }
 
 }

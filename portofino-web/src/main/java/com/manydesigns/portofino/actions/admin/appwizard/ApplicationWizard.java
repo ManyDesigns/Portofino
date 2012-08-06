@@ -283,10 +283,6 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
         selectableSchemas = new ArrayList<SelectableSchema>(schemaNamesFromDb.size());
         for(String schemaName : schemaNamesFromDb) {
-            if (DatabaseSyncer.INFORMATION_SCHEMA.equalsIgnoreCase(schemaName)) {
-                logger.info("Skipping information schema: {}", schemaName);
-                continue;
-            }
             boolean selected = false;
             for(Schema schema : selectedSchemas) {
                 if(schemaName.equalsIgnoreCase(schema.getSchemaName())) {
