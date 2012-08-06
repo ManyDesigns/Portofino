@@ -36,8 +36,10 @@ import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.expression.Parenthesis;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.select.*;
 import org.apache.commons.lang.StringUtils;
@@ -428,24 +430,12 @@ public class QueryUtils {
         CCJSqlParserManager parserManager = new CCJSqlParserManager();
         PlainSelect parsedQueryString;
         PlainSelect parsedCriteriaQuery;
-        String queryPrefix = "select __portofino_fake_select__ ";
         try {
-            if(!formatString.toLowerCase().trim().startsWith("select")) {
-                formatString = queryPrefix + formatString;
-            }
-            parsedQueryString =
-                    (PlainSelect) ((Select) parserManager.parse(new StringReader(formatString)))
-                            .getSelectBody();
+            parsedQueryString = parseQuery(parserManager, formatString);
             if(StringUtils.isEmpty(criteriaQueryString)) {
                 parsedCriteriaQuery = new PlainSelect();
             } else {
-                if(!criteriaQueryString.toLowerCase().trim().startsWith("select")) {
-                    criteriaQueryString = queryPrefix + criteriaQueryString;
-                }
-                parsedCriteriaQuery =
-                        (PlainSelect) ((Select) parserManager.parse
-                                (new StringReader(criteriaQueryString)))
-                                .getSelectBody();
+                parsedCriteriaQuery = parseQuery(parserManager, criteriaQueryString);
             }
         } catch (JSQLParserException e) {
             throw new RuntimeException("Couldn't merge query", e);
@@ -478,8 +468,8 @@ public class QueryUtils {
             parsedQueryString.setOrderByElements(orderByElements);
         }
         String fullQueryString = parsedQueryString.toString();
-        if(fullQueryString.toLowerCase().startsWith(queryPrefix)) {
-            fullQueryString = fullQueryString.substring(queryPrefix.length());
+        if(fullQueryString.toLowerCase().startsWith(FAKE_SELECT_PREFIX)) {
+            fullQueryString = fullQueryString.substring(FAKE_SELECT_PREFIX.length());
         }
 
         // merge the parameters
@@ -490,6 +480,19 @@ public class QueryUtils {
         mergedParametersList.toArray(mergedParameters);
 
         return new QueryStringWithParameters(fullQueryString, mergedParameters);
+    }
+
+    public static final String FAKE_SELECT_PREFIX = "select __portofino_fake_select__ ";
+
+    public static PlainSelect parseQuery(CCJSqlParserManager parserManager, String query) throws JSQLParserException {
+        PlainSelect parsedQueryString;
+        if(!query.toLowerCase().trim().startsWith("select")) {
+            query = FAKE_SELECT_PREFIX + query;
+        }
+        parsedQueryString =
+                (PlainSelect) ((Select) parserManager.parse(new StringReader(query)))
+                        .getSelectBody();
+        return parsedQueryString;
     }
 
     /**
@@ -618,9 +621,6 @@ public class QueryUtils {
     public static Object getObjectByPk(
             Application application, String database, String entityName,
             Serializable pk, String hqlQueryString, Object rootObject) {
-        if(!hqlQueryString.toUpperCase().contains("WHERE")) { //TODO
-            return getObjectByPk(application, database, entityName, pk);
-        }
         TableAccessor table = application.getTableAccessor(database, entityName);
         List<Object> result;
         PropertyAccessor[] keyProperties = table.getKeyProperties();
@@ -631,48 +631,63 @@ public class QueryUtils {
         int p = ognlParameters.length;
         Object[] parameters = new Object[p + i];
         System.arraycopy(ognlParameters, 0, parameters, i, p);
-        int indexOfWhere = formatString.toUpperCase().indexOf("WHERE") + 5; //5 = "WHERE".length()
-        String formatStringPrefix = formatString.substring(0, indexOfWhere);
-        String mainEntityAlias = getEntityAlias(entityName, formatString);
-        formatString = formatString.substring(indexOfWhere);
+        try {
+            PlainSelect parsedQuery = parseQuery(new CCJSqlParserManager(), formatString);
+            if(parsedQuery.getWhere() == null) {
+                return getObjectByPk(application, database, entityName, pk);
+            }
 
-        for(PropertyAccessor propertyAccessor : keyProperties) {
-            i--;
-            formatString = mainEntityAlias + propertyAccessor.getName() + " = ? AND " + formatString;
-            parameters[i] = propertyAccessor.get(pk);
-        }
-        formatString = formatStringPrefix + " " + formatString;
-        Session session = application.getSession(database);
-        result = runHqlQuery(session, formatString, parameters);
-        if(result != null && !result.isEmpty()) {
-            return result.get(0);
-        } else {
-            return null;
+            String mainEntityAlias = getEntityAlias(entityName, parsedQuery);
+            net.sf.jsqlparser.schema.Table mainEntityTable;
+            if(mainEntityAlias != null) {
+                mainEntityTable = new net.sf.jsqlparser.schema.Table(null, mainEntityAlias);
+            } else {
+                mainEntityTable = new net.sf.jsqlparser.schema.Table();
+            }
+
+            for(PropertyAccessor propertyAccessor : keyProperties) {
+                i--;
+                EqualsTo condition = new EqualsTo();
+                parsedQuery.setWhere(
+                        new AndExpression(condition, new Parenthesis(parsedQuery.getWhere())));
+                net.sf.jsqlparser.schema.Column column =
+                        new net.sf.jsqlparser.schema.Column(mainEntityTable, propertyAccessor.getName());
+                condition.setLeftExpression(column);
+                condition.setRightExpression(new JdbcParameter());
+                parameters[i] = propertyAccessor.get(pk);
+            }
+
+            String fullQueryString = parsedQuery.toString();
+            if(fullQueryString.toLowerCase().startsWith(FAKE_SELECT_PREFIX)) {
+                fullQueryString = fullQueryString.substring(FAKE_SELECT_PREFIX.length());
+            }
+            Session session = application.getSession(database);
+            result = runHqlQuery(session, fullQueryString, parameters);
+            if(result != null && !result.isEmpty()) {
+                return result.get(0);
+            } else {
+                return null;
+            }
+        } catch (JSQLParserException e) {
+            throw new Error(e);
         }
     }
 
-    private static String getEntityAlias(String entityName, String hqlQueryString) {
-        try {
-            CCJSqlParserManager parserManager = new CCJSqlParserManager();
-            PlainSelect plainSelect =
-                (PlainSelect) ((Select) parserManager.parse(new StringReader(hqlQueryString))).getSelectBody();
-            FromItem fromItem = plainSelect.getFromItem();
-            if (hasEntityAlias(entityName, fromItem)) {
-                return fromItem.getAlias() + ".";
-            }
-            for(Object o : plainSelect.getJoins()) {
+    protected static String getEntityAlias(String entityName, PlainSelect query) {
+        FromItem fromItem = query.getFromItem();
+        if (hasEntityAlias(entityName, fromItem)) {
+            return fromItem.getAlias();
+        }
+        if(query.getJoins() != null) {
+            for(Object o : query.getJoins()) {
                 Join join = (Join) o;
                 if (hasEntityAlias(entityName, join.getRightItem())) {
-                    return join.getRightItem().getAlias() + ".";
+                    return join.getRightItem().getAlias();
                 }
             }
-            logger.debug("Alias from entity " + entityName + " not found in query " + hqlQueryString);
-            return "";
-        } catch(Exception e) {
-            logger.debug("Couldn't parse query " + hqlQueryString +
-                         ", assuming entity " + entityName + " has no alias", e);
-            return "";
         }
+        logger.debug("Alias from entity " + entityName + " not found in query " + query);
+        return null;
     }
 
     private static boolean hasEntityAlias(String entityName, FromItem fromItem) {
