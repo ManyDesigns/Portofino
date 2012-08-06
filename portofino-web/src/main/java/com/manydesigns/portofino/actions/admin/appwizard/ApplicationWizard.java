@@ -53,6 +53,8 @@ import com.manydesigns.portofino.actions.forms.SelectableSchema;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
+import com.manydesigns.portofino.database.platforms.DatabasePlatform;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.model.Annotation;
@@ -200,10 +202,23 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                             .configPrefix("jndi")
                             .configMode(Mode.CREATE)
                             .build();
+
+        DefaultSelectionProvider driverSelectionProvider = new DefaultSelectionProvider("name");
+        // database platforms
+        DatabasePlatformsManager manager =
+                application.getDatabasePlatformsManager();
+        DatabasePlatform[] databasePlatforms = manager.getDatabasePlatforms();
+        for(DatabasePlatform dp : databasePlatforms) {
+            if(DatabasePlatform.STATUS_OK.equals(dp.getStatus())) {
+                driverSelectionProvider.appendRow(dp.getStandardDriverClassName(), dp.getDescription(), true);
+            }
+        }
+
         jdbcCPForm = new FormBuilder(ConnectionProviderForm.class)
                             .configFields(ConnectionProvidersAction.jdbcEditFields)
                             .configPrefix("jdbc")
                             .configMode(Mode.CREATE)
+                            .configSelectionProvider(driverSelectionProvider, "driver")
                             .build();
 
         //Handle back
