@@ -197,6 +197,10 @@ class Security extends AbstractApplicationRealmDelegate {
         return toBase64(raw);
     }
 
+    def plaintext(String password) {
+        return password
+    }
+
     protected String toHex(byte[] raw) {
         return Hex.encodeToString(raw)
     }

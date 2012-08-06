@@ -553,6 +553,10 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
         DefaultSelectionProvider algoSelectionProvider = new DefaultSelectionProvider("");
         algoSelectionProvider.appendRow(
+                "plaintext",
+                getMessage("appwizard.userTable.encryption.plaintext"),
+                true);
+        algoSelectionProvider.appendRow(
                 "md5Base64",
                 getMessage("appwizard.userTable.encryption.md5Base64"),
                 true);
