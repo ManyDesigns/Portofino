@@ -38,7 +38,7 @@
                                             <button type="submit"
                                                     name="returnToParent"
                                                     class="contentButton">
-                                                <span class="ui-button-text">&lt;&lt; Return to ${actionBean.returnToParentTarget}</span>
+                                                <span class="ui-button-text">&lt;&lt; <%= actionBean.getMessage("commons.returnToParent", actionBean.returnToParentTarget) %></span>
                                             </button>
                                             <% for(Map.Entry<String, String> param : actionBean.getReturnToParentParams().entrySet()) { %>
                                                 <input type="hidden" name="<%= param.getKey() %>" value="<%= param.getValue() %>" />

@@ -1047,7 +1047,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             returnToParentParams.put(SEARCH_STRING_PARAM, searchString);
         }
         if (pk != null) {
-            returnToParentTarget = "search";
+            returnToParentTarget = getMessage("layouts.crud.search");
         } else {
             super.setupReturnToParentTarget();
         }

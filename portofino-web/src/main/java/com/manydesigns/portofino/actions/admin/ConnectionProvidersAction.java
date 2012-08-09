@@ -40,6 +40,7 @@ import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.AbstractActionBean;
+import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.security.RequiresAdministrator;
@@ -487,6 +488,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
             application.syncDataModel(databaseName);
             application.initModel();
             application.saveXmlModel();
+            DispatcherLogic.clearConfigurationCache();
             SessionMessages.addInfoMessage(
                     "Connection provider synchronized correctly");
         } catch (Exception e) {

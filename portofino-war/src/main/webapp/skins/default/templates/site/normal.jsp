@@ -30,7 +30,7 @@
             <jsp:include page="../../header.jsp"/>
             <div class="tabs">
                 <jsp:include page="tabs.jsp">
-                    <jsp:param name="tabsMaxLevels" value="1" />
+                    <jsp:param name="tabsMaxLevels" value="2" />
                     <jsp:param name="tabsIncludeAdminButtons" value="true" />
                 </jsp:include>
             </div>
@@ -57,7 +57,7 @@
                 <portofino:portlets list="aboveNavigation" />
                 <div id="navigation">
                     <jsp:include page="../../navigation.jsp">
-                        <jsp:param name="navigation.startingLevel" value="1" />
+                        <jsp:param name="navigation.startingLevel" value="2" />
                     </jsp:include>
                 </div>
                 <portofino:portlets list="belowNavigation" />
