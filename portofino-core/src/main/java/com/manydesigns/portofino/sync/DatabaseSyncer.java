@@ -90,7 +90,8 @@ public class DatabaseSyncer {
             }
 
             logger.debug("Reading schema names from metadata");
-            List<String> schemaNames = connectionProvider.getDatabasePlatform().getSchemaNames(metadata);
+            List<Schema> schemas = connectionProvider.getDatabase().getSchemas();
+
             DatabaseSnapshotGeneratorFactory dsgf =
                     DatabaseSnapshotGeneratorFactory.getInstance();
 
@@ -99,20 +100,20 @@ public class DatabaseSyncer {
             liquibase.database.Database liquibaseDatabase =
                     databaseFactory.findCorrectDatabaseImplementation(liquibaseConnection);
 
-            for (String schemaName : schemaNames) {
-                logger.info("Processing schema: {}", schemaName);
+            for (Schema schema : schemas) {
+                logger.info("Processing schema: {}", schema.getSchemaName());
                 Schema sourceSchema =
                         DatabaseLogic.findSchemaByNameIgnoreCase(
-                                sourceDatabase, schemaName);
+                                sourceDatabase, schema.getSchemaName());
                 if (sourceSchema == null) {
                     logger.debug("Source schema not found. Creating an empty one.");
                     sourceSchema = new Schema();
-                    sourceSchema.setSchemaName(schemaName);
+                    sourceSchema.setSchemaName(schema.getSchemaName());
                 }
 
                 logger.debug("Creating Liquibase database snapshot");
                 DatabaseSnapshot snapshot =
-                        dsgf.createSnapshot(liquibaseDatabase, schemaName, null);
+                        dsgf.createSnapshot(liquibaseDatabase, schema.getSchemaName(), null);
 
                 logger.debug("Synchronizing schema");
                 Schema targetSchema = new Schema();

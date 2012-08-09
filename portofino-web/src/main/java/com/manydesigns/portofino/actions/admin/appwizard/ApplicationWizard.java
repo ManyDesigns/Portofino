@@ -221,6 +221,8 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                             .configSelectionProvider(driverSelectionProvider, "driver")
                             .build();
 
+        jdbcCPForm.findFieldByPropertyName("driver").setHelp(getMessage("appwizard.jdbcDriver.help"));
+
         //Handle back
         jndiCPForm.readFromRequest(context.getRequest());
         jdbcCPForm.readFromRequest(context.getRequest());

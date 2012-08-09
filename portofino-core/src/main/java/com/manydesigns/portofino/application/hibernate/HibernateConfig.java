@@ -262,14 +262,16 @@ public class HibernateConfig {
 
         for (com.manydesigns.portofino.model.database.Column column
                 : columnList) {
-            createColumn(mappings, clazz, tab, column);
-
+            Column col = createColumn(mappings, tab, column);
+            if(col != null) {
+                clazz.addProperty(createProperty(column, col.getValue()));
+            }
         }
 
         return clazz;
     }
 
-    protected void createColumn(Mappings mappings, RootClass clazz,
+    protected Column createColumn(Mappings mappings,
                                 Table tab,
                                 com.manydesigns.portofino.model.database.Column column) {
         Column col = new Column();
@@ -283,25 +285,27 @@ public class HibernateConfig {
 
         col.setSqlTypeCode(jdbcType);
         col.setSqlType(columnType);
-        tab.addColumn(col);
-
-        Property prop = new Property();
-        prop.setName(column.getActualPropertyName());
-        prop.setNodeName(column.getActualPropertyName());
 
         SimpleValue value = new SimpleValue(mappings, tab);
-
         if (!setHibernateType(value, column, column.getActualJavaType(), jdbcType)) {
             logger.error("Skipping column");
-            return;
+            return null;
         }
 
         value.addColumn(col);
-        clazz.addProperty(prop);
-        prop.setValue(value);
+        tab.addColumn(col);
+        mappings.addColumnBinding(column.getColumnName(), col, tab);
 
-        mappings.addColumnBinding(column.getColumnName(),
-                col, tab);
+        return col;
+    }
+
+    protected Property createProperty(com.manydesigns.portofino.model.database.Column column,
+                                      Value value) {
+        Property prop = new Property();
+        prop.setName(column.getActualPropertyName());
+        prop.setNodeName(column.getActualPropertyName());
+        prop.setValue(value);
+        return prop;
     }
 
     protected void createPKComposite(Mappings mappings,
@@ -329,7 +333,7 @@ public class HibernateConfig {
 
         if (!component.isDynamic()){
             component.setComponentClassName
-                    (mdTable.getJavaClass());
+                    (mdTable.getJavaClass()); //TODO verificare se non si intende actualJavaClass
         }
 
         boolean hasErrors = false;
@@ -339,33 +343,35 @@ public class HibernateConfig {
                 throw new InternalError("Null column");
             }
 
-            Column col = new Column();
-            col.setName(escapeName(column.getColumnName()));
-            String columnType = column.getColumnType();
-            int jdbcType = column.getJdbcType();
+            Column col = createColumn(mappings, tab, column);
 
-            col.setSqlTypeCode(jdbcType);
-            col.setSqlType(columnType);
-            primaryKey.addColumn(col);
-            SimpleValue value = new SimpleValue(mappings, tab);
+            hasErrors = col == null || hasErrors;
 
-            hasErrors = !setHibernateType(value, column, column.getActualJavaType(), jdbcType) || hasErrors;
+            if(col != null) {
+                primaryKey.addColumn(col);
+                Property prop = createProperty(column, col.getValue());
+                prop.setCascade("none");
+                //prop.setPropertyAccessorName("property"); interferisce con il generator più sotto
+                prop.setPersistentClass(clazz);
+                component.addProperty(prop);
 
-            value.addColumn(col);
-            primaryKey.addColumn(col);
-            tab.addColumn(col);
-            Property prop = new Property();
-            prop.setName(column.getActualPropertyName());
-            prop.setValue(value);
-            prop.setCascade("none");
-            prop.setNodeName(column.getActualPropertyName());
-            prop.setPropertyAccessorName("property");
-            component.addProperty(prop);
-            mappings.addColumnBinding(column.getColumnName(), col, tab);
+                //Generator not supported for embedded map identifier
+                //See https://forum.hibernate.org/viewtopic.php?t=945273
+                //See Component.buildIdentifierGenerator()
+                /*String columnName = column.getColumnName();
+                PrimaryKeyColumn pkCol = mdTable.getPrimaryKey().findPrimaryKeyColumnByName(columnName);
+                if(pkCol == null) {
+                    logger.error("Column without corresponding PrimaryKeyColumn: {}", columnName);
+                    hasErrors = true;
+                    continue;
+                }
+                Generator generator = pkCol.getGenerator();
+                setPKColumnGenerator(mappings, clazz, tab, column, value, generator);*/
+            }
         }
         if (hasErrors) {
             // TODO PAOLO: se la PK non e' buona, tutta la tabella dovrebbe saltare
-            logger.error("Skipping foreign key");
+            logger.error("Skipping primary key");
             return;
         }
 
@@ -385,59 +391,48 @@ public class HibernateConfig {
         PrimaryKeyColumn pkcol =mdTable.getPrimaryKey().getPrimaryKeyColumns().get(0);
         com.manydesigns.portofino.model.database.Column
                 column = columnPKList.get(0);
-        SimpleValue id = new SimpleValue(mappings, tab);
         final PrimaryKey primaryKey = new PrimaryKey();
         primaryKey.setName(pkName);
         primaryKey.setTable(tab);
         tab.setPrimaryKey(primaryKey);
 
+        Column col = createColumn(mappings, tab, column);
+
+        if (col == null) {
+            // TODO PAOLO: se la PK non e' buona, tutta la tabella dovrebbe saltare
+            logger.error("Skipping primary key");
+            return;
+        }
+
+        SimpleValue id = (SimpleValue) col.getValue();
         //Make the defaults explicit. See section 5.1.4.5. Assigned identifiers in the Hibernate reference
         //(http://docs.jboss.org/hibernate/core/3.3/reference/en/html/mapping.html)
         id.setIdentifierGeneratorStrategy("assigned");
         id.setNullValue("undefined");
 
-        id.setTypeName(column.getColumnType()); //TODO alessio serve? viene sovrascritto sotto
-        Column col = new Column();
-        col.setName(escapeName(column.getColumnName()));
-        String columnType = column.getColumnType();
-        col.setValue(id);
-        col.setLength(column.getLength());
-        col.setPrecision(column.getLength());
-        col.setScale(column.getScale());
-        col.setNullable(column.isNullable());
-        int jdbcType = column.getJdbcType();
-
-        col.setSqlTypeCode(jdbcType);
-        col.setSqlType(columnType);
-        if (!setHibernateType(id, column, column.getActualJavaType(), jdbcType)) {
-            // TODO PAOLO: se la PK non e' buona, tutta la tabella dovrebbe saltare
-            logger.error("Skipping foreign key");
-            return;
-        }
-
-
-        mappings.addColumnBinding(column.getColumnName(),
-                col, tab);
-        tab.addColumn(col);
         tab.getPrimaryKey().addColumn(col);
-        id.addColumn(col);
         
-
-        Property prop = new Property();
-        prop.setName(column.getActualPropertyName());
-        prop.setNodeName(column.getActualPropertyName());
-
-        prop.setValue(id);
+        Property prop = createProperty(column, id);
+        clazz.addProperty(prop);
         prop.setPropertyAccessorName(mappings.getDefaultAccess());
         PropertyGeneration generation = PropertyGeneration.parse(null);
         prop.setGeneration(generation);
 
         prop.setInsertable(false);
         prop.setUpdateable(false);
-        clazz.addProperty(prop);
 
         Generator generator = pkcol.getGenerator();
 
+        setPKColumnGenerator(mappings, clazz, tab, column, id, generator);
+
+        tab.setIdentifierValue(id);
+        clazz.setIdentifier(id);
+        clazz.setIdentifierProperty(prop);
+        clazz.setDiscriminatorValue(mdTable.getQualifiedName());
+
+    }
+
+    protected void setPKColumnGenerator(Mappings mappings, RootClass clazz, Table tab, com.manydesigns.portofino.model.database.Column column, SimpleValue id, Generator generator) {
         if (column.isAutoincrement()) {
             manageIdentityGenerator(mappings, tab, id);
         } else if (generator != null) {
@@ -451,14 +446,7 @@ public class HibernateConfig {
                                 com.manydesigns.portofino.model.database.IncrementGenerator){
                 manageIncrementGenerator(mappings, tab, id, clazz.getEntityName());
             }
-
         }
-
-        tab.setIdentifierValue(id);
-        clazz.setIdentifier(id);
-        clazz.setIdentifierProperty(prop);
-        clazz.setDiscriminatorValue(mdTable.getQualifiedName());
-
     }
 
     private void manageIdentityGenerator(Mappings mappings, Table tab,

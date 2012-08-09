@@ -147,6 +147,15 @@ public class PrimaryKey implements ModelObject {
         return null;
     }
 
+    public PrimaryKeyColumn findPrimaryKeyColumnByName(String columnName) {
+        for (PrimaryKeyColumn primaryKeyColumn : primaryKeyColumns) {
+            if (primaryKeyColumn.getColumnName().equals(columnName)) {
+                return primaryKeyColumn;
+            }
+        }
+        return null;
+    }
+
     //**************************************************************************
     // Getters/setter
     //**************************************************************************
