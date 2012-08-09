@@ -29,6 +29,18 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
+        <script type="text/javascript">
+            $(function() {
+                var buttons = $(".contentFooter button");
+                buttons.click(function() {
+                    buttons.unbind("click");
+                    buttons.click(function() {
+                        alert("Please wait for the operation to complete");
+                        return false;
+                    });
+                });
+            });
+        </script>
         <portofino:buttons list="select-user-fields" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>

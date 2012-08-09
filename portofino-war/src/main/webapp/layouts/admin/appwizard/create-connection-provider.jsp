@@ -47,6 +47,18 @@
         <mde:write name="actionBean" property="advancedOptionsForm" />
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
+        <script type="text/javascript">
+            $(function() {
+                var buttons = $(".contentFooter button");
+                buttons.click(function() {
+                    buttons.unbind("click");
+                    buttons.click(function() {
+                        alert("Please wait for the operation to complete");
+                        return false;
+                    });
+                });
+            });
+        </script>
         <portofino:buttons list="create-connection-provider" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>
