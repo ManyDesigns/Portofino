@@ -1065,7 +1065,8 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         }
 
         if(enabled && inPk && !inFk &&
-           Number.class.isAssignableFrom(column.getActualJavaType())) {
+           Number.class.isAssignableFrom(column.getActualJavaType()) &&
+           !column.isAutoincrement()) {
             for(PrimaryKeyColumn pkc : table.getPrimaryKey().getPrimaryKeyColumns()) {
                 if(pkc.getActualColumn().equals(column)) {
                     pkc.setGenerator(new IncrementGenerator(pkc));
