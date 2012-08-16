@@ -742,6 +742,10 @@ public class HibernateConfig {
         List<String> columnNames = new ArrayList<String>();
 
         for (Reference ref : relationship.getReferences()) {
+            if(ref.getActualFromColumn() == null) {
+                logger.error("Missing from column {}, skipping relationship", ref.getFromColumn());
+                return;
+            }
             columnNames.add(ref.getFromColumn());
         }
 
@@ -753,13 +757,24 @@ public class HibernateConfig {
                 config.getClassMapping(oneMDQualifiedTableName));
         m2o.setReferencedEntityName(oneMDQualifiedTableName);
         m2o.createPropertyRefConstraints(persistentClasses);
+
+        PersistentClass manyClass = config.getClassMapping(manyMDQualifiedTableName);
         for (String columnName : columnNames) {
             Column col = new Column();
             col.setName(escapeName(columnName));
+            //Recupero la colonna precedentemente associata alla tabella:
+            //essa ha uno uniqueIdentifier generato al momento dell'associazione alla tabella;
+            //questo viene utilizzato per disambiguare l'alias della colonna nelle query
+            //SQL generate da Hibernate.
+            col = manyClass.getTable().getColumn(col);
+            if(col == null) {
+                logger.error("Column not found in 'many' entity {}: {}, " +
+                             "skipping relationship", manyClass.getEntityName(), escapeName(columnName));
+                return;
+            }
             m2o.addColumn(col);
         }
 
-        
         Property prop = new Property();
         prop.setName(relationship.getActualOnePropertyName());
         prop.setNodeName(relationship.getActualOnePropertyName());
