@@ -127,8 +127,6 @@ public class PageAdminAction extends AbstractPageAction {
     // Reload model fields
     //--------------------------------------------------------------------------
 
-    protected boolean runLiquibase;
-
     @Before
     public Resolution prepare() {
         Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
@@ -235,7 +233,7 @@ public class PageAdminAction extends AbstractPageAction {
     @RequiresAdministrator
     public Resolution reloadModel() {
         synchronized (application) {
-            application.loadXmlModel(runLiquibase);
+            application.loadXmlModel();
             DispatcherLogic.clearConfigurationCache();
             return new RedirectResolution(dispatch.getOriginalPath());
         }
@@ -1165,11 +1163,4 @@ public class PageAdminAction extends AbstractPageAction {
         return dispatch.getAbsoluteOriginalPath();
     }
 
-    public boolean isRunLiquibase() {
-        return runLiquibase;
-    }
-
-    public void setRunLiquibase(boolean runLiquibase) {
-        this.runLiquibase = runLiquibase;
-    }
 }

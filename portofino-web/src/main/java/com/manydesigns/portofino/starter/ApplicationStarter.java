@@ -268,7 +268,7 @@ public class ApplicationStarter {
             tmpApplication = new DefaultApplication(appId,
                     portofinoConfiguration, appConfiguration, databasePlatformsManager,
                     appDir);
-            tmpApplication.loadXmlModel(true);
+            tmpApplication.loadXmlModel();
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);
             return false;

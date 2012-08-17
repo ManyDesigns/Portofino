@@ -184,7 +184,7 @@ public class DefaultApplication implements Application {
     // Model loading
     //**************************************************************************
 
-    public synchronized void loadXmlModel(boolean executeUserScripts) {
+    public synchronized void loadXmlModel() {
         logger.info("Loading xml model from file: {}",
                 appModelFile.getAbsolutePath());
 
@@ -194,9 +194,7 @@ public class DefaultApplication implements Application {
             model = (Model) um.unmarshal(appModelFile);
             boolean syncOnStart = false;
             initModel();
-            if(executeUserScripts) {
-                runLiquibaseScripts();
-            }
+            runLiquibaseScripts();
             if (syncOnStart) {
                 List<String> databaseNames = new ArrayList<String>();
                 for (Database sourceDatabase : model.getDatabases()) {
@@ -214,6 +212,8 @@ public class DefaultApplication implements Application {
         }
     }
 
+    protected Date lastLiquibaseRunTime = new Date(0);
+
     protected void runLiquibaseScripts() {
         logger.info("Updating database definitions");
         ResourceAccessor resourceAccessor =
@@ -228,6 +228,14 @@ public class DefaultApplication implements Application {
                         MessageFormat.format(
                                 changelogFileNameTemplate, databaseName + "-" + schemaName);
                 File changelogFile = new File(appDbsDir, changelogFileName);
+                if(!changelogFile.isFile()) {
+                    logger.info("Changelog file does not exist or is not a normal file, skipping: {}", changelogFile);
+                    continue;
+                }
+                if(changelogFile.lastModified() <= lastLiquibaseRunTime.getTime()) {
+                    logger.info("Changelog file not modified since last reload, skipping: {}", changelogFile);
+                    continue;
+                }
                 logger.info("Running changelog file: {}", changelogFile);
                 Connection connection = null;
                 try {
@@ -255,9 +263,11 @@ public class DefaultApplication implements Application {
                 }
             }
         }
+        lastLiquibaseRunTime = new Date();
     }
 
-    public void saveXmlModel() throws IOException, JAXBException {
+    public synchronized void saveXmlModel() throws IOException, JAXBException {
+        //TODO gestire conflitti con modifiche esterne?
         File tempFile = File.createTempFile(appModelFile.getName(), "");
 
         JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
@@ -266,7 +276,7 @@ public class DefaultApplication implements Application {
         m.marshal(model, tempFile);
 
         moveFileSafely(tempFile, appModelFile.getAbsolutePath());
-
+        lastLiquibaseRunTime = new Date(0);
         logger.info("Saved xml model to file: {}", appModelFile);
     }
 

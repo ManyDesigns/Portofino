@@ -15,7 +15,7 @@
             position: relative; margin-left: 10em;
         }
         .calendar-legend-area {
-            position: absolute; overflow: hidden; top: 3.5em; left: 0;
+            position: absolute; overflow-x: hidden; overflow-y: auto; top: 3.5em; left: 0; height: 96%;
         }
         a.calendar-legend-hide-link, .calendar-legend-show-link a {
             border: none;
