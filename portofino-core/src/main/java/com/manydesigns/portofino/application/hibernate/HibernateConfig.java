@@ -543,15 +543,20 @@ public class HibernateConfig {
                     }
                 }
                 if(!found){
+                    logger.warn("Property '{}' not found, skipping relationship {}",
+                                relationship.getActualManyPropertyName(),
+                                relationship.getQualifiedName());
                     return;
                 }
             } catch (Exception e) {
                 //se non c'e' non inserisco la relazione
+                logger.warn("Property not found, skipping relationship ", e);
                 return;
             }
         }
         //relazione virtuali fra Database differenti
         if(!manyMDTable.getDatabaseName().equalsIgnoreCase(oneMDTable.getDatabaseName())){
+            logger.warn("Relationship crosses databases, skipping: {}", relationship.getQualifiedName());
             return;
         }
 
@@ -769,7 +774,7 @@ public class HibernateConfig {
             col = manyClass.getTable().getColumn(col);
             if(col == null) {
                 logger.error("Column not found in 'many' entity {}: {}, " +
-                             "skipping relationship", manyClass.getEntityName(), escapeName(columnName));
+                             "skipping relationship", manyClass.getEntityName(), columnName);
                 return;
             }
             m2o.addColumn(col);
@@ -785,15 +790,15 @@ public class HibernateConfig {
         clazz.addProperty(prop);
     }
 
-    private Property getRefProperty(PersistentClass clazzOne, String colToName) {
+    private Property getRefProperty(PersistentClass clazzOne, String propertyName) {
         Property refProp;
         if (null != clazzOne.getIdentifierProperty()) {
             refProp = clazzOne.getIdentifierProperty();
         } else if (null != clazzOne.getIdentifier()) {
             refProp = ((Component) clazzOne.getIdentifier())
-                    .getProperty(colToName);
+                    .getProperty(propertyName);
         } else {
-            refProp = clazzOne.getProperty(colToName);
+            refProp = clazzOne.getProperty(propertyName);
         }
         return refProp;
     }
