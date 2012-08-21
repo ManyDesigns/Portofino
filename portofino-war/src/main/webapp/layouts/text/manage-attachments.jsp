@@ -37,7 +37,14 @@
                 </c:forEach>
             </table>
             <br/>
-            <portofino:buttons list="manage-attachments-delete" cssClass="portletButton" />
+            <portofino:buttons list="manage-attachments-delete" cssClass="portletButton manage-attachments-delete" />
+            <script type="text/javascript">
+                $(function() {
+                    $("button.manage-attachments-delete").click(function() {
+                        return confirm('<fmt:message key="layouts.text.manage-attachments.confirm_delete"/>');
+                    });
+                });
+            </script>
         </c:if><c:if test="${empty actionBean.textConfiguration.attachments}">
             <fmt:message key="layouts.text.manage-attachments.manage_attachments_for_page"/>
         </c:if>
