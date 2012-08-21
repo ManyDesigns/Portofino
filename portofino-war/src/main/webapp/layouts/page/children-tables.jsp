@@ -5,6 +5,7 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
+<p><fmt:message key="page.children.help" /></p>
 <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
 <div class="childrenTable">
     <mde:write name="actionBean" property="childPagesForm" />
