@@ -498,6 +498,7 @@ Search form
 .search_results {
     overflow-x: auto;
     overflow-y: hidden; /* Fixes a bug in Chrome */
+    padding-bottom: 1px;
 }
 
 .search_results.withSearchForm {

@@ -211,11 +211,10 @@ public class LoginAction extends AbstractActionBean {
 
         URL url = new URL(context.getRequest().getRequestURL().toString());
         String port = url.getPort() > 0 ? ":" + url.getPort() : "";
-        String urlString =
-                url.getProtocol() + "://" + url.getHost() + port +
-                context.getRequest().getContextPath() + urlBuilder;
+        String baseUrl = url.getProtocol() + "://" + url.getHost() + port;
+        String urlString = baseUrl + context.getRequest().getContextPath() + urlBuilder;
         // obtain a AuthRequest message to be sent to the OpenID provider
-        AuthRequest authReq = manager.authenticate(discovered, urlString);
+        AuthRequest authReq = manager.authenticate(discovered, urlString, baseUrl);
 
         // store the discovery information in the user's session for later use
         // leave out for stateless operation / if there is no session
