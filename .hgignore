@@ -3,7 +3,6 @@
 ^portofino-core/target
 ^portofino-web/target
 ^portofino-war/target
-^portofino-pageactions-extras/target
 ^elements/target
 ^elements-struts1/target
 ^elements-struts2/target
