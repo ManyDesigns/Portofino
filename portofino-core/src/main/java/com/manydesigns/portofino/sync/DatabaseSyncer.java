@@ -421,7 +421,6 @@ public class DatabaseSyncer {
             logger.debug("Merging table attributes and annotations");
             targetTable.setEntityName(sourceTable.getEntityName());
             targetTable.setJavaClass(sourceTable.getJavaClass());
-            targetTable.setManyToMany(sourceTable.getManyToMany());
             targetTable.setShortName(sourceTable.getShortName());
             copyAnnotations(sourceTable, targetTable);
 

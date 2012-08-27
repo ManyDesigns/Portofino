@@ -67,7 +67,6 @@ public class Table implements ModelObject, Annotated {
     protected String tableName;
     protected String entityName;
 
-    protected Boolean manyToMany;
     protected String javaClass;
 
     protected String shortName;
@@ -206,15 +205,6 @@ public class Table implements ModelObject, Annotated {
 
     public void setTableName(String tableName) {
         this.tableName = tableName;
-    }
-
-    @XmlAttribute(required = false)
-    public Boolean getManyToMany() {
-        return manyToMany;
-    }
-
-    public void setManyToMany(Boolean manyToMany) {
-        this.manyToMany = manyToMany;
     }
 
     @XmlAttribute(required = false)

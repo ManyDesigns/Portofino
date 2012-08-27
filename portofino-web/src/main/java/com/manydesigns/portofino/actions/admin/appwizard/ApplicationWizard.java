@@ -545,7 +545,6 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             if(!StringUtils.isEmpty(userGroupTableName)) {
                 name = DatabaseLogic.splitQualifiedTableName(userGroupTableName);
                 userGroupTable = DatabaseLogic.findTableByName(tmpModel, name[0], name[1], name[2]);
-                userGroupTable.setManyToMany(true);
             }
 
             createUserManagementSetupForm();

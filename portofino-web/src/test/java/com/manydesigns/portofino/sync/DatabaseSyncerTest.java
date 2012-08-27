@@ -85,7 +85,6 @@ public class DatabaseSyncerTest extends AbstractPortofinoTest {
         assertTrue(table.getAnnotations().isEmpty());
         assertNull(table.getJavaClass());
         assertNull(table.getEntityName());
-        assertNull(table.getManyToMany());
 
         List<Column> columns = table.getColumns();
         assertEquals(2, columns.size());
@@ -186,7 +185,6 @@ public class DatabaseSyncerTest extends AbstractPortofinoTest {
         table = schema.getTables().get(0);
         table.setJavaClass("com.foo.Bar");
         table.setEntityName("entity.name");
-        table.setManyToMany(true);
         PrimaryKey wrongPrimaryKey = new PrimaryKey();
         wrongPrimaryKey.setPrimaryKeyName("wrongName");
         table.setPrimaryKey(wrongPrimaryKey);
@@ -240,7 +238,6 @@ public class DatabaseSyncerTest extends AbstractPortofinoTest {
         assertFalse("wrongName".equals(primaryKey.getPrimaryKeyName()));
         assertEquals("com.foo.Bar", table.getJavaClass());
         assertEquals("entity.name", table.getEntityName());
-        assertTrue(table.getManyToMany());
         List<Annotation> annotations = table.getAnnotations();
         assertEquals(1, annotations.size());
         annotation = annotations.get(0);

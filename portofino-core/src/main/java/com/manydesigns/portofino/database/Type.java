@@ -395,4 +395,33 @@ public class Type {
                 return false;
         }
     }
+
+    public boolean isNumeric() {
+        switch (jdbcType) {
+            case Types.NUMERIC:
+            case Types.DECIMAL:
+            case Types.INTEGER:
+            case Types.FLOAT:
+            case Types.DOUBLE:
+            case Types.BIGINT:
+            case Types.SMALLINT:
+            case Types.TINYINT:
+            case Types.REAL:
+                return true;
+            default: return false;
+        }
+    }
+
+    public boolean isString() {
+        switch (jdbcType) {
+            case Types.CHAR:
+            case Types.VARCHAR:
+            case Types.NCHAR:
+            case Types.NVARCHAR:
+            case Types.CLOB:
+            case Types.NCLOB:
+                return true;
+            default: return false;
+        }
+    }
 }

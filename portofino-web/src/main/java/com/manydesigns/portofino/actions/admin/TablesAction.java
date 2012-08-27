@@ -29,33 +29,32 @@
 
 package com.manydesigns.portofino.actions.admin;
 
-import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.AnnotationsManager;
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.PropertiesAccessor;
-import com.manydesigns.elements.text.OgnlTextFormat;
-import com.manydesigns.portofino.dispatcher.AbstractActionBean;
+import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.model.AnnModel;
-import com.manydesigns.portofino.actions.model.PrimaryKeyColumnModel;
-import com.manydesigns.portofino.actions.model.PrimaryKeyModel;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ModelObjectNotFoundError;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
+import com.manydesigns.portofino.dispatcher.AbstractActionBean;
+import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.model.database.Column;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
+import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.security.RequiresAdministrator;
+import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import net.sourceforge.stripes.action.*;
-import net.sourceforge.stripes.controller.ActionResolver;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -66,11 +65,11 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 
 /*
@@ -80,10 +79,12 @@ import java.util.Set;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @RequiresAdministrator
-@UrlBinding("/actions/admin/tables")
+@UrlBinding(TablesAction.BASE_ACTION_PATH + "{databaseName}/{schemaName}/{tableName}")
 public class TablesAction extends AbstractActionBean implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
+
+    public static final String BASE_ACTION_PATH = "/actions/admin/tables/";
 
     //**************************************************************************
     // Injections
@@ -96,46 +97,26 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     public Application application;
 
     //**************************************************************************
-    // STEP del wizard
-    //**************************************************************************
-    private static final int ANNOTATION_STEP = 4;
-    private static final int COLUMN_STEP = 2;
-    private static final int TABLE_STEP = 1;
-    private static final int PRIMARYKEY_STEP = 3;
-
-    //**************************************************************************
-    // Ex PortofinoAction
-    //**************************************************************************
-    public final static String CREATE = "create";
-    public final static String CANCEL = "cancel";
-
-    //**************************************************************************
     // Web parameters
     //**************************************************************************
     public InputStream inputStream;
 
-    public String qualifiedTableName;
+    protected String databaseName;
+    protected String schemaName;
+    protected String tableName;
+
     public String cancelReturnUrl;
     public Table table;
+
     public final List<String> annotations;
     public final List<String> annotationsImpl;
     public List<AnnModel> colAnnotations;
-    public PrimaryKeyModel pkModel;
-    public String pk_primaryKeyName;
-    public String pk_column;
-    public String colAnn_annotationName;
+
 
     public List<String> columnNames;
 
-    //Contatori righe TableForm
-    public Integer ncol;
-    public Integer npkcol;
-    public Integer nAnnotations;
-
-    //righe da rimuovere
-    public String[] cols_selection;
-    public String[] pkCols_selection;
-    public String[] colAnnT_selection;
+    //Selection provider
+    protected String relName;
 
     //testo parziale per autocomplete
     public String term;
@@ -143,28 +124,18 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     //Step
     public Integer step;
 
-
-    //**************************************************************************
-    // Web parameters setters (for struts.xml inspections in IntelliJ)
-    //**************************************************************************
-    public void setQualifiedTableName(String qualifiedTableName) {
-        this.qualifiedTableName = qualifiedTableName;
-    }
-
-
     //**************************************************************************
     // Forms
     //**************************************************************************
-    public TableForm multilineForm;
     public Form tableForm;
-    public Form columnForm;
+    public TableForm columnsTableForm;
+
     public Form pkForm;
     public Form pkColumnForm;
     //public Form colAnnotationForm;
     public Form annForm;
     public Form annPropForm;
 
-    public TableForm columnTableForm;
     public TableForm pkColumnTableForm;
     public TableForm colAnnotationTableForm;
 
@@ -217,25 +188,124 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
 
     @DefaultHandler
     public Resolution execute() {
-        if (qualifiedTableName == null) {
+        if (tableName == null) {
             return search();
         } else {
-            return read();
+            return edit();
         }
     }
 
     public Resolution search() {
-        List<Table> tableList = DatabaseLogic.getAllTables(model);
-        multilineForm = new TableFormBuilder(Table.class)
-                .configFields("databaseName", "schemaName", "tableName")
-                .configNRows(tableList.size())
-                .configMode(Mode.VIEW)
-                .build();
-        multilineForm.readFromObject(tableList);
-        multilineForm.setSelectable(true);
         return new ForwardResolution("/layouts/admin/tables/list.jsp");
     }
 
+    public Resolution edit() {
+        setupTableForm();
+        setupColumnsForm();
+        return new ForwardResolution("/layouts/admin/tables/edit.jsp");
+    }
+
+    @Button(key = "commons.save", list = "tables-edit-table")
+    public Resolution saveTable() {
+        setupTableForm();
+        setupColumnsForm();
+        tableForm.readFromRequest(context.getRequest());
+        if(tableForm.validate()) {
+            tableForm.writeToObject(table);
+            try {
+                model.init();
+                application.saveXmlModel();
+                DispatcherLogic.clearConfigurationCache();
+            } catch (Exception e) {
+                logger.error("Could not save model", e);
+                SessionMessages.addErrorMessage(e.toString());
+            }
+        }
+        return new ForwardResolution("/layouts/admin/tables/edit.jsp");
+    }
+
+    protected void setupTableForm() {
+        table = findTable();
+        tableForm = new FormBuilder(Table.class)
+                .configFields("entityName", "javaClass", "shortName")
+                .build();
+        Field shortNameField = tableForm.findFieldByPropertyName("shortName");
+        shortNameField.setInsertable(false);
+        shortNameField.setUpdatable(false);
+        tableForm.readFromObject(table);
+    }
+
+    protected void setupColumnsForm() {
+        Type[] types = application.getConnectionProvider(table.getDatabaseName()).getTypes();
+        DefaultSelectionProvider typesSP = new DefaultSelectionProvider("columnType", 2);
+        for(int i = 0; i < types.length; i++) {
+            Type t = types[i];
+            List<Class> javaTypes = getAvailableJavaTypes(t);
+            for(Class c : javaTypes) {
+                typesSP.appendRow(
+                        new Object[] { i, c.getName() },
+                        new String[] { t.getTypeName() + " (JDBC: " + t.getJdbcType() + ")", c.getSimpleName() },
+                        true);
+            }
+        }
+
+        columnsTableForm = new TableFormBuilder(ColumnForm.class)
+                .configFields("columnName", "propertyName", "typeIndex", "length", "scale", "javaType", "nullable")
+                .configSelectionProvider(typesSP, "typeIndex", "javaType")
+                .configNRows(table.getColumns().size())
+                .build();
+        columnsTableForm.setSelectable(true);
+        columnsTableForm.setCaption("Columns");
+        List<ColumnForm> cols = new ArrayList<ColumnForm>(table.getColumns().size());
+        for(Column col : table.getColumns()) {
+            try {
+                ColumnForm cf = new ColumnForm(col, types);
+                cols.add(cf);
+            } catch (Exception e) {
+                throw new Error(e);
+            }
+        }
+        columnsTableForm.readFromObject(cols);
+    }
+
+    protected List<Class> getAvailableJavaTypes(Type t) {
+        List<Class> result;
+        if(t.isNumeric()) {
+            result = Arrays.asList(new Class[] {
+                    Integer.class, Long.class, Byte.class, Short.class,
+                    Float.class, Double.class, BigInteger.class, BigDecimal.class });
+        } else if(t.isString()) {
+            result = Arrays.asList(new Class[] { String.class });
+        } else {
+            result = Arrays.asList(new Class[] { t.getDefaultJavaType() });
+        }
+        result = new ArrayList<Class>(result);
+        result.remove(t.getDefaultJavaType());
+        result.add(0, t.getDefaultJavaType());
+        return result;
+    }
+
+    /*public Resolution jsonSelectFieldOptions() {
+        if("columnType".equals(relName)) {
+            setupTableForm();
+            setupColumnsForm();
+            HttpServletRequest request = context.getRequest();
+            columnsTableForm.readFromRequest(request);
+            for(TableForm.Row row : columnsTableForm.getRows()) {
+                for(Field field : row) {
+                    if(field.getPropertyAccessor().getName().equals("javaType") &&
+                       request.getParameter(field.getInputName()) != null) {
+                        field.readFromRequest(request);
+                        String text = ((SelectField) field).jsonSelectFieldOptions(false);
+                        return new NoCacheStreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, text);
+                    }
+                }
+            }
+        }
+        return null;
+    }*/
+
+    /*
     public Resolution read() {
         Table table = setupTable();
 
@@ -252,18 +322,17 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 .build();
         columnTableForm.readFromObject(table.getColumns());
         return new ForwardResolution("/layouts/admin/tables/read.jsp");
-    }
+    }*/
 
     //**************************************************************************
     // Common methods
     //**************************************************************************
 
-    public Table setupTable() {
-        String[] name = DatabaseLogic.splitQualifiedTableName(qualifiedTableName);
+    public Table findTable() {
         Table table = DatabaseLogic.findTableByName(
-                model, name[0], name[1], name[2]);
+                model, databaseName, schemaName, tableName);
         if (table == null) {
-            throw new ModelObjectNotFoundError(qualifiedTableName);
+            throw new ModelObjectNotFoundError(databaseName + "." + schemaName + "." + tableName);
         }
         return table;
     }
@@ -277,8 +346,8 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     // Cancel
     //**************************************************************************
 
-    public String cancel() {
-        return CANCEL;
+    public Resolution cancel() {
+        return null; //TODO
     }
 
     //**************************************************************************
@@ -294,25 +363,8 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     // Add new Column
     //**************************************************************************
 
-    @Button(list = "tables-list", key = "commons.create", order = 1)
+    /*@Button(list = "tables-list", key = "commons.create", order = 1)
     public String create() throws CloneNotSupportedException {
-        /*CreateTableStatement cts = new CreateTableStatement("pubLic", "teZt");
-        cts.addColumn("a1", new VarcharType());
-        CreateTableGenerator generator = new CreateTableGenerator();
-        try {
-            Database database =
-                   CommandLineUtils.createDatabaseObject(getClass().getClassLoader(),
-                            "jdbc:postgresql://127.0.0.1:5432/portofino4", "manydesigns", "manydesigns", "org.postgresql.Driver",
-                            "public", "liquibase.database.core.PostgresDatabase");
-            SortedSet<SqlGenerator> sqlGenerators = new TreeSet<SqlGenerator>();
-            sqlGenerators.add(generator);
-            Sql[] sqls =  generator.generateSql(cts, database, new SqlGeneratorChain(sqlGenerators) );
-            for(Sql sql : sqls){
-                System.out.println(sql.toSql());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }*/
         setupForms();
         step= TABLE_STEP;
         return CREATE;
@@ -541,15 +593,13 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         pkColumnTableForm.readFromObject(pkModel);
 
         return CREATE;
-    }
+    }*/
 
-    //**************************************************************************
-    // private methods
-    //**************************************************************************
     //**************************************************************************
     // Preparazione dei form
     //**************************************************************************
-    private void setupForms() {
+
+    /*private void setupForms() {
         if (ncol == null){
             ncol = 0;
         }
@@ -634,12 +684,12 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
             }
         }
 
-    }
+    }*/
 
     //**************************************************************************
     // Inizializzazione dei form a partire dalla request
     //**************************************************************************
-    private boolean readFromRequest() {
+    /*private boolean readFromRequest() {
         if(null==table_databaseName){
             return false;
         }
@@ -746,7 +796,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         annPropForm.readFromRequest(req);
 
         return true;
-    }
+    }*/
 
 
 
@@ -850,7 +900,55 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     }
 
     public String getActionPath() {
-        return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
+        String path = BASE_ACTION_PATH;
+        if(tableName != null) {
+            path += "/" + databaseName + "/" + schemaName + "/" + tableName;
+        }
+        return path;
+    }
+
+    public Model getModel() {
+        return model;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
+
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public Table getTable() {
+        return table;
+    }
+
+    public Form getTableForm() {
+        return tableForm;
+    }
+
+    public TableForm getColumnsTableForm() {
+        return columnsTableForm;
+    }
+
+    public void setRelName(String relName) {
+        this.relName = relName;
     }
 }
 
