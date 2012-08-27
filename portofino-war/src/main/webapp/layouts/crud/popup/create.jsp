@@ -12,7 +12,7 @@
         <portofino:buttons list="crud-create" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.crudConfiguration.createTitle}"/>
+        <c:out value="${actionBean.createTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:if test="${actionBean.requiredFieldsPresent}">

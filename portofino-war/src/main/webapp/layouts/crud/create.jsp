@@ -12,7 +12,7 @@
         <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.crudConfiguration.createTitle}"/>
+        <c:out value="${actionBean.createTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:if test="${actionBean.requiredFieldsPresent}">

@@ -8,7 +8,7 @@
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.CrudAction"/>
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.crudConfiguration.searchTitle}"/>
+        <c:out value="${actionBean.searchTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:if test="${not empty actionBean.searchForm}">

@@ -5,8 +5,8 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
-%><stripes:layout-render name="/skins/${skin}/${actionBean.pageTemplate}/modal.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.CrudAction"/>
+%><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.CrudAction"
+/><stripes:layout-render name="/skins/${skin}/${actionBean.pageTemplate}/modal.jsp">
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="configuration" cssClass="contentButton" />
         <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />

@@ -8,7 +8,7 @@
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.CrudAction"/>
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.crudConfiguration.readTitle}"/>
+        <c:out value="${actionBean.readTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="form"/>

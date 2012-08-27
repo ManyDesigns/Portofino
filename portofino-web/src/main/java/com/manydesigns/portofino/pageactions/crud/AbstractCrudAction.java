@@ -2194,6 +2194,30 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Accessors
     //--------------------------------------------------------------------------
 
+    public String getReadTitle() {
+        String title = crudConfiguration.getReadTitle();
+        OgnlTextFormat textFormat = OgnlTextFormat.create(StringUtils.defaultString(title));
+        return textFormat.format(this);
+    }
+
+    public String getSearchTitle() {
+        String title = crudConfiguration.getSearchTitle();
+        OgnlTextFormat textFormat = OgnlTextFormat.create(StringUtils.defaultString(title));
+        return textFormat.format(this);
+    }
+
+    public String getEditTitle() {
+        String title = crudConfiguration.getEditTitle();
+        OgnlTextFormat textFormat = OgnlTextFormat.create(StringUtils.defaultString(title));
+        return textFormat.format(this);
+    }
+
+    public String getCreateTitle() {
+        String title = crudConfiguration.getCreateTitle();
+        OgnlTextFormat textFormat = OgnlTextFormat.create(StringUtils.defaultString(title));
+        return textFormat.format(this);
+    }
+
     public CrudConfiguration getCrudConfiguration() {
         return crudConfiguration;
     }

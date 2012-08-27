@@ -4,15 +4,15 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
-%><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="/skins/${skin}/${actionBean.pageTemplate}/modal.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.CrudAction"/>
+%><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
+%><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.CrudAction"
+/><stripes:layout-render name="/skins/${skin}/${actionBean.pageTemplate}/modal.jsp">
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="crud-edit" cssClass="contentButton" />
         <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.crudConfiguration.editTitle}"/>
+        <c:out value="${actionBean.editTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:if test="${actionBean.requiredFieldsPresent}">
