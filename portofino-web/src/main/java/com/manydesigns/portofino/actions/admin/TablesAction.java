@@ -31,14 +31,12 @@ package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.annotations.AnnotationsManager;
 import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.model.AnnModel;
 import com.manydesigns.portofino.application.Application;
@@ -53,14 +51,12 @@ import com.manydesigns.portofino.model.database.Column;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.annotation.ElementType;
@@ -237,25 +233,36 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
 
     protected void setupColumnsForm() {
         Type[] types = application.getConnectionProvider(table.getDatabaseName()).getTypes();
-        DefaultSelectionProvider typesSP = new DefaultSelectionProvider("columnType", 2);
+        DefaultSelectionProvider typesSP = new DefaultSelectionProvider("columnType", 3);
         for(int i = 0; i < types.length; i++) {
-            Type t = types[i];
-            List<Class> javaTypes = getAvailableJavaTypes(t);
-            for(Class c : javaTypes) {
-                typesSP.appendRow(
-                        new Object[] { i, c.getName() },
-                        new String[] { t.getTypeName() + " (JDBC: " + t.getJdbcType() + ")", c.getSimpleName() },
-                        true);
+            for(Column column : table.getColumns()) {
+                //TODO vincolare il tipo di default alla colonna (precision e scale)
+                Type t = types[i];
+                List<Class> javaTypes = getAvailableJavaTypes(t);
+                for(Class c : javaTypes) {
+                    typesSP.appendRow(
+                            new Object[] { column, i, c.getName() },
+                            new String[] { column.getColumnName(),
+                                           t.getTypeName() + " (JDBC: " + t.getJdbcType() + ")",
+                                    c.getSimpleName() },
+                            true);
+                }
             }
         }
 
         columnsTableForm = new TableFormBuilder(ColumnForm.class)
-                .configFields("columnName", "propertyName", "typeIndex", "length", "scale", "javaType", "nullable")
-                .configSelectionProvider(typesSP, "typeIndex", "javaType")
+                .configFields("columnName", "propertyName", "javaType", "typeIndex", "length", "scale", "nullable")
+                .configSelectionProvider(typesSP, "columnName", "typeIndex", "javaType")
                 .configNRows(table.getColumns().size())
                 .build();
         columnsTableForm.setSelectable(true);
         columnsTableForm.setCaption("Columns");
+        for(TableForm.Row row : columnsTableForm.getRows()) {
+            Field nullableField = row.findFieldByPropertyName("nullable");
+            //Work around Introspector bug
+            nullableField.setInsertable(false);
+            nullableField.setUpdatable(false);
+        }
         List<ColumnForm> cols = new ArrayList<ColumnForm>(table.getColumns().size());
         for(Column col : table.getColumns()) {
             try {
@@ -845,7 +852,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     //**************************************************************************
     // Json output per i corretti Java types per una piattaforma
     //**************************************************************************
-    public String jsonJavaTypes() throws Exception {
+    /*public String jsonJavaTypes() throws Exception {
         Type[] types = application.getConnectionProvider(table_databaseName).getTypes();
         List<String> javaTypesString = new ArrayList<String>();
 
@@ -864,7 +871,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         String result = "["+ StringUtils.join(javaTypesString, ",")+"]";
         inputStream = new ByteArrayInputStream(result.getBytes());
         return "json";
-    }
+    }*/
     
     //**************************************************************************
     // Json output per vedere se richiesta Precision, Scale, ...

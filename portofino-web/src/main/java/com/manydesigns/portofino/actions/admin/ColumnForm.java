@@ -69,12 +69,16 @@ public class ColumnForm extends Column {
 
     @Override
     @FieldSize(4)
+    @Updatable(false)
+    @Insertable(false)
     public Integer getLength() {
         return super.getLength();
     }
 
     @Override
     @FieldSize(4)
+    @Updatable(false)
+    @Insertable(false)
     public Integer getScale() {
         return super.getScale();
     }
@@ -100,15 +104,8 @@ public class ColumnForm extends Column {
     }
 
     @Override
-    @Updatable(false)
-    @Insertable(false)
-    @Label("Null")
     public boolean isNullable() {
         return super.isNullable();
     }
 
-    @Override
-    public void setNullable(boolean nullable) {
-        super.setNullable(nullable);
-    }
 }
