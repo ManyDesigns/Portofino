@@ -157,9 +157,12 @@ public class Type {
             case Types.TIMESTAMP:
                 return Timestamp.class;
             case Types.DECIMAL:
-                return BigDecimal.class;
             case Types.NUMERIC:
-                return BigDecimal.class;
+                if(scale > 0) {
+                    return BigDecimal.class;
+                } else {
+                    return getDefaultIntegerType(precision);
+                }
             case Types.DOUBLE:
                 return Double.class;
             case Types.REAL:
@@ -167,11 +170,7 @@ public class Type {
             case Types.FLOAT:
                 return Float.class;
             case Types.INTEGER:
-                if(precision < Math.log10(Integer.MAX_VALUE)) {
-                    return Integer.class;
-                } else {
-                    return BigInteger.class;
-                }
+                return getDefaultIntegerType(precision);
             case Types.SMALLINT:
                 return Short.class;
             case Types.TINYINT:
@@ -204,6 +203,16 @@ public class Type {
             default:
                 logger.warn("Unsupported jdbc type: {}", jdbcType);
                 return null;
+        }
+    }
+
+    public static Class<? extends Number> getDefaultIntegerType(long precision) {
+        if(precision < Math.log10(Integer.MAX_VALUE) + 1) {
+            return Integer.class;
+        } else if(precision < Math.log10(Long.MAX_VALUE) + 1) {
+            return Long.class;
+        } else {
+            return BigInteger.class;
         }
     }
 
@@ -412,16 +421,4 @@ public class Type {
         }
     }
 
-    public boolean isString() {
-        switch (jdbcType) {
-            case Types.CHAR:
-            case Types.VARCHAR:
-            case Types.NCHAR:
-            case Types.NVARCHAR:
-            case Types.CLOB:
-            case Types.NCLOB:
-                return true;
-            default: return false;
-        }
-    }
 }

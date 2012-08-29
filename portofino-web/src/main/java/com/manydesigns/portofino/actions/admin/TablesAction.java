@@ -234,26 +234,47 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     protected void setupColumnsForm() {
         Type[] types = application.getConnectionProvider(table.getDatabaseName()).getTypes();
         DefaultSelectionProvider typesSP = new DefaultSelectionProvider("columnType", 3);
-        for(int i = 0; i < types.length; i++) {
-            for(Column column : table.getColumns()) {
-                //TODO vincolare il tipo di default alla colonna (precision e scale)
-                Type t = types[i];
-                List<Class> javaTypes = getAvailableJavaTypes(t);
-                for(Class c : javaTypes) {
+        List<ColumnForm> decoratedCols = new ArrayList<ColumnForm>(table.getColumns().size());
+        List<Column> cols = new ArrayList<Column>(table.getColumns().size());
+
+        for(Column column : table.getColumns()) {
+            for (Type type : types) {
+                if (type.getJdbcType() != column.getJdbcType()) {
+                    continue;
+                }
+
+                int index = cols.indexOf(column);
+                if(index > 0) {
+                    ColumnForm cf = decoratedCols.get(index);
+                    if(cf.getType().getTypeName().equals(column.getColumnType())) {
+                        continue; //Column in the list is already the best matching type
+                    } else {
+                        //Replace in form
+                        decoratedCols.set(index, new ColumnForm(column, type));
+                    }
+                } else {
+                    cols.add(column);
+                    //Add to form
+                    decoratedCols.add(new ColumnForm(column, type));
+                }
+
+                //Add to SP
+                List<Class> javaTypes = getAvailableJavaTypes(type, column);
+                for (Class c : javaTypes) {
                     typesSP.appendRow(
-                            new Object[] { column, i, c.getName() },
-                            new String[] { column.getColumnName(),
-                                           t.getTypeName() + " (JDBC: " + t.getJdbcType() + ")",
-                                    c.getSimpleName() },
+                            new Object[]{column.getColumnName(), type, c.getName()},
+                            new String[]{column.getColumnName(),
+                                    type.getTypeName() + " (JDBC: " + type.getJdbcType() + ")",
+                                    c.getSimpleName()},
                             true);
                 }
             }
         }
 
         columnsTableForm = new TableFormBuilder(ColumnForm.class)
-                .configFields("columnName", "propertyName", "javaType", "typeIndex", "length", "scale", "nullable")
-                .configSelectionProvider(typesSP, "columnName", "typeIndex", "javaType")
-                .configNRows(table.getColumns().size())
+                .configFields("columnName", "propertyName", "javaType", "type", "length", "scale", "nullable")
+                .configSelectionProvider(typesSP, "columnName", "type", "javaType")
+                .configNRows(decoratedCols.size())
                 .build();
         columnsTableForm.setSelectable(true);
         columnsTableForm.setCaption("Columns");
@@ -263,32 +284,24 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
             nullableField.setInsertable(false);
             nullableField.setUpdatable(false);
         }
-        List<ColumnForm> cols = new ArrayList<ColumnForm>(table.getColumns().size());
-        for(Column col : table.getColumns()) {
-            try {
-                ColumnForm cf = new ColumnForm(col, types);
-                cols.add(cf);
-            } catch (Exception e) {
-                throw new Error(e);
-            }
-        }
-        columnsTableForm.readFromObject(cols);
+        columnsTableForm.readFromObject(decoratedCols);
     }
 
-    protected List<Class> getAvailableJavaTypes(Type t) {
+    protected List<Class> getAvailableJavaTypes(Type type, Column column) {
         List<Class> result;
-        if(t.isNumeric()) {
+        long precision = column.getLength() != null ? column.getLength() : type.getMaximumPrecision();
+        int scale = column.getScale() != null ? column.getScale() : type.getMaximumScale();
+        Class defaultJavaType = Type.getDefaultJavaType(column.getJdbcType(), precision, scale);
+        if(type.isNumeric()) {
             result = Arrays.asList(new Class[] {
                     Integer.class, Long.class, Byte.class, Short.class,
                     Float.class, Double.class, BigInteger.class, BigDecimal.class });
-        } else if(t.isString()) {
-            result = Arrays.asList(new Class[] { String.class });
         } else {
-            result = Arrays.asList(new Class[] { t.getDefaultJavaType() });
+            result = Arrays.asList(new Class[] { defaultJavaType });
         }
         result = new ArrayList<Class>(result);
-        result.remove(t.getDefaultJavaType());
-        result.add(0, t.getDefaultJavaType());
+        result.remove(type.getDefaultJavaType());
+        result.add(0, type.getDefaultJavaType());
         return result;
     }
 

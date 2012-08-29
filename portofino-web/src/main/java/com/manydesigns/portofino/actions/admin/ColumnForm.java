@@ -46,16 +46,15 @@ public class ColumnForm extends Column {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    protected int typeIndex;
-    protected Type[] availableTypes;
+    protected Type type;
 
-    public ColumnForm(Column copyFrom, Type[] availableTypes) throws InvocationTargetException, IllegalAccessException {
-        BeanUtils.copyProperties(this, copyFrom);
-        this.availableTypes = availableTypes;
-        typeIndex = 0;
-        while(availableTypes[typeIndex].getJdbcType() != copyFrom.getJdbcType()) {
-            typeIndex++;
+    public ColumnForm(Column copyFrom, Type type) {
+        try {
+            BeanUtils.copyProperties(this, copyFrom);
+        } catch (Exception e) {
+            throw new Error(e);
         }
+        this.type = type;
         setJavaType(copyFrom.getActualJavaType().getName());
     }
 
@@ -86,14 +85,8 @@ public class ColumnForm extends Column {
     @Label("Type")
     @Updatable(false)
     @Insertable(false)
-    public int getTypeIndex() {
-        return typeIndex;
-    }
-
-    public void setTypeIndex(int typeIndex) {
-        this.typeIndex = typeIndex;
-        setJdbcType(availableTypes[typeIndex].getJdbcType());
-        setColumnType(availableTypes[typeIndex].getTypeName());
+    public Type getType() {
+        return type;
     }
 
     @Override
