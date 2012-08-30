@@ -33,8 +33,7 @@ import com.manydesigns.elements.annotations.*;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.database.Column;
 import org.apache.commons.beanutils.BeanUtils;
-
-import java.lang.reflect.InvocationTargetException;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -55,7 +54,6 @@ public class ColumnForm extends Column {
             throw new Error(e);
         }
         this.type = type;
-        setJavaType(copyFrom.getActualJavaType().getName());
     }
 
     @Override
@@ -101,4 +99,8 @@ public class ColumnForm extends Column {
         return super.isNullable();
     }
 
+    public void copyTo(Column column) {
+        column.setJavaType(getJavaType());
+        column.setPropertyName(StringUtils.defaultIfEmpty(getPropertyName(), null));
+    }
 }

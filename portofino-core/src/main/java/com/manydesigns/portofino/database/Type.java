@@ -207,9 +207,9 @@ public class Type {
     }
 
     public static Class<? extends Number> getDefaultIntegerType(long precision) {
-        if(precision < Math.log10(Integer.MAX_VALUE) + 1) {
+        if(precision < Math.log10(Integer.MAX_VALUE)) {
             return Integer.class;
-        } else if(precision < Math.log10(Long.MAX_VALUE) + 1) {
+        } else if(precision < Math.log10(Long.MAX_VALUE)) {
             return Long.class;
         } else {
             return BigInteger.class;

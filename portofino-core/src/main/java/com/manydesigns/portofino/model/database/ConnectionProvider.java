@@ -36,9 +36,6 @@ import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
-import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelObjectVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +57,7 @@ import java.util.*;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @XmlAccessorType(XmlAccessType.NONE)
-public abstract class ConnectionProvider implements ModelObject {
+public abstract class ConnectionProvider {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
@@ -258,12 +255,6 @@ public abstract class ConnectionProvider implements ModelObject {
     public void afterUnmarshal(Unmarshaller u, Object parent) {
         this.database = (Database) parent;
     }
-
-    public void init(Model model) {}
-
-    public void link(Model model) {}
-
-    public void visitChildren(ModelObjectVisitor visitor) {}
 
     //**************************************************************************
     // Getters/setters

@@ -99,7 +99,6 @@ public class Database implements ModelObject {
     public void link(Model model) {}
 
     public void visitChildren(ModelObjectVisitor visitor) {
-        visitor.visit(connectionProvider);
         for (Schema schema : schemas) {
             visitor.visit(schema);
         }

@@ -18,7 +18,6 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="tableForm" />
-        <portofino:buttons list="tables-edit-table" cssClass="portletButton" />
         <div style="overflow-x: auto; padding-right: 1px;">
             <mde:write name="actionBean" property="columnsTableForm" />
         </div>
