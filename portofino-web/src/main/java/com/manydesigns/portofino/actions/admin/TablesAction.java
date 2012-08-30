@@ -72,7 +72,7 @@ import java.util.*;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @RequiresAdministrator
-@UrlBinding(TablesAction.BASE_ACTION_PATH + "{databaseName}/{schemaName}/{tableName}")
+@UrlBinding(TablesAction.BASE_ACTION_PATH + "{databaseName}/{schemaName}/{tableName}/{columnName}")
 public class TablesAction extends AbstractActionBean implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
@@ -97,6 +97,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     protected String databaseName;
     protected String schemaName;
     protected String tableName;
+    protected String columnName;
 
     public String cancelReturnUrl;
     public Table table;
@@ -170,8 +171,10 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     public Resolution execute() {
         if (tableName == null) {
             return search();
-        } else {
+        } else if(columnName == null) {
             return edit();
+        } else {
+            return null; //TODO
         }
     }
 
@@ -324,7 +327,16 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 .build();
         columnsTableForm.setSelectable(true);
         columnsTableForm.setCaption("Columns");
-        for(TableForm.Row row : columnsTableForm.getRows()) {
+        for(int i = 0; i < decoratedColumns.size(); i++) {
+            TableForm.Row row = columnsTableForm.getRows()[i];
+            Column column = decoratedColumns.get(i);
+
+            Field columnNameField = row.findFieldByPropertyName("columnName");
+            columnNameField.setHref(
+                    context.getRequest().getContextPath() +
+                    getActionPath() +
+                    "/" + column.getColumnName());
+
             Field nullableField = row.findFieldByPropertyName("nullable");
             //Work around Introspector bug
             nullableField.setInsertable(false);
@@ -976,6 +988,9 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         String path = BASE_ACTION_PATH;
         if(tableName != null) {
             path += "/" + databaseName + "/" + schemaName + "/" + tableName;
+            if(columnName != null) {
+                path += "/" + columnName;
+            }
         }
         return path;
     }
@@ -1006,6 +1021,14 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
 
     public void setTableName(String tableName) {
         this.tableName = tableName;
+    }
+
+    public String getColumnName() {
+        return columnName;
+    }
+
+    public void setColumnName(String columnName) {
+        this.columnName = columnName;
     }
 
     public Table getTable() {

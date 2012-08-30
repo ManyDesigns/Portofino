@@ -1,5 +1,8 @@
 <%@ page import="com.manydesigns.portofino.model.database.DatabaseLogic" %>
 <%@ page import="com.manydesigns.portofino.model.database.Table" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.Comparator" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -38,7 +41,13 @@
             <%
                 String lastDatabase = null;
                 String lastSchema = null;
-                for(Table table : DatabaseLogic.getAllTables(actionBean.getModel())) {
+                List<Table> tables = DatabaseLogic.getAllTables(actionBean.getModel());
+                Collections.sort(tables, new Comparator<Table>() {
+                    public int compare(Table o1, Table o2) {
+                        return o1.getTableName().compareToIgnoreCase(o2.getTableName());
+                    }
+                });
+                for(Table table : tables) {
                     if(table.getDatabaseName().equals(lastDatabase)) {
                         if(table.getSchemaName().equals(lastSchema)) {
                             String tableDescr = table.getTableName();
