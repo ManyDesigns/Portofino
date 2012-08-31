@@ -396,7 +396,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
 
     protected void configureTypesSelectionProvider(DefaultSelectionProvider typesSP, ColumnForm columnForm) {
         Type type = columnForm.getType();
-        Class[] javaTypes = getAvailableJavaTypes(type);
+        Class[] javaTypes = getAvailableJavaTypes(type, columnForm.getLength());
         long precision = columnForm.getLength() != null ? columnForm.getLength() : type.getMaximumPrecision();
         int scale = columnForm.getScale() != null ? columnForm.getScale() : type.getMaximumScale();
         Class defaultJavaType = Type.getDefaultJavaType(columnForm.getJdbcType(), precision, scale);
@@ -446,14 +446,18 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         return cf;
     }
 
-    protected Class[] getAvailableJavaTypes(Type type) {
+    protected Class[] getAvailableJavaTypes(Type type, Integer length) {
         if(type.isNumeric()) {
             return new Class[] {
                     Integer.class, Long.class, Byte.class, Short.class,
                     Float.class, Double.class, BigInteger.class, BigDecimal.class,
                     Boolean.class };
         } else if(type.getDefaultJavaType() == String.class) {
-            return new Class[] { String.class, Boolean.class };
+            if(length != null && length < 256) {
+                return new Class[] { String.class, Boolean.class };
+            } else {
+                return new Class[] { String.class };
+            }
         } else {
             Class defaultJavaType = type.getDefaultJavaType();
             if(defaultJavaType != null) {
