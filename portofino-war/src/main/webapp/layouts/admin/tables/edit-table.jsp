@@ -11,7 +11,7 @@
         Edit table ${actionBean.table.qualifiedName}
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="tables-edit" cssClass="contentButton" />
+        <portofino:buttons list="table-edit" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         Edit table ${actionBean.table.qualifiedName}
@@ -23,6 +23,6 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="tables-edit" cssClass="contentButton" />
+        <portofino:buttons list="table-edit" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>

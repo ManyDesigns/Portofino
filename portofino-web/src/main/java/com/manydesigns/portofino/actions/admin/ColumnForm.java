@@ -30,10 +30,15 @@
 package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.database.Type;
+import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.database.Column;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
+
+import java.math.BigDecimal;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,15 +50,150 @@ public class ColumnForm extends Column {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    protected Type type;
+    protected final Type type;
+    protected final boolean inPk;
 
-    public ColumnForm(Column copyFrom, Type type) {
+    //Known annotations
+    protected Integer fieldSize;
+    protected Integer maxLength;
+    protected boolean multiline;
+    protected boolean email;
+    protected boolean cap;
+    protected boolean highlightLinks;
+    protected String regexp;
+
+    protected BigDecimal minValue;
+    protected BigDecimal maxValue;
+
+    protected String dateFormat;
+
+    public ColumnForm(Column copyFrom, PropertyAccessor columnAccessor, Type type) {
         try {
             BeanUtils.copyProperties(this, copyFrom);
         } catch (Exception e) {
             throw new Error(e);
         }
         this.type = type;
+        inPk = DatabaseLogic.isInPk(copyFrom);
+
+        FieldSize fieldSizeAnn = columnAccessor.getAnnotation(FieldSize.class);
+        if(fieldSizeAnn != null) {
+            fieldSize = fieldSizeAnn.value();
+        }
+
+        MaxLength maxLengthAnn = columnAccessor.getAnnotation(MaxLength.class);
+        if(maxLengthAnn != null) {
+            maxLength = maxLengthAnn.value();
+        }
+
+        Multiline multilineAnn = columnAccessor.getAnnotation(Multiline.class);
+        if(multilineAnn != null) {
+            multiline = true;
+        }
+
+        Email emailAnn = columnAccessor.getAnnotation(Email.class);
+        if(emailAnn != null) {
+            email = true;
+        }
+
+        CAP capAnn = columnAccessor.getAnnotation(CAP.class);
+        if(capAnn != null) {
+            cap = true;
+        }
+
+        HighlightLinks hlAnn = columnAccessor.getAnnotation(HighlightLinks.class);
+        if(hlAnn != null) {
+            highlightLinks = true;
+        }
+
+        RegExp regexpAnn = columnAccessor.getAnnotation(RegExp.class);
+        if(regexpAnn != null) {
+            regexp = regexpAnn.value();
+        }
+
+        MinDecimalValue minDecimalValueAnn = columnAccessor.getAnnotation(MinDecimalValue.class);
+        if(minDecimalValueAnn != null) {
+            minValue = new BigDecimal(minDecimalValueAnn.value());
+        } else {
+            MinIntValue minIntValueAnn = columnAccessor.getAnnotation(MinIntValue.class);
+            if(minIntValueAnn != null) {
+                minValue = new BigDecimal(minIntValueAnn.value());
+            }
+        }
+
+        MaxDecimalValue maxDecimalValueAnn = columnAccessor.getAnnotation(MaxDecimalValue.class);
+        if(maxDecimalValueAnn != null) {
+            maxValue = new BigDecimal(maxDecimalValueAnn.value());
+        } else {
+            MaxIntValue maxIntValueAnn = columnAccessor.getAnnotation(MaxIntValue.class);
+            if(maxIntValueAnn != null) {
+                maxValue = new BigDecimal(maxIntValueAnn.value());
+            }
+        }
+
+        DateFormat dateFormatAnn = columnAccessor.getAnnotation(DateFormat.class);
+        if(dateFormatAnn != null) {
+            dateFormat = dateFormatAnn.value();
+        }
+    }
+
+    public void copyTo(Column column) {
+        column.setJavaType(getJavaType());
+        column.setPropertyName(StringUtils.defaultIfEmpty(getPropertyName(), null));
+
+        //Annotations
+        column.getAnnotations().clear();
+        if(fieldSize != null) {
+            Annotation ann = new Annotation(column, FieldSize.class.getName());
+            ann.getValues().add(fieldSize.toString());
+            column.getAnnotations().add(ann);
+        }
+        if(maxLength != null) {
+            Annotation ann = new Annotation(column, MaxLength.class.getName());
+            ann.getValues().add(maxLength.toString());
+            column.getAnnotations().add(ann);
+        }
+        if(multiline) {
+            Annotation ann = new Annotation(column, Multiline.class.getName());
+            ann.getValues().add("true");
+            column.getAnnotations().add(ann);
+        }
+        if(email) {
+            Annotation ann = new Annotation(column, Email.class.getName());
+            ann.getValues().add("true");
+            column.getAnnotations().add(ann);
+        }
+        if(cap) {
+            Annotation ann = new Annotation(column, CAP.class.getName());
+            ann.getValues().add("true");
+            column.getAnnotations().add(ann);
+        }
+        if(highlightLinks) {
+            Annotation ann = new Annotation(column, HighlightLinks.class.getName());
+            ann.getValues().add("true");
+            column.getAnnotations().add(ann);
+        }
+        if(!StringUtils.isEmpty(regexp)) {
+            Annotation ann = new Annotation(column, RegExp.class.getName());
+            ann.getValues().add(regexp);
+            ann.getValues().add("elements.error.field.regexp.format"); //Default error message
+            column.getAnnotations().add(ann);
+        }
+        if(minValue != null) {
+            Annotation ann = new Annotation(column, MinDecimalValue.class.getName());
+            ann.getValues().add(minValue.toString());
+            column.getAnnotations().add(ann);
+        }
+        if(maxValue != null) {
+            Annotation ann = new Annotation(column, MaxDecimalValue.class.getName());
+            ann.getValues().add(maxValue.toString());
+            column.getAnnotations().add(ann);
+        }
+        if(!StringUtils.isEmpty(dateFormat)) {
+            Annotation ann = new Annotation(column, DateFormat.class.getName());
+            ann.getValues().add(dateFormat);
+            column.getAnnotations().add(ann);
+        }
     }
 
     @Override
@@ -99,8 +239,95 @@ public class ColumnForm extends Column {
         return super.isNullable();
     }
 
-    public void copyTo(Column column) {
-        column.setJavaType(getJavaType());
-        column.setPropertyName(StringUtils.defaultIfEmpty(getPropertyName(), null));
+    @Label("In primary key")
+    @Updatable(false)
+    @Insertable(false)
+    public boolean isInPk() {
+        return inPk;
+    }
+
+    public Integer getFieldSize() {
+        return fieldSize;
+    }
+
+    public void setFieldSize(Integer fieldSize) {
+        this.fieldSize = fieldSize;
+    }
+
+    public Integer getMaxLength() {
+        return maxLength;
+    }
+
+    public void setMaxLength(Integer maxLength) {
+        this.maxLength = maxLength;
+    }
+
+    public boolean isMultiline() {
+        return multiline;
+    }
+
+    public void setMultiline(boolean multiline) {
+        this.multiline = multiline;
+    }
+
+    public boolean isEmail() {
+        return email;
+    }
+
+    public void setEmail(boolean email) {
+        this.email = email;
+    }
+
+    public boolean isCap() {
+        return cap;
+    }
+
+    public void setCap(boolean cap) {
+        this.cap = cap;
+    }
+
+    public boolean isHighlightLinks() {
+        return highlightLinks;
+    }
+
+    public void setHighlightLinks(boolean highlightLinks) {
+        this.highlightLinks = highlightLinks;
+    }
+
+    @FieldSize(75)
+    public String getRegexp() {
+        return regexp;
+    }
+
+    public void setRegexp(String regexp) {
+        this.regexp = regexp;
+    }
+
+    @PrecisionScale(scale = 10, precision = 100)
+    @DecimalFormat("#.#####")
+    public BigDecimal getMinValue() {
+        return minValue;
+    }
+
+    public void setMinValue(BigDecimal minValue) {
+        this.minValue = minValue;
+    }
+
+    @PrecisionScale(scale = 10, precision = 100)
+    @DecimalFormat("#.#####")
+    public BigDecimal getMaxValue() {
+        return maxValue;
+    }
+
+    public void setMaxValue(BigDecimal maxValue) {
+        this.maxValue = maxValue;
+    }
+
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
     }
 }

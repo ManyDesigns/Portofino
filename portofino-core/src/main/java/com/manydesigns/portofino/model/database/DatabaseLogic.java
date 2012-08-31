@@ -340,4 +340,20 @@ public class DatabaseLogic {
         }
         return initialName;
     }
+
+    public static boolean isInPk(Column column) {
+        return column.getTable().getPrimaryKey().getColumns().contains(column);
+    }
+
+    public static boolean isInFk(Column column) {
+        Table table = column.getTable();
+        for(ForeignKey fk : table.getForeignKeys()) {
+            for(Reference ref : fk.getReferences()) {
+                if(ref.getActualFromColumn().equals(column)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

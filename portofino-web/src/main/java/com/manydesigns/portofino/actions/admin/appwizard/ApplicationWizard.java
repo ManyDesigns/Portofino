@@ -1050,8 +1050,8 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         boolean propertyIsUserPassword =
                 table.getQualifiedName().equals(userTableName) &&
                 column.getActualPropertyName().equals(userPasswordProperty);
-        boolean inPk = isInPk(column);
-        boolean inFk = isInFk(column);
+        boolean inPk = DatabaseLogic.isInPk(column);
+        boolean inFk = DatabaseLogic.isInFk(column);
         boolean inSummary =
                 enabled &&
                 (inPk || columnsInSummary < maxColumnsInSummary) &&
@@ -1103,22 +1103,6 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         configuration.getProperties().add(crudProperty);
 
         return columnsInSummary;
-    }
-
-    protected static boolean isInPk(Column column) {
-        return column.getTable().getPrimaryKey().getColumns().contains(column);
-    }
-
-    protected static boolean isInFk(Column column) {
-        Table table = column.getTable();
-        for(ForeignKey fk : table.getForeignKeys()) {
-            for(Reference ref : fk.getReferences()) {
-                if(ref.getActualFromColumn().equals(column)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     protected boolean isUnsupportedProperty(Column column) {

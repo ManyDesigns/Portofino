@@ -38,6 +38,7 @@ import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.model.AnnModel;
 import com.manydesigns.portofino.application.Application;
@@ -49,6 +50,7 @@ import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.ArrayUtils;
@@ -99,8 +101,9 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     protected String tableName;
     protected String columnName;
 
-    public String cancelReturnUrl;
-    public Table table;
+    protected String cancelReturnUrl;
+    protected Table table;
+    protected Column column;
 
     protected List<ColumnForm> decoratedColumns;
 
@@ -123,8 +126,9 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     //**************************************************************************
     // Forms
     //**************************************************************************
-    public Form tableForm;
-    public TableForm columnsTableForm;
+    protected Form tableForm;
+    protected TableForm columnsTableForm;
+    protected Form columnForm;
 
     //**************************************************************************
     // Other objects
@@ -172,9 +176,9 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         if (tableName == null) {
             return search();
         } else if(columnName == null) {
-            return edit();
+            return editTable();
         } else {
-            return null; //TODO
+            return editColumn();
         }
     }
 
@@ -182,13 +186,18 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         return new ForwardResolution("/layouts/admin/tables/list.jsp");
     }
 
-    public Resolution edit() {
+    public Resolution editTable() {
         setupTableForm();
         setupColumnsForm();
-        return new ForwardResolution("/layouts/admin/tables/edit.jsp");
+        return new ForwardResolution("/layouts/admin/tables/edit-table.jsp");
     }
 
-    @Button(key = "commons.save", list = "tables-edit")
+    public Resolution editColumn() {
+        setupColumnForm();
+        return new ForwardResolution("/layouts/admin/tables/edit-column.jsp");
+    }
+
+    @Button(key = "commons.save", list = "table-edit")
     public Resolution saveTable() {
         setupTableForm();
         setupColumnsForm();
@@ -219,14 +228,13 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                                 Column toColumn = ref.getActualToColumn();
                                 if(fromColumn.getActualJavaType() != toColumn.getActualJavaType()) {
                                     SessionMessages.addWarningMessage(
-                                            MessageFormat.format(
-                                            "Detected type mismatch between column {0} ({1}) and column {2} ({3}) " +
-                                            "linked by foreign key {4}",
-                                            fromColumn.getQualifiedName(),
-                                            fromColumn.getActualJavaType(),
-                                            toColumn.getQualifiedName(),
-                                            toColumn.getActualJavaType(),
-                                            fk.getName()));
+                                            getMessage(
+                                                    "layouts.admin.tables.typeMismatchInTable",
+                                                    fromColumn.getQualifiedName(),
+                                                    fromColumn.getActualJavaType().getName(),
+                                                    toColumn.getQualifiedName(),
+                                                    toColumn.getActualJavaType().getName(),
+                                                    fk.getName()));
                                 }
                             }
                         }
@@ -238,7 +246,50 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 SessionMessages.addErrorMessage(e.toString());
             }
         }
-        return new ForwardResolution("/layouts/admin/tables/edit.jsp");
+        return new ForwardResolution("/layouts/admin/tables/edit-table.jsp");
+    }
+
+    @Button(key = "commons.save", list = "column-edit")
+    public Resolution saveColumn() {
+        ColumnForm cf = setupColumnForm();
+        columnForm.readFromRequest(context.getRequest());
+        if(columnForm.validate()) {
+            columnForm.writeToObject(cf);
+            cf.copyTo(column);
+             try {
+                model.init();
+                application.saveXmlModel();
+                DispatcherLogic.clearConfigurationCache();
+                 for(Table otherTable : table.getSchema().getTables()) {
+                    for(ForeignKey fk : otherTable.getForeignKeys()) {
+                        for(Reference ref : fk.getReferences()) {
+                            Column fromColumn = ref.getActualFromColumn();
+                            Column toColumn = ref.getActualToColumn();
+                            if((fromColumn.equals(column) || toColumn.equals(column)) &&
+                                fromColumn.getActualJavaType() != toColumn.getActualJavaType()) {
+                                Column otherColumn;
+                                if(fromColumn.equals(column)) {
+                                    otherColumn = toColumn;
+                                } else {
+                                    otherColumn = fromColumn;
+                                }
+                                SessionMessages.addWarningMessage(
+                                        getMessage(
+                                                "layouts.admin.tables.typeMismatchInColumn",
+                                                otherColumn.getQualifiedName(),
+                                                otherColumn.getActualJavaType().getName(),
+                                                fk.getName()));
+                            }
+                        }
+                    }
+                }
+             } catch (Exception e) {
+                logger.error("Could not save model", e);
+                SessionMessages.addErrorMessage(e.toString());
+            }
+        }
+        setupColumnForm(); //Recalculate applicable annotations
+        return new ForwardResolution("/layouts/admin/tables/edit-column.jsp");
     }
 
     protected void setupTableForm() {
@@ -262,30 +313,20 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
 
     protected void setupColumnsForm() {
         Type[] types = application.getConnectionProvider(table.getDatabaseName()).getTypes();
-        DefaultSelectionProvider typesSP = new DefaultSelectionProvider("columnType", 3);
         decoratedColumns = new ArrayList<ColumnForm>(table.getColumns().size());
+        TableAccessor tableAccessor = new TableAccessor(table);
 
         for(Column column : table.getColumns()) {
-            //Select the best matching type
-            Type type = null;
-            for (Type candidate : types) {
-                if (candidate.getJdbcType() == column.getJdbcType() &&
-                    candidate.getTypeName().equalsIgnoreCase(column.getColumnType())) {
-                    type = candidate;
-                    break;
-                }
+            PropertyAccessor columnAccessor;
+            try {
+                columnAccessor = tableAccessor.getProperty(column.getColumnName());
+            } catch (NoSuchFieldException e) {
+                throw new Error(e);
             }
-            if(type == null) {
-                for (Type candidate : types) {
-                    if (candidate.getJdbcType() == column.getJdbcType()) {
-                        type = candidate;
-                        break;
-                    }
-                }
-            }
-            if(type != null) {
+            ColumnForm cf = decorateColumn(column, columnAccessor, types);
+            if(cf != null) {
                 //Add to form
-                decoratedColumns.add(new ColumnForm(column, type));
+                decoratedColumns.add(cf);
             } else {
                 SessionMessages.addWarningMessage(
                         "Skipped column " + column.getColumnName() + " with unknown type " + column.getColumnType() +
@@ -293,31 +334,9 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
             }
         }
 
+        DefaultSelectionProvider typesSP = new DefaultSelectionProvider("columnType", 3);
         for(ColumnForm columnForm : decoratedColumns) {
-            Type type = columnForm.getType();
-            List<Class> javaTypes = getAvailableJavaTypes(type);
-            long precision = columnForm.getLength() != null ? columnForm.getLength() : type.getMaximumPrecision();
-            int scale = columnForm.getScale() != null ? columnForm.getScale() : type.getMaximumScale();
-            Class defaultJavaType = Type.getDefaultJavaType(columnForm.getJdbcType(), precision, scale);
-            if(defaultJavaType == null) {
-                defaultJavaType = Object.class;
-            }
-            typesSP.appendRow(
-                    new Object[] { columnForm.getColumnName(), type, null },
-                    new String[] {
-                            columnForm.getColumnName(),
-                            type.getTypeName() + " (JDBC: " + type.getJdbcType() + ")",
-                            "Auto (" + defaultJavaType.getSimpleName() + ")" },
-                    true);
-            for (Class c : javaTypes) {
-                typesSP.appendRow(
-                        new Object[] { columnForm.getColumnName(), type, c.getName() },
-                        new String[] {
-                                columnForm.getColumnName(),
-                                type.getTypeName() + " (JDBC: " + type.getJdbcType() + ")",
-                                c.getSimpleName() },
-                        true);
-            }
+            configureTypesSelectionProvider(typesSP, columnForm);
         }
 
         columnsTableForm = new TableFormBuilder(ColumnForm.class)
@@ -325,7 +344,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 .configSelectionProvider(typesSP, "columnName", "type", "javaType")
                 .configNRows(decoratedColumns.size())
                 .build();
-        columnsTableForm.setSelectable(true);
+        columnsTableForm.setSelectable(false);
         columnsTableForm.setCaption("Columns");
         for(int i = 0; i < decoratedColumns.size(); i++) {
             TableForm.Row row = columnsTableForm.getRows()[i];
@@ -345,22 +364,115 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         columnsTableForm.readFromObject(decoratedColumns);
     }
 
-    protected List<Class> getAvailableJavaTypes(Type type) {
-        List<Class> result;
+    protected ColumnForm setupColumnForm() {
+        table = findTable();
+        column = findColumn();
+
+        TableAccessor tableAccessor = new TableAccessor(table);
+        PropertyAccessor columnAccessor;
+        try {
+            columnAccessor = tableAccessor.getProperty(column.getColumnName());
+        } catch (NoSuchFieldException e) {
+            throw new Error(e);
+        }
+
+        Type[] types = application.getConnectionProvider(table.getDatabaseName()).getTypes();
+        ColumnForm cf = decorateColumn(column, columnAccessor, types);
+        DefaultSelectionProvider typesSP = new DefaultSelectionProvider("columnType", 3);
+        configureTypesSelectionProvider(typesSP, cf);
+        columnForm = new FormBuilder(ColumnForm.class)
+                .configFieldSetNames("Properties", "Annotations")
+                .configFields(new String[] { "columnName", "propertyName", "javaType", "type",
+                                             "length", "scale", "nullable", "inPk" },
+                              getApplicableAnnotations(column.getActualJavaType()))
+                .configSelectionProvider(typesSP, "columnName", "type", "javaType")
+                .build();
+        Field nullableField = columnForm.findFieldByPropertyName("nullable");
+        nullableField.setInsertable(false);
+        nullableField.setUpdatable(false);
+        columnForm.readFromObject(cf);
+        return cf;
+    }
+
+    protected void configureTypesSelectionProvider(DefaultSelectionProvider typesSP, ColumnForm columnForm) {
+        Type type = columnForm.getType();
+        Class[] javaTypes = getAvailableJavaTypes(type);
+        long precision = columnForm.getLength() != null ? columnForm.getLength() : type.getMaximumPrecision();
+        int scale = columnForm.getScale() != null ? columnForm.getScale() : type.getMaximumScale();
+        Class defaultJavaType = Type.getDefaultJavaType(columnForm.getJdbcType(), precision, scale);
+        if(defaultJavaType == null) {
+            defaultJavaType = Object.class;
+        }
+        typesSP.appendRow(
+                new Object[] { columnForm.getColumnName(), type, null },
+                new String[] {
+                        columnForm.getColumnName(),
+                        type.getTypeName() + " (JDBC: " + type.getJdbcType() + ")",
+                        "Auto (" + defaultJavaType.getSimpleName() + ")" },
+                true);
+        for (Class c : javaTypes) {
+            typesSP.appendRow(
+                    new Object[] { columnForm.getColumnName(), type, c.getName() },
+                    new String[] {
+                            columnForm.getColumnName(),
+                            type.getTypeName() + " (JDBC: " + type.getJdbcType() + ")",
+                            c.getSimpleName() },
+                    true);
+        }
+    }
+
+    protected ColumnForm decorateColumn(Column column, PropertyAccessor columnAccessor, Type[] types) {
+        //Select the best matching type
+        Type type = null;
+        for (Type candidate : types) {
+            if (candidate.getJdbcType() == column.getJdbcType() &&
+                candidate.getTypeName().equalsIgnoreCase(column.getColumnType())) {
+                type = candidate;
+                break;
+            }
+        }
+        if(type == null) {
+            for (Type candidate : types) {
+                if (candidate.getJdbcType() == column.getJdbcType()) {
+                    type = candidate;
+                    break;
+                }
+            }
+        }
+        ColumnForm cf = null;
+        if(type != null) {
+            cf = new ColumnForm(column, columnAccessor, type);
+        }
+        return cf;
+    }
+
+    protected Class[] getAvailableJavaTypes(Type type) {
         if(type.isNumeric()) {
-            result = Arrays.asList(new Class[] {
+            return new Class[] {
                     Integer.class, Long.class, Byte.class, Short.class,
                     Float.class, Double.class, BigInteger.class, BigDecimal.class,
-                    Boolean.class });
+                    Boolean.class };
+        } else if(type.getDefaultJavaType() == String.class) {
+            return new Class[] { String.class, Boolean.class };
         } else {
             Class defaultJavaType = type.getDefaultJavaType();
             if(defaultJavaType != null) {
-                result = Arrays.asList(new Class[] { defaultJavaType });
+                return new Class[] { defaultJavaType };
             } else {
-                result = Arrays.asList(new Class[] { Object.class });
+                return new Class[] { Object.class };
             }
         }
-        return result;
+    }
+
+    protected String[] getApplicableAnnotations(Class type) {
+        if(Number.class.isAssignableFrom(type)) {
+            return new String[] { "fieldSize", "minValue", "maxValue" };
+        } else if(String.class.equals(type)) {
+            return new String[] { "fieldSize", "multiline", "email", "cap", "highlightLinks", "regexp" };
+        } else if(Date.class.isAssignableFrom(type)) {
+            return new String[] { "fieldSize", "dateFormat" };
+        }
+        return new String[0];
     }
 
     protected String getMessage(String key, Object... args) {
@@ -420,6 +532,14 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
             throw new ModelObjectNotFoundError(databaseName + "." + schemaName + "." + tableName);
         }
         return table;
+    }
+
+    public Column findColumn() {
+        Column column = DatabaseLogic.findColumnByName(table, columnName);
+        if(column == null) {
+            throw new ModelObjectNotFoundError(table.getQualifiedName() + "." + column);
+        }
+        return column;
     }
 
     @Button(list = "tables-list", key = "commons.returnToPages", order = 3)
@@ -1035,12 +1155,20 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         return table;
     }
 
+    public Column getColumn() {
+        return column;
+    }
+
     public Form getTableForm() {
         return tableForm;
     }
 
     public TableForm getColumnsTableForm() {
         return columnsTableForm;
+    }
+
+    public Form getColumnForm() {
+        return columnForm;
     }
 
     public void setRelName(String relName) {
