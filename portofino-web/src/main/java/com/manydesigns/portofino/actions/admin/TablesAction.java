@@ -319,7 +319,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         for(Column column : table.getColumns()) {
             PropertyAccessor columnAccessor;
             try {
-                columnAccessor = tableAccessor.getProperty(column.getColumnName());
+                columnAccessor = tableAccessor.getProperty(column.getActualPropertyName());
             } catch (NoSuchFieldException e) {
                 throw new Error(e);
             }
@@ -371,7 +371,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         TableAccessor tableAccessor = new TableAccessor(table);
         PropertyAccessor columnAccessor;
         try {
-            columnAccessor = tableAccessor.getProperty(column.getColumnName());
+            columnAccessor = tableAccessor.getProperty(column.getActualPropertyName());
         } catch (NoSuchFieldException e) {
             throw new Error(e);
         }
