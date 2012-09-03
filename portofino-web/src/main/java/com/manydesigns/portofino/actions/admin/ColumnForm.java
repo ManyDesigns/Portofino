@@ -220,6 +220,14 @@ public class ColumnForm extends Column {
         return super.getScale();
     }
 
+    @Override
+    @RegExp(
+        value = "(_|$|[a..z]|[\u0080..\ufffe])(_|$|[a..z]|[\u0080..\ufffe]|[0..9])*",
+        errorMessage = "layouts.admin.tables.invalidPropertyName")
+    public String getPropertyName() {
+        return super.getPropertyName();
+    }
+
     @Label("Type")
     @Updatable(false)
     @Insertable(false)
@@ -246,6 +254,7 @@ public class ColumnForm extends Column {
         return inPk;
     }
 
+    @MinIntValue(1)
     public Integer getFieldSize() {
         return fieldSize;
     }

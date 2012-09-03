@@ -8,27 +8,22 @@
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.TablesAction"/>
     <stripes:layout-component name="pageTitle">
-        Edit table ${actionBean.table.qualifiedName}
+        Edit short name for table ${actionBean.table.qualifiedName}
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="table-edit" cssClass="contentButton" />
+        <portofino:buttons list="table-short-name" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Edit table ${actionBean.table.qualifiedName}
+        Edit short name for table ${actionBean.table.qualifiedName}
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <mde:write name="actionBean" property="tableForm" />
-        <span id="editShortNameButton"><portofino:buttons list="table-edit-short-name" cssClass="portletButton" /></span>
-        <div style="overflow-x: auto; padding-right: 1px;">
+        <mde:write name="actionBean" property="shortNameField" />
+        <div style="visibility: hidden;">
+            <mde:write name="actionBean" property="tableForm" />
             <mde:write name="actionBean" property="columnsTableForm" />
         </div>
-        <script type="text/javascript">
-            $(function() {
-                $("#shortName").after($("#editShortNameButton"));
-            });
-        </script>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="table-edit" cssClass="contentButton" />
+        <portofino:buttons list="table-short-name" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>

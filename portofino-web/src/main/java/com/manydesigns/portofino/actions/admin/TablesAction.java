@@ -29,7 +29,8 @@
 
 package com.manydesigns.portofino.actions.admin;
 
-import com.manydesigns.elements.annotations.AnnotationsManager;
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.FieldSize;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.TextField;
 import com.manydesigns.elements.forms.Form;
@@ -38,9 +39,9 @@ import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.actions.model.AnnModel;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ModelObjectNotFoundError;
 import com.manydesigns.portofino.buttons.annotations.Button;
@@ -51,20 +52,18 @@ import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /*
@@ -74,12 +73,12 @@ import java.util.*;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @RequiresAdministrator
-@UrlBinding(TablesAction.BASE_ACTION_PATH + "{databaseName}/{schemaName}/{tableName}/{columnName}")
+@UrlBinding(TablesAction.BASE_ACTION_PATH + "/{databaseName}/{schemaName}/{tableName}/{columnName}")
 public class TablesAction extends AbstractActionBean implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    public static final String BASE_ACTION_PATH = "/actions/admin/tables/";
+    public static final String BASE_ACTION_PATH = "/actions/admin/tables";
 
     //**************************************************************************
     // Injections
@@ -105,23 +104,9 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     protected Table table;
     protected Column column;
 
+    protected String shortName;
+
     protected List<ColumnForm> decoratedColumns;
-
-    public final List<String> annotations;
-    public final List<String> annotationsImpl;
-    public List<AnnModel> colAnnotations;
-
-
-    public List<String> columnNames;
-
-    //Selection provider
-    protected String relName;
-
-    //testo parziale per autocomplete
-    public String term;
-
-    //Step
-    public Integer step;
 
     //**************************************************************************
     // Forms
@@ -129,6 +114,8 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     protected Form tableForm;
     protected TableForm columnsTableForm;
     protected Form columnForm;
+
+    protected Field shortNameField;
 
     //**************************************************************************
     // Other objects
@@ -139,33 +126,9 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
 
 
     //**************************************************************************
-    // WebParameters
-    //**************************************************************************
-
-    public String table_databaseName;
-
-    //**************************************************************************
     // Constructor
     //**************************************************************************
-    public TablesAction() {
-        annotations = new ArrayList<String>();
-        annotationsImpl = new ArrayList<String>();
-        Set<Class> annotationsClasses
-                =  AnnotationsManager.getManager().getManagedAnnotationClasses();
-
-        for (Class aClass: annotationsClasses){
-            Target target;
-            target = (Target) aClass.getAnnotation(Target.class);
-            if (null!= target && ArrayUtils.contains(target.value(),
-                    ElementType.FIELD)){
-                annotations.add(aClass.getName());
-                annotationsImpl.add(AnnotationsManager.getManager()
-                        .getAnnotationImplementationClass(aClass).getName());
-            }
-        }
-        colAnnotations = new ArrayList<AnnModel>();
-        columnNames = new ArrayList<String>();
-    }
+    public TablesAction() {}
 
     //**************************************************************************
     // Action default execute method
@@ -187,8 +150,10 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     }
 
     public Resolution editTable() {
-        setupTableForm();
-        setupColumnsForm();
+        setupTableForm(Mode.EDIT);
+        setupColumnsForm(Mode.EDIT);
+        tableForm.readFromRequest(context.getRequest());
+        columnsTableForm.readFromRequest(context.getRequest());
         return new ForwardResolution("/layouts/admin/tables/edit-table.jsp");
     }
 
@@ -197,14 +162,17 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         return new ForwardResolution("/layouts/admin/tables/edit-column.jsp");
     }
 
-    @Button(key = "commons.save", list = "table-edit")
+    @Button(key = "commons.save", list = "table-edit", order = 1)
     public Resolution saveTable() {
-        setupTableForm();
-        setupColumnsForm();
+        setupTableForm(Mode.EDIT);
+        setupColumnsForm(Mode.EDIT);
         tableForm.readFromRequest(context.getRequest());
         columnsTableForm.readFromRequest(context.getRequest());
-        if(tableForm.validate() && columnsTableForm.validate()) {
-            tableForm.writeToObject(table);
+        if(validateTableForm() && columnsTableForm.validate()) {
+            com.manydesigns.portofino.actions.admin.TableForm tf =
+                    new com.manydesigns.portofino.actions.admin.TableForm(table);
+            tableForm.writeToObject(tf);
+            tf.copyTo(table);
             table.setEntityName(StringUtils.defaultIfEmpty(table.getEntityName(), null));
             table.setJavaClass(StringUtils.defaultIfEmpty(table.getJavaClass(), null));
             columnsTableForm.writeToObject(decoratedColumns);
@@ -249,12 +217,34 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         return new ForwardResolution("/layouts/admin/tables/edit-table.jsp");
     }
 
-    @Button(key = "commons.save", list = "column-edit")
+    protected boolean validateTableForm() {
+        if(tableForm.validate()) {
+            Field javaClassField = tableForm.findFieldByPropertyName("javaClass");
+            String javaClass = javaClassField.getStringValue();
+            if(!StringUtils.isBlank(javaClass)) {
+                try {
+                    Class.forName(javaClass, true, ScriptingUtil.GROOVY_SCRIPT_ENGINE.getGroovyClassLoader());
+                } catch (ClassNotFoundException e) {
+                    javaClassField.getErrors().add(getMessage("layouts.admin.tables.classNotFound"));
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Button(key = "commons.cancel", list = "table-edit", order = 2)
+    public Resolution returnToTables() {
+        return new RedirectResolution(BASE_ACTION_PATH);
+    }
+
+    @Button(key = "commons.save", list = "column-edit", order = 1)
     public Resolution saveColumn() {
         ColumnForm cf = setupColumnForm();
         columnForm.readFromRequest(context.getRequest());
-        if(columnForm.validate()) {
-            columnForm.writeToObject(cf);
+        if(saveToColumnForm(columnForm, cf)) {
             cf.copyTo(column);
              try {
                 model.init();
@@ -289,29 +279,82 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
             }
         }
         setupColumnForm(); //Recalculate applicable annotations
+        columnForm.readFromRequest(context.getRequest());
+        saveToColumnForm(columnForm, cf);
         return new ForwardResolution("/layouts/admin/tables/edit-column.jsp");
     }
 
-    protected void setupTableForm() {
-        table = findTable();
-        tableForm = new FormBuilder(Table.class)
-                .configFields("entityName", "javaClass", "shortName")
-                .build();
-        Field shortNameField = tableForm.findFieldByPropertyName("shortName");
-        shortNameField.setInsertable(false);
-        shortNameField.setUpdatable(false);
-
-        Field entityNameField = tableForm.findFieldByPropertyName("entityName");
-        entityNameField.setHelp("If you leave this empty, the entity name will be generated automatically from the table name.");
-
-        tableForm.readFromObject(table);
-
-        ((TextField) shortNameField).setStringValue(
-                StringUtils.defaultString(shortNameField.getStringValue(), "not set") +  " (Edit)");
-        shortNameField.setHref(table.getTableName() + "?editShortName=");
+    @Button(key = "commons.cancel", list = "column-edit", order = 2)
+    public Resolution returnToTable() {
+        return new RedirectResolution(BASE_ACTION_PATH + "/" + databaseName + "/" + schemaName + "/" + tableName);
     }
 
-    protected void setupColumnsForm() {
+    @Button(key = "layouts.admin.tables.editShortName", list = "table-edit-short-name")
+    public Resolution editShortName() throws NoSuchFieldException {
+        setupTableForm(Mode.HIDDEN);
+        setupColumnsForm(Mode.HIDDEN);
+        tableForm.readFromRequest(context.getRequest());
+        columnsTableForm.readFromRequest(context.getRequest());
+
+        shortName = table.getShortName();
+        JavaClassAccessor jca = JavaClassAccessor.getClassAccessor(getClass());
+        shortNameField = new TextField(jca.getProperty("shortName"), Mode.EDIT);
+        shortNameField.readFromObject(this);
+
+        return new ForwardResolution("/layouts/admin/tables/edit-short-name.jsp");
+    }
+
+    @Button(key = "commons.save", list = "table-short-name", order = 1)
+    public Resolution saveShortName() {
+        RedirectResolution resolution =
+                new RedirectResolution(BASE_ACTION_PATH + "/" + databaseName + "/" + schemaName + "/" + tableName);
+        resolution.addParameters(context.getRequest().getParameterMap());
+        resolution.getParameters().remove("saveShortName");
+        resolution.getParameters().remove("shortName");
+        resolution.addParameter("shortName", shortName);
+        return resolution;
+    }
+
+    @Button(key = "commons.cancel", list = "table-short-name", order = 2)
+    public Resolution cancelEditShortName() {
+        RedirectResolution resolution =
+                new RedirectResolution(BASE_ACTION_PATH + "/" + databaseName + "/" + schemaName + "/" + tableName);
+        resolution.addParameters(context.getRequest().getParameterMap());
+        resolution.getParameters().remove("cancelEditShortName");
+        resolution.getParameters().remove("shortName");
+        return resolution;
+    }
+
+    protected boolean saveToColumnForm(Form columnForm, ColumnForm cf) {
+        if(columnForm.validate()) {
+            columnForm.writeToObject(cf);
+            if(!StringUtils.isEmpty(cf.getDateFormat())) {
+                try {
+                    new SimpleDateFormat(cf.getDateFormat());
+                } catch (Exception e) {
+                    columnForm.findFieldByPropertyName("dateFormat").getErrors().add(getMessage(""));
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    protected void setupTableForm(Mode mode) {
+        table = findTable();
+        tableForm = new FormBuilder(com.manydesigns.portofino.actions.admin.TableForm.class)
+                .configFields("entityName", "javaClass", "shortName")
+                .configMode(mode)
+                .build();
+        //Field entityNameField = tableForm.findFieldByPropertyName("entityName");
+        //entityNameField.setHelp(getMessage("layouts.admin.tables.entityName.help"));
+
+        tableForm.readFromObject(new com.manydesigns.portofino.actions.admin.TableForm(table));
+    }
+
+    protected void setupColumnsForm(Mode mode) {
         Type[] types = application.getConnectionProvider(table.getDatabaseName()).getTypes();
         decoratedColumns = new ArrayList<ColumnForm>(table.getColumns().size());
         TableAccessor tableAccessor = new TableAccessor(table);
@@ -343,9 +386,10 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 .configFields("columnName", "propertyName", "javaType", "type", "length", "scale", "nullable")
                 .configSelectionProvider(typesSP, "columnName", "type", "javaType")
                 .configNRows(decoratedColumns.size())
+                .configMode(mode)
                 .build();
         columnsTableForm.setSelectable(false);
-        columnsTableForm.setCaption("Columns");
+        columnsTableForm.setCaption("<h3>Columns</h3>");
         for(int i = 0; i < decoratedColumns.size(); i++) {
             TableForm.Row row = columnsTableForm.getRows()[i];
             Column column = decoratedColumns.get(i);
@@ -486,45 +530,6 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         return MessageFormat.format(msg, args);
     }
 
-    /*public Resolution jsonSelectFieldOptions() {
-        if("columnType".equals(relName)) {
-            setupTableForm();
-            setupColumnsForm();
-            HttpServletRequest request = context.getRequest();
-            columnsTableForm.readFromRequest(request);
-            for(TableForm.Row row : columnsTableForm.getRows()) {
-                for(Field field : row) {
-                    if(field.getPropertyAccessor().getName().equals("javaType") &&
-                       request.getParameter(field.getInputName()) != null) {
-                        field.readFromRequest(request);
-                        String text = ((SelectField) field).jsonSelectFieldOptions(false);
-                        return new NoCacheStreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, text);
-                    }
-                }
-            }
-        }
-        return null;
-    }*/
-
-    /*
-    public Resolution read() {
-        Table table = setupTable();
-
-        tableForm = new FormBuilder(Table.class)
-                .configFields("databaseName", "schemaName", "tableName")
-                .configMode(Mode.VIEW)
-                .build();
-        tableForm.readFromObject(table);
-
-        columnTableForm = new TableFormBuilder(Column.class)
-                .configFields("columnName", "columnType")
-                .configNRows(table.getColumns().size())
-                .configMode(Mode.VIEW)
-                .build();
-        columnTableForm.readFromObject(table.getColumns());
-        return new ForwardResolution("/layouts/admin/tables/read.jsp");
-    }*/
-
     //**************************************************************************
     // Common methods
     //**************************************************************************
@@ -549,563 +554,6 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     @Button(list = "tables-list", key = "commons.returnToPages", order = 3)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
-    }
-
-    //**************************************************************************
-    // Cancel
-    //**************************************************************************
-
-    public Resolution cancel() {
-        return null; //TODO
-    }
-
-    //**************************************************************************
-    // Drop
-    //**************************************************************************
-
-    @Button(list = "tables-list", key = "commons.delete", order = 2)
-    public String bulkDelete() {
-        return "drop";
-    }
-
-    //**************************************************************************
-    // Add new Column
-    //**************************************************************************
-
-    /*@Button(list = "tables-list", key = "commons.create", order = 1)
-    public String create() throws CloneNotSupportedException {
-        setupForms();
-        step= TABLE_STEP;
-        return CREATE;
-    }
-
-
-
-    public String addCol() {
-        step = COLUMN_STEP;
-        setupForms();
-        readFromRequest();
-        Column col = new Column();
-        col.setTable(table);
-        columnForm.readFromRequest(context.getRequest());
-        if(!columnForm.validate()){
-            return CREATE;
-        }      
-       
-        columnForm.writeToObject(col);
-        List<Column> columns = table.getColumns();
-        boolean found = false;
-        for (Column currentColumn : columns){
-            String name = currentColumn.getColumnName();
-            if (name.equals(col.getColumnName())){
-                found = true;
-            }
-        }       
-        if (!found){
-            columns.add(col);
-            columnNames.add(col.getColumnName());
-        } else {
-            SessionMessages.addInfoMessage("Column exists");
-        }
-        columnTableForm = new TableFormBuilder(Column.class)
-            .configFields("columnName", "columnType", "nullable",
-                    "autoincrement", "length", "scale",
-                    "searchable", "javaType", "propertyName")
-                .configPrefix("cols_")
-                .configNRows(table.getColumns().size())
-                .configMode(Mode.CREATE_PREVIEW)
-                .build();
-        ncol++;
-        columnTableForm.setSelectable(true);
-        columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
-        columnTableForm.readFromObject(table.getColumns());
-
-        return CREATE;
-}
-
-    public String remCol() {
-        step= COLUMN_STEP;
-        setupForms();
-        if(!readFromRequest()){
-            return CREATE;
-        }
-        columnNames.clear();
-        for(TableForm.Row row : columnTableForm.getRows()) {
-            try {
-                Column currCol = new Column();
-                currCol.setTable(table);
-                row.writeToObject(currCol);
-                if (ArrayUtils.contains(cols_selection, currCol.getColumnName())){
-                    table.getColumns().remove(
-                            DatabaseLogic.findColumnByName(
-                                    table, currCol.getColumnName()));
-                } else {
-                    columnNames.add(currCol.getColumnName());
-                }
-            } catch (Throwable e) {
-                logger.info(e.getMessage());
-            }
-        }
-
-        columnTableForm = new TableFormBuilder(Column.class)
-            .configFields("columnName", "columnType", "nullable",
-                    "autoincrement", "length", "scale",
-                    "searchable", "javaType", "propertyName")
-                .configPrefix("cols_")
-                .configNRows(table.getColumns().size())
-                .configMode(Mode.CREATE_PREVIEW)
-                .build();
-        columnTableForm.setSelectable(true);
-        columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
-        columnTableForm.readFromObject(table.getColumns());
-        ncol = table.getColumns().size();
-        columnTableForm.setSelectable(true);
-        columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
-        columnTableForm.readFromObject(table.getColumns());
-
-        return CREATE;
-    }
-
-
-    public String addColAnnotation() {
-        step= ANNOTATION_STEP;
-        setupForms();
-        readFromRequest();
-        
-        AnnModel annotation = new AnnModel();
-        Properties properties = new Properties();
-
-        annForm.writeToObject(annotation);
-        annPropForm.writeToObject(properties);
-        annotation.properties=properties;
-
-        colAnnotations.add(annotation);
-
-        colAnnotationTableForm = new TableFormBuilder(AnnModel.class)
-            .configFields("columnName", "annotationName", "propValues")
-                .configPrefix("colAnnT_")
-            .configNRows(colAnnotations.size())
-            .configMode(Mode.CREATE_PREVIEW)
-            .build();
-        nAnnotations++;
-        colAnnotationTableForm.setSelectable(true);
-        colAnnotationTableForm.setKeyGenerator(
-                OgnlTextFormat.create("%{columnName+\"_\"+annotationName}"));
-        colAnnotationTableForm.readFromObject(colAnnotations);
-
-        return CREATE;
-    }
-
-    public String setAnnParameters() throws ClassNotFoundException, NoSuchFieldException {
-        step= ANNOTATION_STEP;
-        setupForms();
-        readFromRequest(); 
-        if (colAnn_annotationName==null){
-            SessionMessages.addErrorMessage("SELECT A ANNOTATION");
- 
-        }
-        return CREATE;
-    }
-
-    public String remColAnnotation() {
-        step= ANNOTATION_STEP;
-        setupForms();
-        if(!readFromRequest()){
-            return CREATE;
-        }
-
-        for(TableForm.Row row : colAnnotationTableForm.getRows()) {
-            try {
-                AnnModel annotation = new AnnModel();
-                row.writeToObject(annotation);
-                if (ArrayUtils.contains(colAnnT_selection,
-                        annotation.columnName+"_"+
-                        annotation.annotationName)){
-                        colAnnotations.remove(annotation);
-                }
-            } catch (Throwable e) {
-                //do nothing: accetto errori quali assenza di pk sulla tabella
-                logger.info(e.getMessage());
-            }
-        }
-
-        colAnnotationTableForm = new TableFormBuilder(AnnModel.class)
-            .configFields("columnName", "annotationName", "propValues")
-                .configPrefix("colAnnT_")
-            .configNRows(colAnnotations.size())
-            .configMode(Mode.CREATE_PREVIEW)
-            .build();
-        colAnnotationTableForm.setSelectable(true);
-        colAnnotationTableForm.setKeyGenerator(OgnlTextFormat
-                .create("%{columnName+\"_\"+annotationName}"));
-        colAnnotationTableForm.readFromObject(colAnnotations);
-        nAnnotations=colAnnotations.size();
-
-        return CREATE;
-    }
-
-    public String addPkCol() {
-        step= PRIMARYKEY_STEP;
-        setupForms();
-        if(!readFromRequest()){
-            return CREATE;
-        }
-
-        PrimaryKeyColumnModel colModel = new PrimaryKeyColumnModel();
-
-        pkColumnForm.writeToObject(colModel);
-        pkModel.add(colModel);
-        npkcol++;
-
-        pkColumnTableForm = new TableFormBuilder(PrimaryKeyColumnModel.class)
-                .configFields("column", "genType", "seqName",
-                        "tabName", "colName", "colValue").configPrefix("pkCols_")
-            .configNRows(pkModel.size())
-            .configMode(Mode.CREATE_PREVIEW)
-            .build();
-
-        pkColumnTableForm.setSelectable(true);
-        pkColumnTableForm.setKeyGenerator(OgnlTextFormat.create("%{column}"));
-        pkColumnTableForm.readFromObject(pkModel);
-        return CREATE;
-    }
-
-    public String remPkCol() {
-        step= PRIMARYKEY_STEP;
-        setupForms();
-        if(!readFromRequest()){
-            return CREATE;
-        }
-        for(TableForm.Row row : pkColumnTableForm.getRows()) {
-            try {
-                PrimaryKeyColumnModel currCol = new PrimaryKeyColumnModel();
-                row.writeToObject(currCol);
-                if (ArrayUtils.contains(pkCols_selection, currCol.column)){
-                    pkModel.remove(currCol);
-                    npkcol--;
-                } 
-            } catch (Throwable e) {
-                // do nothing: accetto errori quali assenza di pk sulla tabella
-                // la classe mi serve solo come modello dei dati
-                logger.info(e.getMessage());
-            }
-        }
-        pkColumnTableForm = new TableFormBuilder(PrimaryKeyColumnModel.class)
-                .configFields("column", "genType", "seqName",
-                        "tabName", "colName", "colValue").configPrefix("pkCols_")
-            .configNRows(pkModel.size())
-            .configMode(Mode.CREATE_PREVIEW)
-            .build();
-
-        pkColumnTableForm.setSelectable(true);
-        pkColumnTableForm.setKeyGenerator(OgnlTextFormat.create("%{column}"));
-        pkColumnTableForm.readFromObject(pkModel);
-
-        return CREATE;
-    }*/
-
-    //**************************************************************************
-    // Preparazione dei form
-    //**************************************************************************
-
-    /*private void setupForms() {
-        if (ncol == null){
-            ncol = 0;
-        }
-        if (npkcol == null){
-            npkcol = 0;
-        }
-        if (nAnnotations == null){
-            nAnnotations = 0;
-        }
-        Mode mode = Mode.CREATE;
-
-        //Available databases
-        List<Database> databases = model.getDatabases();
-        String [] databaseNames = new String[databases.size()];
-        int i = 0;
-        for (Database db : databases){
-            databaseNames[i++] = db.getQualifiedName();
-        }
-        //Costruisco form per Table
-
-        FormBuilder formBuilder = new FormBuilder(Table.class)
-                .configFields("databaseName", "schemaName", "tableName")
-                .configMode(mode);
-
-        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("databases");
-        for(i = 0; i < databaseNames.length; i++) {
-            selectionProvider.appendRow(databaseNames[i], databaseNames[i], true);
-        }
-        formBuilder.configSelectionProvider(selectionProvider, "databaseName");
-        formBuilder.configPrefix("table_");
-        tableForm = formBuilder.build();
-
-        //Costruisco form per Column
-        formBuilder = new FormBuilder(Column.class)
-                .configFields("columnName", "columnType", "nullable",
-                        "autoincrement", "length", "scale",
-                        "searchable", "javaType", "propertyName")
-                .configMode(mode);
-        formBuilder.configPrefix("column_");
-        columnForm = formBuilder.build();
-
-        //Costruisco form per Primary Key
-        formBuilder = new FormBuilder(PrimaryKey.class)
-                .configFields("primaryKeyName")
-                .configMode(mode);
-        formBuilder.configPrefix("pk_");
-        pkForm = formBuilder.build();
-        pkColumnForm = new FormBuilder(PrimaryKeyColumnModel.class)
-                .configFields("column", "genType", "seqName",
-                        "tabName", "colName", "colValue").configPrefix("pk_")
-                .configMode(mode).build();
-
-        //Costruisco form per Annotations
-        formBuilder = new FormBuilder(AnnModel.class)
-                .configFields("columnName", "annotationName").configPrefix("colAnn_")
-                .configMode(mode);
-        DefaultSelectionProvider selectionProviderAnns = new DefaultSelectionProvider("annotations");
-        for(i = 0; i < annotationsImpl.size(); i++) {
-            selectionProviderAnns.appendRow(annotationsImpl.get(i), annotations.get(i), true);
-        }
-        formBuilder.configSelectionProvider(selectionProviderAnns, "annotationName");
-        annForm = formBuilder.build();
-
-        if (colAnn_annotationName!=null && colAnn_annotationName.length()>0){
-            try {
-                Class annotationClass =
-                        this.getClass().getClassLoader()
-                        .loadClass(colAnn_annotationName);
-                Properties properties = new Properties();
-                Field[] fields = annotationClass.getDeclaredFields();
-                for (Field field : fields){
-                    if (!Modifier.isStatic(field.getModifiers())){
-                        properties.put(field.getName(), "");
-                    }
-                }
-                ClassAccessor propertiesAccessor = new PropertiesAccessor(properties);
-                FormBuilder builder = new FormBuilder(propertiesAccessor);
-                annPropForm = builder.configMode(Mode.CREATE).build();
-            } catch (ClassNotFoundException e) {
-                logger.error(e.getMessage());
-                SessionMessages.addErrorMessage(e.getMessage());
-            }
-        }
-
-    }*/
-
-    //**************************************************************************
-    // Inizializzazione dei form a partire dalla request
-    //**************************************************************************
-    /*private boolean readFromRequest() {
-        if(null==table_databaseName){
-            return false;
-        }
-
-        tableForm.readFromRequest(context.getRequest());
-
-        if(!tableForm.validate()){
-            return false;
-        }
-        //Gestione tabella
-        Database database = new Database();
-        database.setDatabaseName(
-                DatabaseLogic.findDatabaseByName(model, table_databaseName)
-                    .getDatabaseName());
-        Schema schema = new Schema();
-        schema.setDatabase(database);
-        schema.setSchemaName(table_schemaName);
-        table = new Table();
-        table.setSchema(schema);
-        table.setTableName(table_tableName);
-
-        schema.getTables().add(table);
-        tableForm.readFromObject(table);
-
-        if(!tableForm.validate()){
-            return false;
-        }
-
-        HttpServletRequest req = context.getRequest();
-        //Gestione colonne
-        columnTableForm = new TableFormBuilder(Column.class)
-            .configFields("columnName", "columnType", "nullable",
-                    "autoincrement", "length", "scale",
-                    "searchable", "javaType", "propertyName")
-            .configPrefix("cols_").configNRows(ncol)
-            .configMode(Mode.CREATE_PREVIEW)
-            .build();
-        columnTableForm.setSelectable(true);
-        columnTableForm.setKeyGenerator(OgnlTextFormat.create("%{columnName}"));
-        columnTableForm.readFromRequest(req);
-        for(TableForm.Row row : columnTableForm.getRows()) {
-            try {
-                Column currCol = new Column();
-                currCol.setTable(table);
-                row.writeToObject(currCol);
-                table.getColumns().add(currCol);
-                columnNames.add(currCol.getColumnName());
-            } catch (Throwable e) {
-                //Do nothing
-            }
-        }
-
-        //Gestione Chiave primaria
-        pkModel = new PrimaryKeyModel();
-        pkColumnTableForm = new TableFormBuilder(PrimaryKeyColumnModel.class)
-                .configFields("column", "genType", "seqName",
-                        "tabName", "colName", "colValue").configPrefix("pkCols_")
-            .configNRows(npkcol)
-            .configMode(Mode.CREATE_PREVIEW)
-            .build();
-
-        pkColumnTableForm.setSelectable(true);
-        pkColumnTableForm.setKeyGenerator(OgnlTextFormat.create("%{column}"));
-        pkColumnTableForm.readFromRequest(req);
-        pkForm.readFromRequest(req);
-        pkModel.primaryKeyName = pk_primaryKeyName!=null?
-            pk_primaryKeyName:"pk_"+table_tableName;
-        pkColumnForm.readFromRequest(req);
-        for(TableForm.Row row : pkColumnTableForm.getRows()) {
-            try {
-                PrimaryKeyColumnModel currCol = new PrimaryKeyColumnModel();
-                row.writeToObject(currCol);
-                pkModel.add(currCol);
-            } catch (Throwable e) {
-                //Do nothing
-                logger.error(e.getMessage());
-            }
-        }
-
-        //Gestione annotations
-        colAnnotationTableForm = new TableFormBuilder(AnnModel.class)
-            .configFields("columnName", "annotationName", "propValues")
-                .configPrefix("colAnnT_")
-            .configNRows(nAnnotations)
-            .configMode(Mode.CREATE_PREVIEW)
-            .build();
-
-        colAnnotationTableForm.setSelectable(true);
-        colAnnotationTableForm.setKeyGenerator(
-                OgnlTextFormat.create("%{columnName+\"_\"+annotationName}"));
-        colAnnotationTableForm.readFromRequest(req);
-        for(TableForm.Row row : colAnnotationTableForm.getRows()) {
-            try {
-                AnnModel currAnnotation = new AnnModel();
-                row.writeToObject(currAnnotation);
-                colAnnotations.add(currAnnotation);
-            } catch (Throwable e) {
-                logger.error(e.getMessage());
-            }
-        }
-        
-        //Proprieta' delle annotation
-        annForm.readFromRequest(req);
-        annPropForm.readFromRequest(req);
-
-        return true;
-    }*/
-
-
-
-
-
-    private String createJsonArray (List<String> collection) {
-        List<String> resulList = new ArrayList<String>();
-
-        for(String string : collection){
-
-                resulList.add("\""+string+"\"");
-        }
-        String result = "["+ StringUtils.join(resulList, ",")+"]";
-        inputStream = new ByteArrayInputStream(result.getBytes());
-        return "json";
-
-    }
-
-    //**************************************************************************
-    // Json output per lista Colonne
-    //**************************************************************************
-    /*public String jsonColumns() throws Exception {
-        return createJsonArray(columnNames);
-    }*/
-
-    //**************************************************************************
-    // Json output per i corretti types per una piattaforma
-    //**************************************************************************
-    /*public String jsonTypes() throws Exception {
-        Type[] types = application.getConnectionProvider(table_databaseName).getTypes();
-        List<String> typesString = new ArrayList<String>();
-
-        for(Type currentType : types){
-            if(null!=term && !"".equals(term)) {
-                if (StringUtils.startsWithIgnoreCase(currentType.getTypeName(),term))
-                   typesString.add("\""+currentType.getTypeName()+"\"");
-            } else {
-                typesString.add("\""+currentType.getTypeName()+"\"");
-            }
-        }
-        String result = "["+ StringUtils.join(typesString, ",")+"]";
-        inputStream = new ByteArrayInputStream(result.getBytes());
-        return "json";
-    }*/
-
-    //**************************************************************************
-    // Json output per i corretti Java types per una piattaforma
-    //**************************************************************************
-    /*public String jsonJavaTypes() throws Exception {
-        Type[] types = application.getConnectionProvider(table_databaseName).getTypes();
-        List<String> javaTypesString = new ArrayList<String>();
-
-        for(Type currentType : types){
-            if(StringUtils.equalsIgnoreCase(currentType.getTypeName(),
-                    context.getRequest().getParameter("column_columnType"))){
-                String defJavaType;
-                try{
-                    defJavaType= currentType.getDefaultJavaType().getName();
-                } catch (Throwable e){
-                    defJavaType="UNSOPPORTED";
-                }
-                javaTypesString.add("\""+defJavaType+"\"");
-            }
-        }
-        String result = "["+ StringUtils.join(javaTypesString, ",")+"]";
-        inputStream = new ByteArrayInputStream(result.getBytes());
-        return "json";
-    }*/
-    
-    //**************************************************************************
-    // Json output per vedere se richiesta Precision, Scale, ...
-    //**************************************************************************
-    /*public String jsonTypeInfo() throws Exception {
-        Type[] types = application.getConnectionProvider(table_databaseName).getTypes();
-        List<String> info = new ArrayList<String>();
-
-        for(Type currentType : types){
-            if(StringUtils.equalsIgnoreCase(currentType.getTypeName(),
-                    context.getRequest().getParameter("column_columnType"))){
-
-                info.add("\"precision\" : \""+
-                        (currentType.isPrecisionRequired()?"true":"false")+"\"");
-                info.add("\"scale\" : \""+
-                        (currentType.isScaleRequired()?"true":"false")+"\"");
-                info.add("\"searchable\" : \""+
-                        (currentType.isSearchable()?"true":"false")+"\"");
-                info.add("\"autoincrement\" : \""+
-                        (currentType.isAutoincrement()?"true":"false")+"\"");
-            }
-        }
-        String result = "{"+ StringUtils.join(info, ",")+"}";
-        inputStream = new ByteArrayInputStream(result.getBytes());
-        return "json";
-    }*/
-
-    //**************************************************************************
-    // Json output per lista Annotations
-    //**************************************************************************
-    public String jsonAnnotation() throws Exception {
-        return createJsonArray(annotations);
     }
 
     public String getActionPath() {
@@ -1175,8 +623,17 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         return columnForm;
     }
 
-    public void setRelName(String relName) {
-        this.relName = relName;
+    @FieldSize(75)
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+    }
+
+    public Field getShortNameField() {
+        return shortNameField;
     }
 }
 
