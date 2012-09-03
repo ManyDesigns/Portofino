@@ -54,7 +54,6 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
 
     protected String name;
     protected String toDatabase;
-    protected String toSchema;
     protected String sql;
     protected String hql;
 
@@ -93,7 +92,6 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
     public void init(Model model) {
         assert name != null;
         assert toDatabase != null;
-        assert toSchema != null;
     }
 
     public void link(Model model) {}
@@ -133,15 +131,6 @@ public class DatabaseSelectionProvider implements ModelSelectionProvider {
 
     public void setToDatabase(String toDatabase) {
         this.toDatabase = toDatabase;
-    }
-
-    @XmlAttribute(required = true)
-    public String getToSchema() {
-        return toSchema;
-    }
-
-    public void setToSchema(String toSchema) {
-        this.toSchema = toSchema;
     }
 
     @XmlAttribute(required = false)

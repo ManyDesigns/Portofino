@@ -59,6 +59,7 @@ public class ForeignKey extends DatabaseSelectionProvider
 
     protected String onUpdate;
     protected String onDelete;
+    protected String toSchema;
 
     //**************************************************************************
     // Fields (logical)
@@ -235,6 +236,15 @@ public class ForeignKey extends DatabaseSelectionProvider
     @XmlTransient
     public String getHql() {
         return hql;
+    }
+
+    @XmlAttribute(required = true)
+    public String getToSchema() {
+        return toSchema;
+    }
+
+    public void setToSchema(String toSchema) {
+        this.toSchema = toSchema;
     }
 
     public Table getToTable() {

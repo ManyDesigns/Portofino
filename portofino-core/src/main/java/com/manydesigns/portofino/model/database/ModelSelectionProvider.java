@@ -47,7 +47,4 @@ public interface ModelSelectionProvider extends ModelObject, HasReferences {
     String getToDatabase();
     void setToDatabase(String toDatabase);
 
-    String getToSchema();
-    void setToSchema(String toSchema);
-
 }

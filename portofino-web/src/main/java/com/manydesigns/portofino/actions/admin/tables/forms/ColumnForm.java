@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.actions.admin;
+package com.manydesigns.portofino.actions.admin.tables.forms;
 
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -57,13 +57,13 @@ public class ColumnForm extends Column {
     protected Integer fieldSize;
     protected Integer maxLength;
     protected boolean multiline;
-    protected boolean email;
-    protected boolean cap;
+    protected String stringFormat;
     protected boolean highlightLinks;
     protected String regexp;
 
     protected BigDecimal minValue;
     protected BigDecimal maxValue;
+    protected String decimalFormat;
 
     protected String dateFormat;
 
@@ -91,14 +91,20 @@ public class ColumnForm extends Column {
             multiline = true;
         }
 
-        Email emailAnn = columnAccessor.getAnnotation(Email.class);
-        if(emailAnn != null) {
-            email = true;
+        if(columnAccessor.isAnnotationPresent(Email.class)) {
+            stringFormat = Email.class.getName();
         }
-
-        CAP capAnn = columnAccessor.getAnnotation(CAP.class);
-        if(capAnn != null) {
-            cap = true;
+        if(columnAccessor.isAnnotationPresent(CAP.class)) {
+            stringFormat = CAP.class.getName();
+        }
+        if(columnAccessor.isAnnotationPresent(CodiceFiscale.class)) {
+            stringFormat = CodiceFiscale.class.getName();
+        }
+        if(columnAccessor.isAnnotationPresent(PartitaIva.class)) {
+            stringFormat = PartitaIva.class.getName();
+        }
+        if(columnAccessor.isAnnotationPresent(Password.class)) {
+            stringFormat = Password.class.getName();
         }
 
         HighlightLinks hlAnn = columnAccessor.getAnnotation(HighlightLinks.class);
@@ -131,6 +137,11 @@ public class ColumnForm extends Column {
             }
         }
 
+        DecimalFormat decimalFormatAnn = columnAccessor.getAnnotation(DecimalFormat.class);
+        if(decimalFormatAnn != null) {
+            decimalFormat = decimalFormatAnn.value();
+        }
+
         DateFormat dateFormatAnn = columnAccessor.getAnnotation(DateFormat.class);
         if(dateFormatAnn != null) {
             dateFormat = dateFormatAnn.value();
@@ -158,14 +169,8 @@ public class ColumnForm extends Column {
             ann.getValues().add("true");
             column.getAnnotations().add(ann);
         }
-        if(email) {
-            Annotation ann = new Annotation(column, Email.class.getName());
-            ann.getValues().add("true");
-            column.getAnnotations().add(ann);
-        }
-        if(cap) {
-            Annotation ann = new Annotation(column, CAP.class.getName());
-            ann.getValues().add("true");
+        if(stringFormat != null) {
+            Annotation ann = new Annotation(column, stringFormat);
             column.getAnnotations().add(ann);
         }
         if(highlightLinks) {
@@ -187,6 +192,11 @@ public class ColumnForm extends Column {
         if(maxValue != null) {
             Annotation ann = new Annotation(column, MaxDecimalValue.class.getName());
             ann.getValues().add(maxValue.toString());
+            column.getAnnotations().add(ann);
+        }
+        if(!StringUtils.isEmpty(decimalFormat)) {
+            Annotation ann = new Annotation(column, DecimalFormat.class.getName());
+            ann.getValues().add(decimalFormat);
             column.getAnnotations().add(ann);
         }
         if(!StringUtils.isEmpty(dateFormat)) {
@@ -279,20 +289,12 @@ public class ColumnForm extends Column {
         this.multiline = multiline;
     }
 
-    public boolean isEmail() {
-        return email;
+    public String getStringFormat() {
+        return stringFormat;
     }
 
-    public void setEmail(boolean email) {
-        this.email = email;
-    }
-
-    public boolean isCap() {
-        return cap;
-    }
-
-    public void setCap(boolean cap) {
-        this.cap = cap;
+    public void setStringFormat(String stringFormat) {
+        this.stringFormat = stringFormat;
     }
 
     public boolean isHighlightLinks() {
@@ -330,6 +332,14 @@ public class ColumnForm extends Column {
 
     public void setMaxValue(BigDecimal maxValue) {
         this.maxValue = maxValue;
+    }
+
+    public String getDecimalFormat() {
+        return decimalFormat;
+    }
+
+    public void setDecimalFormat(String decimalFormat) {
+        this.decimalFormat = decimalFormat;
     }
 
     public String getDateFormat() {

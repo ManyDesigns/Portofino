@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.actions.admin;
+package com.manydesigns.portofino.actions.admin.tables.forms;
 
 import com.manydesigns.elements.annotations.FieldSize;
 import com.manydesigns.elements.annotations.LabelI18N;

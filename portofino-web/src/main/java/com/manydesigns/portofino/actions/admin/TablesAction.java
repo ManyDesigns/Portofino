@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.annotations.FieldSize;
+import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.TextField;
 import com.manydesigns.elements.forms.Form;
@@ -42,6 +42,7 @@ import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.RequestAttributes;
+import com.manydesigns.portofino.actions.admin.tables.forms.ColumnForm;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ModelObjectNotFoundError;
 import com.manydesigns.portofino.buttons.annotations.Button;
@@ -59,7 +60,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.MessageFormat;
@@ -93,8 +93,6 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     //**************************************************************************
     // Web parameters
     //**************************************************************************
-    public InputStream inputStream;
-
     protected String databaseName;
     protected String schemaName;
     protected String tableName;
@@ -116,6 +114,11 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     protected Form columnForm;
 
     protected Field shortNameField;
+
+    //**************************************************************************
+    // UI
+    //**************************************************************************
+    protected String selectedTabId;
 
     //**************************************************************************
     // Other objects
@@ -169,8 +172,8 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         tableForm.readFromRequest(context.getRequest());
         columnsTableForm.readFromRequest(context.getRequest());
         if(validateTableForm() && columnsTableForm.validate()) {
-            com.manydesigns.portofino.actions.admin.TableForm tf =
-                    new com.manydesigns.portofino.actions.admin.TableForm(table);
+            com.manydesigns.portofino.actions.admin.tables.forms.TableForm tf =
+                    new com.manydesigns.portofino.actions.admin.tables.forms.TableForm(table);
             tableForm.writeToObject(tf);
             tf.copyTo(table);
             table.setEntityName(StringUtils.defaultIfEmpty(table.getEntityName(), null));
@@ -233,6 +236,15 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         } else {
             return false;
         }
+    }
+
+    @Button(key = "todoAddSelectionProvider", list="table-selection-providers")
+    public Resolution addSelectionProvider() {
+        setupTableForm(Mode.HIDDEN);
+        setupColumnsForm(Mode.HIDDEN);
+        tableForm.readFromRequest(context.getRequest());
+        columnsTableForm.readFromRequest(context.getRequest());
+        return null;
     }
 
     @Button(key = "commons.cancel", list = "table-edit", order = 2)
@@ -344,14 +356,14 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
 
     protected void setupTableForm(Mode mode) {
         table = findTable();
-        tableForm = new FormBuilder(com.manydesigns.portofino.actions.admin.TableForm.class)
+        tableForm = new FormBuilder(com.manydesigns.portofino.actions.admin.tables.forms.TableForm.class)
                 .configFields("entityName", "javaClass", "shortName")
                 .configMode(mode)
                 .build();
         //Field entityNameField = tableForm.findFieldByPropertyName("entityName");
         //entityNameField.setHelp(getMessage("layouts.admin.tables.entityName.help"));
 
-        tableForm.readFromObject(new com.manydesigns.portofino.actions.admin.TableForm(table));
+        tableForm.readFromObject(new com.manydesigns.portofino.actions.admin.tables.forms.TableForm(table));
     }
 
     protected void setupColumnsForm(Mode mode) {
@@ -389,7 +401,6 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 .configMode(mode)
                 .build();
         columnsTableForm.setSelectable(false);
-        columnsTableForm.setCaption("<h3>Columns</h3>");
         for(int i = 0; i < decoratedColumns.size(); i++) {
             TableForm.Row row = columnsTableForm.getRows()[i];
             Column column = decoratedColumns.get(i);
@@ -424,12 +435,22 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         ColumnForm cf = decorateColumn(column, columnAccessor, types);
         DefaultSelectionProvider typesSP = new DefaultSelectionProvider("columnType", 3);
         configureTypesSelectionProvider(typesSP, cf);
+
+        DefaultSelectionProvider stringFormatSP = new DefaultSelectionProvider("stringFormat");
+        stringFormatSP.appendRow(Email.class.getName(), "Email", true);
+        stringFormatSP.appendRow(Password.class.getName(), "Password", true);
+        stringFormatSP.appendRow(CAP.class.getName(), "CAP", true);
+        stringFormatSP.appendRow(PartitaIva.class.getName(), "Partita IVA", true);
+        stringFormatSP.appendRow(CodiceFiscale.class.getName(), "Codice Fiscale", true);
+        stringFormatSP.appendRow(Phone.class.getName(), "Phone", true);
+
         columnForm = new FormBuilder(ColumnForm.class)
                 .configFieldSetNames("Properties", "Annotations")
                 .configFields(new String[] { "columnName", "propertyName", "javaType", "type",
                                              "length", "scale", "nullable", "inPk" },
                               getApplicableAnnotations(column.getActualJavaType()))
                 .configSelectionProvider(typesSP, "columnName", "type", "javaType")
+                .configSelectionProvider(stringFormatSP, "stringFormat")
                 .build();
         Field nullableField = columnForm.findFieldByPropertyName("nullable");
         nullableField.setInsertable(false);
@@ -514,9 +535,9 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
 
     protected String[] getApplicableAnnotations(Class type) {
         if(Number.class.isAssignableFrom(type)) {
-            return new String[] { "fieldSize", "minValue", "maxValue" };
+            return new String[] { "fieldSize", "minValue", "maxValue", "decimalFormat" };
         } else if(String.class.equals(type)) {
-            return new String[] { "fieldSize", "multiline", "email", "cap", "highlightLinks", "regexp" };
+            return new String[] { "fieldSize", "multiline", "stringFormat", "regexp" };
         } else if(Date.class.isAssignableFrom(type)) {
             return new String[] { "fieldSize", "dateFormat" };
         }
@@ -634,6 +655,10 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
 
     public Field getShortNameField() {
         return shortNameField;
+    }
+
+    public String getSelectedTabId() {
+        return selectedTabId;
     }
 }
 
