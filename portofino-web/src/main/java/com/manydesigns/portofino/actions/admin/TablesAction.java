@@ -39,17 +39,23 @@ import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.tables.forms.ColumnForm;
+import com.manydesigns.portofino.actions.admin.tables.forms.DatabaseSelectionProviderForm;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.ModelObjectNotFoundError;
+import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.buttons.annotations.Buttons;
+import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.AbstractActionBean;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -97,14 +103,17 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     protected String schemaName;
     protected String tableName;
     protected String columnName;
-
     protected String cancelReturnUrl;
+    protected String shortName;
+    protected String selectionProviderName;
+
+    //**************************************************************************
+    // Domain objects
+    //**************************************************************************
     protected Table table;
     protected Column column;
-
-    protected String shortName;
-
     protected List<ColumnForm> decoratedColumns;
+    protected DatabaseSelectionProvider databaseSelectionProvider;
 
     //**************************************************************************
     // Forms
@@ -114,6 +123,8 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     protected Form columnForm;
 
     protected Field shortNameField;
+
+    protected Form dbSelectionProviderForm;
 
     //**************************************************************************
     // UI
@@ -156,11 +167,13 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         setupTableForm(Mode.EDIT);
         setupColumnsForm(Mode.EDIT);
         tableForm.readFromRequest(context.getRequest());
-        columnsTableForm.readFromRequest(context.getRequest());
         return new ForwardResolution("/layouts/admin/tables/edit-table.jsp");
     }
 
     public Resolution editColumn() {
+        setupTableForm(Mode.HIDDEN);
+        tableForm.readFromRequest(context.getRequest());
+
         setupColumnForm();
         return new ForwardResolution("/layouts/admin/tables/edit-column.jsp");
     }
@@ -238,15 +251,6 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         }
     }
 
-    @Button(key = "todoAddSelectionProvider", list="table-selection-providers")
-    public Resolution addSelectionProvider() {
-        setupTableForm(Mode.HIDDEN);
-        setupColumnsForm(Mode.HIDDEN);
-        tableForm.readFromRequest(context.getRequest());
-        columnsTableForm.readFromRequest(context.getRequest());
-        return null;
-    }
-
     @Button(key = "commons.cancel", list = "table-edit", order = 2)
     public Resolution returnToTables() {
         return new RedirectResolution(BASE_ACTION_PATH);
@@ -254,15 +258,18 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
 
     @Button(key = "commons.save", list = "column-edit", order = 1)
     public Resolution saveColumn() {
+        setupTableForm(Mode.HIDDEN);
+        tableForm.readFromRequest(context.getRequest());
+
         ColumnForm cf = setupColumnForm();
         columnForm.readFromRequest(context.getRequest());
         if(saveToColumnForm(columnForm, cf)) {
             cf.copyTo(column);
-             try {
+            try {
                 model.init();
                 application.saveXmlModel();
                 DispatcherLogic.clearConfigurationCache();
-                 for(Table otherTable : table.getSchema().getTables()) {
+                for(Table otherTable : table.getSchema().getTables()) {
                     for(ForeignKey fk : otherTable.getForeignKeys()) {
                         for(Reference ref : fk.getReferences()) {
                             Column fromColumn = ref.getActualFromColumn();
@@ -285,7 +292,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                         }
                     }
                 }
-             } catch (Exception e) {
+            } catch (Exception e) {
                 logger.error("Could not save model", e);
                 SessionMessages.addErrorMessage(e.toString());
             }
@@ -296,17 +303,24 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         return new ForwardResolution("/layouts/admin/tables/edit-column.jsp");
     }
 
-    @Button(key = "commons.cancel", list = "column-edit", order = 2)
+    @Buttons({
+            @Button(key = "commons.cancel", list = "column-edit", order = 2),
+            @Button(key = "commons.cancel", list = "table-short-name", order = 2),
+            @Button(key = "commons.cancel", list = "table-selection-provider", order = 2)
+    })
     public Resolution returnToTable() {
-        return new RedirectResolution(BASE_ACTION_PATH + "/" + databaseName + "/" + schemaName + "/" + tableName);
+        RedirectResolution resolution =
+                new RedirectResolution(BASE_ACTION_PATH + "/" + databaseName + "/" + schemaName + "/" + tableName);
+        resolution.addParameter("entityName", context.getRequest().getParameter("entityName"));
+        resolution.addParameter("javaClass", context.getRequest().getParameter("javaClass"));
+        resolution.addParameter("selectedTabId", selectedTabId);
+        return resolution;
     }
 
     @Button(key = "layouts.admin.tables.editShortName", list = "table-edit-short-name")
     public Resolution editShortName() throws NoSuchFieldException {
         setupTableForm(Mode.HIDDEN);
-        setupColumnsForm(Mode.HIDDEN);
         tableForm.readFromRequest(context.getRequest());
-        columnsTableForm.readFromRequest(context.getRequest());
 
         shortName = table.getShortName();
         JavaClassAccessor jca = JavaClassAccessor.getClassAccessor(getClass());
@@ -320,21 +334,140 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     public Resolution saveShortName() {
         RedirectResolution resolution =
                 new RedirectResolution(BASE_ACTION_PATH + "/" + databaseName + "/" + schemaName + "/" + tableName);
-        resolution.addParameters(context.getRequest().getParameterMap());
-        resolution.getParameters().remove("saveShortName");
-        resolution.getParameters().remove("shortName");
+        resolution.addParameter("entityName", context.getRequest().getParameter("entityName"));
+        resolution.addParameter("javaClass", context.getRequest().getParameter("javaClass"));
         resolution.addParameter("shortName", shortName);
         return resolution;
     }
 
-    @Button(key = "commons.cancel", list = "table-short-name", order = 2)
-    public Resolution cancelEditShortName() {
-        RedirectResolution resolution =
-                new RedirectResolution(BASE_ACTION_PATH + "/" + databaseName + "/" + schemaName + "/" + tableName);
-        resolution.addParameters(context.getRequest().getParameterMap());
-        resolution.getParameters().remove("cancelEditShortName");
-        resolution.getParameters().remove("shortName");
-        return resolution;
+    @Button(key = "todoAddSelectionProvider", list="table-selection-providers")
+    public Resolution addSelectionProvider() {
+        DatabaseSelectionProviderForm databaseSelectionProviderForm = setupDbSelectionProviderForm(Mode.CREATE);
+        return doEditSelectionProvider(databaseSelectionProviderForm);
+    }
+
+    @Button(key = "commons.delete", list="table-selection-provider")
+    @Guard(test = "getSelectionProviderName() != null", type = GuardType.VISIBLE)
+    public Resolution removeSelectionProvider() {
+        table = findTable();
+        ModelSelectionProvider sp = DatabaseLogic.findSelectionProviderByName(table, selectionProviderName);
+        table.getSelectionProviders().remove(sp);
+        try {
+            model.init();
+            application.saveXmlModel();
+            DispatcherLogic.clearConfigurationCache();
+            SessionMessages.addInfoMessage(getMessage("commons.save.successful"));
+        } catch (Exception e) {
+            logger.error("Could not save model", e);
+            SessionMessages.addErrorMessage(e.toString());
+        }
+        return editTable();
+    }
+
+    public Resolution editSelectionProvider() {
+        DatabaseSelectionProviderForm databaseSelectionProviderForm = setupDbSelectionProviderForm(Mode.CREATE);
+        return doEditSelectionProvider(databaseSelectionProviderForm);
+    }
+
+    protected Resolution doEditSelectionProvider(DatabaseSelectionProviderForm databaseSelectionProviderForm) {
+        setupTableForm(Mode.HIDDEN);
+        tableForm.readFromRequest(context.getRequest());
+        List<String> refCols = new ArrayList<String>();
+        for(Column column : table.getColumns()) {
+            for(Reference ref : databaseSelectionProvider.getReferences()) {
+                if(ref.getFromColumn().equals(column.getColumnName())) {
+                    refCols.add(column.getColumnName());
+                    break;
+                }
+            }
+        }
+        databaseSelectionProviderForm.setColumns(StringUtils.join(refCols, ", "));
+        return new ForwardResolution("/layouts/admin/tables/edit-db-selection-provider.jsp");
+    }
+
+    protected DatabaseSelectionProviderForm setupDbSelectionProviderForm(Mode mode) {
+        table = findTable();
+        databaseSelectionProvider = new DatabaseSelectionProvider(table);
+
+        SelectionProvider databaseChooser =
+                SelectionProviderLogic.createSelectionProvider(
+                        "database",
+                        model.getDatabases(),
+                        Database.class,
+                        null,
+                        new String[]{"databaseName"});
+        dbSelectionProviderForm = new FormBuilder(DatabaseSelectionProviderForm.class)
+                .configFields("name", "toDatabase", "hql", "sql", "columns")
+                .configSelectionProvider(databaseChooser, "toDatabase")
+                .configMode(mode)
+                .build();
+        DatabaseSelectionProviderForm databaseSelectionProviderForm =
+                new DatabaseSelectionProviderForm(databaseSelectionProvider);
+        dbSelectionProviderForm.readFromObject(databaseSelectionProviderForm);
+        return databaseSelectionProviderForm;
+    }
+
+    @Button(key = "commons.save", list = "table-selection-provider", order = 1)
+    public Resolution saveSelectionProvider() {
+        Mode mode = selectionProviderName == null ? Mode.CREATE : Mode.EDIT;
+        DatabaseSelectionProviderForm databaseSelectionProviderForm = setupDbSelectionProviderForm(mode);
+        dbSelectionProviderForm.readFromRequest(context.getRequest());
+        if(dbSelectionProviderForm.validate()) {
+            dbSelectionProviderForm.writeToObject(databaseSelectionProviderForm);
+            if((!StringUtils.isEmpty(databaseSelectionProviderForm.getSql()) &&
+                !StringUtils.isEmpty(databaseSelectionProviderForm.getHql())) ||
+               (StringUtils.isEmpty(databaseSelectionProviderForm.getSql()) &&
+                StringUtils.isEmpty(databaseSelectionProviderForm.getHql()))) {
+                SessionMessages.addErrorMessage("Please fill exactly one of the fields HQL, SQL");
+                return doEditSelectionProvider(databaseSelectionProviderForm);
+            }
+
+            String[] refCols = StringUtils.split(databaseSelectionProviderForm.getColumns(), ",");
+            List<Column> columns = new ArrayList<Column>();
+            for(String c : refCols) {
+                Column col = DatabaseLogic.findColumnByName(table, c.trim());
+                if(col == null) {
+                    SessionMessages.addErrorMessage("Column '" + c + "' not found");
+                    return doEditSelectionProvider(databaseSelectionProviderForm);
+                } else {
+                    columns.add(col);
+                }
+            }
+
+            DatabaseSelectionProvider dsp;
+            if(selectionProviderName == null) {
+                if(DatabaseLogic.findSelectionProviderByName(
+                        table, databaseSelectionProviderForm.getName()) != null) {
+                    SessionMessages.addErrorMessage("Selection provider " + databaseSelectionProviderForm.getName() + " already exists");
+                    return doEditSelectionProvider(databaseSelectionProviderForm);
+                }
+                dsp = new DatabaseSelectionProvider(table);
+                databaseSelectionProviderForm.copyTo(dsp);
+                table.getSelectionProviders().add(dsp);
+            } else {
+                dsp = (DatabaseSelectionProvider) DatabaseLogic.findSelectionProviderByName(
+                        table, selectionProviderName);
+                databaseSelectionProviderForm.copyTo(dsp);
+            }
+            dsp.getReferences().clear();
+            for(Column col : columns) {
+                Reference ref = new Reference(dsp);
+                ref.setFromColumn(col.getColumnName());
+                dsp.getReferences().add(ref);
+            }
+            try {
+                model.init();
+                application.saveXmlModel();
+                DispatcherLogic.clearConfigurationCache();
+                SessionMessages.addInfoMessage(getMessage("commons.save.successful"));
+            } catch (Exception e) {
+                logger.error("Could not save model", e);
+                SessionMessages.addErrorMessage(e.toString());
+            }
+            return editTable();
+        } else {
+            return doEditSelectionProvider(databaseSelectionProviderForm);
+        }
     }
 
     protected boolean saveToColumnForm(Form columnForm, ColumnForm cf) {
@@ -344,7 +477,8 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 try {
                     new SimpleDateFormat(cf.getDateFormat());
                 } catch (Exception e) {
-                    columnForm.findFieldByPropertyName("dateFormat").getErrors().add(getMessage(""));
+                    String message = getMessage("layouts.admin.tables.invalidDateFormat");
+                    columnForm.findFieldByPropertyName("dateFormat").getErrors().add(message);
                     return false;
                 }
             }
@@ -360,9 +494,6 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 .configFields("entityName", "javaClass", "shortName")
                 .configMode(mode)
                 .build();
-        //Field entityNameField = tableForm.findFieldByPropertyName("entityName");
-        //entityNameField.setHelp(getMessage("layouts.admin.tables.entityName.help"));
-
         tableForm.readFromObject(new com.manydesigns.portofino.actions.admin.tables.forms.TableForm(table));
     }
 
@@ -577,6 +708,10 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         return new RedirectResolution("/");
     }
 
+    public String getBaseActionPath() {
+        return BASE_ACTION_PATH;
+    }
+
     public String getActionPath() {
         String path = BASE_ACTION_PATH;
         if(tableName != null) {
@@ -659,6 +794,22 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
 
     public String getSelectedTabId() {
         return selectedTabId;
+    }
+
+    public DatabaseSelectionProvider getDatabaseSelectionProvider() {
+        return databaseSelectionProvider;
+    }
+
+    public Form getDbSelectionProviderForm() {
+        return dbSelectionProviderForm;
+    }
+
+    public String getSelectionProviderName() {
+        return selectionProviderName;
+    }
+
+    public void setSelectionProviderName(String selectionProviderName) {
+        this.selectionProviderName = selectionProviderName;
     }
 }
 

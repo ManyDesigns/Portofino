@@ -18,6 +18,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="columnForm" />
+        <mde:write name="actionBean" property="tableForm" />
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
         <portofino:buttons list="column-edit" cssClass="contentButton" />

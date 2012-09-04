@@ -48,6 +48,7 @@ import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguratio
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.configuration.SelectionProviderReference;
 import com.manydesigns.portofino.reflection.TableAccessor;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -272,7 +273,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
         String databaseName = current.getToDatabase();
         String sql = current.getSql();
         String hql = current.getHql();
-        if (sql != null) {
+        if (!StringUtils.isEmpty(sql)) {
             Session session = application.getSession(databaseName);
             OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
             String formatString = sqlFormat.getFormatString();
@@ -292,7 +293,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
             selectionProvider =
                     SelectionProviderLogic.createSelectionProvider(name, fieldNames.length, fieldTypes, objects);
             selectionProvider.setDisplayMode(dm);
-        } else if (hql != null) {
+        } else if (!StringUtils.isEmpty(hql)) {
             Database database = DatabaseLogic.findDatabaseByName(application.getModel(), databaseName);
             Table table = QueryUtils.getTableFromQueryString(database, hql);
             if(table == null) {

@@ -8,19 +8,25 @@
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.TablesAction"/>
     <stripes:layout-component name="pageTitle">
-        Edit short name for table ${actionBean.table.qualifiedName}
+        <c:if test="${empty actionBean.selectionProviderName}">
+            Add a selection provider to table ${actionBean.table.qualifiedName}
+        </c:if>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="table-short-name" cssClass="contentButton" />
+        <portofino:buttons list="table-selection-provider" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Edit short name for table ${actionBean.table.qualifiedName}
+        <c:if test="${empty actionBean.selectionProviderName}">
+            Add a selection provider to table ${actionBean.table.qualifiedName}
+        </c:if>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <mde:write name="actionBean" property="shortNameField" />
+        <mde:write name="actionBean" property="dbSelectionProviderForm" />
         <mde:write name="actionBean" property="tableForm" />
+        <input name="selectionProviderName" type="hidden" value="${actionBean.selectionProviderName}" />
+        <input name="selectedTabId" type="hidden" value="tab-fk-sp" />
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="table-short-name" cssClass="contentButton" />
+        <portofino:buttons list="table-selection-provider" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>
