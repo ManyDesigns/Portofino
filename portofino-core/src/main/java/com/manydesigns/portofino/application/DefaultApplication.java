@@ -286,11 +286,9 @@ public class DefaultApplication implements Application {
             for (Map.Entry<String, HibernateDatabaseSetup> current : setups.entrySet()) {
                 String databaseName = current.getKey();
                 logger.info("Cleaning up old setup for: {}", databaseName);
-                HibernateDatabaseSetup hibernateDatabaseSetup =
-                        current.getValue();
+                HibernateDatabaseSetup hibernateDatabaseSetup = current.getValue();
                 try {
-                    SessionFactory sessionFactory =
-                            hibernateDatabaseSetup.getSessionFactory();
+                    SessionFactory sessionFactory = hibernateDatabaseSetup.getSessionFactory();
                     sessionFactory.close();
                 } catch (Throwable t) {
                     logger.warn("Cannot close session factory for: " + databaseName, t);
@@ -301,8 +299,7 @@ public class DefaultApplication implements Application {
         setups.clear();
         model.init();
         for (Database database : model.getDatabases()) {
-            ConnectionProvider connectionProvider =
-                    database.getConnectionProvider();
+            ConnectionProvider connectionProvider = database.getConnectionProvider();
             connectionProvider.init(databasePlatformsManager, appDir);
             if (connectionProvider.getStatus()
                     .equals(ConnectionProvider.STATUS_CONNECTED)) {

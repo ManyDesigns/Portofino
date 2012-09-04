@@ -34,10 +34,10 @@
         <script type="text/javascript">
             $(function() {
                 $("#tabs").tabs();
-                $("#shortName").after($("#editShortNameButton"));
                 <c:if test="${not empty actionBean.selectedTabId}">
-                    $("#tabs").tabs("select", <c:out value="${actionBean.selectedTabId});" />);
+                    $("#tabs").tabs("select", '<c:out value="${actionBean.selectedTabId}" />');
                 </c:if>
+                //$("#shortName").after($("#editShortNameButton"));
             });
         </script>
     </stripes:layout-component>
@@ -83,13 +83,13 @@
                                     </tr>
                                     <c:forEach items="${actionBean.table.foreignKeys}" var="fk">
                                         <tr>
-                                            <td colspan="${fn:length(fk.references)}"><c:out value="${fk.name}" /></td>
+                                            <td rowspan="${fn:length(fk.references)}"><c:out value="${fk.name}" /></td>
                                             <td>
                                                 <a href="<stripes:url value="${actionBean.actionPath}/${fk.references[0].actualFromColumn.columnName}"/>">
                                                     <c:out value="${fk.references[0].actualFromColumn.columnName}" />
                                                 </a>
                                             </td>
-                                            <td colspan="${fn:length(fk.references)}">
+                                            <td rowspan="${fn:length(fk.references)}">
                                                 <a href="<stripes:url value="${actionBean.baseActionPath}/${fk.toTable.databaseName}/${fk.toTable.schemaName}/${fk.toTable.tableName}"/>">
                                                     <c:out value="${fk.toTable.tableName}" />
                                                 </a>
@@ -139,7 +139,7 @@
                                     </tr>
                                     <c:forEach items="${actionBean.table.selectionProviders}" var="sp">
                                         <tr>
-                                            <td colspan="${fn:length(sp.references)}">
+                                            <td rowspan="${fn:length(sp.references)}">
                                                 <a href="<stripes:url value="${actionBean.actionPath}?editSelectionProvider=&amp;selectionProviderName=${sp.name}&amp;selectedTabId=tab-fk-sp"/>">
                                                     <c:out value="${sp.name}" />
                                                 </a>
@@ -149,8 +149,8 @@
                                                     <c:out value="${sp.references[0].actualFromColumn.columnName}" />
                                                 </a>
                                             </td>
-                                            <td colspan="${fn:length(sp.references)}"><c:out value="${sp.toDatabase}" /></td>
-                                            <td colspan="${fn:length(sp.references)}">
+                                            <td rowspan="${fn:length(sp.references)}"><c:out value="${sp.toDatabase}" /></td>
+                                            <td rowspan="${fn:length(sp.references)}">
                                                 <c:if test="${not empty sp.hql}">
                                                     <b>(HQL)</b><br />
                                                     <c:out value="${sp.hql}" /><br />
@@ -164,7 +164,11 @@
                                         <c:forEach items="${sp.references}" var="ref" varStatus="status">
                                             <c:if test="${not status.first}">
                                                 <tr>
-                                                    <td><c:out value="${ref.actualFromColumn.columnName}" /></td>
+                                                    <td>
+                                                        <a href="<stripes:url value="${actionBean.actionPath}/${ref.actualFromColumn.columnName}"/>">
+                                                            <c:out value="${ref.actualFromColumn.columnName}" />
+                                                        </a>
+                                                    </td>
                                                 </tr>
                                             </c:if>
                                         </c:forEach>
@@ -172,7 +176,7 @@
                                 </table>
                             </c:if>
                             <c:if test="${empty actionBean.table.selectionProviders}">
-                                None available
+                                None available<br />
                             </c:if>
                             <br />
                             <portofino:buttons list="table-selection-providers" cssClass="contentButton" />

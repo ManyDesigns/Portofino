@@ -29,11 +29,10 @@
 
 package com.manydesigns.portofino.actions.admin.tables.forms;
 
-import com.manydesigns.elements.annotations.FieldSize;
-import com.manydesigns.elements.annotations.LabelI18N;
-import com.manydesigns.elements.annotations.RegExp;
+import com.manydesigns.elements.annotations.*;
 import com.manydesigns.portofino.model.database.Table;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -48,6 +47,7 @@ public class TableForm extends Table {
     public TableForm(Table copyFrom) {
         try {
             BeanUtils.copyProperties(this, copyFrom);
+            actualEntityName = copyFrom.getActualEntityName();
         } catch (Exception e) {
             throw new Error(e);
         }
@@ -64,7 +64,9 @@ public class TableForm extends Table {
 
     @Override
     @FieldSize(50)
-    @RegExp("(_|$|[a..z]|[\u0080..\ufffe])(_|$|[a..z]|[\u0080..\ufffe]|[0..9])*")
+    @RegExp(
+        value = "(_|$|[a-z]|[A-Z]|[\u0080-\ufffe])(_|$|[a-z]|[A-Z]|[\u0080-\ufffe]|[0-9])*",
+        errorMessage = "layouts.admin.tables.invalidEntityName")
     @LabelI18N("layouts.admin.tables.entityName")
     public String getEntityName() {
         return super.getEntityName();
@@ -82,5 +84,11 @@ public class TableForm extends Table {
     @LabelI18N("layouts.admin.tables.shortName")
     public String getShortName() {
         return super.getShortName();
+    }
+
+    @Insertable(false)
+    @Updatable(false)
+    public String getHqlQuery() {
+        return "from " + StringUtils.defaultIfEmpty(entityName, actualEntityName);
     }
 }

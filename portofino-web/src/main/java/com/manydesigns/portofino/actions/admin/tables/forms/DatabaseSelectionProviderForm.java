@@ -68,6 +68,7 @@ public class DatabaseSelectionProviderForm extends DatabaseSelectionProvider {
     @Override
     @Required
     @Updatable(false)
+    @FieldSize(50)
     public String getName() {
         return super.getName();
     }

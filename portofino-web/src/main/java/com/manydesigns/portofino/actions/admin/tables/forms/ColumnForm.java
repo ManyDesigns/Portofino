@@ -232,7 +232,7 @@ public class ColumnForm extends Column {
 
     @Override
     @RegExp(
-        value = "(_|$|[a..z]|[\u0080..\ufffe])(_|$|[a..z]|[\u0080..\ufffe]|[0..9])*",
+        value = "(_|$|[a-z]|[A-Z]|[\u0080-\ufffe])(_|$|[a-z]|[A-Z]|[\u0080-\ufffe]|[0-9])*",
         errorMessage = "layouts.admin.tables.invalidPropertyName")
     public String getPropertyName() {
         return super.getPropertyName();
