@@ -8,13 +8,17 @@
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.TablesAction"/>
     <stripes:layout-component name="pageTitle">
-        Edit short name for table ${actionBean.table.qualifiedName}
+        <fmt:message key="layouts.admin.tables.editShortName.title">
+            <fmt:param value="${actionBean.table.qualifiedName}" />
+        </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="table-short-name" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Edit short name for table ${actionBean.table.qualifiedName}
+        <fmt:message key="layouts.admin.tables.editShortName.title">
+            <fmt:param value="${actionBean.table.qualifiedName}" />
+        </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="shortNameField" />

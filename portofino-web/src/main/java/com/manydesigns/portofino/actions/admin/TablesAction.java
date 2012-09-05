@@ -327,15 +327,13 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         return new ForwardResolution("/layouts/admin/tables/edit-short-name.jsp");
     }*/
 
-    @Button(key = "commons.save", list = "table-short-name", order = 1)
+    /*@Button(key = "commons.save", list = "table-short-name", order = 1)
     public Resolution saveShortName() {
         RedirectResolution resolution =
                 new RedirectResolution(BASE_ACTION_PATH + "/" + databaseName + "/" + schemaName + "/" + tableName);
-        resolution.addParameter("entityName", context.getRequest().getParameter("entityName"));
-        resolution.addParameter("javaClass", context.getRequest().getParameter("javaClass"));
         resolution.addParameter("shortName", shortName);
         return resolution;
-    }
+    }*/
 
     @Button(key = "layouts.admin.tables.addSelectionProvider", list="table-selection-providers")
     public Resolution addSelectionProvider() {
@@ -420,7 +418,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 !StringUtils.isEmpty(databaseSelectionProviderForm.getHql())) ||
                (StringUtils.isEmpty(databaseSelectionProviderForm.getSql()) &&
                 StringUtils.isEmpty(databaseSelectionProviderForm.getHql()))) {
-                SessionMessages.addErrorMessage("Please fill exactly one of the fields HQL, SQL");
+                SessionMessages.addErrorMessage(getMessage("layouts.admin.tables.selectionProvider.hqlSqlError"));
                 return doEditSelectionProvider(databaseSelectionProviderForm);
             }
 
@@ -429,7 +427,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
             for(String c : refCols) {
                 Column col = DatabaseLogic.findColumnByName(table, c.trim());
                 if(col == null) {
-                    SessionMessages.addErrorMessage("Column '" + c + "' not found");
+                    SessionMessages.addErrorMessage(getMessage("layouts.admin.tables.selectionProvider.columnNotFound", c));
                     return doEditSelectionProvider(databaseSelectionProviderForm);
                 } else {
                     columns.add(col);
@@ -439,7 +437,10 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
             if(selectionProviderName == null) {
                 if(DatabaseLogic.findSelectionProviderByName(
                         table, databaseSelectionProviderForm.getName()) != null) {
-                    SessionMessages.addErrorMessage("Selection provider " + databaseSelectionProviderForm.getName() + " already exists");
+                    String message = getMessage(
+                            "layouts.admin.tables.selectionProvider.alreadyExists",
+                            databaseSelectionProviderForm.getName());
+                    SessionMessages.addErrorMessage(message);
                     return doEditSelectionProvider(databaseSelectionProviderForm);
                 }
                 table.getSelectionProviders().add(databaseSelectionProvider);
@@ -515,8 +516,10 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 decoratedColumns.add(cf);
             } else {
                 SessionMessages.addWarningMessage(
-                        "Skipped column " + column.getColumnName() + " with unknown type " + column.getColumnType() +
-                        " (JDBC: " + column.getJdbcType() + ")");
+                        getMessage("layouts.admin.tables.columnSkipped",
+                                   column.getColumnName(),
+                                   column.getColumnType(),
+                                   column.getJdbcType()));
             }
         }
 

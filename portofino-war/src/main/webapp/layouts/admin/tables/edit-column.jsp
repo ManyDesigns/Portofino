@@ -8,13 +8,17 @@
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.TablesAction"/>
     <stripes:layout-component name="pageTitle">
-        Edit column ${actionBean.column.qualifiedName}
+        <fmt:message key="layouts.admin.tables.editColumn.title">
+            <fmt:param value="${actionBean.column.qualifiedName}" />
+        </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="column-edit" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Edit column ${actionBean.column.qualifiedName}
+        <fmt:message key="layouts.admin.tables.editColumn.title">
+            <fmt:param value="${actionBean.column.qualifiedName}" />
+        </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="columnForm" />

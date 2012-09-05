@@ -42,19 +42,23 @@
         </script>
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
-        Edit table ${actionBean.table.qualifiedName}
+        <fmt:message key="layouts.admin.tables.editTable.title">
+            <fmt:param value="${actionBean.table.qualifiedName}" />
+        </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="table-edit" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        Edit table ${actionBean.table.qualifiedName}
+        <fmt:message key="layouts.admin.tables.editTable.title">
+            <fmt:param value="${actionBean.table.qualifiedName}" />
+        </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <div id="tabs">
             <ul>
-                <li><a href="#tab-table-columns">Table and columns</a></li>
-                <li><a href="#tab-fk-sp">Foreign keys and selection providers</a></li>
+                <li><a href="#tab-table-columns"><fmt:message key="layouts.admin.tables.editTable.tableAndColumns" /></a></li>
+                <li><a href="#tab-fk-sp"><fmt:message key="layouts.admin.tables.editTable.foreignKeysAndSelectionProviders" /></a></li>
             </ul>
             <div id="tab-table-columns">
                 <mde:write name="actionBean" property="tableForm" />
@@ -62,7 +66,7 @@
                 <br />
                 <div class="tableForm">
                     <fieldset class="mde-form-fieldset">
-                        <legend>Columns</legend>
+                        <legend><fmt:message key="layouts.admin.tables.editTable.columns" /></legend>
                         <div style="margin-top: 1em;">
                             <mde:write name="actionBean" property="columnsTableForm" />
                         </div>
@@ -72,15 +76,15 @@
             <div id="tab-fk-sp">
                 <div class="tableForm">
                     <fieldset class="mde-form-fieldset">
-                        <legend>Foreign keys</legend>
+                        <legend><fmt:message key="layouts.admin.tables.editTable.foreignKeys" /></legend>
                         <div style="margin-top: 1em;">
                             <c:if test="${not empty actionBean.table.foreignKeys}">
                                 <table>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Columns</th>
-                                        <th>Ref. table</th>
-                                        <th>Ref. columns</th>
+                                        <th><fmt:message key="layouts.admin.tables.editTable.name" /></th>
+                                        <th><fmt:message key="layouts.admin.tables.editTable.columns" /></th>
+                                        <th><fmt:message key="layouts.admin.tables.editTable.refTable" /></th>
+                                        <th><fmt:message key="layouts.admin.tables.editTable.refColumns" /></th>
                                     </tr>
                                     <c:forEach items="${actionBean.table.foreignKeys}" var="fk">
                                         <tr>
@@ -121,22 +125,22 @@
                                 </table>
                             </c:if>
                             <c:if test="${empty actionBean.table.foreignKeys}">
-                                None available
+                                <fmt:message key="layouts.admin.tables.editTable.noForeignKeys" />
                             </c:if>
                         </div>
                     </fieldset>
                 </div>
                 <div class="tableForm">
                     <fieldset class="mde-form-fieldset">
-                        <legend>Selection providers</legend>
+                        <legend><fmt:message key="layouts.admin.tables.editTable.selectionProviders" /></legend>
                         <div style="margin-top: 1em;">
                             <c:if test="${not empty actionBean.table.selectionProviders}">
                                 <table>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Columns</th>
-                                        <th>Database</th>
-                                        <th>Query</th>
+                                        <th><fmt:message key="layouts.admin.tables.editTable.name" /></th>
+                                        <th><fmt:message key="layouts.admin.tables.editTable.columns" /></th>
+                                        <th><fmt:message key="layouts.admin.tables.editTable.database" /></th>
+                                        <th><fmt:message key="layouts.admin.tables.editTable.query" /></th>
                                     </tr>
                                     <c:forEach items="${actionBean.table.selectionProviders}" var="sp">
                                         <tr>
@@ -175,7 +179,7 @@
                                 </table>
                             </c:if>
                             <c:if test="${empty actionBean.table.selectionProviders}">
-                                None available<br />
+                                <fmt:message key="layouts.admin.tables.editTable.noSelectionProviders" /><br />
                             </c:if>
                             <br />
                             <portofino:buttons list="table-selection-providers" cssClass="contentButton" />

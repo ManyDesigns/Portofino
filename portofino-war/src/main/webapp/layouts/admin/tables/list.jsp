@@ -21,6 +21,9 @@
         <script type="text/javascript">
             $(function() {
                 $("#tables").treeTable({"clickableNodeNames": true, "expandable":true, "treeColumn":0, "indent":20 });
+                $("button[name=bulkDelete]").click(function() {
+                    return confirm('<fmt:message key="commons.confirm" />');
+                });
             });
         </script>
     </stripes:layout-component>
@@ -36,8 +39,8 @@
     <stripes:layout-component name="portletBody">
         <table id="tables" style="width: auto;">
             <tr>
-                <th width="20%">Database/Schema</th>
-                <th width="80%">Table</th>
+                <th width="20%"><fmt:message key="layouts.admin.tables.databaseSlashSchema" /></th>
+                <th width="80%"><fmt:message key="layouts.admin.tables.table" /></th>
             </tr>
 
             <%
@@ -97,10 +100,5 @@
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
         <portofino:buttons list="tables-list" cssClass="contentButton" />
-        <script type="text/javascript">
-            $("button[name=bulkDelete]").click(function() {
-                return confirm ('<fmt:message key="commons.confirm" />');
-            });
-        </script>
     </stripes:layout-component>
 </stripes:layout-render>
