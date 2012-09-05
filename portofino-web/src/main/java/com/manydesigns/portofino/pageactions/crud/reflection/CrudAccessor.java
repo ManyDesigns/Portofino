@@ -40,8 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.Comparator;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -110,7 +108,7 @@ public class CrudAccessor
         }
 
 
-        logger.debug("Sorting crud properties to preserve their previous order as much as possible");
+/*        logger.debug("Sorting crud properties to preserve their previous order as much as possible");
         Arrays.sort(propertyAccessors, new Comparator<CrudPropertyAccessor>() {
             private int oldIndex(CrudPropertyAccessor c) {
                 int i = 0;
@@ -136,7 +134,7 @@ public class CrudAccessor
                     return index2 == -1 ? 0 : 1;
                 }
             }
-        });
+        });*/
     }
 
     public static CrudProperty findCrudPropertyByName(CrudConfiguration crudConfiguration, String propertyName) {

@@ -30,6 +30,24 @@
             .ui-tabs .ui-tabs-panel {
                 padding: 1em 0 0 0;
             }
+
+            #sortable {
+                margin-left: 0;
+                width: 30%;
+                display: none;
+            }
+
+            #sortable li {
+                /*font-size: 1.4em;*/
+                list-style: none;
+                height: 18px;
+                margin: 0 3px 3px;
+                padding: 0.4em 0.4em 0.4em 1.5em;
+            }
+
+            legend .ui-button-text {
+                font-size: 0.83em;
+            }
         </style>
         <script type="text/javascript">
             $(function() {
@@ -38,6 +56,27 @@
                     $("#tabs").tabs("select", '<c:out value="${actionBean.selectedTabId}" />');
                 </c:if>
                 //$("#shortName").after($("#editShortNameButton"));
+                var theSortable = $("#sortable");
+                theSortable.sortable();
+                theSortable.disableSelection();
+                var clonedSortable = theSortable.clone();
+                function toggleSortable(theSortable) {
+                    theSortable.toggle();
+                    $("#columns").toggle();
+                    $(".sortButton").toggle();
+                    $(".cancelSortButton").toggle();
+                }
+                $(".sortButton").click(function() {
+                    toggleSortable(theSortable);
+                });
+                $(".cancelSortButton").click(function() {
+                    toggleSortable(theSortable);
+                    theSortable.replaceWith(clonedSortable);
+                    theSortable = clonedSortable;
+                    theSortable.sortable();
+                    theSortable.disableSelection();
+                    clonedSortable = theSortable.clone();
+                });
             });
         </script>
     </stripes:layout-component>
@@ -66,9 +105,29 @@
                 <br />
                 <div class="tableForm">
                     <fieldset class="mde-form-fieldset">
-                        <legend><fmt:message key="layouts.admin.tables.editTable.columns" /></legend>
+                        <legend>
+                            <fmt:message key="layouts.admin.tables.editTable.columns" />
+                            <button class="ui-button ui-widget ui-state-default ui-corner-all portletButton ui-button-text-only sortButton"
+                                type="button" role="button" aria-disabled="false">
+                                <span class="ui-button-text"><fmt:message key="layouts.admin.tables.editTable.changeOrder" /></span>
+                            </button>
+                            <button class="ui-button ui-widget ui-state-default ui-corner-all portletButton ui-button-text-only cancelSortButton"
+                                    type="button" role="button" aria-disabled="false" style="display: none;">
+                                <span class="ui-button-text"><fmt:message key="commons.cancel" /></span>
+                            </button>
+                        </legend>
                         <div style="margin-top: 1em;">
-                            <mde:write name="actionBean" property="columnsTableForm" />
+                            <div id="columns">
+                                <mde:write name="actionBean" property="columnsTableForm" />
+                            </div>
+                            <ul id="sortable">
+                                <c:forEach var="col" items="${actionBean.sortedColumnNames}" varStatus="status">
+                                    <li class="ui-state-default" id="col_${status.index}">
+                                        <c:out value="${col}" />
+                                        <input type="hidden" name="sortedColumnNames[]" value="${col}" />
+                                    </li>
+                                </c:forEach>
+                            </ul>
                         </div>
                     </fieldset>
                 </div>

@@ -112,6 +112,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     //**************************************************************************
     protected Table table;
     protected Column column;
+    protected List<String> sortedColumnNames;
     protected List<ColumnForm> decoratedColumns;
     protected DatabaseSelectionProvider databaseSelectionProvider;
 
@@ -190,12 +191,15 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
             table.setEntityName(StringUtils.defaultIfEmpty(table.getEntityName(), null));
             table.setJavaClass(StringUtils.defaultIfEmpty(table.getJavaClass(), null));
             columnsTableForm.writeToObject(decoratedColumns);
-            for(Column column : table.getColumns()) {
-                for(ColumnForm columnForm : decoratedColumns) {
-                    if(columnForm.getColumnName().equals(column.getColumnName())) {
-                        columnForm.copyTo(column);
-                    }
+            Collections.sort(table.getColumns(), new Comparator<Column>() {
+                public int compare(Column o1, Column o2) {
+                    int i1 = sortedColumnNames.indexOf(o1.getColumnName());
+                    int i2 = sortedColumnNames.indexOf(o2.getColumnName());
+                    return Integer.valueOf(i1).compareTo(i2);
                 }
+            });
+            for(int i = 0; i < table.getColumns().size(); i++) {
+                decoratedColumns.get(i).copyTo(table.getColumns().get(i));
             }
             try {
                 model.init();
@@ -503,7 +507,22 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         decoratedColumns = new ArrayList<ColumnForm>(table.getColumns().size());
         TableAccessor tableAccessor = new TableAccessor(table);
 
-        for(Column column : table.getColumns()) {
+        List<Column> sortedColumns = new ArrayList<Column>(table.getColumns());
+        if(sortedColumnNames != null) {
+            Collections.sort(sortedColumns, new Comparator<Column>() {
+                public int compare(Column o1, Column o2) {
+                    int i1 = sortedColumnNames.indexOf(o1.getColumnName());
+                    int i2 = sortedColumnNames.indexOf(o2.getColumnName());
+                    return Integer.valueOf(i1).compareTo(i2);
+                }
+            });
+        } else {
+            sortedColumnNames = new ArrayList<String>(sortedColumns.size());
+            for(Column column : sortedColumns) {
+                sortedColumnNames.add(column.getColumnName());
+            }
+        }
+        for(Column column : sortedColumns) {
             PropertyAccessor columnAccessor;
             try {
                 columnAccessor = tableAccessor.getProperty(column.getActualPropertyName());
@@ -831,6 +850,14 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
 
     public Application getApplication() {
         return application;
+    }
+
+    public List<String> getSortedColumnNames() {
+        return sortedColumnNames;
+    }
+
+    public void setSortedColumnNames(List<String> sortedColumnNames) {
+        this.sortedColumnNames = sortedColumnNames;
     }
 }
 
