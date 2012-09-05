@@ -32,7 +32,6 @@ package com.manydesigns.portofino.actions.admin;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.TextField;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.forms.TableForm;
@@ -40,7 +39,6 @@ import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.tables.forms.ColumnForm;
@@ -312,8 +310,6 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     public Resolution returnToTable() {
         RedirectResolution resolution =
                 new RedirectResolution(BASE_ACTION_PATH + "/" + databaseName + "/" + schemaName + "/" + tableName);
-        resolution.addParameter("entityName", context.getRequest().getParameter("entityName"));
-        resolution.addParameter("javaClass", context.getRequest().getParameter("javaClass"));
         resolution.addParameter("selectedTabId", selectedTabId);
         return resolution;
     }
@@ -530,7 +526,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         }
 
         columnsTableForm = new TableFormBuilder(ColumnForm.class)
-                .configFields("columnName", "propertyName", "javaType", "type", "length", "scale", "nullable")
+                .configFields("columnName", "propertyName", "javaType", "type", "shortLength", "scale", "reallyNullable")
                 .configSelectionProvider(typesSP, "columnName", "type", "javaType")
                 .configNRows(decoratedColumns.size())
                 .configMode(mode)
@@ -545,11 +541,6 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                     context.getRequest().getContextPath() +
                     getActionPath() +
                     "/" + column.getColumnName());
-
-            Field nullableField = row.findFieldByPropertyName("nullable");
-            //Work around Introspector bug
-            nullableField.setInsertable(false);
-            nullableField.setUpdatable(false);
         }
         columnsTableForm.readFromObject(decoratedColumns);
     }
@@ -582,14 +573,11 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         columnForm = new FormBuilder(ColumnForm.class)
                 .configFieldSetNames("Properties", "Annotations")
                 .configFields(new String[] { "columnName", "propertyName", "javaType", "type",
-                                             "length", "scale", "nullable", "inPk" },
+                                             "length", "scale", "reallyNullable", "reallyAutoincrement", "inPk" },
                               getApplicableAnnotations(column.getActualJavaType()))
                 .configSelectionProvider(typesSP, "columnName", "type", "javaType")
                 .configSelectionProvider(stringFormatSP, "stringFormat")
                 .build();
-        Field nullableField = columnForm.findFieldByPropertyName("nullable");
-        nullableField.setInsertable(false);
-        nullableField.setUpdatable(false);
         columnForm.readFromObject(cf);
         return cf;
     }
@@ -836,6 +824,10 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
 
     public void setSelectionProviderName(String selectionProviderName) {
         this.selectionProviderName = selectionProviderName;
+    }
+
+    public Application getApplication() {
+        return application;
     }
 }
 

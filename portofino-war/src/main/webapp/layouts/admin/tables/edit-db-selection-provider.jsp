@@ -7,9 +7,26 @@
 %><%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.TablesAction"/>
+    <stripes:layout-component name="customScripts">
+        <script type="text/javascript">
+            $(function() {
+                $("button[name=removeSelectionProvider]").click(
+                        function() {
+                            return confirm('<fmt:message key="commons.confirm" />');
+                        });
+            });
+        </script>
+    </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
         <c:if test="${empty actionBean.selectionProviderName}">
-            Add a selection provider to table ${actionBean.table.qualifiedName}
+            <fmt:message key="layouts.admin.tables.addSelectionProvider.title">
+                <fmt:param value="${actionBean.table.qualifiedName}" />
+            </fmt:message>
+        </c:if>
+        <c:if test="${not empty actionBean.selectionProviderName}">
+            <fmt:message key="layouts.admin.tables.editSelectionProvider.title">
+                <fmt:param value="${actionBean.selectionProviderName}" />
+            </fmt:message>
         </c:if>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
@@ -17,7 +34,14 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <c:if test="${empty actionBean.selectionProviderName}">
-            Add a selection provider to table ${actionBean.table.qualifiedName}
+            <fmt:message key="layouts.admin.tables.addSelectionProvider.title">
+                <fmt:param value="${actionBean.table.qualifiedName}" />
+            </fmt:message>
+        </c:if>
+        <c:if test="${not empty actionBean.selectionProviderName}">
+            <fmt:message key="layouts.admin.tables.editSelectionProvider.title">
+                <fmt:param value="${actionBean.selectionProviderName}" />
+            </fmt:message>
         </c:if>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">

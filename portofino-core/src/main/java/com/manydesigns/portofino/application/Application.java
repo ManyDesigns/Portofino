@@ -109,7 +109,6 @@ public interface Application {
 
     /**
      * Loads the model from its XML file.
-     * are executed.
      */
     void loadXmlModel();
     /**
@@ -154,7 +153,7 @@ public interface Application {
     //**************************************************************************
 
     /**
-     * Returns the model associated to this application.
+     * Returns the model associated with this application.
      */
     Model getModel();
 

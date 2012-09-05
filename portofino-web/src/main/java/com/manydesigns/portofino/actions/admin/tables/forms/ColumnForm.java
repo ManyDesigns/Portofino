@@ -222,6 +222,20 @@ public class ColumnForm extends Column {
         return super.getLength();
     }
 
+    @Updatable(false)
+    @Insertable(false)
+    @Label("Length")
+    public String getShortLength() {
+        if(getLength() == null) {
+            return null;
+        }
+        String[] suffix = new String[] { "", "K", "M", "G", "T" };
+        java.text.DecimalFormat decimalFormat = new java.text.DecimalFormat("##0E0");
+        String result = decimalFormat.format(getLength());
+        int suffixIndex = Character.getNumericValue(result.charAt(result.length() - 1)) / 3;
+        return result.replaceAll("E[0-9]", suffix[suffixIndex]);
+    }
+
     @Override
     @FieldSize(4)
     @Updatable(false)
@@ -252,9 +266,20 @@ public class ColumnForm extends Column {
         return super.getJavaType();
     }
 
-    @Override
-    public boolean isNullable() {
-        return super.isNullable();
+    //Work around Introspector bug (boolean property descriptors not inherited)
+
+    @Label("Null")
+    @Insertable(false)
+    @Updatable(false)
+    public boolean isReallyNullable() {
+        return isNullable();
+    }
+
+    @Label("Autoincrement")
+    @Insertable(false)
+    @Updatable(false)
+    public boolean isReallyAutoincrement() {
+        return isAutoincrement();
     }
 
     @Label("In primary key")

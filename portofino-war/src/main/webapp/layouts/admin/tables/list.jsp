@@ -3,6 +3,8 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.Comparator" %>
+<%@ page import="java.text.MessageFormat" %>
+<%@ page import="java.io.File" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -69,6 +71,16 @@
                             </tr><%
                         }
                     } else {
+                        String changelogFileNameTemplate = "{0}-changelog.xml";
+                        String changelogFileName =
+                            MessageFormat.format(
+                                changelogFileNameTemplate, table.getDatabaseName() + "-" + table.getSchemaName());
+                        File changelogFile = new File(actionBean.getApplication().getAppDbsDir(), changelogFileName);
+                        String schemaDescr = table.getSchemaName();
+                        if(changelogFile.isFile()) {
+                            schemaDescr += " (Liquibase script found)";
+                        }
+
                         lastDatabase = table.getDatabaseName();
                         lastSchema = table.getSchemaName(); %>
                         <tr id="<%= "node-" + lastDatabase %>">
@@ -76,7 +88,7 @@
                         </tr>
                         <tr id="<%= "node-" + lastDatabase + "---" + lastSchema %>"
                             class="child-of-node-<%= lastDatabase %>">
-                            <td colspan="2"><%= table.getSchemaName() %></td>
+                            <td colspan="2"><%= schemaDescr %></td>
                         </tr>
                         <%
                     }

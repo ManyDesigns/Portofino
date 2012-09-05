@@ -58,7 +58,8 @@
             </ul>
             <div id="tab-table-columns">
                 <mde:write name="actionBean" property="tableForm" />
-                <span id="editShortNameButton"><portofino:buttons list="table-edit-short-name" cssClass="portletButton" /></span>
+                <%-- <span id="editShortNameButton"><portofino:buttons list="table-edit-short-name" cssClass="portletButton" /></span> --%>
+                <br />
                 <div class="tableForm">
                     <fieldset class="mde-form-fieldset">
                         <legend>Columns</legend>
@@ -152,12 +153,10 @@
                                             <td rowspan="${fn:length(sp.references)}"><c:out value="${sp.toDatabase}" /></td>
                                             <td rowspan="${fn:length(sp.references)}">
                                                 <c:if test="${not empty sp.hql}">
-                                                    <b>(HQL)</b><br />
-                                                    <c:out value="${sp.hql}" /><br />
+                                                    <b>HQL:</b> <c:out value="${sp.hql}" /><br />
                                                 </c:if>
                                                 <c:if test="${not empty sp.sql}">
-                                                    <b>(SQL)</b><br />
-                                                    <c:out value="${sp.sql}" />
+                                                    <b>SQL:</b> <c:out value="${sp.sql}" />
                                                 </c:if>
                                             </td>
                                         </tr>
