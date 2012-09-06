@@ -190,7 +190,11 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
             tf.copyTo(table);
             table.setEntityName(StringUtils.defaultIfEmpty(table.getEntityName(), null));
             table.setJavaClass(StringUtils.defaultIfEmpty(table.getJavaClass(), null));
+            table.setShortName(StringUtils.defaultIfEmpty(table.getShortName(), null));
             columnsTableForm.writeToObject(decoratedColumns);
+            for(int i = 0; i < table.getColumns().size(); i++) {
+                decoratedColumns.get(i).copyTo(table.getColumns().get(i));
+            }
             Collections.sort(table.getColumns(), new Comparator<Column>() {
                 public int compare(Column o1, Column o2) {
                     int i1 = sortedColumnNames.indexOf(o1.getColumnName());
@@ -198,9 +202,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                     return Integer.valueOf(i1).compareTo(i2);
                 }
             });
-            for(int i = 0; i < table.getColumns().size(); i++) {
-                decoratedColumns.get(i).copyTo(table.getColumns().get(i));
-            }
+
             try {
                 model.init();
                 application.saveXmlModel();
@@ -227,6 +229,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                     }
                 }
                 setupTableForm(Mode.EDIT); //Recalculate entity name
+                setupColumnsForm(Mode.EDIT); //Reflect the new order of the columns
                 SessionMessages.addInfoMessage(getMessage("commons.save.successful"));
             } catch (Exception e) {
                 logger.error("Could not save model", e);
@@ -507,22 +510,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         decoratedColumns = new ArrayList<ColumnForm>(table.getColumns().size());
         TableAccessor tableAccessor = new TableAccessor(table);
 
-        List<Column> sortedColumns = new ArrayList<Column>(table.getColumns());
-        if(sortedColumnNames != null) {
-            Collections.sort(sortedColumns, new Comparator<Column>() {
-                public int compare(Column o1, Column o2) {
-                    int i1 = sortedColumnNames.indexOf(o1.getColumnName());
-                    int i2 = sortedColumnNames.indexOf(o2.getColumnName());
-                    return Integer.valueOf(i1).compareTo(i2);
-                }
-            });
-        } else {
-            sortedColumnNames = new ArrayList<String>(sortedColumns.size());
-            for(Column column : sortedColumns) {
-                sortedColumnNames.add(column.getColumnName());
-            }
-        }
-        for(Column column : sortedColumns) {
+        for(Column column : table.getColumns()) {
             PropertyAccessor columnAccessor;
             try {
                 columnAccessor = tableAccessor.getProperty(column.getActualPropertyName());

@@ -34,6 +34,9 @@
             #sortable {
                 margin-left: 0;
                 width: 30%;
+            }
+
+            #sortableContainer {
                 display: none;
             }
 
@@ -61,10 +64,11 @@
                 theSortable.disableSelection();
                 var clonedSortable = theSortable.clone();
                 function toggleSortable(theSortable) {
-                    theSortable.toggle();
+                    $("#sortableContainer").toggle();
                     $("#columns").toggle();
                     $(".sortButton").toggle();
-                    $(".cancelSortButton").toggle();
+                    //$(".confirmSortButton").toggle();
+                    //$(".cancelSortButton").toggle();
                 }
                 $(".sortButton").click(function() {
                     toggleSortable(theSortable);
@@ -77,11 +81,15 @@
                     theSortable.disableSelection();
                     clonedSortable = theSortable.clone();
                 });
+                $(".confirmSortButton").click(function() {
+                    toggleSortable(theSortable);
+                    clonedSortable = theSortable.clone();
+                });
             });
         </script>
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="layouts.admin.tables.editTable.title">
+        <fmt:message key="layouts.admin.tables.title">
             <fmt:param value="${actionBean.table.qualifiedName}" />
         </fmt:message>
     </stripes:layout-component>
@@ -89,14 +97,14 @@
         <portofino:buttons list="table-edit" cssClass="contentButton" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.admin.tables.editTable.title">
+        <fmt:message key="layouts.admin.tables.title">
             <fmt:param value="${actionBean.table.qualifiedName}" />
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <div id="tabs">
             <ul>
-                <li><a href="#tab-table-columns"><fmt:message key="layouts.admin.tables.editTable.tableAndColumns" /></a></li>
+                <li><a href="#tab-table-columns"><fmt:message key="layouts.admin.tables.tableAndColumns" /></a></li>
                 <li><a href="#tab-fk-sp"><fmt:message key="layouts.admin.tables.editTable.foreignKeysAndSelectionProviders" /></a></li>
             </ul>
             <div id="tab-table-columns">
@@ -109,25 +117,33 @@
                             <fmt:message key="layouts.admin.tables.editTable.columns" />
                             <button class="ui-button ui-widget ui-state-default ui-corner-all portletButton ui-button-text-only sortButton"
                                 type="button" role="button" aria-disabled="false">
-                                <span class="ui-button-text"><fmt:message key="layouts.admin.tables.editTable.changeOrder" /></span>
-                            </button>
-                            <button class="ui-button ui-widget ui-state-default ui-corner-all portletButton ui-button-text-only cancelSortButton"
-                                    type="button" role="button" aria-disabled="false" style="display: none;">
-                                <span class="ui-button-text"><fmt:message key="commons.cancel" /></span>
+                                <span class="ui-button-text"><fmt:message key="layouts.admin.tables.changeOrder" /></span>
                             </button>
                         </legend>
                         <div style="margin-top: 1em;">
                             <div id="columns">
                                 <mde:write name="actionBean" property="columnsTableForm" />
                             </div>
-                            <ul id="sortable">
-                                <c:forEach var="col" items="${actionBean.sortedColumnNames}" varStatus="status">
-                                    <li class="ui-state-default" id="col_${status.index}">
-                                        <c:out value="${col}" />
-                                        <input type="hidden" name="sortedColumnNames[]" value="${col}" />
-                                    </li>
-                                </c:forEach>
-                            </ul>
+                            <div id="sortableContainer">
+                                <fmt:message key="layouts.admin.tables.changeOrder.help" />
+                                <br /><br />
+                                <button class="ui-button ui-widget ui-state-default ui-corner-all portletButton ui-button-text-only confirmSortButton"
+                                        type="button" role="button" aria-disabled="false">
+                                    <span class="ui-button-text"><fmt:message key="commons.ok" /></span>
+                                </button>
+                                <button class="ui-button ui-widget ui-state-default ui-corner-all portletButton ui-button-text-only cancelSortButton"
+                                        type="button" role="button" aria-disabled="false">
+                                    <span class="ui-button-text"><fmt:message key="commons.cancel" /></span>
+                                </button>
+                                <ul id="sortable">
+                                    <c:forEach var="col" items="${actionBean.table.columns}" varStatus="status">
+                                        <li class="ui-state-default" id="col_${status.index}">
+                                            <c:out value="${col.columnName}" />
+                                            <input type="hidden" name="sortedColumnNames[]" value="${col.columnName}" />
+                                        </li>
+                                    </c:forEach>
+                                </ul>
+                            </div>
                         </div>
                     </fieldset>
                 </div>
