@@ -53,6 +53,9 @@
                     }
                 });
                 for(Table table : tables) {
+                    if(table.getPrimaryKey() == null) {
+                        continue;
+                    }
                     if(table.getDatabaseName().equals(lastDatabase)) {
                         if(table.getSchemaName().equals(lastSchema)) {
                             String tableDescr = table.getTableName();
