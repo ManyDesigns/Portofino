@@ -84,7 +84,7 @@
                         File changelogFile = new File(actionBean.getApplication().getAppDbsDir(), changelogFileName);
                         String schemaDescr = table.getSchemaName();
                         if(changelogFile.isFile()) {
-                            schemaDescr += " (Liquibase script found)";
+                            schemaDescr += " <img src='" + request.getContextPath() + "/layouts/admin/tables/liquibase_logo_small.gif' /> Liquibase";
                         }
 
                         lastDatabase = table.getDatabaseName();
