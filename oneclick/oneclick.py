@@ -23,10 +23,14 @@ import shutil
 import os
 
 #Derived variables
-base_path = "one-click-start-portofino-" + local.portofino_version
+base_path = "portofino-" + local.portofino_version
 portofino_path = os.path.expanduser(local.portofino_path)
 tomcat_path = base_path + "/" + local.tomcat_dir
 tomcat_zip = local.tomcat_dir + ".zip"
+
+print """//////////////////////
+Portofino build script
+//////////////////////"""
 
 if(not os.path.exists(base_path)):
     os.mkdir(base_path)
