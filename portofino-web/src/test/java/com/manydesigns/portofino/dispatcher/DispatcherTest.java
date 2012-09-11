@@ -29,12 +29,50 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.portofino.TestApplication;
+import junit.framework.TestCase;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla - alessio.stalla@manydesigns.com
 */
+public class DispatcherTest extends TestCase {
+
+    Dispatcher dispatcher;
+    TestApplication application;
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        DispatcherLogic.initConfigurationCache(10, Integer.MAX_VALUE);
+        DispatcherLogic.initPageCache(10, Integer.MAX_VALUE);
+        application = new TestApplication("test");
+        dispatcher = new Dispatcher(application);
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+        if(application != null) {
+            application.shutdown();
+        }
+    }
+
+    public void testJSessionId() throws Exception {
+        application.addPage("/", "bar");
+        Dispatch dispatch = dispatcher.getDispatch("/foo", "/bar;jsessionid=qwertyuiop1234567890");
+        assertNotNull(dispatch);
+
+        application.addPage("/bar", "baz");
+        dispatch = dispatcher.getDispatch("/foo", "/bar/baz;jsessionid=qwertyuiop1234567890");
+        assertNotNull(dispatch);
+        dispatch = dispatcher.getDispatch("/foo", "/bar;foo=1&quux=2/baz;jsessionid=qwertyuiop1234567890");
+        assertNotNull(dispatch);
+    }
+
+}
 //public class DispatcherTest extends AbstractPortofinoTest {
 //
 //    Dispatcher dispatcher;
