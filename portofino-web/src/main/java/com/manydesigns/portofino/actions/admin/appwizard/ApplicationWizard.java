@@ -774,7 +774,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     protected void setupCalendar(List<ChildPage> childPages) throws Exception {
         List<List<String>> calendarDefinitions = new ArrayList<List<String>>();
         Color[] colors = {
-                Color.RED, Color.BLUE, Color.CYAN.darker(), Color.GRAY, Color.GREEN.darker(),
+                Color.RED, new Color(64, 128, 255), Color.CYAN.darker(), Color.GRAY, Color.GREEN.darker(),
                 Color.ORANGE, Color.YELLOW.darker(), Color.MAGENTA.darker(), Color.PINK
             };
         int colorIndex = 0;
