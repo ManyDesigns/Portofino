@@ -34,7 +34,6 @@ import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.application.Application;
 import groovy.lang.Binding;
-import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
 import groovy.lang.GroovyShell;
 import groovy.util.GroovyScriptEngine;
@@ -109,7 +108,6 @@ public class ScriptingUtil {
 
     public static GroovyScriptEngine GROOVY_SCRIPT_ENGINE =
             new GroovyScriptEngine(new URL[0], ScriptingUtil.class.getClassLoader());
-            //makeFallbackClassLoader();
 
     public static Class<?> getGroovyClass(File scriptFile) throws IOException, ScriptException, ResourceException {
         if(!scriptFile.exists()) {
@@ -117,11 +115,6 @@ public class ScriptingUtil {
         }
         return GROOVY_SCRIPT_ENGINE.loadScriptByName(scriptFile.toURI().toString());
     }
-
-    /*public static Class<?> getGroovyClass(String script, File scriptFile) {
-        //String path = scriptFile.getAbsolutePath();
-        return GROOVY_SCRIPT_ENGINE.loadScriptByName(scriptFile.toURI().toString());
-    }*/
 
     //TODO mappa application -> classloader (multi-app)
     public static void initBaseClassLoader(Application application) {
@@ -131,9 +124,6 @@ public class ScriptingUtil {
         logger.info("Base classpath for application " + application.getAppId() + " is " + classpath);
         cc.setClasspath(classpath);
         cc.setRecompileGroovySource(true);
-        GroovyClassLoader gcl = new GroovyClassLoader(ScriptingUtil.class.getClassLoader(), cc);
-        GroovyClassLoader defaultClassLoader = new GroovyClassLoader(gcl);
-        defaultClassLoader.setShouldRecompile(true);
         try {
             GROOVY_SCRIPT_ENGINE =
                     new GroovyScriptEngine(new URL[] { classpathFile.toURI().toURL() },

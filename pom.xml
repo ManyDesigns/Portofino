@@ -21,7 +21,7 @@
         <struts2.version>2.2.1</struts2.version>
         <stripes.version>1.5.7</stripes.version>
         <ognl.version>3.0</ognl.version><!--Struts2/Xwork uses 3.0-->
-        <antlr.version>2.7.6</antlr.version><!-- Hibernate uses 2.7.6 - Struts1 uses 2.7.2 (excluded)-->
+        <antlr.version>2.7.7</antlr.version><!-- Groovy uses 2.7.7, Hibernate uses 2.7.6 - Struts1 uses 2.7.2 (excluded)-->
         <javassist.version>3.8.0.GA</javassist.version><!--Struts2/Xwork uses 3.8.0.GA-->
         <hibernate.version>3.6.9.Final</hibernate.version>
         <ehcache.version>2.5.2</ehcache.version>
@@ -40,7 +40,7 @@
         <jasperreports.version>3.5.0</jasperreports.version>
         <jfreechart.version>1.0.12</jfreechart.version>
         <joda-time.version>1.6.2</joda-time.version>
-        <groovy.version>1.8.0</groovy.version>
+        <groovy.version>1.8.8</groovy.version>
         <json.version>20111031</json.version>
         <liquibase.version>2.0.5</liquibase.version>
         <itext.version>2.1.7</itext.version>
