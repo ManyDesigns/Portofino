@@ -276,7 +276,7 @@ public class ChangePasswordAction extends AbstractPageAction {
         }
         this.configuration = (ChangePasswordConfiguration) pageInstance.getConfiguration();
         if(!pageInstance.getParameters().isEmpty()) {
-            return new ErrorResolution(404);
+            return portletPageNotFound();
         }
         return null;
     }

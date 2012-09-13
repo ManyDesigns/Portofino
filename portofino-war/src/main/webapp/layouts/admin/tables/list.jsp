@@ -1,10 +1,7 @@
-<%@ page import="com.manydesigns.portofino.model.database.DatabaseLogic" %>
 <%@ page import="com.manydesigns.portofino.model.database.Table" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Collections" %>
-<%@ page import="java.util.Comparator" %>
-<%@ page import="java.text.MessageFormat" %>
 <%@ page import="java.io.File" %>
+<%@ page import="java.text.MessageFormat" %>
+<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"

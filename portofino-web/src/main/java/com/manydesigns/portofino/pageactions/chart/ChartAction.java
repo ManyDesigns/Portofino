@@ -343,7 +343,7 @@ public class ChartAction extends AbstractPageAction {
             return resolution;
         }
         if(!pageInstance.getParameters().isEmpty()) {
-            return new ErrorResolution(404);
+            return portletPageNotFound();
         }
         chartConfiguration = (ChartConfiguration) pageInstance.getConfiguration();
         return null;

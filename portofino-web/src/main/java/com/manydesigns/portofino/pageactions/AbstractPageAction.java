@@ -52,6 +52,7 @@ import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.stripes.ModelActionResolver;
 import groovy.lang.GroovyObject;
+import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -704,5 +705,14 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     public Resolution forwardToPortletError(Throwable e) {
         context.getRequest().setAttribute(PORTOFINO_PORTLET_EXCEPTION, e);
         return forwardTo("/layouts/portlet-error.jsp");
+    }
+
+    protected Resolution portletPageNotFound() {
+        if(isEmbedded()) {
+            context.getRequest().setAttribute(PORTOFINO_PORTLET_EXCEPTION, new Exception());
+            return new ForwardResolution("/layouts/portlet-error-404.jsp");
+        } else {
+            return new ErrorResolution(404);
+        }
     }
 }

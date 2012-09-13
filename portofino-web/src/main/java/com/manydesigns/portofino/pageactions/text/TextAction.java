@@ -116,10 +116,11 @@ public class TextAction extends AbstractPageAction {
         textConfiguration = (TextConfiguration) pageInstance.getConfiguration();
         if(!pageInstance.getParameters().isEmpty()) {
             if(pageInstance.getParameters().size() == 1 &&
+               !isEmbedded() &&
                SecurityLogic.hasPermissions(pageInstance, SecurityUtils.getSubject(), AccessLevel.EDIT)) {
                 return new ForwardResolution("/layouts/text/create-page.jsp");
             } else {
-                return new ErrorResolution(404);
+                return portletPageNotFound();
             }
         }
         return null;
@@ -466,13 +467,24 @@ public class TextAction extends AbstractPageAction {
 
         try {
             String attachmentId = attachment.getId();
-            File file = RandomUtil.getCodeFile(
+            final File file = RandomUtil.getCodeFile(
                     application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
+            /* TODO cache
+            //Suggerisce al browser di usare la risorsa che ha in cache invece di riscaricarla
+            HttpServletRequest request = context.getRequest();
+            if(request.getHeader("If-Modified-Since") != null) {
+                long ifModifiedSince = request.getDateHeader("If-Modified-Since");
+                if(ifModifiedSince >= file.lastModified()) {
+                    return new ErrorResolution(304); //Not modified
+                }
+            }*/
+
             InputStream is = new FileInputStream(file);
             Resolution resolution =
                     new StreamingResolution(attachment.getContentType(), is)
-                    .setLength(attachment.getSize())
-                    .setAttachment(false);
+                            .setLength(attachment.getSize())
+                            .setAttachment(false)
+                            .setLastModified(file.lastModified());
             return resolution;
         } catch (IOException e) {
             logger.error("Download failed", e);

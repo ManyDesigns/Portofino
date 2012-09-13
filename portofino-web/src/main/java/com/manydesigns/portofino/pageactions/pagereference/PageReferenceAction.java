@@ -176,7 +176,7 @@ public class PageReferenceAction extends AbstractPageAction {
             return resolution;
         }
         if(!pageInstance.getParameters().isEmpty()) {
-            return new ErrorResolution(404);
+            return portletPageNotFound();
         }
         pageReferenceConfiguration = (PageReferenceConfiguration) getPageInstance().getConfiguration();
         return null;

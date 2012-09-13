@@ -137,4 +137,10 @@ public class Dispatch {
     public Class<? extends ActionBean> getActionBeanClass() {
         return getLastPageInstance().getActionClass();
     }
+
+    @Override
+    public String toString() {
+        return "#<Dispatch contextPath='" + contextPath + "', originalPath='" + originalPath +
+               "', parameters=" + getLastPageInstance().getParameters() + ">";
+    }
 }

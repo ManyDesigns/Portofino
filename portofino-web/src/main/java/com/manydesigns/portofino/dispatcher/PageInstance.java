@@ -82,6 +82,16 @@ public class PageInstance {
         parameters = new ArrayList<String>();
     }
 
+    public PageInstance copy() {
+        PageInstance pageInstance = new PageInstance(parent, directory, application, page, actionClass);
+        pageInstance.prepared = false;
+        pageInstance.parameters.addAll(parameters);
+        pageInstance.configuration = configuration;
+        pageInstance.actionBean = actionBean;
+        pageInstance.description = description;
+        return pageInstance;
+    }
+
     public Page getPage() {
         return page;
     }

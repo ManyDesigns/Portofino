@@ -125,9 +125,8 @@ public class Dispatcher {
     protected Dispatch getDispatch(
             String contextPath, String path, List<PageInstance> initialPath,
             ListIterator<String> fragmentsIterator) {
-        PageInstance rootPageInstance = initialPath.get(initialPath.size() - 1);
         try {
-            makePageInstancePath(initialPath, fragmentsIterator, rootPageInstance);
+            makePageInstancePath(initialPath, fragmentsIterator);
         } catch (PageNotActiveException e) {
             logger.debug("Page not active, not creating dispatch");
             return null;
@@ -156,8 +155,9 @@ public class Dispatcher {
     }
 
     protected void makePageInstancePath
-            (List<PageInstance> pagePath, ListIterator<String> fragmentsIterator, PageInstance parentPageInstance)
+            (List<PageInstance> pagePath, ListIterator<String> fragmentsIterator)
             throws Exception {
+        PageInstance parentPageInstance = pagePath.get(pagePath.size() - 1);
         File currentDirectory = parentPageInstance.getChildrenDirectory();
         boolean params = !parentPageInstance.getParameters().isEmpty();
         while(fragmentsIterator.hasNext()) {
@@ -181,14 +181,16 @@ public class Dispatcher {
                 PageInstance pageInstance =
                         new PageInstance(parentPageInstance, childDirectory, application, page, actionClass);
                 pagePath.add(pageInstance);
-                makePageInstancePath(pagePath, fragmentsIterator, pageInstance);
+                makePageInstancePath(pagePath, fragmentsIterator);
                 return;
             } else {
                 if(!params) {
                     currentDirectory = new File(currentDirectory, PageInstance.DETAIL);
                     params = true;
                 }
+                parentPageInstance = parentPageInstance.copy();
                 parentPageInstance.getParameters().add(nextFragment);
+                pagePath.set(pagePath.size() - 1, parentPageInstance);
             }
         }
     }
