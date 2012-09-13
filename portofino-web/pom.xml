@@ -105,12 +105,12 @@
         <dependency>
             <groupId>org.tuckey</groupId>
             <artifactId>urlrewritefilter</artifactId>
-            <version>3.1.0</version>
+            <version>${tuckey.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
-            <version>1.2.0</version>
+            <version>${shiro.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openid4java</groupId>

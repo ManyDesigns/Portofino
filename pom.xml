@@ -48,7 +48,8 @@
         <c3p0.version>0.9.1.2</c3p0.version> <!-- Hibernate uses 0.9.1, Quartz uses 0.9.1.1 -->
         <guava.version>11.0.2</guava.version>
         <junit.version>3.8.1</junit.version>
-
+        <shiro.version>1.2.0</shiro.version>
+        <tuckey.version>4.0.4</tuckey.version>
         <!--<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
     </properties>
     <modules>
