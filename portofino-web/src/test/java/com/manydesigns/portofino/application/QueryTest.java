@@ -78,14 +78,57 @@ public class QueryTest extends TestCase {
 
         TableCriteria criteria = new TableCriteria(table);
         criteria.eq(tableAccessor.getProperty("column1"), "123");
+
+        //W/o select
         QueryStringWithParameters queryStringWithParameters =
                 QueryUtils.mergeQuery("from test_table t", criteria, null);
-
         assertEquals("FROM test_table AS t WHERE t.column1 = ?", queryStringWithParameters.getQueryString());
 
-        queryStringWithParameters = QueryUtils.mergeQuery("from test_table t where t.foo = 1", criteria, null);
-
+        queryStringWithParameters =
+                QueryUtils.mergeQuery("from test_table t where t.foo = 1", criteria, null);
         assertEquals("FROM test_table AS t WHERE (t.foo = 1) AND t.column1 = ?", queryStringWithParameters.getQueryString());
+
+        queryStringWithParameters =
+                QueryUtils.mergeQuery("from test_table t, other where t.foo = other.bar", criteria, null);
+        assertEquals("FROM test_table AS t, other WHERE (t.foo = other.bar) AND t.column1 = ?", queryStringWithParameters.getQueryString());
+
+        queryStringWithParameters =
+                QueryUtils.mergeQuery("from test_table t, other x where t.foo = x.bar", criteria, null);
+        assertEquals("FROM test_table AS t, other AS x WHERE (t.foo = x.bar) AND t.column1 = ?", queryStringWithParameters.getQueryString());
+
+        //W/select
+        queryStringWithParameters =
+                QueryUtils.mergeQuery("select t from test_table t", criteria, null);
+        assertEquals("SELECT t FROM test_table AS t WHERE t.column1 = ?", queryStringWithParameters.getQueryString());
+
+        queryStringWithParameters =
+                QueryUtils.mergeQuery("select t from test_table t where t.foo = 1", criteria, null);
+        assertEquals("SELECT t FROM test_table AS t WHERE (t.foo = 1) AND t.column1 = ?", queryStringWithParameters.getQueryString());
+
+        queryStringWithParameters =
+                QueryUtils.mergeQuery("select t from test_table t, other where t.foo = other.bar", criteria, null);
+        assertEquals("SELECT t FROM test_table AS t, other WHERE (t.foo = other.bar) AND t.column1 = ?", queryStringWithParameters.getQueryString());
+
+        queryStringWithParameters =
+                QueryUtils.mergeQuery("select t from test_table t, other x where t.foo = x.bar", criteria, null);
+        assertEquals("SELECT t FROM test_table AS t, other AS x WHERE (t.foo = x.bar) AND t.column1 = ?", queryStringWithParameters.getQueryString());
+
+        //W/multiple select
+        queryStringWithParameters =
+                QueryUtils.mergeQuery("select t, u from test_table t", criteria, null);
+        assertEquals("SELECT t, u FROM test_table AS t WHERE t.column1 = ?", queryStringWithParameters.getQueryString());
+
+        queryStringWithParameters =
+                QueryUtils.mergeQuery("select t, u from test_table t where t.foo = 1", criteria, null);
+        assertEquals("SELECT t, u FROM test_table AS t WHERE (t.foo = 1) AND t.column1 = ?", queryStringWithParameters.getQueryString());
+
+        queryStringWithParameters =
+                QueryUtils.mergeQuery("select t, u from test_table t, other where t.foo = other.bar", criteria, null);
+        assertEquals("SELECT t, u FROM test_table AS t, other WHERE (t.foo = other.bar) AND t.column1 = ?", queryStringWithParameters.getQueryString());
+
+        queryStringWithParameters =
+                QueryUtils.mergeQuery("select t, u from test_table t, other x where t.foo = x.bar", criteria, null);
+        assertEquals("SELECT t, u FROM test_table AS t, other AS x WHERE (t.foo = x.bar) AND t.column1 = ?", queryStringWithParameters.getQueryString());
     }
 
 }
