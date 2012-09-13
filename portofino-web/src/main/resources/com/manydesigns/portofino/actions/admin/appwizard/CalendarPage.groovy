@@ -54,13 +54,14 @@ class CalendarPage extends CalendarAction {
 
     protected def addEvent(TableAccessor classAccessor, object, String property, Calendar calendar) {
         def name = ShortNameUtils.getName(classAccessor, object)
-        def eventStart
+        def evtInterval
         if(object[property] instanceof java.sql.Date) {
-            eventStart = new DateMidnight(object[property], DateTimeZone.UTC).toDateTime()
+            def eventStart = new DateMidnight(object[property], DateTimeZone.UTC)
+            evtInterval = new Interval(eventStart, eventStart.plusDays(1));
         } else {
-            eventStart = new DateTime(object[property], DateTimeZone.UTC)
+            def eventStart = new DateTime(object[property], DateTimeZone.UTC)
+            evtInterval = new Interval(eventStart, eventStart);
         }
-        def evtInterval = new Interval(eventStart, eventStart.plusDays(1));
         def prettyProperty = Util.guessToWords(property);
         def event = new Event(
                 calendar, object.id + "_" + property + "_" + events.size(),
