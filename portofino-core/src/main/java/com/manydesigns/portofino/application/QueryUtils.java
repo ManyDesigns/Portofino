@@ -212,11 +212,21 @@ public class QueryUtils {
      */
     public static QueryStringWithParameters getQueryStringWithParametersForCriteria(
             TableCriteria criteria) {
+        return getQueryStringWithParametersForCriteria(criteria, null);
+    }
+
+    /**
+     * Tranforms a {@link TableCriteria} to a query string with an associated array of parameters.
+     * @param criteria the criteria.
+     * @param alias the alias to use for the main entity.
+     * @return the same criteria encoded as a HQL query with parameters.
+     */
+    public static QueryStringWithParameters getQueryStringWithParametersForCriteria(
+            @Nullable TableCriteria criteria, @Nullable String alias) {
         if (criteria == null) {
             return new QueryStringWithParameters("", new Object[0]);
         }
         Table table = criteria.getTable();
-        String actualEntityName = table.getActualEntityName();
 
         ArrayList<Object> parametersList = new ArrayList<Object>();
         StringBuilder whereBuilder = new StringBuilder();
@@ -316,8 +326,11 @@ public class QueryUtils {
                 continue;
             }
 
-            String hql = MessageFormat.format(hqlFormat,
-                    accessor.getName());
+            String accessorName = accessor.getName();
+            if(alias != null) {
+                accessorName = alias + "." + accessorName;
+            }
+            String hql = MessageFormat.format(hqlFormat, accessorName);
 
             if (whereBuilder.length() > 0) {
                 whereBuilder.append(" AND ");
@@ -326,6 +339,10 @@ public class QueryUtils {
         }
         String whereClause = whereBuilder.toString();
         String queryString;
+        String actualEntityName = table.getActualEntityName();
+        if(alias != null) {
+            actualEntityName += " " + alias;
+        }
         if (whereClause.length() > 0) {
             queryString = MessageFormat.format(
                     "FROM {0}" + WHERE_STRING + "{1}",
@@ -429,16 +446,26 @@ public class QueryUtils {
         String formatString = sqlFormat.getFormatString();
         Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
 
-        QueryStringWithParameters criteriaQuery =
-                getQueryStringWithParametersForCriteria(criteria);
-        String criteriaQueryString = criteriaQuery.getQueryString();
-        Object[] criteriaParameters = criteriaQuery.getParameters();
-
         CCJSqlParserManager parserManager = new CCJSqlParserManager();
         PlainSelect parsedQueryString;
         PlainSelect parsedCriteriaQuery;
         try {
             parsedQueryString = parseQuery(parserManager, formatString);
+        } catch (JSQLParserException e) {
+            throw new RuntimeException("Couldn't merge query", e);
+        }
+
+        String mainEntityAlias = null;
+        if(criteria != null) {
+            mainEntityAlias = getEntityAlias(criteria.getTable().getActualEntityName(), parsedQueryString);
+        }
+
+        QueryStringWithParameters criteriaQuery =
+                getQueryStringWithParametersForCriteria(criteria, mainEntityAlias);
+        String criteriaQueryString = criteriaQuery.getQueryString();
+        Object[] criteriaParameters = criteriaQuery.getParameters();
+
+        try {
             if(StringUtils.isEmpty(criteriaQueryString)) {
                 parsedCriteriaQuery = new PlainSelect();
             } else {
