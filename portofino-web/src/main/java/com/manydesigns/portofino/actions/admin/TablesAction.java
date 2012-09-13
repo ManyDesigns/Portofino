@@ -192,8 +192,13 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
             table.setJavaClass(StringUtils.defaultIfEmpty(table.getJavaClass(), null));
             table.setShortName(StringUtils.defaultIfEmpty(table.getShortName(), null));
             columnsTableForm.writeToObject(decoratedColumns);
-            for(int i = 0; i < table.getColumns().size(); i++) {
-                decoratedColumns.get(i).copyTo(table.getColumns().get(i));
+            //Copy by name, not by index. Some columns may have been skipped.
+            for(Column column : table.getColumns()) {
+                for(ColumnForm columnForm : decoratedColumns) {
+                    if(columnForm.getColumnName().equals(column.getColumnName())) {
+                        columnForm.copyTo(column);
+                    }
+                }
             }
             Collections.sort(table.getColumns(), new Comparator<Column>() {
                 public int compare(Column o1, Column o2) {
@@ -228,6 +233,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                         }
                     }
                 }
+                SessionMessages.consumeWarningMessages(); //Clear skipped columns warnings
                 setupTableForm(Mode.EDIT); //Recalculate entity name
                 setupColumnsForm(Mode.EDIT); //Reflect the new order of the columns
                 SessionMessages.addInfoMessage(getMessage("commons.save.successful"));
@@ -743,6 +749,26 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         return path;
     }
 
+    public List<Table> getAllTables() {
+        List<Table> tables = DatabaseLogic.getAllTables(model);
+        Collections.sort(tables, new Comparator<Table>() {
+            public int compare(Table o1, Table o2) {
+                int dbComp = o1.getDatabaseName().compareToIgnoreCase(o2.getDatabaseName());
+                if(dbComp == 0) {
+                    int schemaComp = o1.getSchemaName().compareToIgnoreCase(o2.getSchemaName());
+                    if(schemaComp == 0) {
+                        return o1.getTableName().compareToIgnoreCase(o2.getTableName());
+                    } else {
+                        return schemaComp;
+                    }
+                } else {
+                    return dbComp;
+                }
+            }
+        });
+        return tables;
+    }
+
     public Model getModel() {
         return model;
     }
@@ -846,6 +872,10 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
 
     public void setSortedColumnNames(List<String> sortedColumnNames) {
         this.sortedColumnNames = sortedColumnNames;
+    }
+
+    public List<ColumnForm> getDecoratedColumns() {
+        return decoratedColumns;
     }
 }
 

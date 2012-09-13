@@ -46,12 +46,7 @@
             <%
                 String lastDatabase = null;
                 String lastSchema = null;
-                List<Table> tables = DatabaseLogic.getAllTables(actionBean.getModel());
-                Collections.sort(tables, new Comparator<Table>() {
-                    public int compare(Table o1, Table o2) {
-                        return o1.getTableName().compareToIgnoreCase(o2.getTableName());
-                    }
-                });
+                List<Table> tables = actionBean.getAllTables();
                 for(Table table : tables) {
                     if(table.getPrimaryKey() == null) {
                         continue;

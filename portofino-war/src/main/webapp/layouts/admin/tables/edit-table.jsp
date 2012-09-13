@@ -58,7 +58,6 @@
                 <c:if test="${not empty actionBean.selectedTabId}">
                     $("#tabs").tabs("select", '<c:out value="${actionBean.selectedTabId}" />');
                 </c:if>
-                //$("#shortName").after($("#editShortNameButton"));
                 var theSortable = $("#sortable");
                 theSortable.sortable();
                 theSortable.disableSelection();
@@ -67,8 +66,6 @@
                     $("#sortableContainer").toggle();
                     $("#columns").toggle();
                     $(".sortButton").toggle();
-                    //$(".confirmSortButton").toggle();
-                    //$(".cancelSortButton").toggle();
                 }
                 $(".sortButton").click(function() {
                     toggleSortable(theSortable);
@@ -136,7 +133,7 @@
                                     <span class="ui-button-text"><fmt:message key="commons.cancel" /></span>
                                 </button>
                                 <ul id="sortable">
-                                    <c:forEach var="col" items="${actionBean.table.columns}" varStatus="status">
+                                    <c:forEach var="col" items="${actionBean.decoratedColumns}" varStatus="status">
                                         <li class="ui-state-default" id="col_${status.index}">
                                             <c:out value="${col.columnName}" />
                                             <input type="hidden" name="sortedColumnNames[]" value="${col.columnName}" />

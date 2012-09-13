@@ -1085,9 +1085,19 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         if(!propertyIsUserPassword &&
            column.getActualJavaType() == String.class &&
            column.getLength() > MULTILINE_THRESHOLD) {
-            Annotation annotation = new Annotation(column, Multiline.class.getName());
+            Annotation annotation = null;
+            for(Annotation candidate : column.getAnnotations()) {
+                if(candidate.getType().equals(Multiline.class.getName())) {
+                    annotation = candidate;
+                    break;
+                }
+            }
+            if(annotation == null) {
+                annotation = new Annotation(column, Multiline.class.getName());
+                column.getAnnotations().add(annotation);
+            }
+            annotation.getValues().clear();
             annotation.getValues().add("true");
-            column.getAnnotations().add(annotation);
         }
 
         CrudProperty crudProperty = new CrudProperty();
