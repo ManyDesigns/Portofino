@@ -18,4 +18,9 @@ class MyTextAction extends TextAction {
     //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino
     //Write your code here
 
+    @Override
+    protected String computeTextFileName() {
+        return super.computeTextFileName()
+    }
+
 }

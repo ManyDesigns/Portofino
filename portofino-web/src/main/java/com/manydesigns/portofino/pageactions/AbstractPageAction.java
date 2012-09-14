@@ -172,16 +172,11 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return embedded;
     }
 
-    /*protected void dereferencePageInstance() {
-        if(pageInstance != null) {
-            pageInstance = pageInstance.dereference();
-        }
-    }*/
-
     /**
-     * Detects whether the page is embedded. Subclasses are expected to override and extend
-     * this method.
      * {@inheritDoc}
+     * <p><b>The AbstractPageAction specific implementation</b>
+     * detects whether the page is embedded. Subclasses are expected to override and extend
+     * this method.</p>
      */
     public Resolution preparePage() {
         embedded = context.getRequest().getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH) != null;

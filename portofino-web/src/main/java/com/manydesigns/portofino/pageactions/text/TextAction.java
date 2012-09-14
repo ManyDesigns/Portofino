@@ -144,8 +144,13 @@ public class TextAction extends AbstractPageAction {
         }
     }
 
+    /**
+     * Loads the content of the page from a file (see {@link TextAction#locateTextFile()}).
+     * Assigns the {@link TextAction#content} field.
+     * @throws IOException if there's a problem loading the content.
+     */
     protected void loadContent() throws IOException {
-        textFile = RandomUtil.getCodeFile(pageInstance.getDirectory(), TEXT_FILE_NAME_PATTERN, "text");
+        textFile = locateTextFile();
         try {
             content = FileUtils.readFileToString(textFile, CONTENT_ENCODING);
             content = processContentBeforeView(content);
@@ -155,17 +160,41 @@ public class TextAction extends AbstractPageAction {
         }
     }
 
+    /**
+     * Computes the File object used to store this page's content. The default implementation
+     * looks for a file with a fixed name in this page's directory, computed by calling
+     * {@link TextAction#computeTextFileName()}.
+     * @see TextAction#computeTextFileName()
+     * @return the document File.
+     */
+    protected File locateTextFile() {
+        return new File(pageInstance.getDirectory(), computeTextFileName());
+    }
+
+    /**
+     * Computes the name of the file used to store this page's content. The default implementation
+     * returns "text.html".
+     * @see com.manydesigns.portofino.pageactions.text.TextAction#locateTextFile()
+     * @return the name of the file.
+     */
+    protected String computeTextFileName() {
+        return RandomUtil.getCodeFileName(TEXT_FILE_NAME_PATTERN, "text");
+    }
+
+    /**
+     * Saves the content of the page to a file (see {@link TextAction#locateTextFile()}).
+     * @throws IOException if there's a problem saving the content.
+     */
     protected void saveContent() throws IOException {
         if (content == null) {
             content = EMPTY_STRING;
         }
         content = processContentBeforeSave(content);
         byte[] contentByteArray = content.getBytes(CONTENT_ENCODING);
-        File dataFile =
-                textFile = RandomUtil.getCodeFile(pageInstance.getDirectory(), TEXT_FILE_NAME_PATTERN, "text");
+        textFile = locateTextFile();
 
         // copy the data
-        FileOutputStream fileOutputStream = new FileOutputStream(dataFile);
+        FileOutputStream fileOutputStream = new FileOutputStream(textFile);
         try {
             long size = IOUtils.copyLarge(
                     new ByteArrayInputStream(contentByteArray), fileOutputStream);
@@ -178,6 +207,12 @@ public class TextAction extends AbstractPageAction {
         logger.info("Content saved to: {}", textFile.getAbsolutePath());
     }
 
+    /**
+     * Processes the content before saving it, in order to encode internal links and attachments, and
+     * removing potentially problematic characters.
+     * @param content the original content.
+     * @return the processed content.
+     */
     protected String processContentBeforeSave(String content) {
         content = processAttachmentUrls(content);
         content = processLocalUrls(content);
