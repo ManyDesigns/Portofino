@@ -37,6 +37,7 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.AbstractActionBean;
+import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.shiro.openid.OpenIDToken;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
@@ -82,6 +83,8 @@ public class LoginAction extends AbstractActionBean {
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
     public static final String URL_BINDING = "/actions/user/login";
+    public static final String OPENID_DISCOVERED = "openID.discovered";
+    public static final String OPENID_CONSUMER_MANAGER = "openID.consumerManager";
 
     //**************************************************************************
     // Injections
@@ -120,13 +123,8 @@ public class LoginAction extends AbstractActionBean {
     public Resolution execute () {
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
-            if(StringUtils.isEmpty(returnUrl)) {
-                logger.debug("Already logged in");
-                return new ForwardResolution("/layouts/user/alreadyLoggedIn.jsp");
-            } else {
-                logger.debug("Already logged in, redirecting to {}", returnUrl);
-                return new RedirectResolution(returnUrl);
-            }
+            logger.debug("Already logged in");
+            return redirectToReturnUrl();
         }
 
         recoverPwd = portofinoConfiguration.getBoolean(
@@ -146,11 +144,7 @@ public class LoginAction extends AbstractActionBean {
             String successMsg = MessageFormat.format(
                     bundle.getString("user.login.success"), userName);
             SessionMessages.addInfoMessage(successMsg);
-            if (StringUtils.isEmpty(returnUrl)) {
-                returnUrl = "/";
-            }
-            logger.debug("Redirecting to: {}", returnUrl);
-            return new RedirectResolution(returnUrl);
+            return redirectToReturnUrl();
         } catch (DisabledAccountException e) {
             String errMsg = MessageFormat.format(bundle.getString("user.not.active"), userName);
             SessionMessages.addErrorMessage(errMsg);
@@ -164,6 +158,24 @@ public class LoginAction extends AbstractActionBean {
         }
     }
 
+    protected Resolution redirectToReturnUrl() {
+        return redirectToReturnUrl(returnUrl);
+    }
+
+    protected Resolution redirectToReturnUrl(String returnUrl) {
+        if (StringUtils.isEmpty(returnUrl)) {
+            returnUrl = "/";
+        } else try {
+            new URL(returnUrl);
+            logger.warn("Invalid return URL: " + returnUrl);
+            return new RedirectResolution("/");
+        } catch (MalformedURLException e) {
+            //Ok, it must not be a URL to avoid possible XSS attacks with returnUrl=http://www.evil.com/hack
+        }
+        logger.debug("Redirecting to: {}", returnUrl);
+        return new RedirectResolution(returnUrl);
+    }
+
     @Button(list = "login-buttons", key = "commons.cancel", order = 2)
     public Resolution cancel() {
         String url = "/";
@@ -172,10 +184,11 @@ public class LoginAction extends AbstractActionBean {
         } else if(!StringUtils.isBlank(returnUrl)) {
             url = returnUrl;
         }
-        return new RedirectResolution(url);
+        return redirectToReturnUrl(url);
     }
 
     public Resolution logout() {
+        String userName = ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) + "";
         SecurityUtils.getSubject().logout();
         HttpSession session = getSession();
         if (session != null) {
@@ -186,6 +199,7 @@ public class LoginAction extends AbstractActionBean {
         ResourceBundle bundle = application.getBundle(locale);
         String msg = bundle.getString("user.logout");
         SessionMessages.addInfoMessage(msg);
+        logger.info("User {} logout", userName);
 
         return new RedirectResolution("/");
     }
@@ -219,8 +233,8 @@ public class LoginAction extends AbstractActionBean {
         // store the discovery information in the user's session for later use
         // leave out for stateless operation / if there is no session
         HttpSession session = context.getRequest().getSession();
-        session.setAttribute("discovered", discovered);
-        session.setAttribute("consumerManager", manager);
+        session.setAttribute(OPENID_DISCOVERED, discovered);
+        session.setAttribute(OPENID_CONSUMER_MANAGER, manager);
 
         String destinationUrl = authReq.getDestinationUrl(true);
 
@@ -250,9 +264,9 @@ public class LoginAction extends AbstractActionBean {
         // retrieve the previously stored discovery information
         HttpSession session = request.getSession();
         DiscoveryInformation discovered =
-            (DiscoveryInformation) session.getAttribute("discovered");
+            (DiscoveryInformation) session.getAttribute(OPENID_DISCOVERED);
         ConsumerManager manager =
-                (ConsumerManager) session.getAttribute("consumerManager");
+                (ConsumerManager) session.getAttribute(OPENID_CONSUMER_MANAGER);
 
         // extract the receiving URL from the HTTP request
         StringBuffer receivingURL = request.getRequestURL();
@@ -276,16 +290,14 @@ public class LoginAction extends AbstractActionBean {
                 subject.login(new OpenIDToken(verification));
                 String userId = verification.getVerifiedId().getIdentifier();
                 logger.info("User {} login", userId);
-                String successMsg = MessageFormat.format(
-                        bundle.getString("user.login.success"), userId);
+                String successMsg = MessageFormat.format(bundle.getString("user.login.success"), userId);
                 SessionMessages.addInfoMessage(successMsg);
                 if (StringUtils.isEmpty(returnUrl)) {
                     returnUrl = "/";
                 }
-                session.removeAttribute("discovered");
-                session.removeAttribute("consumerManager");
-                logger.debug("Redirecting to: {}", returnUrl);
-                return new RedirectResolution(returnUrl);
+                session.removeAttribute(OPENID_DISCOVERED);
+                session.removeAttribute(OPENID_CONSUMER_MANAGER);
+                return redirectToReturnUrl(returnUrl);
             } catch (AuthenticationException e) {
                 String errMsg = MessageFormat.format(bundle.getString("user.login.failed"), userName);
                 SessionMessages.addErrorMessage(errMsg);
