@@ -59,6 +59,7 @@ import com.manydesigns.portofino.pageactions.m2m.configuration.ViewType;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
+import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.util.PkHelper;
 import net.sourceforge.stripes.action.*;
 import ognl.OgnlContext;
@@ -82,9 +83,12 @@ import java.util.*;
 @ScriptTemplate("script_template.groovy")
 @ConfigurationClass(ManyToManyConfiguration.class)
 @PageActionName("Many-to-Many")
+@SupportsPermissions(ManyToManyAction.PERMISSION_UPDATE)
 public class ManyToManyAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
+
+    public static final String PERMISSION_UPDATE = "update";
 
     protected ManyToManyConfiguration m2mConfiguration;
 
@@ -291,6 +295,7 @@ public class ManyToManyAction extends AbstractPageAction {
 
     @Button(list = "m2m-checkboxes-edit", key = "commons.update")
     @Guard(test = "onePk != null", type = GuardType.VISIBLE)
+    @RequiresPermissions(permissions = ManyToManyAction.PERMISSION_UPDATE)
     public Resolution saveCheckboxes() throws Exception {
         if(!correctlyConfigured) {
             return forwardToPortletNotConfigured();

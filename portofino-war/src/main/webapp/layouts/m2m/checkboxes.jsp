@@ -4,6 +4,10 @@
 <%@ page import="com.manydesigns.portofino.util.ShortNameUtils" %>
 <%@ page import="com.manydesigns.portofino.util.PkHelper" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
+<%@ page import="org.apache.shiro.SecurityUtils" %>
+<%@ page import="com.manydesigns.portofino.security.AccessLevel" %>
+<%@ page import="com.manydesigns.portofino.pageactions.m2m.ManyToManyAction" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -41,6 +45,11 @@
                 buffer.addAttribute("type", "checkbox");
                 buffer.addAttribute("name", "selectedPrimaryKeys");
                 buffer.addAttribute("value", StringUtils.join(pkHelper.generatePkStringArray(obj), "/"));
+                if(!SecurityLogic.hasPermissions(
+                        actionBean.getPageInstance(), SecurityUtils.getSubject(),
+                        AccessLevel.VIEW, ManyToManyAction.PERMISSION_UPDATE)) {
+                    buffer.addAttribute("disabled", "disabled");
+                }
                 if(entry.getValue()) {
                     buffer.addAttribute("checked", "t");
                 }
