@@ -50,14 +50,12 @@ import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.chart.configuration.ChartConfiguration;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.jfree.chart.JFreeChart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -185,13 +183,7 @@ public class ChartAction extends AbstractPageAction {
         final File file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
 
         inputStream = new FileInputStream(file);
-        return new NoCacheStreamingResolution("image/png", inputStream) {
-            @Override
-            protected void stream(HttpServletResponse response) throws Exception {
-                super.stream(response);
-                //file.delete(); //TODO delete (temporizzato?) + dicitura chart scaduto, ricaricare
-            }
-        };
+        return new StreamingResolution("image/png", inputStream);
     }
 
 

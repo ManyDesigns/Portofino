@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.interceptors;
 
+import com.manydesigns.elements.servlet.ServletConstants;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
@@ -51,11 +52,11 @@ public class NoCacheInterceptor implements Interceptor {
     public Resolution intercept(ExecutionContext context) throws Exception {
         HttpServletResponse response = context.getActionBeanContext().getResponse();
         // Avoid caching of dynamic pages
-        response.setHeader("Pragma", "no-cache");
-        response.addHeader("Cache-Control", "must-revalidate");
-        response.addHeader("Cache-Control", "no-cache");
-        response.addHeader("Cache-Control", "no-store");
-        response.setDateHeader("Expires", 0);
+        response.setHeader(ServletConstants.HTTP_PRAGMA, ServletConstants.HTTP_PRAGMA_NO_CACHE);
+        response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_MUST_REVALIDATE);
+        response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_NO_CACHE);
+        response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_NO_STORE);
+        response.setDateHeader(ServletConstants.HTTP_EXPIRES, 0);
         return context.proceed();
     }
 }

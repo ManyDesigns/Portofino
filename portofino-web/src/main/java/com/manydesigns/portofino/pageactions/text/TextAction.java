@@ -29,6 +29,7 @@
 package com.manydesigns.portofino.pageactions.text;
 
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.servlet.ServletConstants;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.PortofinoProperties;
@@ -54,6 +55,8 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -492,6 +495,15 @@ public class TextAction extends AbstractPageAction {
 
     @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution viewAttachment() {
+        return streamAttachment(false);
+    }
+
+    @RequiresPermissions(level = AccessLevel.VIEW)
+    public Resolution downloadAttachment() {
+        return streamAttachment(true);
+    }
+
+    protected Resolution streamAttachment(boolean isAttachment) {
         // find the attachment
         Attachment attachment =
                 TextLogic.findAttachmentById(textConfiguration, id);
@@ -504,7 +516,15 @@ public class TextAction extends AbstractPageAction {
             String attachmentId = attachment.getId();
             final File file = RandomUtil.getCodeFile(
                     application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
-            /* TODO cache
+
+            //Cache
+            HttpServletResponse response = context.getResponse();
+            response.setHeader(ServletConstants.HTTP_PRAGMA, "");
+            response.setHeader(ServletConstants.HTTP_CACHE_CONTROL, "");
+            response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_PRIVATE);
+            response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_MUST_REVALIDATE);
+            response.setHeader(ServletConstants.HTTP_EXPIRES, "");
+
             //Suggerisce al browser di usare la risorsa che ha in cache invece di riscaricarla
             HttpServletRequest request = context.getRequest();
             if(request.getHeader("If-Modified-Since") != null) {
@@ -512,41 +532,14 @@ public class TextAction extends AbstractPageAction {
                 if(ifModifiedSince >= file.lastModified()) {
                     return new ErrorResolution(304); //Not modified
                 }
-            }*/
+            }
 
             InputStream is = new FileInputStream(file);
             Resolution resolution =
                     new StreamingResolution(attachment.getContentType(), is)
                             .setLength(attachment.getSize())
-                            .setAttachment(false)
+                            .setAttachment(isAttachment)
                             .setLastModified(file.lastModified());
-            return resolution;
-        } catch (IOException e) {
-            logger.error("Download failed", e);
-            return new ErrorResolution(500, "Attachment error");
-        }
-    }
-
-    @RequiresPermissions(level = AccessLevel.VIEW)
-    public Resolution downloadAttachment() {
-        // find the attachment
-        Attachment attachment =
-                TextLogic.findAttachmentById(textConfiguration, id);
-
-        if (attachment == null) {
-            return new ErrorResolution(404, "Attachment not found");
-        }
-
-        try {
-            String attachmentId = attachment.getId();
-            File file = RandomUtil.getCodeFile(
-                    application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
-            InputStream is = new FileInputStream(file);
-            Resolution resolution =
-                    new StreamingResolution(attachment.getContentType(), is)
-                    .setLength(attachment.getSize())
-                    .setFilename(attachment.getFilename())
-                    .setAttachment(true);
             return resolution;
         } catch (IOException e) {
             logger.error("Download failed", e);

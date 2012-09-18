@@ -1,13 +1,5 @@
-<%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.DispatcherUtil" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.PageAction" %>
-<%
-    // Avoid caching of dynamic pages
-    response.setHeader("Pragma", "no-cache");
-    response.addHeader("Cache-Control", "must-revalidate");
-    response.addHeader("Cache-Control", "no-cache");
-    response.addHeader("Cache-Control", "no-store");
-    response.setDateHeader("Expires", 0);
+<%@ page import="com.manydesigns.portofino.dispatcher.Dispatch"
+%><%@ page import="com.manydesigns.portofino.dispatcher.DispatcherUtil"
 %><%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"

@@ -59,7 +59,6 @@ import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.servlets.DummyHttpServletRequest;
-import com.manydesigns.portofino.stripes.NoCacheStreamingResolution;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import jxl.Workbook;
@@ -366,7 +365,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         js.endArray();
         js.endObject();
         String jsonText = js.toString();
-        return new NoCacheStreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
+        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
     }
 
     /**
@@ -2075,7 +2074,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         String text = targetField.jsonSelectFieldOptions(includeSelectPrompt);
         logger.debug("jsonOptions: {}", text);
-        return new NoCacheStreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, text);
+        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, text);
     }
 
     //--------------------------------------------------------------------------

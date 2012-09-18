@@ -21,13 +21,6 @@
 
     response.setStatus(404);
 
-    // Avoid caching of dynamic pages
-    response.setHeader("Pragma", "no-cache");
-    response.addHeader("Cache-Control", "must-revalidate");
-    response.addHeader("Cache-Control", "no-cache");
-    response.addHeader("Cache-Control", "no-store");
-    response.setDateHeader("Expires", 0);
-
     if(!invalidPage.getParameters().isEmpty()) {
         logger.debug("Page instance with parameters failed, trying without parameters");
         invalidPage.getParameters().clear();
