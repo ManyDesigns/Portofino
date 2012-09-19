@@ -88,7 +88,7 @@ public class ManyToManyAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    public static final String PERMISSION_UPDATE = "update";
+    public static final String PERMISSION_UPDATE = "m2m-update";
 
     protected ManyToManyConfiguration m2mConfiguration;
 
