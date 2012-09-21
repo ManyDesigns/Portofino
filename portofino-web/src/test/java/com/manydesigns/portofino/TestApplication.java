@@ -29,15 +29,15 @@
 
 package com.manydesigns.portofino;
 
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
-import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.Dispatcher;
-import com.manydesigns.portofino.dispatcher.DispatcherLogic;
-import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.ConnectionProvider;
+import com.manydesigns.portofino.pageactions.PageActionLogic;
 import com.manydesigns.portofino.pageactions.safemode.SafeModeAction;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Layout;
@@ -45,10 +45,12 @@ import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.io.IOUtils;
 import org.hibernate.Session;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,7 +108,18 @@ public class TestApplication implements Application {
         }
     }
 
-    public File addPage(String path, String name) throws Exception {
+    public File addPage(String path, String name, Class<? extends PageAction> actionClass) throws Exception {
+        String scriptTemplate = PageActionLogic.getScriptTemplate(actionClass);
+        if(scriptTemplate == null) {
+            throw new IllegalArgumentException(actionClass + " doesn't have a script template");
+        }
+
+        if(ElementsThreadLocals.getOgnlContext() == null) {
+            ElementsThreadLocals.setupDefaultElementsContext();
+        }
+
+        String script = OgnlTextFormat.format(scriptTemplate, this);
+
         Page rootPage;
         File rootDir;
         File childrenDir;
@@ -136,6 +149,12 @@ public class TestApplication implements Application {
         Page page = new Page();
         File pageFile = DispatcherLogic.savePage(child, page);
         rememberToDelete(pageFile);
+
+        File scriptFile = new File(child, "action.groovy");
+        FileWriter fileWriter = new FileWriter(scriptFile);
+        IOUtils.write(script, fileWriter);
+        IOUtils.closeQuietly(fileWriter);
+        rememberToDelete(scriptFile);
 
         ChildPage childPage = new ChildPage();
         childPage.setName(name);

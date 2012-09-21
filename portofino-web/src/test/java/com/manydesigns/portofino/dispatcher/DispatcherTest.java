@@ -29,7 +29,10 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.portofino.TestApplication;
+import com.manydesigns.portofino.pageactions.crud.CrudAction;
+import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import junit.framework.TestCase;
 
 /*
@@ -61,15 +64,44 @@ public class DispatcherTest extends TestCase {
     }
 
     public void testJSessionId() throws Exception {
-        application.addPage("/", "bar");
+        application.addPage("/", "bar", CustomAction.class);
         Dispatch dispatch = dispatcher.getDispatch("/foo", "/bar;jsessionid=qwertyuiop1234567890");
         assertNotNull(dispatch);
 
-        application.addPage("/bar", "baz");
+        application.addPage("/bar", "baz", CustomAction.class);
         dispatch = dispatcher.getDispatch("/foo", "/bar/baz;jsessionid=qwertyuiop1234567890");
         assertNotNull(dispatch);
         dispatch = dispatcher.getDispatch("/foo", "/bar;foo=1&quux=2/baz;jsessionid=qwertyuiop1234567890");
         assertNotNull(dispatch);
+    }
+
+    public void testProjectSearch() throws Exception {
+        application.addPage("/", "projects", CrudAction.class);
+        String originalPath = "/projects";
+        MutableHttpServletRequest req = new MutableHttpServletRequest();
+        req.setRequestURI(originalPath);
+        Dispatch dispatch = new Dispatcher(application).getDispatch("", originalPath);
+        assertNotNull(dispatch);
+
+        assertEquals(originalPath, dispatch.getOriginalPath());
+        assertEquals(originalPath, dispatch.getAbsoluteOriginalPath());
+        assertEquals(originalPath, dispatch.getLastPageInstance().getPath());
+        assertTrue(CrudAction.class.isAssignableFrom(dispatch.getActionBeanClass()));
+
+        PageInstance[] pageInstancePath =
+                dispatch.getPageInstancePath();
+        assertEquals(2, pageInstancePath.length);
+
+        dispatch = new Dispatcher(application).getDispatch("/foo", originalPath);
+        assertNotNull(dispatch);
+
+        assertEquals(originalPath, dispatch.getOriginalPath());
+        assertEquals("/foo" + originalPath, dispatch.getAbsoluteOriginalPath());
+        assertEquals(originalPath, dispatch.getLastPageInstance().getPath());
+        assertTrue(CrudAction.class.isAssignableFrom(dispatch.getActionBeanClass()));
+
+        pageInstancePath = dispatch.getPageInstancePath();
+        assertEquals(2, pageInstancePath.length);
     }
 
 }

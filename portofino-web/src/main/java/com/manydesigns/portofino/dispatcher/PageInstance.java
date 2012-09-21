@@ -124,9 +124,13 @@ public class PageInstance {
      */
     public String getPath() {
         if(getParent() == null) {
-            return "";
+            return "/";
         } else {
-            return getParent().getPath() + "/" + getUrlFragment();
+            String parentPath = getParent().getPath();
+            if(!parentPath.endsWith("/")) {
+                parentPath += "/";
+            }
+            return parentPath + getUrlFragment();
         }
     }
 

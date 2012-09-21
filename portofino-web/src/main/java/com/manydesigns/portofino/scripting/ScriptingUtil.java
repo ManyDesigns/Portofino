@@ -107,7 +107,8 @@ public class ScriptingUtil {
     }
 
     public static GroovyScriptEngine GROOVY_SCRIPT_ENGINE =
-            new GroovyScriptEngine(new URL[0], ScriptingUtil.class.getClassLoader());
+            new GroovyScriptEngine(new URL[] { ScriptingUtil.class.getResource("/") },
+                                               ScriptingUtil.class.getClassLoader());
 
     public static Class<?> getGroovyClass(File scriptFile) throws IOException, ScriptException, ResourceException {
         if(!scriptFile.exists()) {
