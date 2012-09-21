@@ -106,6 +106,8 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     protected String cancelReturnUrl;
     protected String shortName;
     protected String selectionProviderName;
+    protected final Map<String, String> fkOnePropertyNames = new HashMap<String, String>();
+    protected final Map<String, String> fkManyPropertyNames = new HashMap<String, String>();
 
     //**************************************************************************
     // Domain objects
@@ -168,6 +170,10 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         setupTableForm(Mode.EDIT);
         setupColumnsForm(Mode.EDIT);
         tableForm.readFromRequest(context.getRequest());
+        for(ForeignKey fk : table.getForeignKeys()) {
+            fkOnePropertyNames.put(fk.getName(), fk.getOnePropertyName());
+            fkManyPropertyNames.put(fk.getName(), fk.getManyPropertyName());
+        }
         return new ForwardResolution("/layouts/admin/tables/edit-table.jsp");
     }
 
@@ -207,6 +213,11 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                     return Integer.valueOf(i1).compareTo(i2);
                 }
             });
+
+            for(ForeignKey fk : table.getForeignKeys()) {
+                fk.setOnePropertyName(fkOnePropertyNames.get(fk.getName()));
+                fk.setManyPropertyName(fkManyPropertyNames.get(fk.getName()));
+            }
 
             try {
                 model.init();
@@ -877,5 +888,12 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
     public List<ColumnForm> getDecoratedColumns() {
         return decoratedColumns;
     }
-}
 
+    public Map<String, String> getFkOnePropertyNames() {
+        return fkOnePropertyNames;
+    }
+
+    public Map<String, String> getFkManyPropertyNames() {
+        return fkManyPropertyNames;
+    }
+}

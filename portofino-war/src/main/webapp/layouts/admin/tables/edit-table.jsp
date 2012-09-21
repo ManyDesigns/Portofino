@@ -154,6 +154,8 @@
                                 <table>
                                     <tr>
                                         <th><fmt:message key="layouts.admin.tables.editTable.name" /></th>
+                                        <th><fmt:message key="layouts.admin.tables.editTable.onePropertyName" /></th>
+                                        <th><fmt:message key="layouts.admin.tables.editTable.manyPropertyName" /></th>
                                         <th><fmt:message key="layouts.admin.tables.editTable.columns" /></th>
                                         <th><fmt:message key="layouts.admin.tables.editTable.refTable" /></th>
                                         <th><fmt:message key="layouts.admin.tables.editTable.refColumns" /></th>
@@ -161,6 +163,12 @@
                                     <c:forEach items="${actionBean.table.foreignKeys}" var="fk">
                                         <tr>
                                             <td rowspan="${fn:length(fk.references)}"><c:out value="${fk.name}" /></td>
+                                            <td rowspan="${fn:length(fk.references)}">
+                                                <input name="fkOnePropertyNames[${fk.name}]" type="text" value="${actionBean.fkOnePropertyNames[fk.name]}"/>
+                                            </td>
+                                            <td rowspan="${fn:length(fk.references)}">
+                                                <input name="fkManyPropertyNames[${fk.name}]" type="text" value="${actionBean.fkManyPropertyNames[fk.name]}"/>
+                                            </td>
                                             <td>
                                                 <a href="<stripes:url value="${actionBean.actionPath}/${fk.references[0].actualFromColumn.columnName}"/>">
                                                     <c:out value="${fk.references[0].actualFromColumn.columnName}" />
