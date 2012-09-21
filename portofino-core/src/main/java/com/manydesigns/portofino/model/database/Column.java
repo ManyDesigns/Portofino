@@ -123,7 +123,7 @@ public class Column implements ModelObject, Annotated {
         assert scale != null;
 
         if (propertyName == null) {
-            actualPropertyName = DatabaseLogic.getUniquePropertyName(table, Table.normalizeName(columnName));
+            actualPropertyName = DatabaseLogic.getUniquePropertyName(table, DatabaseLogic.normalizeName(columnName));
         } else {
             actualPropertyName = propertyName; //AS do not normalize (can be mixed-case Java properties)
         }

@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.portofino.model.Model;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -50,6 +51,7 @@ public class DatabaseLogic {
 
     public static final Logger logger =
             LoggerFactory.getLogger(DatabaseLogic.class);
+    public static final String[] HQL_KEYWORDS = { "member", "order", "group", "select", "update", "from" };
 
     //**************************************************************************
     // Get all objects of a certain kind
@@ -355,5 +357,68 @@ public class DatabaseLogic {
             }
         }
         return false;
+    }
+
+    //**************************************************************************
+    // Rende un nome secondo le regole che specificano gli identificatori in HQL
+    // protected
+    //ID_START_LETTER
+    //    :    '_'
+    //    |    '$'
+    //|    'a'..'z'
+    //|    '\u0080'..'\ufffe'       // HHH-558 : Allow unicode chars in identifiers
+    //;
+    //
+    //protected
+    //ID_LETTER
+    //:    ID_START_LETTER
+    //|    '0'..'9'
+    //;
+    //**************************************************************************
+    public static String normalizeName(String name) {
+        name = StringUtils.replaceChars(name, ".", "_");
+        String firstLetter = name.substring(0,1);
+        String others = name.substring(1);
+
+        StringBuilder result = new StringBuilder();
+        result.append(checkFirstLetter(firstLetter));
+
+        for(int i=0; i< others.length();i++){
+            String letter = String.valueOf(others.charAt(i));
+            result.append(checkOtherLetters(letter));
+        }
+        String normalizedName = result.toString();
+        if(ArrayUtils.contains(HQL_KEYWORDS, normalizedName.toLowerCase())) {
+            normalizedName = "_" + normalizedName;
+        }
+        if(!name.equals(normalizedName)) {
+            logger.info("Name " + name + " normalized to " + normalizedName);
+        }
+        return normalizedName;
+    }
+
+    static String checkFirstLetter(String letter) {
+        letter = StringUtils.replaceChars(letter, "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                                                  "abcdefghijklmnopqrstuvwxyz");
+
+        if (letter.equals("_") || letter.equals("$")
+                || StringUtils.isAlpha(letter)){
+            return letter;
+        } else if (StringUtils.isNumeric(letter)) {
+            return "_"+letter;
+        } else {
+            return "_";
+        }
+    }
+
+    static String checkOtherLetters(String letter) {
+        letter = StringUtils.replaceChars(letter, "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+                                                  "abcdefghijklmnopqrstuvwxyz");
+        if (letter.equals("_") || letter.equals("$")
+                || StringUtils.isAlphanumeric(letter)){
+            return letter;
+        } else {
+            return "_";
+        }
     }
 }

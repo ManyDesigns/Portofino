@@ -141,7 +141,7 @@ public class ForeignKey extends DatabaseSelectionProvider
             hql = "from " + toTable.getActualEntityName();
 
             actualManyPropertyName = (manyPropertyName == null)
-                ? DatabaseLogic.getUniquePropertyName(toTable, name)
+                ? DatabaseLogic.getUniquePropertyName(toTable, DatabaseLogic.normalizeName(name))
                 : manyPropertyName;
 
         } else {
@@ -149,12 +149,12 @@ public class ForeignKey extends DatabaseSelectionProvider
                     Table.composeQualifiedName(toDatabase, toSchema, toTableName));
 
             actualManyPropertyName = (manyPropertyName == null)
-                ? name
+                ? DatabaseLogic.normalizeName(name)
                 : manyPropertyName;
         }
 
         actualOnePropertyName = (onePropertyName == null)
-                ? DatabaseLogic.getUniquePropertyName(fromTable, name)
+                ? DatabaseLogic.getUniquePropertyName(fromTable, DatabaseLogic.normalizeName(name))
                 : onePropertyName;
     }
 

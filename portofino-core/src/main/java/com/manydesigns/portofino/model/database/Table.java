@@ -32,8 +32,6 @@ package com.manydesigns.portofino.model.database;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.model.*;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,9 +129,9 @@ public class Table implements ModelObject, Annotated {
 
         String baseEntityName;
         if (entityName == null) {
-            baseEntityName = normalizeName(getTableName());
+            baseEntityName = DatabaseLogic.normalizeName(getTableName());
         } else {
-            baseEntityName = normalizeName(entityName);
+            baseEntityName = DatabaseLogic.normalizeName(entityName);
         }
 
         String calculatedEntityName = baseEntityName;
@@ -302,68 +300,4 @@ public class Table implements ModelObject, Annotated {
                 "{0}.{1}.{2}", databaseName, schemaName, tableName);
     }
 
-    public static final String[] KEYWORDS = { "member", "order", "group", "select", "update", "from" };
-
-    //**************************************************************************
-    // Rende un nome secondo le regole che specificano gli identificatori in HQL
-    // protected
-    //ID_START_LETTER
-    //    :    '_'
-    //    |    '$'
-    //|    'a'..'z'
-    //|    '\u0080'..'\ufffe'       // HHH-558 : Allow unicode chars in identifiers
-    //;
-    //
-    //protected
-    //ID_LETTER
-    //:    ID_START_LETTER
-    //|    '0'..'9'
-    //;
-    //**************************************************************************
-    public static String normalizeName(String name) {
-        name = StringUtils.replaceChars(name, ".", "_");
-        String firstLetter = name.substring(0,1);
-        String others = name.substring(1);
-
-        StringBuffer result = new StringBuffer();
-        result.append(checkFirstLetter(firstLetter));
-
-        for(int i=0; i< others.length();i++){
-            String letter = String.valueOf(others.charAt(i));
-            result.append(checkOtherLetters(letter));
-        }
-        String normalizedName = result.toString();
-        if(ArrayUtils.contains(KEYWORDS, normalizedName.toLowerCase())) {
-            normalizedName = "_" + normalizedName;
-        }
-        if(!name.equals(normalizedName)) {
-            logger.info("Entity name " + name + " normalized to " + normalizedName);
-        }
-        return normalizedName;
-    }
-
-    private static String checkFirstLetter(String letter) {
-        letter = StringUtils.replaceChars(letter, "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-                                                  "abcdefghijklmnopqrstuvwxyz");
-
-        if (letter.equals("_") || letter.equals("$")
-                || StringUtils.isAlpha(letter)){
-            return letter;
-        } else if (StringUtils.isNumeric(letter)) {
-            return "_"+letter;
-        } else {
-            return "_";
-        }
-    }
-
-    private  static String checkOtherLetters(String letter) {
-        letter = StringUtils.replaceChars(letter, "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-                                                  "abcdefghijklmnopqrstuvwxyz");
-        if (letter.equals("_") || letter.equals("$")
-                || StringUtils.isAlphanumeric(letter)){
-            return letter;
-        } else {
-            return "_";
-        }
-    }
 }
