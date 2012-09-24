@@ -495,6 +495,9 @@ public class QueryUtils {
             OrderByElement orderByElement = new OrderByElement();
             orderByElement.setAsc(criteria.getOrderBy().isAsc());
             String propertyName = criteria.getOrderBy().getPropertyAccessor().getName();
+            if(mainEntityAlias != null) {
+                propertyName = mainEntityAlias + "." + propertyName;
+            }
             orderByElement.setExpression(
                     new net.sf.jsqlparser.schema.Column(
                             new net.sf.jsqlparser.schema.Table(), propertyName));
