@@ -45,7 +45,7 @@ os.system("unzip " + tomcat_zip + " -d " + base_path)
 
 shutil.rmtree(tomcat_path + "/webapps/ROOT")
 
-shutil.copy(portofino_path + "/OPEN-SOURCE-LICENSE.txt", base_path + "/OPEN-SOURCE-LICENSE.txt")
+shutil.copy(portofino_path + "/LICENSE.txt", base_path + "/LICENSE.txt")
 shutil.copy(portofino_path + "/THIRDPARTIES.txt", base_path + "/THIRDPARTIES.txt")
 
 print "Downloading JDBC drivers..."
@@ -58,6 +58,14 @@ shutil.copy(portofino_path + "/portofino-war/target/portofino-war-" + local.port
 
 shutil.copy("setenv.sh", tomcat_path + "/bin")
 shutil.copy("setenv.bat", tomcat_path + "/bin")
+
+os.chmod(tomcat_path + "/bin/catalina.sh", 0755)
+os.chmod(tomcat_path + "/bin/digest.sh", 0755)
+os.chmod(tomcat_path + "/bin/setclasspath.sh", 0755)
+os.chmod(tomcat_path + "/bin/shutdown.sh", 0755)
+os.chmod(tomcat_path + "/bin/startup.sh", 0755)
+os.chmod(tomcat_path + "/bin/tool-wrapper.sh", 0755)
+os.chmod(tomcat_path + "/bin/version.sh", 0755)
 
 zipfile = base_path + ".zip"
 if(os.path.exists(zipfile)):

@@ -106,15 +106,8 @@
                 <version>2.2-beta-3</version>
                 <configuration>
                     <descriptors>
-                        <!-- Open source -->
-                        <descriptor>assembly-os-src.xml</descriptor>
-                        <descriptor>assembly-os-bin.xml</descriptor>
-                        <!-- Commercial/evaluation (no extras) -->
-                        <descriptor>assembly-commercial-bin.xml</descriptor>
-                        <descriptor>assembly-evaluation-bin.xml</descriptor>
-                        <!-- Commercial/evaluation (with extras) -->
-                        <descriptor>assembly-extras-commercial-bin.xml</descriptor>
-                        <descriptor>assembly-extras-evaluation-bin.xml</descriptor>
+                        <descriptor>assembly-src.xml</descriptor>
+                        <descriptor>assembly-bin.xml</descriptor>
                     </descriptors>
                 </configuration>
             </plugin>

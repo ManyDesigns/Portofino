@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assembly>
-  <id>os-src</id>
+  <id>src</id>
   <formats>
-    <format>tar.gz</format>
     <format>zip</format>
   </formats>
   <files>
@@ -13,15 +12,27 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>OPEN-SOURCE-LICENSE.txt</source>
+      <source>LICENSE.txt</source>
       <outputDirectory></outputDirectory>
-      <destName>OPEN-SOURCE-LICENSE.txt</destName>
+      <destName>LICENSE.txt</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
       <source>THIRDPARTIES.txt</source>
       <outputDirectory></outputDirectory>
       <destName>THIRDPARTIES.txt</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>assembly-src.xml</source>
+      <outputDirectory></outputDirectory>
+      <destName>assembly-src.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>assembly-bin.xml</source>
+      <outputDirectory></outputDirectory>
+      <destName>assembly-bin.xml</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
