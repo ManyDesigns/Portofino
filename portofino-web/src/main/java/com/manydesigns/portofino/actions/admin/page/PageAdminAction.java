@@ -431,7 +431,7 @@ public class PageAdminAction extends AbstractPageAction {
             } catch (Exception e) {
                 logger.error("Error deleting page", e);
             }
-            return new RedirectResolution(parentPageInstance.getPath());
+            return new RedirectResolution(StringUtils.defaultIfEmpty(parentPageInstance.getPath(), "/"));
         }
         return new RedirectResolution(dispatch.getOriginalPath());
     }
