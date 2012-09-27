@@ -1,6 +1,13 @@
-<%@page contentType="text/javascript; UTF-8" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
+<%@ page import="com.manydesigns.elements.servlet.ServletConstants"%><%@page contentType="text/javascript; UTF-8"
+%><%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><%
+    // Avoid caching of dynamic pages
+    response.setHeader(ServletConstants.HTTP_PRAGMA, ServletConstants.HTTP_PRAGMA_NO_CACHE);
+    response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_MUST_REVALIDATE);
+    response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_NO_CACHE);
+    response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_NO_STORE);
+    response.setDateHeader(ServletConstants.HTTP_EXPIRES, 0);
+%>
 function fixSideBar() {
     $(
         function() {
