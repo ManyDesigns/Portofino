@@ -56,8 +56,6 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.model.ModelObject;
-import com.manydesigns.portofino.model.ModelObjectVisitor;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
 import com.manydesigns.portofino.pageactions.registry.PageActionInfo;
@@ -86,7 +84,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileWriter;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -588,40 +588,6 @@ public class PageAdminAction extends AbstractPageAction {
             SessionMessages.addErrorMessage(msg);
             return new RedirectResolution(dispatch.getOriginalPath());
         }
-    }
-
-    protected class CopyVisitor extends ModelObjectVisitor {
-
-        @Override
-        public void visitNodeBeforeChildren(ModelObject node) {
-            if(node instanceof Page) {
-                Page page = (Page) node;
-                final String oldPageId = page.getId();
-                final String pageId = RandomUtil.createRandomId();
-                page.setId(pageId);
-                File storageDirFile = application.getAppStorageDir();
-                copyPageFiles(oldPageId, pageId, storageDirFile);
-                File scriptsFile = application.getAppScriptsDir();
-                copyPageFiles(oldPageId, pageId, scriptsFile);
-            }
-        }
-
-        private void copyPageFiles(final String oldPageId, String pageId, File dirFile) {
-            File[] resources = dirFile.listFiles(new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    return name.startsWith(oldPageId + ".");
-                }
-            });
-            for(File res : resources) {
-                File dest = new File(dirFile, pageId + res.getName().substring(oldPageId.length()));
-                try {
-                    FileUtils.copyFile(res, dest);
-                } catch (IOException e) {
-                    logger.error("Couldn't copy resource file " + res + " to " + dest, e);
-                }
-            }
-        }
-
     }
 
     private void prepareNewPageForm() throws Exception {
