@@ -235,6 +235,7 @@ public class PageAdminAction extends AbstractPageAction {
         synchronized (application) {
             application.loadXmlModel();
             DispatcherLogic.clearConfigurationCache();
+            SessionMessages.addInfoMessage(getMessage("model.reloaded"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
     }
