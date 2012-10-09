@@ -2,8 +2,6 @@
     <permissions />
     <layout>
         <self container="default" order="0"/>
-        <childPages>
-            <childPage name="wizard" showInNavigation="true"/>
-        </childPages>
+        <childPages/>
     </layout>
 </page>

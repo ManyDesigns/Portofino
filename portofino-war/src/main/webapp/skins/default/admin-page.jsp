@@ -25,11 +25,13 @@
                 <div id="content" class="yui-b">
                     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.AdminAction"/>
                     <stripes:form action="${actionBean.actionPath}" method="post" enctype="multipart/form-data">
-                        <div class="contentHeader">
-                            <stripes:layout-component name="contentHeader">
-                                Content header
-                            </stripes:layout-component>
-                        </div>
+                        <stripes:layout-component name="contentHeaderContainer">
+                            <div class="contentHeader">
+                                <stripes:layout-component name="contentHeader">
+                                    Content header
+                                </stripes:layout-component>
+                            </div>
+                        </stripes:layout-component>
                         <div class="contentBody">
                             <div class="portletWrapper">
                                 <div class="portlet">
@@ -62,11 +64,13 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="contentFooter">
-                            <stripes:layout-component name="contentFooter">
-                                Content footer
-                            </stripes:layout-component>
-                        </div>
+                        <stripes:layout-component name="contentFooterContainer">
+                            <div class="contentFooter">
+                                <stripes:layout-component name="contentFooter">
+                                    Content footer
+                                </stripes:layout-component>
+                            </div>
+                        </stripes:layout-component>
                     </stripes:form>
                 </div>
             </div>
@@ -108,6 +112,9 @@
                     <li>
                         <div class="navigationHeader">Data modeling</div>
                         <ul>
+                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                                                   text="Wizard"
+                                                   link="/actions/admin/wizard"/>
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Connection providers"
                                                    link="/actions/admin/connection-providers"/>

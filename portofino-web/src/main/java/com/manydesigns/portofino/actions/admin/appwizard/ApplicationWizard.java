@@ -47,6 +47,7 @@ import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
+import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderForm;
 import com.manydesigns.portofino.actions.forms.SelectableSchema;
@@ -103,7 +104,8 @@ import java.util.List;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresAdministrator
-public class ApplicationWizard extends AbstractWizardPageAction {
+@UrlBinding("/actions/admin/wizard")
+public class ApplicationWizard extends AbstractWizardPageAction implements AdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
     public static final String JDBC = "JDBC";
@@ -114,6 +116,8 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     protected int step = 0;
 
+    //Forms and fields
+    protected SelectField connectionProviderField;
     protected Form jndiCPForm;
     protected Form jdbcCPForm;
     protected Form connectionProviderForm;
@@ -122,6 +126,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     protected Form userManagementSetupForm;
 
     protected String connectionProviderType;
+    protected String connectionProviderName;
     protected ConnectionProvider connectionProvider;
     protected boolean advanced;
     protected Form advancedOptionsForm;
@@ -174,7 +179,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     protected Resolution createConnectionProviderForm() {
         step = 0;
-        return new ForwardResolution("/layouts/admin/appwizard/create-connection-provider.jsp");
+        return new ForwardResolution("/layouts/admin/appwizard/connection-provider.jsp");
     }
 
     @Before
@@ -197,6 +202,28 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     }
 
     protected void buildCPForms() {
+        DefaultSelectionProvider connectionProviderSP = new DefaultSelectionProvider("connectionProviderName");
+        for(Database db : application.getModel().getDatabases()) {
+            connectionProviderSP.appendRow(
+                    db.getDatabaseName(),
+                    db.getDatabaseName() + " (" + db.getConnectionProvider().getDatabasePlatform().getDescription() + ")",
+                    true);
+        }
+
+        ClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(ApplicationWizard.class);
+        try {
+            connectionProviderField =
+                    new SelectField(
+                            classAccessor.getProperty("connectionProviderName"),
+                            connectionProviderSP,
+                            Mode.EDIT,
+                            null);
+            connectionProviderField.setLabel(getMessage("appwizard.existingConnectionProvider"));
+            connectionProviderField.setComboLabel("--");
+        } catch (NoSuchFieldException e) {
+            throw new Error(e);
+        }
+
         jndiCPForm = new FormBuilder(ConnectionProviderForm.class)
                             .configFields(ConnectionProvidersAction.jndiEditFields)
                             .configPrefix("jndi")
@@ -226,14 +253,25 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         //Handle back
         jndiCPForm.readFromRequest(context.getRequest());
         jdbcCPForm.readFromRequest(context.getRequest());
+        connectionProviderField.readFromObject(this);
+        connectionProviderField.readFromRequest(context.getRequest());
     }
 
     @Buttons({
-        @Button(list = "create-connection-provider", key="wizard.next", order = 2),
+        @Button(list = "connection-provider", key="wizard.next", order = 2),
         @Button(list = "select-tables", key="wizard.prev", order = 1)
     })
-    public Resolution createConnectionProvider() {
+    public Resolution configureConnectionProvider() {
         buildCPForms();
+        if(connectionProviderField.validate()) {
+            connectionProviderField.writeToObject(this);
+        } else {
+            return createConnectionProviderForm();
+        }
+        if(!isNewConnectionProvider()) {
+            connectionProvider = DatabaseLogic.findDatabaseByName(model, connectionProviderName).getConnectionProvider();
+            return afterCreateConnectionProvider();
+        }
         if(JDBC.equals(connectionProviderType)) {
             connectionProvider = new JdbcConnectionProvider();
             connectionProviderForm = jdbcCPForm;
@@ -250,6 +288,11 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         connectionProviderForm.readFromRequest(context.getRequest());
         if(connectionProviderForm.validate()) {
             connectionProviderForm.writeToObject(edit);
+            Database existingDatabase = DatabaseLogic.findDatabaseByName(model, edit.getDatabaseName());
+            if(existingDatabase != null) {
+                SessionMessages.addErrorMessage("TODO dup db");
+                return createConnectionProviderForm();
+            }
             return afterCreateConnectionProvider();
         } else {
             return createConnectionProviderForm();
@@ -313,19 +356,13 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         @Button(list = "select-user-fields", key="wizard.prev", order = 1)
     })
     public Resolution selectSchemas() {
-        createConnectionProvider();
+        configureConnectionProvider();
         schemasForm.readFromRequest(context.getRequest());
         if(schemasForm.validate()) {
             schemasForm.writeToObject(selectableSchemas);
-            boolean atLeastOneSelected = false;
-            for(SelectableSchema schema : selectableSchemas) {
-                if(schema.selected) {
-                    atLeastOneSelected = true;
-                    break;
-                }
-            }
+            boolean atLeastOneSelected = isAtLeastOneSchemaSelected();
             if(atLeastOneSelected) {
-                if (!addSchemasToModel()) {
+                if (!configureModelSchemas(false)) {
                     return selectSchemasForm();
                 }
                 return afterSelectSchemas();
@@ -337,20 +374,79 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         return selectSchemasForm();
     }
 
-    protected boolean addSchemasToModel() {
-        Database database = connectionProvider.getDatabase();
+    @Button(list = "select-schemas", key="wizard.finish", order = 3)
+    public Resolution selectSchemasAndFinish() {
+        configureConnectionProvider();
+        schemasForm.readFromRequest(context.getRequest());
+        if(schemasForm.validate()) {
+            schemasForm.writeToObject(selectableSchemas);
+            boolean atLeastOneSelected = isAtLeastOneSchemaSelected();
+            if(atLeastOneSelected) {
+                if (!configureModelSchemas(true)) {
+                    return selectSchemasForm();
+                }
+                try {
+                    application.saveXmlModel();
+                    return new RedirectResolution("/actions/admin/connection-providers")
+                            .addParameter("databaseName", connectionProvider.getDatabase().getDatabaseName());
+                } catch (Exception e) {
+                    saveModelFailed(e);
+                    return selectSchemasForm();
+                }
+            } else {
+                SessionMessages.addErrorMessage(getMessage("appwizard.error.schemas.noneSelected"));
+                return selectSchemasForm();
+            }
+        }
+        return selectSchemasForm();
+    }
+
+    protected boolean isAtLeastOneSchemaSelected() {
+        boolean atLeastOneSelected = false;
         for(SelectableSchema schema : selectableSchemas) {
             if(schema.selected) {
-                Schema modelSchema = new Schema();
-                modelSchema.setSchemaName(schema.schemaName);
-                modelSchema.setDatabase(database);
-                database.getSchemas().add(modelSchema);
+                atLeastOneSelected = true;
+                break;
+            }
+        }
+        return atLeastOneSelected;
+    }
+
+    protected void saveModelFailed(Exception e) {
+        logger.error("Could not save model", e);
+        SessionMessages.addErrorMessage(
+                getMessage("appwizard.error.saveModelFailed", ExceptionUtils.getRootCauseMessage(e)));
+        if(connectionProviderName == null) { //This is a new connection provider
+            application.getModel().getDatabases().remove(connectionProvider.getDatabase());
+        }
+        application.initModel();
+    }
+
+    protected boolean configureModelSchemas(boolean alwaysUseExistingModel) {
+        Model model;
+        if(!alwaysUseExistingModel && isNewConnectionProvider()) {
+            model = new Model();
+        } else {
+            model = this.model;
+        }
+        Database database = connectionProvider.getDatabase();
+        for(SelectableSchema schema : selectableSchemas) {
+            Schema modelSchema = DatabaseLogic.findSchemaByName(database, schema.schemaName);
+            if(schema.selected) {
+                if(modelSchema == null) {
+                    modelSchema = new Schema();
+                    modelSchema.setSchemaName(schema.schemaName);
+                    modelSchema.setDatabase(database);
+                    database.getSchemas().add(modelSchema);
+                }
+            } else if(modelSchema != null) {
+                database.getSchemas().remove(modelSchema);
             }
         }
         Database targetDatabase;
         DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
         try {
-            targetDatabase = dbSyncer.syncDatabase(new Model());
+            targetDatabase = dbSyncer.syncDatabase(model);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             SessionMessages.addErrorMessage(getMessage("appwizard.error.sync", e));
@@ -358,10 +454,17 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         }
         connectionProvider.setDatabase(targetDatabase);
         connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
-        Model model = new Model();
+        Database oldDatabase = DatabaseLogic.findDatabaseByName(model, targetDatabase.getDatabaseName());
+        if(oldDatabase != null) {
+            model.getDatabases().remove(oldDatabase);
+        }
         model.getDatabases().add(targetDatabase);
         model.init();
         return true;
+    }
+
+    protected boolean isNewConnectionProvider() {
+        return connectionProviderName == null;
     }
 
     public Resolution afterSelectSchemas() {
@@ -717,7 +820,9 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     @Button(list = "build-app", key="wizard.finish", order = 2)
     public Resolution buildApplication() {
         selectUserFields();
-        application.getModel().getDatabases().add(connectionProvider.getDatabase());
+        if(isNewConnectionProvider()) {
+            application.getModel().getDatabases().add(connectionProvider.getDatabase());
+        }
         application.initModel();
         try {
             TemplateEngine engine = new SimpleTemplateEngine();
@@ -749,11 +854,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             application.initModel();
             application.saveXmlModel();
         } catch (Exception e) {
-            logger.error("Could not save model", e);
-            SessionMessages.addErrorMessage(
-                    getMessage("appwizard.error.saveModelFailed", ExceptionUtils.getRootCauseMessage(e)));
-            application.getModel().getDatabases().remove(connectionProvider.getDatabase());
-            application.initModel();
+            saveModelFailed(e);
             return buildAppForm();
         }
         SessionMessages.addInfoMessage(getMessage("appwizard.finished"));
@@ -1293,6 +1394,10 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                 pages, template, bindings, childTitle);
     }
 
+    public SelectField getConnectionProviderField() {
+        return connectionProviderField;
+    }
+
     public Form getJndiCPForm() {
         return jndiCPForm;
     }
@@ -1303,6 +1408,14 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     public ConnectionProvider getConnectionProvider() {
         return connectionProvider;
+    }
+
+    public String getConnectionProviderName() {
+        return connectionProviderName;
+    }
+
+    public void setConnectionProviderName(String connectionProviderName) {
+        this.connectionProviderName = connectionProviderName;
     }
 
     public boolean isJdbc() {

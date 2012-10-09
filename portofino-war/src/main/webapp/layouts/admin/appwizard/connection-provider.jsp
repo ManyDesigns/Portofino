@@ -5,12 +5,13 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="/skins/default/wizard-page.jsp">
+<stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
         <fmt:message key="appwizard.step1.title" />
     </stripes:layout-component>
-    <stripes:layout-component name="contentHeader">
+    <stripes:layout-component name="contentHeaderContainer">
+        <jsp:include page="/skins/default/wizard-content-header.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <fmt:message key="appwizard.step1.title" />
@@ -18,23 +19,24 @@
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
         <script type="text/javascript">
-            function changeSPForm() {
+            function changeNewSPForm() {
                 $("#jndiCPForm").toggle();
                 $("#jdbcCPForm").toggle();
             }
         </script>
-        <fmt:message key="appwizard.connectionType" />
+        <mde:write name="actionBean" property="connectionProviderField" /><br />
+        <fmt:message key="appwizard.newConnectionProvider" />
         <ul>
             <li><input id="jdbc_radio" type="radio" value="JDBC"
                        name="connectionProviderType"
                        <%= actionBean.isJdbc() ? "checked='checked'" : "" %>
-                       onchange="changeSPForm();"
+                       onchange="changeNewSPForm();"
                     />
                 <label for="jdbc_radio">JDBC</label></li>
             <li><input id="jndi_radio" type="radio" value="JNDI"
                        name="connectionProviderType"
                        <%= actionBean.isJndi() ? "checked='checked'" : "" %>
-                       onchange="changeSPForm();"/>
+                       onchange="changeNewSPForm();"/>
                 <label for="jndi_radio">JNDI</label></li>
         </ul>
         <div id="jndiCPForm" style='display: <%= actionBean.isJndi() ? "inherit" : "none" %>'>
@@ -59,6 +61,6 @@
                 });
             });
         </script>
-        <portofino:buttons list="create-connection-provider" cssClass="contentButton" />
+        <portofino:buttons list="connection-provider" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>

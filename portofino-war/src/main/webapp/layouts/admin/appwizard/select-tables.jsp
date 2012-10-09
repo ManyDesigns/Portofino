@@ -5,12 +5,13 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="/skins/default/wizard-page.jsp">
+<stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
         <fmt:message key="appwizard.step3.title" />
     </stripes:layout-component>
-    <stripes:layout-component name="contentHeader">
+    <stripes:layout-component name="contentHeaderContainer">
+        <jsp:include page="/skins/default/wizard-content-header.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <fmt:message key="appwizard.step3.title" />
@@ -28,6 +29,7 @@
         <div style="display: none;">
             <mde:write name="actionBean" property="schemasForm"/>
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
+            <mde:write name="actionBean" property="connectionProviderField" />
             <mde:write name="actionBean" property="jndiCPForm"/>
             <mde:write name="actionBean" property="jdbcCPForm"/>
         </div>

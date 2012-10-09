@@ -1,7 +1,0 @@
-<page description="Wizard" id="zpAUFstfgEUSzsEX9Ho1" title="Wizard">
-    <permissions />
-    <layout>
-        <self container="default" order="0"/>
-        <childPages/>
-    </layout>
-</page>
