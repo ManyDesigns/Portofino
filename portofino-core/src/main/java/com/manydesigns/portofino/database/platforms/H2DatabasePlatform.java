@@ -30,7 +30,7 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.model.database.ConnectionProvider;
-import org.hibernate.dialect.PostgreSQLDialect;
+import org.hibernate.dialect.H2Dialect;
 
 import java.sql.Connection;
 
@@ -53,7 +53,7 @@ public class H2DatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public H2DatabasePlatform() {
-        super(new PostgreSQLDialect());
+        super(new H2Dialect(), "jdbc:h2:<database or connection spec>");
     }
 
     //**************************************************************************

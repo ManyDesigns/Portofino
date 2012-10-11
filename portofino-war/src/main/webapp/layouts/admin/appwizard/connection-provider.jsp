@@ -56,6 +56,18 @@
     <stripes:layout-component name="contentFooter">
         <script type="text/javascript">
             $(function() {
+                $("#jdbcdriver").change(function() {
+                    var connectionUrlDefaults = {
+                        <c:forEach var="db" items="${actionBean.application.databasePlatformsManager.databasePlatforms}"
+                                   varStatus="status">
+                            <c:out value="'${db.standardDriverClassName}': '${db.connectionStringTemplate}'" escapeXml="false"/>
+                            <c:if test="${!status.last}">,</c:if>
+                        </c:forEach>
+                    };
+
+                    $("input[name=jdbcurl]").val(connectionUrlDefaults[$(this).val()]);
+                });
+
                 var buttons = $(".contentFooter button");
                 buttons.click(function() {
                     buttons.unbind("click");

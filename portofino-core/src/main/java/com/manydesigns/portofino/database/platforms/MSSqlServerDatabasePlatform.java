@@ -51,7 +51,7 @@ public class MSSqlServerDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public MSSqlServerDatabasePlatform() {
-        super(new SQLServerDialect());
+        super(new SQLServerDialect(), "jdbc:sqlserver://<host>[:<port>];database=<databaseName>");
     }
 
     //**************************************************************************

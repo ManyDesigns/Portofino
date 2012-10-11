@@ -85,6 +85,7 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
 
     protected String status;
     protected Dialect hibernateDialect;
+    protected String connectionStringTemplate;
     public static final Logger logger =
             LoggerFactory.getLogger(AbstractDatabasePlatform.class);
 
@@ -92,8 +93,9 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
     // Constructors
     //**************************************************************************
 
-    public AbstractDatabasePlatform(Dialect hibernateDialect) {
+    public AbstractDatabasePlatform(Dialect hibernateDialect, String connectionStringTemplate) {
         this.hibernateDialect = hibernateDialect;
+        this.connectionStringTemplate = connectionStringTemplate;
         status = STATUS_CREATED;
     }
 
@@ -116,6 +118,10 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
 
     public Dialect getHibernateDialect() {
         return hibernateDialect;
+    }
+
+    public String getConnectionStringTemplate() {
+        return connectionStringTemplate;
     }
 
     public void shutdown(ConnectionProvider connectionProvider) {

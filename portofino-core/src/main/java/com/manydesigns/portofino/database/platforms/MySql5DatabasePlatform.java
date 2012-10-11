@@ -58,7 +58,7 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public MySql5DatabasePlatform() {
-        super(new MySQLDialect());
+        super(new MySQLDialect(), "jdbc:mysql://<host>[:<port>]/<database>");
     }
 
     //**************************************************************************

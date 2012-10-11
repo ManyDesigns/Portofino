@@ -54,6 +54,7 @@ public interface DatabasePlatform {
     String getDescription();
     String getStandardDriverClassName();
     Dialect getHibernateDialect();
+    String getConnectionStringTemplate();
 
     @Status(red={}, amber={STATUS_CREATED, STATUS_DRIVER_NOT_FOUND}, green={STATUS_OK})
     String getStatus();

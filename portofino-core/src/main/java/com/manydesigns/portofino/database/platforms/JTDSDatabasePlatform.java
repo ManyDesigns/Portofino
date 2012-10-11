@@ -51,7 +51,7 @@ public class JTDSDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public JTDSDatabasePlatform() {
-        super(new SQLServerDialect());
+        super(new SQLServerDialect(), "jdbc:jtds:sqlserver://<server>[:<port>][/<database>]");
     }
 
     //**************************************************************************

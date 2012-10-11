@@ -55,7 +55,7 @@ public class OracleDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public OracleDatabasePlatform() {
-        super(new Oracle9iDialect());
+        super(new Oracle9iDialect(), "jdbc:oracle:thin:@//<host>:<port, default 1521>:<sid>");
     }
 
     //**************************************************************************
