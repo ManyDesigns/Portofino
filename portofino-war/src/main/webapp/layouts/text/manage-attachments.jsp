@@ -51,6 +51,8 @@
         <div class="horizontalSeparator"></div>
         <fmt:message key="layouts.text.manage-attachments.upload_new_file"/>:
         <stripes:file name="upload"/>
+        <stripes:checkbox name="uploadDownloadable" checked="checked" />
+        <fmt:message key="layouts.text.manage-attachments.downloadable" />
         <br/>
         <br/>
         <portofino:buttons list="manage-attachments-upload" cssClass="portletButton" />

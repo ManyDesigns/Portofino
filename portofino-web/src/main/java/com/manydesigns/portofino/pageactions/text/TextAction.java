@@ -84,6 +84,7 @@ public class TextAction extends AbstractPageAction {
     public String content;
     public String[] selection;
     public String[] downloadable;
+    public boolean uploadDownloadable = true;
 
     //**************************************************************************
     // File upload with CKEditor
@@ -478,10 +479,11 @@ public class TextAction extends AbstractPageAction {
         if(textConfiguration == null) {
             textConfiguration = new TextConfiguration();
         }
-        TextLogic.createAttachment(
+        Attachment attachment = TextLogic.createAttachment(
                 textConfiguration, attachmentId,
                 upload.getFileName(), upload.getContentType(),
                 upload.getSize());
+        attachment.setDownloadable(uploadDownloadable);
         viewAttachmentUrl =
                 generateViewAttachmentUrl(attachmentId);
         saveConfiguration(textConfiguration);
