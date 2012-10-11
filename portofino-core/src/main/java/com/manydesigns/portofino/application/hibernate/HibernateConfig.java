@@ -90,16 +90,8 @@ public class HibernateConfig {
             // mettendo la modalità dynamic map, non funzionano le entità mappate su bean.
             // configuration.setProperty("hibernate.default_entity_mode", "dynamic-map");
 
-            JdbcConnectionProvider jdbcConnectionProvider =
-                    (JdbcConnectionProvider) connectionProvider;
-            configuration.setProperty("hibernate.connection.url",
-                    jdbcConnectionProvider.getActualUrl())
-                    .setProperty("hibernate.connection.driver_class",
-                            jdbcConnectionProvider.getDriver())
-                    .setProperty("hibernate.connection.username",
-                            jdbcConnectionProvider.getUsername())
-                    .setProperty("hibernate.connection.password",
-                            jdbcConnectionProvider.getPassword())
+            setupConnection(configuration);
+            configuration
                     .setProperty("hibernate.current_session_context_class",
                             "org.hibernate.context.ThreadLocalSessionContext")
                     .setProperty("org.hibernate.hql.ast.AST", "true")
@@ -107,21 +99,6 @@ public class HibernateConfig {
             configuration.setProperty("hibernate.show_sql",
                     portofinoConfiguration.getString(
                             PortofinoProperties.HIBERNATE_SHOW_SQL));
-            configuration.setProperty("hibernate.connection.provider_class",
-                    portofinoConfiguration.getString(
-                            PortofinoProperties.HIBERNATE_CONNECTION_PROVIDER_CLASS));
-            configuration.setProperty("hibernate.c3p0.min_size",
-                    portofinoConfiguration.getString(
-                            PortofinoProperties.HIBERNATE_C3P0_MIN_SIZE));
-            configuration.setProperty("hibernate.c3p0.max_size",
-                    portofinoConfiguration.getString(
-                            PortofinoProperties.HIBERNATE_C3P0_MAX_SIZE));
-            configuration.setProperty("hibernate.c3p0.timeout",
-                    portofinoConfiguration.getString(
-                            PortofinoProperties.HIBERNATE_C3P0_TIMEOUT));
-            configuration.setProperty("hibernate.c3p0.idle_test_period",
-                    portofinoConfiguration.getString(
-                            PortofinoProperties.HIBERNATE_C3P0_IDLE_TEST_PERIOD));
             /* Per abilitare 2nd-level cache
             configuration.setProperty("hibernate.cache.region.factory_class",
                     portofinoConfiguration.getString("hibernate.cache.region.factory_class"));
@@ -149,7 +126,44 @@ public class HibernateConfig {
         }
     }
 
-     private Mappings classMapping(Database database, Mappings mappings) {
+    protected void setupConnection(Configuration configuration) {
+        if(connectionProvider instanceof JdbcConnectionProvider) {
+            JdbcConnectionProvider jdbcConnectionProvider =
+                    (JdbcConnectionProvider) connectionProvider;
+            configuration.setProperty("hibernate.connection.url",
+                    jdbcConnectionProvider.getActualUrl())
+                    .setProperty("hibernate.connection.driver_class",
+                            jdbcConnectionProvider.getDriver())
+                    .setProperty("hibernate.connection.username",
+                            jdbcConnectionProvider.getUsername())
+                    .setProperty("hibernate.connection.password",
+                            jdbcConnectionProvider.getPassword());
+
+            configuration.setProperty("hibernate.connection.provider_class",
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.HIBERNATE_CONNECTION_PROVIDER_CLASS));
+            configuration.setProperty("hibernate.c3p0.min_size",
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.HIBERNATE_C3P0_MIN_SIZE));
+            configuration.setProperty("hibernate.c3p0.max_size",
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.HIBERNATE_C3P0_MAX_SIZE));
+            configuration.setProperty("hibernate.c3p0.timeout",
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.HIBERNATE_C3P0_TIMEOUT));
+            configuration.setProperty("hibernate.c3p0.idle_test_period",
+                    portofinoConfiguration.getString(
+                            PortofinoProperties.HIBERNATE_C3P0_IDLE_TEST_PERIOD));
+        } else if(connectionProvider instanceof JndiConnectionProvider) {
+            JndiConnectionProvider jndiConnectionProvider =
+                    (JndiConnectionProvider) connectionProvider;
+            configuration.setProperty("hibernate.connection.datasource", jndiConnectionProvider.getJndiResource());
+        } else {
+            throw new Error("Unsupported connection provider: " + connectionProvider);
+        }
+    }
+
+    private Mappings classMapping(Database database, Mappings mappings) {
 
         for (Schema schema : database.getSchemas()) {
             for (com.manydesigns.portofino.model.database.Table aTable :

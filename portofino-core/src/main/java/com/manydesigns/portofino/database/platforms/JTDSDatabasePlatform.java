@@ -69,6 +69,7 @@ public class JTDSDatabasePlatform extends AbstractDatabasePlatform {
     public boolean isApplicable(ConnectionProvider connectionProvider) {
         return connectionProvider
                 .getDatabaseProductName()
-                .startsWith("Microsoft SQL Server");
+                .startsWith("Microsoft SQL Server") &&
+               STANDARD_DRIVER_CLASS_NAME.equals(connectionProvider.getDriverName());
     }
 }

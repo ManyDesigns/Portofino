@@ -279,8 +279,11 @@ public class PageAdminAction extends AbstractPageAction {
             String pageClassName = newPage.getActionClassName();
             Class actionClass = getActionClass(pageClassName);
             PageActionInfo info = registry.getInfo(actionClass);
-            String pageId = RandomUtil.createRandomId();
+            String scriptTemplate = info.scriptTemplate;
+            Class<?> configurationClass = info.configurationClass;
+            boolean supportsDetail = info.supportsDetail;
 
+            String pageId = RandomUtil.createRandomId();
             String className = pageId;
             if(Character.isDigit(className.charAt(0))) {
                 className = "_" + className;
@@ -288,15 +291,15 @@ public class PageAdminAction extends AbstractPageAction {
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
             ognlContext.put("generatedClassName", className);
             ognlContext.put("pageClassName", pageClassName);
-            String script = OgnlTextFormat.format(info.scriptTemplate, this);
+            String script = OgnlTextFormat.format(scriptTemplate, this);
 
             Page page = new Page();
             BeanUtils.copyProperties(page, newPage);
             page.setId(pageId);
 
             Object configuration = null;
-            if(info.configurationClass != null) {
-                configuration = ReflectionUtil.newInstance(info.configurationClass);
+            if(configurationClass != null) {
+                configuration = ReflectionUtil.newInstance(configurationClass);
             }
             page.init();
 
@@ -372,7 +375,7 @@ public class PageAdminAction extends AbstractPageAction {
                     childPage.setShowInNavigation(true);
                     parentLayout.getChildPages().add(childPage);
 
-                    if(info.supportsDetail) {
+                    if(supportsDetail) {
                         File detailDir = new File(directory, PageInstance.DETAIL);
                         logger.debug("Creating _detail directory: {}", detailDir);
                         if(!detailDir.mkdir()) {
