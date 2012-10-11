@@ -37,6 +37,7 @@ import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.RequestAttributes;
+import com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderForm;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderTableForm;
 import com.manydesigns.portofino.actions.forms.SelectableSchema;
@@ -90,7 +91,6 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     public TableForm databasePlatformsTableForm;
 
     public String databaseName;
-    public String connectionType;
 
     public String[] selection;
     protected List<SelectableSchema> selectableSchemas;
@@ -286,69 +286,9 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
                 .addParameter("databaseName", databaseName);
     }
 
-    @Buttons({
-        @Button(list = "connectionProviders-search", key = "commons.create", order = 1),
-        @Button(list = "connectionProviders-select-type",
-                key = "layouts.admin.connectionProviders.edit.select_provider_type", order = 1)
-    })
+    @Button(list = "connectionProviders-search", key = "commons.create", order = 1)
     public Resolution create() {
-        if (!createConnectionProvider()) {
-            return new ForwardResolution("/layouts/admin/connectionProviders/createSelectType.jsp");
-        }
-        buildConnectionProviderForm(Mode.CREATE);
-        return new ForwardResolution("/layouts/admin/connectionProviders/create.jsp");
-    }
-
-    protected boolean createConnectionProvider() {
-        Database database = new Database();
-        if("JDBC".equals(connectionType)) {
-            connectionProvider = new JdbcConnectionProvider();
-        } else if("JNDI".equals(connectionType)) {
-            connectionProvider = new JndiConnectionProvider();
-        } else {
-            return false;
-        }
-        database.setConnectionProvider(connectionProvider);
-        connectionProvider.setDatabase(database);
-        connectionProviderForm = new ConnectionProviderForm(database);
-        return true;
-    }
-
-    @Button(list = "connectionProviders-create", key = "commons.save", order = 1)
-    public Resolution save() {
-        if (!createConnectionProvider()) {
-            return new ForwardResolution("/layouts/admin/connectionProviders/createSelectType.jsp");
-        }
-        buildConnectionProviderForm(Mode.CREATE);
-        
-        form.readFromRequest(context.getRequest());
-        if (form.validate()) {
-            form.writeToObject(connectionProviderForm);
-            if(DatabaseLogic.findDatabaseByName
-                    (application.getModel(), connectionProviderForm.getDatabaseName()) != null) {
-                SessionMessages.addErrorMessage(getMessage("connectionProviders.save.duplicateDatabaseName"));
-                return new ForwardResolution("/layouts/admin/connectionProviders/create.jsp");
-            }
-            Database database = connectionProvider.getDatabase();
-            database.setConnectionProvider(connectionProvider);
-            connectionProvider.setDatabase(database);
-            model.getDatabases().add(database);
-            try {
-                application.initModel();
-                application.saveXmlModel();
-                connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
-                SessionMessages.addInfoMessage(getMessage("connectionProviders.save.successful"));
-                return new RedirectResolution(this.getClass());
-            } catch (Exception e) {
-                String msg = "Cannot save model: " +
-                        ExceptionUtils.getRootCauseMessage(e);
-                logger.error(msg, e);
-                SessionMessages.addErrorMessage(msg);
-                return new ForwardResolution("/layouts/admin/connectionProviders/create.jsp");
-            }
-        } else {
-            return new ForwardResolution("/layouts/admin/connectionProviders/create.jsp");
-        }
+        return new RedirectResolution(ApplicationWizard.class);
     }
 
     @Button(list = "connectionProviders-read", key = "commons.edit", order = 2)
@@ -542,14 +482,6 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
 
     public Form getDetectedValuesForm() {
         return detectedValuesForm;
-    }
-
-    public String getConnectionType() {
-        return connectionType;
-    }
-
-    public void setConnectionType(String connectionType) {
-        this.connectionType = connectionType;
     }
 
     public TableForm getSchemasForm() {

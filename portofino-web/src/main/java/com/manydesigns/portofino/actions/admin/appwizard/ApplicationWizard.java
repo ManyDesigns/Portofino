@@ -290,7 +290,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             connectionProviderForm.writeToObject(edit);
             Database existingDatabase = DatabaseLogic.findDatabaseByName(model, edit.getDatabaseName());
             if(existingDatabase != null) {
-                SessionMessages.addErrorMessage("TODO dup db");
+                SessionMessages.addErrorMessage(getMessage("appwizard.error.duplicateDatabase", edit.getDatabaseName()));
                 return createConnectionProviderForm();
             }
             return afterCreateConnectionProvider();

@@ -24,8 +24,13 @@
                 $("#jdbcCPForm").toggle();
             }
         </script>
-        <mde:write name="actionBean" property="connectionProviderField" /><br />
-        <fmt:message key="appwizard.newConnectionProvider" />
+        <c:if test="${not empty actionBean.application.model.databases}">
+            <mde:write name="actionBean" property="connectionProviderField" /><br />
+            <fmt:message key="appwizard.orNewConnectionProvider" />
+        </c:if>
+        <c:if test="${empty actionBean.application.model.databases}">
+            <fmt:message key="appwizard.newConnectionProvider" />
+        </c:if>
         <ul>
             <li><input id="jdbc_radio" type="radio" value="JDBC"
                        name="connectionProviderType"
