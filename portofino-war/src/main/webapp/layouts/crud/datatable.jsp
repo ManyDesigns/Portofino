@@ -37,10 +37,10 @@
                 var href = sData.href;
                 if (href) {
                     elCell.innerHTML = '<a href="' + htmlEscape(href) + '">' +
-                            htmlEscape(sData.displayValue) +
+                            sData.displayValue +
                             '</a>';
                 } else {
-                    elCell.innerHTML = htmlEscape(sData.displayValue);
+                    elCell.innerHTML = sData.displayValue;
                 }
             }
         };

@@ -1408,7 +1408,11 @@
     <annotations/>
 </column>
 <column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations />
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.RichText">
+            <value>true</value>
+        </annotation>
+    </annotations>
 </column>
 <column autoincrement="false" columnName="homepage" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
     <annotations/>

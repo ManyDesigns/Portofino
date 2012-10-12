@@ -7,6 +7,12 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.CrudAction"
 /><stripes:layout-render name="/skins/${skin}/${actionBean.pageTemplate}/modal.jsp">
+    <stripes:layout-component name="customScripts">
+        <c:if test="${actionBean.formWithRichTextFields}">
+            <script type="text/javascript" src="<stripes:url value="/ckeditor/ckeditor.js"/>"></script>
+            <script type="text/javascript" src="<stripes:url value="/ckeditor/adapters/jquery.js"/>"></script>
+        </c:if>
+    </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="crud-edit" cssClass="contentButton" />
         <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />

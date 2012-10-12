@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.pageactions.crud;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.FormElement;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.blobs.Blob;
@@ -2295,6 +2296,20 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public boolean isMultipartRequest() {
         return form != null && form.isMultipartRequest();
+    }
+
+    public boolean isFormWithRichTextFields() {
+        for(FieldSet fieldSet : form) {
+            for(FormElement field : fieldSet) {
+                if(field instanceof TextField &&
+                   ((TextField) field).isEnabled() &&
+                   !form.getMode().isView(((TextField) field).isInsertable(), ((TextField) field).isUpdatable()) &&
+                   ((TextField) field).isRichText()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public Form getCrudConfigurationForm() {

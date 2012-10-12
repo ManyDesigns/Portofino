@@ -56,7 +56,7 @@ public class ColumnForm extends Column {
     //Known annotations
     protected Integer fieldSize;
     protected Integer maxLength;
-    protected boolean multiline;
+    protected String typeOfContent;
     protected String stringFormat;
     protected boolean highlightLinks;
     protected String regexp;
@@ -87,8 +87,12 @@ public class ColumnForm extends Column {
         }
 
         Multiline multilineAnn = columnAccessor.getAnnotation(Multiline.class);
-        if(multilineAnn != null) {
-            multiline = true;
+        if(multilineAnn != null && multilineAnn.value()) {
+            typeOfContent = Multiline.class.getName();
+        }
+        RichText richTextAnn = columnAccessor.getAnnotation(RichText.class);
+        if(richTextAnn != null && richTextAnn.value()) {
+            typeOfContent = RichText.class.getName();
         }
 
         if(columnAccessor.isAnnotationPresent(Email.class)) {
@@ -164,8 +168,8 @@ public class ColumnForm extends Column {
             ann.getValues().add(maxLength.toString());
             column.getAnnotations().add(ann);
         }
-        if(multiline) {
-            Annotation ann = new Annotation(column, Multiline.class.getName());
+        if(typeOfContent != null) {
+            Annotation ann = new Annotation(column, typeOfContent);
             ann.getValues().add("true");
             column.getAnnotations().add(ann);
         }
@@ -306,12 +310,12 @@ public class ColumnForm extends Column {
         this.maxLength = maxLength;
     }
 
-    public boolean isMultiline() {
-        return multiline;
+    public String getTypeOfContent() {
+        return typeOfContent;
     }
 
-    public void setMultiline(boolean multiline) {
-        this.multiline = multiline;
+    public void setTypeOfContent(String typeOfContent) {
+        this.typeOfContent = typeOfContent;
     }
 
     public String getStringFormat() {

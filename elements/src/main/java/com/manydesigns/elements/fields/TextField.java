@@ -39,6 +39,8 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.regex.Matcher;
@@ -184,19 +186,41 @@ public class TextField extends AbstractTextField {
         }
         xb.addAttribute("class", cssClass);
         xb.addAttribute("id", id);
-        String escapedText = StringEscapeUtils.escapeHtml(stringValue);
+        String escapedText = getDisplayValue();
         if (href != null) {
             xb.openElement("a");
             xb.addAttribute("href", href);
             xb.addAttribute("alt", title);
-        } else  if (highlightLinks) {
-            escapedText = highlightLinks(escapedText);
         }
-        xb.writeNoHtmlEscape(adjustText(escapedText));
+        xb.writeNoHtmlEscape(escapedText);
         if (href != null) {
             xb.closeElement("a");
         }
         xb.closeElement("div");
+    }
+
+    public String getDisplayValue() {
+        String escapedText;
+        if(richText) {
+            try {
+                Whitelist whitelist = getWhitelist();
+                escapedText = Jsoup.clean(stringValue, whitelist);
+            } catch (Throwable t) {
+                logger.error("Could not clean HTML, falling back to escaped text", t);
+                escapedText = StringEscapeUtils.escapeHtml(stringValue);
+            }
+        } else {
+            escapedText = StringEscapeUtils.escapeHtml(stringValue);
+        }
+        if(href == null && highlightLinks && !richText) {
+            escapedText = highlightLinks(escapedText);
+        }
+        escapedText = adjustText(escapedText);
+        return escapedText;
+    }
+
+    protected Whitelist getWhitelist() {
+        return Whitelist.basic();
     }
 
     public String getValue() {

@@ -32,6 +32,7 @@ package com.manydesigns.portofino.actions.admin;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.forms.TableForm;
@@ -597,6 +598,10 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         stringFormatSP.appendRow(CodiceFiscale.class.getName(), "Codice Fiscale", true);
         stringFormatSP.appendRow(Phone.class.getName(), "Phone", true);
 
+        DefaultSelectionProvider typeOfContentSP = new DefaultSelectionProvider("typeOfContent");
+        typeOfContentSP.appendRow(Multiline.class.getName(), "Multiline", true);
+        typeOfContentSP.appendRow(RichText.class.getName(), "RichText", true);
+
         columnForm = new FormBuilder(ColumnForm.class)
                 .configFieldSetNames("Properties", "Annotations")
                 .configFields(new String[] { "columnName", "propertyName", "javaType", "type",
@@ -604,7 +609,14 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                               getApplicableAnnotations(column.getActualJavaType()))
                 .configSelectionProvider(typesSP, "columnName", "type", "javaType")
                 .configSelectionProvider(stringFormatSP, "stringFormat")
+                .configSelectionProvider(typeOfContentSP, "typeOfContent")
                 .build();
+
+        SelectField typeOfContentField = (SelectField) columnForm.findFieldByPropertyName("typeOfContent");
+        if(typeOfContentField != null) {
+            typeOfContentField.setComboLabel("Plain"); //TODO I18n
+        }
+
         columnForm.readFromObject(cf);
         return cf;
     }
@@ -705,7 +717,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         if(Number.class.isAssignableFrom(type)) {
             return new String[] { "fieldSize", "minValue", "maxValue", "decimalFormat" };
         } else if(String.class.equals(type)) {
-            return new String[] { "fieldSize", "multiline", "stringFormat", "regexp" };
+            return new String[] { "fieldSize", "typeOfContent", "stringFormat", "regexp" };
         } else if(Date.class.isAssignableFrom(type)) {
             return new String[] { "fieldSize", "dateFormat" };
         }
