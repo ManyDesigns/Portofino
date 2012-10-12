@@ -46,7 +46,6 @@
                                         <!-- Admin buttons -->
                                         <div class="contentBarButtons">
                                             <portofino:page-layout-button />
-                                            <portofino:reload-model-button />
                                             <portofino:page-children-button />
                                             <portofino:page-permissions-button />
                                             <portofino:page-copy-button />

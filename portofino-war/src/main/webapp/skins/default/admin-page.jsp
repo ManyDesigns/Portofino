@@ -121,6 +121,9 @@
                             <stripes:layout-render name="/skins/default/adminLink.jsp"
                                                    text="Tables"
                                                    link="/actions/admin/tables"/>
+                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                                                   text="Reload model"
+                                                   link="/actions/admin/reload-model"/>
                         </ul>
                     </li>
                 </ul>

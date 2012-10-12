@@ -123,10 +123,6 @@ public class PageAdminAction extends AbstractPageAction {
 
     protected final PageActionRegistry registry = new PageActionRegistry();
 
-    //--------------------------------------------------------------------------
-    // Reload model fields
-    //--------------------------------------------------------------------------
-
     @Before
     public Resolution prepare() {
         Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
@@ -228,16 +224,6 @@ public class PageAdminAction extends AbstractPageAction {
             }
         }
         DispatcherLogic.savePage(instance);
-    }
-
-    @RequiresAdministrator
-    public Resolution reloadModel() {
-        synchronized (application) {
-            application.loadXmlModel();
-            DispatcherLogic.clearConfigurationCache();
-            SessionMessages.addInfoMessage(getMessage("model.reloaded"));
-            return new RedirectResolution(dispatch.getOriginalPath());
-        }
     }
 
     public Resolution newPage() throws Exception {
