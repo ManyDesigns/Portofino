@@ -227,8 +227,7 @@ public class SecurityLogic {
             Class actionClass = actionBean.getClass();
             while (actionClass != null) {
                 if (actionClass.isAnnotationPresent(RequiresAdministrator.class)) {
-                    logger.debug("Action class requires administrator: {}",
-                    actionClass);
+                    logger.debug("Action class requires administrator: {}", actionClass);
                     requiresAdministrator = true;
                     break;
                 }

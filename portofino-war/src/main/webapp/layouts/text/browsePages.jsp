@@ -16,7 +16,7 @@
     Choose a page:
     <button onclick="window.opener.CKEDITOR.tools.callFunction(
                         <c:out value='${actionBean.CKEditorFuncNum}'/>,
-                        $('#iframe').attr('contentWindow').location.href
+                        $('#iframe').prop('contentWindow').location.href
                     ); window.close();"
             class="contentButton">
         <span class="ui-button-text">Choose</span>
@@ -33,7 +33,7 @@
     Choose a page:
     <button onclick="window.opener.CKEDITOR.tools.callFunction(
                         <c:out value='${actionBean.CKEditorFuncNum}'/>,
-                        $('#iframe').attr('contentWindow').location.href
+                        $('#iframe').prop('contentWindow').location.href
                     ); window.close();"
             class="contentButton">
         <span class="ui-button-text">Choose</span>
