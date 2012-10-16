@@ -38,6 +38,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.DisplayMode;
+import com.manydesigns.elements.options.SearchDisplayMode;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -185,7 +186,7 @@ public class ManyToManyAction extends AbstractPageAction {
                 if (hql != null) {
                     selectionProvider =
                             SelectionProviderLogic.createSelectionProviderFromHql
-                                    (name, application, databaseName, hql, DisplayMode.DROPDOWN);
+                                    (name, application, databaseName, hql, DisplayMode.DROPDOWN, SearchDisplayMode.DROPDOWN);
 
                     if(sp instanceof ForeignKey) {
                         selectionProvider.sortByLabel();

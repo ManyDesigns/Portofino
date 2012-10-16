@@ -41,6 +41,7 @@ import com.manydesigns.elements.forms.*;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.DisplayMode;
+import com.manydesigns.elements.options.SearchDisplayMode;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -1903,11 +1904,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     if(selectionProvider != null) {
                         selectionProviderEdits[i].selectionProvider = selectionProvider.getName();
                         selectionProviderEdits[i].displayMode = selectionProvider.getDisplayMode();
+                        selectionProviderEdits[i].searchDisplayMode = selectionProvider.getSearchDisplayMode();
                         selectionProviderEdits[i].createNewHref = cp.getCreateNewValueHref();
                         selectionProviderEdits[i].createNewText = cp.getCreateNewValueText();
                     } else {
                         selectionProviderEdits[i].selectionProvider = null;
                         selectionProviderEdits[i].displayMode = DisplayMode.DROPDOWN;
+                        selectionProviderEdits[i].searchDisplayMode = SearchDisplayMode.DROPDOWN;
                     }
                 }
             }
@@ -1975,7 +1978,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 selectionProviderSupport.disableSelectionProvider(key);
             } else {
                 selectionProviderSupport.configureSelectionProvider(
-                        key, sp.selectionProvider, sp.displayMode, sp.createNewHref, sp.createNewText);
+                        key, sp.selectionProvider, sp.displayMode, sp.searchDisplayMode,
+                        sp.createNewHref, sp.createNewText);
             }
         }
     }

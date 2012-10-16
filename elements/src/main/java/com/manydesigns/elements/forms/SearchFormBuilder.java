@@ -160,8 +160,7 @@ public class SearchFormBuilder extends AbstractFormBuilder {
                 String[] fieldNames = current.getKey();
                 int index = ArrayUtils.indexOf(fieldNames, fieldName);
                 if (index >= 0) {
-                    field = new SelectSearchField(propertyAccessor, prefix);
-                    
+                    field = new SelectSearchField(propertyAccessor, current.getValue(), prefix);
                     break;
                 }
             }

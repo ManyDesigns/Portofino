@@ -57,6 +57,7 @@ public class DefaultSelectionProvider implements SelectionProvider {
     protected final List<Row> rows;
 
     protected DisplayMode displayMode;
+    protected SearchDisplayMode searchDisplayMode;
 
     protected String createNewValueHref;
     protected String createNewValueText;
@@ -328,6 +329,14 @@ public class DefaultSelectionProvider implements SelectionProvider {
 
     public void setDisplayMode(DisplayMode displayMode) {
         this.displayMode = displayMode;
+    }
+
+    public SearchDisplayMode getSearchDisplayMode() {
+        return searchDisplayMode;
+    }
+
+    public void setSearchDisplayMode(SearchDisplayMode searchDisplayMode) {
+        this.searchDisplayMode = searchDisplayMode;
     }
 
     public String getCreateNewValueHref() {

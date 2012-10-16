@@ -460,8 +460,12 @@ Search form
     display: inline;
 }
 
-.search_form input, .search_form select {
+.search_form input, .search_form select, .search_form span.input {
     margin-right: 2em;
+}
+
+.searchform input[type="radio"], .searchform input[type="checkbox"] {
+    margin-right: auto;
 }
 
 .mde-boolean-search-field {

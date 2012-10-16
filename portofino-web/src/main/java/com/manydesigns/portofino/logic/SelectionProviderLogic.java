@@ -33,6 +33,7 @@ import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.DisplayMode;
+import com.manydesigns.elements.options.SearchDisplayMode;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -153,7 +154,8 @@ public class SelectionProviderLogic {
     }
 
     public static DefaultSelectionProvider createSelectionProviderFromHql
-            (String name, Application application, String databaseName, String hql, DisplayMode dm) {
+            (String name, Application application, String databaseName,
+             String hql, DisplayMode dm, SearchDisplayMode sdm) {
         Database database = DatabaseLogic.findDatabaseByName(application.getModel(), databaseName);
         Table table = QueryUtils.getTableFromQueryString(database, hql);
         String entityName = table.getActualEntityName();
@@ -174,6 +176,7 @@ public class SelectionProviderLogic {
         DefaultSelectionProvider selectionProvider = createSelectionProvider
                 (name, objects, tableAccessor.getKeyProperties(), textFormats);
         selectionProvider.setDisplayMode(dm);
+        selectionProvider.setSearchDisplayMode(sdm);
         return selectionProvider;
     }
 }

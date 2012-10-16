@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.pageactions.crud.configuration;
 
 import com.manydesigns.elements.options.DisplayMode;
+import com.manydesigns.elements.options.SearchDisplayMode;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.ForeignKey;
 import com.manydesigns.portofino.model.database.ModelSelectionProvider;
@@ -58,6 +59,7 @@ public class SelectionProviderReference {
     protected String foreignKeyName;
     protected boolean enabled = true;
     protected String displayModeName;
+    protected String searchDisplayModeName;
     protected String selectionProviderName;
 
     protected String createNewValueHref;
@@ -69,6 +71,7 @@ public class SelectionProviderReference {
 
     protected ForeignKey foreignKey;
     protected DisplayMode displayMode;
+    protected SearchDisplayMode searchDisplayMode;
     protected ModelSelectionProvider selectionProvider;
 
     public void init(Table table) {
@@ -76,6 +79,11 @@ public class SelectionProviderReference {
             displayMode = DisplayMode.valueOf(displayModeName);
         } else {
             displayMode = DisplayMode.DROPDOWN;
+        }
+        if(searchDisplayModeName != null) {
+            searchDisplayMode = SearchDisplayMode.valueOf(searchDisplayModeName);
+        } else {
+            searchDisplayMode = SearchDisplayMode.DROPDOWN;
         }
 
         if(!StringUtils.isEmpty(foreignKeyName)) {
@@ -138,6 +146,24 @@ public class SelectionProviderReference {
     public void setDisplayMode(DisplayMode displayMode) {
         this.displayMode = displayMode;
         displayModeName = displayMode.name();
+    }
+
+    @XmlAttribute(name = "searchDisplayMode")
+    public String getSearchDisplayModeName() {
+        return searchDisplayModeName;
+    }
+
+    public void setSearchDisplayModeName(String displayModeName) {
+        this.searchDisplayModeName = displayModeName;
+    }
+
+    public SearchDisplayMode getSearchDisplayMode() {
+        return searchDisplayMode;
+    }
+
+    public void setSearchDisplayMode(SearchDisplayMode displayMode) {
+        this.searchDisplayMode = displayMode;
+        searchDisplayModeName = displayMode.name();
     }
 
     public ModelSelectionProvider getSelectionProvider() {

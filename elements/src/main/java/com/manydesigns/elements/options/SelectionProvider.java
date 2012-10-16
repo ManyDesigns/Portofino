@@ -43,6 +43,7 @@ public interface SelectionProvider {
     int getFieldCount();
 
     DisplayMode getDisplayMode();
+    SearchDisplayMode getSearchDisplayMode();
 
     SelectionModel createSelectionModel();
 

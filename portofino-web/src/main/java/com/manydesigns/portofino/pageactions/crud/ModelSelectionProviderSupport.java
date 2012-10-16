@@ -35,6 +35,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.annotations.ShortName;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.DisplayMode;
+import com.manydesigns.elements.options.SearchDisplayMode;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.OgnlTextFormat;
@@ -155,10 +156,11 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
 
         if(ref == null || ref.isEnabled()) {
             DisplayMode dm = ref != null ? ref.getDisplayMode() : DisplayMode.DROPDOWN;
+            SearchDisplayMode sdm = ref != null ? ref.getSearchDisplayMode() : SearchDisplayMode.DROPDOWN;
             String newHref = ref != null ? ref.getCreateNewValueHref() : null;
             String newText = ref != null ? ref.getCreateNewValueText() : null;
             SelectionProvider selectionProvider = createSelectionProvider
-                    (current, fieldNames, fieldTypes, dm, newHref, newText);
+                    (current, fieldNames, fieldTypes, dm, sdm, newHref, newText);
 
             CrudSelectionProvider crudSelectionProvider =
                 new CrudSelectionProvider(selectionProvider, fieldNames, newHref, newText);
@@ -176,7 +178,8 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
 
     protected SelectionProvider createSelectionProvider
             (DatabaseSelectionProvider current, String[] fieldNames,
-             Class[] fieldTypes, DisplayMode dm, String newHref, String newText) {
+             Class[] fieldTypes, DisplayMode dm, SearchDisplayMode sdm,
+             String newHref, String newText) {
         DefaultSelectionProvider selectionProvider;
 
         boolean anyActiveProperty = false;
@@ -192,7 +195,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
             selectionProvider = SelectionProviderLogic.createSelectionProvider(
                     current.getName(), 0, new Class[0], Collections.<Object[]>emptyList());
         } else {
-            selectionProvider = createSelectionProvider(current, fieldNames, fieldTypes, dm);
+            selectionProvider = createSelectionProvider(current, fieldNames, fieldTypes, dm, sdm);
         }
         if(selectionProvider != null) {
             if(newHref != null) {
@@ -225,12 +228,14 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
     }
 
     public void configureSelectionProvider
-            (List<String> key, String name, DisplayMode displayMode, String createNewHref, String createNewText) {
+            (List<String> key, String name, DisplayMode displayMode, SearchDisplayMode searchDisplayMode,
+             String createNewHref, String createNewText) {
         Collection<ModelSelectionProvider> selectionProviders = availableSelectionProviders.get(key);
         for(ModelSelectionProvider dsp : selectionProviders) {
             if(name.equals(dsp.getName())) {
                 SelectionProviderReference sel = makeSelectionProviderReference(dsp);
                 sel.setDisplayMode(displayMode);
+                sel.setSearchDisplayMode(searchDisplayMode);
                 sel.setCreateNewValueHref(createNewHref);
                 sel.setCreateNewValueText(createNewText);
                 break;
@@ -267,7 +272,8 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
     }
 
     protected DefaultSelectionProvider createSelectionProvider(
-            DatabaseSelectionProvider current, String[] fieldNames, Class[] fieldTypes, DisplayMode dm) {
+            DatabaseSelectionProvider current, String[] fieldNames, Class[] fieldTypes,
+            DisplayMode dm, SearchDisplayMode sdm) {
         DefaultSelectionProvider selectionProvider = null;
         String name = current.getName();
         String databaseName = current.getToDatabase();
@@ -293,6 +299,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
             selectionProvider =
                     SelectionProviderLogic.createSelectionProvider(name, fieldNames.length, fieldTypes, objects);
             selectionProvider.setDisplayMode(dm);
+            selectionProvider.setSearchDisplayMode(sdm);
         } else if (!StringUtils.isEmpty(hql)) {
             Database database = DatabaseLogic.findDatabaseByName(application.getModel(), databaseName);
             Table table = QueryUtils.getTableFromQueryString(database, hql);
@@ -334,6 +341,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
             selectionProvider = SelectionProviderLogic.createSelectionProvider
                     (name, objects, tableAccessor.getKeyProperties(), textFormats);
             selectionProvider.setDisplayMode(dm);
+            selectionProvider.setSearchDisplayMode(sdm);
 
             if(current instanceof ForeignKey) {
                 selectionProvider.sortByLabel();

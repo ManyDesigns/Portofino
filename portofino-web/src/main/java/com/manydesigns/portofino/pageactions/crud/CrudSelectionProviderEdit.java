@@ -31,6 +31,7 @@ package com.manydesigns.portofino.pageactions.crud;
 
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.options.DisplayMode;
+import com.manydesigns.elements.options.SearchDisplayMode;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -51,6 +52,10 @@ public class CrudSelectionProviderEdit {
     @Select(nullOption = false)
     @Required
     public DisplayMode displayMode;
+
+    @Select(nullOption = false)
+    @Required
+    public SearchDisplayMode searchDisplayMode;
 
     @InSummary(false) //Per non includere in TableForm
     public String[] fieldNames;

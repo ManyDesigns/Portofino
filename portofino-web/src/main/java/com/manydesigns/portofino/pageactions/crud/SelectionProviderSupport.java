@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.pageactions.crud;
 
 import com.manydesigns.elements.options.DisplayMode;
+import com.manydesigns.elements.options.SearchDisplayMode;
 
 import java.util.Collection;
 import java.util.List;
@@ -54,5 +55,6 @@ public interface SelectionProviderSupport {
     void disableSelectionProvider(List<String> properties);
 
     void configureSelectionProvider(
-            List<String> properties, String name, DisplayMode displayMode, String createNewHref, String createNewText);
+            List<String> properties, String name, DisplayMode displayMode, SearchDisplayMode searchDisplayMode,
+            String createNewHref, String createNewText);
 }
