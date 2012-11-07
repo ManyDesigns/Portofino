@@ -41,11 +41,9 @@ import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
-import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.QueryUtils;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.configuration.SelectionProviderReference;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -72,21 +70,19 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
     public static final Logger logger =
             LoggerFactory.getLogger(ModelSelectionProviderSupport.class);
 
-    protected final Application application;
-    protected final CrudConfiguration crudConfiguration;
+    protected final AbstractCrudAction crudAction;
     protected List<CrudSelectionProvider> crudSelectionProviders;
     protected final Multimap<List<String>, ModelSelectionProvider> availableSelectionProviders;
 
-    public ModelSelectionProviderSupport(Application application, CrudConfiguration crudConfiguration) {
-        this.application = application;
-        this.crudConfiguration = crudConfiguration;
+    public ModelSelectionProviderSupport(AbstractCrudAction crudAction) {
+        this.crudAction = crudAction;
         availableSelectionProviders = HashMultimap.create();
     }
 
     public void setup() {
         crudSelectionProviders = new ArrayList<CrudSelectionProvider>();
         Set<String> configuredSPs = new HashSet<String>();
-        for(SelectionProviderReference ref : crudConfiguration.getSelectionProviders()) {
+        for(SelectionProviderReference ref : crudAction.getCrudConfiguration().getSelectionProviders()) {
             boolean added;
             if(ref.getForeignKey() != null) {
                 added = setupSelectionProvider(ref, ref.getForeignKey(), configuredSPs);
@@ -114,7 +110,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
             }
         }
 
-        Table table = crudConfiguration.getActualTable();
+        Table table = crudAction.getCrudConfiguration().getActualTable();
         if(table != null) {
             for(ForeignKey fk : table.getForeignKeys()) {
                 setupSelectionProvider(null, fk, configuredSPs);
@@ -184,7 +180,8 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
 
         boolean anyActiveProperty = false;
         for(String propertyName : fieldNames) {
-            CrudProperty crudProperty = findProperty(propertyName, crudConfiguration.getProperties());
+            CrudProperty crudProperty =
+                    findProperty(propertyName, crudAction.getCrudConfiguration().getProperties());
             if(crudProperty != null && crudProperty.isEnabled()) {
                 anyActiveProperty = true;
                 break;
@@ -200,14 +197,14 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
         if(selectionProvider != null) {
             if(newHref != null) {
                 OgnlTextFormat tf = new OgnlTextFormat(newHref);
-                newHref = tf.format(this);
+                newHref = tf.format(crudAction);
                 String contextPath = ElementsThreadLocals.getHttpServletRequest().getContextPath();
                 if(newHref.startsWith("/") && !newHref.startsWith(contextPath)) {
                     newHref = contextPath + newHref;
                 }
 
                 tf = new OgnlTextFormat(newText);
-                newText = tf.format(this);
+                newText = tf.format(crudAction);
             }
             selectionProvider.setCreateNewValueHref(newHref);
             selectionProvider.setCreateNewValueText(newText);
@@ -250,7 +247,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
         } else {
             sel.setSelectionProviderName(dsp.getName());
         }
-        crudConfiguration.getSelectionProviders().add(sel);
+        crudAction.getCrudConfiguration().getSelectionProviders().add(sel);
         return sel;
     }
 
@@ -280,7 +277,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
         String sql = current.getSql();
         String hql = current.getHql();
         if (!StringUtils.isEmpty(sql)) {
-            Session session = application.getSession(databaseName);
+            Session session = crudAction.getApplication().getSession(databaseName);
             OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
             String formatString = sqlFormat.getFormatString();
             Object[] parameters = sqlFormat.evaluateOgnlExpressions(this);
@@ -301,7 +298,8 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
             selectionProvider.setDisplayMode(dm);
             selectionProvider.setSearchDisplayMode(sdm);
         } else if (!StringUtils.isEmpty(hql)) {
-            Database database = DatabaseLogic.findDatabaseByName(application.getModel(), databaseName);
+            Database database =
+                    DatabaseLogic.findDatabaseByName(crudAction.getApplication().getModel(), databaseName);
             Table table = QueryUtils.getTableFromQueryString(database, hql);
             if(table == null) {
                 logger.error("Selection provider {} has a HQL query that " +
@@ -309,7 +307,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
                 return null;
             }
             String entityName = table.getActualEntityName();
-            Session session = application.getSession(databaseName);
+            Session session = crudAction.getApplication().getSession(databaseName);
             QueryStringWithParameters queryWithParameters = QueryUtils.mergeQuery(hql, null, this);
 
             Collection<Object> objects = getFromQueryCache(current, queryWithParameters);
@@ -327,7 +325,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
             }
 
             TableAccessor tableAccessor =
-                    application.getTableAccessor(databaseName, entityName);
+                    crudAction.getApplication().getTableAccessor(databaseName, entityName);
             ShortName shortNameAnnotation =
                     tableAccessor.getAnnotation(ShortName.class);
             TextFormat[] textFormats = null;

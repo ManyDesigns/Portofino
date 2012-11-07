@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * An abstraction over the creation and configuration of selection providers.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com

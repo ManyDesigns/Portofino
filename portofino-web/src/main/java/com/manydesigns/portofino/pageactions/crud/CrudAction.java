@@ -204,7 +204,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
     }
 
     protected ModelSelectionProviderSupport createSelectionProviderSupport() {
-        return new ModelSelectionProviderSupport(application, crudConfiguration);
+        return new ModelSelectionProviderSupport(this);
     }
 
     @Override
