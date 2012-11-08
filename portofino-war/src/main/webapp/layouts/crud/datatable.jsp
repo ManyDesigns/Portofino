@@ -26,6 +26,9 @@
         </tbody>
     </table>
 </div>
+<c:if test="${empty actionBean.crudConfiguration.rowsPerPage}">
+    <div style="line-height: 8px;">&nbsp;<%-- Reserve space for the missing paginator --%></div>
+</c:if>
 <input type="hidden" name="sortProperty" value="${actionBean.sortProperty}" />
 <input type="hidden" name="sortDirection" value="${actionBean.sortDirection}" />
 <!--<input type="hidden" name="firstResult" value="${actionBean.firstResult}" />
