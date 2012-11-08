@@ -113,7 +113,7 @@
             var dir = (oState.sortedBy && oState.sortedBy.dir === YAHOO.widget.DataTable.CLASS_DESC) ? "desc" : "asc";
             var firstResult = (oState.pagination) ? oState.pagination.recordOffset : 0;
             var maxResults = null;
-            <c:if test="${actionBean.crudConfiguration.paginated}">
+            <c:if test="${not empty actionBean.crudConfiguration.rowsPerPage}">
                 maxResults = (oState.pagination) ? oState.pagination.rowsPerPage : ${actionBean.crudConfiguration.rowsPerPage};
             </c:if>
 
@@ -151,7 +151,7 @@
             MSG_EMPTY: '<fmt:message key="layouts.crud.datatable.msg_empty"/>'
         };
 
-        <c:if test="${actionBean.crudConfiguration.paginated}">
+        <c:if test="${not empty actionBean.crudConfiguration.rowsPerPage}">
             myConfigs.paginator = new YAHOO.widget.Paginator({
                 rowsPerPage: <%= actionBean.getCrudConfiguration().getRowsPerPage() %>,
                 firstPageLinkLabel: '&lt;&lt; <fmt:message key="commons.first" />',

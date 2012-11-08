@@ -74,8 +74,7 @@ public class CrudConfiguration implements PageActionConfiguration {
 
     protected boolean largeResultSet;
 
-    protected boolean paginated = true;
-    protected Integer rowsPerPage = 10;
+    protected Integer rowsPerPage;
 
     //**************************************************************************
     // Fields for wire-up
@@ -250,12 +249,4 @@ public class CrudConfiguration implements PageActionConfiguration {
         this.rowsPerPage = rowsPerPage;
     }
 
-    @XmlAttribute(required = false)
-    public boolean isPaginated() {
-        return paginated;
-    }
-
-    public void setPaginated(boolean paginated) {
-        this.paginated = paginated;
-    }
 }

@@ -92,7 +92,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     public static final String[][] CRUD_CONFIGURATION_FIELDS =
                 {{"name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
-                  "largeResultSet", "paginated", "rowsPerPage"}};
+                  "largeResultSet", "rowsPerPage"}};
 
     public Table baseTable;
 

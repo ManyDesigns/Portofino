@@ -914,7 +914,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             String calendarDefinitionsStr = "[";
             calendarDefinitionsStr += StringUtils.join(calendarDefinitions, ", ");
             calendarDefinitionsStr += "]";
-            File dir = new File(application.getPagesDir(), "calendar");
+            File dir = new File(application.getPagesDir(), "calendar-" + connectionProvider.getDatabase().getDatabaseName());
             if(dir.exists()) {
                 SessionMessages.addWarningMessage(
                         getMessage("appwizard.error.directoryExists", dir.getAbsolutePath()));
@@ -924,8 +924,9 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
 
                 Page page = new Page();
                 page.setId(RandomUtil.createRandomId());
-                page.setTitle("Calendar (generated)");
-                page.setDescription("Calendar (generated)");
+                String calendarTitle = "Calendar (" + connectionProvider.getDatabase().getDatabaseName() + ")";
+                page.setTitle(calendarTitle);
+                page.setDescription(calendarTitle);
 
                 DispatcherLogic.savePage(dir, page);
                 File actionFile = new File(dir, "action.groovy");
@@ -1073,6 +1074,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             logger.info("Creating CRUD page {}", dir.getAbsolutePath());
             CrudConfiguration configuration = new CrudConfiguration();
             configuration.setDatabase(connectionProvider.getDatabase().getDatabaseName());
+            configuration.setRowsPerPage(10);
 
             configuration.setQuery(query);
             String variable = table.getActualEntityName();
