@@ -51,7 +51,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -317,9 +316,7 @@ public class DefaultApplication implements Application {
                 }
                 Configuration configuration =
                         builder.buildSessionFactory(database);
-                SessionFactoryImpl sessionFactory =
-                        (SessionFactoryImpl) configuration
-                                .buildSessionFactory();
+                SessionFactory sessionFactory = configuration.buildSessionFactory();
 
                 HibernateDatabaseSetup setup =
                         new HibernateDatabaseSetup(

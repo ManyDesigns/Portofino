@@ -52,8 +52,10 @@ import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderForm;
 import com.manydesigns.portofino.actions.forms.SelectableSchema;
 import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
+import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
@@ -128,6 +130,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
     protected String connectionProviderType;
     protected String connectionProviderName;
     protected ConnectionProvider connectionProvider;
+    protected Database database;
     protected boolean advanced;
     protected Form advancedOptionsForm;
 
@@ -199,6 +202,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         advancedOptionsForm.readFromObject(this);
         advancedOptionsForm.readFromRequest(context.getRequest());
         advancedOptionsForm.writeToObject(this);
+        connectionProviderName = context.getRequest().getParameter("connectionProviderName");
     }
 
     protected void buildCPForms() {
@@ -269,7 +273,8 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             return createConnectionProviderForm();
         }
         if(!isNewConnectionProvider()) {
-            connectionProvider = DatabaseLogic.findDatabaseByName(model, connectionProviderName).getConnectionProvider();
+            connectionProvider =
+                    DatabaseLogic.findDatabaseByName(model, connectionProviderName).getConnectionProvider();
             return afterCreateConnectionProvider();
         }
         if(JDBC.equals(connectionProviderType)) {
@@ -324,18 +329,9 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
                 connectionProvider.getDatabasePlatform().getSchemaNames(metadata);
         connectionProvider.releaseConnection(conn);
 
-        List<Schema> selectedSchemas = connectionProvider.getDatabase().getSchemas();
-
         selectableSchemas = new ArrayList<SelectableSchema>(schemaNamesFromDb.size());
         for(String schemaName : schemaNamesFromDb) {
-            boolean selected = false;
-            for(Schema schema : selectedSchemas) {
-                if(schemaName.equalsIgnoreCase(schema.getSchemaName())) {
-                    selected = true;
-                    break;
-                }
-            }
-            SelectableSchema schema = new SelectableSchema(schemaName, selected);
+            SelectableSchema schema = new SelectableSchema(schemaName, false);
             selectableSchemas.add(schema);
         }
         schemasForm = new TableFormBuilder(SelectableSchema.class)
@@ -362,7 +358,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             schemasForm.writeToObject(selectableSchemas);
             boolean atLeastOneSelected = isAtLeastOneSchemaSelected();
             if(atLeastOneSelected) {
-                if (!configureModelSchemas(false)) {
+                if (configureModelSchemas(false) == null) {
                     return selectSchemasForm();
                 }
                 return afterSelectSchemas();
@@ -374,6 +370,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         return selectSchemasForm();
     }
 
+    @Guard(test = "isNewConnectionProvider()", type = GuardType.VISIBLE)
     @Button(list = "select-schemas", key="wizard.finish", order = 3)
     public Resolution selectSchemasAndFinish() {
         configureConnectionProvider();
@@ -382,15 +379,29 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             schemasForm.writeToObject(selectableSchemas);
             boolean atLeastOneSelected = isAtLeastOneSchemaSelected();
             if(atLeastOneSelected) {
-                if (!configureModelSchemas(true)) {
+                if (configureModelSchemas(true) == null) {
                     return selectSchemasForm();
                 }
+                Database oldDatabase =
+                        DatabaseLogic.findDatabaseByName(application.getModel(), database.getDatabaseName());
+                if(oldDatabase != null) {
+                    model.getDatabases().remove(oldDatabase);
+                }
+                model.getDatabases().add(database);
+                model.init();
                 try {
+                    connectionProvider.setDatabase(database);
+                    connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
                     application.saveXmlModel();
                     return new RedirectResolution("/actions/admin/connection-providers")
                             .addParameter("databaseName", connectionProvider.getDatabase().getDatabaseName());
                 } catch (Exception e) {
                     saveModelFailed(e);
+                    model.getDatabases().remove(database);
+                    model.getDatabases().add(oldDatabase);
+                    model.init();
+                    connectionProvider.setDatabase(oldDatabase);
+                    connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
                     return selectSchemasForm();
                 }
             } else {
@@ -416,19 +427,20 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         logger.error("Could not save model", e);
         SessionMessages.addErrorMessage(
                 getMessage("appwizard.error.saveModelFailed", ExceptionUtils.getRootCauseMessage(e)));
-        if(connectionProviderName == null) { //This is a new connection provider
+        if(isNewConnectionProvider()) {
             application.getModel().getDatabases().remove(connectionProvider.getDatabase());
         }
         application.initModel();
     }
 
-    protected boolean configureModelSchemas(boolean alwaysUseExistingModel) {
-        Model model;
+    protected Database configureModelSchemas(boolean alwaysUseExistingModel) {
+        Model refModel;
         if(!alwaysUseExistingModel && isNewConnectionProvider()) {
-            model = new Model();
+            refModel = new Model();
         } else {
-            model = this.model;
+            refModel = this.model;
         }
+        List<Schema> tempSchemas = new ArrayList<Schema>();
         Database database = connectionProvider.getDatabase();
         for(SelectableSchema schema : selectableSchemas) {
             Schema modelSchema = DatabaseLogic.findSchemaByName(database, schema.schemaName);
@@ -438,32 +450,34 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
                     modelSchema.setSchemaName(schema.schemaName);
                     modelSchema.setDatabase(database);
                     database.getSchemas().add(modelSchema);
-                }
-            } else if(modelSchema != null) {
-                database.getSchemas().remove(modelSchema);
+                    tempSchemas.add(modelSchema);
+                }/* else if(!isNewConnectionProvider()) {
+                    SessionMessages.addWarningMessage(getMessage("appwizard.warning.schemaExists", schema.schemaName));
+                }*/
             }
         }
         Database targetDatabase;
         DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
         try {
-            targetDatabase = dbSyncer.syncDatabase(model);
+            targetDatabase = dbSyncer.syncDatabase(refModel);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             SessionMessages.addErrorMessage(getMessage("appwizard.error.sync", e));
-            return false;
+            return null;
+        } finally {
+            database.getSchemas().removeAll(tempSchemas);
+            connectionProvider.setDatabase(database); //Restore
         }
-        connectionProvider.setDatabase(targetDatabase);
-        connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
-        Database oldDatabase = DatabaseLogic.findDatabaseByName(model, targetDatabase.getDatabaseName());
-        if(oldDatabase != null) {
-            model.getDatabases().remove(oldDatabase);
-        }
+        //connectionProvider.setDatabase(targetDatabase);
+        //connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
+        Model model = new Model();
         model.getDatabases().add(targetDatabase);
         model.init();
-        return true;
+        this.database = targetDatabase;
+        return targetDatabase;
     }
 
-    protected boolean isNewConnectionProvider() {
+    public boolean isNewConnectionProvider() {
         return connectionProviderName == null;
     }
 
@@ -542,8 +556,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         List<Table> roots = new ArrayList<Table>();
         for(SelectableSchema selectableSchema : selectableSchemas) {
             if(selectableSchema.selected) {
-                Schema schema = DatabaseLogic.findSchemaByName(
-                        connectionProvider.getDatabase(), selectableSchema.schemaName);
+                Schema schema = DatabaseLogic.findSchemaByName(database, selectableSchema.schemaName);
                 roots.addAll(schema.getTables());
             }
         }
@@ -557,9 +570,9 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
 
             allTables.add(table);
 
-            boolean removed = false;
-            boolean selected = false; //Così che selected => known
-            boolean known = false;
+            boolean removed = false; //Did we already remove the table from the list of roots?
+            boolean selected = false; //Is the table selected as a root? Note that selected => known
+            boolean known = false; //Is the table in the list of selectable roots?
 
             for(SelectableRoot root : selectableRoots) {
                 if(root.tableName.equals(table.getSchemaName() + "." + table.getTableName())) {
@@ -636,7 +649,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         userAndGroupTablesForm.writeToObject(this);
         if(!StringUtils.isEmpty(userTableName)) {
             Model tmpModel = new Model();
-            tmpModel.getDatabases().add(connectionProvider.getDatabase());
+            tmpModel.getDatabases().add(database);
             String[] name = DatabaseLogic.splitQualifiedTableName(userTableName);
             userTable = DatabaseLogic.findTableByName(tmpModel, name[0], name[1], name[2]);
 
@@ -820,9 +833,13 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
     @Button(list = "build-app", key="wizard.finish", order = 2)
     public Resolution buildApplication() {
         selectUserFields();
-        if(isNewConnectionProvider()) {
-            application.getModel().getDatabases().add(connectionProvider.getDatabase());
+        Database oldDatabase =
+                        DatabaseLogic.findDatabaseByName(application.getModel(), database.getDatabaseName());
+        if(oldDatabase != null) {
+            model.getDatabases().remove(oldDatabase);
         }
+        model.getDatabases().add(database);
+        connectionProvider.setDatabase(database);
         application.initModel();
         try {
             TemplateEngine engine = new SimpleTemplateEngine();
@@ -914,17 +931,23 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             String calendarDefinitionsStr = "[";
             calendarDefinitionsStr += StringUtils.join(calendarDefinitions, ", ");
             calendarDefinitionsStr += "]";
-            File dir = new File(application.getPagesDir(), "calendar-" + connectionProvider.getDatabase().getDatabaseName());
-            if(dir.exists()) {
-                SessionMessages.addWarningMessage(
-                        getMessage("appwizard.error.directoryExists", dir.getAbsolutePath()));
-            } else if(dir.mkdirs()) {
+            String baseName = "calendar-" + connectionProvider.getDatabase().getDatabaseName();
+            File dir = new File(application.getPagesDir(), baseName);
+            int retries = 1;
+            while(dir.exists()) {
+                retries++;
+                dir = new File(application.getPagesDir(), baseName + "-" + retries);
+            }
+            if(dir.mkdirs()) {
                 CalendarConfiguration configuration = new CalendarConfiguration();
                 DispatcherLogic.saveConfiguration(dir, configuration);
 
                 Page page = new Page();
                 page.setId(RandomUtil.createRandomId());
                 String calendarTitle = "Calendar (" + connectionProvider.getDatabase().getDatabaseName() + ")";
+                if(retries > 1) {
+                    calendarTitle += " - " + retries;
+                }
                 page.setTitle(calendarTitle);
                 page.setDescription(calendarTitle);
 

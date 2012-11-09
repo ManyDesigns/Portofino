@@ -74,7 +74,7 @@ public class StringBooleanType implements UserType, ParameterizedType {
         return ObjectUtils.hashCode(x);
     }
 
-    public Object nullSafeGet(ResultSet resultSet, String[] names, Object owner)
+    public Object nullSafeGet(ResultSet resultSet, String[] names,/* hb4 SessionImplementor sessionImplementor,*/ Object owner)
         throws HibernateException, SQLException {
         String value = resultSet.getString(names[0]);
         if(value != null) {
@@ -98,7 +98,7 @@ public class StringBooleanType implements UserType, ParameterizedType {
         }
     }
 
-    public void nullSafeSet(PreparedStatement statement, Object value, int index)
+    public void nullSafeSet(PreparedStatement statement, Object value, int index/*hb4, SessionImplementor sessionImplementor*/)
         throws HibernateException, SQLException {
         if(value == null) {
             if(trueString != null && falseString != null) {

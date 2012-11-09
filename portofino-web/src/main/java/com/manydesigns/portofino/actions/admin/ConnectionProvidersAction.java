@@ -78,7 +78,6 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-//    public List<ConnectionProvider> connectionProviders;
     public ConnectionProvider connectionProvider;
     public DatabasePlatform[] databasePlatforms;
     public DatabasePlatform databasePlatform;
@@ -376,7 +375,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         return execute();
     }
 
-    @Button(list = "connectionProviders-read", key = "commons.delete", order = 5)
+    @Button(list = "connectionProviders-read", key = "commons.delete", order = 6)
     public Resolution delete() {
         String[] databaseNames = new String[] {databaseName};
         try {
@@ -446,6 +445,15 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         }
         return new RedirectResolution(getClass())
                 .addParameter("databaseName", databaseName);
+    }
+
+    @Button(list = "connectionProviders-read", key = "layouts.admin.connectionProviders.list.runWizard", order = 5)
+    public Resolution runWizard() {
+        ConnectionProvider connectionProvider = application.getConnectionProvider(databaseName);
+        return new RedirectResolution(ApplicationWizard.class)
+                .addParameter("connectionProviderName", databaseName)
+                .addParameter("configureConnectionProvider")
+                .addParameter("connectionProviderType", connectionProvider instanceof JdbcConnectionProvider ? "JDBC" : "JNDI");
     }
 
     @Buttons({
