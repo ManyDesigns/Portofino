@@ -31,6 +31,13 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Legacy -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-model-extras</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>

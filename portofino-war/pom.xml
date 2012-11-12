@@ -19,13 +19,6 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- Legacy -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-model-extras</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
