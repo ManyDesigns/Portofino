@@ -905,6 +905,10 @@ public class PageAdminAction extends AbstractPageAction {
         Class<?> actualActionClass = getPageInstance().getActionClass();
         SupportsPermissions supportsPermissions =
                 actualActionClass.getAnnotation(SupportsPermissions.class);
+        while(supportsPermissions == null && actualActionClass.getSuperclass() != Object.class) {
+            actualActionClass = actualActionClass.getSuperclass();
+            supportsPermissions = actualActionClass.getAnnotation(SupportsPermissions.class);
+        }
         if(supportsPermissions != null && supportsPermissions.value().length > 0) {
             return supportsPermissions.value();
         } else {

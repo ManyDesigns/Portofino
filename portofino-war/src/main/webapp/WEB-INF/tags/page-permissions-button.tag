@@ -1,7 +1,10 @@
 <%@ tag import="com.manydesigns.portofino.logic.SecurityLogic"
-%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%>
+<%@ tag import="com.manydesigns.portofino.security.AccessLevel" %>
+<%@ tag import="org.apache.shiro.SecurityUtils" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
-<% if(SecurityLogic.isAdministrator(request)) { %>
+<% if(SecurityLogic.hasPermissions(actionBean.getPageInstance(), SecurityUtils.getSubject(), AccessLevel.DEVELOP)) { %>
 <button name="pagePermissions"
         type="submit"
         class="person ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"

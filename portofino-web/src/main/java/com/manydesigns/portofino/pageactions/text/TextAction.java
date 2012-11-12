@@ -35,6 +35,7 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
+import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
@@ -42,8 +43,10 @@ import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.text.configuration.Attachment;
 import com.manydesigns.portofino.pageactions.text.configuration.TextConfiguration;
+import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
+import com.manydesigns.portofino.security.SupportsPermissions;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -51,7 +54,6 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +75,7 @@ import java.util.regex.Pattern;
 @ScriptTemplate("script_template.groovy")
 @ConfigurationClass(TextConfiguration.class)
 @PageActionName("Text")
+@SupportsPermissions({ TextAction.PERMISSION_EDIT })
 public class TextAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
@@ -80,6 +83,8 @@ public class TextAction extends AbstractPageAction {
     public static final String EMPTY_STRING = "";
     public static final String TEXT_FILE_NAME_PATTERN = "{0}.html";
     public static final String ATTACHMENT_FILE_NAME_PATTERN = "{0}.data";
+
+    public static final String PERMISSION_EDIT = "permission.text.edit";
 
     public String content;
     public String[] selection;
@@ -396,10 +401,10 @@ public class TextAction extends AbstractPageAction {
         return pathDispatch.getPathUrl();
     }*/
 
-    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
-    @RequiresPermissions(level = AccessLevel.EDIT)
+    @Button(list = "portletHeaderButtons", key = "layouts.text.edit", order = 2, icon = "ui-icon-document")
+    @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution configure() {
-        prepareConfigurationForms();
+        title = pageInstance.getPage().getTitle();
         try {
             loadContent();
             logger.info("Edit content: {}", textFile.getAbsolutePath());
@@ -407,18 +412,24 @@ public class TextAction extends AbstractPageAction {
             logger.error("Could not load content", e);
             SessionMessages.addErrorMessage("Could not load content: " + e);
         }
+        return new ForwardResolution("/layouts/text/edit-content.jsp");
+    }
+
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
+    @RequiresPermissions(level = AccessLevel.EDIT)
+    public Resolution configurePage() {
+        prepareConfigurationForms();
         return new ForwardResolution("/layouts/text/configure.jsp");
     }
 
     @Button(list = "configuration", key = "commons.updateConfiguration")
-    @RequiresPermissions(level = AccessLevel.EDIT)
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() throws IOException {
         prepareConfigurationForms();
         readPageConfigurationFromRequest();
         boolean valid = validatePageConfiguration();
         if (valid) {
             updatePageConfiguration();
-            saveContent();
             SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
             return cancel();
         } else {
@@ -426,16 +437,8 @@ public class TextAction extends AbstractPageAction {
         }
     }
 
-    @Override
-    protected void updateScript() {
-        Subject subject = SecurityUtils.getSubject();
-        if(SecurityLogic.hasPermissions(getPageInstance(), subject, AccessLevel.DEVELOP)) {
-            super.updateScript();
-        }
-    }
-
-    @RequiresPermissions(level = AccessLevel.EDIT)
     @Button(list = "manage-attachments-upload", key = "text.attachment.upload", order = 1)
+    @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution uploadAttachment() {
         if (upload == null) {
             SessionMessages.addWarningMessage(getMessage("text.attachment.noFileSelected"));
@@ -453,7 +456,7 @@ public class TextAction extends AbstractPageAction {
                 .addParameter("cancelReturnUrl", cancelReturnUrl);
     }
 
-    @RequiresPermissions(level = AccessLevel.EDIT)
+    @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution uploadAttachmentFromCKEditor() {
         try {
             commonUploadAttachment();
@@ -549,39 +552,49 @@ public class TextAction extends AbstractPageAction {
         }
     }
 
-    @RequiresPermissions(level = AccessLevel.DEVELOP)
+    @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution browse() {
         logger.info("Browse");
         return new ForwardResolution("/layouts/text/browse.jsp");
     }
 
-    @RequiresPermissions(level = AccessLevel.DEVELOP)
+    @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution browsePages() {
         logger.info("Browse Pages");
         return new ForwardResolution("/layouts/text/browsePages.jsp");
     }
 
     @Button(list = "portletHeaderButtons", key = "layouts.text.manage-attachments.manage_attachments_for_page", order = 3, icon = "ui-icon-link")
-    @RequiresPermissions(level = AccessLevel.EDIT)
+    @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution manageAttachments() {
         logger.info("Manage attachments");
         return new ForwardResolution("/layouts/text/manage-attachments.jsp");
     }
 
     @Button(list = "edit-content", key = "commons.update")
-    @RequiresPermissions(level = AccessLevel.EDIT)
+    @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution updateContent() {
+        title = context.getRequest().getParameter("title");
+        title = StringUtils.trimToNull(title);
+        if (title == null) {
+            SessionMessages.addErrorMessage(getMessage("commons.configuration.titleEmpty"));
+            return new ForwardResolution("/layouts/text/edit-content.jsp");
+        }
+        Page page = pageInstance.getPage();
+        page.setTitle(title);
         try {
+            DispatcherLogic.savePage(pageInstance.getDirectory(), page);
             saveContent();
             SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
-        } catch (IOException e) {
+        } catch (Exception e) {
+            logger.error("Could not save content for page " + pageInstance.getPath(), e);
             SessionMessages.addInfoMessage(getMessage("commons.update.failed"));
         }
         return cancel();
     }
 
-    @RequiresPermissions(level = AccessLevel.EDIT)
     @Button(list = "manage-attachments-delete", key = "commons.delete", order = 1)
+    @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution deleteAttachments() {
         if (selection == null || selection.length == 0) {
             SessionMessages.addWarningMessage(getMessage("text.attachment.noAttachmentSelected"));
@@ -615,8 +628,8 @@ public class TextAction extends AbstractPageAction {
     }
 
     @Button(list = "manage-attachments", key = "commons.ok", order = 1)
-    @RequiresPermissions(level = AccessLevel.EDIT)
-    public Resolution save() {
+    @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
+    public Resolution saveAttachments() {
         if(downloadable == null) {
             downloadable = new String[0];
         }

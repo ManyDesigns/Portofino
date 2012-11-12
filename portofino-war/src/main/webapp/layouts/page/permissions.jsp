@@ -26,7 +26,7 @@
     <stripes:layout-component name="portletBody">
         <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
         <div class="yui-gc">
-            <div class="yui-u first">
+            <div class="yui-u first" style="width: auto;">
                 <table>
                 <%
                     PageInstance currentPageInstance = actionBean.getPageInstance();
@@ -151,7 +151,7 @@
                     </c:forEach>
                 </table>
             </div>
-            <div class="yui-u">
+            <div class="yui-u" style="min-width: 20em;">
                 <h2 style="margin-top: 0;"><fmt:message key="layouts.page.permissions.test-a-user" /></h2>
                 <label for="testUserIdSelect"><fmt:message key="layouts.page.permissions.select-a-user" /></label>
                 <c:if test="${actionBean.users != null}">

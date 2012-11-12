@@ -35,7 +35,6 @@
     <textarea id="scriptEditorTextArea"
               name="script" style="min-height: 20em; width: 100%;"
             ><c:out value="${actionBean.script}" /></textarea>
-    <pre id="scriptEditor"
-         style="min-height: 20em; width: 100%; display: none;"></pre>
+    <pre id="scriptEditor"></pre>
 </fieldset>
 <% } %>
