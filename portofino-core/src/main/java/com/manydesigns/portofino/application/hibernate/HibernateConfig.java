@@ -87,25 +87,8 @@ public class HibernateConfig {
         try {
             Configuration configuration = new Configuration();
 
-            // mettendo la modalità dynamic map, non funzionano le entità mappate su bean.
-            // configuration.setProperty("hibernate.default_entity_mode", "dynamic-map");
-
             setupConnection(configuration);
-            configuration
-                    .setProperty("hibernate.current_session_context_class",
-                            "org.hibernate.context.ThreadLocalSessionContext")
-                    .setProperty("org.hibernate.hql.ast.AST", "true")
-                    .setProperty("hibernate.globally_quoted_identifiers", "false");
-            configuration.setProperty("hibernate.show_sql",
-                    portofinoConfiguration.getString(
-                            PortofinoProperties.HIBERNATE_SHOW_SQL));
-            /* Per abilitare 2nd-level cache
-            configuration.setProperty("hibernate.cache.region.factory_class",
-                    portofinoConfiguration.getString("hibernate.cache.region.factory_class"));
-            configuration.setProperty("hibernate.cache.use_second_level_cache",
-                    portofinoConfiguration.getString("hibernate.cache.use_second_level_cache"));
-            configuration.setProperty("hibernate.cache.use_query_cache",
-                    portofinoConfiguration.getString("hibernate.cache.use_query_cache"));*/
+            setupConfigurationProperties(configuration);
 
             Mappings mappings = configuration.createMappings();
 
@@ -113,7 +96,7 @@ public class HibernateConfig {
             classMapping(database, mappings);
             //One2Many Mapping
             o2mMapping(database, configuration, mappings);
-            //Many2One Mapping solo per molti a molti
+            //Many2One Mapping
             m2oMapping(database, configuration, mappings);
 
             return configuration;
@@ -124,6 +107,26 @@ public class HibernateConfig {
             ex.printStackTrace();
             throw new ExceptionInInitializerError(ex);
         }
+    }
+
+    protected void setupConfigurationProperties(Configuration configuration) {
+        configuration
+                .setProperty("hibernate.current_session_context_class",
+                        "org.hibernate.context.ThreadLocalSessionContext") //hb4: "org.hibernate.context.internal.ThreadLocalSessionContext"
+                .setProperty("org.hibernate.hql.ast.AST", "true")
+                .setProperty("hibernate.globally_quoted_identifiers", "false");
+        configuration.setProperty("hibernate.show_sql",
+                portofinoConfiguration.getString(
+                        PortofinoProperties.HIBERNATE_SHOW_SQL));
+        // mettendo la modalità dynamic map, non funzionano le entità mappate su bean.
+        // configuration.setProperty("hibernate.default_entity_mode", "dynamic-map");
+        /* Per abilitare 2nd-level cache
+configuration.setProperty("hibernate.cache.region.factory_class",
+    portofinoConfiguration.getString("hibernate.cache.region.factory_class"));
+configuration.setProperty("hibernate.cache.use_second_level_cache",
+    portofinoConfiguration.getString("hibernate.cache.use_second_level_cache"));
+configuration.setProperty("hibernate.cache.use_query_cache",
+    portofinoConfiguration.getString("hibernate.cache.use_query_cache"));*/
     }
 
     protected void setupConnection(Configuration configuration) {
@@ -220,23 +223,23 @@ public class HibernateConfig {
                                            com.manydesigns.portofino.model.database.Table aTable) {
 
 
-        Table tab = mappings.addTable(aTable.getSchemaName(), null,
-                aTable.getTableName(), null, false);
-        tab.setName(escapeName(aTable.getTableName()));
-        tab.setSchema(escapeName(aTable.getSchemaName()));
+        Table tab = mappings.addTable(escapeName(aTable.getSchemaName()), null,
+                escapeName(aTable.getTableName()), null, false);
+        //tab.setName(escapeName(aTable.getTableName()));
+        //tab.setSchema(escapeName(aTable.getSchemaName()));
         mappings.addTableBinding(aTable.getSchemaName(), null,
                 aTable.getTableName(), aTable.getTableName(), null);
 
         RootClass clazz = new RootClass();
         clazz.setEntityName(aTable.getActualEntityName());
+        clazz.setJpaEntityName(aTable.getActualEntityName());
         if (aTable.getJavaClass() != null) {
             clazz.setClassName(aTable.getJavaClass());
             clazz.setProxyInterfaceName(aTable.getJavaClass());
         }
         clazz.setLazy(LAZY);
         clazz.setTable(tab);
-        clazz.setNodeName(aTable.getTableName());
-
+        //clazz.setNodeName(aTable.getTableName());
 
         List<com.manydesigns.portofino.model.database.Column> columnList =
                 new ArrayList<com.manydesigns.portofino.model.database.Column>();
@@ -253,7 +256,7 @@ public class HibernateConfig {
             } else {
                 logger.error("Cannot find Hibernate type for table: {}, column: {}, jdbc type: {}, type name: {}. Skipping column.",
                         new Object[]{
-                                aTable.getTableName(),
+                                aTable.getQualifiedName(),
                                 modelColumn.getColumnName(),
                                 jdbcType,
                                 javaType != null ? javaType.getName() : null
@@ -266,7 +269,7 @@ public class HibernateConfig {
                 = aTable.getPrimaryKey().getColumns();
 
         if(!columnList.containsAll(columnPKList)) {
-            logger.error("Primary key refers to some invalid columns, skipping class");
+            logger.error("Primary key refers to some invalid columns, skipping table {}", aTable.getQualifiedName());
             return null;
         }
 
@@ -309,7 +312,7 @@ public class HibernateConfig {
 
         SimpleValue value = new SimpleValue(mappings, tab);
         if (!setHibernateType(value, column, column.getActualJavaType(), jdbcType)) {
-            logger.error("Skipping column");
+            logger.error("Skipping column {}", column.getQualifiedName());
             return null;
         }
 
@@ -324,7 +327,7 @@ public class HibernateConfig {
                                       Value value) {
         Property prop = new Property();
         prop.setName(column.getActualPropertyName());
-        prop.setNodeName(column.getActualPropertyName());
+        //prop.setNodeName(column.getActualPropertyName());
         prop.setValue(value);
         return prop;
     }
@@ -348,7 +351,7 @@ public class HibernateConfig {
 
         component.setRoleName(name + ".id");
         component.setEmbedded(true);
-        component.setNodeName("id");
+        //component.setNodeName("id");
         component.setKey(true);
         component.setNullValue("undefined");
 
@@ -436,8 +439,8 @@ public class HibernateConfig {
         Property prop = createProperty(column, id);
         clazz.addProperty(prop);
         prop.setPropertyAccessorName(mappings.getDefaultAccess());
-        PropertyGeneration generation = PropertyGeneration.parse(null);
-        prop.setGeneration(generation);
+        //PropertyGeneration generation = PropertyGeneration.parse(null);
+        //prop.setGeneration(generation);
 
         prop.setInsertable(false);
         prop.setUpdateable(false);
@@ -599,8 +602,8 @@ public class HibernateConfig {
         // nelle relazioni
         set.setLazy(LAZY);
 
-        set.setRole(relationship.getToTable()+"."+relationship.getActualManyPropertyName());
-        set.setNodeName(relationship.getActualManyPropertyName());
+        set.setRole(relationship.getToTable().getActualEntityName()+"."+relationship.getActualManyPropertyName());
+        //set.setNodeName(relationship.getActualManyPropertyName());
         set.setCollectionTable(clazzMany.getTable());
         OneToMany oneToMany = new OneToMany(mappings, set.getOwner());
         set.setElement(oneToMany);
@@ -641,7 +644,7 @@ public class HibernateConfig {
 
         Property prop = new Property();
         prop.setName(relationship.getActualManyPropertyName());
-        prop.setNodeName(relationship.getActualManyPropertyName());
+        //prop.setNodeName(relationship.getActualManyPropertyName());
         prop.setValue(set);
         if (ForeignKeyConstraintType.importedKeyCascade.name()
                 .equalsIgnoreCase(relationship.getOnDelete())){
@@ -796,7 +799,7 @@ public class HibernateConfig {
 
         Property prop = new Property();
         prop.setName(relationship.getActualOnePropertyName());
-        prop.setNodeName(relationship.getActualOnePropertyName());
+        //prop.setNodeName(relationship.getActualOnePropertyName());
         prop.setValue(m2o);
         prop.setCascade("none"); //TODO era "all", capire
         prop.setInsertable(false);
@@ -806,6 +809,7 @@ public class HibernateConfig {
 
     private Property getRefProperty(PersistentClass clazzOne, String propertyName) {
         Property refProp;
+        //TODO alessio ha senso questo automatismo?
         if (null != clazzOne.getIdentifierProperty()) {
             refProp = clazzOne.getIdentifierProperty();
         } else if (null != clazzOne.getIdentifier()) {
