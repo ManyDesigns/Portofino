@@ -472,7 +472,7 @@ public class TextAction extends AbstractPageAction {
         InputStream attachmentStream = upload.getInputStream();
         String attachmentId = RandomUtil.createRandomId();
         File dataFile = RandomUtil.getCodeFile(
-                application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
+                pageInstance.getDirectory(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
 
         // copy the data
         IOUtils.copyLarge(attachmentStream, new FileOutputStream(dataFile));
@@ -517,7 +517,7 @@ public class TextAction extends AbstractPageAction {
         try {
             String attachmentId = attachment.getId();
             final File file = RandomUtil.getCodeFile(
-                    application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
+                    pageInstance.getDirectory(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
 
             //Cache
             HttpServletResponse response = context.getResponse();
@@ -594,11 +594,11 @@ public class TextAction extends AbstractPageAction {
                     logger.warn("Ignoring non-existing attachment with code: {}", code);
                     continue;
                 }
-                File file = RandomUtil.getCodeFile(application.getAppStorageDir(), ATTACHMENT_FILE_NAME_PATTERN, attachment.getId());
+                File file = RandomUtil.getCodeFile(
+                        pageInstance.getDirectory(), ATTACHMENT_FILE_NAME_PATTERN, attachment.getId());
                 if(!FileUtils.deleteQuietly(file)) {
                     logger.warn("File wasn't deleted: {}", file.getAbsolutePath());
                 }
-
                 counter++;
             }
             saveConfiguration(textConfiguration);
