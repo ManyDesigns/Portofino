@@ -43,12 +43,10 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.Date;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -181,6 +179,7 @@ public abstract class ConnectionProvider {
             while (typeRs.next()) {
                 readType(typeRs);
             }
+            fixMissingTypeAliases(types);
             Collections.sort(types, new TypeComparator());
 
             databasePlatform =
@@ -204,6 +203,35 @@ public abstract class ConnectionProvider {
             DbUtil.closeResultSetAndStatement(typeRs);
             releaseConnection(conn);
             lastTested = new Date();
+        }
+    }
+
+    protected void fixMissingTypeAliases(List<Type> types) {
+        Type numericType = null;
+        Type decimalType = null;
+        for(Type type : types) {
+            if(type.getJdbcType() == Types.NUMERIC) {
+                numericType = type;
+            } else if(type.getJdbcType() == Types.DECIMAL) {
+                decimalType = type;
+            }
+        }
+        if(numericType == null && decimalType != null) {
+            numericType = new Type(
+                    "NUMERIC", Types.NUMERIC, decimalType.getMaximumPrecision(), decimalType.getLiteralPrefix(),
+                    decimalType.getLiteralSuffix(), decimalType.isNullable(), decimalType.isCaseSensitive(),
+                    decimalType.isSearchable(), decimalType.isAutoincrement(), decimalType.getMinimumScale(),
+                    decimalType.getMaximumScale(), decimalType.isPrecisionRequired(), decimalType.isScaleRequired());
+            types.add(numericType);
+            logger.info("Added NUMERIC type as an alias of DECIMAL");
+        } else if(decimalType == null && numericType != null) {
+            decimalType = new Type(
+                    "DECIMAL", Types.DECIMAL, numericType.getMaximumPrecision(), numericType.getLiteralPrefix(),
+                    numericType.getLiteralSuffix(), numericType.isNullable(), numericType.isCaseSensitive(),
+                    numericType.isSearchable(), numericType.isAutoincrement(), numericType.getMinimumScale(),
+                    numericType.getMaximumScale(), numericType.isPrecisionRequired(), numericType.isScaleRequired());
+            types.add(decimalType);
+            logger.info("Added DECIMAL type as an alias of NUMERIC");
         }
     }
 
