@@ -1097,7 +1097,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             logger.info("Creating CRUD page {}", dir.getAbsolutePath());
             CrudConfiguration configuration = new CrudConfiguration();
             configuration.setDatabase(connectionProvider.getDatabase().getDatabaseName());
-            configuration.setRowsPerPage(10);
+            configuration.setupDefaults();
 
             configuration.setQuery(query);
             String variable = table.getActualEntityName();

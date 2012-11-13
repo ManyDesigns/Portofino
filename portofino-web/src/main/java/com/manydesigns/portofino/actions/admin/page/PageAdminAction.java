@@ -57,6 +57,7 @@ import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.dispatcher.ConfigurationWithDefaults;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
 import com.manydesigns.portofino.pageactions.registry.PageActionInfo;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
@@ -286,6 +287,9 @@ public class PageAdminAction extends AbstractPageAction {
             Object configuration = null;
             if(configurationClass != null) {
                 configuration = ReflectionUtil.newInstance(configurationClass);
+                if(configuration instanceof ConfigurationWithDefaults) {
+                    ((ConfigurationWithDefaults) configuration).setupDefaults();
+                }
             }
             page.init();
 

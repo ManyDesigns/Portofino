@@ -32,6 +32,7 @@ package com.manydesigns.portofino.pageactions.crud.configuration;
 import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.portofino.application.QueryUtils;
+import com.manydesigns.portofino.dispatcher.ConfigurationWithDefaults;
 import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
@@ -51,7 +52,7 @@ import java.util.List;
 
 @XmlRootElement(name = "configuration")
 @XmlAccessorType(value = XmlAccessType.NONE)
-public class CrudConfiguration implements PageActionConfiguration {
+public class CrudConfiguration implements PageActionConfiguration, ConfigurationWithDefaults {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
     
@@ -121,6 +122,10 @@ public class CrudConfiguration implements PageActionConfiguration {
         for(SelectionProviderReference ref : selectionProviders) {
             ref.init(getActualTable());
         }
+    }
+
+    public void setupDefaults() {
+        rowsPerPage = 10;
     }
 
     //**************************************************************************
