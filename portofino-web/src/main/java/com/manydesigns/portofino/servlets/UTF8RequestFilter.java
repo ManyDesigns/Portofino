@@ -38,7 +38,7 @@ import java.io.IOException;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class CharacterEncodingFilter implements Filter {
+public class UTF8RequestFilter implements Filter {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 

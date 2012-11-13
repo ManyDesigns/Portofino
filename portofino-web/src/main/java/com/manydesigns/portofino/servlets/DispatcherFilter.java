@@ -27,9 +27,10 @@
  *
  */
 
-package com.manydesigns.portofino.dispatcher;
+package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.portofino.RequestAttributes;
+import com.manydesigns.portofino.dispatcher.DispatcherUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

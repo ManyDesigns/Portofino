@@ -4,23 +4,4 @@
     "http://www.tuckey.org/res/dtds/urlrewrite4.0.dtd">
 
 <urlrewrite>
-
-    <!-- Allow only /app/web -->
-    <rule>
-        <from>^/app/(?!web).*$</from>
-        <to type="forward">/404.jsp</to>
-    </rule>
-
-    <!-- Forbid /apps -->
-    <rule>
-        <from>^/apps/.*$</from>
-        <to type="forward">/404.jsp</to>
-    </rule>
-
-    <!-- Do not allow URLs with ../ -->
-    <rule>
-        <from>^(?=.*(\.|%2e)(\.|%2e)).*$</from>
-        <to type="forward">/404.jsp</to>
-    </rule>
-
 </urlrewrite>

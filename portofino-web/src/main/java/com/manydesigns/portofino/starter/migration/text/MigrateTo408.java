@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.pageactions.text.migration;
+package com.manydesigns.portofino.starter.migration.text;
 
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.application.Application;

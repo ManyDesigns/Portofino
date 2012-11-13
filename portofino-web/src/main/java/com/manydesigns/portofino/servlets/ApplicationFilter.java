@@ -33,6 +33,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.i18n.SimpleTextProvider;
 import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.i18n.MultipleTextProvider;
@@ -43,9 +44,14 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.jstl.core.Config;
 import javax.servlet.jsp.jstl.fmt.LocalizationContext;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -78,6 +84,47 @@ public class ApplicationFilter implements Filter {
                 (ApplicationStarter) servletContext.getAttribute(
                         ApplicationAttributes.APPLICATION_STARTER);
 
+        try {
+            if (!filterForbiddenUrls(applicationStarter, httpRequest)) {
+                HttpServletResponse httpResponse = (HttpServletResponse) response;
+                httpResponse.sendError(404, httpRequest.getRequestURI());
+                return;
+            }
+        } catch (URISyntaxException e) {
+            throw new ServletException(e);
+        }
+        setupApplication(applicationStarter, request);
+
+        chain.doFilter(request, response);
+    }
+
+    public static boolean filterForbiddenUrls(
+            ApplicationStarter applicationStarter, HttpServletRequest httpRequest)
+            throws IOException, ServletException, URISyntaxException {
+        String encoding = applicationStarter.getPortofinoConfiguration().getString(PortofinoProperties.URL_ENCODING);
+        String uriString = httpRequest.getRequestURL().toString();
+        return filterForbiddenUrls(uriString, encoding);
+    }
+
+    public static boolean filterForbiddenUrls(String uriString, String encoding) throws UnsupportedEncodingException, URISyntaxException {
+        uriString = URLDecoder.decode(uriString, encoding);
+        URI requestUrl = new URI(uriString);
+        requestUrl = requestUrl.normalize();
+        String path = requestUrl.getPath();
+        if(path.startsWith("/app/") && !path.startsWith("/app/web")) {
+            return false;
+        }
+        if(path.startsWith("/apps/")) {
+            return false;
+        }
+        if(path.startsWith("/../") || path.startsWith("../")) {
+            return false;
+        }
+        return true;
+    }
+
+    protected void setupApplication(ApplicationStarter applicationStarter, ServletRequest request)
+            throws ServletException {
         logger.debug("Retrieving application");
         Application application;
         try {
@@ -92,32 +139,21 @@ public class ApplicationFilter implements Filter {
 
             //I18n
             Locale locale = request.getLocale();
+            ResourceBundle portofinoResourceBundle = application.getBundle(locale);
+
             LocalizationContext localizationContext =
-                    new LocalizationContext(application.getBundle(locale), locale);
+                    new LocalizationContext(portofinoResourceBundle, locale);
             request.setAttribute(Config.FMT_LOCALIZATION_CONTEXT + ".request", localizationContext);
 
             //Setup Elements I18n
             ResourceBundle elementsResourceBundle =
                     ResourceBundle.getBundle(SimpleTextProvider.DEFAULT_MESSAGE_RESOURCE, locale);
-            ResourceBundle portofinoResourceBundle = application.getBundle(locale);
 
             TextProvider textProvider =
                     new MultipleTextProvider(
                             portofinoResourceBundle, elementsResourceBundle);
             ElementsThreadLocals.setTextProvider(textProvider);
-
-            String appPathPrefix = httpRequest.getContextPath() + "/app/";
-            if(httpRequest.getRequestURI().startsWith(appPathPrefix)) {
-                String internalPath =
-                        "/apps/" + application.getAppId() + "/" +
-                        httpRequest.getRequestURI().substring(appPathPrefix.length());
-                RequestDispatcher requestDispatcher = request.getRequestDispatcher(internalPath);
-                requestDispatcher.forward(request, response);
-                return;
-            }
         }
-
-        chain.doFilter(request, response);
     }
 
     public void destroy() {

@@ -37,6 +37,7 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.DefaultApplication;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
+import com.manydesigns.portofino.starter.migration.text.MigrateTo408;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -308,7 +309,7 @@ public class ApplicationStarter {
     }
 
     protected void runMigrations(Application tmpApplication) {
-        com.manydesigns.portofino.pageactions.text.migration.MigrateTo408.migrate(tmpApplication);
+        MigrateTo408.migrate(tmpApplication);
     }
 
 
