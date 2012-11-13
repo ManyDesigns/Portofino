@@ -382,7 +382,7 @@ public class DispatcherLogic {
         return (T) entry.object;
     }
 
-    protected static <T> T loadConfiguration(
+    public static <T> T loadConfiguration(
             File configurationFile, Application application, Class<? extends T> configurationClass) throws Exception {
         if (configurationClass == null) {
             return null;
@@ -395,7 +395,7 @@ public class DispatcherLogic {
         }
     }
 
-    protected static <T> T loadConfiguration
+    public static <T> T loadConfiguration
             (InputStream inputStream, Application application, Class<? extends T> configurationClass)
             throws Exception {
         if (configurationClass == null) {
@@ -438,7 +438,7 @@ public class DispatcherLogic {
         }
     }
 
-    protected static Class<? extends PageAction> getFallbackActionClass(Application application) {
+    public static Class<? extends PageAction> getFallbackActionClass(Application application) {
         Configuration configuration = application.getPortofinoProperties();
         String className = configuration.getString(PortofinoProperties.FALLBACK_ACTION_CLASS);
         try {

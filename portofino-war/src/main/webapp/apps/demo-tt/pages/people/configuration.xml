@@ -1,4 +1,4 @@
-<configuration createTitle="Create person" database="redmine" editTitle="Edit person" largeResultSet="false" name="People" query="from users" readTitle="View person" searchTitle="People" variable="person">
+<configuration createTitle="Create person" database="redmine" editTitle="Edit person" largeResultSet="false" name="People" query="from users" readTitle="View person" searchTitle="People" variable="person" rowsPerPage="10">
     <annotations/>
     <properties>
         <property enabled="true" inSummary="true" insertable="true" label="" name="id" searchable="false" updatable="true">
