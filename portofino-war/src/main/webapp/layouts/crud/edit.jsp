@@ -11,6 +11,11 @@
         <c:if test="${actionBean.formWithRichTextFields}">
             <script type="text/javascript" src="<stripes:url value="/ckeditor/ckeditor.js"/>"></script>
             <script type="text/javascript" src="<stripes:url value="/ckeditor/adapters/jquery.js"/>"></script>
+            <script type="text/javascript">
+                $(function() {
+                    portofino.setupRichTextEditors();
+                });
+            </script>
         </c:if>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">

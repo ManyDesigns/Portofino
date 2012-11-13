@@ -25,28 +25,12 @@
             <stripes:textarea class="mde-form-rich-text" name="content" value="${actionBean.content}"/>
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
             <script type="text/javascript">
-                var windowWidth = 640, windowHeight = 480;
-                if (window.innerWidth && window.innerHeight) {
-                    windowWidth = window.innerWidth;
-                    windowHeight = window.innerHeight;
-                } else if (document.compatMode=='CSS1Compat' &&
-                    document.documentElement &&
-                    document.documentElement.offsetWidth ) {
-                    windowWidth = document.documentElement.offsetWidth;
-                    windowHeight = document.documentElement.offsetHeight;
-                } else if (document.body && document.body.offsetWidth) {
-                    windowWidth = document.body.offsetWidth;
-                    windowHeight = document.body.offsetHeight;
-                }
-
-                $('textarea[name=content]').data('mdeRichTextConfig', {
-                    toolbar: 'Full',
-                    toolbarCanCollapse: false,
-                    filebrowserWindowWidth : windowWidth,
-                    filebrowserWindowHeight : windowHeight,
-                    filebrowserBrowseUrl : '<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>?browse=',
-                    filebrowserImageBrowseUrl : '<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>?browse=&images-only=',
-                    filebrowserUploadUrl : '<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>?uploadAttachmentFromCKEditor='
+                $(function() {
+                    portofino.setupRichTextEditors({
+                        filebrowserBrowseUrl : '<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>?browse=',
+                        filebrowserImageBrowseUrl : '<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>?browse=&images-only=',
+                        filebrowserUploadUrl : '<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>?uploadAttachmentFromCKEditor='
+                    });
                 });
             </script>
         </fieldset>

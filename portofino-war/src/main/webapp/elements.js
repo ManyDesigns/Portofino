@@ -111,7 +111,7 @@ function stripQueryString(url) {
     return url.replace(regexp, "");
 }
 
-$(function() {
+function setupRichTextEditors() {
     $('textarea.mde-form-rich-text').each(function(index, element) {
         element = $(element);
         var conf = element.data('mdeRichTextConfig') || {
@@ -124,6 +124,10 @@ $(function() {
             console.error("CKEditor not loaded! Make sure that ckeditor/ckeditor.js and ckeditor/adapters/jquery.js are included in your page.");
         }
     });
+}
+
+$(function() {
+    setupRichTextEditors();
 });
 
 function configureBulkEditTextField(id, checkboxName) {

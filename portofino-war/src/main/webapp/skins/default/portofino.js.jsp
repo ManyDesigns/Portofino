@@ -1,5 +1,6 @@
 <%@ page import="com.manydesigns.elements.servlet.ServletConstants"%><%@page contentType="text/javascript; UTF-8"
 %><%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%
     // Avoid caching of dynamic pages
     response.setHeader(ServletConstants.HTTP_PRAGMA, ServletConstants.HTTP_PRAGMA_NO_CACHE);
@@ -111,6 +112,8 @@ function showCopyPageDialog(pagePath, contextPath) {
 }
 
 var portofino = {
+    _setupRichTextEditors: setupRichTextEditors,
+
     decorateButton: function(selector, options) {
         $(selector).each(function(index, element) {
             element = $(element);
@@ -126,8 +129,38 @@ var portofino = {
             },
             text: false
         });
+    },
+
+    setupRichTextEditors: function(config) {
+        config = config || {};
+        var windowWidth = 640, windowHeight = 480;
+        if (window.innerWidth && window.innerHeight) {
+            windowWidth = window.innerWidth;
+            windowHeight = window.innerHeight;
+        } else if (document.compatMode=='CSS1Compat' &&
+            document.documentElement &&
+            document.documentElement.offsetWidth ) {
+            windowWidth = document.documentElement.offsetWidth;
+            windowHeight = document.documentElement.offsetHeight;
+        } else if (document.body && document.body.offsetWidth) {
+            windowWidth = document.body.offsetWidth;
+            windowHeight = document.body.offsetHeight;
+        }
+
+        config = $.extend({}, {
+            customConfig : '<c:out value="${pageContext.request.contextPath}"/>/ckeditor-custom/config.js',
+            toolbar: 'PortofinoDefault',
+            toolbarCanCollapse: false,
+            filebrowserWindowWidth : windowWidth,
+            filebrowserWindowHeight : windowHeight
+        }, config);
+
+        $('textarea.mde-form-rich-text').data('mdeRichTextConfig', config);
+        portofino._setupRichTextEditors();
     }
 };
+
+setupRichTextEditors = function() {/* Do nothing (remove default initialization by Elements) */};
 
 $(function() {
     portofino.decorateButton("button.contentButton");
@@ -198,4 +231,3 @@ function htmlEscape (string) {
         return HTML_CHARS[match];
     });
 }
-
