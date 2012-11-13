@@ -86,7 +86,6 @@ public class DefaultApplication implements Application {
     public static final String APP_MODEL_FILE = "portofino-model.xml";
     public static final String APP_SCRIPTS_DIR = "groovy";
     public static final String APP_PAGES_DIR = "pages";
-    public static final String APP_STORAGE_DIR = "storage";
     public static final String APP_WEB_DIR = "web";
 
     public final static String changelogFileNameTemplate = "{0}-changelog.xml";
@@ -109,7 +108,6 @@ public class DefaultApplication implements Application {
     protected final File appModelFile;
     protected final File appScriptsDir;
     protected final File appPagesDir;
-    protected final File appStorageDir;
     protected final File appWebDir;
 
     protected final ResourceBundleManager resourceBundleManager;
@@ -161,11 +159,6 @@ public class DefaultApplication implements Application {
         logger.info("Application pages dir: {}",
                 appPagesDir.getAbsolutePath());
         result &= ElementsFileUtils.ensureDirectoryExistsAndWritable(appPagesDir);
-
-        appStorageDir = new File(appDir, APP_STORAGE_DIR);
-        logger.info("Application storage dir: {}",
-                appStorageDir.getAbsolutePath());
-        result &= ElementsFileUtils.ensureDirectoryExistsAndWritable(appStorageDir);
 
         appWebDir = new File(appDir, APP_WEB_DIR);
         logger.info("Application web dir: {}",
@@ -546,10 +539,6 @@ public class DefaultApplication implements Application {
 
     public File getAppScriptsDir() {
         return appScriptsDir;
-    }
-
-    public File getAppStorageDir() {
-        return appStorageDir;
     }
 
     public File getAppWebDir() {

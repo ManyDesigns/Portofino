@@ -27,16 +27,21 @@
 *
 */
 
-package com.manydesigns.portofino.migration;
+package com.manydesigns.portofino.pageactions.text.migration;
 
 import com.manydesigns.elements.util.RandomUtil;
+import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.pageactions.text.TextAction;
 import com.manydesigns.portofino.pageactions.text.configuration.Attachment;
 import com.manydesigns.portofino.pageactions.text.configuration.TextConfiguration;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -44,38 +49,60 @@ import java.io.File;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class Migrate407To408 {
+public class MigrateTo408 {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
+
+    public static final Logger logger = LoggerFactory.getLogger(MigrateTo408.class);
 
     public static void main(String[] args) {
         String appDir = "";
         if(args.length > 0) {
             appDir = args[0];
         }
-        File appDirFile = new File(appDir);
-        File pagesDirFile = new File(appDirFile, "pages");
-        File storageDirFile = new File(appDirFile, "storage");
-        if(!pagesDirFile.isDirectory()) {
-            System.err.println("Not a directory: " + pagesDirFile.getAbsolutePath());
-            System.exit(1);
-        }
         DispatcherLogic.initConfigurationCache(0, 1);
-        try {
-            migrate(pagesDirFile, storageDirFile);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Migration failed.");
-            System.exit(2);
-        }
+        File appDirFile = new File(appDir);
+        migrate(appDirFile);
     }
 
-    private static void migrate(File dir, File storageDirFile) throws Exception {
+    public static void migrate(Application app) {
+        migrate(app.getAppDir());
+    }
+
+    protected static void migrate(File appDirFile) {
+        File pagesDirFile = new File(appDirFile, "pages");
+        File storageDirFile = new File(appDirFile, "storage");
+        if(!storageDirFile.isDirectory()) {
+            return;
+        }
+        logger.info("Storage directory found: \"" + storageDirFile.getAbsolutePath() + "\". Attempting migration to version 4.0.8.");
+        if(!pagesDirFile.isDirectory()) {
+            throw new RuntimeException("Not a directory: " + pagesDirFile.getAbsolutePath());
+        }
+        try {
+            Set<File> files = migrate(pagesDirFile, storageDirFile);
+            for(File file : files) {
+                file.delete();
+            }
+            if(storageDirFile.delete()) {
+                logger.info("Storage directory deleted");
+            } else {
+                logger.warn("Storage directory could not be deleted");
+            }
+        } catch (Exception e) {
+            logger.error("Migration failed", e);
+            throw new RuntimeException(e);
+        }
+        logger.info("Migration of text pages completed. Remember to review permissions.");
+    }
+
+    private static Set<File> migrate(File dir, File storageDirFile) throws Exception {
         File textHtml = new File(dir, "text.html");
+        Set<File> filesToDelete = new HashSet<File>();
         if(textHtml.exists()) {
             File configurationFile = new File(dir, "configuration.xml");
             if(configurationFile.exists()) {
-                System.out.println("Found text page: " + dir);
+                logger.info("Found text page: " + dir);
                 TextConfiguration configuration =
                         DispatcherLogic.getConfiguration(configurationFile, null, TextConfiguration.class);
                 for(Attachment attachment : configuration.getAttachments()) {
@@ -83,17 +110,19 @@ public class Migrate407To408 {
                             storageDirFile, TextAction.ATTACHMENT_FILE_NAME_PATTERN, attachment.getId());
                     if(attFile.exists()) {
                         File destFile = new File(dir, attFile.getName());
-                        FileUtils.moveFile(attFile, destFile);
-                        System.out.println("Attachment moved: " + destFile);
+                        FileUtils.copyFile(attFile, destFile);
+                        filesToDelete.add(attFile);
+                        logger.info("Attachment copied: " + destFile);
                     }
                 }
             }
         }
         for(File file : dir.listFiles()) {
             if(file.isDirectory()) {
-                migrate(file, storageDirFile);
+                filesToDelete.addAll(migrate(file, storageDirFile));
             }
         }
+        return filesToDelete;
     }
 
 }

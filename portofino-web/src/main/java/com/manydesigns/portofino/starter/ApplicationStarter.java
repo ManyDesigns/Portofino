@@ -274,6 +274,8 @@ public class ApplicationStarter {
             return false;
         }
 
+        runMigrations(tmpApplication);
+
         logger.info("Initializing base classloader for application {}", tmpApplication.getAppId());
         ScriptingUtil.initBaseClassLoader(tmpApplication);
         File appListenerFile = new File(tmpApplication.getAppScriptsDir(), "AppListener.groovy");
@@ -303,6 +305,10 @@ public class ApplicationStarter {
             ScriptingUtil.removeBaseClassLoader(tmpApplication);
         }
         return success;
+    }
+
+    protected void runMigrations(Application tmpApplication) {
+        com.manydesigns.portofino.pageactions.text.migration.MigrateTo408.migrate(tmpApplication);
     }
 
 

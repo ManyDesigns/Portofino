@@ -94,10 +94,6 @@ public interface Application {
      */
     File getAppScriptsDir();
     /**
-     * Returns the storage directory of the application.
-     */
-    File getAppStorageDir();
-    /**
      * Returns the web pages directory of the application.
      */
     File getAppWebDir();
