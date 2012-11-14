@@ -13,7 +13,10 @@
             <script type="text/javascript" src="<stripes:url value="/ckeditor/adapters/jquery.js"/>"></script>
             <script type="text/javascript">
                 $(function() {
-                    portofino.setupRichTextEditors();
+                    portofino.setupRichTextEditors({
+                        toolbarCanCollapse: true,
+                        height: null
+                    });
                 });
             </script>
         </c:if>

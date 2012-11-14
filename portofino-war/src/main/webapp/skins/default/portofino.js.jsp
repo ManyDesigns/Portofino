@@ -133,7 +133,7 @@ var portofino = {
 
     setupRichTextEditors: function(config) {
         config = config || {};
-        var windowWidth = 640, windowHeight = 480;
+        var windowWidth, windowHeight;
         if (window.innerWidth && window.innerHeight) {
             windowWidth = window.innerWidth;
             windowHeight = window.innerHeight;
@@ -147,14 +147,25 @@ var portofino = {
             windowHeight = document.body.offsetHeight;
         }
 
-        config = $.extend({}, {
+        var baseConfig = {};
+        if(windowHeight) {
+            baseConfig.height =
+                    windowHeight -
+                    $("textarea.mde-form-rich-text").offset().top -
+                    $("#ft").height() -
+                    $(".contentFooter").height() -
+                    250; //250 ~= toolbar 3 righe + footer + margine tolleranza
+        }
+
+        config = $.extend(baseConfig, {
             customConfig : '<c:out value="${pageContext.request.contextPath}"/>/ckeditor-custom/config.js',
             toolbar: 'PortofinoDefault',
             toolbarCanCollapse: false,
-            filebrowserWindowWidth : windowWidth,
-            filebrowserWindowHeight : windowHeight
+            filebrowserWindowWidth : windowWidth || 640,
+            filebrowserWindowHeight : windowHeight || 480
         }, config);
 
+        console.log(config);
         $('textarea.mde-form-rich-text').data('mdeRichTextConfig', config);
         portofino._setupRichTextEditors();
     }
