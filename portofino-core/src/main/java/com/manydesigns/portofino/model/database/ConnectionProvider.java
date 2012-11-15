@@ -187,7 +187,7 @@ public abstract class ConnectionProvider {
             if (databasePlatform == null) {
                 status = STATUS_ERROR;
                 errorMessage = MessageFormat.format(
-                        "Database abstraction not found for {0}",
+                        "Database platform not found for {0}",
                         databaseProductName);
                 logger.warn(errorMessage);
             } else {
@@ -197,7 +197,7 @@ public abstract class ConnectionProvider {
         } catch (Throwable e) {
             status = STATUS_ERROR;
             errorMessage = e.getMessage();
-            logger.warn("Could not create database abstraction for " +
+            logger.warn("Could not create database platform for " +
                     databaseName, e);
         } finally {
             DbUtil.closeResultSetAndStatement(typeRs);
