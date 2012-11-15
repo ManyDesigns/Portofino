@@ -8,15 +8,19 @@
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.pageactions.text.TextAction"/>
 <head>
+    <jsp:include page="/skins/${skin}/head.jsp" />
     <title><fmt:message key="layouts.text.browse.browse_server"/></title>
 </head>
-<body>
+<body style="text-align: left;">
 <% if(request.getParameter("images-only") == null) { %>
     <form action="${actionBean.dispatch.absoluteOriginalPath}">
         <input type="hidden" name="cancelReturnUrl"
                value='<%= actionBean.getDispatch().getAbsoluteOriginalPath() + "?" + request.getQueryString() %>' />
         <input type="hidden" name="CKEditorFuncNum" value='${actionBean.CKEditorFuncNum}' />
-        Pagine: <button name="browsePages" type="submit">Browse</button> (TODO) 
+        <fmt:message key="layouts.text.browse.pages"/>:
+        <button class="ui-button ui-widget ui-state-default ui-corner-all contentButton ui-button-text-only"
+                type="submit" name="browsePages" role="button" aria-disabled="false">
+            <span class="ui-button-text"><fmt:message key="layouts.text.browse"/></span></button>
     </form>
 <% } %>
 <c:if test="${not empty actionBean.textConfiguration.attachments}">

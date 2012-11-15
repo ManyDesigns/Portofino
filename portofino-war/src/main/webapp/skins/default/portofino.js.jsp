@@ -161,8 +161,8 @@ var portofino = {
             customConfig : '<c:out value="${pageContext.request.contextPath}"/>/ckeditor-custom/config.js',
             toolbar: 'PortofinoDefault',
             toolbarCanCollapse: false,
-            filebrowserWindowWidth : windowWidth || 640,
-            filebrowserWindowHeight : windowHeight || 480
+            filebrowserWindowWidth : windowWidth,
+            filebrowserWindowHeight : windowHeight
         }, config);
 
         console.log(config);
