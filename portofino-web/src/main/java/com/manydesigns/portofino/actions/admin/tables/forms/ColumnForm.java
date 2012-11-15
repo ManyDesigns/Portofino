@@ -39,6 +39,8 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -66,6 +68,14 @@ public class ColumnForm extends Column {
     protected String decimalFormat;
 
     protected String dateFormat;
+
+    public static final String[] KNOWN_ANNOTATIONS = {
+            FieldSize.class.getName(), MaxLength.class.getName(), Multiline.class.getName(), RichText.class.getName(),
+            Email.class.getName(), CAP.class.getName(), CodiceFiscale.class.getName(), PartitaIva.class.getName(),
+            Password.class.getName(), HighlightLinks.class.getName(), RegExp.class.getName(),
+            MinDecimalValue.class.getName(), MinIntValue.class.getName(), MaxDecimalValue.class.getName(),
+            MaxIntValue.class.getName(), DecimalFormat.class.getName(), DateFormat.class.getName()
+    };
 
     public ColumnForm(Column copyFrom, PropertyAccessor columnAccessor, Type type) {
         try {
@@ -157,7 +167,10 @@ public class ColumnForm extends Column {
         column.setPropertyName(StringUtils.defaultIfEmpty(getPropertyName(), null));
 
         //Annotations
-        column.getAnnotations().clear();
+        for(String annotationClass : KNOWN_ANNOTATIONS) {
+            removeAnnotation(annotationClass, column.getAnnotations());
+        }
+
         if(fieldSize != null) {
             Annotation ann = new Annotation(column, FieldSize.class.getName());
             ann.getValues().add(fieldSize.toString());
@@ -207,6 +220,16 @@ public class ColumnForm extends Column {
             Annotation ann = new Annotation(column, DateFormat.class.getName());
             ann.getValues().add(dateFormat);
             column.getAnnotations().add(ann);
+        }
+    }
+
+    protected void removeAnnotation(String annotationClass, List<Annotation> annotations) {
+        Iterator<Annotation> it = annotations.iterator();
+        while (it.hasNext()) {
+            Annotation ann = it.next();
+            if(ann.getType().equals(annotationClass)) {
+                it.remove();
+            }
         }
     }
 

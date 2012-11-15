@@ -478,7 +478,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
     }
 
     public boolean isNewConnectionProvider() {
-        return connectionProviderName == null;
+        return StringUtils.isEmpty(connectionProviderName);
     }
 
     public Resolution afterSelectSchemas() {
