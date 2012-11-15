@@ -5,10 +5,6 @@
     position: relative;
 }
 
-div.contentBody {
-    padding: 1em 0 0;
-}
-
 .navigation {
     position: absolute;
     bottom: 0;
