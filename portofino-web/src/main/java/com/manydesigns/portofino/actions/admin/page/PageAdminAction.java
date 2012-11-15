@@ -57,14 +57,13 @@ import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
-import com.manydesigns.portofino.dispatcher.ConfigurationWithDefaults;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
 import com.manydesigns.portofino.pageactions.registry.PageActionInfo;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import com.manydesigns.portofino.pages.*;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
-import com.manydesigns.portofino.security.RequiresAdministrator;
+import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.shiro.UsersGroupsDAO;
 import com.manydesigns.portofino.stripes.ForbiddenAccessResolution;
@@ -233,6 +232,7 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     @Button(list = "page-create", key = "commons.create", order = 1)
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution createPage() {
         try {
             return doCreateNewPage();
@@ -729,6 +729,7 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     @Button(list = "page-children-edit", key = "commons.update", order = 1)
+    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updatePageChildren() {
         setupChildPages();
         String[] order = context.getRequest().getParameterValues("childrenTable_0");
@@ -851,7 +852,7 @@ public class PageAdminAction extends AbstractPageAction {
     protected AccessLevel testedAccessLevel;
     protected Set<String> testedPermissions;
 
-    @RequiresAdministrator //Altrimenti un utente può cambiare i propri permessi
+    @RequiresPermissions(level = AccessLevel.DEVELOP) //Altrimenti un utente può cambiare i propri permessi
     public Resolution pagePermissions() {
         setupGroups();
 
@@ -868,7 +869,7 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     @Button(list = "testUserPermissions", key = "user.permissions.test")
-    @RequiresAdministrator
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution testUserPermissions() {
         testUserId = StringUtils.defaultIfEmpty(testUserId, null);
         PrincipalCollection principalCollection;
@@ -946,8 +947,8 @@ public class PageAdminAction extends AbstractPageAction {
         }
     }
 
-    @RequiresAdministrator
     @Button(list = "page-permissions-edit", key = "commons.update", order = 1)
+    @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updatePagePermissions() {
         try {
             updatePagePermissions(getPageInstance());
