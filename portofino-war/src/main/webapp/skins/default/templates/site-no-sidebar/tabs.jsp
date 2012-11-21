@@ -66,17 +66,15 @@
                 <stripes:form action="/actions/admin/page" method="post" id="pageAdminForm">
                     <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
                     <!-- Admin buttons -->
-                    <% if(SecurityLogic.isAdministrator(request)) { %>
-                        <div class="contentBarButtons">
-                            <portofino:page-layout-button />
-                            <portofino:page-children-button />
-                            <portofino:page-permissions-button />
-                            <portofino:page-copy-button />
-                            <portofino:page-new-button />
-                            <portofino:page-delete-button />
-                            <portofino:page-move-button />
-                        </div>
-                    <% } %>
+                    <div class="contentBarButtons">
+                        <portofino:page-layout-button />
+                        <portofino:page-children-button />
+                        <portofino:page-permissions-button />
+                        <portofino:page-copy-button />
+                        <portofino:page-new-button />
+                        <portofino:page-delete-button />
+                        <portofino:page-move-button />
+                    </div>
                 </stripes:form><%
             }
         }
