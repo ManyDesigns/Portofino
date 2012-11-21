@@ -459,6 +459,7 @@ public class TextAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution uploadAttachmentFromCKEditor() {
         try {
+            uploadDownloadable = false;
             commonUploadAttachment();
             message = null;
         } catch (IOException e) {
