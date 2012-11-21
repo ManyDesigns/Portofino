@@ -84,6 +84,7 @@ public class AppUrlFilter implements Filter {
                         httpRequest.getRequestURI().substring(appPathPrefix.length());
                 RequestDispatcher requestDispatcher = request.getRequestDispatcher(internalPath);
                 requestDispatcher.forward(request, response);
+                return;
             }
         }
         chain.doFilter(request, response);
