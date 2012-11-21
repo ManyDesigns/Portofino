@@ -49,19 +49,7 @@
                         continue;
                     }
                     if(table.getDatabaseName().equals(lastDatabase)) {
-                        if(table.getSchemaName().equals(lastSchema)) {
-                            String tableDescr = table.getTableName();
-                            if(!table.getActualEntityName().equals(table.getTableName())) {
-                                tableDescr += " (" + table.getActualEntityName() + ")";
-                            }
-                            %>
-                            <tr id="<%= "node-" + lastDatabase + "---" + lastSchema + "---" + table.getTableName() %>"
-                                class="child-of-node-<%= lastDatabase + "---" + lastSchema %>">
-                                <td></td>
-                                <td><a href="tables/<%= lastDatabase %>/<%= lastSchema %>/<%= table.getTableName() %>"
-                                        ><%= tableDescr %></a></td>
-                            </tr><%
-                        } else {
+                        if(!table.getSchemaName().equals(lastSchema)) {
                             lastSchema = table.getSchemaName(); %>
                             <tr id="<%= "node-" + lastDatabase + "---" + lastSchema %>"
                                 class="child-of-node-<%= lastDatabase %>">
@@ -90,6 +78,17 @@
                         </tr>
                         <%
                     }
+                    String tableDescr = table.getTableName();
+                    if(!table.getActualEntityName().equals(table.getTableName())) {
+                        tableDescr += " (" + table.getActualEntityName() + ")";
+                    }
+                    %>
+                    <tr id="<%= "node-" + lastDatabase + "---" + lastSchema + "---" + table.getTableName() %>"
+                        class="child-of-node-<%= lastDatabase + "---" + lastSchema %>">
+                        <td></td>
+                        <td><a href="tables/<%= lastDatabase %>/<%= lastSchema %>/<%= table.getTableName() %>"
+                                ><%= tableDescr %></a></td>
+                    </tr><%
                 } %>
         </table>
     </stripes:layout-component>
