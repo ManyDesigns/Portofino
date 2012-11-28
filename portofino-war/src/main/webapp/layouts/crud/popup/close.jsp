@@ -2,7 +2,7 @@
 <html>
 <head></head>
 <body>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.CrudAction"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"/>
 <script type="text/javascript">
     window.opener.${actionBean.popupCloseCallback};
     window.self.close();

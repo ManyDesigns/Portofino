@@ -6,7 +6,7 @@
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/skins/${skin}/portlet.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.CrudAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.Abs"/>
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.readTitle}"/>
     </stripes:layout-component>
