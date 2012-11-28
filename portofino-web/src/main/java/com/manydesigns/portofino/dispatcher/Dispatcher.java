@@ -40,12 +40,14 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * Factory object that can produce {@link Dispatch} instances given the requested path.
+ *
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public class Dispatcher {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
@@ -60,6 +62,12 @@ public class Dispatcher {
         this.application = application;
     }
 
+    /**
+     * Returns a dispatch for the provided path.
+     * @param contextPath context path of the web application (as returned by request.getContextPath()).
+     * @param path the path to resolve, not including the context path.
+     * @return the dispatch. If no dispatch can be constructed, this method returns null.
+     */
     public Dispatch getDispatch(String contextPath, String path) {
         if(path.endsWith(".jsp")) {
             logger.debug("Path is a JSP page ({}), not dispatching.", path);

@@ -59,6 +59,8 @@ import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * A collection of methods that operate on {@link Dispatch} instances and related objects.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -154,10 +156,23 @@ public class DispatcherLogic {
         }
     }
 
+    /**
+     * Persists a page to the file system.
+     * @param pageInstance the live PageInstance containing the Page to save. 
+     * @return the file where the page was saved.
+     * @throws Exception in case the save fails.
+     */
     public static File savePage(PageInstance pageInstance) throws Exception {
         return savePage(pageInstance.getDirectory(), pageInstance.getPage());
     }
 
+    /**
+     * Persists a page to the file system.
+     * @param directory the directory where to save the page.xml file.
+     * @param page the page to save.
+     * @return the file where the page was saved.
+     * @throws Exception in case the save fails.
+     */
     public static File savePage(File directory, Page page) throws Exception {
         File pageFile = getPageFile(directory);
         Marshaller marshaller = pagesJaxbContext.createMarshaller();
@@ -206,7 +221,7 @@ public class DispatcherLogic {
 
     //NB il reload delle cache è _asincrono_ rispetto alla get, è quindi possibile che una get ritorni
     //un valore vecchio anche nel caso in cui sia appena stato rilevato un errore nel reload (es. ho scritto
-    //caratteri invalidi prima all'inizio dell'xml).
+    //caratteri invalidi all'inizio dell'xml).
 
     protected static LoadingCache<File, FileCacheEntry<Page>> pageCache;
 
