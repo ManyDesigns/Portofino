@@ -30,7 +30,6 @@
 package com.manydesigns.portofino.database;
 
 import org.apache.commons.dbutils.DbUtils;
-import org.hibernate.type.NumericBooleanType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,8 +47,6 @@ public class DbUtil {
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
     public final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
-
-    public static final NumericBooleanType NUMERIC_BOOLEAN = new NumericBooleanType();
 
     public static void closeResultSetAndStatement(ResultSet rs) {
         try {
