@@ -27,7 +27,7 @@
             <script type="text/javascript">
                 $(function() {
                     $(".onePkContainer select").change(function() {
-                        $(this).attr("form").submit();
+                        $(this).prop("form").submit();
                     });
                 });
             </script>

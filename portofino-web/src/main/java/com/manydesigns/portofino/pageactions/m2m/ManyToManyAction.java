@@ -338,6 +338,7 @@ public class ManyToManyAction extends AbstractPageAction {
         SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
         if(oneSelectField != null) {
             session.beginTransaction();
+            session.clear();
             loadAssociations();
             return view();
         } else {
