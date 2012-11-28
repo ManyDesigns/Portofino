@@ -30,6 +30,8 @@
 package com.manydesigns.portofino;
 
 /**
+ * Keys for attributes in session scope
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
