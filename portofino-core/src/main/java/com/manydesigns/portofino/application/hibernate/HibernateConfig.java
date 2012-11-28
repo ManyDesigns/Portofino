@@ -32,7 +32,6 @@ package com.manydesigns.portofino.application.hibernate;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.StringBooleanType;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.ForeignKey;
@@ -868,8 +867,9 @@ configuration.setProperty("hibernate.cache.use_query_cache",
         } else if (javaType == Boolean.class) {
             if(jdbcType == Types.BIT || jdbcType == Types.BOOLEAN) {
                 typeName = BooleanType.INSTANCE.getName();
-            } else if(jdbcType == Types.NUMERIC || jdbcType == Types.DECIMAL || jdbcType == Types.INTEGER) {
-                typeName = DbUtil.NUMERIC_BOOLEAN.getName();
+            } else if(jdbcType == Types.NUMERIC || jdbcType == Types.DECIMAL || jdbcType == Types.INTEGER ||
+                      jdbcType == Types.SMALLINT || jdbcType == Types.TINYINT || jdbcType == Types.BIGINT) {
+                typeName = NumericBooleanType.INSTANCE.getName();
             } else if(jdbcType == Types.CHAR || jdbcType == Types.VARCHAR) {
                 typeName = StringBooleanType.class.getName();
                 typeParams = new Properties();
