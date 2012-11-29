@@ -239,14 +239,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public abstract void loadObjects();
 
     /**
-     * Creates a fresh object to populate the create form.
-     * @return the instance
-     */
-    protected T createNewObject() {
-        return (T) classAccessor.newInstance();
-    }
-
-    /**
      * Loads an object by its identifier and returns it. The object must satisfy the current search criteria.
      * @param pkObject the object used as an identifier; the actual implementation is regulated by subclasses.
      * The only constraint is that it is serializable.
@@ -424,7 +416,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     public Resolution create() {
         setupForm(Mode.CREATE);
-        object = createNewObject();
+        object = (T) classAccessor.newInstance();
         createSetup(object);
         form.readFromObject(object);
 
@@ -435,7 +427,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     public Resolution save() {
         setupForm(Mode.CREATE);
-        object = createNewObject();
+        object = (T) classAccessor.newInstance();
         createSetup(object);
         form.readFromObject(object);
 

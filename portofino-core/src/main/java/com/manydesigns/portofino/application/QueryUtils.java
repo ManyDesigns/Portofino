@@ -502,10 +502,6 @@ public class QueryUtils {
                     new net.sf.jsqlparser.schema.Column(
                             new net.sf.jsqlparser.schema.Table(), propertyName));
             orderByElements.add(orderByElement);
-            List previousOrderBy = parsedQueryString.getOrderByElements();
-            if(previousOrderBy != null) {
-                orderByElements.addAll(previousOrderBy);
-            }
             parsedQueryString.setOrderByElements(orderByElements);
         }
         String fullQueryString = parsedQueryString.toString();
