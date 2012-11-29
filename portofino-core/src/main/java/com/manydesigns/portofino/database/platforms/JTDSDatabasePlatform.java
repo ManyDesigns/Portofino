@@ -42,7 +42,7 @@ public class JTDSDatabasePlatform extends AbstractDatabasePlatform {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    public final static String DESCRIPTION = "Microsoft SQL Server (jTDS driver)";
+    public final static String DESCRIPTION = "Microsoft SQL Server (jTDS driver - Java 6+)";
     public final static String STANDARD_DRIVER_CLASS_NAME =
             "net.sourceforge.jtds.jdbc.Driver";
 
@@ -51,7 +51,7 @@ public class JTDSDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public JTDSDatabasePlatform() {
-        super(new SQLServerDialect(), "jdbc:jtds:sqlserver://<server>[:<port>][/<database>]");
+        super(new SQLServerDialect(), "jdbc:jtds:sqlserver://<server>[:<port>][/<database>][;instance=<instance>]");
     }
 
     //**************************************************************************
@@ -66,10 +66,25 @@ public class JTDSDatabasePlatform extends AbstractDatabasePlatform {
         return STANDARD_DRIVER_CLASS_NAME;
     }
 
+    public void test() {
+	super.test();
+	if(status == STATUS_OK) {
+	    checkJdbc4();
+	}
+    }
+
+    protected void checkJdbc4() {
+	try {
+	    Class.forName("java.sql.NClob");
+	} catch(ClassNotFoundException e) {
+	    status = STATUS_DRIVER_ERROR;
+	}
+    }
+
     public boolean isApplicable(ConnectionProvider connectionProvider) {
         return connectionProvider
                 .getDatabaseProductName()
                 .startsWith("Microsoft SQL Server") &&
-               STANDARD_DRIVER_CLASS_NAME.equals(connectionProvider.getDriverName());
+	       connectionProvider.getDriverName().contains("jTDS");
     }
 }

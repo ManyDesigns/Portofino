@@ -70,6 +70,6 @@ public class MSSqlServerDatabasePlatform extends AbstractDatabasePlatform {
         return connectionProvider
                 .getDatabaseProductName()
                 .startsWith("Microsoft SQL Server") &&
-               STANDARD_DRIVER_CLASS_NAME.equals(connectionProvider.getDriverName());
+	       !connectionProvider.getDriverName().contains("jTDS");
     }
 }

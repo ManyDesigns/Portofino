@@ -50,13 +50,14 @@ public interface DatabasePlatform {
     final static String STATUS_CREATED = "created";
     final static String STATUS_OK = "ok";
     final static String STATUS_DRIVER_NOT_FOUND = "driver not found";
+    final static String STATUS_DRIVER_ERROR = "driver error";
 
     String getDescription();
     String getStandardDriverClassName();
     Dialect getHibernateDialect();
     String getConnectionStringTemplate();
 
-    @Status(red={}, amber={STATUS_CREATED, STATUS_DRIVER_NOT_FOUND}, green={STATUS_OK})
+    @Status(red={STATUS_DRIVER_ERROR}, amber={STATUS_CREATED, STATUS_DRIVER_NOT_FOUND}, green={STATUS_OK})
     String getStatus();
 
     void test();
