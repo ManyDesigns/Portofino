@@ -134,6 +134,8 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
     public TableForm rootsForm;
     protected List<SelectableRoot> selectableRoots = new ArrayList<SelectableRoot>();
 
+    protected String generationStrategy = "AUTO";
+
     //Users
     protected String userTableName;
     protected String groupTableName;
@@ -839,31 +841,36 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         model.getDatabases().add(database);
         connectionProvider.setDatabase(database);
         application.initModel();
-        try {
-            TemplateEngine engine = new SimpleTemplateEngine();
-            Template template = engine.createTemplate(ApplicationWizard.class.getResource("CrudPage.groovy"));
-            List<ChildPage> childPages = new ArrayList<ChildPage>();
-            for(Table table : roots) {
-                File dir = new File(application.getPagesDir(), table.getActualEntityName());
-                depth = 1;
-                createCrudPage(dir, table, childPages, template);
-            }
-            if(userTable != null) {
-                setupUsers(childPages, template);
-            }
-            setupCalendar(childPages);
-            Page rootPage = DispatcherLogic.getPage(application.getPagesDir());
-            Collections.sort(childPages, new Comparator<ChildPage>() {
-                public int compare(ChildPage o1, ChildPage o2) {
-                    return o1.getName().compareToIgnoreCase(o2.getName());
+        if(!generationStrategy.equals("NO")) {
+            try {
+                TemplateEngine engine = new SimpleTemplateEngine();
+                Template template = engine.createTemplate(ApplicationWizard.class.getResource("CrudPage.groovy"));
+                List<ChildPage> childPages = new ArrayList<ChildPage>();
+                for(Table table : roots) {
+                    File dir = new File(application.getPagesDir(), table.getActualEntityName());
+                    depth = 1;
+                    createCrudPage(dir, table, childPages, template);
                 }
-            });
-            rootPage.getLayout().getChildPages().addAll(childPages);
-            DispatcherLogic.savePage(application.getPagesDir(), rootPage);
-        } catch (Exception e) {
-            logger.error("Error while creating pages", e);
-            SessionMessages.addErrorMessage(getMessage("appwizard.error.createPagesFailed", e));
-            return buildAppForm();
+                if(userTable != null) {
+                    setupUserPages(childPages, template);
+                }
+                setupCalendar(childPages);
+                Page rootPage = DispatcherLogic.getPage(application.getPagesDir());
+                Collections.sort(childPages, new Comparator<ChildPage>() {
+                    public int compare(ChildPage o1, ChildPage o2) {
+                        return o1.getName().compareToIgnoreCase(o2.getName());
+                    }
+                });
+                rootPage.getLayout().getChildPages().addAll(childPages);
+                DispatcherLogic.savePage(application.getPagesDir(), rootPage);
+            } catch (Exception e) {
+                logger.error("Error while creating pages", e);
+                SessionMessages.addErrorMessage(getMessage("appwizard.error.createPagesFailed", e));
+                return buildAppForm();
+            }
+        }
+        if(userTable != null) {
+            setupUsers();
         }
         try {
             application.initModel();
@@ -977,7 +984,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         }
     }
 
-    protected void setupUsers(List<ChildPage> childPages, Template template) throws Exception {
+    protected void setupUserPages(List<ChildPage> childPages, Template template) throws Exception {
         if(!roots.contains(userTable)) {
             File dir = new File(application.getPagesDir(), userTable.getActualEntityName());
             depth = 1;
@@ -1030,6 +1037,9 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
                 }
             }
         }
+    }
+
+    protected void setupUsers() {
         try {
             TemplateEngine engine = new SimpleTemplateEngine();
             Template secTemplate = engine.createTemplate(ApplicationWizard.class.getResource("security.groovy"));
@@ -1585,6 +1595,14 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
 
     public void setEncryptionAlgorithm(String encryptionAlgorithm) {
         this.encryptionAlgorithm = encryptionAlgorithm;
+    }
+
+    public String getGenerationStrategy() {
+        return generationStrategy;
+    }
+
+    public void setGenerationStrategy(String generationStrategy) {
+        this.generationStrategy = generationStrategy;
     }
 
     //Wizard implementation

@@ -20,9 +20,10 @@
         <mde:sessionMessages />
         <%= actionBean.getMessage("appwizard.finish.text") %>
         <div style="display: none;">
+            <input type="hidden" name="generationStrategy" value="${actionBean.generationStrategy}" />
+            <mde:write name="actionBean" property="rootsForm"/>
             <mde:write name="actionBean" property="userManagementSetupForm"/>
             <mde:write name="actionBean" property="userAndGroupTablesForm"/>
-            <mde:write name="actionBean" property="rootsForm"/>
             <mde:write name="actionBean" property="schemasForm"/>
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
             <mde:write name="actionBean" property="connectionProviderField" />

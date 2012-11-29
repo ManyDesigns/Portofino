@@ -17,7 +17,24 @@
         <fmt:message key="appwizard.step4.title" />
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
+        <style type="text/css">
+            ul li {
+                list-style-type: none;
+            }
+        </style>
         <mde:sessionMessages />
+        <p><fmt:message key="appwizard.createPages.selectStrategy" /></p>
+        <ul>
+            <li><input type="radio" name="generationStrategy" value="NO" id="generationStrategy_no"
+                       ${actionBean.generationStrategy eq 'NO' ? 'checked="checked"' : ''} />
+                <label for="generationStrategy_no"><fmt:message key="appwizard.createPages.strategy.no" /></label></li>
+            <li><input type="radio" name="generationStrategy" value="AUTO" id="generationStrategy_auto"
+                       ${actionBean.generationStrategy eq 'AUTO' ? 'checked="checked"' : ''} />
+                <label for="generationStrategy_auto"><fmt:message key="appwizard.createPages.strategy.auto" /></label></li>
+            <li><input type="radio" name="generationStrategy" value="MANUAL" id="generationStrategy_manual"
+                       ${actionBean.generationStrategy eq 'MANUAL' ? 'checked="checked"' : ''} />
+                <label for="generationStrategy_manual"><fmt:message key="appwizard.createPages.strategy.manual" /></label></li>
+        </ul>
         <div id="rootsFormContainer">
             <h3><fmt:message key="appwizard.roots.select" /></h3>
             <mde:write name="actionBean" property="rootsForm"/>
@@ -34,6 +51,14 @@
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
         <script type="text/javascript">
+            function toggleRootsForm() {
+                if($("#generationStrategy_manual").prop("checked")) {
+                    $("#rootsFormContainer").show();
+                } else {
+                    $("#rootsFormContainer").hide();
+                }
+            }
+
             $(function() {
                 var buttons = $(".contentFooter button");
                 buttons.click(function() {
@@ -43,6 +68,8 @@
                         return false;
                     });
                 });
+                toggleRootsForm();
+                $("input[name=generationStrategy]").change(toggleRootsForm);
             });
         </script>
         <portofino:buttons list="select-tables" cssClass="contentButton" />
