@@ -32,6 +32,7 @@ package com.manydesigns.elements.forms;
 import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.fields.search.SearchField;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.jetbrains.annotations.NotNull;
 
@@ -73,5 +74,17 @@ public class SearchForm extends AbstractCompositeElement<SearchField> {
             current.configureCriteria(criteria);
         }
     }
+
+    public SearchField findSearchFieldByPropertyName(String propertyName) {
+        for(SearchField current : this) {
+            PropertyAccessor accessor = current.getPropertyAccessor();
+            if (accessor.getName().equals(propertyName)) {
+                return current;
+            }
+        }
+        return null;
+    }
+
+
 
 }

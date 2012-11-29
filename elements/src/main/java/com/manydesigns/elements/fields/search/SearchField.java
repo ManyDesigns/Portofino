@@ -30,6 +30,7 @@
 package com.manydesigns.elements.fields.search;
 
 import com.manydesigns.elements.Element;
+import com.manydesigns.elements.reflection.PropertyAccessor;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -41,6 +42,7 @@ public interface SearchField extends Element {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
+    PropertyAccessor getPropertyAccessor();
     void toSearchString(StringBuilder sb);
     void configureCriteria(Criteria criteria);
 }

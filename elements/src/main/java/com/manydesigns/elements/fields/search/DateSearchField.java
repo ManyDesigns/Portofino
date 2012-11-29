@@ -58,11 +58,11 @@ public class DateSearchField extends RangeSearchField {
     // Fields
     //**************************************************************************
 
-    protected final String datePattern;
-    protected final DateTimeFormatter dateTimeFormatter;
-    protected final boolean containsTime;
-    protected final String jsDatePattern;
-    protected final int maxLength;
+    protected String datePattern;
+    protected DateTimeFormatter dateTimeFormatter;
+    protected boolean containsTime;
+    protected String jsDatePattern;
+    protected int maxLength;
 
 
     //**************************************************************************
@@ -155,4 +155,48 @@ public class DateSearchField extends RangeSearchField {
                 || NULL_VALUE.equals(maxStringValue));
     }
 
+    //**************************************************************************
+    // Getters/setters
+    //**************************************************************************
+
+
+    public String getDatePattern() {
+        return datePattern;
+    }
+
+    public void setDatePattern(String datePattern) {
+        this.datePattern = datePattern;
+    }
+
+    public DateTimeFormatter getDateTimeFormatter() {
+        return dateTimeFormatter;
+    }
+
+    public void setDateTimeFormatter(DateTimeFormatter dateTimeFormatter) {
+        this.dateTimeFormatter = dateTimeFormatter;
+    }
+
+    public boolean isContainsTime() {
+        return containsTime;
+    }
+
+    public void setContainsTime(boolean containsTime) {
+        this.containsTime = containsTime;
+    }
+
+    public String getJsDatePattern() {
+        return jsDatePattern;
+    }
+
+    public void setJsDatePattern(String jsDatePattern) {
+        this.jsDatePattern = jsDatePattern;
+    }
+
+    public int getMaxLength() {
+        return maxLength;
+    }
+
+    public void setMaxLength(int maxLength) {
+        this.maxLength = maxLength;
+    }
 }

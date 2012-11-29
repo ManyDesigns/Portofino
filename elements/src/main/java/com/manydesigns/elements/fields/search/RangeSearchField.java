@@ -160,4 +160,81 @@ public class RangeSearchField extends AbstractSearchField {
             criteria.le(accessor, maxValue);
         }
     }
+    
+    //**************************************************************************
+    // Getters/setters
+    //**************************************************************************
+
+
+    public String getMinId() {
+        return minId;
+    }
+
+    public void setMinId(String minId) {
+        this.minId = minId;
+    }
+
+    public String getMinInputName() {
+        return minInputName;
+    }
+
+    public void setMinInputName(String minInputName) {
+        this.minInputName = minInputName;
+    }
+
+    public String getMinStringValue() {
+        return minStringValue;
+    }
+
+    public void setMinStringValue(String minStringValue) {
+        this.minStringValue = minStringValue;
+    }
+
+    public Object getMinValue() {
+        return minValue;
+    }
+
+    public void setMinValue(Object minValue) {
+        this.minValue = minValue;
+    }
+
+    public String getMaxId() {
+        return maxId;
+    }
+
+    public void setMaxId(String maxId) {
+        this.maxId = maxId;
+    }
+
+    public String getMaxInputName() {
+        return maxInputName;
+    }
+
+    public void setMaxInputName(String maxInputName) {
+        this.maxInputName = maxInputName;
+    }
+
+    public String getMaxStringValue() {
+        return maxStringValue;
+    }
+
+    public void setMaxStringValue(String maxStringValue) {
+        this.maxStringValue = maxStringValue;
+    }
+
+    public Object getMaxValue() {
+        return maxValue;
+    }
+
+    public void setMaxValue(Object maxValue) {
+        this.maxValue = maxValue;
+    }
+
+    public boolean isSearchNullValue() {
+        return searchNullValue;
+    }
+
+    public void setSearchNullValue(boolean searchNullValue) {
+        this.searchNullValue = searchNullValue;
+    }
 }

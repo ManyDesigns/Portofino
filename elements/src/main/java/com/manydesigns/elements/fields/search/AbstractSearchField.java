@@ -115,7 +115,7 @@ public abstract class AbstractSearchField implements SearchField {
     // Getters/setters
     //**************************************************************************
 
-    public PropertyAccessor getAccessor() {
+    public PropertyAccessor getPropertyAccessor() {
         return accessor;
     }
 
