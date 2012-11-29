@@ -51,7 +51,6 @@
             <mde:write name="actionBean" property="jdbcCPForm"/>
         </div>
 
-        <mde:write name="actionBean" property="advancedOptionsForm" />
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
         <script type="text/javascript">
@@ -72,7 +71,7 @@
                 buttons.click(function() {
                     buttons.unbind("click");
                     buttons.click(function() {
-                        alert("Please wait for the operation to complete");
+                        alert('<fmt:message key="commons.waitOperation" />');
                         return false;
                     });
                 });

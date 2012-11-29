@@ -8,38 +8,29 @@
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="appwizard.step3.title" />
+        <fmt:message key="appwizard.step4.title" />
     </stripes:layout-component>
     <stripes:layout-component name="contentHeaderContainer">
         <jsp:include page="/skins/default/wizard-content-header.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        <fmt:message key="appwizard.step3.title" />
+        <fmt:message key="appwizard.step4.title" />
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
-        <mde:write name="actionBean" property="userAndGroupTablesForm"/>
-        <div id="advancedOptionsFormContainer">
-            <mde:write name="actionBean" property="advancedOptionsForm" />
-        </div>
-        <div id="rootsFormContainer" style="display: ${actionBean.advanced ? 'visible' : 'none'}">
+        <div id="rootsFormContainer">
             <h3><fmt:message key="appwizard.roots.select" /></h3>
             <mde:write name="actionBean" property="rootsForm"/>
         </div>
         <div style="display: none;">
+            <mde:write name="actionBean" property="userManagementSetupForm"/>
+            <mde:write name="actionBean" property="userAndGroupTablesForm"/>
             <mde:write name="actionBean" property="schemasForm"/>
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
             <mde:write name="actionBean" property="connectionProviderField" />
             <mde:write name="actionBean" property="jndiCPForm"/>
             <mde:write name="actionBean" property="jdbcCPForm"/>
         </div>
-        <script type="text/javascript">
-            $(function() {
-               $("#advancedOptionsFormContainer input").change(function () {
-                   $("#rootsFormContainer").toggle();
-               });
-            });
-        </script>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
         <script type="text/javascript">
@@ -48,7 +39,7 @@
                 buttons.click(function() {
                     buttons.unbind("click");
                     buttons.click(function() {
-                        alert("Please wait for the operation to complete");
+                        alert('<fmt:message key="commons.waitOperation" />');
                         return false;
                     });
                 });

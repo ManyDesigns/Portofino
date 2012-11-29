@@ -18,11 +18,10 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
+        <p><fmt:message key="appwizard.userManagement.warning" /></p>
         <mde:write name="actionBean" property="userManagementSetupForm"/>
-        <mde:write name="actionBean" property="advancedOptionsForm" />
         <div style="display: none;">
             <mde:write name="actionBean" property="userAndGroupTablesForm"/>
-            <mde:write name="actionBean" property="rootsForm"/>
             <mde:write name="actionBean" property="schemasForm"/>
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
             <mde:write name="actionBean" property="connectionProviderField" />
@@ -37,7 +36,7 @@
                 buttons.click(function() {
                     buttons.unbind("click");
                     buttons.click(function() {
-                        alert("Please wait for the operation to complete");
+                        alert('<fmt:message key="commons.waitOperation" />');
                         return false;
                     });
                 });

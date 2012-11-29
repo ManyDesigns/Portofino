@@ -104,6 +104,17 @@ public class DispatcherTest extends TestCase {
         assertEquals(2, pageInstancePath.length);
     }
 
+    public void testArguments() throws Exception {
+        application.addPage("/", "projects", CrudAction.class);
+        String originalPath = "/projects/A%2FB";
+        MutableHttpServletRequest req = new MutableHttpServletRequest();
+        req.setRequestURI(originalPath);
+        Dispatch dispatch = new Dispatcher(application).getDispatch("", originalPath);
+        assertNotNull(dispatch);
+        assertEquals(1, dispatch.getLastPageInstance().getParameters().size());
+        assertEquals("A%2FB", dispatch.getLastPageInstance().getParameters().get(0));
+    }
+
 }
 //public class DispatcherTest extends AbstractPortofinoTest {
 //

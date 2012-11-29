@@ -8,13 +8,13 @@
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
-        <%= actionBean.getMessage("appwizard.step4.title") %>
+        <%= actionBean.getMessage("appwizard.step5.title") %>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeaderContainer">
         <jsp:include page="/skins/default/wizard-content-header.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        <%= actionBean.getMessage("appwizard.step4.title") %>
+        <%= actionBean.getMessage("appwizard.step5.title") %>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
@@ -26,7 +26,6 @@
             <mde:write name="actionBean" property="schemasForm"/>
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
             <mde:write name="actionBean" property="connectionProviderField" />
-            <mde:write name="actionBean" property="advancedOptionsForm" />
             <mde:write name="actionBean" property="jndiCPForm"/>
             <mde:write name="actionBean" property="jdbcCPForm"/>
         </div>
@@ -38,7 +37,7 @@
                 buttons.click(function() {
                     buttons.unbind("click");
                     buttons.click(function() {
-                        alert("Please wait for the operation to complete");
+                        alert('<fmt:message key="commons.waitOperation" />');
                         return false;
                     });
                 });

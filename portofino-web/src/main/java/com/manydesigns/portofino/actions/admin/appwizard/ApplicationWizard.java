@@ -33,7 +33,6 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Password;
-import com.manydesigns.elements.fields.BooleanField;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.TextField;
@@ -52,10 +51,8 @@ import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderForm;
 import com.manydesigns.portofino.actions.forms.SelectableSchema;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
-import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
@@ -131,8 +128,6 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
     protected String connectionProviderName;
     protected ConnectionProvider connectionProvider;
     protected Database database;
-    protected boolean advanced;
-    protected Form advancedOptionsForm;
 
     public TableForm schemasForm;
     protected List<SelectableSchema> selectableSchemas;
@@ -187,21 +182,6 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
 
     @Before
     public void prepare() {
-        ClassAccessor selfAccessor = JavaClassAccessor.getClassAccessor(ApplicationWizard.class);
-        PropertyAccessor propertyAccessor;
-        try {
-            propertyAccessor = selfAccessor.getProperty("advanced");
-        } catch (NoSuchFieldException e) {
-            throw new Error(e);
-        }
-        Field advancedOptionsField = new BooleanField(propertyAccessor, Mode.EDIT, "advanced_");
-        advancedOptionsForm = new Form(Mode.EDIT);
-        FieldSet fieldSet = new FieldSet(null, 1, Mode.EDIT);
-        fieldSet.add(advancedOptionsField);
-        advancedOptionsForm.add(fieldSet);
-        advancedOptionsForm.readFromObject(this);
-        advancedOptionsForm.readFromRequest(context.getRequest());
-        advancedOptionsForm.writeToObject(this);
         connectionProviderName = context.getRequest().getParameter("connectionProviderName");
     }
 
@@ -263,7 +243,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
 
     @Buttons({
         @Button(list = "connection-provider", key="wizard.next", order = 2),
-        @Button(list = "select-tables", key="wizard.prev", order = 1)
+        @Button(list = "user-management", key="wizard.prev", order = 1)
     })
     public Resolution configureConnectionProvider() {
         buildCPForms();
@@ -335,9 +315,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             selectableSchemas.add(schema);
         }
         schemasForm = new TableFormBuilder(SelectableSchema.class)
-                .configFields(
-                        "selected", "schemaName"
-                )
+                .configFields("selected", "schemaName")
                 .configMode(Mode.EDIT)
                 .configNRows(selectableSchemas.size())
                 .configPrefix("schemas_")
@@ -370,6 +348,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         return selectSchemasForm();
     }
 
+    /*
     @Guard(test = "isNewConnectionProvider()", type = GuardType.VISIBLE)
     @Button(list = "select-schemas", key="wizard.finish", order = 3)
     public Resolution selectSchemasAndFinish() {
@@ -410,7 +389,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             }
         }
         return selectSchemasForm();
-    }
+    }*/
 
     protected boolean isAtLeastOneSchemaSelected() {
         boolean atLeastOneSelected = false;
@@ -459,7 +438,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         Database targetDatabase;
         DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
         try {
-            targetDatabase = dbSyncer.syncDatabase(refModel);
+            targetDatabase = dbSyncer.syncDatabase(refModel); //TODO bisognerebbe fare il sync solo degli schemi selezionati
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             SessionMessages.addErrorMessage(getMessage("appwizard.error.sync", e));
@@ -544,106 +523,18 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             throw new Error(e);
         }
 
-        return selectTablesForm();
+        return userManagementForm();
     }
 
-    protected Resolution selectTablesForm() {
+    protected Resolution userManagementForm() {
         step = 2;
-        return new ForwardResolution("/layouts/admin/appwizard/select-tables.jsp");
+        return new ForwardResolution("/layouts/admin/appwizard/user-management.jsp");
     }
 
-    protected List<Table> determineRoots(MultiMap children, List<Table> allTables) {
-        List<Table> roots = new ArrayList<Table>();
-        for(SelectableSchema selectableSchema : selectableSchemas) {
-            if(selectableSchema.selected) {
-                Schema schema = DatabaseLogic.findSchemaByName(database, selectableSchema.schemaName);
-                roots.addAll(schema.getTables());
-            }
-        }
-        for(Iterator<Table> it = roots.iterator(); it.hasNext();) {
-            Table table = it.next();
-
-            if(table.getPrimaryKey() == null) {
-                it.remove();
-                continue;
-            }
-
-            allTables.add(table);
-
-            boolean removed = false; //Did we already remove the table from the list of roots?
-            boolean selected = false; //Is the table selected as a root? Note that selected => known
-            boolean known = false; //Is the table in the list of selectable roots?
-
-            for(SelectableRoot root : selectableRoots) {
-                if(root.tableName.equals(table.getSchemaName() + "." + table.getTableName())) {
-                    selected = root.selected;
-                    known = true;
-                    break;
-                }
-            }
-
-            if(known && !selected) {
-                it.remove();
-                removed = true;
-            }
-
-            if(!table.getForeignKeys().isEmpty()) {
-                for(ForeignKey fk : table.getForeignKeys()) {
-                    for(Reference ref : fk.getReferences()) {
-                        Column column = ref.getActualToColumn();
-                        if(column.getTable() != table) {
-                            children.put(column.getTable(), ref);
-                            //TODO potrebbe essere un ciclo nel grafo...
-                            if(!selected && !removed) {
-                                it.remove();
-                                removed = true;
-                            }
-                        }
-                    }
-                }
-            }
-            if(!table.getSelectionProviders().isEmpty()) {
-                for(ModelSelectionProvider sp : table.getSelectionProviders()) {
-                    for(Reference ref : sp.getReferences()) {
-                        Column column = ref.getActualToColumn();
-                        if(column.getTable() != table) {
-                            children.put(column.getTable(), ref);
-                            //TODO potrebbe essere un ciclo nel grafo...
-                            if(!selected && !removed) {
-                                it.remove();
-                                removed = true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if(!known) {
-                SelectableRoot root =
-                        new SelectableRoot(table.getSchemaName() + "." + table.getTableName(), !removed);
-                selectableRoots.add(root);
-            }
-        }
-        Collections.sort(selectableRoots, new Comparator<SelectableRoot>() {
-            public int compare(SelectableRoot o1, SelectableRoot o2) {
-                return o1.tableName.compareTo(o2.tableName);
-            }
-        });
-        return roots;
-    }
-
-    @Button(list = "select-tables", key="wizard.next", order = 2)
-    public Resolution selectTables() {
+    @Button(list = "user-management", key="wizard.next", order = 2)
+    public Resolution setupUserManagement() {
         selectSchemas();
-
-        rootsForm.readFromRequest(context.getRequest());
-        rootsForm.writeToObject(selectableRoots);
-        //Recalc roots
         afterSelectSchemas();
-
-        if(roots.isEmpty()) {
-            SessionMessages.addWarningMessage(getMessage("appwizard.warning.noRoot"));
-        }
 
         userAndGroupTablesForm.readFromRequest(context.getRequest());
         userAndGroupTablesForm.writeToObject(this);
@@ -666,7 +557,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             createUserManagementSetupForm();
             return selectUserFieldsForm();
         } else {
-            return buildAppForm();
+            return selectTablesForm();
         }
     }
 
@@ -796,17 +687,17 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
 
     @Button(list = "select-user-fields", key="wizard.next", order = 2)
     public Resolution selectUserFields() {
-        selectTables();
+        setupUserManagement();
         if(userTable != null) {
             userManagementSetupForm.readFromRequest(context.getRequest());
             if(userManagementSetupForm.validate()) {
                 userManagementSetupForm.writeToObject(this);
-                return buildAppForm();
+                return selectTablesForm();
             } else {
                 return selectUserFieldsForm();
             }
         } else {
-            return buildAppForm();
+            return selectTablesForm();
         }
     }
 
@@ -815,19 +706,126 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         return new ForwardResolution("/layouts/admin/appwizard/select-user-fields.jsp");
     }
 
-    protected Resolution buildAppForm() {
+    protected Resolution selectTablesForm() {
         step = (userTable == null) ? 3 : 4;
+        return new ForwardResolution("/layouts/admin/appwizard/select-tables.jsp");
+    }
+
+    protected List<Table> determineRoots(MultiMap children, List<Table> allTables) {
+        List<Table> roots = new ArrayList<Table>();
+        for(SelectableSchema selectableSchema : selectableSchemas) {
+            if(selectableSchema.selected) {
+                Schema schema = DatabaseLogic.findSchemaByName(database, selectableSchema.schemaName);
+                roots.addAll(schema.getTables());
+            }
+        }
+        for(Iterator<Table> it = roots.iterator(); it.hasNext();) {
+            Table table = it.next();
+
+            if(table.getPrimaryKey() == null) {
+                it.remove();
+                continue;
+            }
+
+            allTables.add(table);
+
+            boolean removed = false; //Did we already remove the table from the list of roots?
+            boolean selected = false; //Is the table selected as a root? Note that selected => known
+            boolean known = false; //Is the table in the list of selectable roots?
+
+            for(SelectableRoot root : selectableRoots) {
+                if(root.tableName.equals(table.getSchemaName() + "." + table.getTableName())) {
+                    selected = root.selected;
+                    known = true;
+                    break;
+                }
+            }
+
+            if(known && !selected) {
+                it.remove();
+                removed = true;
+            }
+
+            if(!table.getForeignKeys().isEmpty()) {
+                for(ForeignKey fk : table.getForeignKeys()) {
+                    for(Reference ref : fk.getReferences()) {
+                        Column column = ref.getActualToColumn();
+                        if(column.getTable() != table) {
+                            children.put(column.getTable(), ref);
+                            //TODO potrebbe essere un ciclo nel grafo...
+                            if(!selected && !removed) {
+                                it.remove();
+                                removed = true;
+                            }
+                        }
+                    }
+                }
+            }
+            if(!table.getSelectionProviders().isEmpty()) {
+                for(ModelSelectionProvider sp : table.getSelectionProviders()) {
+                    for(Reference ref : sp.getReferences()) {
+                        Column column = ref.getActualToColumn();
+                        if(column.getTable() != table) {
+                            children.put(column.getTable(), ref);
+                            //TODO potrebbe essere un ciclo nel grafo...
+                            if(!selected && !removed) {
+                                it.remove();
+                                removed = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(!known) {
+                SelectableRoot root =
+                        new SelectableRoot(table.getSchemaName() + "." + table.getTableName(), !removed);
+                selectableRoots.add(root);
+            }
+        }
+        Collections.sort(selectableRoots, new Comparator<SelectableRoot>() {
+            public int compare(SelectableRoot o1, SelectableRoot o2) {
+                return o1.tableName.compareTo(o2.tableName);
+            }
+        });
+        return roots;
+    }
+
+    @Button(list = "select-tables", key="wizard.next", order = 2)
+    public Resolution selectTables() {
+        selectUserFields();
+
+        rootsForm.readFromRequest(context.getRequest());
+        rootsForm.writeToObject(selectableRoots);
+        //Recalc roots
+        afterSelectSchemas();
+
+        if(roots.isEmpty()) {
+            SessionMessages.addWarningMessage(getMessage("appwizard.warning.noRoot"));
+        }
+
+        return buildAppForm();
+    }
+
+    @Button(list = "select-tables", key="wizard.prev", order = 1)
+    public Resolution goBackFromSelectTables() {
+        selectUserFields();
+        if(userTable == null) {
+            return userManagementForm();
+        } else {
+            return selectUserFieldsForm();
+        }
+    }
+
+    protected Resolution buildAppForm() {
+        step = (userTable == null) ? 4 : 5;
         return new ForwardResolution("/layouts/admin/appwizard/build-app.jsp");
     }
 
     @Button(list = "build-app", key="wizard.prev", order = 1)
-    public Resolution goBackFromBuildApplication() {
-        selectUserFields();
-        if(userTable == null) {
-            return selectTablesForm();
-        } else {
-            return selectUserFieldsForm();
-        }
+    public Resolution returnToSelectTables() {
+        selectTables();
+        return selectTablesForm();
     }
 
     @Button(list = "build-app", key="wizard.finish", order = 2)
@@ -1580,15 +1578,6 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         this.adminGroupName = adminGroupName;
     }
 
-    @LabelI18N("appwizard.showAdvancedOptions")
-    public boolean isAdvanced() {
-        return advanced;
-    }
-
-    public void setAdvanced(boolean advanced) {
-        this.advanced = advanced;
-    }
-
     @LabelI18N("appwizard.userTable.encryption")
     public String getEncryptionAlgorithm() {
         return encryptionAlgorithm;
@@ -1596,10 +1585,6 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
 
     public void setEncryptionAlgorithm(String encryptionAlgorithm) {
         this.encryptionAlgorithm = encryptionAlgorithm;
-    }
-
-    public Form getAdvancedOptionsForm() {
-        return advancedOptionsForm;
     }
 
     //Wizard implementation
@@ -1614,6 +1599,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             steps.add(new Step(getMessage("appwizard.step3a"), getMessage("appwizard.step3a.title")));
         }
         steps.add(new Step(getMessage("appwizard.step4"), getMessage("appwizard.step4.title")));
+        steps.add(new Step(getMessage("appwizard.step5"), getMessage("appwizard.step5.title")));
         return steps;
     }
 

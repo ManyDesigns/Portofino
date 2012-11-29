@@ -8,19 +8,20 @@
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="appwizard.step2.title" />
+        <fmt:message key="appwizard.step3.title" />
     </stripes:layout-component>
     <stripes:layout-component name="contentHeaderContainer">
         <jsp:include page="/skins/default/wizard-content-header.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
-        <fmt:message key="appwizard.step2.title" />
+        <fmt:message key="appwizard.step3.title" />
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
-        <h2><fmt:message key="appwizard.schemas.found" /></h2>
-        <mde:write name="actionBean" property="schemasForm"/>
+        <p><fmt:message key="appwizard.userManagement.warning" /></p>
+        <mde:write name="actionBean" property="userAndGroupTablesForm"/>
         <div style="display: none;">
+            <mde:write name="actionBean" property="schemasForm"/>
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
             <mde:write name="actionBean" property="connectionProviderField" />
             <mde:write name="actionBean" property="jndiCPForm"/>
@@ -40,6 +41,6 @@
                 });
             });
         </script>
-        <portofino:buttons list="select-schemas" cssClass="contentButton" />
+        <portofino:buttons list="user-management" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>
