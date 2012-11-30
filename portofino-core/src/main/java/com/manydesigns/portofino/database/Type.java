@@ -147,8 +147,8 @@ public class Type {
                 return Boolean.class;
             case Types.CHAR:
             case Types.VARCHAR:
-            case Types.NCHAR:
-            case Types.NVARCHAR:
+            case -15: // Types.NCHAR is on JDBC4/Java6 - we try to stay compatible with JDBC3/Java5
+            case -9:  // Types.NVARCHAR (same)
                 return String.class;
             case Types.DATE:
                 return java.sql.Date.class;
