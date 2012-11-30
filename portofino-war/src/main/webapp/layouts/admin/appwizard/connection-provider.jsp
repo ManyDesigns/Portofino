@@ -77,6 +77,10 @@
                 });
 
                 var toggleNewSPForm = function() {
+                    if(${empty actionBean.application.model.databases}) {
+                        return;
+                    }
+
                     var inputs = $("#jdbcCPForm input, #jdbcCPForm select, #connectionProviderTypeForm input");
                     if("" == $("#connectionProviderName").val()) {
                         inputs.removeAttr("disabled");
