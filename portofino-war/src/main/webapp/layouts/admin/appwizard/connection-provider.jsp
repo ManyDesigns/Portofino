@@ -31,7 +31,7 @@
         <c:if test="${empty actionBean.application.model.databases}">
             <fmt:message key="appwizard.newConnectionProvider" />
         </c:if>
-        <ul>
+        <ul id="connectionProviderTypeForm">
             <li><input id="jdbc_radio" type="radio" value="JDBC"
                        name="connectionProviderType"
                        <%= actionBean.isJdbc() ? "checked='checked'" : "" %>
@@ -71,10 +71,26 @@
                 buttons.click(function() {
                     buttons.unbind("click");
                     buttons.click(function() {
-                        alert('<fmt:message key="commons.waitOperation" />');
+                        alert("<fmt:message key='commons.waitOperation' />");
                         return false;
                     });
                 });
+
+                var toggleNewSPForm = function() {
+                    var inputs = $("#jdbcCPForm input, #jdbcCPForm select, #connectionProviderTypeForm input");
+                    if("" == $("#connectionProviderName").val()) {
+                        inputs.removeAttr("disabled");
+                        inputs.removeAttr("disabled");
+                    } else {
+                        inputs.attr("disabled", "disabled");
+                        inputs.attr("disabled", "disabled");
+                        inputs.attr("disabled", "disabled");
+                    }
+                };
+
+                $("#connectionProviderName").change(toggleNewSPForm);
+
+                toggleNewSPForm();
             });
         </script>
         <portofino:buttons list="connection-provider" cssClass="contentButton" />

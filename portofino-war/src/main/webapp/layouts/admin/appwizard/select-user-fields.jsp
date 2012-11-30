@@ -36,7 +36,7 @@
                 buttons.click(function() {
                     buttons.unbind("click");
                     buttons.click(function() {
-                        alert('<fmt:message key="commons.waitOperation" />');
+                        alert("<fmt:message key='commons.waitOperation' />");
                         return false;
                     });
                 });
