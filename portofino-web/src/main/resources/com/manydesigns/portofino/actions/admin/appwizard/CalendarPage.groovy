@@ -77,7 +77,8 @@ class CalendarPage extends CalendarAction {
         for(cal in calDefs) {
             Calendar calendar = new Calendar(cal[1], cal[0], cal[3])
             calendars.add(calendar)
-            Table table = DatabaseLogic.findTableByQualifiedName(model, cal[1])
+            def qname = DatabaseLogic.splitQualifiedTableName(cal[1]);
+            Table table = DatabaseLogic.findTableByName(model, qname[0], qname[1], qname[2])
             Session session = application.getSession(table.schema.databaseName)
             for(col in cal[2]) {
                 Criteria criteria = session.createCriteria(table.actualEntityName)
