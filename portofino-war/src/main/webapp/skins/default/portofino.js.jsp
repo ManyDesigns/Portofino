@@ -165,7 +165,6 @@ var portofino = {
             filebrowserWindowHeight : windowHeight
         }, config);
 
-        console.log(config);
         $('textarea.mde-form-rich-text').data('mdeRichTextConfig', config);
         portofino._setupRichTextEditors();
     }
