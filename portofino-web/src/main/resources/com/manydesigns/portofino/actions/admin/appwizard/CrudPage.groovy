@@ -1,11 +1,24 @@
-package com.manydesigns.portofino.actions.admin.appwizard
+import javax.servlet.*
 
-import com.manydesigns.portofino.pageactions.crud.CrudAction
-import com.manydesigns.portofino.security.AccessLevel
-import com.manydesigns.portofino.security.RequiresPermissions
-import com.manydesigns.portofino.security.SupportsPermissions
-import net.sourceforge.stripes.action.Resolution
+import com.manydesigns.elements.messages.*
+import com.manydesigns.elements.reflection.*
+import com.manydesigns.portofino.*
+import com.manydesigns.portofino.application.*
+import com.manydesigns.portofino.buttons.*
+import com.manydesigns.portofino.buttons.annotations.*
+import com.manydesigns.portofino.dispatcher.*
+import com.manydesigns.portofino.model.database.*
+import com.manydesigns.portofino.pageactions.*
+import com.manydesigns.portofino.security.*
+import com.manydesigns.portofino.shiro.*
+
+import net.sourceforge.stripes.action.*
 import org.apache.commons.lang.StringUtils
+import org.apache.shiro.*
+import org.hibernate.*
+import org.hibernate.criterion.*
+
+import com.manydesigns.portofino.pageactions.crud.*
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
