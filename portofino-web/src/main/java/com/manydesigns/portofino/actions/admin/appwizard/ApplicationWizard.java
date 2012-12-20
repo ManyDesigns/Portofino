@@ -536,7 +536,6 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
     @Button(list = "user-management", key="wizard.next", order = 2)
     public Resolution setupUserManagement() {
         selectSchemas();
-        afterSelectSchemas();
 
         userAndGroupTablesForm.readFromRequest(context.getRequest());
         userAndGroupTablesForm.writeToObject(this);
@@ -832,7 +831,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
 
     @Button(list = "build-app", key="wizard.finish", order = 2)
     public Resolution buildApplication() {
-        selectUserFields();
+        selectTables();
         Database oldDatabase =
                         DatabaseLogic.findDatabaseByName(application.getModel(), database.getDatabaseName());
         if(oldDatabase != null) {
@@ -1137,6 +1136,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
                 for(Reference ref : references) {
                     createChildCrudPage(dir, template, variable, references, ref, pages);
                 }
+                depth--;
                 Collections.sort(pages, new Comparator<ChildPage>() {
                     public int compare(ChildPage o1, ChildPage o2) {
                         return o1.getName().compareToIgnoreCase(o2.getName());
