@@ -116,6 +116,9 @@ public class LiquibaseUtils {
 
         logger.debug("Registering Postgres");
         databaseFactory.register(new PortofinoPostgresDatabase());
+
+        logger.debug("Registering Google Cloud SQL");
+        databaseFactory.register(new GoogleCloudSQLDatabase());
     }
 
     public static void setupDatabaseSnapshotGeneratorFactory() {

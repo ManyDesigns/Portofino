@@ -223,11 +223,11 @@ public class ApplicationStarter {
         portofinoConfiguration.getString(
                 PortofinoProperties.APPS_DIR_PATH);
         File appsDir = new File(appsDirPath);
-        boolean success = ElementsFileUtils.ensureDirectoryExistsAndWritable(appsDir);
+        boolean success = ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(appsDir);
 
         appDir = new File(appsDir, appId);
         logger.info("Application dir: {}", appDir.getAbsolutePath());
-        success &= ElementsFileUtils.ensureDirectoryExistsAndWritable(appDir);
+        success &= ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(appDir);
 
         if(success) {
             try {

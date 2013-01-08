@@ -71,6 +71,17 @@ public class ElementsFileUtils {
 
     public static boolean ensureDirectoryExistsAndWritable(File file) {
         logger.debug("Ensure directory exists and writable: {}", file);
+        if (!ensureDirectoryExists(file)) return false;
+        if (!file.canWrite()) {
+            logger.warn("Directory not writable: {}", file);
+            return false;
+        } else {
+            logger.debug("Success");
+            return true;
+        }
+    }
+
+    public static boolean ensureDirectoryExists(File file) {
         if (file.exists()) {
             logger.debug("File esists");
             if (file.isDirectory()) {
@@ -88,13 +99,22 @@ public class ElementsFileUtils {
                 return false;
             }
         }
-        if (!file.canWrite()) {
-            logger.warn("Directory not writable: {}", file);
-            return false;
-        } else {
-            logger.debug("Success");
-            return true;
+        return true;
+    }
+
+    public static boolean ensureDirectoryExistsAndWarnIfNotWritable(File file) {
+        logger.debug("Ensure directory exists and writable: {}", file);
+        if (!ensureDirectoryExists(file)) return false;
+        try {
+            if (!file.canWrite()) {
+                logger.warn("Directory not writable: {}", file);
+            } else {
+                logger.debug("Success");
+            }
+        } catch (Exception e) {
+            logger.warn("Directory not writable: " + file, e);
         }
+        return true;
     }
 
 

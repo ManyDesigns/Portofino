@@ -120,6 +120,10 @@ public abstract class AbstractDatabasePlatform implements DatabasePlatform {
         return hibernateDialect;
     }
 
+    public boolean isDialectAutodetected() {
+        return true;
+    }
+
     public String getConnectionStringTemplate() {
         return connectionStringTemplate;
     }

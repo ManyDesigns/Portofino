@@ -44,6 +44,7 @@ import com.manydesigns.portofino.quartz.MailSenderJob;
 import com.manydesigns.portofino.shiro.UsersGroupsDAO;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import net.sf.ehcache.CacheManager;
+import ognl.OgnlRuntime;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -222,6 +223,9 @@ public class PortofinoListener
                         serverInfo.getRealPath()
                 }
         );
+
+        logger.info("Disabling OGNL security manager");
+        OgnlRuntime.setSecurityManager(null);
     }
 
     public void contextDestroyed(ServletContextEvent servletContextEvent) {

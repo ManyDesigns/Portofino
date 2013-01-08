@@ -32,7 +32,6 @@ package com.manydesigns.portofino.application;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.application.hibernate.HibernateConfig;
 import com.manydesigns.portofino.application.hibernate.HibernateDatabaseSetup;
-import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.model.Model;
@@ -50,8 +49,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,12 +136,12 @@ public class DefaultApplication implements Application {
 
         appBlobsDir = new File(appDir, APP_BLOBS_DIR);
         logger.info("Application blobs dir: {}", appBlobsDir.getAbsolutePath());
-        boolean result = ElementsFileUtils.ensureDirectoryExistsAndWritable(appBlobsDir);
+        boolean result = ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(appBlobsDir);
 
         appDbsDir = new File(appDir, APP_DBS_DIR);
         logger.info("Application dbs dir: {}",
                 appDbsDir.getAbsolutePath());
-        result &= ElementsFileUtils.ensureDirectoryExistsAndWritable(appDbsDir);
+        result &= ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(appDbsDir);
 
         appModelFile = new File(appDir, APP_MODEL_FILE);
         logger.info("Application model file: {}",
@@ -153,17 +150,17 @@ public class DefaultApplication implements Application {
         appScriptsDir = new File(appDir, APP_SCRIPTS_DIR);
         logger.info("Application scripts dir: {}",
                 appScriptsDir.getAbsolutePath());
-        result &= ElementsFileUtils.ensureDirectoryExistsAndWritable(appScriptsDir);
+        result &= ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(appScriptsDir);
 
         appPagesDir = new File(appDir, APP_PAGES_DIR);
         logger.info("Application pages dir: {}",
                 appPagesDir.getAbsolutePath());
-        result &= ElementsFileUtils.ensureDirectoryExistsAndWritable(appPagesDir);
+        result &= ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(appPagesDir);
 
         appWebDir = new File(appDir, APP_WEB_DIR);
         logger.info("Application web dir: {}",
                 appWebDir.getAbsolutePath());
-        result &= ElementsFileUtils.ensureDirectoryExistsAndWritable(appWebDir);
+        result &= ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(appWebDir);
 
         if (!result) {
             throw new Exception("Could not initialize application");
@@ -406,7 +403,7 @@ public class DefaultApplication implements Application {
     // DDL
     //**************************************************************************
 
-    public List<String> getDDLCreate() {
+    /*public List<String> getDDLCreate() {
         List<String> result = new ArrayList<String>();
         for (Database db : model.getDatabases()) {
             result.add("-- DB: " + db.getDatabaseName());
@@ -455,7 +452,7 @@ public class DefaultApplication implements Application {
 
         }
         return result;
-    }
+    }*/
 
     public @NotNull TableAccessor getTableAccessor(String databaseName, String entityName) {
         Database database = DatabaseLogic.findDatabaseByName(model, databaseName);

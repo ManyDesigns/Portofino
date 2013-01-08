@@ -153,8 +153,48 @@
                <artifactId>cobertura-maven-plugin</artifactId>
                <version>2.3</version>
             </plugin>
+            <plugin>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-maven-plugin</artifactId>
+                <version>1.7.5-SNAPSHOT</version>
+                <configuration>
+                <jvmFlags>
+                    <!--
+                    <jvmFlag>-Xdebug</jvmFlag>
+                    <jvmFlag>-Xrunjdwp:transport=dt_socket,address=1044,server=y,suspend=y</jvmFlag>-->
+                    <jvmFlag>-Drdbms.server=local</jvmFlag>
+                    <jvmFlag>-Drdbms.driver=com.mysql.jdbc.Driver</jvmFlag>
+                    <jvmFlag>-Drdbms.url=jdbc:mysql://localhost/public?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI,character_set_database=utf8</jvmFlag>
+                    <jvmFlag>-Xdebug</jvmFlag>
+                    <jvmFlag>-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005</jvmFlag>
+                    <jvmFlag>-Xmx128M</jvmFlag>
+                    <jvmFlag>-XX:MaxPermSize=128M</jvmFlag>
+                    <jvmFlag>-XX:+UseConcMarkSweepGC</jvmFlag>
+                    <jvmFlag>-XX:+CMSClassUnloadingEnabled</jvmFlag>
+                    <jvmFlag>-ea</jvmFlag>
+                    <jvmFlag>-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true</jvmFlag>
+                </jvmFlags>
+                <disableUpdateCheck>true</disableUpdateCheck>
+            </configuration>
+            </plugin>
       </plugins>
     </build>
+
+    <!--Sperimentale, rimuovere-->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>google-snapshots</id>
+            <name>Google Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/google-snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+
 <!--
     <repositories>
         <repository>

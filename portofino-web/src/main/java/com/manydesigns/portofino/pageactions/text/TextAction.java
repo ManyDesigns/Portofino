@@ -541,9 +541,10 @@ public class TextAction extends AbstractPageAction {
             }
 
             InputStream is = new FileInputStream(file);
-            Resolution resolution =
+            StreamingResolution resolution =
                     new StreamingResolution(attachment.getContentType(), is)
                             .setLength(attachment.getSize())
+                            .setFilename(attachment.getFilename())
                             .setAttachment(isAttachment)
                             .setLastModified(file.lastModified());
             return resolution;

@@ -129,17 +129,22 @@ configuration.setProperty("hibernate.cache.use_query_cache",
     }
 
     protected void setupConnection(Configuration configuration) {
+        if(!connectionProvider.getDatabasePlatform().isDialectAutodetected()) {
+            configuration.setProperty(
+                    "hibernate.dialect",
+                    connectionProvider.getDatabasePlatform().getHibernateDialect().getClass().getName());
+        }
         if(connectionProvider instanceof JdbcConnectionProvider) {
             JdbcConnectionProvider jdbcConnectionProvider =
                     (JdbcConnectionProvider) connectionProvider;
-            configuration.setProperty("hibernate.connection.url",
-                    jdbcConnectionProvider.getActualUrl())
-                    .setProperty("hibernate.connection.driver_class",
-                            jdbcConnectionProvider.getDriver())
-                    .setProperty("hibernate.connection.username",
-                            jdbcConnectionProvider.getUsername())
-                    .setProperty("hibernate.connection.password",
-                            jdbcConnectionProvider.getPassword());
+            configuration.setProperty("hibernate.connection.url", jdbcConnectionProvider.getActualUrl());
+            configuration.setProperty("hibernate.connection.driver_class", jdbcConnectionProvider.getDriver());
+            if(jdbcConnectionProvider.getUsername() != null) {
+                configuration.setProperty("hibernate.connection.username", jdbcConnectionProvider.getUsername());
+            }
+            if(jdbcConnectionProvider.getPassword() != null) {
+                    configuration.setProperty("hibernate.connection.password", jdbcConnectionProvider.getPassword());
+            }
 
             configuration.setProperty("hibernate.connection.provider_class",
                     portofinoConfiguration.getString(

@@ -190,11 +190,14 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
     protected void buildCPForms() {
         DefaultSelectionProvider connectionProviderSP = new DefaultSelectionProvider("connectionProviderName");
         for(Database db : application.getModel().getDatabases()) {
-            connectionProviderSP.appendRow(
-                    db.getDatabaseName(),
-                    db.getDatabaseName() + " (" + db.getConnectionProvider().getDatabasePlatform().getDescription() + ")",
-                    true);
+            if(!ConnectionProvider.STATUS_ERROR.equals(db.getConnectionProvider().getStatus())) {
+                connectionProviderSP.appendRow(
+                        db.getDatabaseName(),
+                        db.getDatabaseName() + " (" + db.getConnectionProvider().getDatabasePlatform().getDescription() + ")",
+                        true);
+            }
         }
+
 
         ClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(ApplicationWizard.class);
         try {

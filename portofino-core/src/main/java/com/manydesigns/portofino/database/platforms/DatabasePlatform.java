@@ -55,6 +55,12 @@ public interface DatabasePlatform {
     String getDescription();
     String getStandardDriverClassName();
     Dialect getHibernateDialect();
+    /**
+     * Is Hibernate able to automatically the dialect from a JDBC connection for this database platform?
+     * @return false if and only if the hibernate.dialect property must be explicitly set in order to connect to
+     * an instance of this database platform.
+     */
+    boolean isDialectAutodetected();
     String getConnectionStringTemplate();
 
     @Status(red={STATUS_DRIVER_ERROR}, amber={STATUS_CREATED, STATUS_DRIVER_NOT_FOUND}, green={STATUS_OK})
