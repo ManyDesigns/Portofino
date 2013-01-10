@@ -162,6 +162,10 @@
             <param-name>LocalePicker.Locales</param-name>
             <param-value>en,it</param-value>
         </init-param>
+        <init-param>
+            <param-name>MultipartWrapper.Class</param-name>
+            <param-value>com.manydesigns.portofino.stripes.StreamingCommonsMultipartWrapper</param-value>
+        </init-param>
     </filter>
 
     <filter-mapping>
