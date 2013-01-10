@@ -159,9 +159,6 @@
                 <version>1.7.5-SNAPSHOT</version>
                 <configuration>
                 <jvmFlags>
-                    <!--
-                    <jvmFlag>-Xdebug</jvmFlag>
-                    <jvmFlag>-Xrunjdwp:transport=dt_socket,address=1044,server=y,suspend=y</jvmFlag>-->
                     <jvmFlag>-Drdbms.server=local</jvmFlag>
                     <jvmFlag>-Drdbms.driver=com.mysql.jdbc.Driver</jvmFlag>
                     <jvmFlag>-Drdbms.url=jdbc:mysql://localhost/public?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI,character_set_database=utf8</jvmFlag>

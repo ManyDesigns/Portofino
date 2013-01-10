@@ -2,10 +2,13 @@
 <%@ page import="com.manydesigns.portofino.security.AccessLevel" %>
 <%@ page import="org.apache.shiro.SecurityUtils" %>
 <%@ page import="org.apache.shiro.subject.Subject" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.AbstractActionBean" %>
+<%@ page import="com.manydesigns.portofino.pageactions.AbstractPageAction" %>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%
+    AbstractPageAction theActionBean = (AbstractPageAction) request.getAttribute("actionBean");
     Subject subject = SecurityUtils.getSubject();
-    if(SecurityLogic.hasPermissions(actionBean.getPageInstance(), subject, AccessLevel.DEVELOP)) { %>
+    if(SecurityLogic.hasPermissions(theActionBean.getPageInstance(), subject, AccessLevel.DEVELOP)) { %>
 <script src="<stripes:url value="/ace-0.2.0/ace.js" />" type="text/javascript" charset="utf-8"></script>
 <script src="<stripes:url value="/ace-0.2.0/theme-twilight.js" />" type="text/javascript" charset="utf-8"></script>
 <script src="<stripes:url value="/ace-0.2.0/mode-groovy.js" />" type="text/javascript" charset="utf-8"></script>

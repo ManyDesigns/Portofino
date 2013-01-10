@@ -54,7 +54,7 @@ public class RandomUtil {
     protected static final File tempDir;
 
     static {
-        tempDir = new File(System.getProperty("java.io.tmpdir"));
+        tempDir = new File(System.getProperty("java.io.tmpdir", "/tmp"));
     }
 
     public static File getTempDir() {

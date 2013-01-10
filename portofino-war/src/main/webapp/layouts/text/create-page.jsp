@@ -17,7 +17,7 @@
     String fragment = parameters.get(0);
     String path = actionBean.getDispatch().getOriginalPath();
     path = path.substring(0, path.length() - fragment.length());
-%><stripes:layout-render name="/skins/${skin}/${actionBean.pageTemplate}/normal.jsp">
+%><stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="contentHeader">
         <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
     </stripes:layout-component>

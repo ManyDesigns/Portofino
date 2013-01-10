@@ -40,6 +40,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.text.OgnlTextFormat;
+import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.ApplicationAttributes;
@@ -341,7 +342,7 @@ public class PageAdminAction extends AbstractPageAction {
                 SessionMessages.addErrorMessage(getMessage("page.create.failed.directoryExists"));
                 return new ForwardResolution("/layouts/page-crud/new-page.jsp");
             }
-            if(directory.mkdirs()) {
+            if(ElementsFileUtils.safeMkdirs(directory)) {
                 try {
                     page.getLayout().setTemplate(parentPage.getLayout().getTemplate());
                     page.getDetailLayout().setTemplate(parentPage.getDetailLayout().getTemplate());
@@ -368,7 +369,7 @@ public class PageAdminAction extends AbstractPageAction {
                     if(supportsDetail) {
                         File detailDir = new File(directory, PageInstance.DETAIL);
                         logger.debug("Creating _detail directory: {}", detailDir);
-                        if(!detailDir.mkdir()) {
+                        if(!ElementsFileUtils.safeMkdir(detailDir)) {
                             logger.warn("Couldn't create detail directory {}", detailDir);
                         }
                     }
@@ -518,7 +519,7 @@ public class PageAdminAction extends AbstractPageAction {
             File newDirectory = newParent.getChildPageDirectory(newName);
             File newParentDirectory = newDirectory.getParentFile();
             logger.debug("Ensuring that new parent directory {} exists", newParentDirectory);
-            newParentDirectory.mkdirs();
+            ElementsFileUtils.safeMkdirs(newParentDirectory);
             if(!newDirectory.exists()) {
                 try {
                     Iterator<ChildPage> it = oldParent.getLayout().getChildPages().iterator();
@@ -647,7 +648,7 @@ public class PageAdminAction extends AbstractPageAction {
         childPagesForm = setupChildPagesForm(childPages, directory, getPage().getLayout(), "");
         if(PageActionLogic.supportsDetail(getPageInstance().getActionClass())) {
             File detailDirectory = new File(directory, PageInstance.DETAIL);
-            if(!detailDirectory.isDirectory() && !detailDirectory.mkdir()) {
+            if(!detailDirectory.isDirectory() && !ElementsFileUtils.safeMkdir(detailDirectory)) {
                 logger.error("Could not create detail directory{}", detailDirectory.getAbsolutePath());
                 SessionMessages.addErrorMessage("Could not create detail directory");
                 return;

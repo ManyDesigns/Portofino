@@ -654,8 +654,13 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     public String getMessage(String key, Object... args) {
         Locale locale = context.getLocale();
         ResourceBundle resourceBundle = application.getBundle(locale);
-        String msg = resourceBundle.getString(key);
-        return MessageFormat.format(msg, args);
+        try {
+            String msg = resourceBundle.getString(key);
+            return MessageFormat.format(msg, args);
+        } catch (MissingResourceException e) {
+            logger.error("Resource " + key + " not found; locale: " + locale, e);
+            throw e;
+        }
     }
 
     /**

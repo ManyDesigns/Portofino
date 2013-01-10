@@ -2,14 +2,18 @@
 <%@ page import="com.manydesigns.elements.reflection.PropertyAccessor" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.json.JSONWriter" %>
+<%@ page import="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction" %>
 <%@ page language="java" %>
 <c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
+<%
+    AbstractCrudAction crudAction = (AbstractCrudAction) request.getAttribute("actionBean");
+%>
 <div id="<c:out value="tableContainer-${pageId}" />">
     <table id="<c:out value="table-${pageId}" />">
         <thead>
         <tr>
             <%
-                TableForm tableForm = actionBean.getTableForm();
+                TableForm tableForm = crudAction.getTableForm();
                 TableForm.Column[] columns = tableForm.getColumns();
                 for (TableForm.Column column : columns) {
                     out.print("<th>");
@@ -127,7 +131,7 @@
             }
             <c:if test="${(not actionBean.embedded) && (not empty actionBean.searchString)}">
                 url = url + "&searchString=" + encodeURIComponent(
-                    '<%= StringEscapeUtils.escapeJavaScript(actionBean.getSearchString()) %>');
+                    '<%= StringEscapeUtils.escapeJavaScript(crudAction.getSearchString()) %>');
             </c:if>
 
             //Update pagination & sort input fields in the form
@@ -140,10 +144,10 @@
         };
 
         var firstReqConf = {};
-        <% if(actionBean.getFirstResult() != null) { %>
+        <% if(crudAction.getFirstResult() != null) { %>
             firstReqConf['pagination'] = {
-                recordOffset: <%= actionBean.getFirstResult() %>,
-                rowsPerPage:  <%= actionBean.getMaxResults() %>
+                recordOffset: <%= crudAction.getFirstResult() %>,
+                rowsPerPage:  <%= crudAction.getMaxResults() %>
             };
         <% } %>
 
@@ -156,7 +160,7 @@
 
         <c:if test="${not empty actionBean.crudConfiguration.rowsPerPage}">
             myConfigs.paginator = new YAHOO.widget.Paginator({
-                rowsPerPage: <%= actionBean.getCrudConfiguration().getRowsPerPage() %>,
+                rowsPerPage: <%= crudAction.getCrudConfiguration().getRowsPerPage() %>,
                 firstPageLinkLabel: '&lt;&lt; <fmt:message key="commons.first" />',
                 previousPageLinkLabel: '&lt; <fmt:message key="commons.prev" />',
                 nextPageLinkLabel: '<fmt:message key="commons.next" /> &gt;',

@@ -5,7 +5,7 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<stripes:layout-render name="/skins/${skin}/${actionBean.pageTemplate}/modal.jsp">
+<stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.text.TextAction"/>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="manage-attachments" cssClass="contentButton" />

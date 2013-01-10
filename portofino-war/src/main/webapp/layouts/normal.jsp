@@ -4,4 +4,4 @@
     taglib prefix="mde" uri="/manydesigns-elements"%><%@
     taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%--
 --%><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.AbstractPageAction" /><%--
---%><stripes:layout-render name="/skins/${skin}/${actionBean.pageTemplate}/normal.jsp"></stripes:layout-render>
+--%><stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/normal.jsp"></stripes:layout-render>

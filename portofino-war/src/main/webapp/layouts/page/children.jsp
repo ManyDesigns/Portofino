@@ -5,7 +5,7 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="/skins/${skin}/${actionBean.pageTemplate}/modal.jsp" formActionUrl="/actions/admin/page">
+<stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/modal.jsp" formActionUrl="/actions/admin/page">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="page-children-edit" cssClass="contentButton" />

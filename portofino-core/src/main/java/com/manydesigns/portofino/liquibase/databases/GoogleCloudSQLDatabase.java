@@ -42,14 +42,14 @@ public class GoogleCloudSQLDatabase extends PortofinoMySQLDatabase {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    public static final String PRODUCT_NAME = "Google SQL Service/MySQL";
+    public static final String PRODUCT_NAME = "MySQL/Google Cloud SQL";
 
     public int getPriority() {
         return PRIORITY_DEFAULT;
     }
 
     public boolean isCorrectDatabaseImplementation(DatabaseConnection conn) throws DatabaseException {
-        return PRODUCT_NAME.equalsIgnoreCase(conn.getDatabaseProductName());
+        return PRODUCT_NAME.equals(conn.getDatabaseProductName());
     }
 
     public String getDefaultDriver(String url) {

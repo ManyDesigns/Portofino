@@ -6,7 +6,7 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><jsp:useBean id="actionBean" scope="request"
                type="com.manydesigns.portofino.pageactions.calendar.CalendarAction"
-/><stripes:layout-render name="/skins/${skin}/${actionBean.pageTemplate}/modal.jsp">
+/><stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/modal.jsp">
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="configuration" cssClass="contentButton" />
         <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />

@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-  <application>Portofino 4 (sample; replace with your own app id and version to deploy on GAE!)</application>
-  <version>4.0.9-SNAPSHOT</version>
+  <application>portofino4-test</application>
+    <version>1</version>
+  <!--<version>4.0.9-SNAPSHOT</version>-->
   <threadsafe>true</threadsafe>
   <sessions-enabled>true</sessions-enabled>
+<!--  <precompilation-enabled>false</precompilation-enabled>-->
+
+  <system-properties>
+    <property name="com.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize" value="true" />
+    <property name="com.sun.xml.bind.v2.runtime.JAXBContextImpl.fastBoot" value="true"/>
+  </system-properties>
 </appengine-web-app>

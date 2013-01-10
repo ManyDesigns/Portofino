@@ -5,7 +5,7 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
-%><stripes:layout-render name="/skins/${skin}/${actionBean.pageTemplate}/modal.jsp">
+%><stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/modal.jsp">
     <stripes:layout-component name="customScripts">
         <script type="text/javascript" src="<stripes:url value="/ckeditor/ckeditor.js"/>"></script>
         <script type="text/javascript" src="<stripes:url value="/ckeditor/adapters/jquery.js"/>"></script>

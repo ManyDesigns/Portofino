@@ -92,7 +92,7 @@ public class ElementsFileUtils {
             }
         } else {
             logger.debug("File does not exist");
-            if (file.mkdirs()) {
+            if (safeMkdirs(file)) {
                 logger.info("Directory created successfully: {}", file);
             } else {
                 logger.warn("Cannot create directory: {}", file);
@@ -144,5 +144,21 @@ public class ElementsFileUtils {
         }
     }
 
+    public static boolean safeMkdir(File detailDirectory) {
+        try {
+            return detailDirectory.mkdir();
+        } catch (SecurityException e) {
+            logger.error("mkdir failed, security exception", e);
+            return false;
+        }
+    }
 
+    public static boolean safeMkdirs(File detailDirectory) {
+        try {
+            return detailDirectory.mkdirs();
+        } catch (SecurityException e) {
+            logger.error("mkdir failed, security exception", e);
+            return false;
+        }
+    }
 }

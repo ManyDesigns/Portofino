@@ -183,7 +183,7 @@ public class DefaultApplication implements Application {
             model = (Model) um.unmarshal(appModelFile);
             boolean syncOnStart = false;
             initModel();
-            runLiquibaseScripts();
+            //runLiquibaseScripts();
             if (syncOnStart) {
                 List<String> databaseNames = new ArrayList<String>();
                 for (Database sourceDatabase : model.getDatabases()) {

@@ -33,7 +33,6 @@ import com.manydesigns.elements.annotations.Required;
 import org.apache.commons.dbutils.DbUtils;
 
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -80,7 +79,7 @@ public class JndiConnectionProvider extends ConnectionProvider {
         return ds.getConnection();
     }
 
-    public DataSource getDataSource() throws NamingException {
+    public DataSource getDataSource() throws Exception {
         InitialContext ic = new InitialContext();
         return (DataSource) ic.lookup(jndiResource);
     }

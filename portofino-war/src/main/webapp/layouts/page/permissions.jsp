@@ -13,7 +13,7 @@
 %><%@ page import="com.manydesigns.portofino.shiro.GroupPermission"
 %><%@ page import="com.manydesigns.portofino.shiro.PagePermission"
 %><%@ page import="java.util.Collections"
-%><stripes:layout-render name="/skins/${skin}/${actionBean.pageTemplate}/modal.jsp" formActionUrl="/actions/admin/page">
+%><stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/modal.jsp" formActionUrl="/actions/admin/page">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="page-permissions-edit" cssClass="contentButton" />

@@ -174,6 +174,10 @@ public class LiquibaseUtils {
         sqlGeneratorFactory.register(
                 new PortofinoPostgresLockDatabaseChangeLogGenerator());
 
+        logger.debug("Registering GoogleCloudSQLLockDatabaseChangeLogGenerator");
+        sqlGeneratorFactory.register(
+                new GoogleCloudSQLLockDatabaseChangeLogGenerator());
+
         logger.debug("Registering PortofinoPostgresMarkChangeSetRanGenerator");
         sqlGeneratorFactory.register(
                 new PortofinoPostgresMarkChangeSetRanGenerator());
