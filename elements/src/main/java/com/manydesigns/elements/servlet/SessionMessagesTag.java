@@ -29,12 +29,11 @@
 
 package com.manydesigns.elements.servlet;
 
-import com.manydesigns.elements.Element;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 
-import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.tagext.TagSupport;
 import java.util.List;
 
 /*

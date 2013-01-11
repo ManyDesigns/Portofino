@@ -37,18 +37,19 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public class SessionMessages {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
@@ -59,15 +60,8 @@ public class SessionMessages {
     public final static Logger logger =
             LoggerFactory.getLogger(SessionMessages.class);
 
-    public static XhtmlBuffer createStringMessage(String msg) {
-        XhtmlBuffer xb = new XhtmlBuffer();
-        xb.write(msg);
-        return xb;
-    }
-
     public static void addInfoMessage(String msg) {
-        XhtmlBuffer xb = createStringMessage(msg);
-        addInfoMessage(xb);
+        getInfoQueue().add(new Message(msg));
     }
 
     public static void addInfoMessage(XhtmlFragment xml) {
@@ -75,8 +69,7 @@ public class SessionMessages {
     }
 
     public static void addWarningMessage(String msg) {
-        XhtmlBuffer xb = createStringMessage(msg);
-        addWarningMessage(xb);
+        getWarningQueue().add(new Message(msg));
     }
 
     public static void addWarningMessage(XhtmlFragment xml) {
@@ -84,8 +77,7 @@ public class SessionMessages {
     }
 
     public static void addErrorMessage(String msg) {
-        XhtmlBuffer xb = createStringMessage(msg);
-        addErrorMessage(xb);
+        getErrorQueue().add(new Message(msg));
     }
 
     public static void addErrorMessage(XhtmlFragment xml) {
@@ -147,20 +139,39 @@ public class SessionMessages {
      */
     public static class Message implements XhtmlFragment, Serializable {
 
-        protected final transient XhtmlFragment delegate;
+        protected XhtmlFragment delegate;
+        protected String string;
+
+        public Message(String string) {
+            this.string = string;
+        }
 
         public Message(XhtmlFragment delegate) {
             this.delegate = delegate;
         }
 
         public void toXhtml(@NotNull XhtmlBuffer xb) {
-            if(delegate != null) {
+            if(string != null) {
+                xb.writeNoHtmlEscape(string);
+            } else if(delegate != null) {
                 delegate.toXhtml(xb);
+            } else {
+                logger.warn("Empty message");
             }
         }
 
-        public XhtmlFragment getDelegate() {
-            return delegate;
+        /*
+         * On serialization, if delegate is not null and not serializable, realize it to a string.
+         */
+        private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+            if(delegate != null && !(delegate instanceof Serializable)) {
+                XhtmlBuffer buf = new XhtmlBuffer();
+                delegate.toXhtml(buf);
+                string = buf.toString();
+                delegate = null;
+            }
+            out.defaultWriteObject();
         }
+
     }
 }
