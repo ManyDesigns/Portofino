@@ -41,7 +41,7 @@
         <jfreechart.version>1.0.12</jfreechart.version>
         <joda-time.version>1.6.2</joda-time.version>
         <jsoup.version>1.7.1</jsoup.version>
-        <groovy.version>1.8.8</groovy.version>
+        <groovy.version>2.0.6</groovy.version>
         <json.version>20111031</json.version>
         <liquibase.version>2.0.5</liquibase.version>
         <itext.version>2.1.7</itext.version>
