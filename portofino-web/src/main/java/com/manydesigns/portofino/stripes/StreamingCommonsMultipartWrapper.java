@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2012 ManyDesigns srl.  All rights reserved.
+* Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
 * http://www.manydesigns.com/
 *
 * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -25,6 +25,8 @@
 * 59 Temple Place - Suite 330,
 * Boston, MA  02111-1307  USA
 *
+*
+* Adapted from CommonsMultipartWrapper from the Stripes framework (Copyright 2005-2006 Tim Fennell)
 */
 
 package com.manydesigns.portofino.stripes;
@@ -46,6 +48,8 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
+ * MultipartWrapper implementation that uses the streaming API of Commons Fileupload, avoiding the use of files.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -53,7 +57,7 @@ import java.util.regex.Pattern;
  */
 public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
     public static final String copyright =
-            "Copyright (c) 2005-2012, ManyDesigns srl";
+            "Copyright (c) 2005-2013, ManyDesigns srl";
 
     private static final Pattern WINDOWS_PATH_PREFIX_PATTERN = Pattern.compile("(?i:^[A-Z]:\\\\)");
 
