@@ -53,6 +53,8 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.files.TempFile;
+import com.manydesigns.portofino.files.TempFileService;
 import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
@@ -1173,18 +1175,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Button(list = "crud-search", key = "commons.exportExcel", order = 5)
     public Resolution exportSearchExcel() {
         try {
-            final File tmpFile = File.createTempFile(crudConfiguration.getName() + ".search", ".xls");
-            exportSearchExcel(tmpFile);
-            FileInputStream fileInputStream = new FileInputStream(tmpFile);
-            return new StreamingResolution("application/vnd.ms-excel", fileInputStream) {
-                @Override
-                protected void stream(HttpServletResponse response) throws Exception {
-                    super.stream(response);
-                    if(!tmpFile.delete()) {
-                        logger.warn("Temporary file {} could not be deleted", tmpFile.getAbsolutePath());
-                    }
-                }
-            }.setFilename(crudConfiguration.getSearchTitle() + ".xls");
+            TempFileService fileService = TempFileService.getInstance();
+            TempFile tempFile =
+                    fileService.newTempFile("application/vnd.ms-excel", crudConfiguration.getSearchTitle() + ".xls");
+            OutputStream outputStream = tempFile.getOutputStream();
+            exportSearchExcel(outputStream);
+            outputStream.flush();
+            outputStream.close();
+            return fileService.stream(tempFile);
         } catch (Exception e) {
             logger.error("Excel export failed", e);
             SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
@@ -1192,20 +1190,20 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    public void exportSearchExcel(File fileTemp) {
+    public void exportSearchExcel(OutputStream outputStream) {
         setupSearchForm();
         loadObjects();
         setupTableForm(Mode.VIEW);
 
-        writeFileSearchExcel(fileTemp);
+        writeFileSearchExcel(outputStream);
     }
 
-    private void writeFileSearchExcel(File fileTemp) {
+    private void writeFileSearchExcel(OutputStream outputStream) {
         WritableWorkbook workbook = null;
         try {
             WorkbookSettings workbookSettings = new WorkbookSettings();
-            workbookSettings.setUseTemporaryFileDuringWrite(true);
-            workbook = Workbook.createWorkbook(fileTemp, workbookSettings);
+            workbookSettings.setUseTemporaryFileDuringWrite(false);
+            workbook = Workbook.createWorkbook(outputStream, workbookSettings);
             String title = crudConfiguration.getSearchTitle();
             if(StringUtils.isBlank(title)) {
                 title = "export";

@@ -31,16 +31,20 @@
 
 package com.manydesigns.portofino.stripes;
 
+import com.manydesigns.portofino.files.TempFile;
+import com.manydesigns.portofino.files.TempFileService;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.controller.FileUploadLimitExceededException;
 import net.sourceforge.stripes.controller.multipart.MultipartWrapper;
-import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,12 +77,14 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
     public static class FileItem {
         public final String fileName;
         public final String contentType;
-        public final byte[] contents;
+        public final TempFile contents;
+        public final int size;
 
-        public FileItem(String fileName, String contentType, byte[] contents) {
+        public FileItem(String fileName, String contentType, TempFile contents, int size) {
             this.fileName = fileName;
             this.contentType = contentType;
             this.contents = contents;
+            this.size = size;
         }
     }
 
@@ -123,7 +129,9 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
                 }
                 // Else store the file param
                 else {
-                    FileItem fileItem = new FileItem(item.getName(), item.getContentType(), IOUtils.toByteArray(stream));
+                    TempFile tempFile = TempFileService.getInstance().newTempFile(item.getContentType(), item.getName());
+                    int size = IOUtils.copy(stream, tempFile.getOutputStream());
+                    FileItem fileItem = new FileItem(item.getName(), item.getContentType(), tempFile, size);
                     files.put(item.getFieldName(), fileItem);
                 }
             }
@@ -188,7 +196,7 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
         final FileItem item = this.files.get(name);
 
         if (item == null
-                || ((item.fileName == null || item.fileName.length() == 0) && item.contents.length == 0)) {
+                || ((item.fileName == null || item.fileName.length() == 0) && item.size == 0)) {
             return null;
         }
         else {
@@ -206,19 +214,19 @@ public class StreamingCommonsMultipartWrapper implements MultipartWrapper {
             // methods that rely on having a File present, to use the FileItem
             // created by commons upload instead.
             return new FileBean(null, item.contentType, filename, this.charset) {
-                @Override public long getSize() { return item.contents.length; }
-
-                @Override public InputStream getInputStream() throws IOException {
-                    return new ByteArrayInputStream(item.contents);
+                @Override
+                public long getSize() {
+                    return item.size;
                 }
 
-                @Override public void save(File toFile) throws IOException {
-                    throw new UnsupportedOperationException("Unsupported");
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    return item.contents.getInputStream();
                 }
 
                 @Override
                 public void delete() throws IOException {
-                    throw new UnsupportedOperationException("Unsupported");
+                    item.contents.dispose();
                 }
             };
         }
