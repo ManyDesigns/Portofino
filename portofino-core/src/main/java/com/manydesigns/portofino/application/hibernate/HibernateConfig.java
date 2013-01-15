@@ -31,7 +31,6 @@ package com.manydesigns.portofino.application.hibernate;
 
 import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.database.StringBooleanType;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.ForeignKey;
@@ -114,18 +113,11 @@ public class HibernateConfig {
                         "org.hibernate.context.ThreadLocalSessionContext") //hb4: "org.hibernate.context.internal.ThreadLocalSessionContext"
                 .setProperty("org.hibernate.hql.ast.AST", "true")
                 .setProperty("hibernate.globally_quoted_identifiers", "false");
-        configuration.setProperty("hibernate.show_sql",
+        /*configuration.setProperty("hibernate.show_sql",
                 portofinoConfiguration.getString(
-                        PortofinoProperties.HIBERNATE_SHOW_SQL));
+                        PortofinoProperties.HIBERNATE_SHOW_SQL));*/
         // mettendo la modalità dynamic map, non funzionano le entità mappate su bean.
         // configuration.setProperty("hibernate.default_entity_mode", "dynamic-map");
-        /* Per abilitare 2nd-level cache
-configuration.setProperty("hibernate.cache.region.factory_class",
-    portofinoConfiguration.getString("hibernate.cache.region.factory_class"));
-configuration.setProperty("hibernate.cache.use_second_level_cache",
-    portofinoConfiguration.getString("hibernate.cache.use_second_level_cache"));
-configuration.setProperty("hibernate.cache.use_query_cache",
-    portofinoConfiguration.getString("hibernate.cache.use_query_cache"));*/
     }
 
     protected void setupConnection(Configuration configuration) {
@@ -146,7 +138,7 @@ configuration.setProperty("hibernate.cache.use_query_cache",
                     configuration.setProperty("hibernate.connection.password", jdbcConnectionProvider.getPassword());
             }
 
-            configuration.setProperty("hibernate.connection.provider_class",
+            /*configuration.setProperty("hibernate.connection.provider_class",
                     portofinoConfiguration.getString(
                             PortofinoProperties.HIBERNATE_CONNECTION_PROVIDER_CLASS));
             configuration.setProperty("hibernate.c3p0.min_size",
@@ -160,7 +152,7 @@ configuration.setProperty("hibernate.cache.use_query_cache",
                             PortofinoProperties.HIBERNATE_C3P0_TIMEOUT));
             configuration.setProperty("hibernate.c3p0.idle_test_period",
                     portofinoConfiguration.getString(
-                            PortofinoProperties.HIBERNATE_C3P0_IDLE_TEST_PERIOD));
+                            PortofinoProperties.HIBERNATE_C3P0_IDLE_TEST_PERIOD));*/
         } else if(connectionProvider instanceof JndiConnectionProvider) {
             JndiConnectionProvider jndiConnectionProvider =
                     (JndiConnectionProvider) connectionProvider;

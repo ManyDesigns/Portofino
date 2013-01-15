@@ -57,8 +57,6 @@ public final class PortofinoProperties {
 
     public static final String PORTOFINO_VERSION =
             "portofino.version";
-    public static final String SYSTEM_DATABASE =
-            "portofino.system.database";
     public static final String DATABASE_PLATFORMS_LIST =
             "database.platforms.list";
     public static final String SECURITY_TYPE =
@@ -94,22 +92,14 @@ public final class PortofinoProperties {
     public static final String MAIL_QUEUE_LOCATION = "mail.queue.location";
     public static final String MAIL_SENDER_POLL_INTERVAL = "mail.sender.poll.interval";
 
-    //Password properties
-    public static final String PWD_ENCRYPTED = "pwd.encrypted";
-
     public static final String GROUP_ALL = "group.all";
     public static final String GROUP_ANONYMOUS = "group.anonymous";
     public static final String GROUP_REGISTERED = "group.registered";
     public static final String GROUP_EXTERNALLY_AUTHENTICATED = "group.externallyAuthenticated";
     public static final String GROUP_ADMINISTRATORS = "group.administrators";
 
-    //Hibernate properties
-    public static final String HIBERNATE_SHOW_SQL = "hibernate.show_sql";
-    public static final String HIBERNATE_CONNECTION_PROVIDER_CLASS = "hibernate.connection.provider_class";
-    public static final String HIBERNATE_C3P0_MIN_SIZE = "hibernate.c3p0.min_size";
-    public static final String HIBERNATE_C3P0_MAX_SIZE = "hibernate.c3p0.max_size";
-    public static final String HIBERNATE_C3P0_TIMEOUT = "hibernate.c3p0.timeout";
-    public static final String HIBERNATE_C3P0_IDLE_TEST_PERIOD = "hibernate.c3p0.idle_test_period";
+    //Liquibase properties
+    public static final String LIQUIBASE_ENABLED = "liquibase.enabled";
 
     //Cache configuration properties
     public static final String PAGE_CACHE_SIZE = "page.cache.size";

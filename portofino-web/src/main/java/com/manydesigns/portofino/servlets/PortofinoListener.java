@@ -49,7 +49,6 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
-import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.realm.Realm;
@@ -87,11 +86,6 @@ public class PortofinoListener
     //**************************************************************************
     // Constants
     //**************************************************************************
-
-    /**
-     * How often do we reload portofino-custom.properties
-     */
-    public static final int CONFIGURATION_REFRESH_DELAY = 2000;
 
     public static final String SEPARATOR =
             "----------------------------------------" +
@@ -153,8 +147,8 @@ public class PortofinoListener
                 ApplicationAttributes.ELEMENTS_CONFIGURATION, elementsConfiguration);
 
         portofinoConfiguration = new CompositeConfiguration();
-        addConfiguration(PortofinoProperties.CUSTOM_PROPERTIES_RESOURCE, true);
-        addConfiguration(PortofinoProperties.PROPERTIES_RESOURCE, false);
+        addConfiguration(PortofinoProperties.CUSTOM_PROPERTIES_RESOURCE);
+        addConfiguration(PortofinoProperties.PROPERTIES_RESOURCE);
         servletContext.setAttribute(
                 ApplicationAttributes.PORTOFINO_CONFIGURATION, portofinoConfiguration);
 
@@ -329,16 +323,10 @@ public class PortofinoListener
     // Setup
     //**************************************************************************
 
-    public void addConfiguration(String resource, boolean reloadable) {
+    public void addConfiguration(String resource) {
         try {
             PropertiesConfiguration propertiesConfiguration =
                     new PropertiesConfiguration(resource);
-            if (reloadable) {
-                FileChangedReloadingStrategy reloadingStrategy =
-                        new FileChangedReloadingStrategy();
-                reloadingStrategy.setRefreshDelay(CONFIGURATION_REFRESH_DELAY);
-                propertiesConfiguration.setReloadingStrategy(reloadingStrategy);
-            }
             portofinoConfiguration.addConfiguration(propertiesConfiguration);
         } catch (Throwable e) {
             String errorMessage = ExceptionUtils.getRootCauseMessage(e);

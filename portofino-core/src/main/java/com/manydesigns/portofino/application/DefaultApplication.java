@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.application;
 
 import com.manydesigns.elements.util.ElementsFileUtils;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.hibernate.HibernateConfig;
 import com.manydesigns.portofino.application.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
@@ -183,7 +184,9 @@ public class DefaultApplication implements Application {
             model = (Model) um.unmarshal(appModelFile);
             boolean syncOnStart = false;
             initModel();
-            //runLiquibaseScripts();
+            if(portofinoConfiguration.getBoolean(PortofinoProperties.LIQUIBASE_ENABLED)) {
+                runLiquibaseScripts();
+            }
             if (syncOnStart) {
                 List<String> databaseNames = new ArrayList<String>();
                 for (Database sourceDatabase : model.getDatabases()) {
