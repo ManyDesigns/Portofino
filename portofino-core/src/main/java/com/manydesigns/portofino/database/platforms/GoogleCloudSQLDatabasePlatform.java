@@ -77,7 +77,7 @@ public class GoogleCloudSQLDatabasePlatform extends AbstractDatabasePlatform {
     }
 
     public boolean isApplicable(ConnectionProvider connectionProvider) {
-        return connectionProvider.getDatabaseProductName().equals("MySQL/Google Cloud SQL");
+        return connectionProvider.getDatabaseProductName().contains("Google");
     }
 
     public List<String> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
