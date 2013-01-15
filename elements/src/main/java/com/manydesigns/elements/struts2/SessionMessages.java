@@ -29,7 +29,6 @@
 package com.manydesigns.elements.struts2;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import com.manydesigns.elements.xml.XhtmlFragment;
 import com.opensymphony.xwork2.util.ValueStack;
 import org.apache.struts2.components.Component;
 
@@ -54,13 +53,13 @@ public class SessionMessages extends Component {
     public boolean start(Writer writer) {
         XhtmlBuffer xb = new XhtmlBuffer(writer);
 
-        List<XhtmlFragment> errorMessages =
+        List<String> errorMessages =
                 com.manydesigns.elements.messages.SessionMessages
                         .consumeErrorMessages();
-        List<XhtmlFragment> warningMessages =
+        List<String> warningMessages =
                 com.manydesigns.elements.messages.SessionMessages
                         .consumeWarningMessages();
-        List<XhtmlFragment> infoMessages =
+        List<String> infoMessages =
                 com.manydesigns.elements.messages.SessionMessages
                         .consumeInfoMessages();
 
@@ -83,7 +82,7 @@ public class SessionMessages extends Component {
     }
 
     private void writeList(XhtmlBuffer xb,
-                           List<XhtmlFragment> errorMessages,
+                           List<String> errorMessages,
                            String htmlClass) {
         if (errorMessages.size() == 0) {
             return;
@@ -91,9 +90,9 @@ public class SessionMessages extends Component {
         
         xb.openElement("ul");
         xb.addAttribute("class", htmlClass);
-        for (XhtmlFragment current : errorMessages) {
+        for (String current : errorMessages) {
             xb.openElement("li");
-            current.toXhtml(xb);
+            xb.writeNoHtmlEscape(current);
             xb.closeElement("li");
         }
         xb.closeElement("ul");
