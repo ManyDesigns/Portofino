@@ -479,7 +479,8 @@ public class TextAction extends AbstractPageAction {
                 pageInstance.getDirectory(), ATTACHMENT_FILE_NAME_PATTERN, attachmentId);
 
         // copy the data
-        IOUtils.copyLarge(attachmentStream, new FileOutputStream(dataFile));
+        FileOutputStream fileOutputStream = new FileOutputStream(dataFile);
+        IOUtils.copyLarge(attachmentStream, fileOutputStream);
         if(textConfiguration == null) {
             textConfiguration = new TextConfiguration();
         }
@@ -491,6 +492,9 @@ public class TextAction extends AbstractPageAction {
         viewAttachmentUrl =
                 generateViewAttachmentUrl(attachmentId);
         saveConfiguration(textConfiguration);
+        IOUtils.closeQuietly(attachmentStream);
+        IOUtils.closeQuietly(fileOutputStream);
+        upload.delete();
     }
 
     protected String generateViewAttachmentUrl(String attachmentId) {

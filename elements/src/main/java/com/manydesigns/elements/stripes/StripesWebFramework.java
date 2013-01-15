@@ -74,7 +74,7 @@ public class StripesWebFramework extends WebFramework {
     public Upload getUpload(HttpServletRequest req, String parameterName) {
         StripesRequestWrapper stripesRequest =
                 StripesRequestWrapper.findStripesWrapper(req);
-        FileBean fileBean = stripesRequest.getFileParameterValue(parameterName);
+        final FileBean fileBean = stripesRequest.getFileParameterValue(parameterName);
 
         if (fileBean == null) {
             logger.debug("Parameter not found: {}", parameterName);
@@ -86,7 +86,17 @@ public class StripesWebFramework extends WebFramework {
         String characterEncoding = null;
         try {
             InputStream is = fileBean.getInputStream();
-            return new Upload(is, fileName, contentType, characterEncoding);
+            return new Upload(is, fileName, contentType, characterEncoding) {
+                @Override
+                public void dispose() {
+                    super.dispose();
+                    try {
+                        fileBean.delete();
+                    } catch (IOException e) {
+                        logger.error("Could not delete FileBean" + fileBean.getFileName(), e);
+                    }
+                }
+            };
         } catch (IOException e) {
             logger.warn("Cannot read upload file", e);
             return null;

@@ -29,6 +29,8 @@
 
 package com.manydesigns.elements.servlet;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.InputStream;
 
 /*
@@ -88,5 +90,12 @@ public class Upload {
 
     public void setCharacterEncoding(String characterEncoding) {
         this.characterEncoding = characterEncoding;
+    }
+
+    /**
+     * Disposes of any resources associated with this upload. Call this method when you finished handling the upload.
+     */
+    public void dispose() {
+        IOUtils.closeQuietly(inputStream);
     }
 }

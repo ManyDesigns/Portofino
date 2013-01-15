@@ -237,8 +237,9 @@ public class FileBlobField extends AbstractField
             throw new Error("No blob manager found. Cannot save upload.");
         }
 
+        Upload upload = null;
         try {
-            Upload upload = webFramework.getUpload(req, inputName);
+            upload = webFramework.getUpload(req, inputName);
             if (upload == null) {
                 blob = null;
             } else {
@@ -253,6 +254,10 @@ public class FileBlobField extends AbstractField
         } catch (Throwable e) {
             logger.warn("Cannot save upload", e);
             throw new Error("Cannot save upload", e);
+        } finally {
+            if(upload != null) {
+                upload.dispose();
+            }
         }
     }
 
