@@ -33,9 +33,7 @@ import com.manydesigns.portofino.model.database.ConnectionProvider;
 import org.apache.commons.dbutils.DbUtils;
 import org.hibernate.dialect.MySQLDialect;
 
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +57,11 @@ public class GoogleCloudSQLDatabasePlatform extends AbstractDatabasePlatform {
 
     public GoogleCloudSQLDatabasePlatform() {
         super(new MySQLDialect(), "jdbc:google:rdbms://<instance-name>/<database>");
+        try {
+            DriverManager.registerDriver((Driver) Class.forName("com.google.cloud.sql.Driver").newInstance());
+        } catch (Exception e) {
+            logger.debug("Driver not found", e);
+        }
     }
 
     //**************************************************************************
