@@ -176,8 +176,8 @@
         <dependency>
             <groupId>com.google.appengine</groupId>
             <artifactId>appengine-api-1.0-sdk</artifactId>
-            <version>1.7.4</version>
-            <scope>compile</scope>
+            <version>${google.appengine.sdk.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- stuff for testing -->
