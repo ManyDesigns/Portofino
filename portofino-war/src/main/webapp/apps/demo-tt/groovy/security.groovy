@@ -76,7 +76,7 @@ class Security extends AbstractApplicationRealmDelegate {
         org.hibernate.Criteria criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq("login", principal));
         def user = criteria.uniqueResult();
-        if("admin".equals(user.login)) {
+        if(user != null && "admin".equals(user.login)) {
             return [realm.application.portofinoProperties.getString(PortofinoProperties.GROUP_ADMINISTRATORS)]
         } else {
             return []
