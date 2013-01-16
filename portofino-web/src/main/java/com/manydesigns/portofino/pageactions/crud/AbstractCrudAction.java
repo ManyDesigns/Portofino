@@ -1248,18 +1248,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Button(list = "crud-read", key = "commons.exportExcel", order = 4)
     public Resolution exportReadExcel() {
         try {
-            final File tmpFile = File.createTempFile(crudConfiguration.getName(), ".read.xls");
-            exportReadExcel(tmpFile);
-            FileInputStream fileInputStream = new FileInputStream(tmpFile);
-            return new StreamingResolution("application/vnd.ms-excel", fileInputStream) {
-                @Override
-                protected void stream(HttpServletResponse response) throws Exception {
-                    super.stream(response);
-                    if(!tmpFile.delete()) {
-                        logger.warn("Temporary file {} could not be deleted", tmpFile.getAbsolutePath());
-                    }
-                }
-            }.setFilename(crudConfiguration.getReadTitle() + ".xls");
+            TempFileService fileService = TempFileService.getInstance();
+            TempFile tempFile =
+                    fileService.newTempFile("application/vnd.ms-excel", crudConfiguration.getReadTitle() + ".xls");
+            OutputStream outputStream = tempFile.getOutputStream();
+            exportReadExcel(outputStream);
+            outputStream.flush();
+            outputStream.close();
+            return fileService.stream(tempFile);
         } catch (Exception e) {
             logger.error("Excel export failed", e);
             SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
@@ -1267,7 +1263,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    public void exportReadExcel(File tempFile)
+    public void exportReadExcel(OutputStream outputStream)
             throws IOException, WriteException {
         setupSearchForm();
 
@@ -1276,16 +1272,16 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         setupForm(Mode.VIEW);
         form.readFromObject(object);
 
-        writeFileReadExcel(tempFile);
+        writeFileReadExcel(outputStream);
     }
 
-    private void writeFileReadExcel(File fileTemp)
+    private void writeFileReadExcel(OutputStream outputStream)
             throws IOException, WriteException {
         WritableWorkbook workbook = null;
         try {
             WorkbookSettings workbookSettings = new WorkbookSettings();
-            workbookSettings.setUseTemporaryFileDuringWrite(true);
-            workbook = Workbook.createWorkbook(fileTemp, workbookSettings);
+            workbookSettings.setUseTemporaryFileDuringWrite(false);
+            workbook = Workbook.createWorkbook(outputStream, workbookSettings);
             WritableSheet sheet =
                 workbook.createSheet(crudConfiguration.getReadTitle(),
                         workbook.getNumberOfSheets());
@@ -1301,38 +1297,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 }
                 i++;
             }
-
-            /*
-            ValueStack valueStack = Struts2Utils.getValueStack();
-            valueStack.push(object);
-
-            //Aggiungo le relazioni/sheet
-            WritableCellFormat formatCell = headerExcel();
-            for (CrudUnit subCrudUnit: subCrudUnits) {
-                subCrudUnit.setupSearchForm();
-                subCrudUnit.loadObjects();
-                subCrudUnit.setupTableForm(Mode.VIEW);
-
-                sheet = workbook.createSheet(subCrudUnit.searchTitle ,
-                        workbook.getNumberOfSheets());
-
-                int m = 0;
-                for (TableForm.Column col : subCrudUnit.tableForm.getColumns()) {
-                    sheet.addCell(new Label(m, 0, col.getLabel(), formatCell));
-                    m++;
-                }
-                int k = 1;
-                for (TableForm.Row row : subCrudUnit.tableForm.getRows()) {
-                    int j = 0;
-                    for (Field field : Arrays.asList(row.getFields())) {
-                        addFieldToCell(sheet, k, j, field);
-                        j++;
-                    }
-                    k++;
-                }
-            }
-            valueStack.pop();
-            */
             workbook.write();
         } catch (IOException e) {
             logger.warn("IOException", e);
