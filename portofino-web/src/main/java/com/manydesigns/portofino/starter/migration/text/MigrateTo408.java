@@ -102,7 +102,7 @@ public class MigrateTo408 {
         if(textHtml.exists()) {
             File configurationFile = new File(dir, "configuration.xml");
             if(configurationFile.exists()) {
-                logger.info("Found text page: " + dir);
+                logger.debug("Found text page: " + dir);
                 TextConfiguration configuration =
                         DispatcherLogic.getConfiguration(configurationFile, null, TextConfiguration.class);
                 for(Attachment attachment : configuration.getAttachments()) {
@@ -112,7 +112,7 @@ public class MigrateTo408 {
                         File destFile = new File(dir, attFile.getName());
                         FileUtils.copyFile(attFile, destFile);
                         filesToDelete.add(attFile);
-                        logger.info("Attachment copied: " + destFile);
+                        logger.debug("Attachment copied: " + destFile);
                     }
                 }
             }

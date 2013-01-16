@@ -560,20 +560,20 @@ public class TextAction extends AbstractPageAction {
 
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution browse() {
-        logger.info("Browse");
+        logger.debug("Browse");
         return new ForwardResolution("/layouts/text/browse.jsp");
     }
 
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution browsePages() {
-        logger.info("Browse Pages");
+        logger.debug("Browse Pages");
         return new ForwardResolution("/layouts/text/browsePages.jsp");
     }
 
     @Button(list = "portletHeaderButtons", key = "layouts.text.manage-attachments.manage_attachments_for_page", order = 3, icon = "ui-icon-link")
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution manageAttachments() {
-        logger.info("Manage attachments");
+        logger.debug("Manage attachments");
         return new ForwardResolution("/layouts/text/manage-attachments.jsp");
     }
 
