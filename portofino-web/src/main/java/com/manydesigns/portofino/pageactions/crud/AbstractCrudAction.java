@@ -1449,18 +1449,15 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Button(list = "crud-search", key = "commons.exportPdf", order = 4)
     public Resolution exportSearchPdf() {
         try {
-            final File tmpFile = File.createTempFile(crudConfiguration.getName() + ".search", ".pdf");
-            exportSearchPdf(tmpFile);
-            FileInputStream fileInputStream = new FileInputStream(tmpFile);
-            return new StreamingResolution(MimeTypes.APPLICATION_PDF, fileInputStream) {
-                @Override
-                protected void stream(HttpServletResponse response) throws Exception {
-                    super.stream(response);
-                    if(!tmpFile.delete()) {
-                        logger.warn("Temporary file {} could not be deleted", tmpFile.getAbsolutePath());
-                    }
-                }
-            }.setFilename(crudConfiguration.getSearchTitle() + ".pdf");
+            //final File tmpFile = File.createTempFile(crudConfiguration.getName() + ".search", ".pdf");
+            TempFileService fileService = TempFileService.getInstance();
+            TempFile tempFile =
+                    fileService.newTempFile(MimeTypes.APPLICATION_PDF, crudConfiguration.getSearchTitle() + ".pdf");
+            OutputStream outputStream = tempFile.getOutputStream();
+            exportSearchPdf(outputStream);
+            outputStream.flush();
+            outputStream.close();
+            return fileService.stream(tempFile);
         } catch (Exception e) {
             logger.error("PDF export failed", e);
             SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
@@ -1468,7 +1465,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    public void exportSearchPdf(File tempPdfFile) throws FOPException,
+    public void exportSearchPdf(OutputStream outputStream) throws FOPException,
             IOException, TransformerException {
 
         setupSearchForm();
@@ -1479,12 +1476,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         FopFactory fopFactory = FopFactory.newInstance();
 
-        FileOutputStream out = null;
         InputStream xsltStream = null;
         try {
-            out = new FileOutputStream(tempPdfFile);
-
-            Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
+            Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, outputStream);
 
             xsltStream = getSearchPdfXsltStream();
 
@@ -1508,20 +1502,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             transformer.transform(src, res);
             reader.close();
 
-            out.flush();
-        } catch (Exception e) {
-            logger.warn("IOException", e);
-            SessionMessages.addErrorMessage(e.getMessage());
+            outputStream.flush();
         } finally {
             IOUtils.closeQuietly(xsltStream);
-            try {
-                if (out != null)
-                    out.close();
-            }
-            catch (Exception e) {
-                logger.warn("IOException", e);
-                SessionMessages.addErrorMessage(e.getMessage());
-            }
         }
     }
 

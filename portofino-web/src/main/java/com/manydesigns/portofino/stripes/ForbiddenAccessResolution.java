@@ -73,23 +73,22 @@ public class ForbiddenAccessResolution implements Resolution {
         if (subject.isAuthenticated()) {
             userId = subject.getPrincipal().toString();
         }
+        String originalPath = ServletUtils.getOriginalPath(request);
+        UrlBuilder urlBuilder =
+                new UrlBuilder(Locale.getDefault(), originalPath, false);
+        Map parameters = request.getParameterMap();
+        urlBuilder.addParameters(parameters);
+        String returnUrl = urlBuilder.toString();
         if (userId == null){
             logger.info("Anonymous user not allowed. Redirecting to login.");
-            String originalPath = ServletUtils.getOriginalPath(request);
-            UrlBuilder urlBuilder =
-                    new UrlBuilder(Locale.getDefault(), originalPath, false);
-            Map parameters = request.getParameterMap();
-            urlBuilder.addParameters(parameters);
-            String returnUrl = urlBuilder.toString();
 
             new RedirectResolution("/actions/user/login")
                     .addParameter("returnUrl", returnUrl)
                     .addParameter("cancelReturnUrl", "/")
                     .execute(request, response);
         } else {
-            logger.warn("User {} not authorized.", userId);
-            new ErrorResolution(UNAUTHORIZED, errorMessage)
-                    .execute(request, response);
+            logger.warn("User {} not authorized for url {}.", userId, returnUrl);
+            new ErrorResolution(UNAUTHORIZED, errorMessage).execute(request, response);
         }
     }
 }

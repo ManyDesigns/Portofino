@@ -93,6 +93,8 @@ public abstract class AbstractApplicationRealmDelegate implements ApplicationRea
             } else {
                 throw new UnsupportedOperationException("OpenID authentication not supported");
             }
+        } else if(token instanceof ServletContainerToken) {
+            return getAuthenticationInfo(realm, (ServletContainerToken) token);
         } else {
             return doGetAuthenticationInfo(realm, token);
         }
@@ -195,6 +197,17 @@ public abstract class AbstractApplicationRealmDelegate implements ApplicationRea
     protected AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, VerificationResult principal) {
         return new SimpleAuthenticationInfo(
                 principal.getVerifiedId(), OpenIDToken.NO_CREDENTIALS, realm.getName());
+    }
+
+    /**
+     * Returns the AuthenticationInfo for a user who was logged in by the container. You can override this method if you
+     * want to associate the user with more information than just a username.
+     * @param realm
+     * @param token
+     * @return
+     */
+    protected AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, ServletContainerToken token) {
+        return new SimpleAuthenticationInfo(token.getPrincipal().getName(), token.getCredentials(), realm.getName());
     }
 
     /**

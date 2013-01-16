@@ -93,14 +93,6 @@
                     <disableUpdateCheck>true</disableUpdateCheck>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.3</version>
-                <configuration>
-                    <packagingExcludes>WEB-INF/lib/logback*.jar</packagingExcludes>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 

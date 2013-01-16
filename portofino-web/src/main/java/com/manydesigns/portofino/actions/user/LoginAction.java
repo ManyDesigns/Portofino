@@ -30,7 +30,6 @@ package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
@@ -109,7 +108,6 @@ public class LoginAction extends AbstractActionBean {
     //**************************************************************************
     // Presentation elements
     //**************************************************************************
-    public boolean recoverPwd;
 
     public String returnUrl;
     public String cancelReturnUrl;
@@ -120,15 +118,12 @@ public class LoginAction extends AbstractActionBean {
     public LoginAction() {}
 
     @DefaultHandler
-    public Resolution execute () {
+    public Resolution execute() {
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
             logger.debug("Already logged in");
             return redirectToReturnUrl();
         }
-
-        recoverPwd = portofinoConfiguration.getBoolean(
-                PortofinoProperties.MAIL_ENABLED, false);
 
         return new ForwardResolution("/layouts/user/login.jsp");
     }
