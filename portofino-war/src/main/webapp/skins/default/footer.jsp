@@ -10,5 +10,5 @@
 <div id="responseTime">
     <fmt:message key="skins.default.footer.response_time"/>: <c:out value="${stopWatch.time}"/> ms.
 </div>
-Powered by <a href="http://www.manydesigns.com/">ManyDesigns Portofino</a>
+Powered by <a href="http://www.manydesigns.com/">Portofino</a>
 <c:out value="${mde:getString(portofinoConfiguration, 'portofino.version')}"/>
