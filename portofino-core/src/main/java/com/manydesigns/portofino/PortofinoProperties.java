@@ -59,8 +59,6 @@ public final class PortofinoProperties {
             "portofino.version";
     public static final String DATABASE_PLATFORMS_LIST =
             "database.platforms.list";
-    public static final String SECURITY_TYPE =
-            "security.type";
     public static final String WAR_REAL_PATH =
             "war.real.path";
     public static final String APPS_DIR_PATH =
@@ -69,28 +67,7 @@ public final class PortofinoProperties {
             "app.id";
     public static final String HOSTNAMES = "portofino.hostnames";
     public static final String FALLBACK_ACTION_CLASS = "fallback.action.class";
-    public static final String SECURITY_REALM_CLASSES = "security.realm.classes";
     public static final String URL_ENCODING = "url.encoding";
-
-    //Email properties
-    public static final String MAIL_ENABLED = "mail.enabled";
-    public static final String MAIL_SMTP_SENDER = "mail.smtp.sender";
-    public static final String MAIL_SMTP_HOST = "mail.smtp.host";
-    public static final String MAIL_SMTP_PORT = "mail.smtp.port";
-    public static final String MAIL_SMTP_SSL_ENABLED = "mail.smtp.ssl.enabled";
-    public static final String MAIL_SMTP_TLS_ENABLED = "mail.smtp.tls.enabled";
-    public static final String MAIL_SMTP_LOGIN = "mail.smtp.login";
-    public static final String MAIL_SMTP_PASSWORD = "mail.smtp.password";
-    public static final String MAIL_POP3_HOST = "mail.pop3.host";
-    public static final String MAIL_POP3_PROTOCOL = "mail.pop3.protocol";
-    public static final String MAIL_POP3_PORT = "mail.pop3.port";
-    public static final String MAIL_POP3_LOGIN = "mail.pop3.login";
-    public static final String MAIL_POP3_PASSWORD = "mail.pop3.password";
-    public static final String MAIL_BOUNCE_ENABLED = "mail.bounce.enabled";
-    public static final String MAIL_POP3_SSL_ENABLED = "mail.pop3.ssl.enabled";
-    public static final String MAIL_KEEP_SENT = "mail.keep.sent";
-    public static final String MAIL_QUEUE_LOCATION = "mail.queue.location";
-    public static final String MAIL_SENDER_POLL_INTERVAL = "mail.sender.poll.interval";
 
     public static final String GROUP_ALL = "group.all";
     public static final String GROUP_ANONYMOUS = "group.anonymous";
