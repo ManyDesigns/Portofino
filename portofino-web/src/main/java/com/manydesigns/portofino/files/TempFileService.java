@@ -31,6 +31,8 @@ package com.manydesigns.portofino.files;
 
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -47,13 +49,17 @@ public abstract class TempFileService {
 
     private static final TempFileService IMPL;
 
+    public static final Logger logger = LoggerFactory.getLogger(TempFileService.class);
+
     static {
         TempFileService impl;
         try {
             Class.forName("com.google.appengine.api.files.FileServiceFactory");
             impl = new GAETempFileService();
+            logger.info("Using Google App Engine FileService API for temporary files");
         } catch (Throwable e) {
             impl = new SimpleTempFileService();
+            logger.info("Using the java.io API for temporary files");
         }
         IMPL = impl;
     }
