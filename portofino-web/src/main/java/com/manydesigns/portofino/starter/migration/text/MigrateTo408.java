@@ -112,7 +112,7 @@ public class MigrateTo408 {
                         File destFile = new File(dir, attFile.getName());
                         FileUtils.copyFile(attFile, destFile);
                         filesToDelete.add(attFile);
-                        logger.debug("Attachment copied: " + destFile);
+                        logger.info("Attachment copied: " + destFile.getAbsolutePath());
                     }
                 }
             }
