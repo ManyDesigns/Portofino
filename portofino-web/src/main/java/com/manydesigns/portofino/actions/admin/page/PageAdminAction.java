@@ -43,7 +43,6 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.forms.CopyPage;
@@ -66,7 +65,7 @@ import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
-import com.manydesigns.portofino.shiro.UsersGroupsDAO;
+import com.manydesigns.portofino.shiro.ApplicationRealm;
 import com.manydesigns.portofino.stripes.ForbiddenAccessResolution;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.HttpUtil;
@@ -77,6 +76,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
@@ -857,13 +857,15 @@ public class PageAdminAction extends AbstractPageAction {
     public Resolution pagePermissions() {
         setupGroups();
 
-        UsersGroupsDAO dao =
-                (UsersGroupsDAO) context.getServletContext().getAttribute(ApplicationAttributes.USERS_GROUPS_DAO);
+        RealmSecurityManager securityManager = (RealmSecurityManager) SecurityUtils.getSecurityManager();
+        ApplicationRealm applicationRealm = (ApplicationRealm) securityManager.getRealms().iterator().next();
 
-        if(dao != null) {
-            users = new LinkedHashSet<String>();
-            users.add(null);
-            users.addAll(dao.getUsers());
+        users = new LinkedHashSet<String>();
+        users.add(null);
+        try {
+            users.addAll(applicationRealm.getUsers());
+        } catch (Exception e) {
+            logger.error("Could not load users", e);
         }
 
         return forwardToPagePermissions();
@@ -927,11 +929,12 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     protected void setupGroups() {
-        UsersGroupsDAO dao =
-                (UsersGroupsDAO) context.getServletContext().getAttribute(ApplicationAttributes.USERS_GROUPS_DAO);
-        if(dao != null) {
-            groups = dao.getGroups();
-        } else {
+        RealmSecurityManager securityManager = (RealmSecurityManager) SecurityUtils.getSecurityManager();
+        ApplicationRealm applicationRealm = (ApplicationRealm) securityManager.getRealms().iterator().next();
+        try {
+            groups = applicationRealm.getGroups();
+        } catch (Exception e) {
+            logger.warn("Could not load groups, falling back to default ones", e);
             groups = new LinkedHashSet<String>();
             Configuration conf = application.getPortofinoProperties();
             groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
