@@ -29,13 +29,12 @@
 
 package com.manydesigns.portofino.quartz;
 
-import com.manydesigns.mail.sender.MailSender;
 import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -43,38 +42,28 @@ import java.util.Set;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@PersistJobDataAfterExecution
 @DisallowConcurrentExecution
-public class MailSenderJob implements Job {
+public class URLInvokeJob implements Job {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    public static final String MAIL_SENDER_KEY = "mail.sender";
-    public static final String MAIL_IDS_TO_MARK_AS_SENT = "mail.sender.idsToMarkAsSent";
-
-    public static final Logger logger = LoggerFactory.getLogger(MailSenderJob.class);
+    public static final Logger logger = LoggerFactory.getLogger(URLInvokeJob.class);
+    public static final String URL_KEY = "url";
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
-        MailSender sender;
         try {
-            sender = (MailSender) jobExecutionContext.getScheduler().getContext().get(MAIL_SENDER_KEY);
-        } catch (SchedulerException e) {
-            logger.error(e.getMessage(), e);
-            return;
-        }
-        if(sender != null) {
-            Set<String> idsToMarkAsSent = (Set<String>) jobDataMap.get(MAIL_IDS_TO_MARK_AS_SENT);
-            if(idsToMarkAsSent == null) {
-                idsToMarkAsSent = new HashSet<String>();
+            JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
+            String urlToInvoke = jobDataMap.get(URL_KEY).toString();
+            logger.debug("URL to invoke: " + urlToInvoke);
+            HttpURLConnection urlConnection = (HttpURLConnection) new URL(urlToInvoke).openConnection();
+            urlConnection.connect();
+            int responseCode = urlConnection.getResponseCode();
+            if(responseCode != 200) {
+                logger.warn("Invocation of URL " + urlToInvoke + " returned response code " + responseCode);
             }
-            int serverErrors = sender.runOnce(idsToMarkAsSent);
-            if(serverErrors < 0) {
-                logger.warn("Mail sender did not run.");
-            } else if(serverErrors > 0) {
-                logger.warn("Mail sender encountered {} server errors.", serverErrors);
-            }
-            jobDataMap.put(MAIL_IDS_TO_MARK_AS_SENT, idsToMarkAsSent);
+        } catch (Exception e) {
+            logger.error("Failed to invoke URL", e);
+            throw new JobExecutionException(e);
         }
     }
 }
