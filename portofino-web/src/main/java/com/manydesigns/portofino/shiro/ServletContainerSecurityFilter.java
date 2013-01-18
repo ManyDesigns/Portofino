@@ -41,7 +41,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Add this to web.xml to manage user authentication with the servlet container.
+ * Add this to shiro.ini to manage user authentication with the servlet container.
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -53,25 +53,6 @@ public class ServletContainerSecurityFilter extends PathMatchingFilter {
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(ServletContainerSecurityFilter.class);
-
-    /*public void init(FilterConfig filterConfig) throws ServletException {}
-
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        Subject subject = SecurityUtils.getSubject();
-        HttpServletRequest req = (HttpServletRequest) request;
-        if (!subject.isAuthenticated() && req.getUserPrincipal() != null) {
-            logger.debug("User is known to the servlet container, but not to Shiro, attempting programmatic login");
-            try {
-                subject.login(new ServletContainerToken(req));
-                logger.info("User {} login", req.getUserPrincipal().getName());
-            } catch (AuthenticationException e) {
-                logger.warn("Programmatic login failed", e);
-            }
-        }// else if(subject.isAuthenticated() )
-        chain.doFilter(request, response);
-    }
-
-    public void destroy() {}*/
 
     @Override
     protected boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
@@ -88,10 +69,17 @@ public class ServletContainerSecurityFilter extends PathMatchingFilter {
             } catch (AuthenticationException e) {
                 logger.warn("Programmatic login failed", e);
             }
-        } else if(shiroAuthenticated && !shiroAuthenticated) {
+        } else if(shiroAuthenticated && !containerAuthenticated) {
             logger.debug("User is authenticated to Shiro, but not to the servlet container; logging out of Shiro.");
+            String userName = ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) + "";
             subject.logout();
+            logger.info("User {} logout", userName);
+            //TODO valutare effetti del distruggere o meno la sessione
+            /*HttpSession session = req.getSession(false);
+            if(session != null) {
+                session.invalidate();
+            }*/
         }
-        return super.onPreHandle(request, response, mappedValue);
+        return true;
     }
 }
