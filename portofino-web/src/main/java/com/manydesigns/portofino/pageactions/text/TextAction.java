@@ -407,7 +407,7 @@ public class TextAction extends AbstractPageAction {
         title = pageInstance.getPage().getTitle();
         try {
             loadContent();
-            logger.info("Edit content: {}", textFile.getAbsolutePath());
+            logger.debug("Edit content: {}", textFile.getAbsolutePath());
         } catch (IOException e) {
             logger.error("Could not load content", e);
             SessionMessages.addErrorMessage("Could not load content: " + e);
@@ -471,8 +471,8 @@ public class TextAction extends AbstractPageAction {
     }
 
     protected void commonUploadAttachment() throws IOException {
+        logger.debug("Uploading attachment");
         viewAttachmentUrl = null;
-        logger.info("Uploading attachment");
         InputStream attachmentStream = upload.getInputStream();
         String attachmentId = RandomUtil.createRandomId();
         File dataFile = RandomUtil.getCodeFile(
@@ -492,9 +492,11 @@ public class TextAction extends AbstractPageAction {
         viewAttachmentUrl =
                 generateViewAttachmentUrl(attachmentId);
         saveConfiguration(textConfiguration);
+        logger.info("Attachment uploaded: " + upload.getFileName() + " (" + attachmentId + ")");
         IOUtils.closeQuietly(attachmentStream);
         IOUtils.closeQuietly(fileOutputStream);
         upload.delete();
+        logger.debug("Upload resources cleaned");
     }
 
     protected String generateViewAttachmentUrl(String attachmentId) {
