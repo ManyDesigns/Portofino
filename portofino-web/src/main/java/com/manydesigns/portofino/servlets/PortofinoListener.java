@@ -219,7 +219,7 @@ public class PortofinoListener
                 logger.info("Scheduling mail sends with Quartz job");
                 try {
                     MailSenderJob.schedule(mailQueueSetup.getMailSender(), mailConfiguration, "portofino");
-                } catch (SchedulerException e) {
+                } catch (Exception e) {
                     logger.error("Could not schedule mail sender job");
                 }
             }
