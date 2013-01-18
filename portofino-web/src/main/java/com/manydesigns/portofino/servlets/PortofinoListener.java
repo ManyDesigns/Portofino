@@ -31,17 +31,14 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.configuration.BeanLookup;
-import com.manydesigns.mail.queue.FileSystemMailQueue;
-import com.manydesigns.mail.queue.LockingMailQueue;
+import com.manydesigns.mail.quartz.MailSenderJob;
 import com.manydesigns.mail.queue.MailQueue;
-import com.manydesigns.mail.sender.DefaultMailSender;
-import com.manydesigns.mail.sender.MailSender;
+import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
-import com.manydesigns.portofino.quartz.MailSenderJob;
-import com.manydesigns.portofino.shiro.UsersGroupsDAO;
+import com.manydesigns.portofino.shiro.ApplicationRealm;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import net.sf.ehcache.CacheManager;
 import ognl.OgnlRuntime;
@@ -55,8 +52,7 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.WebEnvironment;
-import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -67,9 +63,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-import java.io.File;
 import java.nio.charset.Charset;
-import java.util.List;
 
 
 /*
@@ -102,8 +96,6 @@ public class PortofinoListener
     protected ServerInfo serverInfo;
 
     protected ApplicationStarter applicationStarter;
-
-    protected MailSender mailSender;
 
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
 
@@ -183,26 +175,19 @@ public class PortofinoListener
         WebEnvironment environment = environmentLoader.initEnvironment(servletContext);
         logger.debug("Publishing the Application Realm in the servlet context");
         RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
-        List classNames = portofinoConfiguration.getList(PortofinoProperties.SECURITY_REALM_CLASSES);
-        for(Object className : classNames) {
-            try {
-                Class c = Class.forName(className.toString());
-                Realm realm = (Realm) c.newInstance();
-                LifecycleUtils.init(realm);
-                rsm.setRealm(realm);
-                if(realm instanceof UsersGroupsDAO) {
-                    servletContext.setAttribute(ApplicationAttributes.USERS_GROUPS_DAO, realm);
-                }
-            } catch (Throwable t) {
-                logger.error("Couldn't create security realm " + className, t);
-            }
-        }
+        
+        Realm realm = new ApplicationRealm(applicationStarter);
+        LifecycleUtils.init(realm);
+        rsm.setRealm(realm);
 
         logger.info("Initializing ehcache service");
         cacheManager = CacheManager.newInstance();
         servletContext.setAttribute(ApplicationAttributes.EHCACHE_MANAGER, cacheManager);
 
-        setupEmailScheduler();
+        setupMailScheduler();
+
+        logger.info("Disabling OGNL security manager");
+        OgnlRuntime.setSecurityManager(null);
 
         String lineSeparator = System.getProperty("line.separator", "\n");
         logger.info(lineSeparator + SEPARATOR +
@@ -217,9 +202,28 @@ public class PortofinoListener
                         serverInfo.getRealPath()
                 }
         );
+    }
 
-        logger.info("Disabling OGNL security manager");
-        OgnlRuntime.setSecurityManager(null);
+    protected void setupMailScheduler() {
+        MailQueueSetup mailQueueSetup = new MailQueueSetup();
+        mailQueueSetup.setup();
+
+        MailQueue mailQueue = mailQueueSetup.getMailQueue();
+        if(mailQueue != null) {
+            servletContext.setAttribute(ApplicationAttributes.MAIL_QUEUE, mailQueue);
+        }
+
+        Configuration mailConfiguration = mailQueueSetup.getMailConfiguration();
+        if(mailConfiguration != null) {
+            if(mailConfiguration.getBoolean("mail.quartz.enabled", false)) {
+                logger.info("Scheduling mail sends with Quartz job");
+                try {
+                    MailSenderJob.schedule(mailQueueSetup.getMailSender(), mailConfiguration, "portofino");
+                } catch (SchedulerException e) {
+                    logger.error("Could not schedule mail sender job");
+                }
+            }
+        }
     }
 
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
@@ -231,78 +235,6 @@ public class PortofinoListener
         logger.info("Shutting down cache...");
         cacheManager.shutdown();
         logger.info("ManyDesigns Portofino stopped.");
-    }
-
-    //**************************************************************************
-    // Mail
-    //**************************************************************************
-
-    public void setupEmailScheduler() {
-        String securityType = portofinoConfiguration
-                .getString(PortofinoProperties.SECURITY_TYPE, "application");
-        boolean mailEnabled = portofinoConfiguration.getBoolean(
-                PortofinoProperties.MAIL_ENABLED, false);
-        if ("application".equals(securityType) && mailEnabled) {
-            String mailHost = portofinoConfiguration
-                    .getString(PortofinoProperties.MAIL_SMTP_HOST);
-            if (null == mailHost) {
-                logger.error("Mail is enabled but smtp server not set in portofino-custom.properties");
-            } else {
-                logger.info("Mail is enabled, starting sender");
-                int port = portofinoConfiguration.getInt(
-                        PortofinoProperties.MAIL_SMTP_PORT, 25);
-                boolean ssl = portofinoConfiguration.getBoolean(
-                        PortofinoProperties.MAIL_SMTP_SSL_ENABLED, false);
-                boolean tls = portofinoConfiguration.getBoolean(
-                        PortofinoProperties.MAIL_SMTP_TLS_ENABLED, false);
-                String login = portofinoConfiguration.getString(
-                        PortofinoProperties.MAIL_SMTP_LOGIN);
-                String password = portofinoConfiguration.getString(
-                        PortofinoProperties.MAIL_SMTP_PASSWORD);
-                boolean keepSent = portofinoConfiguration.getBoolean(
-                        PortofinoProperties.MAIL_KEEP_SENT, false);
-
-                String mailQueueLocation =
-                        portofinoConfiguration.getString(PortofinoProperties.MAIL_QUEUE_LOCATION);
-                MailQueue mailQueue =
-                        new LockingMailQueue(new FileSystemMailQueue(new File(mailQueueLocation)));
-                logger.info("Mail queue location: {}", mailQueueLocation);
-                mailQueue.setKeepSent(keepSent);
-                mailSender = new DefaultMailSender(mailQueue);
-                mailSender.setServer(mailHost);
-                mailSender.setLogin(login);
-                mailSender.setPassword(password);
-                mailSender.setPort(port);
-                mailSender.setSsl(ssl);
-                mailSender.setTls(tls);
-
-                try {
-                    Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-                    JobDetail job = JobBuilder
-                            .newJob(MailSenderJob.class)
-                            .withIdentity("mail.sender", "portofino")
-                            .build();
-
-                    int pollInterval = portofinoConfiguration.getInt(PortofinoProperties.MAIL_SENDER_POLL_INTERVAL);
-
-                    Trigger trigger = TriggerBuilder.newTrigger()
-                        .withIdentity("mail.sender.trigger", "portofino")
-                        .startNow()
-                        .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                            .withIntervalInMilliseconds(pollInterval)
-                            .repeatForever())
-                        .build();
-
-                    scheduler.getContext().put(MailSenderJob.MAIL_SENDER_KEY, mailSender);
-                    scheduler.scheduleJob(job, trigger);
-                    servletContext.setAttribute(
-                        ApplicationAttributes.MAIL_QUEUE, mailQueue);
-                    logger.info("Mail sender started");
-                } catch (SchedulerException e) {
-                    logger.error("Couldn't start email task", e);
-                }
-            }
-        }
     }
 
     //**************************************************************************
@@ -341,5 +273,5 @@ public class PortofinoListener
         ConfigurationInterpolator.registerGlobalLookup(
         ApplicationAttributes.SERVER_INFO,
         serverInfoLookup);
-}
+    }
 }
