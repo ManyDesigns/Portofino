@@ -70,12 +70,15 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * Action that handles the standard Portofino login form. It supports two login methods: username + password
+ * and OpenID.
+ *
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 @UrlBinding(LoginAction.URL_BINDING)
 public class LoginAction extends AbstractActionBean {
     public static final String copyright =

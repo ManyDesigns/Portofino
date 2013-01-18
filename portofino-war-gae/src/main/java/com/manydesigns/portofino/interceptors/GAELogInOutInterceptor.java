@@ -27,7 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.stripes;
+package com.manydesigns.portofino.interceptors;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -38,12 +38,14 @@ import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
+import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Locale;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -52,21 +54,35 @@ import javax.servlet.http.HttpServletRequest;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @Intercepts(LifecycleStage.EventHandling)
-public class GAELoginInterceptor implements Interceptor {
+public class GAELogInOutInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (c) 2005-2012, ManyDesigns srl";
 
-    public static final Logger logger = LoggerFactory.getLogger(GAELoginInterceptor.class);
+    public static final Logger logger = LoggerFactory.getLogger(GAELogInOutInterceptor.class);
 
     public Resolution intercept(ExecutionContext context) throws Exception {
-        if(context.getActionBean() instanceof LoginAction && context.getHandler().getName().equals("execute")) {
-            Subject subject = SecurityUtils.getSubject();
-            if (!subject.isAuthenticated()) {
-                logger.debug("User not authenticated, redirecting to GAE login URL");
-                HttpServletRequest request = context.getActionBeanContext().getRequest();
-                UserService userService = UserServiceFactory.getUserService();
-                String loginUrl = userService.createLoginURL(request.getParameter("returnUrl"));
-                return new RedirectResolution(loginUrl);
+        if(context.getActionBean() instanceof LoginAction) {
+            if(context.getHandler().getName().equals("execute")) {
+                //((LoginAction) context.getActionBean()).getApplication().getAppConfiguration();
+                Subject subject = SecurityUtils.getSubject();
+                if (!subject.isAuthenticated()) {
+                    logger.debug("User not authenticated, redirecting to GAE login URL");
+                    HttpServletRequest request = context.getActionBeanContext().getRequest();
+                    UserService userService = UserServiceFactory.getUserService();
+                    String loginUrl = userService.createLoginURL(request.getParameter("returnUrl"));
+                    return new RedirectResolution(loginUrl);
+                }
+            } else if(context.getHandler().getName().equals("logout")) {
+                Subject subject = SecurityUtils.getSubject();
+                if(subject.isAuthenticated()) {
+                    logger.debug("User not authenticated, redirecting to GAE logout URL");
+                    UserService userService = UserServiceFactory.getUserService();
+                    Locale locale = context.getActionBeanContext().getLocale();
+                    UrlBuilder urlBuilder = new UrlBuilder(locale, LoginAction.class, false);
+                    urlBuilder.setEvent("logout");
+                    String logoutUrl = userService.createLogoutURL(urlBuilder.toString());
+                    return new RedirectResolution(logoutUrl);
+                }
             }
         }
         return context.proceed();

@@ -60,6 +60,12 @@ public class ApplicationRealm extends AuthorizingRealm implements UsersGroupsDAO
 
     public static final Logger logger = LoggerFactory.getLogger(ApplicationRealm.class);
 
+    protected final ApplicationStarter applicationStarter;
+
+    public ApplicationRealm(ApplicationStarter applicationStarter) {
+        this.applicationStarter = applicationStarter;
+    }
+
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         //null usernames are invalid
