@@ -38,14 +38,12 @@ import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
-import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Locale;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -77,10 +75,9 @@ public class GAELogInOutInterceptor implements Interceptor {
                 if(subject.isAuthenticated()) {
                     logger.debug("User not authenticated, redirecting to GAE logout URL");
                     UserService userService = UserServiceFactory.getUserService();
-                    Locale locale = context.getActionBeanContext().getLocale();
-                    UrlBuilder urlBuilder = new UrlBuilder(locale, LoginAction.class, false);
-                    urlBuilder.setEvent("logout");
-                    String logoutUrl = userService.createLogoutURL(urlBuilder.toString());
+                    ((LoginAction) context.getActionBean()).logout();
+                    String logoutUrl = userService.createLogoutURL(
+                            context.getActionBeanContext().getRequest().getContextPath() + "/");
                     return new RedirectResolution(logoutUrl);
                 }
             }

@@ -54,6 +54,10 @@ public class ServletContainerSecurityFilter extends PathMatchingFilter {
 
     public static final Logger logger = LoggerFactory.getLogger(ServletContainerSecurityFilter.class);
 
+    public ServletContainerSecurityFilter() {
+        processPathConfig("/**", null);
+    }
+
     @Override
     protected boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
         Subject subject = SecurityUtils.getSubject();
