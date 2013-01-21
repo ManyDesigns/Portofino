@@ -31,13 +31,14 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.configuration.BeanLookup;
-import com.manydesigns.mail.quartz.MailSenderJob;
 import com.manydesigns.mail.queue.MailQueue;
+import com.manydesigns.mail.setup.MailProperties;
 import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
+import com.manydesigns.portofino.quartz.URLInvokeJob;
 import com.manydesigns.portofino.shiro.ApplicationRealm;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import net.sf.ehcache.CacheManager;
@@ -52,7 +53,8 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.WebEnvironment;
-import org.quartz.SchedulerException;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -209,16 +211,43 @@ public class PortofinoListener
         mailQueueSetup.setup();
 
         MailQueue mailQueue = mailQueueSetup.getMailQueue();
-        if(mailQueue != null) {
-            servletContext.setAttribute(ApplicationAttributes.MAIL_QUEUE, mailQueue);
+        if(mailQueue == null) {
+            logger.debug("Mail not enabled");
+            return;
         }
+
+        servletContext.setAttribute(ApplicationAttributes.MAIL_QUEUE, mailQueue);
+        servletContext.setAttribute(ApplicationAttributes.MAIL_SENDER, mailQueueSetup.getMailSender());
 
         Configuration mailConfiguration = mailQueueSetup.getMailConfiguration();
         if(mailConfiguration != null) {
             if(mailConfiguration.getBoolean("mail.quartz.enabled", false)) {
                 logger.info("Scheduling mail sends with Quartz job");
                 try {
-                    MailSenderJob.schedule(mailQueueSetup.getMailSender(), mailConfiguration, "portofino");
+                    Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+                    JobDetail job = JobBuilder
+                            .newJob(URLInvokeJob.class)
+                            .withIdentity("mail.sender", "portofino")
+                            .build();
+
+                    int pollInterval = mailConfiguration.getInt(MailProperties.MAIL_SENDER_POLL_INTERVAL);
+
+                    Trigger trigger = TriggerBuilder.newTrigger()
+                        .withIdentity("mail.sender.trigger", "portofino")
+                        .startNow()
+                        .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                                .withIntervalInMilliseconds(pollInterval)
+                                .repeatForever())
+                        .build();
+
+                    if(serverInfo.getContextPath() == null) {
+                        logger.error("Could not start mail sender URL invoke job, context path is not known (Servlet < 2.5?)");
+                        return;
+                    }
+                    String hostPort = mailConfiguration.getString("mail.sender.host_port", "localhost:8080");
+                    String url = "http://" + hostPort + serverInfo.getContextPath() + "/actions/mail-sender-run";
+                    scheduler.getContext().put(URLInvokeJob.URL_KEY, url);
+                    scheduler.scheduleJob(job, trigger);
                 } catch (Exception e) {
                     logger.error("Could not schedule mail sender job");
                 }

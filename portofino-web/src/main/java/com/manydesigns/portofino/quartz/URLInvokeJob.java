@@ -52,8 +52,8 @@ public class URLInvokeJob implements Job {
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         try {
-            JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
-            String urlToInvoke = jobDataMap.get(URL_KEY).toString();
+            SchedulerContext context = jobExecutionContext.getScheduler().getContext();
+            String urlToInvoke = context.get(URL_KEY).toString();
             logger.debug("URL to invoke: " + urlToInvoke);
             HttpURLConnection urlConnection = (HttpURLConnection) new URL(urlToInvoke).openConnection();
             urlConnection.connect();
