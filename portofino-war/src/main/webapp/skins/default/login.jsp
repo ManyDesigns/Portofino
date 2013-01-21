@@ -132,7 +132,10 @@
                                 </stripes:layout-component>
                             </div>
                             <div class="portletFooter" style="border-top: 1px solid #ddd; padding-top: 0.5em">
-                                Powered by <a href="http://www.manydesigns.com/">ManyDesigns Portofino</a>
+                                <jsp:useBean id="portofinoConfiguration" scope="application"
+                                             type="org.apache.commons.configuration.Configuration"/>
+                                Powered by <a href="http://www.manydesigns.com/">Portofino</a>
+                                <c:out value="${mde:getString(portofinoConfiguration, 'portofino.version')}"/>
                             </div>
                         </div>
                     </div>
