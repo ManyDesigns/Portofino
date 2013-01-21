@@ -188,6 +188,10 @@ public class PortofinoListener
 
         setupMailScheduler();
 
+        //Disabilitazione security manager per funzionare su GAE. Il security manager permette di valutare
+        //in sicurezza espressioni OGNL provenienti da fonti non sicure, configurando i necessari permessi
+        //(invoke.<declaring-class>.<method-name>). In Portofino non permettiamo agli utenti finali di valutare
+        //espressioni OGNL arbitrarie, pertanto il security manager può essere disabilitato in sicurezza.
         logger.info("Disabling OGNL security manager");
         OgnlRuntime.setSecurityManager(null);
 
