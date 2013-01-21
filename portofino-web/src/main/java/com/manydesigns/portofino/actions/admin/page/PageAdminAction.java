@@ -43,7 +43,6 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.forms.CopyPage;
 import com.manydesigns.portofino.actions.forms.MovePage;
@@ -936,11 +935,11 @@ public class PageAdminAction extends AbstractPageAction {
         } catch (Exception e) {
             logger.warn("Could not load groups, falling back to default ones", e);
             groups = new LinkedHashSet<String>();
-            Configuration conf = application.getPortofinoProperties();
-            groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
-            groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
-            groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
-            groups.add(conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS));
+            Configuration conf = application.getAppConfiguration();
+            groups.add(conf.getString(AppProperties.GROUP_ALL));
+            groups.add(conf.getString(AppProperties.GROUP_ANONYMOUS));
+            groups.add(conf.getString(AppProperties.GROUP_REGISTERED));
+            groups.add(conf.getString(AppProperties.GROUP_ADMINISTRATORS));
             Permissions permissions = SecurityLogic.calculateActualPermissions(getPageInstance());
             for(String group : permissions.getActualLevels().keySet()) {
                 groups.add(group);

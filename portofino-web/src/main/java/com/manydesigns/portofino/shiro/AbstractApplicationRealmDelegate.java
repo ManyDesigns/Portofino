@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.shiro;
 
-import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.shiro.openid.OpenIDToken;
 import org.apache.commons.configuration.Configuration;
@@ -112,18 +112,18 @@ public abstract class AbstractApplicationRealmDelegate implements ApplicationRea
     public AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, Object principal) {
         Application application = realm.getApplication();
         Set<String> groups = new HashSet<String>();
-        Configuration conf = application.getPortofinoProperties();
-        groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
+        Configuration conf = application.getAppConfiguration();
+        groups.add(conf.getString(AppProperties.GROUP_ALL));
         if (principal == null) {
-            groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
+            groups.add(conf.getString(AppProperties.GROUP_ANONYMOUS));
         } else if(principal instanceof PrincipalCollection) {
-            groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
+            groups.add(conf.getString(AppProperties.GROUP_REGISTERED));
             groups.addAll(loadAuthorizationInfo(realm, (PrincipalCollection) principal));
         } else if(principal instanceof String) {
-            groups.add(conf.getString(PortofinoProperties.GROUP_REGISTERED));
+            groups.add(conf.getString(AppProperties.GROUP_REGISTERED));
             groups.addAll(loadAuthorizationInfo(realm, (String) principal));
         } else if(realm.isOpenIDEnabled() && (principal instanceof Identifier)) {
-            groups.add(conf.getString(PortofinoProperties.GROUP_EXTERNALLY_AUTHENTICATED));
+            groups.add(conf.getString(AppProperties.GROUP_EXTERNALLY_AUTHENTICATED));
             groups.addAll(loadAuthorizationInfo(realm, (Identifier) principal));
         } else {
             groups.addAll(loadAuthorizationInfo(realm, principal));
@@ -179,12 +179,12 @@ public abstract class AbstractApplicationRealmDelegate implements ApplicationRea
     }
 
     /**
-     * Returns the name of the administrators group as defined in portofino.properties.
+     * Returns the name of the administrators group as defined in app.properties.
      * @param realm
      * @return
      */
     protected String getAdministratorsGroup(ApplicationRealm realm) {
-        return realm.getApplication().getPortofinoProperties().getString(PortofinoProperties.GROUP_ADMINISTRATORS);
+        return realm.getApplication().getAppConfiguration().getString(AppProperties.GROUP_ADMINISTRATORS);
     }
 
     /**
@@ -232,17 +232,17 @@ public abstract class AbstractApplicationRealmDelegate implements ApplicationRea
     public Set<String> getGroups(ApplicationRealm realm) {
         Application application = realm.getApplication();
         Set<String> groups = new LinkedHashSet<String>();
-        Configuration conf = application.getPortofinoProperties();
-        String group = conf.getString(PortofinoProperties.GROUP_ALL);
+        Configuration conf = application.getAppConfiguration();
+        String group = conf.getString(AppProperties.GROUP_ALL);
         groups.add(group);
-        group = conf.getString(PortofinoProperties.GROUP_ANONYMOUS);
+        group = conf.getString(AppProperties.GROUP_ANONYMOUS);
         groups.add(group);
-        group = conf.getString(PortofinoProperties.GROUP_REGISTERED);
+        group = conf.getString(AppProperties.GROUP_REGISTERED);
         groups.add(group);
-        group = conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
+        group = conf.getString(AppProperties.GROUP_ADMINISTRATORS);
         groups.add(group);
         if(realm.isOpenIDEnabled()) {
-            groups.add(conf.getString(PortofinoProperties.GROUP_EXTERNALLY_AUTHENTICATED));
+            groups.add(conf.getString(AppProperties.GROUP_EXTERNALLY_AUTHENTICATED));
         }
         return groups;
     }

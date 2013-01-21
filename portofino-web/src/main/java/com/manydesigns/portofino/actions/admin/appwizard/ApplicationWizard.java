@@ -44,12 +44,12 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderForm;
 import com.manydesigns.portofino.actions.forms.SelectableSchema;
+import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
@@ -993,7 +993,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             createCrudPage(dir, userTable, childPages, template);
         }
 
-        Configuration conf = application.getPortofinoProperties();
+        Configuration conf = application.getAppConfiguration();
         List<Reference> references = (List<Reference>) children.get(userTable);
         if(references != null) {
             for(Reference ref : references) {
@@ -1030,7 +1030,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
                         childPages, template, bindings, title);
                 if(page != null) {
                     Group group = new Group();
-                    group.setName(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
+                    group.setName(conf.getString(AppProperties.GROUP_ANONYMOUS));
                     group.setAccessLevel(AccessLevel.DENY.name());
                     Permissions permissions = new Permissions();
                     permissions.getGroups().add(group);

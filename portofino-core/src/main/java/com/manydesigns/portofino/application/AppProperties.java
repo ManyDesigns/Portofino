@@ -43,6 +43,8 @@ public class AppProperties {
     // Default location
     //**************************************************************************
 
+    public final static String PROPERTIES_DEFAULT_RESOURCE =
+            "app.default.properties";
     public final static String PROPERTIES_RESOURCE =
             "app.properties";
 
@@ -60,4 +62,11 @@ public class AppProperties {
             "init-at-startup";
     public static final String OPENID_ENABLED =
             "openId.enabled";
+
+    public static final String GROUP_ALL = "group.all";
+    public static final String GROUP_ANONYMOUS = "group.anonymous";
+    public static final String GROUP_REGISTERED = "group.registered";
+    public static final String GROUP_EXTERNALLY_AUTHENTICATED = "group.externallyAuthenticated";
+    public static final String GROUP_ADMINISTRATORS = "group.administrators";
+
 }

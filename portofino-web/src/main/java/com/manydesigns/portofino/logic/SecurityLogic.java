@@ -29,8 +29,8 @@
 
 package com.manydesigns.portofino.logic;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
+import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -166,8 +166,8 @@ public class SecurityLogic {
     public static boolean hasPermissions
             (Application application, Permissions configuration, Subject subject, AccessLevel level, String... permissions) {
         if(subject.isAuthenticated()) {
-            Configuration conf = application.getPortofinoProperties();
-            String administratorsGroup = conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
+            Configuration conf = application.getAppConfiguration();
+            String administratorsGroup = conf.getString(AppProperties.GROUP_ADMINISTRATORS);
             if(isUserInGroup(administratorsGroup)) {
                 return true;
             }
@@ -194,10 +194,10 @@ public class SecurityLogic {
     public static boolean hasAnonymousPermissions
             (Application application, Permissions configuration, AccessLevel level, String... permissions) {
         PagePermission pagePermission = new PagePermission(configuration, level, permissions);
-        Configuration portofinoConfiguration = application.getPortofinoProperties();
+        Configuration conf = application.getAppConfiguration();
         List<String> groups = new ArrayList<String>();
-        groups.add(portofinoConfiguration.getString(PortofinoProperties.GROUP_ALL));
-        groups.add(portofinoConfiguration.getString(PortofinoProperties.GROUP_ANONYMOUS));
+        groups.add(conf.getString(AppProperties.GROUP_ALL));
+        groups.add(conf.getString(AppProperties.GROUP_ANONYMOUS));
         return new GroupPermission(groups).implies(pagePermission);
     }
 
@@ -212,8 +212,8 @@ public class SecurityLogic {
     }
 
     public static boolean isAdministrator(Application application) {
-        Configuration portofinoConfiguration = application.getPortofinoProperties();
-        String administratorsGroup = portofinoConfiguration.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
+        Configuration conf = application.getAppConfiguration();
+        String administratorsGroup = conf.getString(AppProperties.GROUP_ADMINISTRATORS);
         return isUserInGroup(administratorsGroup);
     }
 

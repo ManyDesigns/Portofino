@@ -69,12 +69,6 @@ public final class PortofinoProperties {
     public static final String FALLBACK_ACTION_CLASS = "fallback.action.class";
     public static final String URL_ENCODING = "url.encoding";
 
-    public static final String GROUP_ALL = "group.all";
-    public static final String GROUP_ANONYMOUS = "group.anonymous";
-    public static final String GROUP_REGISTERED = "group.registered";
-    public static final String GROUP_EXTERNALLY_AUTHENTICATED = "group.externallyAuthenticated";
-    public static final String GROUP_ADMINISTRATORS = "group.administrators";
-
     //Liquibase properties
     public static final String LIQUIBASE_ENABLED = "liquibase.enabled";
 

@@ -38,6 +38,7 @@ import com.manydesigns.portofino.application.DefaultApplication;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.starter.migration.text.MigrateTo408;
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -79,7 +80,7 @@ public class ApplicationStarter {
     //--------------------------------------------------------------------------
 
     protected final Configuration portofinoConfiguration;
-    protected Configuration appConfiguration;
+    protected CompositeConfiguration appConfiguration;
 
     protected Status status;
 
@@ -142,7 +143,9 @@ public class ApplicationStarter {
         File appConfigurationFile =
                 new File(appDir, AppProperties.PROPERTIES_RESOURCE);
         if(appConfigurationFile.exists()) {
-            appConfiguration = new PropertiesConfiguration(appConfigurationFile);
+            appConfiguration = new CompositeConfiguration();
+            appConfiguration.addConfiguration(new PropertiesConfiguration(getClass().getResource("/app.default.properties")));
+            appConfiguration.addConfiguration(new PropertiesConfiguration(appConfigurationFile));
         } else {
             throw new FileNotFoundException(appConfigurationFile.getAbsolutePath());
         }

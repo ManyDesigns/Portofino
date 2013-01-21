@@ -13,6 +13,7 @@ import org.hibernate.Session
 import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import com.manydesigns.portofino.application.AppProperties
 
 class Security extends AbstractApplicationRealmDelegate {
 
@@ -63,7 +64,7 @@ class Security extends AbstractApplicationRealmDelegate {
         logger.debug("Loading user with id = {}", userId);
         def user = session.load("users", userId);
         if("admin".equals(user.login)) {
-            return [realm.application.portofinoProperties.getString(PortofinoProperties.GROUP_ADMINISTRATORS)]
+            return [realm.application.appConfiguration.getString(AppProperties.GROUP_ADMINISTRATORS)]
         } else {
             return []
         }
@@ -77,7 +78,7 @@ class Security extends AbstractApplicationRealmDelegate {
         criteria.add(Restrictions.eq("login", principal));
         def user = criteria.uniqueResult();
         if(user != null && "admin".equals(user.login)) {
-            return [realm.application.portofinoProperties.getString(PortofinoProperties.GROUP_ADMINISTRATORS)]
+            return [realm.application.appConfiguration.getString(AppProperties.GROUP_ADMINISTRATORS)]
         } else {
             return []
         }
