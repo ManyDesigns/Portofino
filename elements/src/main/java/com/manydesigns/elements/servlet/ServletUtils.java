@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2012 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -43,7 +43,7 @@ import java.util.Enumeration;
  */
 public class ServletUtils {
     public static final String copyright =
-            "Copyright (c) 2005-2012, ManyDesigns srl";
+            "Copyright (c) 2005-2013, ManyDesigns srl";
 
     public final static Logger logger =
             LoggerFactory.getLogger(ServletUtils.class);

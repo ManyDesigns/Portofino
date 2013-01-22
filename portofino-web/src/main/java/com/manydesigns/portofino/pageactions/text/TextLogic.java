@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2012 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -40,7 +40,7 @@ import com.manydesigns.portofino.pageactions.text.configuration.TextConfiguratio
  */
 public class TextLogic {
     public static final String copyright =
-            "Copyright (c) 2005-2012, ManyDesigns srl";
+            "Copyright (c) 2005-2013, ManyDesigns srl";
 
     public static Attachment createAttachment(TextConfiguration textConfiguration, String id, String fileName,
                                               String contentType, long size) {

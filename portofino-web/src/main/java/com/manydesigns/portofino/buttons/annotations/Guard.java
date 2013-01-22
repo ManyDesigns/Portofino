@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2012 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -50,7 +50,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD})
 public @interface Guard {
     public static final String copyright =
-            "Copyright (c) 2005-2012, ManyDesigns srl";
+            "Copyright (c) 2005-2013, ManyDesigns srl";
 
     /**
      * The test condition, an OGNL expression that must return a boolean. The root object for the expression

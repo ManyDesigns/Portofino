@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 */
 public class NumericFieldTest extends AbstractElementsTest {
     public static final String copyright =
-            "Copyright (c) 2005-2012, ManyDesigns srl";
+            "Copyright (c) 2005-2013, ManyDesigns srl";
 
     public BigDecimal myDecimal;
     private NumericField decimalField;

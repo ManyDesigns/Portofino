@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2012 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -39,7 +39,7 @@ import java.util.Set;
 */
 public class POP3SimpleClient extends POP3Client {
     public static final String copyright =
-            "Copyright (c) 2005-2012, ManyDesigns srl";
+            "Copyright (c) 2005-2013, ManyDesigns srl";
 
 
     public POP3SimpleClient(String host, String provider, int port, String username, String password) {

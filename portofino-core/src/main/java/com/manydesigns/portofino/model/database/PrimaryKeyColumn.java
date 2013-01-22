@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2012 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -48,7 +48,7 @@ import javax.xml.bind.annotation.*;
 @XmlAccessorType(XmlAccessType.NONE)
 public class PrimaryKeyColumn implements ModelObject {
     public static final String copyright =
-            "Copyright (c) 2005-2012, ManyDesigns srl";
+            "Copyright (c) 2005-2013, ManyDesigns srl";
 
     //**************************************************************************
     // Fields

@@ -11,7 +11,7 @@ import com.manydesigns.elements.annotations.Updatable;
  */
 public class SelectableRoot {
     public static final String copyright =
-            "Copyright (c) 2005-2012, ManyDesigns srl";
+            "Copyright (c) 2005-2013, ManyDesigns srl";
 
     @Updatable(false)
     public String tableName;

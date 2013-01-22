@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2012 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -83,7 +83,7 @@ import java.util.*;
 @UrlBinding(TablesAction.BASE_ACTION_PATH + "/{databaseName}/{schemaName}/{tableName}/{columnName}")
 public class TablesAction extends AbstractActionBean implements AdminAction {
     public static final String copyright =
-            "Copyright (c) 2005-2012, ManyDesigns srl";
+            "Copyright (c) 2005-2013, ManyDesigns srl";
 
     public static final String BASE_ACTION_PATH = "/actions/admin/tables";
 

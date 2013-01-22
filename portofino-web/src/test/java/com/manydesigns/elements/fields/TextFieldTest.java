@@ -18,7 +18,7 @@ import com.manydesigns.elements.util.Util;
 */
 public class TextFieldTest extends AbstractElementsTest {
     public static final String copyright =
-            "Copyright (c) 2005-2012, ManyDesigns srl";
+            "Copyright (c) 2005-2013, ManyDesigns srl";
 
     public String myText;
 
