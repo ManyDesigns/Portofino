@@ -24,7 +24,7 @@
         </c:if>
         <c:if test="${actionBean.schemasForm != null}">
             <div class="horizontalSeparator"></div>
-            <h2><fmt:message key="layouts.admin.connectionProviders.read.detected_values"/></h2>
+            <h2><fmt:message key="layouts.admin.connectionProviders.read.configured_schemas"/></h2>
             <mde:write name="actionBean" property="schemasForm"/>
         </c:if>
         <stripes:hidden name="databaseName" value="${actionBean.databaseName}"/>
