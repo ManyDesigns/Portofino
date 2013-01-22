@@ -459,7 +459,8 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 }
             }
 
-            if(selectionProviderName == null) {
+            if(!StringUtils.equals(databaseSelectionProviderForm.getName(), selectionProviderName)) {
+                logger.debug("Selection provider name changed or is new, checking for duplicates");
                 if(DatabaseLogic.findSelectionProviderByName(
                         table, databaseSelectionProviderForm.getName()) != null) {
                     String message = getMessage(
@@ -468,7 +469,10 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                     SessionMessages.addErrorMessage(message);
                     return doEditSelectionProvider(databaseSelectionProviderForm);
                 }
-                table.getSelectionProviders().add(databaseSelectionProvider);
+                if(selectionProviderName == null) {
+                    logger.debug("Selection provider is new, adding");
+                    table.getSelectionProviders().add(databaseSelectionProvider);
+                }
             }
             databaseSelectionProviderForm.copyTo(databaseSelectionProvider);
             databaseSelectionProvider.getReferences().clear();

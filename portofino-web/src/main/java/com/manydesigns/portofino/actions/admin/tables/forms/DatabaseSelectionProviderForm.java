@@ -32,7 +32,6 @@ package com.manydesigns.portofino.actions.admin.tables.forms;
 import com.manydesigns.elements.annotations.FieldSize;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
-import com.manydesigns.elements.annotations.Updatable;
 import com.manydesigns.portofino.model.database.DatabaseSelectionProvider;
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -67,7 +66,6 @@ public class DatabaseSelectionProviderForm extends DatabaseSelectionProvider {
 
     @Override
     @Required
-    @Updatable(false)
     @FieldSize(50)
     public String getName() {
         return super.getName();
