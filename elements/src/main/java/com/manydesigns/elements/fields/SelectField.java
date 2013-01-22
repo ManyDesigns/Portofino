@@ -467,7 +467,7 @@ public class SelectField extends AbstractField {
     public void valueToXhtmlHidden(XhtmlBuffer xb) {
         Object value = selectionModel.getValue(selectionModelIndex);
         String stringValue = OgnlUtils.convertValueToString(value);
-        xb.writeInputHidden(id, inputName, stringValue);
+        xb.writeInputHidden(inputName, stringValue);
     }
 
     public void valueToXhtmlView(XhtmlBuffer xb) {
