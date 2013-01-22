@@ -65,8 +65,12 @@
 
     <!-- Uncomment the following to enable container-managed security.
          Note that, in order to properly use the GAE user service, you must also ensure that the class defined in your
-         security.groovy file inherits from com.manydesigns.portofino.shiro.GAEApplicationRealmDelegate and enable the
-         interceptor com.manydesigns.portofino.interceptors.GAELogInOutInterceptor in the Stripes filter further below.
+         security.groovy file inherits from com.manydesigns.portofino.shiro.GAEApplicationRealmDelegate and that your
+         app.properties file contains the following settings:
+
+            login.link=/actions/user/login.gae?returnUrl={0}
+            logout.link=/actions/user/login.gae?logout=
+
     -->
     <!--
     <filter>
@@ -151,7 +155,6 @@
                 com.manydesigns.portofino.interceptors.ApplicationInterceptor,
                 com.manydesigns.portofino.interceptors.InjectionInterceptor,
                 com.manydesigns.portofino.interceptors.GuardsInterceptor
-                <!-- com.manydesigns.portofino.interceptors.GAELogInOutInterceptor -->
             </param-value>
         </init-param>
         <init-param>

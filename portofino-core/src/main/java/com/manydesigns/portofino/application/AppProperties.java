@@ -44,7 +44,7 @@ public class AppProperties {
     //**************************************************************************
 
     public final static String PROPERTIES_DEFAULT_RESOURCE =
-            "app.default.properties";
+            "/app.default.properties";
     public final static String PROPERTIES_RESOURCE =
             "app.properties";
 
@@ -68,5 +68,8 @@ public class AppProperties {
     public static final String GROUP_REGISTERED = "group.registered";
     public static final String GROUP_EXTERNALLY_AUTHENTICATED = "group.externallyAuthenticated";
     public static final String GROUP_ADMINISTRATORS = "group.administrators";
+
+    public static final String LOGIN_LINK = "login.link";
+    public static final String LOGOUT_LINK = "logout.link";
 
 }

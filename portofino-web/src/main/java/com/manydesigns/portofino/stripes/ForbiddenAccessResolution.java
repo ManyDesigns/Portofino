@@ -30,6 +30,9 @@
 package com.manydesigns.portofino.stripes;
 
 import com.manydesigns.elements.servlet.ServletUtils;
+import com.manydesigns.portofino.RequestAttributes;
+import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.shiro.ShiroUtils;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -81,11 +84,9 @@ public class ForbiddenAccessResolution implements Resolution {
         String returnUrl = urlBuilder.toString();
         if (userId == null){
             logger.info("Anonymous user not allowed. Redirecting to login.");
-
-            new RedirectResolution("/actions/user/login")
-                    .addParameter("returnUrl", returnUrl)
-                    .addParameter("cancelReturnUrl", "/")
-                    .execute(request, response);
+            Application application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
+            String loginLink = ShiroUtils.getLoginLink(application, returnUrl, "/");
+            new RedirectResolution(loginLink).execute(request, response);
         } else {
             logger.warn("User {} not authorized for url {}.", userId, returnUrl);
             new ErrorResolution(UNAUTHORIZED, errorMessage).execute(request, response);
