@@ -53,13 +53,13 @@
     Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);
     if(dispatch != null) {
         String baseHref = dispatch.getAbsoluteOriginalPath();
+        //Remove all trailing slashes
         while (baseHref.length() > 1 && baseHref.endsWith("/")) {
             baseHref = baseHref.substring(0, baseHref.length() - 1);
         }
-        int lastSlashIndex = baseHref.lastIndexOf("/");
-        if(lastSlashIndex >= 0) {
-            baseHref = baseHref.substring(0, lastSlashIndex + 1);
-        }
+        //Add a single trailing slash so all relative URLs use this page as the root
+        baseHref += "/";
+        //Try to make the base HREF absolute
         try {
             URL url = new URL(request.getRequestURL().toString());
             String port = url.getPort() > 0 ? ":" + url.getPort() : "";
@@ -67,10 +67,6 @@
         } catch (MalformedURLException e) {
             //Ignore
         }
-        while (baseHref.length() > 1 && baseHref.endsWith("/")) {
-            baseHref = baseHref.substring(0, baseHref.length() - 1);
-        }
-        baseHref += "/";
         %><base href="<%= baseHref %>" /><%
     }
 %>
