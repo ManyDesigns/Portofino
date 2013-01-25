@@ -34,6 +34,7 @@ import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.files.TempFileService;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
 import com.manydesigns.portofino.shiro.ApplicationRealm;
 import com.manydesigns.portofino.starter.ApplicationStarter;
@@ -140,7 +141,17 @@ public class PortofinoListener
         servletContext.setAttribute(
                 ApplicationAttributes.PORTOFINO_CONFIGURATION, portofinoConfiguration);
 
+        logger.debug("Initializing dispatcher");
         DispatcherLogic.init(portofinoConfiguration);
+
+        logger.debug("Setting up temporary file service");
+        String tempFileServiceClass = portofinoConfiguration.getString(PortofinoProperties.TEMP_FILE_SERVICE_CLASS);
+        try {
+            TempFileService.setInstance((TempFileService) Class.forName(tempFileServiceClass).newInstance());
+        } catch (Exception e) {
+            logger.error("Could not set up temp file service", e);
+            throw new Error(e);
+        }
 
         logger.info("Checking servlet API version...");
         if (serverInfo.getServletApiMajor() < 2 ||

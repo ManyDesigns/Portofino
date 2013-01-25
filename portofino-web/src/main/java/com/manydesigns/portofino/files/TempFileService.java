@@ -47,22 +47,9 @@ public abstract class TempFileService {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    private static final TempFileService IMPL;
+    private static TempFileService IMPL;
 
     public static final Logger logger = LoggerFactory.getLogger(TempFileService.class);
-
-    static {
-        TempFileService impl;
-        try {
-            Class.forName("com.google.appengine.api.files.FileServiceFactory");
-            impl = new GAETempFileService();
-            logger.info("Using Google App Engine FileService API for temporary files");
-        } catch (Throwable e) {
-            impl = new SimpleTempFileService();
-            logger.info("Using the java.io API for temporary files");
-        }
-        IMPL = impl;
-    }
 
     public abstract TempFile newTempFile(String mimeType, String name) throws IOException;
 
@@ -78,6 +65,11 @@ public abstract class TempFileService {
 
     public static TempFileService getInstance() {
         return IMPL;
+    }
+
+    public static void setInstance(TempFileService tempFileService) {
+        logger.info("Using temp file service: {}", tempFileService);
+        IMPL = tempFileService;
     }
 
 }

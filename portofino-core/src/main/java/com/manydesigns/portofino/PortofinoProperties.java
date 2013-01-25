@@ -70,6 +70,7 @@ public final class PortofinoProperties {
     public static final String HOSTNAMES = "portofino.hostnames";
     public static final String FALLBACK_ACTION_CLASS = "fallback.action.class";
     public static final String URL_ENCODING = "url.encoding";
+    public static final String TEMP_FILE_SERVICE_CLASS = "temp.file.service.class";
 
     //Liquibase properties
     public static final String LIQUIBASE_ENABLED = "liquibase.enabled";
