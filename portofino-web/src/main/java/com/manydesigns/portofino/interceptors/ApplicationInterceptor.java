@@ -29,8 +29,6 @@
 
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.AppProperties;
@@ -95,10 +93,6 @@ public class ApplicationInterceptor implements Interceptor {
             String skin = application.getAppConfiguration().getString(AppProperties.SKIN);
             request.setAttribute(RequestAttributes.SKIN, skin);
         }
-
-        logger.debug("Setting blobs directory");
-        BlobManager blobManager = ElementsThreadLocals.getBlobManager();
-        blobManager.setBlobsDir(application.getAppBlobsDir());
 
         Dispatch dispatch = DispatcherUtil.getDispatch(request);
         if (dispatch != null) {

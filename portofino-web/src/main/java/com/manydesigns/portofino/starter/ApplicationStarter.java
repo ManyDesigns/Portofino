@@ -64,9 +64,6 @@ public class ApplicationStarter {
     // Constants
     //**************************************************************************
 
-    public static final int PERIOD = 10000;
-    public static final int DELAY2 = 5300;
-
     public enum Status {
         UNINITIALIZED,
         INITIALIZING,
@@ -223,8 +220,7 @@ public class ApplicationStarter {
         tmpApplication = null;
 
         String appsDirPath =
-        portofinoConfiguration.getString(
-                PortofinoProperties.APPS_DIR_PATH);
+        portofinoConfiguration.getString(PortofinoProperties.APPS_DIR_PATH);
         File appsDir = new File(appsDirPath);
         boolean success = ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(appsDir);
 
@@ -245,6 +241,10 @@ public class ApplicationStarter {
             success = setupDatabasePlatformsManager();
         }
 
+        if(success) {
+            success = checkBlobsDirectory();
+        }
+
         if (success) {
             success = setupApplication();
         }
@@ -257,6 +257,17 @@ public class ApplicationStarter {
             status = Status.UNINITIALIZED;
         }
         return success;
+    }
+
+    protected boolean checkBlobsDirectory() {
+        File appBlobsDir;
+        if(portofinoConfiguration.containsKey(PortofinoProperties.BLOBS_DIR_PATH)) {
+            appBlobsDir = new File(portofinoConfiguration.getString(PortofinoProperties.BLOBS_DIR_PATH));
+        } else {
+            appBlobsDir = new File(appDir, "blobs");
+        }
+        logger.info("Application blobs dir: {}", appBlobsDir.getAbsolutePath());
+        return ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(appBlobsDir);
     }
 
     public boolean setupDatabasePlatformsManager() {

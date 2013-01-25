@@ -63,6 +63,8 @@ public final class PortofinoProperties {
             "war.real.path";
     public static final String APPS_DIR_PATH =
             "apps.dir.path";
+    public static final String BLOBS_DIR_PATH =
+            "blobs.dir.path";
     public static final String APP_ID =
             "app.id";
     public static final String HOSTNAMES = "portofino.hostnames";

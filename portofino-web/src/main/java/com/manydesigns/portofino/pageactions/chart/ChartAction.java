@@ -137,7 +137,7 @@ public class ChartAction extends AbstractPageAction {
 
             String actionurl = getDispatch().getAbsoluteOriginalPath();
             UrlBuilder chartResolution =
-                    new UrlBuilder(actionurl, false)
+                    new UrlBuilder(context.getLocale(), actionurl, false)
                             .addParameter("chartId", chartId)
                             .addParameter("chart", "");
             String portletUrl = chartResolution.toString();

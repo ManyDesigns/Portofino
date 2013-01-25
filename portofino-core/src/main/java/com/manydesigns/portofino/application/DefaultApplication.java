@@ -101,7 +101,6 @@ public class DefaultApplication implements Application {
     protected final String appId;
 
     protected final File appDir;
-    protected final File appBlobsDir;
     protected final File appDbsDir;
     protected final File appModelFile;
     protected final File appScriptsDir;
@@ -135,14 +134,10 @@ public class DefaultApplication implements Application {
         resourceBundleManager = new ResourceBundleManager(appDir);
         this.appConfiguration = appConfiguration;
 
-        appBlobsDir = new File(appDir, APP_BLOBS_DIR);
-        logger.info("Application blobs dir: {}", appBlobsDir.getAbsolutePath());
-        boolean result = ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(appBlobsDir);
-
         appDbsDir = new File(appDir, APP_DBS_DIR);
         logger.info("Application dbs dir: {}",
                 appDbsDir.getAbsolutePath());
-        result &= ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(appDbsDir);
+        boolean result = ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(appDbsDir);
 
         appModelFile = new File(appDir, APP_MODEL_FILE);
         logger.info("Application model file: {}",
@@ -519,10 +514,6 @@ public class DefaultApplication implements Application {
 
     public File getAppDir() {
         return appDir;
-    }
-
-    public File getAppBlobsDir() {
-        return appBlobsDir;
     }
 
     public File getPagesDir() {

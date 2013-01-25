@@ -74,10 +74,6 @@ public interface Application {
      */
     File getAppDir();
     /**
-     * Returns the blobs directory of the application.
-     */
-    File getAppBlobsDir();
-    /**
      * Returns the pages directory of the application.
      */
     File getPagesDir();

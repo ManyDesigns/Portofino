@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.i18n.SimpleTextProvider;
 import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.portofino.ApplicationAttributes;
@@ -39,6 +40,7 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.i18n.MultipleTextProvider;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.starter.ApplicationStarter;
+import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +49,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.jstl.core.Config;
 import javax.servlet.jsp.jstl.fmt.LocalizationContext;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -153,6 +156,18 @@ public class ApplicationFilter implements Filter {
                     new MultipleTextProvider(
                             portofinoResourceBundle, elementsResourceBundle);
             ElementsThreadLocals.setTextProvider(textProvider);
+
+            //Setup Elements blob manager
+            File appBlobsDir;
+            Configuration portofinoConfiguration = application.getPortofinoProperties();
+            if(portofinoConfiguration.containsKey(PortofinoProperties.BLOBS_DIR_PATH)) {
+                appBlobsDir = new File(portofinoConfiguration.getString(PortofinoProperties.BLOBS_DIR_PATH));
+            } else {
+                appBlobsDir = new File(application.getAppDir(), "blobs");
+            }
+            logger.debug("Setting blobs directory");
+            BlobManager blobManager = ElementsThreadLocals.getBlobManager();
+            blobManager.setBlobsDir(appBlobsDir);
         }
     }
 
