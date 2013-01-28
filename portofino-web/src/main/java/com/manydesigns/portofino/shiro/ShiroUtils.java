@@ -29,6 +29,7 @@
 
 package com.manydesigns.portofino.shiro;
 
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import org.apache.commons.configuration.Configuration;
@@ -39,6 +40,8 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -113,7 +116,14 @@ public class ShiroUtils {
     public static String getLoginLink(Application application, String returnUrl, String cancelReturnUrl) {
         Configuration conf = application.getAppConfiguration();
         String loginLink = conf.getString(AppProperties.LOGIN_LINK);
-        return MessageFormat.format(loginLink, returnUrl, cancelReturnUrl);
+        String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
+        try {
+            String encodedReturnUrl = URLEncoder.encode(returnUrl, encoding);
+            String encodedCancelReturnUrl = URLEncoder.encode(returnUrl, encoding);
+            return MessageFormat.format(loginLink, encodedReturnUrl, encodedCancelReturnUrl);
+        } catch (UnsupportedEncodingException e) {
+            throw new Error(e);
+        }
     }
 
     public static String getLogoutLink(Application application) {
