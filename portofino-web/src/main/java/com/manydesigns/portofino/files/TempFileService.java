@@ -47,7 +47,7 @@ public abstract class TempFileService {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    private static TempFileService IMPL;
+    private static TempFileService IMPL = new SimpleTempFileService();
 
     public static final Logger logger = LoggerFactory.getLogger(TempFileService.class);
 

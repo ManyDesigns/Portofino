@@ -71,6 +71,18 @@
       <destName>pom.xml</destName>
       <fileMode>0644</fileMode>
     </file>
+    <file>
+      <source>portofino-war-jee/pom.xml</source>
+      <outputDirectory>portofino-war-jee</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-war-gae/pom.xml</source>
+      <outputDirectory>portofino-war-gae</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
   </files>
   <fileSets>
     <!-- Source code -->
@@ -112,6 +124,20 @@
     <fileSet>
       <directory>mail/src/main</directory>
       <outputDirectory>mail/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-war-jee/src/main</directory>
+      <outputDirectory>portofino-war-jee/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-war-gae/src/main</directory>
+      <outputDirectory>portofino-war-gae/src/main</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>

@@ -38,6 +38,8 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tuckey.web.filters.urlrewrite.utils.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -56,6 +58,8 @@ import java.util.Collections;
 public class OAuthHelper {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
+
+    public static final Logger logger = LoggerFactory.getLogger(OAuthHelper.class);
 
     protected CredentialStore credentialStore;
     protected String authorizeMethod = "authorize";
@@ -161,17 +165,25 @@ public class OAuthHelper {
         return authorize(code, userId);
     }
 
-    public boolean isAlreadyAuthorized(String userId) {
-        try {
-            Credential credential = new Credential.Builder(accessMethod)
+    public Credential loadCredential(String userId) {
+        if(credentialStore == null) {
+            return null;
+        }
+        Credential credential = new Credential.Builder(accessMethod)
                     .setJsonFactory(JSON_FACTORY)
                     .setTransport(httpTransport)
                     .setClientAuthentication(new ClientParametersAuthentication(clientId, clientSecret))
                     .setTokenServerUrl(new GenericUrl(tokenServerUrl))
                     .build();
-            return getCredentialStore().load(userId, credential);
+        try {
+            if(getCredentialStore().load(userId, credential)) {
+                return credential;
+            } else {
+                return null;
+            }
         } catch (IOException e) {
-            throw new Error("I/O error", e);
+            logger.error("Could not load credential", e);
+            return null;
         }
     }
 
@@ -209,5 +221,9 @@ public class OAuthHelper {
 
     public String getError() {
         return error;
+    }
+
+    public JsonFactory getJsonFactory() {
+        return JSON_FACTORY;
     }
 }

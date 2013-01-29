@@ -146,10 +146,16 @@
             <artifactId>guice</artifactId>
             <version>3.0</version>
         </dependency>
+        <!-- Google OAuth client -->
         <dependency>
             <groupId>com.google.oauth-client</groupId>
             <artifactId>google-oauth-client</artifactId>
             <version>1.13.1-beta</version>
+        </dependency>
+        <dependency>
+          <groupId>com.google.http-client</groupId>
+          <artifactId>google-http-client-jackson2</artifactId>
+          <version>1.13.1-beta</version>
         </dependency>
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
