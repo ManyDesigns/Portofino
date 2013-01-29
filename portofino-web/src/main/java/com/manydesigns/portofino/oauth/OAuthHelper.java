@@ -31,6 +31,7 @@ package com.manydesigns.portofino.oauth;
 
 import com.google.api.client.auth.oauth2.*;
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpExecuteInterceptor;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -123,18 +124,7 @@ public class OAuthHelper {
     public Credential authorize(String code, @Nullable String userId) throws IOException {
         String redirectUri = getRedirectUrl();
 
-        AuthorizationCodeFlow codeFlow =
-                new AuthorizationCodeFlow.Builder(
-                        accessMethod,
-                        httpTransport,
-                        JSON_FACTORY,
-                        new GenericUrl(tokenServerUrl),
-                        new ClientParametersAuthentication(clientId, clientSecret),
-                        clientId,
-                        authorizationServerUrl)
-                        .setScopes(scopes)
-                        .setCredentialStore(credentialStore)
-                        .build();
+        AuthorizationCodeFlow codeFlow = createCodeFlow();
 
         TokenResponse response = codeFlow
                 .newTokenRequest(code)
@@ -143,6 +133,24 @@ public class OAuthHelper {
                 .execute();
 
         return codeFlow.createAndStoreCredential(response, userId);
+    }
+
+    protected AuthorizationCodeFlow createCodeFlow() {
+        return new AuthorizationCodeFlow.Builder(
+                accessMethod,
+                httpTransport,
+                JSON_FACTORY,
+                new GenericUrl(tokenServerUrl),
+                getHttpExecuteInterceptor(),
+                clientId,
+                authorizationServerUrl)
+                .setScopes(scopes)
+                .setCredentialStore(credentialStore)
+                .build();
+    }
+
+    protected HttpExecuteInterceptor getHttpExecuteInterceptor() {
+        return new ClientParametersAuthentication(clientId, clientSecret);
     }
 
     /**
@@ -166,21 +174,8 @@ public class OAuthHelper {
     }
 
     public Credential loadCredential(String userId) {
-        if(credentialStore == null) {
-            return null;
-        }
-        Credential credential = new Credential.Builder(accessMethod)
-                    .setJsonFactory(JSON_FACTORY)
-                    .setTransport(httpTransport)
-                    .setClientAuthentication(new ClientParametersAuthentication(clientId, clientSecret))
-                    .setTokenServerUrl(new GenericUrl(tokenServerUrl))
-                    .build();
         try {
-            if(getCredentialStore().load(userId, credential)) {
-                return credential;
-            } else {
-                return null;
-            }
+            return createCodeFlow().loadCredential(userId);
         } catch (IOException e) {
             logger.error("Could not load credential", e);
             return null;
