@@ -36,8 +36,15 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.ognl.OgnlUtils;
+import com.manydesigns.portofino.shiro.ShiroUtils;
 import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.util.UrlBuilder;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +54,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.concurrent.Callable;
 
 /**
  * Utility class for generic OAuth authorization
@@ -135,24 +143,6 @@ public class OAuthHelper {
         return codeFlow.createAndStoreCredential(response, userId);
     }
 
-    protected AuthorizationCodeFlow createCodeFlow() {
-        return new AuthorizationCodeFlow.Builder(
-                accessMethod,
-                httpTransport,
-                JSON_FACTORY,
-                new GenericUrl(tokenServerUrl),
-                getHttpExecuteInterceptor(),
-                clientId,
-                authorizationServerUrl)
-                .setScopes(scopes)
-                .setCredentialStore(credentialStore)
-                .build();
-    }
-
-    protected HttpExecuteInterceptor getHttpExecuteInterceptor() {
-        return new ClientParametersAuthentication(clientId, clientSecret);
-    }
-
     /**
      * Handles the callback from the OAuth provider, returning a valid Credential if successful.
      * @param request
@@ -171,6 +161,77 @@ public class OAuthHelper {
             throw new RuntimeException("No authorization code found in request");
         }
         return authorize(code, userId);
+    }
+
+    /**
+     * Handles the callback from the OAuth provider, returning a valid Credential if successful. Automatically uses
+     * the current request and the logged in user.
+     * @return
+     * @throws IOException
+     */
+    public Credential authorize() throws IOException {
+        HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
+        Subject subject = SecurityUtils.getSubject();
+        String userId;
+        if(subject.isAuthenticated()) {
+            userId = OgnlUtils.convertValueToString(ShiroUtils.getPrimaryPrincipal(subject));
+        } else {
+            throw new IllegalStateException("User is not logged in, can not determine the user id");
+        }
+        return authorize(request, userId);
+    }
+
+    /**
+     * Executes an action if the user's credential is known, otherwise redirects to the authorization page.
+     * @param userId
+     * @param action
+     * @return
+     */
+    public Resolution doWithCredential(String userId, Callable<Resolution> action) {
+        Credential credential = loadCredential(userId);
+        if (credential != null) {
+            try {
+                return action.call();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return new RedirectResolution(computeAuthorizationUrl());
+    }
+
+    /**
+     * Executes an action if the current logged in user's credential is known,
+     * otherwise redirects to the authorization page.
+     * @param action
+     * @return
+     */
+    public Resolution doWithCredential(Callable<Resolution> action) {
+        Subject subject = SecurityUtils.getSubject();
+        String userId;
+        if(subject.isAuthenticated()) {
+            userId = OgnlUtils.convertValueToString(ShiroUtils.getPrimaryPrincipal(subject));
+        } else {
+            throw new IllegalStateException("User is not logged in, can not determine the user id");
+        }
+        return doWithCredential(userId, action);
+    }
+
+    protected AuthorizationCodeFlow createCodeFlow() {
+        return new AuthorizationCodeFlow.Builder(
+                accessMethod,
+                httpTransport,
+                JSON_FACTORY,
+                new GenericUrl(tokenServerUrl),
+                getHttpExecuteInterceptor(),
+                clientId,
+                authorizationServerUrl)
+                .setScopes(scopes)
+                .setCredentialStore(credentialStore)
+                .build();
+    }
+
+    protected HttpExecuteInterceptor getHttpExecuteInterceptor() {
+        return new ClientParametersAuthentication(clientId, clientSecret);
     }
 
     public Credential loadCredential(String userId) {
