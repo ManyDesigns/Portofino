@@ -31,6 +31,8 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.configuration.BeanLookup;
+import com.manydesigns.mail.queue.MailQueue;
+import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
@@ -191,11 +193,7 @@ public class PortofinoListener
         cacheManager = CacheManager.newInstance();
         servletContext.setAttribute(ApplicationAttributes.EHCACHE_MANAGER, cacheManager);
 
-        try {
-            MailScheduler.setupMailScheduler(serverInfo, servletContext);
-        } catch (NoClassDefFoundError e) {
-            logger.debug("Quartz not available, mail scheduler not started", e);
-        }
+        setupMailQueue();
 
         //Disabilitazione security manager per funzionare su GAE. Il security manager permette di valutare
         //in sicurezza espressioni OGNL provenienti da fonti non sicure, configurando i necessari permessi
@@ -217,6 +215,28 @@ public class PortofinoListener
                         serverInfo.getRealPath()
                 }
         );
+    }
+
+    protected void setupMailQueue() {
+        MailQueueSetup mailQueueSetup = new MailQueueSetup();
+        mailQueueSetup.setup();
+
+        MailQueue mailQueue = mailQueueSetup.getMailQueue();
+        if(mailQueue == null) {
+            logger.debug("Mail not enabled");
+            return;
+        }
+
+        servletContext.setAttribute(ApplicationAttributes.MAIL_QUEUE, mailQueue);
+        servletContext.setAttribute(ApplicationAttributes.MAIL_SENDER, mailQueueSetup.getMailSender());
+        servletContext.setAttribute(ApplicationAttributes.MAIL_CONFIGURATION, mailQueueSetup.getMailConfiguration());
+
+        try {
+            //In classe separata per permettere al Listener di essere caricato anche in assenza di Quartz a runtime
+            MailScheduler.setupMailScheduler(serverInfo, mailQueueSetup);
+        } catch (NoClassDefFoundError e) {
+            logger.debug("Quartz not available, mail scheduler not started", e);
+        }
     }
 
     public void contextDestroyed(ServletContextEvent servletContextEvent) {

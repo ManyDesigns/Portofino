@@ -29,18 +29,14 @@
 
 package com.manydesigns.portofino.servlets;
 
-import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.setup.MailProperties;
 import com.manydesigns.mail.setup.MailQueueSetup;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.quartz.URLInvokeJob;
 import org.apache.commons.configuration.Configuration;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.ServletContext;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -54,19 +50,7 @@ public class MailScheduler {
 
     public static final Logger logger = LoggerFactory.getLogger(MailScheduler.class);
 
-    public static void setupMailScheduler(ServerInfo serverInfo, ServletContext servletContext) {
-        MailQueueSetup mailQueueSetup = new MailQueueSetup();
-        mailQueueSetup.setup();
-
-        MailQueue mailQueue = mailQueueSetup.getMailQueue();
-        if(mailQueue == null) {
-            logger.debug("Mail not enabled");
-            return;
-        }
-
-        servletContext.setAttribute(ApplicationAttributes.MAIL_QUEUE, mailQueue);
-        servletContext.setAttribute(ApplicationAttributes.MAIL_SENDER, mailQueueSetup.getMailSender());
-
+    public static void setupMailScheduler(ServerInfo serverInfo, MailQueueSetup mailQueueSetup) {
         Configuration mailConfiguration = mailQueueSetup.getMailConfiguration();
         if(mailConfiguration != null) {
             if(mailConfiguration.getBoolean("mail.quartz.enabled", false)) {
