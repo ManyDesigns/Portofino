@@ -41,6 +41,7 @@ import com.manydesigns.portofino.i18n.MultipleTextProvider;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import org.apache.commons.configuration.Configuration;
+import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,9 +53,7 @@ import javax.servlet.jsp.jstl.fmt.LocalizationContext;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -105,15 +104,15 @@ public class ApplicationFilter implements Filter {
             ApplicationStarter applicationStarter, HttpServletRequest httpRequest)
             throws IOException, ServletException, URISyntaxException {
         String encoding = applicationStarter.getPortofinoConfiguration().getString(PortofinoProperties.URL_ENCODING);
-        String uriString = httpRequest.getRequestURL().toString();
+        String uriString = httpRequest.getRequestURI();
         return filterForbiddenUrls(uriString, encoding);
     }
 
     public static boolean filterForbiddenUrls(String uriString, String encoding) throws UnsupportedEncodingException, URISyntaxException {
-        uriString = URLDecoder.decode(uriString, encoding);
-        URI requestUrl = new URI(uriString);
-        requestUrl = requestUrl.normalize();
-        String path = requestUrl.getPath();
+        String path = WebUtils.normalize(uriString);
+        if(path == null) {
+            return false;
+        }
         if(path.startsWith("/app/") && !path.startsWith("/app/web")) {
             return false;
         }
