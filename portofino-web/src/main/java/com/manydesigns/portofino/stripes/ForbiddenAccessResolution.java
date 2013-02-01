@@ -85,7 +85,7 @@ public class ForbiddenAccessResolution implements Resolution {
         if (userId == null){
             logger.info("Anonymous user not allowed. Redirecting to login.");
             Application application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
-            String loginLink = ShiroUtils.getLoginLink(application, returnUrl, "/");
+            String loginLink = ShiroUtils.getLoginLink(application, request.getContextPath(), returnUrl, "/");
             new RedirectResolution(loginLink).execute(request, response);
         } else {
             logger.warn("User {} not authorized for url {}.", userId, returnUrl);

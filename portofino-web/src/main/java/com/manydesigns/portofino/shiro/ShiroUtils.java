@@ -113,22 +113,23 @@ public class ShiroUtils {
         clearCache(SecurityUtils.getSubject().getPrincipals());
     }
 
-    public static String getLoginLink(Application application, String returnUrl, String cancelReturnUrl) {
+    public static String getLoginLink(Application application, String contextPath, String returnUrl, String cancelReturnUrl) {
         Configuration conf = application.getAppConfiguration();
         String loginLink = conf.getString(AppProperties.LOGIN_LINK);
         String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
         try {
             String encodedReturnUrl = URLEncoder.encode(returnUrl, encoding);
-            String encodedCancelReturnUrl = URLEncoder.encode(returnUrl, encoding);
-            return MessageFormat.format(loginLink, encodedReturnUrl, encodedCancelReturnUrl);
+            String encodedCancelReturnUrl = URLEncoder.encode(cancelReturnUrl, encoding);
+            return MessageFormat.format(loginLink, contextPath, encodedReturnUrl, encodedCancelReturnUrl);
         } catch (UnsupportedEncodingException e) {
             throw new Error(e);
         }
     }
 
-    public static String getLogoutLink(Application application) {
+    public static String getLogoutLink(Application application, String contextPath) {
         Configuration conf = application.getAppConfiguration();
-        return conf.getString(AppProperties.LOGOUT_LINK);
+        String logoutLink = conf.getString(AppProperties.LOGOUT_LINK);
+        return MessageFormat.format(logoutLink, contextPath);
     }
 
 }

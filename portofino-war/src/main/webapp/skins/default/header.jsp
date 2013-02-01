@@ -19,8 +19,9 @@
 <div id="hd-title">
     <div id="globalLinks">
         <%
-            String loginLink = ShiroUtils.getLoginLink(app, actionBean.getOriginalPath(), actionBean.getOriginalPath());
-            String logoutLink = ShiroUtils.getLogoutLink(app);
+            String loginLink = ShiroUtils.getLoginLink(
+                    app, request.getContextPath(), actionBean.getOriginalPath(), actionBean.getOriginalPath());
+            String logoutLink = ShiroUtils.getLogoutLink(app, request.getContextPath());
             pageContext.setAttribute("loginLink", new UrlBuilder(request.getLocale(), loginLink, true).toString());
             pageContext.setAttribute("logoutLink", new UrlBuilder(request.getLocale(), logoutLink, true).toString());
         %>
