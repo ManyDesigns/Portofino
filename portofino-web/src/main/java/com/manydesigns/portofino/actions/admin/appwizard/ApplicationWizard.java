@@ -57,6 +57,7 @@ import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
@@ -1154,6 +1155,14 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             template.make(bindings).writeTo(fileWriter);
             IOUtils.closeQuietly(fileWriter);
 
+            logger.debug("Creating _detail directory");
+            File detailDir = new File(dir, PageInstance.DETAIL);
+            if(!detailDir.isDirectory() && !detailDir.mkdir()) {
+                logger.warn("Could not create detail directory {}", detailDir.getAbsolutePath());
+                SessionMessages.addWarningMessage(
+                    getMessage("appwizard.error.createDirectoryFailed", detailDir.getAbsolutePath()));
+            }
+
             ChildPage childPage = new ChildPage();
             childPage.setName(dir.getName());
             childPage.setShowInNavigation(true);
@@ -1417,7 +1426,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         if(multipleRoles) {
             childDirName += "-as-" + linkToParentProperty;
         }
-        File childDir = new File(new File(dir, "_detail"), childDirName);
+        File childDir = new File(new File(dir, PageInstance.DETAIL), childDirName);
         String childTitle = Util.guessToWords(childDirName);
 
         Map<String, String> bindings = new HashMap<String, String>();
