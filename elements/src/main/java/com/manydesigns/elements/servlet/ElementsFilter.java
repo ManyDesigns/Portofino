@@ -112,14 +112,13 @@ public class ElementsFilter implements Filter {
         ServletContext context = filterConfig.getServletContext();
 
         try {
-            WebFramework webFramework = WebFramework.getWebFramework();
-            req = webFramework.wrapRequest(req);
-
-            HttpSession session = req.getSession(false);
-
             logger.debug("Setting up default OGNL context");
             ElementsThreadLocals.setupDefaultElementsContext();
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
+
+            logger.debug("Wrapping request");
+            WebFramework webFramework = ElementsThreadLocals.getWebFramework();
+            req = webFramework.wrapRequest(req);
 
             logger.debug("Creating request attribute mapper");
             AttributeMap requestAttributeMap =
@@ -127,6 +126,7 @@ public class ElementsFilter implements Filter {
             ognlContext.put(REQUEST_OGNL_ATTRIBUTE, requestAttributeMap);
 
             logger.debug("Creating session attribute mapper");
+            HttpSession session = req.getSession(false);
             AttributeMap sessionAttributeMap =
                     AttributeMap.createAttributeMap(session);
             ognlContext.put(SESSION_OGNL_ATTRIBUTE, sessionAttributeMap);

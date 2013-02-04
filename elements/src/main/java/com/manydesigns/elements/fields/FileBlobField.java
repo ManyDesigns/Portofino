@@ -229,7 +229,7 @@ public class FileBlobField extends AbstractField
     }
 
     private void saveUpload(HttpServletRequest req) {
-        WebFramework webFramework = WebFramework.getWebFramework();
+        WebFramework webFramework = ElementsThreadLocals.getWebFramework();
 
         BlobManager blobManager = ElementsThreadLocals.getBlobManager();
         if (blobManager == null) {

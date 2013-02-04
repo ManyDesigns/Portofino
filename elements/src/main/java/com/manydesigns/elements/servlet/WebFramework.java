@@ -94,7 +94,7 @@ public class WebFramework {
         webFramework = builder.createInstance(managerClassName);
     }
 
-    public static WebFramework getWebFramework() {
+    public static WebFramework getDefaultWebFramework() {
         return webFramework;
     }
 
