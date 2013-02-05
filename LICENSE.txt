@@ -1,133 +1,170 @@
 ManyDesigns Portofino
 Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
 http://www.manydesigns.com/
+This software is licensed under the following terms:
 
-If you are developing and distributing open source software under an
-OSI-Approved License then you are free to use ManyDesigns Portofino under the
-terms of version 3 of the GNU General Public License (the "GPL") with a
-FLOSS License Exception as detailed below.
+                   GNU LESSER GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
 
-
-Covered Software and Third-Party Software
-
-This license covers ManyDesigns Portofino software developed by ManyDesigns srl.
-The present distribution may include third-party software that is not covered
-by this license. Third-party software is covered by the licenses granted by
-their respective copyright owners. For more details see the file
-THIRDPARTIES.txt in this distribution.
+ Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
 
 
-GPL Terms
+  This version of the GNU Lesser General Public License incorporates
+the terms and conditions of version 3 of the GNU General Public
+License, supplemented by the additional permissions listed below.
 
-The terms of the GPL are published at the following address:
-http://www.gnu.org/licenses/gpl.html
+  0. Additional Definitions.
 
+  As used herein, "this License" refers to version 3 of the GNU Lesser
+General Public License, and the "GNU GPL" refers to version 3 of the GNU
+General Public License.
 
-FLOSS Licence Exception
+  "The Library" refers to a covered work governed by this License,
+other than an Application or a Combined Work as defined below.
 
-The ManyDesigns srl Exception for Free/Libre and Open Source Software-only
-Applications Using ManyDesigns Portofino software (the `FLOSS Exception').
+  An "Application" is any work that makes use of an interface provided
+by the Library, but which is not otherwise based on the Library.
+Defining a subclass of a class defined by the Library is deemed a mode
+of using an interface provided by the Library.
 
-Exception Intent
+  A "Combined Work" is a work produced by combining or linking an
+Application with the Library.  The particular version of the Library
+with which the Combined Work was made is also called the "Linked
+Version".
 
-We want specified Free/Libre and Open Source Software ("FLOSS") applications to
-be able to use specified GPL-licensed ManyDesigns Portofino software (the
-"Program") despite the fact that not all FLOSS licenses are compatible with
-version 3 of the GNU General Public License (the "GPL").
+  The "Minimal Corresponding Source" for a Combined Work means the
+Corresponding Source for the Combined Work, excluding any source code
+for portions of the Combined Work that, considered in isolation, are
+based on the Application, and not on the Linked Version.
 
+  The "Corresponding Application Code" for a Combined Work means the
+object code and/or source code for the Application, including any data
+and utility programs needed for reproducing the Combined Work from the
+Application, but excluding the System Libraries of the Combined Work.
 
-Legal Terms and Conditions
+  1. Exception to Section 3 of the GNU GPL.
 
-As a special exception to the terms and conditions of version 3 of the GPL:
+  You may convey a covered work under sections 3 and 4 of this License
+without being bound by section 3 of the GNU GPL.
 
-You are free to distribute a Derivative Work that is formed entirely from the
-Program and one or more works (each, a "FLOSS Work") licensed under one or more
-of the licenses listed below in section 1, as long as:
+  2. Conveying Modified Versions.
 
-   1. You obey the GPL in all respects for the Program and the Derivative Work,
-except for identifiable sections of the Derivative Work which are not derived
-from the Program, and which can reasonably be considered independent and
-separate works in themselves,
-   2. all identifiable sections of the Derivative Work which are not derived
-from the Program, and which can reasonably be considered independent and
-separate works in themselves,
-         1. are distributed subject to one of the FLOSS licenses listed below,
-and
-         2. the object code or executable form of those sections are accompanied
-by the complete corresponding machine-readable source code for those sections on
-the same medium and under the same FLOSS license as the corresponding object code
-or executable forms of those sections, and
-   3. any works which are aggregated with the Program or with a Derivative Work
-on a volume of a storage or distribution medium in accordance with the GPL, can
-reasonably be considered independent and separate works in themselves which are
-not derivatives of either the Program, a Derivative Work or a FLOSS Work.
+  If you modify a copy of the Library, and, in your modifications, a
+facility refers to a function or data to be supplied by an Application
+that uses the facility (other than as an argument passed when the
+facility is invoked), then you may convey a copy of the modified
+version:
 
-If the above conditions are not met, then the Program may only be copied,
-modified, distributed or used under the terms and conditions of the GPL or
-another valid licensing option from ManyDesigns srl.
+   a) under this License, provided that you make a good faith effort to
+   ensure that, in the event an Application does not supply the
+   function or data, the facility still operates, and performs
+   whatever part of its purpose remains meaningful, or
 
+   b) under the GNU GPL, with none of the additional permissions of
+   this License applicable to that copy.
 
-1. FLOSS License List
+  3. Object Code Incorporating Material from Library Header Files.
 
-License name    Version(s)/Copyright Date
-Academic Free License   2.0
-Apache Software License         1.0/1.1/2.0
-Apple Public Source License     2.0
-Artistic license        From Perl 5.8.0
-BSD license     "July 22 1999"
-Common Development and Distribution License (CDDL)      1.0
-Common Public License   1.0
-GNU Library or "Lesser" General Public License (LGPL)   2.0/2.1
-Jabber Open Source License      1.0
-MIT License (As listed in file MIT-License.txt)         -
-Mozilla Public License (MPL)    1.0/1.1
-Open Software License   2.0
-OpenSSL license (with original SSLeay license)  "2003" ("1998")
-PHP License     3.0
-Python license (CNRI Python License)    -
-Python Software Foundation License      2.1.1
-Sleepycat License       "1999"
-University of Illinois/NCSA Open Source License         -
-W3C License     "2001"
-X11 License     "2001"
-Zlib/libpng License     -
-Zope Public License     2.0
+  The object code form of an Application may incorporate material from
+a header file that is part of the Library.  You may convey such object
+code under terms of your choice, provided that, if the incorporated
+material is not limited to numerical parameters, data structure
+layouts and accessors, or small macros, inline functions and templates
+(ten or fewer lines in length), you do both of the following:
 
-Due to the many variants of some of the above licenses, we require that any
-version follow the 2003 version of the Free Software Foundation's Free Software
-Definition (http://www.gnu.org/philosophy/free-sw.html) or version 1.9 of the
-Open Source Definition by the Open Source Initiative
-(http://www.opensource.org/docs/definition.php).
+   a) Give prominent notice with each copy of the object code that the
+   Library is used in it and that the Library and its use are
+   covered by this License.
 
+   b) Accompany the object code with a copy of the GNU GPL and this license
+   document.
 
-2. Definitions
+  4. Combined Works.
 
-   1. Terms used, but not defined, herein shall have the meaning provided in
-the GPL.
-   2. Derivative Work means a derivative work under copyright law.
+  You may convey a Combined Work under terms of your choice that,
+taken together, effectively do not restrict modification of the
+portions of the Library contained in the Combined Work and reverse
+engineering for debugging such modifications, if you also do each of
+the following:
 
+   a) Give prominent notice with each copy of the Combined Work that
+   the Library is used in it and that the Library and its use are
+   covered by this License.
 
-3. Applicability
+   b) Accompany the Combined Work with a copy of the GNU GPL and this license
+   document.
 
-This FLOSS Exception applies to all Programs that contain a notice placed by
-ManyDesigns srl saying that the Program may be distributed under the terms of
-this FLOSS Exception. If you create or distribute a work which is a Derivative
-Work of both the Program and any other work licensed under the GPL, then this
-FLOSS Exception is not available for that work; thus, you must remove the FLOSS
-Exception notice from that work and comply with the GPL in all respects,
-including by retaining all GPL notices. You may choose to redistribute a copy of
-the Program exclusively under the terms of the GPL by removing the FLOSS
-Exception notice from that copy of the Program, provided that the copy has never
-been modified by you or any third party.
+   c) For a Combined Work that displays copyright notices during
+   execution, include the copyright notice for the Library among
+   these notices, as well as a reference directing the user to the
+   copies of the GNU GPL and this license document.
 
+   d) Do one of the following:
 
-Appendix A. Qualified Libraries and Packages
+       0) Convey the Minimal Corresponding Source under the terms of this
+       License, and the Corresponding Application Code in a form
+       suitable for, and under terms that permit, the user to
+       recombine or relink the Application with a modified version of
+       the Linked Version to produce a modified Combined Work, in the
+       manner specified by section 6 of the GNU GPL for conveying
+       Corresponding Source.
 
-The following is a non-exhaustive list of libraries and packages which are
-covered by the FLOSS License Exception. Please note that appendix is merely
-provided as an additional service to specific FLOSS projects who wish to
-simplify licensing information for their users. Compliance with one of the
-licenses noted under the "FLOSS license list" section remains a prerequisite.
-Package name    Qualifying License and Version
-Apache Portable Runtime (APR)   Apache Software License 2.0
+       1) Use a suitable shared library mechanism for linking with the
+       Library.  A suitable mechanism is one that (a) uses at run time
+       a copy of the Library already present on the user's computer
+       system, and (b) will operate properly with a modified version
+       of the Library that is interface-compatible with the Linked
+       Version.
 
+   e) Provide Installation Information, but only if you would otherwise
+   be required to provide such information under section 6 of the
+   GNU GPL, and only to the extent that such information is
+   necessary to install and execute a modified version of the
+   Combined Work produced by recombining or relinking the
+   Application with a modified version of the Linked Version. (If
+   you use option 4d0, the Installation Information must accompany
+   the Minimal Corresponding Source and Corresponding Application
+   Code. If you use option 4d1, you must provide the Installation
+   Information in the manner specified by section 6 of the GNU GPL
+   for conveying Corresponding Source.)
+
+  5. Combined Libraries.
+
+  You may place library facilities that are a work based on the
+Library side by side in a single library together with other library
+facilities that are not Applications and are not covered by this
+License, and convey such a combined library under terms of your
+choice, if you do both of the following:
+
+   a) Accompany the combined library with a copy of the same work based
+   on the Library, uncombined with any other library facilities,
+   conveyed under the terms of this License.
+
+   b) Give prominent notice with the combined library that part of it
+   is a work based on the Library, and explaining where to find the
+   accompanying uncombined form of the same work.
+
+  6. Revised Versions of the GNU Lesser General Public License.
+
+  The Free Software Foundation may publish revised and/or new versions
+of the GNU Lesser General Public License from time to time. Such new
+versions will be similar in spirit to the present version, but may
+differ in detail to address new problems or concerns.
+
+  Each version is given a distinguishing version number. If the
+Library as you received it specifies that a certain numbered version
+of the GNU Lesser General Public License "or any later version"
+applies to it, you have the option of following the terms and
+conditions either of that published version or of any later version
+published by the Free Software Foundation. If the Library as you
+received it does not specify a version number of the GNU Lesser
+General Public License, you may choose any version of the GNU Lesser
+General Public License ever published by the Free Software Foundation.
+
+  If the Library as you received it specifies that a proxy can decide
+whether future versions of the GNU Lesser General Public License shall
+apply, that proxy's public statement of acceptance of any version is
+permanent authorization for you to choose that version for the
+Library.
