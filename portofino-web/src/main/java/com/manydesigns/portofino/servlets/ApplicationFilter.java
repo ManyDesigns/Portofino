@@ -45,6 +45,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -100,6 +101,7 @@ public class ApplicationFilter implements Filter {
     }
 
     public static boolean filterForbiddenUrls(String uriString, String encoding) throws UnsupportedEncodingException, URISyntaxException {
+        uriString = URLDecoder.decode(uriString, encoding);
         String path = WebUtils.normalize(uriString);
         if(path == null) {
             return false;
