@@ -24,10 +24,6 @@ import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.system.model.users.Group;
-import com.manydesigns.portofino.system.model.users.User;
-import com.manydesigns.portofino.system.model.users.UserConstants;
-import com.manydesigns.portofino.system.model.users.UsersGroups;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.proxy.map.MapProxy;
@@ -63,26 +59,6 @@ public class HibernateTest extends AbstractPortofinoTest {
         assertEquals("prodotti", 16, sizePrd);
     }
 
-    public void testUsers() {
-        Session session = application.getSession("portofino");
-        Criteria criteria = session.createCriteria(UserConstants.GROUP_ENTITY_NAME);
-        List<Group> groupList = new ArrayList(criteria.list());
-        assertEquals( 2, groupList.size());
-
-        criteria = session.createCriteria(UsersGroups.class);
-        List<UsersGroups> usergroups = new ArrayList(criteria.list());
-        assertEquals( 3, usergroups.size());
-
-        criteria = session.createCriteria(UserConstants.USER_ENTITY_NAME);
-        List<User> users = new ArrayList(criteria.list());
-
-        assertEquals("numero utenti", 2, users.size());
-        User admin = users.get(0);
-        List<UsersGroups> groups = admin.getGroups();
-        assertEquals("numero gruppi per admin",  2, groups.size());
-        
-
-    }
     public void testSearchAndReadCategorieProdotti() {
         Session session = application.getSession("jpetstore");
         Criteria criteria = session.createCriteria("category");
@@ -278,7 +254,7 @@ public class HibernateTest extends AbstractPortofinoTest {
 
     }
 
-        public void testSpaccaSession(){
+    /*    public void testSpaccaSession(){
 
         try {
             Session session = application.getSession("jpetstore");
@@ -327,7 +303,7 @@ public class HibernateTest extends AbstractPortofinoTest {
             e.printStackTrace();
             fail("La sessione è spaccata");
         }
-    }
+    }*/
 
     public void testGetObjByPk(){
         //Test Chiave singola

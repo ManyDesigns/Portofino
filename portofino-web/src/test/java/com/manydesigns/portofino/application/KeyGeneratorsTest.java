@@ -21,16 +21,13 @@ package com.manydesigns.portofino.application;
 
 import com.manydesigns.portofino.AbstractPortofinoTest;
 import com.manydesigns.portofino.database.TableCriteria;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.system.model.users.Group;
-import com.manydesigns.portofino.system.model.users.UserConstants;
 import org.hibernate.Session;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -156,7 +153,7 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
 
     }
 
-    public void testIdentityGenerator(){
+    /*public void testIdentityGenerator(){
         Group myGroup = new Group();
         myGroup.setCreationDate(new Timestamp(new Date().getTime()));
         myGroup.setName("testGroup");
@@ -181,5 +178,5 @@ public class KeyGeneratorsTest extends AbstractPortofinoTest {
             e.printStackTrace();
             fail();
         }
-    }
+    }*/
 }
