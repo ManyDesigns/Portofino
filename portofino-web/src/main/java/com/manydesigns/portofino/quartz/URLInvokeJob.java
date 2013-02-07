@@ -42,9 +42,9 @@ public class URLInvokeJob implements Job {
     public static final String URL_KEY = "url";
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        String urlToInvoke = null;
         try {
-            SchedulerContext context = jobExecutionContext.getScheduler().getContext();
-            String urlToInvoke = context.get(URL_KEY).toString();
+            urlToInvoke = jobExecutionContext.getMergedJobDataMap().get(URL_KEY).toString();
             logger.debug("URL to invoke: " + urlToInvoke);
             HttpURLConnection urlConnection = (HttpURLConnection) new URL(urlToInvoke).openConnection();
             urlConnection.connect();
@@ -53,7 +53,7 @@ public class URLInvokeJob implements Job {
                 logger.warn("Invocation of URL " + urlToInvoke + " returned response code " + responseCode);
             }
         } catch (Exception e) {
-            logger.error("Failed to invoke URL", e);
+            logger.error("Failed to invoke URL: " + urlToInvoke, e);
             throw new JobExecutionException(e);
         }
     }

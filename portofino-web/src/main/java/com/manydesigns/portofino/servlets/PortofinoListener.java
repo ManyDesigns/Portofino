@@ -214,7 +214,7 @@ public class PortofinoListener
 
         MailQueue mailQueue = mailQueueSetup.getMailQueue();
         if(mailQueue == null) {
-            logger.debug("Mail not enabled");
+            logger.info("Mail queue not enabled");
             return;
         }
 
@@ -224,9 +224,10 @@ public class PortofinoListener
 
         try {
             //In classe separata per permettere al Listener di essere caricato anche in assenza di Quartz a runtime
-            MailScheduler.setupMailScheduler(serverInfo, mailQueueSetup);
+            MailScheduler.setupMailScheduler(mailQueueSetup);
         } catch (NoClassDefFoundError e) {
-            logger.debug("Quartz not available, mail scheduler not started", e);
+            logger.debug(e.getMessage(), e);
+            logger.info("Quartz is not available, mail scheduler not started");
         }
     }
 

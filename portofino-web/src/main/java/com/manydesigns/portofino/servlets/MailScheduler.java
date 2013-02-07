@@ -41,16 +41,20 @@ public class MailScheduler {
 
     public static final Logger logger = LoggerFactory.getLogger(MailScheduler.class);
 
-    public static void setupMailScheduler(ServerInfo serverInfo, MailQueueSetup mailQueueSetup) {
+    public static void setupMailScheduler(MailQueueSetup mailQueueSetup) {
         Configuration mailConfiguration = mailQueueSetup.getMailConfiguration();
         if(mailConfiguration != null) {
-            if(mailConfiguration.getBoolean("mail.quartz.enabled", false)) {
+            if(mailConfiguration.getBoolean(MailProperties.MAIL_QUARTZ_ENABLED)) {
                 logger.info("Scheduling mail sends with Quartz job");
                 try {
+                    String serverUrl = mailConfiguration.getString(MailProperties.MAIL_SENDER_SERVER_URL);
+                    logger.info("Scheduling mail sends using URL: {}", serverUrl);
+
                     Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
                     JobDetail job = JobBuilder
                             .newJob(URLInvokeJob.class)
                             .withIdentity("mail.sender", "portofino")
+                            .usingJobData(URLInvokeJob.URL_KEY, serverUrl)
                             .build();
 
                     int pollInterval = mailConfiguration.getInt(MailProperties.MAIL_SENDER_POLL_INTERVAL);
@@ -63,17 +67,12 @@ public class MailScheduler {
                                 .repeatForever())
                         .build();
 
-                    if(serverInfo.getContextPath() == null) {
-                        logger.error("Could not start mail sender URL invoke job, context path is not known (Servlet < 2.5?)");
-                        return;
-                    }
-                    String hostPort = mailConfiguration.getString("mail.sender.host_port", "localhost:8080");
-                    String url = "http://" + hostPort + serverInfo.getContextPath() + "/actions/mail-sender-run";
-                    scheduler.getContext().put(URLInvokeJob.URL_KEY, url);
                     scheduler.scheduleJob(job, trigger);
                 } catch (Exception e) {
-                    logger.error("Could not schedule mail sender job");
+                    logger.error("Could not schedule mail sender job", e);
                 }
+            } else {
+                logger.info("Mail scheduling using Quartz is disabled");
             }
         }
     }

@@ -28,6 +28,7 @@ import com.manydesigns.mail.sender.MailSender;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,33 +50,22 @@ public class MailQueueSetup {
 
     protected MailQueue mailQueue;
     protected MailSender mailSender;
-    protected Configuration mailConfiguration;
+    protected CompositeConfiguration mailConfiguration;
 
     public MailQueueSetup() {}
 
-    public MailQueueSetup(Configuration mailConfiguration) {
-        this.mailConfiguration = mailConfiguration;
-    }
-
     public void setup() {
         mailConfiguration = new CompositeConfiguration();
-        try {
-            PropertiesConfiguration propertiesConfiguration =
-                    new PropertiesConfiguration(MailProperties.PROPERTIES_RESOURCE);
-            ((CompositeConfiguration) mailConfiguration).addConfiguration(propertiesConfiguration);
-        } catch (Throwable e) {
-            logger.info("{} not found. Mail queue not enabled.", MailProperties.PROPERTIES_RESOURCE);
-            logger.debug("Error loading configuration", e);
-            return;
-        }
+        addConfiguration(MailProperties.PROPERTIES_CUSTOM_RESOURCE);
+        addConfiguration(MailProperties.PROPERTIES_RESOURCE);
 
         boolean mailEnabled = mailConfiguration.getBoolean(MailProperties.MAIL_ENABLED, false);
         if (mailEnabled) {
             String mailHost = mailConfiguration.getString(MailProperties.MAIL_SMTP_HOST);
             if (null == mailHost) {
-                logger.error("Mail is enabled but smtp server not set in portofino-custom.properties");
+                logger.error("Mail queue is enabled but smtp server not set in portofino-custom.properties");
             } else {
-                logger.info("Mail is enabled, starting sender");
+                logger.info("Mail queue is enabled, starting sender");
                 int port = mailConfiguration.getInt(
                         MailProperties.MAIL_SMTP_PORT, 25);
                 boolean ssl = mailConfiguration.getBoolean(
@@ -105,6 +95,20 @@ public class MailQueueSetup {
 
                 logger.info("Mail sender started");
             }
+        } else {
+            logger.info("Mail queue is not enabled");
+        }
+    }
+
+    protected void addConfiguration(String resource) {
+        try {
+            PropertiesConfiguration propertiesConfiguration =
+                    new PropertiesConfiguration(resource);
+            mailConfiguration.addConfiguration(propertiesConfiguration);
+        } catch (Throwable e) {
+            String errorMessage = ExceptionUtils.getRootCauseMessage(e);
+            logger.warn(errorMessage);
+            logger.debug("Error loading configuration", e);
         }
     }
 
