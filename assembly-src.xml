@@ -18,6 +18,12 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
+      <source>COPYRIGHT.txt</source>
+      <outputDirectory></outputDirectory>
+      <destName>COPYRIGHT.txt</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>THIRDPARTIES.txt</source>
       <outputDirectory></outputDirectory>
       <destName>THIRDPARTIES.txt</destName>
@@ -42,7 +48,7 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-        <source>elements-extras/pom.xml</source>
+      <source>elements-extras/pom.xml</source>
       <outputDirectory>elements-extras</outputDirectory>
       <destName>pom.xml</destName>
       <fileMode>0644</fileMode>

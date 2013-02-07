@@ -6,8 +6,8 @@ Template del contenuto di local.py:
 
 #! /usr/bin/env python
 
-portofino_version = "4.0.6"
-tomcat_dir = "apache-tomcat-6.0.35"
+portofino_version = "4.0.9"
+tomcat_dir = "apache-tomcat-6.0.36"
 portofino_path = "~/projects/portofino4"
 tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-6/v6.0.35/bin/apache-tomcat-6.0.35.zip"
 drivers = [["postgresql/postgresql/9.1-901.jdbc3/", "postgresql-9.1-901.jdbc3.jar"],

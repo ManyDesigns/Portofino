@@ -166,12 +166,12 @@ License: Apache License v2
 
 Google Guice
 Site: http://code.google.com/p/google-guice/
-File: guice-2.0.jar
+File: guice-3.0.jar
 License: Apache License v2
 
 Groovy
 Site: http://groovy.codehaus.org/
-File: groovy-1.8.0.jar
+File: groovy-all-2.0.6.jar
 License: Apache License v2
 
 H2 Database Engine
@@ -284,7 +284,7 @@ License: Common Public License - v 1.0
 
 Liquibase
 Site: http://www.liquibase.org/
-File: liquibase-core-2.0.1.jar
+File: liquibase-core-2.0.5.jar
 License: Apache License v2.0
 
 LOGBack
