@@ -45,6 +45,7 @@ os.system("unzip " + tomcat_zip + " -d " + base_path)
 
 shutil.rmtree(tomcat_path + "/webapps/ROOT")
 
+shutil.copy(portofino_path + "/COPYRIGHT.txt", base_path + "/COPYRIGHT.txt")
 shutil.copy(portofino_path + "/LICENSE.txt", base_path + "/LICENSE.txt")
 shutil.copy(portofino_path + "/THIRDPARTIES.txt", base_path + "/THIRDPARTIES.txt")
 
@@ -54,7 +55,7 @@ for driver in local.drivers:
 
 os.system("pushd " + portofino_path + "; mvn clean install -Dmaven.test.skip=true; popd")
 
-shutil.copy(portofino_path + "/portofino-war/target/portofino-war-" + local.portofino_version + ".war", tomcat_path + "/webapps/ROOT.war")
+shutil.copy(portofino_path + "/portofino-war/target/portofino-war-jee-" + local.portofino_version + ".war", tomcat_path + "/webapps/ROOT.war")
 
 shutil.copy("setenv.sh", tomcat_path + "/bin")
 shutil.copy("setenv.bat", tomcat_path + "/bin")
