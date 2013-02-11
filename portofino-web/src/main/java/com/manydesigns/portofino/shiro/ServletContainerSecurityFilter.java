@@ -32,7 +32,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Add this to shiro.ini to manage user authentication with the servlet container.
+ * Add this to web.xml to manage user authentication with the servlet container.
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -45,8 +45,12 @@ public class ServletContainerSecurityFilter extends PathMatchingFilter {
 
     public static final Logger logger = LoggerFactory.getLogger(ServletContainerSecurityFilter.class);
 
-    public ServletContainerSecurityFilter() {
-        processPathConfig("/**", null);
+    @Override
+    protected void onFilterConfigSet() throws Exception {
+        if(this.appliedPaths.isEmpty()) {
+            processPathConfig("/**", null);
+        }
+        super.onFilterConfigSet();
     }
 
     @Override
