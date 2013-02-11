@@ -1,8 +1,21 @@
 /*
- * $Source: /home/cvs/cvsroot/portofino/manydesigns-portofino/test/com/manydesigns/methods/XmlBufferTest.java,v $
- * $Id: XmlBufferTest.java,v 1.1 2007-04-18 15:54:40 predo Exp $
+ * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
  *
- * Copyright ManyDesigns srl 2006-2009
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
 package com.manydesigns.elements.xml;
