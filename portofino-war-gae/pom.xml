@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.0.9-SNAPSHOT</version>
+        <version>4.0.9</version>
     </parent>
     <artifactId>portofino-war-gae</artifactId>
     <packaging>war</packaging>
@@ -75,7 +75,11 @@
             <plugin>
                 <groupId>com.google.appengine</groupId>
                 <artifactId>appengine-maven-plugin</artifactId>
-                <version>1.7.5-SNAPSHOT</version>
+                <version>1.7.4</version>
+                <!-- v1.7.4 does not work locally with a simulated MySQL database. If you want to run
+                     Portofino with mvn appengine:devserver, change the version to at least 1.7.5 if available,
+                     or use 1.7.5-SNAPSHOT and uncomment pluginRepositories below.
+                 -->
                 <configuration>
                     <jvmFlags>
                         <jvmFlag>-Drdbms.server=local</jvmFlag>
@@ -96,8 +100,7 @@
         </plugins>
     </build>
 
-    <!--Sperimentale, rimuovere-->
-    <pluginRepositories>
+    <!--<pluginRepositories>
         <pluginRepository>
             <id>google-snapshots</id>
             <name>Google Snapshots</name>
@@ -109,5 +112,5 @@
                 <enabled>false</enabled>
             </releases>
         </pluginRepository>
-    </pluginRepositories>
+    </pluginRepositories>-->
 </project>
