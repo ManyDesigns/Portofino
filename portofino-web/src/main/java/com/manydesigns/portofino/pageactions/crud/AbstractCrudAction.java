@@ -341,20 +341,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             js.object()
                     .key("__rowKey")
                     .value(row.getKey());
-            for (Field field : row) {
-                Object value = field.getValue();
-                String displayValue = field.getDisplayValue();
-                String href = field.getHref();
-                js.key(field.getPropertyAccessor().getName());
-                js.object()
-                        .key("value")
-                        .value(value)
-                        .key("displayValue")
-                        .value(displayValue)
-                        .key("href")
-                        .value(href)
-                        .endObject();
-            }
+            fieldsToJson(js, row);
             js.endObject();
         }
         js.endArray();
@@ -399,6 +386,24 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         setupReturnToParentTarget();
 
         return getReadView();
+    }
+
+    public Resolution jsonRead() throws JSONException {
+        if(object == null) {
+            throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
+        }
+
+        setupForm(Mode.VIEW);
+        form.readFromObject(object);
+        refreshBlobDownloadHref();
+        JSONStringer js = new JSONStringer();
+        js.object();
+        List<Field> fields = new ArrayList<Field>();
+        collectVisibleFields(form, fields);
+        fieldsToJson(js, fields);
+        js.endObject();
+        String jsonText = js.toString();
+        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
     }
 
     //**************************************************************************
@@ -2128,6 +2133,50 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             throw new Error(e);
         }
         return encodedSearchString;
+    }
+
+    /**
+     * Writes a collection of fields as properties of a JSON object.
+     * @param js the JSONStringer to write to. Must have a JSON object open for writing.
+     * @param fields the fields to output
+     * @throws JSONException if the JSON can not be generated.
+     */
+    protected void fieldsToJson(JSONStringer js, Collection<Field> fields) throws JSONException {
+        for (Field field : fields) {
+            Object value = field.getValue();
+            String displayValue = field.getDisplayValue();
+            String href = field.getHref();
+            js.key(field.getPropertyAccessor().getName());
+            js.object()
+                    .key("value")
+                    .value(value)
+                    .key("displayValue")
+                    .value(displayValue)
+                    .key("href")
+                    .value(href)
+                    .endObject();
+        }
+    }
+
+    protected List<Field> collectVisibleFields(Form form, List<Field> fields) {
+        for(FieldSet fieldSet : form) {
+             collectVisibleFields(fieldSet, fields);
+        }
+        return fields;
+    }
+
+    protected List<Field> collectVisibleFields(FieldSet fieldSet, List<Field> fields) {
+        for(FormElement element : fieldSet) {
+            if(element instanceof Field) {
+                Field field = (Field) element;
+                if(field.isEnabled()) {
+                    fields.add(field);
+                }
+            } else if(element instanceof FieldSet) {
+                collectVisibleFields((FieldSet) element, fields);
+            }
+        }
+        return fields;
     }
 
     //--------------------------------------------------------------------------
