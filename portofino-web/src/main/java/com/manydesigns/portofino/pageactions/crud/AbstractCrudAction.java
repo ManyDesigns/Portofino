@@ -388,7 +388,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return getReadView();
     }
 
-    public Resolution jsonRead() throws JSONException {
+    public Resolution jsonReadData() throws JSONException {
         if(object == null) {
             throw new IllegalStateException("Object not loaded. Are you including the primary key in the URL?");
         }
