@@ -59,10 +59,21 @@
         <module>portofino-core</module>
         <module>portofino-web</module>
         <module>portofino-war</module>
-        <module>portofino-war-gae</module>
         <module>portofino-war-jee</module>
         <module>mail</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>jdk16</id>
+            <activation>
+                <jdk>1.6</jdk>
+            </activation>
+            <modules>
+                <module>portofino-war-gae</module>
+            </modules>
+        </profile>
+    </profiles>
     
     <build>
         <plugins>

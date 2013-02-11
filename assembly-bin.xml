@@ -24,9 +24,15 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>portofino-war/target/portofino-war-${project.version}.war</source>
+      <source>portofino-war/target/portofino-war-jee-${project.version}.war</source>
       <outputDirectory></outputDirectory>
-      <destName>portofino-war-${project.version}.war</destName>
+      <destName>portofino-war-jee-${project.version}.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-war/target/portofino-war-gae-${project.version}.war</source>
+      <outputDirectory></outputDirectory>
+      <destName>portofino-war-jee-${project.version}.war</destName>
       <fileMode>0644</fileMode>
     </file>
   </files>
