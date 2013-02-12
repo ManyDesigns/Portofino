@@ -55,7 +55,7 @@ for driver in local.drivers:
 
 os.system("pushd " + portofino_path + "; mvn clean install -Dmaven.test.skip=true; popd")
 
-shutil.copy(portofino_path + "/portofino-war/target/portofino-war-jee-" + local.portofino_version + ".war", tomcat_path + "/webapps/ROOT.war")
+shutil.copy(portofino_path + "/portofino-war-jee/target/portofino-war-jee-" + local.portofino_version + ".war", tomcat_path + "/webapps/ROOT.war")
 
 shutil.copy("setenv.sh", tomcat_path + "/bin")
 shutil.copy("setenv.bat", tomcat_path + "/bin")
