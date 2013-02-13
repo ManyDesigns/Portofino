@@ -91,7 +91,9 @@ public class
 
         logger.debug("Setting up logging MDC");
         MDC.clear();
-        MDC.put("userId", userId);
+        if(userId != null) { //Issue #755
+            MDC.put("userId", userId);
+        }
 
         if (!SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler)) {
             return new ForbiddenAccessResolution();
