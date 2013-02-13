@@ -58,13 +58,15 @@ public class ColumnForm extends Column {
     protected BigDecimal minValue;
     protected BigDecimal maxValue;
     protected String decimalFormat;
+    //TODO PrecisionScale (non gestita a livello di field)
 
     protected String dateFormat;
 
     public static final String[] KNOWN_ANNOTATIONS = {
             FieldSize.class.getName(), MaxLength.class.getName(), Multiline.class.getName(), RichText.class.getName(),
             Email.class.getName(), CAP.class.getName(), CodiceFiscale.class.getName(), PartitaIva.class.getName(),
-            Password.class.getName(), HighlightLinks.class.getName(), RegExp.class.getName(), FileBlob.class.getName(),
+            Password.class.getName(), Phone.class.getName(),
+            HighlightLinks.class.getName(), RegExp.class.getName(), FileBlob.class.getName(),
             MinDecimalValue.class.getName(), MinIntValue.class.getName(), MaxDecimalValue.class.getName(),
             MaxIntValue.class.getName(), DecimalFormat.class.getName(), DateFormat.class.getName()
     };
@@ -111,6 +113,9 @@ public class ColumnForm extends Column {
         }
         if(columnAccessor.isAnnotationPresent(Password.class)) {
             stringFormat = Password.class.getName();
+        }
+        if(columnAccessor.isAnnotationPresent(Phone.class)) {
+            stringFormat = Phone.class.getName();
         }
 
         HighlightLinks hlAnn = columnAccessor.getAnnotation(HighlightLinks.class);
