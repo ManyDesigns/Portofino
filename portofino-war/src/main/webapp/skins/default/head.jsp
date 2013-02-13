@@ -22,7 +22,7 @@
       href="<stripes:url value="/jquery-ui-1.8.21/css/smoothness/jquery-ui-1.8.21.custom.css"/>"/>
 
 <link rel="stylesheet" type="text/css"
-      href="<stripes:url value="/skins/default/portofino.css"/>"/>
+      href="<stripes:url value="/skins/${skin}/portofino.css"/>"/>
 
 <script type="text/javascript"
         src="<stripes:url value="/jquery-ui-1.8.21/js/jquery-1.7.2.min.js"/>"></script>
@@ -47,7 +47,7 @@
 <script type="text/javascript"
         src="<stripes:url value="/elements.js"/>"></script>
 <script type="text/javascript"
-        src="<stripes:url value="/skins/default/portofino.js.jsp"/>"></script>
+        src="<stripes:url value="/skins/${skin}/portofino.js.jsp"/>"></script>
 <jsp:useBean id="actionBean" scope="request" type="net.sourceforge.stripes.action.ActionBean" />
 <%
     Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);

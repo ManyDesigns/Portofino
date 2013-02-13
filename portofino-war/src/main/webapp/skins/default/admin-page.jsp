@@ -79,13 +79,13 @@
                     <%--<li>
                         <div class="navigationHeader first">Site content</div>
                         <ul>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                            <stripes:layout-render name="/skins/${skin}/adminLink.jsp"
                                                    text="Recent site activity"
                                                    link="/"/>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                            <stripes:layout-render name="/skins/${skin}/adminLink.jsp"
                                                    text="Pages"
                                                    link="/"/>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                            <stripes:layout-render name="/skins/${skin}/adminLink.jsp"
                                                    text="Attachments"
                                                    link="/"/>
                         </ul>
@@ -93,7 +93,7 @@
                     <li>
                         <div class="navigationHeader">Security</div>
                         <ul>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                            <stripes:layout-render name="/skins/${skin}/adminLink.jsp"
                                                    text="Root permissions"
                                                    link="/actions/admin/root-page/permissions"/>
                         </ul>
@@ -101,10 +101,10 @@
                     <li>
                         <div class="navigationHeader">Configuration</div>
                         <ul>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                            <stripes:layout-render name="/skins/${skin}/adminLink.jsp"
                                                    text="Settings"
                                                    link="/actions/admin/settings"/>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                            <stripes:layout-render name="/skins/${skin}/adminLink.jsp"
                                                    text="Top-level pages"
                                                    link="/actions/admin/root-page/children"/>
                         </ul>
@@ -112,16 +112,16 @@
                     <li>
                         <div class="navigationHeader">Data modeling</div>
                         <ul>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                            <stripes:layout-render name="/skins/${skin}/adminLink.jsp"
                                                    text="Wizard"
                                                    link="/actions/admin/wizard"/>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                            <stripes:layout-render name="/skins/${skin}/adminLink.jsp"
                                                    text="Connection providers"
                                                    link="/actions/admin/connection-providers"/>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                            <stripes:layout-render name="/skins/${skin}/adminLink.jsp"
                                                    text="Tables"
                                                    link="/actions/admin/tables"/>
-                            <stripes:layout-render name="/skins/default/adminLink.jsp"
+                            <stripes:layout-render name="/skins/${skin}/adminLink.jsp"
                                                    text="Reload model"
                                                    link="/actions/admin/reload-model"/>
                         </ul>
