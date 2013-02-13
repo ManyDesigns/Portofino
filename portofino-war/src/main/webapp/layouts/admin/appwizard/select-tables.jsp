@@ -36,6 +36,7 @@
                 <label for="generationStrategy_manual"><fmt:message key="appwizard.createPages.strategy.manual" /></label></li>
         </ul>
         <div id="rootsFormContainer">
+            <span style="font-weight: bold;"><mde:write name="actionBean" property="generateCalendarField" /></span>
             <h3><fmt:message key="appwizard.roots.select" /></h3>
             <mde:write name="actionBean" property="rootsForm"/>
         </div>

@@ -20,6 +20,7 @@
         <mde:sessionMessages />
         <%= actionBean.getMessage("appwizard.finish.text") %>
         <div style="display: none;">
+            <input type="hidden" name="generateCalendar" value="${actionBean.generateCalendar}" />
             <input type="hidden" name="generationStrategy" value="${actionBean.generationStrategy}" />
             <mde:write name="actionBean" property="rootsForm"/>
             <c:if test="${not empty actionBean.userManagementSetupForm}">

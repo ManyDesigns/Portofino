@@ -24,6 +24,7 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Password;
+import com.manydesigns.elements.fields.BooleanField;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.TextField;
@@ -127,6 +128,9 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
     protected List<SelectableRoot> selectableRoots = new ArrayList<SelectableRoot>();
 
     protected String generationStrategy = "AUTO";
+
+    protected BooleanField generateCalendarField;
+    protected boolean generateCalendar = true;
 
     //Users
     protected String userTableName;
@@ -345,49 +349,6 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         return selectSchemasForm();
     }
 
-    /*
-    @Guard(test = "isNewConnectionProvider()", type = GuardType.VISIBLE)
-    @Button(list = "select-schemas", key="wizard.finish", order = 3)
-    public Resolution selectSchemasAndFinish() {
-        configureConnectionProvider();
-        schemasForm.readFromRequest(context.getRequest());
-        if(schemasForm.validate()) {
-            schemasForm.writeToObject(selectableSchemas);
-            boolean atLeastOneSelected = isAtLeastOneSchemaSelected();
-            if(atLeastOneSelected) {
-                if (configureModelSchemas(true) == null) {
-                    return selectSchemasForm();
-                }
-                Database oldDatabase =
-                        DatabaseLogic.findDatabaseByName(application.getModel(), database.getDatabaseName());
-                if(oldDatabase != null) {
-                    model.getDatabases().remove(oldDatabase);
-                }
-                model.getDatabases().add(database);
-                model.init();
-                try {
-                    connectionProvider.setDatabase(database);
-                    connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
-                    application.saveXmlModel();
-                    return new RedirectResolution("/actions/admin/connection-providers")
-                            .addParameter("databaseName", connectionProvider.getDatabase().getDatabaseName());
-                } catch (Exception e) {
-                    saveModelFailed(e);
-                    model.getDatabases().remove(database);
-                    model.getDatabases().add(oldDatabase);
-                    model.init();
-                    connectionProvider.setDatabase(oldDatabase);
-                    connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
-                    return selectSchemasForm();
-                }
-            } else {
-                SessionMessages.addErrorMessage(getMessage("appwizard.error.schemas.noneSelected"));
-                return selectSchemasForm();
-            }
-        }
-        return selectSchemasForm();
-    }*/
-
     protected boolean isAtLeastOneSchemaSelected() {
         boolean atLeastOneSelected = false;
         for(SelectableSchema schema : selectableSchemas) {
@@ -427,9 +388,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
                     modelSchema.setDatabase(database);
                     database.getSchemas().add(modelSchema);
                     tempSchemas.add(modelSchema);
-                }/* else if(!isNewConnectionProvider()) {
-                    SessionMessages.addWarningMessage(getMessage("appwizard.warning.schemaExists", schema.schemaName));
-                }*/
+                }
             }
         }
         Database targetDatabase;
@@ -444,8 +403,6 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             database.getSchemas().removeAll(tempSchemas);
             connectionProvider.setDatabase(database); //Restore
         }
-        //connectionProvider.setDatabase(targetDatabase);
-        //connectionProvider.init(application.getDatabasePlatformsManager(), application.getAppDir());
         Model model = new Model();
         model.getDatabases().add(targetDatabase);
         model.init();
@@ -704,7 +661,20 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
 
     protected Resolution selectTablesForm() {
         step = (userTable == null) ? 3 : 4;
+        setupCalendarField();
         return new ForwardResolution("/layouts/admin/appwizard/select-tables.jsp");
+    }
+
+    protected void setupCalendarField() {
+        ClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(ApplicationWizard.class);
+        try {
+            generateCalendarField =
+                    new BooleanField(classAccessor.getProperty("generateCalendar"), Mode.EDIT);
+            generateCalendarField.setLabel(getMessage("appwizard.generateCalendar"));
+            generateCalendarField.readFromObject(this);
+        } catch (NoSuchFieldException e) {
+            throw new Error(e);
+        }
     }
 
     protected List<Table> determineRoots(MultiMap children, List<Table> allTables) {
@@ -761,7 +731,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
                 for(ModelSelectionProvider sp : table.getSelectionProviders()) {
                     for(Reference ref : sp.getReferences()) {
                         Column column = ref.getActualToColumn();
-                        if(column.getTable() != table) {
+                        if(column != null && column.getTable() != table) {
                             children.put(column.getTable(), ref);
                             //TODO potrebbe essere un ciclo nel grafo...
                             if(!selected && !removed) {
@@ -815,6 +785,9 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
 
     protected Resolution buildAppForm() {
         step = (userTable == null) ? 4 : 5;
+        setupCalendarField();
+        generateCalendarField.readFromRequest(context.getRequest());
+        generateCalendarField.writeToObject(this);
         return new ForwardResolution("/layouts/admin/appwizard/build-app.jsp");
     }
 
@@ -836,6 +809,10 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         connectionProvider.setDatabase(database);
         application.initModel();
         if(!generationStrategy.equals("NO")) {
+            if(generationStrategy.equals("AUTO")) {
+                generateCalendar = true;
+            }
+
             try {
                 TemplateEngine engine = new SimpleTemplateEngine();
                 Template template = engine.createTemplate(ApplicationWizard.class.getResource("CrudPage.groovy"));
@@ -848,7 +825,9 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
                 if(userTable != null) {
                     setupUserPages(childPages, template);
                 }
-                setupCalendar(childPages);
+                if(generateCalendar) {
+                    setupCalendar(childPages);
+                }
                 Page rootPage = DispatcherLogic.getPage(application.getPagesDir());
                 Collections.sort(childPages, new Comparator<ChildPage>() {
                     public int compare(ChildPage o1, ChildPage o2) {
@@ -1606,6 +1585,18 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
 
     public void setGenerationStrategy(String generationStrategy) {
         this.generationStrategy = generationStrategy;
+    }
+
+    public boolean isGenerateCalendar() {
+        return generateCalendar;
+    }
+
+    public void setGenerateCalendar(boolean generateCalendar) {
+        this.generateCalendar = generateCalendar;
+    }
+
+    public BooleanField getGenerateCalendarField() {
+        return generateCalendarField;
     }
 
     //Wizard implementation
