@@ -315,6 +315,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         setupColumnForm(); //Recalculate applicable annotations
         columnForm.readFromRequest(context.getRequest());
         saveToColumnForm(columnForm, cf);
+        SessionMessages.addInfoMessage(getMessage("commons.save.successful"));
         return new ForwardResolution("/layouts/admin/tables/edit-column.jsp");
     }
 
@@ -329,27 +330,6 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         resolution.addParameter("selectedTabId", selectedTabId);
         return resolution;
     }
-
-    /*@Button(key = "layouts.admin.tables.editShortName", list = "table-edit-short-name")
-    public Resolution editShortName() throws NoSuchFieldException {
-        setupTableForm(Mode.HIDDEN);
-        tableForm.readFromRequest(context.getRequest());
-
-        shortName = table.getShortName();
-        JavaClassAccessor jca = JavaClassAccessor.getClassAccessor(getClass());
-        shortNameField = new TextField(jca.getProperty("shortName"), Mode.EDIT);
-        shortNameField.readFromObject(this);
-
-        return new ForwardResolution("/layouts/admin/tables/edit-short-name.jsp");
-    }*/
-
-    /*@Button(key = "commons.save", list = "table-short-name", order = 1)
-    public Resolution saveShortName() {
-        RedirectResolution resolution =
-                new RedirectResolution(BASE_ACTION_PATH + "/" + databaseName + "/" + schemaName + "/" + tableName);
-        resolution.addParameter("shortName", shortName);
-        return resolution;
-    }*/
 
     @Button(key = "layouts.admin.tables.addSelectionProvider", list="table-selection-providers")
     public Resolution addSelectionProvider() {
@@ -712,7 +692,8 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         if(Number.class.isAssignableFrom(type)) {
             return new String[] { "fieldSize", "minValue", "maxValue", "decimalFormat" };
         } else if(String.class.equals(type)) {
-            return new String[] { "fieldSize", "typeOfContent", "stringFormat", "regexp" };
+            return new String[] { "fieldSize", "typeOfContent", "stringFormat", "regexp",
+                                  "highlightLinks", "fileBlob" };
         } else if(Date.class.isAssignableFrom(type)) {
             return new String[] { "fieldSize", "dateFormat" };
         }

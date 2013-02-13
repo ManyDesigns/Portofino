@@ -53,6 +53,7 @@ public class ColumnForm extends Column {
     protected String stringFormat;
     protected boolean highlightLinks;
     protected String regexp;
+    protected boolean fileBlob;
 
     protected BigDecimal minValue;
     protected BigDecimal maxValue;
@@ -63,7 +64,7 @@ public class ColumnForm extends Column {
     public static final String[] KNOWN_ANNOTATIONS = {
             FieldSize.class.getName(), MaxLength.class.getName(), Multiline.class.getName(), RichText.class.getName(),
             Email.class.getName(), CAP.class.getName(), CodiceFiscale.class.getName(), PartitaIva.class.getName(),
-            Password.class.getName(), HighlightLinks.class.getName(), RegExp.class.getName(),
+            Password.class.getName(), HighlightLinks.class.getName(), RegExp.class.getName(), FileBlob.class.getName(),
             MinDecimalValue.class.getName(), MinIntValue.class.getName(), MaxDecimalValue.class.getName(),
             MaxIntValue.class.getName(), DecimalFormat.class.getName(), DateFormat.class.getName()
     };
@@ -114,12 +115,17 @@ public class ColumnForm extends Column {
 
         HighlightLinks hlAnn = columnAccessor.getAnnotation(HighlightLinks.class);
         if(hlAnn != null) {
-            highlightLinks = true;
+            highlightLinks = hlAnn.value();
         }
 
         RegExp regexpAnn = columnAccessor.getAnnotation(RegExp.class);
         if(regexpAnn != null) {
             regexp = regexpAnn.value();
+        }
+
+        FileBlob fileBlobAnn = columnAccessor.getAnnotation(FileBlob.class);
+        if(fileBlobAnn != null) {
+            fileBlob = true;
         }
 
         MinDecimalValue minDecimalValueAnn = columnAccessor.getAnnotation(MinDecimalValue.class);
@@ -190,6 +196,10 @@ public class ColumnForm extends Column {
             Annotation ann = new Annotation(column, RegExp.class.getName());
             ann.getValues().add(regexp);
             ann.getValues().add("elements.error.field.regexp.format"); //Default error message
+            column.getAnnotations().add(ann);
+        }
+        if(fileBlob) {
+            Annotation ann = new Annotation(column, FileBlob.class.getName());
             column.getAnnotations().add(ann);
         }
         if(minValue != null) {
@@ -355,6 +365,14 @@ public class ColumnForm extends Column {
 
     public void setRegexp(String regexp) {
         this.regexp = regexp;
+    }
+
+    public boolean isFileBlob() {
+        return fileBlob;
+    }
+
+    public void setFileBlob(boolean fileBlob) {
+        this.fileBlob = fileBlob;
     }
 
     @PrecisionScale(scale = 10, precision = 100)
