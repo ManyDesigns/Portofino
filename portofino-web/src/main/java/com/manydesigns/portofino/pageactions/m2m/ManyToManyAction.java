@@ -220,6 +220,7 @@ public class ManyToManyAction extends AbstractPageAction {
     protected Resolution view() {
         switch (m2mConfiguration.getActualViewType()) {
             case CHECKBOXES:
+            case CHECKBOXES_VERTICAL:
                 booleanRelation = new LinkedHashMap<Object, Boolean>();
                 if(potentiallyAvailableAssociations != null) {
                     for(Object o : potentiallyAvailableAssociations) {
@@ -418,6 +419,8 @@ public class ManyToManyAction extends AbstractPageAction {
         DefaultSelectionProvider viewTypeSelectionProvider = new DefaultSelectionProvider("viewType");
         String label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.CHECKBOXES");
         viewTypeSelectionProvider.appendRow(ViewType.CHECKBOXES.name(), label, true);
+        label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.CHECKBOXES_VERTICAL");
+        viewTypeSelectionProvider.appendRow(ViewType.CHECKBOXES_VERTICAL.name(), label, true);
         //label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.LISTS");
         //viewTypeSelectionProvider.appendRow(ViewType.LISTS.name(), label, true);
         formBuilder.configSelectionProvider(viewTypeSelectionProvider, "viewType");

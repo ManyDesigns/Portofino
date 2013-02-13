@@ -28,7 +28,7 @@ package com.manydesigns.portofino.pageactions.m2m.configuration;
  */
 public enum ViewType {
 
-    CHECKBOXES;//, LISTS;
+    CHECKBOXES, CHECKBOXES_VERTICAL;//, LISTS;
 
     public static final String copyright=
             "Copyright (c) 2005-2013, ManyDesigns srl";

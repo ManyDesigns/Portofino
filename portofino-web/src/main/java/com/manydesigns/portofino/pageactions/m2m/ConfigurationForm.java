@@ -46,10 +46,12 @@ public class ConfigurationForm extends ManyToManyConfiguration {
         setQuery(m2mConfiguration.getQuery());
         setOneExpression(m2mConfiguration.getOneExpression());
         setOnePropertyName(m2mConfiguration.getOnePropertyName());
-        if(m2mConfiguration.getOneSelectionProvider() != null) {
+        if(m2mConfiguration.getOneSelectionProvider() != null &&
+           m2mConfiguration.getOneSelectionProvider().getActualSelectionProvider() != null) {
             oneSpName = m2mConfiguration.getOneSelectionProvider().getActualSelectionProvider().getName();
         }
-        if(m2mConfiguration.getManySelectionProvider() != null) {
+        if(m2mConfiguration.getManySelectionProvider() != null &&
+           m2mConfiguration.getManySelectionProvider().getActualSelectionProvider() != null) {
             manySpName = m2mConfiguration.getManySelectionProvider().getActualSelectionProvider().getName();
         }
     }

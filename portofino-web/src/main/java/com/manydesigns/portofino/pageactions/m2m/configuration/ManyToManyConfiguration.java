@@ -101,20 +101,24 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
                 if(actualRelationTable != null) {
                     if(manySelectionProvider != null) {
                         manySelectionProvider.init(actualRelationTable);
-                        ModelSelectionProvider actualSelectionProvider = manySelectionProvider.getActualSelectionProvider();
-                        String manyDatabaseName = actualSelectionProvider.getToDatabase();
-                        actualManyDatabase =
-                            DatabaseLogic.findDatabaseByName(application.getModel(), manyDatabaseName);
-                        actualManyTable = actualSelectionProvider.getToTable();
-                        if(actualManyTable == null && actualSelectionProvider instanceof DatabaseSelectionProvider) {
-                            logger.debug("Trying to determine the many table from the selection provider query");
-                            String hql = ((DatabaseSelectionProvider) actualSelectionProvider).getHql();
-                            if(hql != null) {
-                                actualManyTable = QueryUtils.getTableFromQueryString(actualManyDatabase, hql);
+                        if(manySelectionProvider.getActualSelectionProvider() != null) {
+                            ModelSelectionProvider actualSelectionProvider = manySelectionProvider.getActualSelectionProvider();
+                            String manyDatabaseName = actualSelectionProvider.getToDatabase();
+                            actualManyDatabase =
+                                DatabaseLogic.findDatabaseByName(application.getModel(), manyDatabaseName);
+                            actualManyTable = actualSelectionProvider.getToTable();
+                            if(actualManyTable == null && actualSelectionProvider instanceof DatabaseSelectionProvider) {
+                                logger.debug("Trying to determine the many table from the selection provider query");
+                                String hql = ((DatabaseSelectionProvider) actualSelectionProvider).getHql();
+                                if(hql != null) {
+                                    actualManyTable = QueryUtils.getTableFromQueryString(actualManyDatabase, hql);
+                                }
                             }
-                        }
-                        if(actualManyTable == null) {
-                            logger.error("Invalid selection provider: only foreign keys or HQL selection providers that select a single entity are supported");
+                            if(actualManyTable == null) {
+                                logger.error("Invalid selection provider: only foreign keys or HQL selection providers that select a single entity are supported");
+                            }
+                        } else {
+                            logger.error("Many-side selection provider not found");
                         }
                     } else {
                         logger.error("Many-side selection provider is required");

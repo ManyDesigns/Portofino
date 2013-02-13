@@ -2,10 +2,11 @@
          pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
-%><%@taglib prefix="mde" uri="/manydesigns-elements"
+%><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
-%><stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/modal.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.m2m.ManyToManyAction"/>
+%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.m2m.ManyToManyAction"
+/><stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/modal.jsp">
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="configuration" cssClass="contentButton" />
         <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
@@ -15,6 +16,18 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="configurationForm" />
+        <br /><br />
+        <p>
+            <%
+                if(SecurityLogic.isAdministrator(request) &&
+                   actionBean.getConfiguration().getActualRelationTable() != null) { %>
+                <a href="/${pageContext.request.contextPath}actions/admin/tables/${actionBean.configuration.actualRelationTable.databaseName}/${actionBean.configuration.actualRelationTable.schemaName}/${actionBean.configuration.actualRelationTable.tableName}?addSelectionProvider="
+                   target="_blank">
+                    <fmt:message key="com.manydesigns.portofino.pageactions.m2m.configuration.addSelectionProvider.linkText" />
+                </a>
+                <fmt:message key="com.manydesigns.portofino.pageactions.m2m.configuration.addSelectionProvider.explanation" />
+            <% } %>
+        </p>
         <%@include file="../script-configuration.jsp" %>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
