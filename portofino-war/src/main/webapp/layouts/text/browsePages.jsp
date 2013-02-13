@@ -3,7 +3,7 @@
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%--
---%><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+--%><!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" style="height: 100%;">
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.pageactions.text.TextAction"/>

@@ -24,10 +24,10 @@
                                 "join \"projects\" on \"project_id\" = \"projects\".\"id\" " +
                                 "group by \"status_id\", \"project_id\" order by \"project_id\"");%>
             <table id="projectTree">
-            <tr width="100%" style="background-color: #ECEEF0">
-                <th width="40%">Project</th>
-                <th width="40%">Status</th>
-                <th width="20%">Issues</th>
+            <tr style="background-color: #ECEEF0; width: 100%;">
+                <th style="width: 40%;">Project</th>
+                <th style="width: 40%;">Status</th>
+                <th style="width: 20%;">Issues</th>
             </tr>
 
             <%
