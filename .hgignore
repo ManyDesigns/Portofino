@@ -7,6 +7,7 @@
 ^.*/overlays/[^/]+[.]info$
 ^oneclick/local.py$
 ^oneclick/local.pyc$
+^oneclick/build/
 derby.log
 syntax: glob
 *.DS_Store

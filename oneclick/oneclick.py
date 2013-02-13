@@ -23,17 +23,19 @@ import shutil
 import os
 
 #Derived variables
-base_path = "portofino-" + local.portofino_version
+base_path = "build/portofino-" + local.portofino_version
 portofino_path = os.path.expanduser(local.portofino_path)
 tomcat_path = base_path + "/" + local.tomcat_dir
-tomcat_zip = local.tomcat_dir + ".zip"
+tomcat_zip = base_path + "/../" + local.tomcat_dir + ".zip"
 
 print """//////////////////////
 Portofino build script
 //////////////////////"""
 
-if(not os.path.exists(base_path)):
-    os.mkdir(base_path)
+if(os.path.exists(base_path)):
+    shutil.rmtree(base_path + "/..")
+
+os.makedirs(base_path)
 
 print "Downloading Tomcat..."
 urllib.urlretrieve(local.tomcat_url, tomcat_zip)
