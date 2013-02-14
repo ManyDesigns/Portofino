@@ -331,7 +331,8 @@ public class TextAction extends AbstractPageAction {
         while (matcher.find()) {
             String attachmentId = matcher.group(1);
             //Default to src for old texts
-            String hrefAttribute = matcher.groupCount() >= 3 ? matcher.group(3) : "src";
+            String hrefAttribute =
+                    (matcher.groupCount() >= 3 && matcher.group(3) != null) ? matcher.group(3) : "src";
 
             sb.append(content.substring(lastEnd, matcher.start()))
               .append(hrefAttribute).append("=\"")
