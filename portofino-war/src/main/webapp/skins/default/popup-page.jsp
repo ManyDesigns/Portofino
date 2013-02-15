@@ -5,7 +5,7 @@
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><stripes:layout-definition><%--
---%><%@include file="doctype.txt"%>
+--%><!doctype html>
     <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
     <head>
         <jsp:include page="head.jsp"/>
