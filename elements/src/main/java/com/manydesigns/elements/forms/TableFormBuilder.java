@@ -35,10 +35,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -225,8 +222,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
             String rowPrefix =
                     StringUtils.join(new Object[] {prefix, "row", index, "_"});
 
-            for (int j = 0; j < propertyAccessors.size(); j++) {
-                PropertyAccessor propertyAccessor = propertyAccessors.get(j);
+            for (PropertyAccessor propertyAccessor : propertyAccessors) {
                 Field field = buildField(propertyAccessor, rowPrefix);
                 if (field == null) {
                     logger.warn("Cannot instanciate field for property {}",
@@ -306,4 +302,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
         return field;
     }
 
+    public List<PropertyAccessor> getPropertyAccessors() {
+        return propertyAccessors != null ? Collections.unmodifiableList(propertyAccessors) : null;
+    }
 }

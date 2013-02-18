@@ -944,11 +944,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     selectionProvider, fieldNames);
         }
 
-        for (PropertyAccessor property : classAccessor.getKeyProperties()) {
-            tableFormBuilder.configHrefTextFormat(
-                    property.getName(), hrefFormat);
-        }
-
         int nRows;
         if (objects == null) {
             nRows = 0;
@@ -956,23 +951,31 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             nRows = objects.size();
         }
 
-        tableFormBuilder
-                .configPrefix(prefix)
-                .configNRows(nRows)
-                .configMode(mode)
-                .configReflectiveFields();
+        configureTableFormBuilder(tableFormBuilder, mode, nRows);
+
+        if(tableFormBuilder.getPropertyAccessors() == null) {
+            tableFormBuilder.configReflectiveFields();
+        }
 
         boolean isShowingKey = false;
         for (PropertyAccessor property : classAccessor.getKeyProperties()) {
-            if(tableFormBuilder.isPropertyVisible(property)) {
+            if(tableFormBuilder.getPropertyAccessors().contains(property) &&
+               tableFormBuilder.isPropertyVisible(property)) {
                 isShowingKey = true;
                 break;
             }
         }
 
-        if(!isShowingKey) {
+        if(isShowingKey) {
+            logger.debug("TableForm: configuring detail links for primary key properties");
+            for (PropertyAccessor property : classAccessor.getKeyProperties()) {
+                tableFormBuilder.configHrefTextFormat(property.getName(), hrefFormat);
+            }
+        } else {
+            logger.debug("TableForm: configuring detail link for the first visible property");
             for (PropertyAccessor property : classAccessor.getProperties()) {
-                if(tableFormBuilder.isPropertyVisible(property)) {
+                if(tableFormBuilder.getPropertyAccessors().contains(property) &&
+                   tableFormBuilder.isPropertyVisible(property)) {
                     tableFormBuilder.configHrefTextFormat(
                         property.getName(), hrefFormat);
                     break;
@@ -988,6 +991,21 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             tableForm.readFromObject(objects);
             refreshTableBlobDownloadHref();
         }
+    }
+
+    /**
+     * Configures the builder for the search results form. You can override this method to customize how
+     * the form is generated (e.g. adding custom links on specific columns, hiding or showing columns
+     * based on some runtime condition, etc.).
+     * @param tableFormBuilder
+     * @param mode
+     * @param nRows
+     */
+    protected void configureTableFormBuilder(TableFormBuilder tableFormBuilder, Mode mode, int nRows) {
+        tableFormBuilder
+                .configPrefix(prefix)
+                .configNRows(nRows)
+                .configMode(mode);
     }
 
     protected void setupForm(Mode mode) {
@@ -1021,10 +1039,18 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             formBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
 
-        form = formBuilder
-                .configPrefix(prefix)
-                .configMode(mode)
-                .build();
+        configureFormBuilder(formBuilder, mode);
+        form = formBuilder.build();
+    }
+
+    /**
+     * Configures the builder for the search detail (view, create, edit) form.
+     * You can override this method to customize how the form is generated
+     * (e.g. adding custom links on specific properties, hiding or showing properties
+     * based on some runtime condition, etc.).
+     */
+    protected void configureFormBuilder(FormBuilder formBuilder, Mode mode) {
+        formBuilder.configPrefix(prefix).configMode(mode);
     }
 
     //**************************************************************************
