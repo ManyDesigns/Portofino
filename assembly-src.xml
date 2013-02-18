@@ -36,9 +36,15 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>assembly-bin.xml</source>
+      <source>assembly-jee-bin.xml</source>
       <outputDirectory></outputDirectory>
-      <destName>assembly-bin.xml</destName>
+      <destName>assembly-jee-bin.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>assembly-gae-bin.xml</source>
+      <outputDirectory></outputDirectory>
+      <destName>assembly-gae-bin.xml</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
