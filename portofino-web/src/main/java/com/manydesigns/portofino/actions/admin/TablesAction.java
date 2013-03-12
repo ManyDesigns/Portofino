@@ -57,6 +57,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -212,9 +214,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
             }
 
             try {
-                model.init();
-                application.saveXmlModel();
-                DispatcherLogic.clearConfigurationCache();
+                saveModel();
                 for(Table otherTable : table.getSchema().getTables()) {
                     for(ForeignKey fk : otherTable.getForeignKeys()) {
                         if(fk.getFromTable().equals(table) ||
@@ -239,7 +239,6 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 SessionMessages.consumeWarningMessages(); //Clear skipped columns warnings
                 setupTableForm(Mode.EDIT); //Recalculate entity name
                 setupColumnsForm(Mode.EDIT); //Reflect the new order of the columns
-                SessionMessages.addInfoMessage(getMessage("commons.save.successful"));
             } catch (Exception e) {
                 logger.error("Could not save model", e);
                 SessionMessages.addErrorMessage(e.toString());
@@ -281,9 +280,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         if(saveToColumnForm(columnForm, cf)) {
             cf.copyTo(column);
             try {
-                model.init();
-                application.saveXmlModel();
-                DispatcherLogic.clearConfigurationCache();
+                saveModel();
                 for(Table otherTable : table.getSchema().getTables()) {
                     for(ForeignKey fk : otherTable.getForeignKeys()) {
                         for(Reference ref : fk.getReferences()) {
@@ -346,10 +343,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         ModelSelectionProvider sp = DatabaseLogic.findSelectionProviderByName(table, selectionProviderName);
         table.getSelectionProviders().remove(sp);
         try {
-            model.init();
-            application.saveXmlModel();
-            DispatcherLogic.clearConfigurationCache();
-            SessionMessages.addInfoMessage(getMessage("commons.delete.successful"));
+            saveModel();
         } catch (Exception e) {
             logger.error("Could not save model", e);
             SessionMessages.addErrorMessage(e.toString());
@@ -453,10 +447,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 databaseSelectionProvider.getReferences().add(ref);
             }
             try {
-                model.init();
-                application.saveXmlModel();
-                DispatcherLogic.clearConfigurationCache();
-                SessionMessages.addInfoMessage(getMessage("commons.save.successful"));
+                saveModel();
             } catch (Exception e) {
                 logger.error("Could not save model", e);
                 SessionMessages.addErrorMessage(e.toString());
@@ -466,6 +457,13 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         } else {
             return doEditSelectionProvider(databaseSelectionProviderForm);
         }
+    }
+
+    protected void saveModel() throws IOException, JAXBException {
+        application.initModel();
+        application.saveXmlModel();
+        DispatcherLogic.clearConfigurationCache();
+        SessionMessages.addInfoMessage(getMessage("commons.save.successful"));
     }
 
     protected boolean saveToColumnForm(Form columnForm, ColumnForm cf) {
