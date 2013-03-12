@@ -20,6 +20,8 @@
 
 package com.manydesigns.portofino.model.database;
 
+import com.manydesigns.portofino.model.Annotated;
+import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -287,6 +289,16 @@ public class DatabaseLogic {
         } else {
             throw new IllegalArgumentException("Not a qualified table name: " + qualifiedName);
         }
+    }
+
+    public static Annotation findAnnotation(
+            Annotated object, Class<? extends java.lang.annotation.Annotation> annotationClass) {
+        for(Annotation candidate : object.getAnnotations()) {
+            if(candidate.getType().equals(annotationClass.getName())) {
+                return candidate;
+            }
+        }
+        return null;
     }
 
     //**************************************************************************

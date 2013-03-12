@@ -17,6 +17,7 @@ import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.hibernate.criterion.Order
 
 class Security extends AbstractApplicationRealmDelegate {
 
@@ -161,9 +162,10 @@ class Security extends AbstractApplicationRealmDelegate {
         if(!StringUtils.isEmpty(groupTableEntityName)) {
             Session session = application.getSession(databaseName)
             def criteria = session.createCriteria(groupTableEntityName)
-            criteria.setProjection(Projections.property(groupNameProperty))
+            criteria.projection = Projections.property(groupNameProperty)
+            criteria.addOrder(Order.asc(groupNameProperty))
             for(x in criteria.list()) {
-                groups.addAll(String.valueOf(x))
+                groups.add(String.valueOf(x))
             }
         }
         return groups;

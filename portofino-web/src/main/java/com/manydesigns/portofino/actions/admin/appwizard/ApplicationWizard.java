@@ -157,6 +157,8 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
     protected int maxDepth = 5;
     protected int depth;
 
+    private final String databaseSessionKey = getClass().getName() + ".database";
+
     //**************************************************************************
     // Injections
     //**************************************************************************
@@ -170,6 +172,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
     @Button(list = "select-schemas", key="wizard.prev", order = 1)
     public Resolution start() {
         buildCPForms();
+        context.getRequest().getSession().removeAttribute(databaseSessionKey);
         return createConnectionProviderForm();
     }
 
@@ -242,10 +245,13 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         connectionProviderField.readFromRequest(context.getRequest());
     }
 
-    @Buttons({
-        @Button(list = "connection-provider", key="wizard.next", order = 2),
-        @Button(list = "user-management", key="wizard.prev", order = 1)
-    })
+    @Button(list = "user-management", key="wizard.prev", order = 1)
+    public Resolution backToSelectSchemas() {
+        context.getRequest().getSession().removeAttribute(databaseSessionKey);
+        return configureConnectionProvider();
+    }
+
+    @Button(list = "connection-provider", key="wizard.next", order = 2)
     public Resolution configureConnectionProvider() {
         buildCPForms();
         if(connectionProviderField.validate()) {
@@ -391,6 +397,12 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
                 }
             }
         }
+
+        this.database = (Database) context.getRequest().getSession().getAttribute(databaseSessionKey);
+        if(this.database != null) {
+            return this.database;
+        }
+
         Database targetDatabase;
         DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
         try {
@@ -407,6 +419,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         model.getDatabases().add(targetDatabase);
         model.init();
         this.database = targetDatabase;
+        context.getRequest().getSession().setAttribute(databaseSessionKey, this.database);
         return targetDatabase;
     }
 
@@ -1147,7 +1160,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         }
     }
 
-    public static final int MULTILINE_THRESHOLD = 200;
+    public static final int MULTILINE_THRESHOLD = 256;
 
     protected int setupColumn
             (Column column, CrudConfiguration configuration, int columnsInSummary, String linkToParentProperty) {
@@ -1192,28 +1205,24 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         }
 
         if(propertyIsUserPassword) {
-            Annotation annotation = new Annotation(column, Password.class.getName());
-            column.getAnnotations().add(annotation);
+            Annotation annotation = DatabaseLogic.findAnnotation(column, Password.class);
+            if(annotation == null) {
+                column.getAnnotations().add(new Annotation(column, Password.class.getName()));
+            }
             insertable = false;
             updatable = false;
         }
 
         if(!propertyIsUserPassword &&
            column.getActualJavaType() == String.class &&
-           column.getLength() > MULTILINE_THRESHOLD) {
-            Annotation annotation = null;
-            for(Annotation candidate : column.getAnnotations()) {
-                if(candidate.getType().equals(Multiline.class.getName())) {
-                    annotation = candidate;
-                    break;
-                }
-            }
+           column.getLength() > MULTILINE_THRESHOLD &&
+           isNewConnectionProvider()) {
+            Annotation annotation = DatabaseLogic.findAnnotation(column, Multiline.class);
             if(annotation == null) {
                 annotation = new Annotation(column, Multiline.class.getName());
+                annotation.getValues().add("true");
                 column.getAnnotations().add(annotation);
             }
-            annotation.getValues().clear();
-            annotation.getValues().add("true");
         }
 
         CrudProperty crudProperty = new CrudProperty();
@@ -1236,7 +1245,12 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         return column.getJdbcType() == Types.BLOB || column.getJdbcType() == Types.LONGVARBINARY;
     }
 
+    protected final Set<Column> detectedBooleanColumns = new HashSet<Column>();
+
     protected void detectBooleanColumn(Table table, Column column) {
+        if(detectedBooleanColumns.contains(column)) {
+            return;
+        }
         if(column.getJdbcType() == Types.INTEGER ||
            column.getJdbcType() == Types.DECIMAL ||
            column.getJdbcType() == Types.NUMERIC) {
@@ -1300,7 +1314,8 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
                 }
                 statement.close();
             } catch (Exception e) {
-                logger.error("Could not determine whether column " + column.getQualifiedName() + " is boolean", e);
+                logger.debug("Could not determine whether column " + column.getQualifiedName() + " is boolean", e);
+                logger.info("Could not determine whether column " + column.getQualifiedName() + " is boolean");
             } finally {
                 try {
                     if(connection != null) {
@@ -1310,10 +1325,19 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
                     logger.error("Could not close connection", e);
                 }
             }
+            detectedBooleanColumns.add(column);
         }
     }
 
+    protected final Map<Table, Boolean> largeResultSet = new HashMap<Table, Boolean>();
+
     protected void detectLargeResultSet(Table table, CrudConfiguration configuration) {
+        Boolean lrs = largeResultSet.get(table);
+        if(lrs != null) {
+            configuration.setLargeResultSet(lrs);
+            return;
+        }
+
         Connection connection = null;
         try {
             logger.info("Trying to detect whether table {} has many records...", table.getQualifiedName());
@@ -1359,6 +1383,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
                 logger.error("Could not close connection", e);
             }
         }
+        largeResultSet.put(table, configuration.isLargeResultSet());
     }
 
     protected void setQueryTimeout(PreparedStatement statement, int seconds) {
