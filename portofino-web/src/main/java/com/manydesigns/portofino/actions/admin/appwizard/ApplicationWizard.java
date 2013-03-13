@@ -189,14 +189,14 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
     protected void buildCPForms() {
         DefaultSelectionProvider connectionProviderSP = new DefaultSelectionProvider("connectionProviderName");
         for(Database db : application.getModel().getDatabases()) {
-            if(!ConnectionProvider.STATUS_ERROR.equals(db.getConnectionProvider().getStatus())) {
+            ConnectionProvider cp = db.getConnectionProvider();
+            if(!ConnectionProvider.STATUS_ERROR.equals(cp.getStatus())) {
                 connectionProviderSP.appendRow(
                         db.getDatabaseName(),
-                        db.getDatabaseName() + " (" + db.getConnectionProvider().getDatabasePlatform().getDescription() + ")",
+                        db.getDatabaseName() + " (" + cp.getDatabasePlatform().getDescription() + ")",
                         true);
             }
         }
-
 
         ClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(ApplicationWizard.class);
         try {
@@ -318,7 +318,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
 
         selectableSchemas = new ArrayList<SelectableSchema>(schemaNamesFromDb.size());
         for(String schemaName : schemaNamesFromDb) {
-            SelectableSchema schema = new SelectableSchema(schemaName, false);
+            SelectableSchema schema = new SelectableSchema(schemaName, schemaNamesFromDb.size() == 1);
             selectableSchemas.add(schema);
         }
         schemasForm = new TableFormBuilder(SelectableSchema.class)
@@ -406,7 +406,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         Database targetDatabase;
         DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
         try {
-            targetDatabase = dbSyncer.syncDatabase(refModel); //TODO bisognerebbe fare il sync solo degli schemi selezionati
+            targetDatabase = dbSyncer.syncDatabase(refModel);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             SessionMessages.addErrorMessage(getMessage("appwizard.error.sync", e));
@@ -870,6 +870,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
             SessionMessages.addWarningMessage(getMessage("appwizard.warning.userTable.created"));
             //ShiroUtils.clearCache(SecurityUtils.getSubject().getPrincipals());
         }
+        context.getRequest().getSession().removeAttribute(databaseSessionKey);
         return new RedirectResolution("/");
     }
 
