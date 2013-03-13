@@ -388,61 +388,6 @@ public class DefaultApplication implements Application {
         }
     }
 
-    //**************************************************************************
-    // DDL
-    //**************************************************************************
-
-    /*public List<String> getDDLCreate() {
-        List<String> result = new ArrayList<String>();
-        for (Database db : model.getDatabases()) {
-            result.add("-- DB: " + db.getDatabaseName());
-            HibernateDatabaseSetup setup = ensureDatabaseSetup(db.getDatabaseName());
-            ConnectionProvider connectionProvider =
-                    getConnectionProvider(db.getDatabaseName());
-            DatabasePlatform platform = connectionProvider.getDatabasePlatform();
-            Dialect dialect = platform.getHibernateDialect();
-            Configuration conf = setup.getConfiguration();
-            String[] ddls = conf.generateSchemaCreationScript(dialect);
-            result.addAll(Arrays.asList(ddls));
-        }
-        return result;
-    }
-
-    public List<String> getDDLUpdate() {
-        List<String> result = new ArrayList<String>();
-
-
-        for (Database db : model.getDatabases()) {
-            HibernateDatabaseSetup setup = ensureDatabaseSetup(db.getDatabaseName());
-            DatabaseMetadata databaseMetadata;
-            ConnectionProvider provider =
-                    getConnectionProvider(db.getDatabaseName());
-            DatabasePlatform platform = provider.getDatabasePlatform();
-            Dialect dialect = platform.getHibernateDialect();
-            Connection conn = null;
-            try {
-                conn = provider.acquireConnection();
-
-                databaseMetadata = new DatabaseMetadata(conn, dialect);
-
-                result.add("-- DB: " + db.getDatabaseName());
-
-                Configuration conf = setup.getConfiguration();
-                String[] ddls = conf.generateSchemaUpdateScript(
-                        dialect, databaseMetadata);
-                result.addAll(Arrays.asList(ddls));
-
-            } catch (Throwable e) {
-                logger.warn("Cannot retrieve DDLs for update DB for DB: " +
-                        db.getDatabaseName(), e);
-            } finally {
-                provider.releaseConnection(conn);
-            }
-
-        }
-        return result;
-    }*/
-
     public @NotNull TableAccessor getTableAccessor(String databaseName, String entityName) {
         Database database = DatabaseLogic.findDatabaseByName(model, databaseName);
         assert database != null;

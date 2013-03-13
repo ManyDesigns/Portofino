@@ -54,10 +54,7 @@ public abstract class CommonTestUtil extends AbstractPortofinoTest{
         System.out.println("Context creati e legati correttamente");
     }
 
-    private void setupPortofinoProperties() throws IOException{
-//        portofinoConfiguration.setProperty(PortofinoProperties.MODEL_LOCATION,
-//                "portofino-war/src/test/resources/portofino-model.xml");
-    }
+    private void setupPortofinoProperties() throws IOException{}
 
     private void setUpWorkingDirectory() {
         try {
