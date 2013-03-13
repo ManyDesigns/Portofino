@@ -175,7 +175,7 @@ public class Type {
             case Types.LONGVARBINARY:
                 return byte[].class;
             case Types.LONGVARCHAR:
-                return java.lang.String.class;
+                return String.class;
             case Types.VARBINARY:
                 return byte[].class;
             case Types.ARRAY:
@@ -203,7 +203,11 @@ public class Type {
         } else if(precision < Math.log10(Long.MAX_VALUE)) {
             return Long.class;
         } else {
-            return BigInteger.class;
+            if(precision == 131089) {
+                return BigDecimal.class; //Postgres bug - #925
+            } else {
+                return BigInteger.class;
+            }
         }
     }
 
