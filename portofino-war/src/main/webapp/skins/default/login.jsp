@@ -21,7 +21,7 @@
         <script type="text/javascript" src="<stripes:url value="/skins/${skin}/openid-custom.js"/>"></script>
         <script type="text/javascript">
             $(document).ready(function() {
-                openid.img_path = '<stripes:url value="/openid-selector/images/" />';
+                openid.img_path = '${pageContext.request.contextPath}/openid-selector/images/';
                 openid.useInputBox = function(provider) {
                     var input_area = $('#openid_input_area');
                     var html = '';
