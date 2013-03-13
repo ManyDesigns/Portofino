@@ -131,8 +131,9 @@ public class ApplicationStarter {
         File appConfigurationFile =
                 new File(appDir, AppProperties.PROPERTIES_RESOURCE);
         if(appConfigurationFile.exists()) {
-            appConfiguration = new CompositeConfiguration();
-            appConfiguration.addConfiguration(new PropertiesConfiguration(appConfigurationFile));
+            PropertiesConfiguration config = new PropertiesConfiguration(appConfigurationFile);
+            appConfiguration = new CompositeConfiguration(config);
+            appConfiguration.addConfiguration(config);
             appConfiguration.addConfiguration(new PropertiesConfiguration(getClass().getResource(AppProperties.PROPERTIES_DEFAULT_RESOURCE)));
         } else {
             throw new FileNotFoundException(appConfigurationFile.getAbsolutePath());

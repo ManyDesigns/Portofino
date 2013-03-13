@@ -38,8 +38,8 @@ import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.servlets.ServerInfo;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.FileConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +83,6 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
     @DefaultHandler
     public Resolution execute() {
         setupFormAndBean();
-
         return new ForwardResolution("/layouts/admin/settings.jsp");
     }
 
@@ -103,6 +102,10 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
         //TODO I18n
         form.findFieldByPropertyName(AppProperties.APPLICATION_NAME).setLabel("Application name");
         form.findFieldByPropertyName(AppProperties.LANDING_PAGE).setLabel("Landing page");
+
+        form.findFieldByPropertyName(AppProperties.APPLICATION_NAME).setRequired(true);
+        form.findFieldByPropertyName(AppProperties.LANDING_PAGE).setRequired(true);
+        form.findFieldByPropertyName(AppProperties.SKIN).setRequired(true);
         form.readFromObject(appConfiguration);
     }
 
@@ -112,12 +115,12 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
             logger.debug("Applying settings to model");
-            Configuration appConfiguration = application.getAppConfiguration();
-            form.writeToObject(appConfiguration);
-
             try {
-                ((FileConfiguration) appConfiguration).save();
-            } catch (ConfigurationException e) {
+                CompositeConfiguration appConfiguration = (CompositeConfiguration) application.getAppConfiguration();
+                form.writeToObject(appConfiguration);
+                ((FileConfiguration) appConfiguration.getInMemoryConfiguration()).save();
+            } catch (Exception e) {
+                logger.error("Configuration not saved", e);
                 SessionMessages.addInfoMessage(getMessage("commons.configuration.notUpdated"));
                 return new ForwardResolution("/layouts/admin/settings.jsp");
             }
