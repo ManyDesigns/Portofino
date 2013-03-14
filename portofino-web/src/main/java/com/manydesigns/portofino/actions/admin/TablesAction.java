@@ -315,7 +315,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         setupColumnForm(); //Recalculate applicable annotations
         columnForm.readFromRequest(context.getRequest());
         saveToColumnForm(columnForm, cf);
-                return new RedirectResolution(TablesAction.class, "editColumn")
+        return new RedirectResolution(TablesAction.class, "editColumn")
                 .addParameter("databaseName", databaseName)
                 .addParameter("schemaName", schemaName)
                 .addParameter("tableName", tableName)
