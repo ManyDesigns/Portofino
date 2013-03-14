@@ -237,14 +237,17 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                     }
                 }
                 SessionMessages.consumeWarningMessages(); //Clear skipped columns warnings
-                setupTableForm(Mode.EDIT); //Recalculate entity name
-                setupColumnsForm(Mode.EDIT); //Reflect the new order of the columns
+                //setupTableForm(Mode.EDIT); //Recalculate entity name
+                //setupColumnsForm(Mode.EDIT); //Reflect the new order of the columns
             } catch (Exception e) {
                 logger.error("Could not save model", e);
                 SessionMessages.addErrorMessage(e.toString());
             }
         }
-        return new ForwardResolution("/layouts/admin/tables/edit-table.jsp");
+        return new RedirectResolution(TablesAction.class, "editTable")
+                .addParameter("databaseName", databaseName)
+                .addParameter("schemaName", schemaName)
+                .addParameter("tableName", tableName);
     }
 
     protected boolean validateTableForm() {
@@ -312,7 +315,11 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         setupColumnForm(); //Recalculate applicable annotations
         columnForm.readFromRequest(context.getRequest());
         saveToColumnForm(columnForm, cf);
-        return new ForwardResolution("/layouts/admin/tables/edit-column.jsp");
+                return new RedirectResolution(TablesAction.class, "editColumn")
+                .addParameter("databaseName", databaseName)
+                .addParameter("schemaName", schemaName)
+                .addParameter("tableName", tableName)
+                .addParameter("columnName", columnName);
     }
 
     @Buttons({
