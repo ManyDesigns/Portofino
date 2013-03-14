@@ -312,7 +312,6 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         setupColumnForm(); //Recalculate applicable annotations
         columnForm.readFromRequest(context.getRequest());
         saveToColumnForm(columnForm, cf);
-        SessionMessages.addInfoMessage(getMessage("commons.save.successful"));
         return new ForwardResolution("/layouts/admin/tables/edit-column.jsp");
     }
 
