@@ -22,8 +22,8 @@ package com.manydesigns.portofino.database;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.hibernate.HibernateException;
+import org.hibernate.usertype.EnhancedUserType;
 import org.hibernate.usertype.ParameterizedType;
-import org.hibernate.usertype.UserType;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;
@@ -38,7 +38,7 @@ import java.util.Properties;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class StringBooleanType implements UserType, ParameterizedType {
+public class StringBooleanType implements EnhancedUserType, ParameterizedType {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -68,6 +68,10 @@ public class StringBooleanType implements UserType, ParameterizedType {
     public Object nullSafeGet(ResultSet resultSet, String[] names,/* hb4 SessionImplementor sessionImplementor,*/ Object owner)
         throws HibernateException, SQLException {
         String value = resultSet.getString(names[0]);
+        return parseBoolean(value);
+    }
+
+    protected Object parseBoolean(String value) {
         if(value != null) {
             if(value.trim().equalsIgnoreCase(trueString)) {
                 return Boolean.TRUE;
@@ -148,5 +152,25 @@ public class StringBooleanType implements UserType, ParameterizedType {
         if(sqlTypeCode != null) {
             sqlType = Integer.parseInt(sqlTypeCode);
         }
+    }
+
+    public String objectToSQLString(Object value) {
+        if((Boolean) value) {
+            return '\'' + trueString + '\'';
+        } else {
+            return '\'' + falseString + '\'';
+        }
+    }
+
+    public String toXMLString(Object value) {
+        if((Boolean) value) {
+            return trueString;
+        } else {
+            return falseString;
+        }
+    }
+
+    public Object fromXMLString(String xmlValue) {
+        return parseBoolean(xmlValue);
     }
 }
