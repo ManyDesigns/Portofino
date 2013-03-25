@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.0.10</version>
+        <version>4.0.11-SNAPSHOT</version>
     </parent>
     <artifactId>portofino-war-jee</artifactId>
     <packaging>war</packaging>
