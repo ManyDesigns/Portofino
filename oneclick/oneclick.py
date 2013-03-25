@@ -23,17 +23,19 @@ import shutil
 import os
 
 #Derived variables
-base_path = "build/portofino-" + local.portofino_version
+build_path = "build"
+portofino_dir = "portofino-" + local.portofino_version;
+base_path = build_path + "/" + portofino_dir
 portofino_path = os.path.expanduser(local.portofino_path)
 tomcat_path = base_path + "/" + local.tomcat_dir
-tomcat_zip = base_path + "/../" + local.tomcat_dir + ".zip"
+tomcat_zip = build_path + "/" + local.tomcat_dir + ".zip"
 
 print """//////////////////////
 Portofino build script
 //////////////////////"""
 
 if(os.path.exists(base_path)):
-    shutil.rmtree(base_path + "/..")
+    shutil.rmtree(build_path)
 
 os.makedirs(base_path)
 
@@ -70,11 +72,15 @@ os.chmod(tomcat_path + "/bin/startup.sh", 0755)
 os.chmod(tomcat_path + "/bin/tool-wrapper.sh", 0755)
 os.chmod(tomcat_path + "/bin/version.sh", 0755)
 
-zipfile = base_path + ".zip"
-if(os.path.exists(zipfile)):
-    os.remove(zipfile)
-
 print "Building zip..."
-os.system("zip -r " + zipfile + " " + base_path)
+cwd = os.getcwd()
+os.chdir(build_path)
+try:
+    zipfile = portofino_dir + ".zip"
+    if(os.path.exists(zipfile)):
+        os.remove(zipfile)
+    os.system("zip -r " + zipfile + " " + portofino_dir)
+finally:
+    os.chdir(cwd)
 
 print "Done."
