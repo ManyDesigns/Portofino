@@ -923,26 +923,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected void setupTableForm(Mode mode) {
-        String readLinkExpression = getReadLinkExpression();
-        OgnlTextFormat hrefFormat =
-                OgnlTextFormat.create(readLinkExpression);
-        hrefFormat.setUrl(true);
-        String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
-        hrefFormat.setEncoding(encoding);
-
-        TableFormBuilder tableFormBuilder = new TableFormBuilder(classAccessor);
-
-        // setup option providers
-        for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
-            SelectionProvider selectionProvider =
-                    current.getSelectionProvider();
-            if(selectionProvider == null) {
-                continue;
-            }
-            String[] fieldNames = current.getFieldNames();
-            tableFormBuilder.configSelectionProvider(
-                    selectionProvider, fieldNames);
-        }
+        TableFormBuilder tableFormBuilder = createTableFormBuilder();
+        configureTableFormSelectionProviders(tableFormBuilder);
 
         int nRows;
         if (objects == null) {
@@ -952,11 +934,27 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
 
         configureTableFormBuilder(tableFormBuilder, mode, nRows);
+        tableForm = buildTableForm(tableFormBuilder);
 
-        if(tableFormBuilder.getPropertyAccessors() == null) {
-            tableFormBuilder.configReflectiveFields();
+        if (objects != null) {
+            tableForm.readFromObject(objects);
+            refreshTableBlobDownloadHref();
         }
+    }
 
+    protected void configureTableFormSelectionProviders(TableFormBuilder tableFormBuilder) {
+        // setup option providers
+        for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
+            SelectionProvider selectionProvider = current.getSelectionProvider();
+            if(selectionProvider == null) {
+                continue;
+            }
+            String[] fieldNames = current.getFieldNames();
+            tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
+        }
+    }
+
+    protected void configureDetailLink(TableFormBuilder tableFormBuilder) {
         boolean isShowingKey = false;
         for (PropertyAccessor property : classAccessor.getKeyProperties()) {
             if(tableFormBuilder.getPropertyAccessors().contains(property) &&
@@ -965,6 +963,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 break;
             }
         }
+
+        String readLinkExpression = getReadLinkExpression();
+        OgnlTextFormat hrefFormat =
+                OgnlTextFormat.create(readLinkExpression);
+        hrefFormat.setUrl(true);
+        String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
+        hrefFormat.setEncoding(encoding);
 
         if(isShowingKey) {
             logger.debug("TableForm: configuring detail links for primary key properties");
@@ -982,39 +987,51 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 }
             }
         }
+    }
 
-        tableForm = tableFormBuilder.build();
+    protected TableForm buildTableForm(TableFormBuilder tableFormBuilder) {
+        TableForm tableForm = tableFormBuilder.build();
 
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
         tableForm.setSelectable(true);
-        if (objects != null) {
-            tableForm.readFromObject(objects);
-            refreshTableBlobDownloadHref();
-        }
+
+        return tableForm;
+    }
+
+    protected TableFormBuilder createTableFormBuilder() {
+        return new TableFormBuilder(classAccessor);
     }
 
     /**
      * Configures the builder for the search results form. You can override this method to customize how
      * the form is generated (e.g. adding custom links on specific columns, hiding or showing columns
      * based on some runtime condition, etc.).
-     * @param tableFormBuilder
-     * @param mode
-     * @param nRows
+     * @param tableFormBuilder the table form builder.
+     * @param mode the mode of the form.
+     * @param nRows number of rows to display.
+     * @return the table form builder.
      */
-    protected void configureTableFormBuilder(TableFormBuilder tableFormBuilder, Mode mode, int nRows) {
-        tableFormBuilder
-                .configPrefix(prefix)
-                .configNRows(nRows)
-                .configMode(mode);
+    protected TableFormBuilder configureTableFormBuilder(TableFormBuilder tableFormBuilder, Mode mode, int nRows) {
+        tableFormBuilder.configPrefix(prefix).configNRows(nRows).configMode(mode);
+        if(tableFormBuilder.getPropertyAccessors() == null) {
+            tableFormBuilder.configReflectiveFields();
+        }
+
+        configureDetailLink(tableFormBuilder);
+
+        return tableFormBuilder;
     }
 
     protected void setupForm(Mode mode) {
-        FormBuilder formBuilder = new FormBuilder(classAccessor);
+        FormBuilder formBuilder = createFormBuilder();
+        configureFormBuilder(formBuilder, mode);
+        form = buildForm(formBuilder);
+    }
 
+    protected void configureFormSelectionProviders(FormBuilder formBuilder) {
         // setup option providers
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
-            SelectionProvider selectionProvider =
-                    current.getSelectionProvider();
+            SelectionProvider selectionProvider = current.getSelectionProvider();
             if(selectionProvider == null) {
                 continue;
             }
@@ -1038,9 +1055,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }
             formBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
+    }
 
-        configureFormBuilder(formBuilder, mode);
-        form = formBuilder.build();
+    protected Form buildForm(FormBuilder formBuilder) {
+        return formBuilder.build();
+    }
+
+    protected FormBuilder createFormBuilder() {
+        return new FormBuilder(classAccessor);
     }
 
     /**
@@ -1048,9 +1070,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * You can override this method to customize how the form is generated
      * (e.g. adding custom links on specific properties, hiding or showing properties
      * based on some runtime condition, etc.).
+     * @param formBuilder the form builder.
+     * @param mode the mode of the form.
+     * @return the form builder.
      */
-    protected void configureFormBuilder(FormBuilder formBuilder, Mode mode) {
+    protected FormBuilder configureFormBuilder(FormBuilder formBuilder, Mode mode) {
         formBuilder.configPrefix(prefix).configMode(mode);
+        configureFormSelectionProviders(formBuilder);
+        return formBuilder;
     }
 
     //**************************************************************************
@@ -2026,12 +2053,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 crudSelectionProvider.getSelectionProvider();
         String[] fieldNames = crudSelectionProvider.getFieldNames();
 
-        Form form = new FormBuilder(classAccessor)
+        Form form = buildForm(createFormBuilder()
                 .configFields(fieldNames)
                 .configSelectionProvider(selectionProvider, fieldNames)
                 .configPrefix(prefix)
-                .configMode(Mode.EDIT)
-                .build();
+                .configMode(Mode.EDIT));
 
         FieldSet fieldSet = form.get(0);
         //Ensure the value is actually read from the request
