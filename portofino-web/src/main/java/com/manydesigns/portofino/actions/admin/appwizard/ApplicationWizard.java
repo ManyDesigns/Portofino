@@ -814,12 +814,13 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
     public Resolution buildApplication() {
         selectTables();
         Database oldDatabase =
-                        DatabaseLogic.findDatabaseByName(application.getModel(), database.getDatabaseName());
+                DatabaseLogic.findDatabaseByName(application.getModel(), database.getDatabaseName());
         if(oldDatabase != null) {
             model.getDatabases().remove(oldDatabase);
         }
         model.getDatabases().add(database);
         connectionProvider.setDatabase(database);
+        database.setConnectionProvider(connectionProvider);
         application.initModel();
         if(!generationStrategy.equals("NO")) {
             if(generationStrategy.equals("AUTO")) {

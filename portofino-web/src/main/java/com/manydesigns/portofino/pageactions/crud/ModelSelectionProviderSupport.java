@@ -90,7 +90,6 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
             }
         }
 
-
         //Remove disabled selection providers and mark them as configured to avoid re-adding them
         Iterator<CrudSelectionProvider> it = crudSelectionProviders.iterator();
         while (it.hasNext()) {
