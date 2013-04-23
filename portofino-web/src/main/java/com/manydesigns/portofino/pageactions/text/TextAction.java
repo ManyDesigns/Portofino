@@ -336,7 +336,7 @@ public class TextAction extends AbstractPageAction {
 
             sb.append(content.substring(lastEnd, matcher.start()))
               .append(hrefAttribute).append("=\"")
-              .append(generateViewAttachmentUrl(attachmentId))
+              .append(StringEscapeUtils.escapeHtml(generateViewAttachmentUrl(attachmentId)))
               .append("\"");
 
             lastEnd = matcher.end();
@@ -493,7 +493,7 @@ public class TextAction extends AbstractPageAction {
     }
 
     protected String generateViewAttachmentUrl(String attachmentId) {
-        return String.format("%s?viewAttachment=&amp;id=%s",
+        return String.format("%s?viewAttachment=&id=%s",
                 getDispatch().getAbsoluteOriginalPath(),
                 attachmentId);
     }
