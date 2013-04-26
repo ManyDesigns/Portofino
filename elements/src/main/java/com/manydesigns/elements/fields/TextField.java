@@ -30,8 +30,6 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.regex.Matcher;
@@ -193,25 +191,15 @@ public class TextField extends AbstractTextField {
     public String getDisplayValue() {
         String escapedText;
         if(richText) {
-            try {
-                Whitelist whitelist = getWhitelist();
-                escapedText = Jsoup.clean(stringValue, whitelist);
-            } catch (Throwable t) {
-                logger.error("Could not clean HTML, falling back to escaped text", t);
-                escapedText = StringEscapeUtils.escapeHtml(stringValue);
-            }
+            escapedText = stringValue;
         } else {
             escapedText = StringEscapeUtils.escapeHtml(stringValue);
+            if(href == null && highlightLinks) {
+                escapedText = highlightLinks(escapedText);
+            }
+            escapedText = adjustText(escapedText);
         }
-        if(href == null && highlightLinks && !richText) {
-            escapedText = highlightLinks(escapedText);
-        }
-        escapedText = adjustText(escapedText);
         return escapedText;
-    }
-
-    protected Whitelist getWhitelist() {
-        return Whitelist.basic();
     }
 
     public String getValue() {

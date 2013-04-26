@@ -75,6 +75,8 @@ import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 import org.json.JSONException;
 import org.json.JSONStringer;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -411,6 +413,37 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     //**************************************************************************
+    // Form handling
+    //**************************************************************************
+
+    /**
+     * Writes the contents of the create or edit form into the persistent object.
+     * Assumes that the form has already been validated.
+     * Also processes rich-text (HTML) fields by cleaning the submitted HTML according
+     * to the {@link #getWhitelist() whitelist}.
+     */
+    protected void writeFormToObject() {
+        form.writeToObject(object);
+        for(TextField textField : getEditableRichTextFields()) {
+            PropertyAccessor propertyAccessor = textField.getPropertyAccessor();
+            String stringValue = textField.getStringValue();
+            String cleanText;
+            try {
+                Whitelist whitelist = getWhitelist();
+                cleanText = Jsoup.clean(stringValue, whitelist);
+            } catch (Throwable t) {
+                logger.error("Could not clean HTML, falling back to escaped text", t);
+                cleanText = StringEscapeUtils.escapeHtml(stringValue);
+            }
+            propertyAccessor.set(object, cleanText);
+        }
+    }
+
+    protected Whitelist getWhitelist() {
+        return Whitelist.basic();
+    }
+
+    //**************************************************************************
     // Create/Save
     //**************************************************************************
 
@@ -435,7 +468,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
-            form.writeToObject(object);
+            writeFormToObject();
             if(createValidate(object)) {
                 try {
                     doSave(object);
@@ -494,7 +527,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         form.readFromObject(object);
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
-            form.writeToObject(object);
+            writeFormToObject();
             if(editValidate(object)) {
                 try {
                     doUpdate(object);
@@ -549,7 +582,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             for (String current : selection) {
                 loadObject(current.split("/"));
                 editSetup(object);
-                form.writeToObject(object);
+                writeFormToObject();
                 if(editValidate(object)) {
                     doUpdate(object);
                 }
@@ -2350,18 +2383,23 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return form != null && form.isMultipartRequest();
     }
 
-    public boolean isFormWithRichTextFields() {
+    public List<TextField> getEditableRichTextFields() {
+        List<TextField> richTextFields = new ArrayList<TextField>();
         for(FieldSet fieldSet : form) {
             for(FormElement field : fieldSet) {
                 if(field instanceof TextField &&
                    ((TextField) field).isEnabled() &&
                    !form.getMode().isView(((TextField) field).isInsertable(), ((TextField) field).isUpdatable()) &&
                    ((TextField) field).isRichText()) {
-                    return true;
+                    richTextFields.add(((TextField) field));
                 }
             }
         }
-        return false;
+        return richTextFields;
+    }
+
+    public boolean isFormWithRichTextFields() {
+        return !getEditableRichTextFields().isEmpty();
     }
 
     public Form getCrudConfigurationForm() {
