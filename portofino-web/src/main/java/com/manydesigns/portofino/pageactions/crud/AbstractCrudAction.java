@@ -385,7 +385,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         setupReturnToParentTarget();
 
-        return getReadView();
+        if(isEmbedded()) {
+            return getEmbeddedReadView();
+        } else {
+            return getReadView();
+        }
     }
 
     public Resolution jsonReadData() throws JSONException {
@@ -728,6 +732,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     protected Resolution getReadView() {
         return forwardToPortletPage("/layouts/crud/read.jsp");
+    }
+
+    /**
+     * Returns the Resolution used to show the Search page when this page is embedded in its parent.
+     */
+    protected Resolution getEmbeddedReadView() {
+        return new ForwardResolution("/layouts/crud/read.jsp");
     }
 
     /**
