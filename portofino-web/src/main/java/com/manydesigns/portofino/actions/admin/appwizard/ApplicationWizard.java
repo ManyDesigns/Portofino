@@ -997,7 +997,8 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
                 String childQuery =
                         "from " + entityName +
                         " where " + linkToUserProperty +
-                        " = %{#securityUtils.getPrincipal(1)}";
+                        " = %{#securityUtils.getPrincipal(1)}" +
+                        " order by id desc";
                 String dirName = "my-" + entityName;
                 boolean multipleRoles = isMultipleRoles(fromTable, ref, references);
                 if(multipleRoles) {
@@ -1072,7 +1073,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
 
     protected Page createCrudPage(File dir, Table table, List<ChildPage> childPages, Template template)
             throws Exception {
-        String query = "from " + table.getActualEntityName();
+        String query = "from " + table.getActualEntityName() + " order by id desc";
         String title = Util.guessToWords(table.getActualEntityName());
         HashMap<String, String> bindings = new HashMap<String, String>();
         bindings.put("parentName", "");
@@ -1417,7 +1418,8 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         String childQuery =
                 "from " + entityName +
                 " where " + linkToParentProperty +
-                " = %{#" + parentName + "." + parentProperty + "}";
+                " = %{#" + parentName + "." + parentProperty + "}" +
+                " order by id desc";
         String childDirName = entityName;
         boolean multipleRoles = isMultipleRoles(fromTable, ref, references);
         if(multipleRoles) {

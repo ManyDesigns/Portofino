@@ -29,8 +29,6 @@ import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.database.TableCriteria;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
-import com.manydesigns.portofino.model.database.Column;
-import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
@@ -493,6 +491,16 @@ public class QueryUtils {
                     new net.sf.jsqlparser.schema.Column(
                             new net.sf.jsqlparser.schema.Table(), propertyName));
             orderByElements.add(orderByElement);
+            for(Object el : parsedQueryString.getOrderByElements()) {
+                OrderByElement toAdd = (OrderByElement) el;
+                if(toAdd.getExpression() instanceof net.sf.jsqlparser.schema.Column) {
+                    net.sf.jsqlparser.schema.Column column = (net.sf.jsqlparser.schema.Column) toAdd.getExpression();
+                    if(StringUtils.isEmpty(column.getTable().getName()) && propertyName.equals(column.getColumnName())) {
+                        continue; //do not add
+                    }
+                }
+                orderByElements.add(toAdd);
+            }
             parsedQueryString.setOrderByElements(orderByElements);
         }
         String fullQueryString = parsedQueryString.toString();
