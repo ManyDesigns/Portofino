@@ -13,13 +13,13 @@ import org.apache.shiro.subject.PrincipalCollection
 import org.apache.shiro.subject.SimplePrincipalCollection
 import org.hibernate.Query
 import org.hibernate.Session
+import org.hibernate.criterion.Order
 import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.hibernate.criterion.Order
 
-class Security extends AbstractApplicationRealmDelegate {
+public class Security extends AbstractApplicationRealmDelegate {
 
     public static final Logger logger = LoggerFactory.getLogger(Security.class);
 
@@ -63,7 +63,7 @@ class Security extends AbstractApplicationRealmDelegate {
                 and ug.${userLinkProperty} = :userId
             """
             def query = session.createQuery(queryString)
-            query.setParameter("userId", principalCollection.asList().get(1))
+            query.setParameter("userId", principalCollection.asList().get(1).getDatabaseId())
             groups.addAll(query.list())
 
             if(!StringUtils.isEmpty(adminGroupName) && groups.contains(adminGroupName)) {
@@ -118,11 +118,13 @@ class Security extends AbstractApplicationRealmDelegate {
         List result = criteria.list();
 
         if (result.size() == 1) {
-            def user = result.get(0);
-            PrincipalCollection loginAndId = new SimplePrincipalCollection(userName, realm.name);
-            loginAndId.add(user.get(userIdProperty), realm.name);
+            def user = new User();
+            user.username = userName;
+            user.databaseId = result.get(0).get(userIdProperty);
+            PrincipalCollection loginAndUser = new SimplePrincipalCollection(userName, realm.name);
+            loginAndUser.add(user, realm.name);
             SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(loginAndId, password.toCharArray(), realm.name);
+                    new SimpleAuthenticationInfo(loginAndUser, password.toCharArray(), realm.name);
             return info;
         } else {
             /////////////////////////////////////////////////////////////////
@@ -211,4 +213,14 @@ class Security extends AbstractApplicationRealmDelegate {
         return Base64.encodeToString(bytes)
     }
 
+}
+
+public class User {
+
+    String username;
+    Serializable databaseId;
+
+    public String toString() {
+        return username
+    }
 }

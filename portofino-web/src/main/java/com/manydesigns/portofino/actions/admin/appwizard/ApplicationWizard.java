@@ -997,7 +997,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
                 String childQuery =
                         "from " + entityName +
                         " where " + linkToUserProperty +
-                        " = %{#securityUtils.getPrincipal(1)}" +
+                        " = %{#securityUtils.getPrincipal(1).getDatabaseId()}" +
                         " order by id desc";
                 String dirName = "my-" + entityName;
                 boolean multipleRoles = isMultipleRoles(fromTable, ref, references);
@@ -1009,7 +1009,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
 
                 Map<String, String> bindings = new HashMap<String, String>();
                 bindings.put("parentName", "securityUtils");
-                bindings.put("parentProperty", "getPrincipal(1)");
+                bindings.put("parentProperty", "getPrincipal(1).getDatabaseId()");
                 bindings.put("linkToParentProperty", linkToUserProperty);
 
                 Page page = createCrudPage(
