@@ -439,6 +439,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
+    /**
+     * Returns the JSoup whitelist used to clean user-provided HTML in rich-text fields.
+     * @return the default implementation returns the "basic" whitelist ({@see Whitelist#basic()}).
+     */
     protected Whitelist getWhitelist() {
         return Whitelist.basic();
     }

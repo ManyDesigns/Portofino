@@ -187,6 +187,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
         <!-- stuff for testing -->
         <dependency>
