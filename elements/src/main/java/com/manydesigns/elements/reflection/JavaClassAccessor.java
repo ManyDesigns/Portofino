@@ -20,6 +20,7 @@
 
 package com.manydesigns.elements.reflection;
 
+import com.manydesigns.elements.annotations.Key;
 import com.manydesigns.elements.util.ReflectionUtil;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
@@ -31,10 +32,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -52,6 +50,7 @@ public class JavaClassAccessor implements ClassAccessor {
 
     protected final Class javaClass;
     protected final PropertyAccessor[] propertyAccessors;
+    protected final PropertyAccessor[] keyPropertyAccessors;
 
     //**************************************************************************
     // Static fields and methods
@@ -88,8 +87,17 @@ public class JavaClassAccessor implements ClassAccessor {
     protected JavaClassAccessor(Class javaClass) {
         this.javaClass = javaClass;
 
-        List<PropertyAccessor> accessorList =
-                new ArrayList<PropertyAccessor>();
+        List<PropertyAccessor> accessorList = setupPropertyAccessors();
+        propertyAccessors = new PropertyAccessor[accessorList.size()];
+        accessorList.toArray(propertyAccessors);
+
+        List<PropertyAccessor> keyAccessors = setupKeyPropertyAccessors();
+        keyPropertyAccessors = new PropertyAccessor[keyAccessors.size()];
+        keyAccessors.toArray(keyPropertyAccessors);
+    }
+
+    protected List<PropertyAccessor> setupPropertyAccessors() {
+        List<PropertyAccessor> accessorList = new ArrayList<PropertyAccessor>();
 
         // handle properties through introspection
         try {
@@ -100,7 +108,7 @@ public class JavaClassAccessor implements ClassAccessor {
                 accessorList.add(new JavaPropertyAccessor(current));
             }
         } catch (IntrospectionException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         // handle public fields
@@ -110,8 +118,55 @@ public class JavaClassAccessor implements ClassAccessor {
             }
             accessorList.add(new JavaFieldAccessor(field));
         }
-        propertyAccessors = new PropertyAccessor[accessorList.size()];
-        accessorList.toArray(propertyAccessors);
+
+        return accessorList;
+    }
+
+    protected List<PropertyAccessor> setupKeyPropertyAccessors() {
+        Map<String, List<PropertyAccessor>> keys = new HashMap<String, List<PropertyAccessor>>();
+        for(PropertyAccessor propertyAccessor : propertyAccessors) {
+            Key key = propertyAccessor.getAnnotation(Key.class);
+            if(key != null) {
+                List<PropertyAccessor> keyProperties = keys.get(key.name());
+                if(keyProperties == null) {
+                    keyProperties = new ArrayList<PropertyAccessor>();
+                    keys.put(key.name(), keyProperties);
+                }
+                keyProperties.add(propertyAccessor);
+            }
+        }
+
+        if(keys.isEmpty()) {
+            logger.debug("No primary key configured for {}", javaClass);
+            return Collections.emptyList();
+        }
+
+        String primaryKeyName;
+        List<PropertyAccessor> keyAccessors;
+        Key key = getAnnotation(Key.class);
+        if(key != null) {
+            primaryKeyName = key.name();
+        } else {
+            primaryKeyName = Key.DEFAULT_NAME;
+        }
+        keyAccessors = keys.get(primaryKeyName);
+        if(keyAccessors == null) {
+            keyAccessors = keys.get(Key.DEFAULT_NAME);
+        }
+        if(keyAccessors == null) {
+            logger.debug("Primary key \"" + primaryKeyName + "\" not found in " + javaClass + "; using the first available key.");
+            keyAccessors = keys.values().iterator().next();
+        }
+
+        Collections.sort(keyAccessors, new Comparator<PropertyAccessor>() {
+            public int compare(PropertyAccessor o1, PropertyAccessor o2) {
+                Integer ord1 = o1.getAnnotation(Key.class).order();
+                Integer ord2 = o2.getAnnotation(Key.class).order();
+                return ord1.compareTo(ord2);
+            }
+        });
+
+        return keyAccessors;
     }
 
     private boolean isPropertyPresent(List<PropertyAccessor> accessorList,
@@ -148,7 +203,7 @@ public class JavaClassAccessor implements ClassAccessor {
     }
 
     public PropertyAccessor[] getKeyProperties() {
-        return new PropertyAccessor[0];
+        return keyPropertyAccessors.clone();
     }
 
     public Object newInstance() {
