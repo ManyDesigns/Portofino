@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.0.11-SNAPSHOT</version>
+        <version>4.1.beta1-SNAPSHOT</version>
     </parent>
     <artifactId>manydesigns-mail</artifactId>
     <packaging>jar</packaging>
@@ -36,16 +36,6 @@
                     <artifactId>mail</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>${jaxb-api.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>${jaxb-impl.version}</version>
         </dependency>
 
         <!-- logging -->

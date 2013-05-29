@@ -33,7 +33,7 @@ public class JTDSDatabasePlatform extends AbstractDatabasePlatform {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    public final static String DESCRIPTION = "Microsoft SQL Server (jTDS driver - Java 6+)";
+    public final static String DESCRIPTION = "Microsoft SQL Server (jTDS driver)";
     public final static String STANDARD_DRIVER_CLASS_NAME =
             "net.sourceforge.jtds.jdbc.Driver";
 

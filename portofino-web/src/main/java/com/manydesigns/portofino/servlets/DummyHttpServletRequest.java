@@ -22,19 +22,15 @@ package com.manydesigns.portofino.servlets;
 
 import org.apache.commons.lang.ArrayUtils;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import javax.servlet.*;
+import javax.servlet.http.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
+
+//TODO perché??? usiamo MutableHttpServletRequest invece!
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -159,6 +155,31 @@ public class DummyHttpServletRequest implements HttpServletRequest {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void login(String s, String s1) throws ServletException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void logout() throws ServletException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Collection<Part> getParts() throws IOException, ServletException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Part getPart(String s) throws IOException, ServletException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
     public Object getAttribute(String s) {
         throw new UnsupportedOperationException();
     }
@@ -278,6 +299,41 @@ public class DummyHttpServletRequest implements HttpServletRequest {
 
     public int getLocalPort() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ServletContext getServletContext() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public AsyncContext startAsync() throws IllegalStateException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public AsyncContext startAsync(ServletRequest request, ServletResponse response) throws IllegalStateException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean isAsyncStarted() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean isAsyncSupported() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public AsyncContext getAsyncContext() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public DispatcherType getDispatcherType() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void addParameter(String key, String value) {

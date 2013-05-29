@@ -23,10 +23,11 @@ package com.manydesigns.elements.servlet;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.ArrayUtils;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletInputStream;
+import javax.servlet.*;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -264,7 +265,7 @@ public class MutableHttpServletRequest implements MultipartRequest {
     }
 
     public Enumeration getAttributeNames() {
-        throw new UnsupportedOperationException();
+        return Collections.enumeration(attributeMap.keySet());
     }
 
     public String getCharacterEncoding() {
@@ -350,6 +351,67 @@ public class MutableHttpServletRequest implements MultipartRequest {
 
     public int getLocalPort() {
         throw new UnsupportedOperationException();
+    }
+
+    //Servlet API 3.0 methods
+    @Override
+    public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
+        return false;
+    }
+
+    @Override
+    public void login(String s, String s1) throws ServletException {
+
+    }
+
+    @Override
+    public void logout() throws ServletException {
+
+    }
+
+    @Override
+    public Collection<Part> getParts() throws IOException, ServletException {
+        return null;
+    }
+
+    @Override
+    public Part getPart(String s) throws IOException, ServletException {
+        return null;
+    }
+
+    @Override
+    public ServletContext getServletContext() {
+        return null;
+    }
+
+    @Override
+    public AsyncContext startAsync() throws IllegalStateException {
+        return null;
+    }
+
+    @Override
+    public AsyncContext startAsync(ServletRequest request, ServletResponse response) throws IllegalStateException {
+        return null;
+    }
+
+    @Override
+    public boolean isAsyncStarted() {
+        return false;
+    }
+
+    @Override
+    public boolean isAsyncSupported() {
+        return false;
+    }
+
+    @Override
+    public AsyncContext getAsyncContext() {
+        return null;
+    }
+
+    @Override
+    public DispatcherType getDispatcherType() {
+        return null;
     }
 
 }
