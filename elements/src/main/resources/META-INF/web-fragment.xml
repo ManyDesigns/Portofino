@@ -1,0 +1,17 @@
+<!--
+  Copyright 2013 ManyDesigns srl
+-->
+<web-fragment>
+    <name>manydesigns-elements</name>
+    <filter>
+        <filter-name>elements-filter</filter-name>
+        <filter-class>
+            com.manydesigns.elements.servlet.ElementsFilter
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>elements-filter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+</web-fragment>

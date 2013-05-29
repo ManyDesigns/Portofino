@@ -146,13 +146,9 @@ public class PortofinoListener
             throw new Error(e);
         }
 
-        logger.info("Checking servlet API version...");
-        if (serverInfo.getServletApiMajor() < 2 ||
-                (serverInfo.getServletApiMajor() == 2 &&
-                        serverInfo.getServletApiMinor() < 3)) {
-            String msg = String.format(
-                    "Servlet API version must be >= 2.3. Found: %s.",
-                    serverInfo.getServletApiVersion());
+        logger.info("Servlet API version is " + serverInfo.getServletApiVersion());
+        if (serverInfo.getServletApiMajor() < 3) {
+            String msg = "Servlet API version must be >= 3.0.";
             logger.error(msg);
             throw new InternalError(msg);
         }
