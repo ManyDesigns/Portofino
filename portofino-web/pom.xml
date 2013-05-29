@@ -187,122 +187,6 @@
             <version>${jsoup.version}</version>
             <scope>compile</scope>
         </dependency>
-
-        <!-- stuff for testing -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>httpunit</artifactId>
-            <version>1.7.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>Tidy</groupId>
-            <artifactId>Tidy</artifactId>
-            <version>1.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ojdbc</groupId>
-            <artifactId>ojdbc</artifactId>
-            <version>14</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.5</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>sqljdbc</groupId>
-            <artifactId>sqljdbc</artifactId>
-            <version>1.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>db2jcc</groupId>
-            <artifactId>db2jcc</artifactId>
-            <version>1.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>8.4-702.jdbc3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>jpdfunit</groupId>
-            <artifactId>jpdfunit</artifactId>
-            <version>0.94</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>naming-factory-dbcp</artifactId>
-            <version>5.5.23</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>naming-factory</artifactId>
-            <version>5.5.23</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>tomcat</groupId>
-            <artifactId>naming-resources</artifactId>
-            <version>5.5.23</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>jasper</artifactId>
-            <version>6.0.18</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.mockrunner</groupId>
-            <artifactId>mockrunner</artifactId>
-            <version>0.3.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>rhino</groupId>
-            <artifactId>js</artifactId>
-            <version>1.7R2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${logback.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <build>
         <resources>
@@ -313,7 +197,7 @@
         </resources>
         <testResources>
             <testResource>
-                <directory>src/test/resources</directory>
+                <directory>../portofino-tests/src/test/resources</directory>
                 <filtering>true</filtering>
             </testResource>
         </testResources>
