@@ -114,23 +114,6 @@ function showCopyPageDialog(pagePath, contextPath) {
 var portofino = {
     _setupRichTextEditors: setupRichTextEditors,
 
-    decorateButton: function(selector, options) {
-        $(selector).each(function(index, element) {
-            element = $(element);
-            element.html(element.find('.ui-button-text').html());
-            //element.button(options);
-        });
-    },
-
-    decorateIconButton: function(selector, icon) {
-        portofino.decorateButton(selector, {
-            icons: {
-                primary: icon
-            },
-            text: false
-        });
-    },
-
     setupRichTextEditors: function(config) {
         config = config || {};
         var windowWidth, windowHeight;
@@ -173,7 +156,7 @@ var portofino = {
 setupRichTextEditors = function() {/* Do nothing (remove default initialization by Elements) */};
 
 $(function() {
-    portofino.decorateButton("button.contentButton");
+    /*portofino.decorateButton("button.contentButton");
     portofino.decorateButton("button.portletButton");
 
     portofino.decorateIconButton("button.arrow-4", "ui-icon-arrow-4");
@@ -184,7 +167,7 @@ $(function() {
     portofino.decorateIconButton("button.minusthick", "ui-icon-minusthick");
     portofino.decorateIconButton("button.transferthick-e-w", "ui-icon-transferthick-e-w");
     portofino.decorateIconButton("button.folder-open", "ui-icon-folder-open");
-    portofino.decorateIconButton(".portletHeaderButtons button[name=configure]", "ui-icon-wrench");
+    portofino.decorateIconButton(".portletHeaderButtons button[name=configure]", "ui-icon-wrench");*/
 });
 
 function enablePortletDragAndDrop(button) {

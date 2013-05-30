@@ -353,7 +353,7 @@ public class ManyToManyAction extends AbstractPageAction {
 
     //Configuration
 
-    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "wrench")
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();

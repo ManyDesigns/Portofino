@@ -1,22 +1,18 @@
-html {
-    background-color: #f8f8ff;
-}
-
 /*******************************************************************************
-YUI reset/base overrides
+Bootstrap overrides
 *******************************************************************************/
 
-ol > li {
-    list-style: decimal outside;
+.row-fluid [class*="span"] {
+    min-height: 0;
 }
 
-ul > li {
-    list-style: disc outside;
+.breadcrumb {
+    margin-bottom: 0;
 }
 
-ul > li.ui-menu-item {
-    list-style-type: none;
-    text-align: left;
+h1 {
+    font-size: 138.5%;
+    line-height: inherit;
 }
 
 /*******************************************************************************
@@ -67,7 +63,6 @@ button.ui-button-icon-only { width: 1.6em; }
     text-align: left;
 }
 
-
 /*******************************************************************************
 Header / footer
 *******************************************************************************/
@@ -92,27 +87,6 @@ div#hd h1 a {
 
 div#responseTime, div#globalLinks {
     float: right;
-}
-
-/*******************************************************************************
-Body and content layout
-*******************************************************************************/
-
-.yui-t2 #yui-main div#content {
-    margin-left: 13.8461em;
-    border: 3px solid #65a7db;
-    -moz-border-radius: 6px;
-    border-radius: 6px;
-    background-color: white;
-    position: relative;
-}
-
-.yui-t3 #yui-main div#content {
-    margin-left: 23.0769em;
-    border: 3px solid #65a7db;
-    -moz-border-radius: 6px;
-    border-radius: 6px;
-    background-color: white;
 }
 
 /*******************************************************************************
@@ -148,13 +122,8 @@ div.contentBody {
 
 .contentHeader, .contentFooter {
     background-color: #eef;
-    padding: 0.5em 1em;
+    padding: 0;
     clear: both;
-}
-
-.contentFooter {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
 }
 
 .contentHeader {
@@ -163,6 +132,7 @@ div.contentBody {
     border-radius: 3px 3px 0 0;
 }
 
+/*
 .contentHeader .contentBarRight {
     float: right;
     padding: 0.2em 0;
@@ -172,7 +142,7 @@ div.contentBody {
     float: left;
     padding: 0.2em 0;
 }
-
+*/
 
 .contentFooter {
     border-top: 1px solid gray;
@@ -522,10 +492,6 @@ Search form
     margin-top: 1em;
 }
 
-.yui-skin-sam .yui-dt table {
-    width: 100%;
-}
-
 /*******************************************************************************
 General
 *******************************************************************************/
@@ -611,6 +577,10 @@ div#content-login .userMessages {
 /*******************************************************************************
 Forms
 *******************************************************************************/
+
+form {
+    margin: 0;
+}
 
 fieldset.mde-form-fieldset {
     border: 0 none;

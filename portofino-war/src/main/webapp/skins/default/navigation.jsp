@@ -16,15 +16,22 @@
 <%
     Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);
     boolean admin = SecurityLogic.isAdministrator(request);
-    int startingLevel = 0;
-    int maxLevel = 10000;
+    int startingLevel;
+    int maxLevel;
     String param = request.getParameter("navigation.startingLevel");
     if(param != null) {
         startingLevel = Integer.parseInt(param);
+    } else {
+        startingLevel = dispatch.getPageInstancePath().length - dispatch.getClosestSubtreeRootIndex() - 2;
+        if(startingLevel < 0) {
+            startingLevel = 0;
+        }
     }
     param = request.getParameter("navigation.maxLevel");
     if(param != null) {
         maxLevel = Integer.parseInt(param);
+    } else {
+        maxLevel = startingLevel + 2;
     }
 
     Navigation navigation = new Navigation(app, dispatch, SecurityUtils.getSubject(), admin);
@@ -38,26 +45,22 @@
     }
     boolean first = true;
     int level = 0;
+    String title = "";
     while (!navigationItems.isEmpty()) {
         NavigationItem nextNavigationItem = null;
         if(level >= startingLevel) {
             if (first) {
                 first = false;
-            } else {
-                %><hr><%
+                %><ul class="nav nav-list bs-docs-sidenav"><%
             }
-            %><ul><%
+            %><li class="nav-header"><%= title %></li><%
         }
         for (NavigationItem current : navigationItems) {
             XhtmlBuffer xb = new XhtmlBuffer(out);
             if(level >= startingLevel) {
                 xb.openElement("li");
                 if (current.isInPath()) {
-                    if (current.isSelected()) {
-                        xb.addAttribute("class", "selected");
-                    } else {
-                        xb.addAttribute("class", "path");
-                    }
+                	xb.addAttribute("class", "active");
                     nextNavigationItem = current;
                 }
                 xb.writeAnchor(current.getPath(), current.getPage().getTitle());
@@ -66,14 +69,15 @@
                 nextNavigationItem = current;
             }
         }
-        if(level >= startingLevel) {
-            %></ul><%
-        }
         if (nextNavigationItem != null && level < maxLevel) {
             navigationItems = nextNavigationItem.getChildNavigationItems();
+            title = nextNavigationItem.getPage().getTitle();
         } else {
             navigationItems = Collections.EMPTY_LIST;
         }
         level++;
+    }
+    if(!first) {
+        %></ul><%
     }
 %>

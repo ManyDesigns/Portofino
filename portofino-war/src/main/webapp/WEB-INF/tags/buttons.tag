@@ -61,25 +61,24 @@
             String value = (String) jspContext.getAttribute("__buttonValue");
             jspContext.removeAttribute("__buttonValue");
             buffer.addAttribute("type", "submit");
-            String actualCssClass = "ui-button ui-widget ui-state-default ui-corner-all ";
+            String actualCssClass = "btn ";
+            //TODO icon + text
+            if(hasIcon) {
+                actualCssClass += "btn-mini ";
+            }
             if(cssClass != null) {
                 actualCssClass += cssClass;
             }
-            if(hasIcon) {
-                actualCssClass += " ui-button-icon-only";
-            } else {
-                actualCssClass += " ui-button-text-only";
-            }
             buffer.addAttribute("class", actualCssClass);
+            //TODO icon + text
             if(hasIcon) {
-                buffer.openElement("span");
-                buffer.addAttribute("class", "ui-button-icon-primary ui-icon " + theButton.icon());
-                buffer.closeElement("span");
+                buffer.addAttribute("title", value);
+                buffer.openElement("i");
+                buffer.addAttribute("class", "icon-" + theButton.icon());
+                buffer.closeElement("i");
+            } else {
+                buffer.write(value);
             }
-            buffer.openElement("span");
-            buffer.addAttribute("class", "ui-button-text");
-            buffer.write(value);
-            buffer.closeElement("span");
             buffer.closeElement("button");
             if(hasIcon) {
                 %><script type="text/javascript">

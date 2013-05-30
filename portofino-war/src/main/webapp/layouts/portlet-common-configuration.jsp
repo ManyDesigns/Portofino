@@ -1,5 +1,5 @@
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<div class="yui-g">
+<div>
     <div class="portletTitle">
         <h1>
         <stripes:layout-component name="portletTitle">
@@ -12,5 +12,5 @@
     </div>
 </div>
 <div class="portletHeaderSeparator"></div>
-<div style="margin-top: 2em;"></div>
+<div style="margin-top: 2em; clear: both;"></div>
 <mde:write name="actionBean" property="pageConfigurationForm"/>

@@ -9,10 +9,10 @@
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
 <%--<meta http-equiv="Content-Script-Type" content="text/javascript"/>
 <meta http-equiv="Content-Style-Type" content="text/css"/>--%>
-<link rel="stylesheet" type="text/css"
+<!--<link rel="stylesheet" type="text/css"
       href="<stripes:url value="/yui-2.9.0/build/reset-fonts-grids/reset-fonts-grids.css"/>"/>
 <link rel="stylesheet" type="text/css"
-      href="<stripes:url value="/yui-2.9.0/build/base/base-min.css"/>"/>
+      href="<stripes:url value="/yui-2.9.0/build/base/base-min.css"/>"/>-->
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/yui-2.9.0/build/datatable/assets/skins/sam/datatable.css"/>">
 <link rel="stylesheet" type="text/css"
@@ -22,10 +22,21 @@
       href="<stripes:url value="/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"/>"/>
 
 <link rel="stylesheet" type="text/css"
+      href="<stripes:url value="/elements/bootstrap/css/bootstrap.min.css"/>"/>
+<link rel="stylesheet" type="text/css"
       href="<stripes:url value="/elements/bootstrap/css/bootstrap-responsive.min.css"/>"/>
+<!--<style type="text/css">
+      body {
+        padding-bottom: 40px;
+      }
+</style>-->
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/elements/datepicker/css/datepicker.css"/>"/>
 
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/skins/${skin}/portofino.css"/>"/>
 <%-- jQuery & jQuery UI (for draggable/droppable) --%>

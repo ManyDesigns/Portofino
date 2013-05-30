@@ -5,11 +5,8 @@
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
 <% if(SecurityLogic.hasPermissions(actionBean.getPageInstance(), SecurityUtils.getSubject(), AccessLevel.EDIT)) { %>
 <button name="pageChildren"
-        type="submit"
-        class="folder-open ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
-        role="button" aria-disabled="false"
+        type="submit" class="btn btn-mini" role="button" aria-disabled="false"
         title="Page children">
-    <span class="ui-button-icon-primary ui-icon ui-icon-folder-open"></span>
-    <span class="ui-button-text">Page children</span>
+    <i class="icon-folder-open"></i>
 </button>
 <% } %>

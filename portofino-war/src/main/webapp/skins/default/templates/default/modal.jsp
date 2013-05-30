@@ -17,72 +17,66 @@
         %>
         <title><c:out value="${dispatch.lastPageInstance.page.description}"/></title>
     </head>
-    <body class="yui-skin-sam">
-    <div id="doc3" class="yui-t2">
-        <div id="hd">
+    <body>
+    <div class="container">
+        <div class="row">
             <jsp:include page="../../header.jsp"/>
         </div>
-        <div id="bd">
-            <div id="yui-main">
-                <div id="content" class="yui-b">
-                    <c:if test="${empty formActionUrl}">
-                        <c:set var="formActionUrl" value="${dispatch.originalPath}" />
-                    </c:if>
-                    <stripes:form action="${formActionUrl}" method="post" enctype="multipart/form-data">
-                        <div class="contentHeader">
+        <div class="row">
+            <div class="span2 bs-docs-sidebar">
+                <portofino:portlets list="aboveNavigation" />
+                <div id="navigation">
+                    <jsp:include page="../../navigation.jsp" />
+                </div>
+                <portofino:portlets list="belowNavigation" />
+            </div>
+            <div id="content" class="span10">
+                <c:if test="${empty formActionUrl}">
+                    <c:set var="formActionUrl" value="${dispatch.originalPath}" />
+                </c:if>
+                <stripes:form action="${formActionUrl}" method="post" enctype="multipart/form-data">
+                    <div class="contentHeader">
+                        <div class="contentHeader row-fluid">
                             <stripes:layout-component name="contentHeader">
-                                Portlet page header
                             </stripes:layout-component>
                         </div>
-                        <div class="contentBody">
-                            <div class="portletWrapper">
-                                <div class="portlet">
-                                    <mde:sessionMessages/>
-                                    <div class="portletHeader">
-                                        <stripes:layout-component name="portletHeader">
-                                            <div>
-                                                <div class="portletTitle">
-                                                    <h1>
-                                                    <stripes:layout-component name="portletTitle">
-                                                        portletTitle
-                                                    </stripes:layout-component>
-                                                    </h1>
-                                                </div>
-                                                <div class="portletHeaderButtons">
-                                                    <stripes:layout-component name="portletHeaderButtons" />
-                                                </div>
+                    </div>
+                    <div class="contentBody">
+                        <div class="portletWrapper">
+                            <div class="portlet">
+                                <mde:sessionMessages/>
+                                <div class="portletHeader">
+                                    <stripes:layout-component name="portletHeader">
+                                        <div>
+                                            <div class="portletTitle">
+                                                <h1>
+                                                <stripes:layout-component name="portletTitle" />
+                                                </h1>
                                             </div>
-                                            <div class="portletHeaderSeparator"></div>
-                                        </stripes:layout-component>
-                                    </div>
-                                    <div class="portletBody">
-                                        <stripes:layout-component name="portletBody">
-                                            Portlet body
-                                        </stripes:layout-component>
-                                    </div>
-                                    <div class="portletFooter">
-                                        <stripes:layout-component name="portletFooter">
-                                        </stripes:layout-component>
-                                    </div>
+                                            <div class="portletHeaderButtons">
+                                                <stripes:layout-component name="portletHeaderButtons" />
+                                            </div>
+                                        </div>
+                                        <div class="portletHeaderSeparator"></div>
+                                    </stripes:layout-component>
+                                </div>
+                                <div class="portletBody">
+                                    <stripes:layout-component name="portletBody" />
+                                </div>
+                                <div class="portletFooter">
+                                    <stripes:layout-component name="portletFooter" />
                                 </div>
                             </div>
                         </div>
-                        <div class="contentFooter">
-                            <stripes:layout-component name="contentFooter">
-                                Portlet page footer
-                            </stripes:layout-component>
-                        </div>
-                    </stripes:form>
-                </div>
+                    </div>
+                    <div class="contentFooter">
+                        <stripes:layout-component name="contentFooter">
+                        </stripes:layout-component>
+                    </div>
+                </stripes:form>
             </div>
-            <div id="sidebar" class="yui-b">
-                <jsp:include page="../../navigation.jsp"/>
-            </div>
-            <script type="text/javascript">
-                fixSideBar();
-            </script>
         </div>
-        <div id="ft">
+        <div class="row">
             <jsp:include page="../../footer.jsp"/>
         </div>
     </div>

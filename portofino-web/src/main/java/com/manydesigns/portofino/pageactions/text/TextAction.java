@@ -408,7 +408,7 @@ public class TextAction extends AbstractPageAction {
         return new ForwardResolution("/layouts/text/edit-content.jsp");
     }
 
-    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "ui-icon-wrench")
+    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "wrench")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configurePage() {
         prepareConfigurationForms();
