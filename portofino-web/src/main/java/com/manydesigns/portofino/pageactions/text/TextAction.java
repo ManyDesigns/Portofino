@@ -394,7 +394,7 @@ public class TextAction extends AbstractPageAction {
         return pathDispatch.getPathUrl();
     }*/
 
-    @Button(list = "portletHeaderButtons", key = "layouts.text.edit", order = 2, icon = "ui-icon-document")
+    @Button(list = "portletHeaderButtons", key = "layouts.text.edit", order = 2, icon = "edit")
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution configure() {
         title = pageInstance.getPage().getTitle();
@@ -565,7 +565,7 @@ public class TextAction extends AbstractPageAction {
         return new ForwardResolution("/layouts/text/browsePages.jsp");
     }
 
-    @Button(list = "portletHeaderButtons", key = "layouts.text.manage-attachments.manage_attachments_for_page", order = 3, icon = "ui-icon-link")
+    @Button(list = "portletHeaderButtons", key = "layouts.text.manage-attachments.manage_attachments_for_page", order = 3, icon = "picture")
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution manageAttachments() {
         logger.debug("Manage attachments");

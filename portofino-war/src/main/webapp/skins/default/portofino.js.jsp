@@ -155,21 +155,6 @@ var portofino = {
 
 setupRichTextEditors = function() {/* Do nothing (remove default initialization by Elements) */};
 
-$(function() {
-    /*portofino.decorateButton("button.contentButton");
-    portofino.decorateButton("button.portletButton");
-
-    portofino.decorateIconButton("button.arrow-4", "ui-icon-arrow-4");
-    portofino.decorateIconButton("button.refresh", "ui-icon-refresh");
-    portofino.decorateIconButton("button.person", "ui-icon-person");
-    portofino.decorateIconButton("button.copy", "ui-icon-copy");
-    portofino.decorateIconButton("button.plusthick", "ui-icon-plusthick");
-    portofino.decorateIconButton("button.minusthick", "ui-icon-minusthick");
-    portofino.decorateIconButton("button.transferthick-e-w", "ui-icon-transferthick-e-w");
-    portofino.decorateIconButton("button.folder-open", "ui-icon-folder-open");
-    portofino.decorateIconButton(".portletHeaderButtons button[name=configure]", "ui-icon-wrench");*/
-});
-
 function enablePortletDragAndDrop(button) {
     $("div.portletContainer").sortable({
         connectWith: "div.portletContainer",

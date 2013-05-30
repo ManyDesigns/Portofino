@@ -51,7 +51,7 @@
         if(level >= startingLevel) {
             if (first) {
                 first = false;
-                %><ul class="nav nav-list bs-docs-sidenav"><%
+                %><ul class="nav nav-list portofino-sidenav"><% //Con classe "afflix" la navbar rimane sempre visibile, ma bisogna dare width assoluta (Responsive)
             }
             %><li class="nav-header"><%= title %></li><%
         }
@@ -60,7 +60,7 @@
             if(level >= startingLevel) {
                 xb.openElement("li");
                 if (current.isInPath()) {
-                	xb.addAttribute("class", "active");
+                    xb.addAttribute("class", "active");
                     nextNavigationItem = current;
                 }
                 xb.writeAnchor(current.getPath(), current.getPage().getTitle());

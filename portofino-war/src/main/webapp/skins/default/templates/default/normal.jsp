@@ -22,7 +22,7 @@
             <jsp:include page="../../header.jsp"/>
         </div>
         <div class="row">
-            <div class="span2 bs-docs-sidebar">
+            <div class="span2 portofino-sidebar">
                 <portofino:portlets list="aboveNavigation" />
                 <div id="navigation">
                     <jsp:include page="../../navigation.jsp" />
@@ -33,12 +33,10 @@
                 <stripes:layout-component name="contentHeader">
                     <div class="contentHeader row-fluid">
                         <div class="span6">
-                            <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data">
+                            <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data" class="form-horizontal">
                                 <c:if test="${not empty actionBean.returnToParentTarget}">
-                                    <button type="submit"
-                                            name="returnToParent"
-                                            class="contentButton">
-                                        <span class="ui-button-text">&lt;&lt; <%= actionBean.getMessage("commons.returnToParent", actionBean.returnToParentTarget) %></span>
+                                    <button type="submit" name="returnToParent" class="contentButton btn">
+                                        <span>&lt;&lt; <%= actionBean.getMessage("commons.returnToParent", actionBean.returnToParentTarget) %></span>
                                     </button>
                                     <% for(Map.Entry<String, String> param : actionBean.getReturnToParentParams().entrySet()) { %>
                                         <input type="hidden" name="<%= param.getKey() %>" value="<%= param.getValue() %>" />
@@ -49,7 +47,7 @@
                         </div>
                         <div class="span6">
                             <div class="text-right">
-                                <stripes:form action="/actions/admin/page" method="post" id="pageAdminForm">
+                                <stripes:form action="/actions/admin/page" method="post" id="pageAdminForm" class="form-horizontal">
                                     <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
                                     <!-- Admin buttons -->
                                     <div class="contentBarButtons">

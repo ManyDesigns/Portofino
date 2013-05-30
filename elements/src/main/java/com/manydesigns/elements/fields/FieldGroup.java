@@ -60,7 +60,7 @@ public class FieldGroup extends AbstractCompositeElement<Field> implements FormE
         } else {
             if(!mode.isBulk()) {
                 xb.openElement("th");
-                xb.writeLabel(label, get(0).getId(), "mde-field-label");
+                xb.writeLabel(label, get(0).getId(), "control-label");
                 xb.closeElement("th");
                 xb.openElement("td");
                 xb.openElement("table");

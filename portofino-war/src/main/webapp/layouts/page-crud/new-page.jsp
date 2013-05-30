@@ -27,11 +27,11 @@
             <table class="mde-form-table">
                 <tbody>
                 <tr>
-                    <th><label class="mde-field-label" for="url">Url:</label></th>
+                    <th><label class="control-label" for="url">Url:</label></th>
                     <td><span id="url"></span></td>
                 </tr>
                 <tr>
-                    <th><label class="mde-field-label" for="breadcrumbs">Breadcrumbs:</label></th>
+                    <th><label class="control-label" for="breadcrumbs">Breadcrumbs:</label></th>
                     <td><span id="breadcrumbs"></span></td>
                 </tr>
                 </tbody>

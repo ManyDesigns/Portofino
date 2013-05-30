@@ -24,7 +24,6 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -208,17 +207,6 @@ public class BooleanField extends AbstractField {
             labelI18N = FALSE_LABEL_I18N;
         }
         return getText(labelI18N);
-    }
-
-    //**************************************************************************
-    // Other methods
-    //**************************************************************************
-    public void labelToXhtml(XhtmlBuffer xb) {
-        xb.openElement("label");
-        xb.addAttribute("for", id);
-        xb.addAttribute("class", "field");
-        xb.write(StringUtils.capitalize(label + ":"));
-        xb.closeElement("label");
     }
 
     //**************************************************************************

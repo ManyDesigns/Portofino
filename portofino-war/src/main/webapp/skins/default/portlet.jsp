@@ -8,7 +8,8 @@
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
     <div class="portlet" id="portlet_${actionBean.pageInstance.page.id}">
-        <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data">
+        <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data"
+                      class="form-horizontal">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>

@@ -50,7 +50,7 @@ public class TextField extends AbstractTextField {
     public final static Pattern emailPattern =
             Pattern.compile("[a-z0-9\\-_]++(\\.[a-z0-9\\-_]++)*@[a-z0-9\\-_]++" +
                     "(\\.[a-z0-9\\-_]++)++", Pattern.CASE_INSENSITIVE);
-    public static final String DEFAULT_FIELD_CSS_CLASS = "mde-text-field";
+    public static final String DEFAULT_FIELD_CSS_CLASS = "";
 
     protected boolean highlightLinks = false;
     protected boolean multiline = false;
@@ -164,8 +164,8 @@ public class TextField extends AbstractTextField {
     }
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
-        xb.openElement("div");
-        String cssClass = "value";
+        xb.openElement("span");
+        String cssClass = "value uneditable-input"; //TODO
         if (ArrayUtils.contains(red, stringValue)) {
             cssClass += " status_red";
         } else if (ArrayUtils.contains(amber, stringValue)) {
@@ -185,7 +185,7 @@ public class TextField extends AbstractTextField {
         if (href != null) {
             xb.closeElement("a");
         }
-        xb.closeElement("div");
+        xb.closeElement("span");
     }
 
     public String getDisplayValue() {

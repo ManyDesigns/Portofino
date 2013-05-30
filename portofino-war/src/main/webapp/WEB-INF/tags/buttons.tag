@@ -80,13 +80,6 @@
                 buffer.write(value);
             }
             buffer.closeElement("button");
-            if(hasIcon) {
-                %><script type="text/javascript">
-                    $(function() {
-                        portofino.decorateIconButton("#<%= id %>", "<%= theButton.icon() %>");
-                    });
-                </script><%
-            }
         }
     }
 %>

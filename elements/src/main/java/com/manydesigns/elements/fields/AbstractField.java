@@ -49,7 +49,7 @@ public abstract class AbstractField implements Field {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     public final static String BULK_SUFFIX = "_bulk";
-    public static final String FORM_LABEL_CLASS = "mde-field-label";
+    public static final String FORM_LABEL_CLASS = "control-label";
 
     protected final Configuration elementsConfiguration;
 
@@ -170,55 +170,54 @@ public abstract class AbstractField implements Field {
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         if (mode.isView(insertable, updatable)) {
-            if (mode.isBulk()) {
-                xb.openElement("td");
-                xb.writeNbsp();
-                xb.closeElement("td");
-            }
-
-            xb.openElement("th");
-            labelToXhtml(xb);
-            xb.closeElement("th");
-            xb.openElement("td");
-            if (colSpan != 1) {
-                xb.addAttribute("colspan", Integer.toString(colSpan * 2 - 1));
-            }
+            openVisibleField(xb);
             valueToXhtml(xb);
-            xb.closeElement("td");
+            closeVisibleField(xb);
         } else if (mode.isEdit()) {
-            if (mode.isBulk()) {
-                xb.openElement("td");
-                xb.writeInputCheckbox(null, bulkCheckboxName,
-                        "checked", bulkChecked);
-                xb.closeElement("td");
-            }
-
-            xb.openElement("th");
-            labelToXhtml(xb);
-            xb.closeElement("th");
-            xb.openElement("td");
-            if (colSpan != 1) {
-                xb.addAttribute("colspan", Integer.toString(colSpan * 2 - 1));
-            }
+            openVisibleField(xb);
             valueToXhtml(xb);
             helpToXhtml(xb);
             errorsToXhtml(xb);
-            xb.closeElement("td");
+            closeVisibleField(xb);
         } else if (mode.isPreview()) {
-            xb.openElement("th");
-            labelToXhtml(xb);
-            xb.closeElement("th");
-            xb.openElement("td");
-            if (colSpan != 1) {
-                xb.addAttribute("colspan", Integer.toString(colSpan * 2 - 1));
-            }
+            openVisibleField(xb);
             valueToXhtml(xb);
-            xb.closeElement("td");
+            closeVisibleField(xb);
         } else if (mode.isHidden()) {
             valueToXhtml(xb);
         } else {
             throw new IllegalStateException("Unknown mode: " + mode);
         }
+    }
+
+    /**
+     * Writes the HTML before a visible input field. The HTML includes the label and any necessary layout
+     * tags.
+     * @param xb the buffer to write to.
+     */
+    protected void openVisibleField(XhtmlBuffer xb) {
+        xb.openElement("div");
+        xb.addAttribute("class", "control-group");
+        if (mode.isBulk() && mode.isEdit() && !mode.isView(insertable, updatable)) {
+            xb.writeInputCheckbox(null, bulkCheckboxName, "checked", bulkChecked, false, "pull-left");
+        }
+        labelToXhtml(xb);
+        xb.openElement("div");
+        xb.addAttribute("class", "controls");
+        //TODO recuperare form multi column
+        /*if (colSpan != 1) {
+            xb.addAttribute("colspan", Integer.toString(colSpan * 2 - 1));
+        }*/
+    }
+
+    /**
+     * Writes the HTML after a visible input field. The HTML closes any necessary layout tags opened by
+     * openVisibleField().
+     * @param xb the buffer to write to.
+     */
+    protected void closeVisibleField(XhtmlBuffer xb) {
+        xb.closeElement("div");
+        xb.closeElement("div");
     }
 
     public void labelToXhtml(XhtmlBuffer xb) {

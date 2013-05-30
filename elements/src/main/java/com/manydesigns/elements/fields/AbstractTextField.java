@@ -124,15 +124,15 @@ public abstract class AbstractTextField extends AbstractField {
     }
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
-        xb.openElement("div");
-        xb.addAttribute("class", fieldCssClass);
+        xb.openElement("span");
+        xb.addAttribute("class", fieldCssClass + " uneditable-input"); //TODO
         xb.addAttribute("id", id);
         if (href == null) {
             xb.write(stringValue);
         } else {
             xb.writeAnchor(href, stringValue, null, title);
         }
-        xb.closeElement("div");
+        xb.closeElement("span");
     }
 
     //**************************************************************************

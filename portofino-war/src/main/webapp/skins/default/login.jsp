@@ -38,8 +38,8 @@
                         style = 'background: #FFF url(' + openid.img_path + 'openid-inputicon.gif) no-repeat scroll 0 50%; padding-left:18px;';
                     }
                     html += '<input id="' + id + '" type="text" style="' + style + '" name="' + id + '" value="' + value + '" />' +
-                            '<button id="openid_submit" type="submit" class="ui-button ui-widget ui-state-default ui-corner-all portletButton ui-button-text-only">' +
-                            '<span class="ui-button-text">' + openid.signin_text + '</span></button>';
+                            '<button id="openid_submit" type="submit" class="btn portletButton">' +
+                            openid.signin_text + '/button>';
                     input_area.empty();
                     input_area.append(html);
                     $('#' + id).focus();
@@ -56,13 +56,12 @@
         <title><fmt:message key="skins.default.login.login_to"/> <c:out value="${applicationName}"/></title>
     </head>
     <body>
-    <div id="doc3">
-        <div id="hd"></div>
-        <div id="bd">
+    <div class="container">
         <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
-        <div id="content-login">
-            <div class="contentBody">
-                <div class="portletWrapper noSpacing">
+        <div class="row">
+            <div class="span3 hidden-phone"></div>
+            <div id="content-login" class="span6 contentBody">
+                <div class="portletWrapper noSpacing well">
                     <div class="portlet">
                         <div class="portletHeader">
                             <div>
@@ -70,8 +69,7 @@
                                     <h1><fmt:message key="skins.default.login.login_to"/>: <c:out value="${applicationName}"/></h1>
                                 </div>
                                 <div class="portletHeaderButtons">
-                                    <stripes:layout-component name="portletHeaderButtons">
-                                    </stripes:layout-component>
+                                    <stripes:layout-component name="portletHeaderButtons" />
                                 </div>
                             </div>
                             <div class="portletHeaderSeparator"></div>
@@ -79,33 +77,33 @@
                         <div class="portletBody">
                             <stripes:layout-component name="portletBody">
                                 <mde:sessionMessages/>
-                                <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction" method="post">
+                                <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction"
+                                              method="post" class="form-horizontal">
                                     <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
-                                    <table class="mde-form-table loginTable">
-                                        <tbody>
+                                    <div class="control-group">
+                                        <label class="control-label" for="userName"><fmt:message key="skins.default.login.username"/>:</label>
+                                        <div class="controls">
+                                            <stripes:text name="userName" id="userName" />
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label" for="pwd">Password:</label>
+                                        <div class="controls">
+                                            <input type="password" name="pwd" id="pwd" />
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <div class="controls">
+                                            <portofino:buttons list="login-buttons" cssClass="portletButton" />
+                                        </div>
+                                    </div>
+                                    <!--<c:if test="recoverPwd">
                                         <tr>
-                                            <th><label class="mde-field-label" for="userName"><fmt:message key="skins.default.login.username"/>:</label></th>
-                                            <td><stripes:text name="userName" id="userName" class="mde-text-field" /></td>
-                                        </tr>
-                                        <tr>
-                                            <th><label class="mde-field-label" for="pwd">Password:</label></th>
-                                            <td><input type="password" name="pwd" id="pwd" class="mde-text-field" /></td>
-                                        </tr>
-                                        <tr>
-                                            <th></th>
-                                            <td>
-                                                <portofino:buttons list="login-buttons" cssClass="portletButton" />
+                                            <td colspan="2">
+                                                <fmt:message key="skins.default.login.forgot_pwd"/> <a href="PwdRecovery.action"><fmt:message key="skins.default.login.retrieve_pwd"/></a>
                                             </td>
                                         </tr>
-                                        <!--<c:if test="recoverPwd">
-                                            <tr>
-                                                <td colspan="2">
-                                                    <fmt:message key="skins.default.login.forgot_pwd"/> <a href="PwdRecovery.action"><fmt:message key="skins.default.login.retrieve_pwd"/></a>
-                                                </td>
-                                            </tr>
-                                        </c:if>-->
-                                        </tbody>
-                                    </table>
+                                    </c:if>-->
                                     <stripes:hidden name="returnUrl"/>
                                 </stripes:form>
                                 <c:if test="${actionBean.openIdEnabled}">
@@ -121,30 +119,28 @@
                                             </div>
                                             <div id="openid_input_area">
                                                 <input id="openid_identifier" name="openIdUrl" type="text" value="http://" />
-                                                <button id="openid_submit" type="submit"
-                                                        class="ui-button ui-widget ui-state-default ui-corner-all portletButton ui-button-text-only">
-                                                    <span class="ui-button-text">Sign in</span>
+                                                <button id="openid_submit" type="submit" class="btn portletButton">
+                                                    Sign in
                                                 </button>
                                             </div>
                                         </stripes:form>
                                     </div>
                                 </c:if>
-                                </stripes:layout-component>
-                            </div>
-                            <div class="portletFooter" style="border-top: 1px solid #ddd; padding-top: 0.5em">
-                                <jsp:useBean id="portofinoConfiguration" scope="application"
-                                             type="org.apache.commons.configuration.Configuration"/>
-                                Powered by <a href="http://www.manydesigns.com/">Portofino</a>
-                                <c:out value="${mde:getString(portofinoConfiguration, 'portofino.version')}"/>
-                            </div>
+                            </stripes:layout-component>
+                        </div>
+                        <div class="portletFooter" style="border-top: 1px solid #ddd; padding-top: 0.5em">
+                            <jsp:useBean id="portofinoConfiguration" scope="application"
+                                         type="org.apache.commons.configuration.Configuration"/>
+                            Powered by <a href="http://www.manydesigns.com/">Portofino</a>
+                            <c:out value="${mde:getString(portofinoConfiguration, 'portofino.version')}"/>
                         </div>
                     </div>
                 </div>
             </div>
-            <script type="text/javascript">
-                $('#userName').focus();
-            </script>
         </div>
+        <script type="text/javascript">
+            $('#userName').focus();
+        </script>
     </div>
  </body>
 </html>

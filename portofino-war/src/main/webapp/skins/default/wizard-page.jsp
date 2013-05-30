@@ -10,74 +10,63 @@
         <jsp:include page="head.jsp"/>
         <stripes:layout-component name="customScripts"/>
         <title>
-            <stripes:layout-component name="pageTitle">
-                Page title
-            </stripes:layout-component>
+            <stripes:layout-component name="pageTitle" />
         </title>
     </head>
-    <body class="yui-skin-sam">
-    <div id="doc3" class="yui-t2">
-        <div id="hd">
+    <body>
+    <div class="container">
+        <div class="row">
             <jsp:include page="header.jsp"/>
         </div>
-        <div id="bd">
-            <div id="yui-main">
-                <div id="content" class="yui-b">
-                    <jsp:useBean id="actionBean" scope="request"
-                                 type="com.manydesigns.portofino.pageactions.wizard.AbstractWizardPageAction"/>
-                    <stripes:form action="${actionBean.dispatch.originalPath}"
-                                  method="post" enctype="multipart/form-data">
-                        <jsp:include page="wizard-content-header.jsp" />
-                        <stripes:layout-component name="contentHeader">
-                        </stripes:layout-component>
-                        <div class="contentBody">
-                            <div class="portletWrapper">
-                                <div class="portlet">
-                                    <mde:sessionMessages/>
-                                    <div class="portletHeader">
-                                        <stripes:layout-component name="portletHeader">
-                                            <div>
-                                                <div class="portletTitle">
-                                                    <h1>
-                                                    <stripes:layout-component name="portletTitle">
-                                                        portletTitle
-                                                    </stripes:layout-component>
-                                                    </h1>
-                                                </div>
-                                                <div class="portletHeaderButtons">
-                                                    <portofino:buttons list="portletHeaderButtons" />
-                                                </div>
+        <div class="row">
+            <div class="span2 portofino-sidebar">
+                <div id="navigation">
+                    <jsp:include page="navigation.jsp" />
+                </div>
+            </div>
+            <div id="content" class="span10">
+                <jsp:useBean id="actionBean" scope="request"
+                             type="com.manydesigns.portofino.pageactions.wizard.AbstractWizardPageAction"/>
+                <stripes:form action="${actionBean.dispatch.originalPath}"
+                              method="post" enctype="multipart/form-data" class="form-horizontal">
+                    <jsp:include page="wizard-content-header.jsp" />
+                    <div class="contentHeader row-fluid">
+                        <stripes:layout-component name="contentHeader" />
+                    </div>
+                    <div class="contentBody row-fluid">
+                        <div class="portletWrapper noSpacing">
+                            <div class="portlet">
+                                <mde:sessionMessages/>
+                                <div class="portletHeader">
+                                    <stripes:layout-component name="portletHeader">
+                                        <div>
+                                            <div class="portletTitle">
+                                                <h1>
+                                                <stripes:layout-component name="portletTitle" />
+                                                </h1>
                                             </div>
-                                        </stripes:layout-component>
-                                    </div>
-                                    <div class="portletBody">
-                                        <stripes:layout-component name="portletBody">
-                                            Portlet body
-                                        </stripes:layout-component>
-                                    </div>
-                                    <div class="portletFooter">
-                                        <stripes:layout-component name="portletFooter">
-                                        </stripes:layout-component>
-                                    </div>
+                                            <div class="portletHeaderButtons">
+                                                <portofino:buttons list="portletHeaderButtons" />
+                                            </div>
+                                        </div>
+                                    </stripes:layout-component>
+                                </div>
+                                <div class="portletBody">
+                                    <stripes:layout-component name="portletBody" />
+                                </div>
+                                <div class="portletFooter">
+                                    <stripes:layout-component name="portletFooter" />
                                 </div>
                             </div>
                         </div>
-                        <div class="contentFooter">
-                            <stripes:layout-component name="contentFooter">
-                                Content footer
-                            </stripes:layout-component>
-                        </div>
-                    </stripes:form>
-                </div>
+                    </div>
+                    <div class="contentFooter row-fluid">
+                        <stripes:layout-component name="contentFooter" />
+                    </div>
+                </stripes:form>
             </div>
-            <div id="sidebar" class="yui-b">
-                <jsp:include page="navigation.jsp"/>
-            </div>
-            <script type="text/javascript">
-                fixSideBar();
-            </script>
         </div>
-        <div id="ft">
+        <div class="row">
             <jsp:include page="footer.jsp"/>
         </div>
     </div>

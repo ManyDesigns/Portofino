@@ -23,26 +23,22 @@
             <jsp:include page="../../header.jsp"/>
         </div>
         <div class="row">
-            <div class="span2 bs-docs-sidebar">
-                <portofino:portlets list="aboveNavigation" />
+            <div class="span2 portofino-sidebar">
                 <div id="navigation">
                     <jsp:include page="../../navigation.jsp" />
                 </div>
-                <portofino:portlets list="belowNavigation" />
             </div>
             <div id="content" class="span10">
                 <c:if test="${empty formActionUrl}">
                     <c:set var="formActionUrl" value="${dispatch.originalPath}" />
                 </c:if>
-                <stripes:form action="${formActionUrl}" method="post" enctype="multipart/form-data">
-                    <div class="contentHeader">
-                        <div class="contentHeader row-fluid">
-                            <stripes:layout-component name="contentHeader">
-                            </stripes:layout-component>
-                        </div>
+                <stripes:form action="${formActionUrl}" method="post" enctype="multipart/form-data"
+                              class="form-horizontal">
+                    <div class="contentHeader row-fluid">
+                        <stripes:layout-component name="contentHeader" />
                     </div>
-                    <div class="contentBody">
-                        <div class="portletWrapper">
+                    <div class="contentBody row-fluid">
+                        <div class="portletWrapper noSpacing">
                             <div class="portlet">
                                 <mde:sessionMessages/>
                                 <div class="portletHeader">
@@ -69,9 +65,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="contentFooter">
-                        <stripes:layout-component name="contentFooter">
-                        </stripes:layout-component>
+                    <div class="contentFooter row-fluid">
+                        <stripes:layout-component name="contentFooter" />
                     </div>
                 </stripes:form>
             </div>
