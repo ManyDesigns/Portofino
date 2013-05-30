@@ -118,7 +118,7 @@ var portofino = {
         $(selector).each(function(index, element) {
             element = $(element);
             element.html(element.find('.ui-button-text').html());
-            element.button(options);
+            //element.button(options);
         });
     },
 
@@ -200,8 +200,8 @@ function enablePortletDragAndDrop(button) {
     $(button).remove();
     container.prepend('<button name="cancel" type="submit" class="contentButton">Cancel</button> ');
     container.prepend('<button name="updateLayout" type="submit" class="contentButton">Save</button>');
-    container.children("button[name=cancel]").button();
-    container.children("button[name=updateLayout]").button();
+    //container.children("button[name=cancel]").button();
+    //container.children("button[name=updateLayout]").button();
     $("button[name=updateLayout]").click(function() {
         var theButton = $(this);
         $('div.portletContainer').each(function(index, element) {

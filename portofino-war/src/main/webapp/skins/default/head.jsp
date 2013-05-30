@@ -19,15 +19,25 @@
       href="<stripes:url value="/yui-2.9.0/build/paginator/assets/skins/sam/paginator.css"/>">
 
 <link rel="stylesheet" type="text/css"
-      href="<stripes:url value="/jquery-ui-1.8.21/css/smoothness/jquery-ui-1.8.21.custom.css"/>"/>
+      href="<stripes:url value="/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"/>"/>
+
+<link rel="stylesheet" type="text/css"
+      href="<stripes:url value="/elements/bootstrap/css/bootstrap-responsive.min.css"/>"/>
+<link rel="stylesheet" type="text/css"
+      href="<stripes:url value="/elements/datepicker/css/datepicker.css"/>"/>
 
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/skins/${skin}/portofino.css"/>"/>
-
+<%-- jQuery & jQuery UI (for draggable/droppable) --%>
 <script type="text/javascript"
-        src="<stripes:url value="/jquery-ui-1.8.21/js/jquery-1.7.2.min.js"/>"></script>
+        src="<stripes:url value="/elements/jquery/jquery.min.js"/>"></script>
 <script type="text/javascript"
-        src="<stripes:url value="/jquery-ui-1.8.21/js/jquery-ui-1.8.21.custom.min.js"/>"></script>
+        src="<stripes:url value="/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
+<%-- Twitter Bootstrap --%>
+<script type="text/javascript"
+        src="<stripes:url value="/elements/bootstrap/js/bootstrap.min.js"/>"></script>
+<script type="text/javascript"
+        src="<stripes:url value="/elements/datepicker/js/bootstrap-datepicker.js"/>"></script>
 
 <script type="text/javascript"
         src="<stripes:url value="/yui-2.9.0/build/yahoo-dom-event/yahoo-dom-event.js"/>"></script>
@@ -45,7 +55,7 @@
         src="<stripes:url value="/yui-2.9.0/build/paginator/paginator-min.js"/>"></script>
 
 <script type="text/javascript"
-        src="<stripes:url value="/elements.js"/>"></script>
+        src="<stripes:url value="/elements/elements.js"/>"></script>
 <script type="text/javascript"
         src="<stripes:url value="/skins/${skin}/portofino.js.jsp"/>"></script>
 <jsp:useBean id="actionBean" scope="request" type="net.sourceforge.stripes.action.ActionBean" />

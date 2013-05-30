@@ -7,8 +7,8 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/modal.jsp">
     <stripes:layout-component name="customScripts">
-        <script type="text/javascript" src="<stripes:url value="/ckeditor/ckeditor.js"/>"></script>
-        <script type="text/javascript" src="<stripes:url value="/ckeditor/adapters/jquery.js"/>"></script>
+        <script type="text/javascript" src="<stripes:url value="/elements/ckeditor/ckeditor.js"/>"></script>
+        <script type="text/javascript" src="<stripes:url value="/elements/ckeditor/adapters/jquery.js"/>"></script>
     </stripes:layout-component>
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.text.TextAction"/>
     <stripes:layout-component name="contentHeader">

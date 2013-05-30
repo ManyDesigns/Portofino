@@ -10,7 +10,7 @@
     <static-files>
         <include path="/favicon.ico" />
         <include path="/robots.txt" />
-        <include path="/elements.js" />
+        <!--<include path="/elements.js" /> TODO Servlet 3.0 -->
         <include path="/ace-0.2.0/**" />
         <include path="/ckeditor/**" />
         <include path="/ckeditor-custom/**" />
