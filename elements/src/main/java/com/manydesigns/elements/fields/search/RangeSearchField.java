@@ -54,7 +54,6 @@ public class RangeSearchField extends AbstractSearchField {
     protected Object maxValue;
 
     protected boolean searchNullValue;
-    private static final String RANGE_SEARCH_FIELD_HTML_CLASS = "mde-range-search-field";
 
     //**************************************************************************
     // Costruttori
@@ -80,31 +79,38 @@ public class RangeSearchField extends AbstractSearchField {
     //**************************************************************************
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
-        xb.openElement("span");
-        xb.addAttribute("class", RANGE_SEARCH_FIELD_HTML_CLASS);
+        xb.openElement("div");
+        xb.addAttribute("class", "control-group");
         xb.openElement("label");
         xb.addAttribute("for", minId);
         xb.addAttribute("class", ATTR_NAME_HTML_CLASS);
         xb.write(StringUtils.capitalize(label));
         xb.closeElement("label");
 
+        xb.openElement("div");
+        xb.addAttribute("class", "controls");
         rangeEndToXhtml(xb, minId, minInputName, minStringValue,
                 getText("elements.search.range.from"));
         rangeEndToXhtml(xb, maxId, maxInputName, maxStringValue,
                 getText("elements.search.range.to"));
-        xb.closeElement("span");
+        xb.closeElement("div");
+        xb.closeElement("div");
     }
 
     public void rangeEndToXhtml(XhtmlBuffer xb, String id,
                                 String inputName, String stringValue,
                                 String label) {
+        xb.openElement("div");
+        xb.addAttribute("class", "input-prepend");
         xb.openElement("label");
+        xb.addAttribute("class", "add-on");
         xb.addAttribute("for", id);
         xb.write(label);
         xb.closeElement("label");
         xb.writeInputText(id, inputName, stringValue, "text", null, null);
+        xb.closeElement("div");
+        xb.write(" ");
     }
-
 
     public void readFromRequest(HttpServletRequest req) {
         Class type = accessor.getType();

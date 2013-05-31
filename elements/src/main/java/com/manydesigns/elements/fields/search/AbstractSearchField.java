@@ -49,7 +49,7 @@ public abstract class AbstractSearchField implements SearchField {
 
     public static final Logger logger =
             LoggerFactory.getLogger(AbstractSearchField.class);
-    public static final String ATTR_NAME_HTML_CLASS = "attr_name";
+    public static final String ATTR_NAME_HTML_CLASS = "control-label";
 
     //**************************************************************************
     // Costruttori

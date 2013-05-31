@@ -66,7 +66,7 @@
                         <div class="portletHeader">
                             <div>
                                 <div class="portletTitle">
-                                    <h1><fmt:message key="skins.default.login.login_to"/>: <c:out value="${applicationName}"/></h1>
+                                    <h4><fmt:message key="skins.default.login.login_to"/>: <c:out value="${applicationName}"/></h4>
                                 </div>
                                 <div class="portletHeaderButtons">
                                     <stripes:layout-component name="portletHeaderButtons" />

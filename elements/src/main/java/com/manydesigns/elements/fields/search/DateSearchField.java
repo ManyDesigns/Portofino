@@ -104,14 +104,13 @@ public class DateSearchField extends RangeSearchField {
     @Override
     public void rangeEndToXhtml(XhtmlBuffer xb, String id,
                                 String inputName, String stringValue, String label) {
-        xb.openElement("tr");
-        xb.openElement("th");
+        xb.openElement("div");
+        xb.addAttribute("class", "input-prepend");
         xb.openElement("label");
+        xb.addAttribute("class", "add-on");
         xb.addAttribute("for", id);
         xb.write(label);
         xb.closeElement("label");
-        xb.closeElement("th");
-        xb.openElement("td");
         xb.writeInputText(id, inputName, stringValue, "text", null, null);
         if (!containsTime) {
             String js = MessageFormat.format(
@@ -120,8 +119,8 @@ public class DateSearchField extends RangeSearchField {
                     StringEscapeUtils.escapeJavaScript(jsDatePattern));
             xb.writeJavaScript(js);
         }        
-        xb.closeElement("td");
-        xb.closeElement("tr");
+        xb.closeElement("div");
+        xb.write(" ");
     }
 
     @Override

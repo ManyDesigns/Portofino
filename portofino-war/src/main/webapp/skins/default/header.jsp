@@ -35,5 +35,5 @@
             <a href="${loginLink}"><fmt:message key="skins.default.header.log_in"/></a>
         </c:if>
     </div>
-    <h1><stripes:link href="/"><c:out value="${app.name}"/></stripes:link></h1>
+    <h4><stripes:link href="/"><c:out value="${app.name}"/></stripes:link></h4>
 </div>

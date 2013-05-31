@@ -10,11 +10,6 @@ Bootstrap overrides
     margin-bottom: 0;
 }
 
-h1 {
-    font-size: 138.5%;
-    line-height: inherit;
-}
-
 /*******************************************************************************
 Links
 *******************************************************************************/
@@ -192,13 +187,13 @@ Portlet
 
 /* page hader/footer buttons*/
 input.contentButton, button.contentButton, .portletHeaderButtons button {
-    border: 1px solid #D6D6E6;
+    border: 1px solid #D6D6E7;
     background: #EEEEFF;
 }
-input.contentButton.ui-button.ui-state-hover, button.contentButton.ui-button.ui-state-hover, .portletHeaderButtons button.ui-state-hover {
-    border: 1px solid #7171B0;
-    background: #65a7db url(images/ui-bg_glass_75_a8a8e6_1x400.png) 50% 50% repeat-x;
-    font-weight: normal; color: #212121;
+
+.contentButton.btn:hover {
+    border: 1px solid #BEBECF;
+    background-color: #D6D6E7;
 }
 
 .portletHeaderButtons {
@@ -209,7 +204,7 @@ input.contentButton.ui-button.ui-state-hover, button.contentButton.ui-button.ui-
     float: left;
 }
 
-.portletTitle h1 {
+.portletTitle h4 {
     margin: 0;
     color: #166BBF;
 }
@@ -345,8 +340,12 @@ Forms
     overflow: hidden;
 }
 
-.value > p, .yui-dt-liner > p {
-    margin-bottom: 0; /* Rich text */
+.controls .value {
+    padding-top: 5px;
+}
+
+.form-horizontal .control-group.readonly {
+    margin-bottom: 10px;
 }
 
 /*******************************************************************************
@@ -382,45 +381,31 @@ Search form
     margin-top: 1em;
 }
 
-.search_form th, .search_form td {
-    border: none;
-    padding-left: 0;
+.searchform select, .searchform input {
+    width: auto;
 }
 
-.search_form ul {
-    margin: 0;
-    padding: 0;
-    border: 0 none;
-}
-
-.search_form ul li {
+.searchform .control-group {
     display: inline-block;
-    list-style: none;
-    padding-bottom: 0.5em;
-    margin-bottom: 0.5em;
 }
 
-.search_form fieldset {
+.searchform .control-label {
+    margin-left: 1em;
+}
+
+.searchform label.match_mode {
+    display: none;
+}
+
+.form-inline .searchform .controls {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+.searchform fieldset {
     margin: 0;
     padding: 0;
     border: 0 none;
-}
-
-.search_form legend.attr_name, .search_form label.attr_name {
-    margin-right: 1em;
-    padding: 0;
-    border: 0 none;
-    font-weight: bold;
-    font-size: 1em;
-    display: inline;
-}
-
-.search_form input, .search_form select, .search_form span.input {
-    margin-right: 2em;
-}
-
-.searchform input[type="radio"], .searchform input[type="checkbox"] {
-    margin-right: auto;
 }
 
 .mde-boolean-search-field {
@@ -432,32 +417,6 @@ Search form
     margin-right: 0.5em;
 }
 
-.mde-range-search-field {
-    margin-right: 1em;
-}
-
-.mde-range-search-field input {
-    margin-left: 1em;
-    margin-right: 1em;
-}
-
-.search_form table.range {
-    border-collapse: collapse;
-}
-
-.search_form table.range th {
-    text-align: left;
-    font-weight: normal;
-}
-
-.search_form label.match_mode, label.rel_name {
-    display: none;
-}
-
-.search_form span.disabled {
-    color: gray;
-}
-
 .search_results {
     overflow-x: auto;
     overflow-y: hidden; /* Fixes a bug in Chrome */
@@ -467,10 +426,6 @@ Search form
 .search_results.withSearchForm {
     padding-right: 1em;
     border-right: 1px solid #AAAAAA;
-}
-
-.search_form .matchMode {
-    margin-right: 0.5em;
 }
 
 .searchFormButtons {
@@ -558,27 +513,6 @@ div#content-login .userMessages {
 Forms
 *******************************************************************************/
 
-form {
-    margin: 0;
-}
-
-fieldset.mde-form-fieldset {
-    border: 0 none;
-    border-top: 1px solid #bbb;
-    padding: 0 0 0 10px;
-    margin: 0;
-}
-
-fieldset.mde-form-fieldset.mde-no-legend {
-    border: 0 none;
-}
-
-fieldset.mde-form-fieldset legend {
-    padding: .1em .3em;
-    font-size: 1.2em;
-    color: #333;
-}
-
 fieldset#scriptFieldset {
     position: relative; padding-top: 1em; margin-top: 1em; min-height: 20em;
 }
@@ -589,15 +523,6 @@ fieldset#scriptFieldset {
 
 fieldset.radio {
     margin-bottom: 0;
-}
-
-table.mde-form-table td {
-    border: 0 none;
-}
-
-table.mde-form-table th {
-    border: 0 none;
-    text-align: right;
 }
 
 table.mde-field-group-table td {

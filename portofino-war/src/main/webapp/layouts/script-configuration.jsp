@@ -33,7 +33,7 @@
 </script>
 
 
-<fieldset id="scriptFieldset" class="mde-form-fieldset">
+<fieldset id="scriptFieldset">
     <legend>Script</legend>
     <textarea id="scriptEditorTextArea"
               name="script" style="min-height: 20em; width: 100%;"

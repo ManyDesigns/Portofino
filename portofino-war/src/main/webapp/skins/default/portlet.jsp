@@ -9,7 +9,7 @@
                  type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
     <div class="portlet" id="portlet_${actionBean.pageInstance.page.id}">
         <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data"
-                      class="form-horizontal">
+                      class="${formClass != null ? formClass : 'form-horizontal'}">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
@@ -17,10 +17,7 @@
                 <stripes:layout-component name="portletHeader">
                     <div>
                         <div class="portletTitle">
-                            <h1>
-                            <stripes:layout-component name="portletTitle">
-                            </stripes:layout-component>
-                            </h1>
+                            <h4><stripes:layout-component name="portletTitle" /></h4>
                         </div>
                         <div class="portletHeaderButtons">
                             <stripes:layout-component name="portletHeaderButtons">

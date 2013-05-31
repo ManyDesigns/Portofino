@@ -172,6 +172,8 @@ public class SelectSearchField extends AbstractSearchField {
     }
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
+        xb.openElement("div");
+        xb.addAttribute("class", "control-group");
         switch (displayMode) {
             case DROPDOWN:
                 valueToXhtmlDropDown(xb);
@@ -192,12 +194,14 @@ public class SelectSearchField extends AbstractSearchField {
                 throw new IllegalStateException(
                         "Unknown display mode: " + displayMode.name());
         }
+        xb.closeElement("div");
     }
 
     private void valueToXhtmlDropDown(XhtmlBuffer xb) {
-        xb.openElement("span");
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
 
+        xb.openElement("div");
+        xb.addAttribute("class", "controls");
         Object[] values = getValues();
         Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
@@ -229,7 +233,7 @@ public class SelectSearchField extends AbstractSearchField {
             xb.writeJavaScript(js);
         }
 
-        xb.closeElement("span");
+        xb.closeElement("div");
     }
 
     public String composeDropDownJs() {
@@ -251,10 +255,12 @@ public class SelectSearchField extends AbstractSearchField {
         Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
 
-        xb.openElement("span");
-        xb.addAttribute("class", "input");
+
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
-        
+
+        xb.openElement("div");
+        xb.addAttribute("class", "controls");
+
         int counter = 0;
 
         if (!required) {
@@ -280,7 +286,7 @@ public class SelectSearchField extends AbstractSearchField {
                     optionStringValue, checked);
             counter++;
         }
-        xb.closeElement("span");
+        xb.closeElement("div");
 
         // TODO: gestire radio in cascata
     }
@@ -297,8 +303,10 @@ public class SelectSearchField extends AbstractSearchField {
     }
 
     public void valueToXhtmlAutocomplete(XhtmlBuffer xb) {
-        xb.openElement("span");
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
+
+        xb.openElement("div");
+        xb.addAttribute("class", "controls");
 
         Object value = selectionModel.getValue(selectionModelIndex);
         String stringValue = OgnlUtils.convertValueToString(value);
@@ -316,13 +324,14 @@ public class SelectSearchField extends AbstractSearchField {
 
         String js = composeAutocompleteJs();
         xb.writeJavaScript(js);
-        xb.closeElement("span");
+        xb.closeElement("div");
     }
 
     private void valueToXhtmlCheckbox(XhtmlBuffer xb) {
-        xb.openElement("span");
-        xb.addAttribute("class", "input");
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
+
+        xb.openElement("div");
+        xb.addAttribute("class", "controls");
 
         Object[] values = getValues();
         Map<Object, SelectionModel.Option> options =
@@ -344,7 +353,7 @@ public class SelectSearchField extends AbstractSearchField {
             xb.writeNbsp();
             counter++;
         }
-        xb.closeElement("span");
+        xb.closeElement("div");
     }
 
     private void valueToXhtmlMultipleSelection(XhtmlBuffer xb) {

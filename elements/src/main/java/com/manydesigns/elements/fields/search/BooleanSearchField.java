@@ -108,12 +108,14 @@ public class BooleanSearchField extends AbstractSearchField {
     }
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
-        xb.openElement("span");
-        xb.addAttribute("class", BOOLEAN_SEARCH_FIELD_HTML_CLASS);
+        xb.openElement("div");
+        xb.addAttribute("class", "control-group " + BOOLEAN_SEARCH_FIELD_HTML_CLASS);
         xb.openElement("label");
         xb.addAttribute("class", ATTR_NAME_HTML_CLASS);
         xb.write(StringUtils.capitalize(label));
         xb.closeElement("label");
+        xb.openElement("div");
+        xb.addAttribute("class", "controls");
 
         for (BooleanSearchValue current : BooleanSearchValue.values()) {
             // don't print null if the attribute is required
@@ -127,7 +129,8 @@ public class BooleanSearchField extends AbstractSearchField {
             String label = getText(current.getLabelI18N());
             xb.writeLabel(label, idStr, null);
         }
-        xb.closeElement("span");
+        xb.closeElement("div");
+        xb.closeElement("div");
     }
 
     //**************************************************************************

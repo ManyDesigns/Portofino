@@ -1007,7 +1007,7 @@ public class PageAdminAction extends AbstractPageAction {
     protected Form copyForm;
 
     public Resolution confirmDelete() {
-        return new ForwardResolution("/layouts/admin/deletePageDialog.jsp");
+        return new ForwardResolution("/layouts/page-crud/deletePageDialog.jsp");
     }
 
     public Resolution chooseNewLocation() {

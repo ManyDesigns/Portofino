@@ -21,10 +21,9 @@
     <stripes:layout-component name="portletBody">
         <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
         <mde:write name="actionBean" property="newPageForm"/>
-        <br /><br />
-        <fieldset class="mde-form-fieldset">
+        <fieldset>
             <legend><fmt:message key="layouts.page-crud.new-page.preview"/></legend>
-            <table class="mde-form-table">
+            <table>
                 <tbody>
                 <tr>
                     <th><label class="control-label" for="url">Url:</label></th>

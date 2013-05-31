@@ -38,18 +38,13 @@ public class SearchForm extends AbstractCompositeElement<SearchField> {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
-        xb.openElement("ul");
+        xb.openElement("div");
         xb.addAttribute("class", "searchform");
 
         for (SearchField current : this) {
-            xb.openElement("li");
-
             current.toXhtml(xb);
-
-            xb.closeElement("li");
         }
-
-        xb.closeElement("ul");
+        xb.closeElement("div");
     }
 
     public String toSearchString() {

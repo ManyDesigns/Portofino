@@ -66,8 +66,8 @@
                         </div>
                     </div>
                 </stripes:layout-component>
-                <div class="contentBody">
-                    <stripes:layout-component name="contentBody">
+                <stripes:layout-component name="contentBody">
+                    <div class="contentBody">
                         <mde:sessionMessages/>
                         <portofino:portlets list="default" cssClass="row-fluid" />
                         <div class="row-fluid">
@@ -75,12 +75,9 @@
                             <portofino:portlets list="contentLayoutRight" cssClass="span6" />
                         </div>
                         <portofino:portlets list="contentLayoutBottom" cssClass="row-fluid" />
-                    </stripes:layout-component>
-                </div>
-                <div class="contentFooter">
-                    <stripes:layout-component name="contentFooter">
-                    </stripes:layout-component>
-                </div>
+                    </div>
+                </stripes:layout-component>
+                <stripes:layout-component name="contentFooter" />
             </div>
         </div>
         <div class="row">

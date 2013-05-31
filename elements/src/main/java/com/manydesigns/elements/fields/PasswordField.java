@@ -151,7 +151,7 @@ public class PasswordField extends TextField {
                              String actualLabel) {
         xb.openElement("label");
         xb.addAttribute("for", actualHtmlId);
-        xb.addAttribute("class", "field");
+        xb.addAttribute("class", FORM_LABEL_CLASS);
         if (required && (mode.isEdit())) {
             xb.openElement("span");
             xb.addAttribute("class", "required");

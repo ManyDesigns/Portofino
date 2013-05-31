@@ -164,8 +164,8 @@ public class TextField extends AbstractTextField {
     }
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
-        xb.openElement("span");
-        String cssClass = "value uneditable-input"; //TODO
+        xb.openElement("div");
+        String cssClass = "value";
         if (ArrayUtils.contains(red, stringValue)) {
             cssClass += " status_red";
         } else if (ArrayUtils.contains(amber, stringValue)) {
@@ -185,7 +185,7 @@ public class TextField extends AbstractTextField {
         if (href != null) {
             xb.closeElement("a");
         }
-        xb.closeElement("span");
+        xb.closeElement("div");
     }
 
     public String getDisplayValue() {

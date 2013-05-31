@@ -386,10 +386,6 @@ public class SelectField extends AbstractField {
         Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
 
-        xb.openElement("fieldset");
-        xb.addAttribute("id", id);
-        xb.addAttribute("class", "radio");
-
         int counter = 0;
         
         if (!required) {
@@ -415,8 +411,6 @@ public class SelectField extends AbstractField {
                     optionStringValue, checked);
             counter++;
         }
-        xb.closeElement("fieldset");
-
         // TODO: gestire radio in cascata
     }
 
@@ -425,10 +419,13 @@ public class SelectField extends AbstractField {
                                        String label,
                                        String stringValue,
                                        boolean checked) {
-        xb.writeInputRadio(radioId, inputName, stringValue, checked);
+        xb.openElement("label");
+        xb.addAttribute("for", radioId);
+        xb.addAttribute("class", "radio");
+        xb.write(label);
         xb.writeNbsp();
-        xb.writeLabel(label, radioId, null);
-        xb.writeBr();
+        xb.writeInputRadio(radioId, inputName, stringValue, checked);
+        xb.closeElement("label");
     }
 
     public void valueToXhtmlEditAutocomplete(XhtmlBuffer xb) {

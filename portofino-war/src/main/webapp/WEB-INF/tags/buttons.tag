@@ -80,6 +80,7 @@
                 buffer.write(value);
             }
             buffer.closeElement("button");
+            buffer.write(" ");
         }
     }
 %>

@@ -5,7 +5,7 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="/skins/${skin}/portlet.jsp">
+<stripes:layout-render name="/skins/${skin}/portlet.jsp" formClass="form-inline">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"/>
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.searchTitle}"/>

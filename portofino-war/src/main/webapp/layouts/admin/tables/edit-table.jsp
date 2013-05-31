@@ -109,7 +109,7 @@
                 <%-- <span id="editShortNameButton"><portofino:buttons list="table-edit-short-name" cssClass="portletButton" /></span> --%>
                 <br />
                 <div class="tableForm">
-                    <fieldset class="mde-form-fieldset">
+                    <fieldset>
                         <legend>
                             <fmt:message key="layouts.admin.tables.editTable.columns" />
                             <button class="ui-button ui-widget ui-state-default ui-corner-all portletButton ui-button-text-only sortButton"
@@ -147,7 +147,7 @@
             </div>
             <div id="tab-fk-sp">
                 <div class="tableForm">
-                    <fieldset class="mde-form-fieldset">
+                    <fieldset>
                         <legend><fmt:message key="layouts.admin.tables.editTable.foreignKeys" /></legend>
                         <div style="margin-top: 1em;">
                             <c:if test="${not empty actionBean.table.foreignKeys}">
@@ -211,7 +211,7 @@
                     </fieldset>
                 </div>
                 <div class="tableForm">
-                    <fieldset class="mde-form-fieldset">
+                    <fieldset>
                         <legend><fmt:message key="layouts.admin.tables.editTable.selectionProviders" /></legend>
                         <div style="margin-top: 1em;">
                             <c:if test="${not empty actionBean.table.selectionProviders}">

@@ -43,24 +43,11 @@ function copyFormAsHiddenFields(source, form) {
 }
 
 function confirmDeletePage(pagePath, contextPath) {
-    var dialogDiv = $(document.createElement("div"));
+    var dialogDiv = $("<div></div>").appendTo($("body"));
     dialogDiv.load(contextPath + "/actions/admin/page?confirmDelete&originalPath=" + pagePath, function() {
-        dialogDiv.find("#dialog-confirm-delete-page").dialog({
-            modal: true,
-            width: 500,
-            buttons: {
-                '<fmt:message key="commons.delete" />': function() {
-                    var form = $("#pageAdminForm");
-                    copyFormAsHiddenFields($(this), form);
-                    form.submit();
-                    $(this).dialog("close");
-                },
-                '<fmt:message key="commons.cancel" />': function() {
-                    $(this).dialog("close");
-                    dialogDiv.remove();
-                }
-            }
-        });
+        var dialog = dialogDiv.find("#dialog-confirm-delete-page");
+        $("body").append(dialog);
+        dialog.modal({ backdrop: 'static'});
     });
     return false;
 }

@@ -197,7 +197,11 @@ public abstract class AbstractField implements Field {
      */
     protected void openVisibleField(XhtmlBuffer xb) {
         xb.openElement("div");
-        xb.addAttribute("class", "control-group");
+        String cssClass = "control-group";
+        if(mode.isView(insertable, updatable)) {
+            cssClass += " readonly";
+        }
+        xb.addAttribute("class", cssClass);
         if (mode.isBulk() && mode.isEdit() && !mode.isView(insertable, updatable)) {
             xb.writeInputCheckbox(null, bulkCheckboxName, "checked", bulkChecked, false, "pull-left");
         }

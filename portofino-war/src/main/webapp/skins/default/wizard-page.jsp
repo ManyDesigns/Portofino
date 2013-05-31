@@ -41,9 +41,7 @@
                                     <stripes:layout-component name="portletHeader">
                                         <div>
                                             <div class="portletTitle">
-                                                <h1>
-                                                <stripes:layout-component name="portletTitle" />
-                                                </h1>
+                                                <h4><stripes:layout-component name="portletTitle" /></h4>
                                             </div>
                                             <div class="portletHeaderButtons">
                                                 <portofino:buttons list="portletHeaderButtons" />
