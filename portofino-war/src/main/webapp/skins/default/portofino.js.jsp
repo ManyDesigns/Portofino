@@ -46,54 +46,25 @@ function confirmDeletePage(pagePath, contextPath) {
     var dialogDiv = $("<div></div>").appendTo($("body"));
     dialogDiv.load(contextPath + "/actions/admin/page?confirmDelete&originalPath=" + pagePath, function() {
         var dialog = dialogDiv.find("#dialog-confirm-delete-page");
-        $("body").append(dialog);
         dialog.modal({ backdrop: 'static'});
     });
     return false;
 }
 
 function showMovePageDialog(pagePath, contextPath) {
-    var dialogDiv = $(document.createElement("div"));
+    var dialogDiv = $("<div></div>").appendTo($("body"));
     dialogDiv.load(contextPath + "/actions/admin/page?chooseNewLocation&originalPath=" + pagePath, function() {
-        dialogDiv.find("#dialog-move-page").dialog({
-            modal: true,
-            width: 500,
-            buttons: {
-                '<fmt:message key="commons.move"/>': function() {
-                    var form = $("#pageAdminForm");
-                    copyFormAsHiddenFields($(this), form);
-                    form.submit();
-                    $(this).dialog("close");
-                },
-                '<fmt:message key="commons.cancel" />': function() {
-                    $(this).dialog("close");
-                    dialogDiv.remove();
-                }
-            }
-        });
+        var dialog = dialogDiv.find("#dialog-move-page");
+        dialog.modal({ backdrop: 'static'});
     });
     return false;
 }
 
 function showCopyPageDialog(pagePath, contextPath) {
-    var dialogDiv = $(document.createElement("div"));
+    var dialogDiv = $("<div></div>").appendTo($("body"));
     dialogDiv.load(contextPath + "/actions/admin/page?copyPageDialog&originalPath=" + pagePath, function() {
-        dialogDiv.find("#dialog-copy-page").dialog({
-            modal: true,
-            width: 500,
-            buttons: {
-                '<fmt:message key="commons.copy"/>': function() {
-                    var form = $("#pageAdminForm");
-                    copyFormAsHiddenFields($(this), form);
-                    form.submit();
-                    $(this).dialog("close");
-                },
-                '<fmt:message key="commons.cancel" />': function() {
-                    $(this).dialog("close");
-                    dialogDiv.remove();
-                }
-            }
-        });
+        var dialog = dialogDiv.find("#dialog-copy-page");
+        dialog.modal({ backdrop: 'static'});
     });
     return false;
 }

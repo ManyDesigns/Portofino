@@ -33,7 +33,8 @@
                 <stripes:layout-component name="contentHeader">
                     <div class="contentHeader row-fluid">
                         <div class="span6">
-                            <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data" class="form-horizontal">
+                            <stripes:form action="${actionBean.dispatch.originalPath}" method="post"
+                                          enctype="multipart/form-data" class="form-horizontal">
                                 <c:if test="${not empty actionBean.returnToParentTarget}">
                                     <button type="submit" name="returnToParent" class="contentButton btn">
                                         <span>&lt;&lt; <%= actionBean.getMessage("commons.returnToParent", actionBean.returnToParentTarget) %></span>

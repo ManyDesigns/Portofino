@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.actions.forms;
 
-import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.annotations.Required;
 
 /**
@@ -34,7 +34,7 @@ public class MovePage {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     @Required
-    @Label("Move to")
+    @LabelI18N("layouts.admin.movePageDialog.choose_where_move")
     public String destinationPagePath;
 
 }

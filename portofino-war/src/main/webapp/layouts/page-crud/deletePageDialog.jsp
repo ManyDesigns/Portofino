@@ -30,9 +30,10 @@
             Page pg = pageInstance.getPage();
             if(!pg.getLayout().getChildPages().isEmpty() ||
                !pg.getDetailLayout().getChildPages().isEmpty()) { %>
-                <p><fmt:message key="layouts.admin.deletePageDialog.children"/></p>
-                <%= displayPageChildrenAsList(pg) %>
-        <%  } %>
+                <p><fmt:message key="layouts.admin.deletePageDialog.children"/></p><%
+                out.print(displayPageChildrenAsList(pg));
+            }
+        %>
         <input type="hidden" name="deletePage" value="action" />
     </div>
     <div class="modal-footer">

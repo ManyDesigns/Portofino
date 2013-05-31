@@ -126,6 +126,10 @@ div.contentBody {
     border-radius: 3px 3px 0 0;
 }
 
+.contentHeader form {
+    margin: 0;
+}
+
 .contentFooter {
     -moz-border-radius: 0 0 3px 3px;
     border-radius: 0 0 3px 3px;

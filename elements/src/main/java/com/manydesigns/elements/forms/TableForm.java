@@ -80,6 +80,7 @@ public class TableForm implements Element {
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("table");
+        xb.addAttribute("class", "table");
         if (caption != null) {
             xb.writeCaption(caption);
         }

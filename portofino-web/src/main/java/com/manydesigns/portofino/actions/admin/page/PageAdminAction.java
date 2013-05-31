@@ -476,6 +476,19 @@ public class PageAdminAction extends AbstractPageAction {
             SessionMessages.addErrorMessage(getMessage("page.copyOrMove.forbidden.root"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
+        if(deleteOriginal) {
+            logger.debug("Checking if we've been asked to move the landing page...");
+            Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
+            String contextPath = context.getRequest().getContextPath();
+            String landingPagePath = application.getAppConfiguration().getString(AppProperties.LANDING_PAGE);
+            Dispatch landingPageDispatch = dispatcher.getDispatch(contextPath, landingPagePath);
+            if(landingPageDispatch != null &&
+               landingPageDispatch.getLastPageInstance().getDirectory().equals(pageInstance.getDirectory())) {
+                SessionMessages.addErrorMessage(getMessage("page.move.forbidden.landing"));
+                return new RedirectResolution(dispatch.getOriginalPath());
+            }
+        }
+
         PageInstance newParent;
         if("/".equals(destinationPagePath)) {
             File dir = application.getPagesDir();
@@ -1012,7 +1025,12 @@ public class PageAdminAction extends AbstractPageAction {
 
     public Resolution chooseNewLocation() {
         buildMovePageForm();
-        return new ForwardResolution("/layouts/admin/movePageDialog.jsp");
+        return new ForwardResolution("/layouts/page-crud/movePageDialog.jsp");
+    }
+
+    public Resolution copyPageDialog() {
+        buildCopyPageForm();
+        return new ForwardResolution("/layouts/page-crud/copyPageDialog.jsp");
     }
 
     protected void buildMovePageForm() {
@@ -1024,11 +1042,6 @@ public class PageAdminAction extends AbstractPageAction {
                 .configReflectiveFields()
                 .configSelectionProvider(pagesSelectionProvider, "destinationPagePath")
                 .build();
-    }
-
-    public Resolution copyPageDialog() {
-        buildCopyPageForm();
-        return new ForwardResolution("/layouts/admin/copyPageDialog.jsp");
     }
 
     protected void buildCopyPageForm() {
