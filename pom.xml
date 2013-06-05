@@ -8,7 +8,48 @@
     <packaging>pom</packaging>
     <version>4.1.beta1-SNAPSHOT</version>
     <name>manydesigns-portofino</name>
+    <description>
+        Portofino is a web application framework written in Java and
+        extensible using Groovy, distributed under the LGPL open source license.
+        The framework can be used to create interactive database-driven web
+        applications. The creation process includes automatic generation through
+        a &quot;wizard&quot; tool, manual configuration through a web-based
+        administration interface, and customization through scripting languages.
+        The framework combines features that are typical of Content Management
+        Systems and of Rapid application development tools. Portofino is mainly
+        intended for Java developers of enterprise applications and of dynamic
+        web sites. It can connect to an existing database and generate a working
+        web application based on an automatic analysis of the database's
+        structure.
+    </description>
     <url>http://www.manydesigns.com/</url>
+    <licenses>
+        <license>
+            <name>GNU LESSER GENERAL PUBLIC LICENSE, Version 3</name>
+            <url>http://www.gnu.org/licenses/lgpl.html</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+    <organization>
+        <name>MANYDESIGNS s.r.l.</name>
+        <url>http://www.manydesigns.com/</url>
+    </organization>
+    <mailingLists>
+        <mailingList>
+            <name>Portofino mailing list in English</name>
+            <archive>http://groups.google.com/group/manydesigns-portofino</archive>
+        </mailingList>
+        <mailingList>
+            <name>Portofino mailing list in Italian</name>
+            <archive>http://groups.google.com/group/manydesigns-portofino-it</archive>
+        </mailingList>
+    </mailingLists>
+    <scm>
+        <connection>scm:hg:http://hg.code.sf.net/p/portofino/mercurial</connection>
+        <developerConnection>scm:hg:https://hg.code.sf.net/p/portofino/mercurial</developerConnection>
+        <url>http://sourceforge.net/p/portofino/mercurial/</url>
+    </scm>
     <properties>
         <javaee-web-api.version>6.0</javaee-web-api.version>
         <jstl.version>1.1.2</jstl.version>
