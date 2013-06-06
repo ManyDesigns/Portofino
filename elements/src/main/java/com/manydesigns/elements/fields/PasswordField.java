@@ -117,26 +117,21 @@ public class PasswordField extends TextField {
     @Override
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         if (mode.isEdit() && (mode.isCreate() || updatable)) { //was !immutable
-            // print out regular input field
-            xb.openElement("th");
-            labelToXhtml(xb);
-            xb.closeElement("th");
-            xb.openElement("td");
+            openVisibleField(xb);
             valueToXhtml(xb, id, inputName, stringValue);
             if (confirmationRequired) {
                 // print out confirmation input field
                 String confirmationHtmlId = id + "_confirm";
                 String confirmationInputName = inputName + "_confirm";
                 xb.writeNbsp();
-                xb.write(ElementsThreadLocals
-                        .getText("elements.field.password.confirm"));
-                xb.write(":");
+                String confirmLabel = ElementsThreadLocals.getText("elements.field.password.confirm") + ":";
+                xb.writeLabel(confirmLabel, confirmationHtmlId, FORM_LABEL_CLASS);
                 valueToXhtml(xb, confirmationHtmlId,
                         confirmationInputName, confirmationValue);
             }
             helpToXhtml(xb);
             errorsToXhtml(xb);
-            xb.closeElement("td");
+            closeVisibleField(xb);
         } else {
             super.toXhtml(xb);
         }
@@ -173,22 +168,7 @@ public class PasswordField extends TextField {
         if (mode.isView(insertable, updatable)) {
             valueToXhtmlView(xb);
         } else if (mode.isEdit()) {
-            xb.openElement("input");
-            xb.addAttribute("type", "password");
-            xb.addAttribute("class", "text");
-            xb.addAttribute("id", actualHtmlId);
-            xb.addAttribute("name", actualInputName);
-            xb.addAttribute("value", actualStringValue);
-            if (maxLength != null) {
-                int textInputSize = (size != null) && (maxLength > size)
-                        ? size
-                        : maxLength;
-                xb.addAttribute("maxlength",
-                        Integer.toString(maxLength));
-                xb.addAttribute("size",
-                        Integer.toString(textInputSize));
-            }
-            xb.closeElement("input");
+            valueToXhtmlEdit(xb, actualHtmlId, actualInputName, actualStringValue);
         } else if (mode.isPreview()) {
             valueToXhtmlPreview(xb, actualInputName, actualStringValue);
         } else if (mode.isHidden()) {
@@ -211,6 +191,25 @@ public class PasswordField extends TextField {
         xb.addAttribute("id", id);
         xb.write(PASSWORD_PLACEHOLDER);
         xb.closeElement("div");
+    }
+
+    protected void valueToXhtmlEdit(XhtmlBuffer xb, String actualHtmlId, String actualInputName, String actualStringValue) {
+        xb.openElement("input");
+        xb.addAttribute("type", "password");
+        xb.addAttribute("class", "text");
+        xb.addAttribute("id", actualHtmlId);
+        xb.addAttribute("name", actualInputName);
+        xb.addAttribute("value", actualStringValue);
+        if (maxLength != null) {
+            int textInputSize = (size != null) && (maxLength > size)
+                    ? size
+                    : maxLength;
+            xb.addAttribute("maxlength",
+                    Integer.toString(maxLength));
+            xb.addAttribute("size",
+                    Integer.toString(textInputSize));
+        }
+        xb.closeElement("input");
     }
 
     //**************************************************************************

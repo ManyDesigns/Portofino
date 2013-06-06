@@ -84,6 +84,10 @@ div#responseTime, div#globalLinks {
     float: right;
 }
 
+div#globalLinks {
+    margin: 10px 0;
+}
+
 /*******************************************************************************
 Breadcrumbs
 *******************************************************************************/
@@ -116,8 +120,10 @@ div.contentBody {
 }
 
 .contentHeader, .contentFooter {
-    background-color: #eef;
-    padding: 5px;
+    background-color: #eeeeff;
+    padding-left: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     clear: both;
 }
 
@@ -517,12 +523,9 @@ div#content-login .userMessages {
 Forms
 *******************************************************************************/
 
-fieldset#scriptFieldset {
-    position: relative; padding-top: 1em; margin-top: 1em; min-height: 20em;
-}
-
 #scriptEditor {
-    min-height: 20em; width: 100%; display: none; margin-left: -1em;
+    min-height: 20em; width: 100%; display: none;
+    position: relative; padding: 0;
 }
 
 fieldset.radio {
@@ -647,4 +650,12 @@ Wizard
 
 wizard-step.after {
     color: black;
+}
+
+/*******************************************************************************
+Configuration
+*******************************************************************************/
+
+#crudSelectionProvidersFieldset select, #crudSelectionProvidersFieldset input {
+    width: auto;
 }

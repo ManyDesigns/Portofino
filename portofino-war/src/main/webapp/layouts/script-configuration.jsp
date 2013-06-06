@@ -9,9 +9,9 @@
     AbstractPageAction theActionBean = (AbstractPageAction) request.getAttribute("actionBean");
     Subject subject = SecurityUtils.getSubject();
     if(SecurityLogic.hasPermissions(theActionBean.getPageInstance(), subject, AccessLevel.DEVELOP)) { %>
-<script src="<stripes:url value="/ace-0.2.0/ace.js" />" type="text/javascript" charset="utf-8"></script>
-<script src="<stripes:url value="/ace-0.2.0/theme-twilight.js" />" type="text/javascript" charset="utf-8"></script>
-<script src="<stripes:url value="/ace-0.2.0/mode-groovy.js" />" type="text/javascript" charset="utf-8"></script>
+<script src="<stripes:url value="/ace-1.0.0/ace.js" />" type="text/javascript" charset="utf-8"></script>
+<script src="<stripes:url value="/ace-1.0.0/theme-twilight.js" />" type="text/javascript" charset="utf-8"></script>
+<script src="<stripes:url value="/ace-1.0.0/mode-groovy.js" />" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
     $(function() {
         $("#scriptEditor").css('display', 'block');

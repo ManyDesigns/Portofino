@@ -1881,27 +1881,30 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     selectionProviderSupport.getAvailableSelectionProviderNames();
             if(!selectionProviderNames.isEmpty()) {
                 setupSelectionProviderEdits();
-                TableFormBuilder tableFormBuilder =
-                        new TableFormBuilder(CrudSelectionProviderEdit.class);
-                tableFormBuilder.configNRows(selectionProviderNames.size());
-                for(int i = 0; i < selectionProviderEdits.length; i++) {
-                    Collection<String> availableProviders =
-                            selectionProviderNames.get
-                                    (Arrays.asList(selectionProviderEdits[i].fieldNames));
-                    if(availableProviders == null || availableProviders.size() == 0) {
-                        continue;
-                    }
-                    DefaultSelectionProvider selectionProvider =
-                            new DefaultSelectionProvider(selectionProviderEdits[i].columns);
-                    selectionProvider.appendRow(null, "None", true);
-                    for(String spName : availableProviders) {
-                        selectionProvider.appendRow(spName, spName, true);
-                    }
-                    tableFormBuilder.configSelectionProvider(i, selectionProvider, "selectionProvider");
-                }
-                selectionProvidersForm = tableFormBuilder.build();
+                setupSelectionProvidersForm(selectionProviderNames);
             }
         }
+    }
+
+    protected void setupSelectionProvidersForm(Map<List<String>, Collection<String>> selectionProviderNames) {
+        TableFormBuilder tableFormBuilder = new TableFormBuilder(CrudSelectionProviderEdit.class);
+        tableFormBuilder.configNRows(selectionProviderNames.size());
+        for(int i = 0; i < selectionProviderEdits.length; i++) {
+            Collection<String> availableProviders =
+                    selectionProviderNames.get(Arrays.asList(selectionProviderEdits[i].fieldNames));
+            if(availableProviders == null || availableProviders.size() == 0) {
+                continue;
+            }
+            DefaultSelectionProvider selectionProvider =
+                    new DefaultSelectionProvider(selectionProviderEdits[i].columns);
+            selectionProvider.appendRow(null, "None", true);
+            for(String spName : availableProviders) {
+                selectionProvider.appendRow(spName, spName, true);
+            }
+            tableFormBuilder.configSelectionProvider(i, selectionProvider, "selectionProvider");
+        }
+        selectionProvidersForm = tableFormBuilder.build();
+        selectionProvidersForm.setCondensed(true);
     }
 
     protected void setupPropertyEdits() {

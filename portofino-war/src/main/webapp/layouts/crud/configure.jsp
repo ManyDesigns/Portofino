@@ -17,7 +17,7 @@
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="crudConfigurationForm"/>
         <!-- Properties -->
-        <fieldset id="crudPropertiesFieldset" style="padding-top: 1em; margin-top: 1em;">
+        <fieldset id="crudPropertiesFieldset">
             <legend><fmt:message key= "layouts.crud.configure.properties" /></legend>
             <c:if test="${not empty actionBean.propertiesTableForm}">
                 <mde:write name="actionBean" property="propertiesTableForm"/>
@@ -65,7 +65,7 @@
         </c:if>
         <!-- End properties -->
 
-        <fieldset id="crudSelectionProvidersFieldset" style="padding-top: 1em; margin-top: 1em;">
+        <fieldset id="crudSelectionProvidersFieldset">
             <legend><fmt:message key="layouts.crud.configure.selectionProviders" /></legend>
             <c:choose>
                 <c:when test="${not empty actionBean.selectionProvidersForm}">

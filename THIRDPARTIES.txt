@@ -18,7 +18,7 @@ All trademarks belong to their respective owners.
 
 Ace (Ajax.org Cloud9 Editor)
 Site: https://github.com/ajaxorg/ace/
-Files: ace-0.2.0 directory
+Files: ace-1.0.0 directory
 License: Mozilla Public License
 
 ANTLR Parser Generator

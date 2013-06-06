@@ -57,6 +57,8 @@ public class TableForm implements Element {
     protected boolean selectable = false;
     protected TextFormat keyTextFormat;
 
+    protected boolean condensed = false;
+
     //**************************************************************************
     // Costruttori
     //**************************************************************************
@@ -80,7 +82,7 @@ public class TableForm implements Element {
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("table");
-        xb.addAttribute("class", "table");
+        xb.addAttribute("class", "table" + (condensed ? " table-condensed" : ""));
         if (caption != null) {
             xb.writeCaption(caption);
         }
@@ -225,6 +227,18 @@ public class TableForm implements Element {
 
     public void setPrefix(String prefix) {
         this.prefix = prefix;
+    }
+
+    /**
+     * If a table is "condensed", it is rendered with less whitespace to make it more compact.
+     * @return the value of the "condensed" property.
+     */
+    public boolean isCondensed() {
+        return condensed;
+    }
+
+    public void setCondensed(boolean condensed) {
+        this.condensed = condensed;
     }
 
     //**************************************************************************
