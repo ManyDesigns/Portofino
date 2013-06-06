@@ -121,8 +121,7 @@ div.contentBody {
 
 .contentHeader, .contentFooter {
     background-color: #eeeeff;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding: 5px; /* TODO */
     clear: both;
 }
 
@@ -133,10 +132,6 @@ div.contentBody {
 
 .contentHeader form {
     margin: 0;
-}
-
-.contentHeader > div {
-    padding-left: 5px; padding-right: 5px;
 }
 
 .contentFooter {
