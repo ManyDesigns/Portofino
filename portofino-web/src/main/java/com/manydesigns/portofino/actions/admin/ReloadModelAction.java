@@ -20,15 +20,9 @@
 
 package com.manydesigns.portofino.actions.admin;
 
-import com.manydesigns.elements.forms.Form;
-import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.elements.reflection.CommonsConfigurationAccessor;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
@@ -38,14 +32,9 @@ import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.servlets.ServerInfo;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.ActionResolver;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.FileConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -100,7 +89,7 @@ public class ReloadModelAction extends AbstractActionBean implements AdminAction
         return bundle.getString(key);
     }
 
-    @Button(list = "settings", key = "commons.returnToPages", order = 2)
+    @Button(list = "reload-model-bar", key = "commons.returnToPages", order = 1)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

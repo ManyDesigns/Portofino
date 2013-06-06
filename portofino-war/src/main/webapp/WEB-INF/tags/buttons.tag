@@ -15,6 +15,7 @@
 <%@ tag import="java.util.List" %>
 <%@ tag import="java.util.MissingResourceException" %>
 <%@ tag import="java.util.UUID" %>
+<%@ tag import="org.slf4j.LoggerFactory" %>
 
 <%@ attribute name="list" required="true" %>
 <%@ attribute name="cssClass" required="false" %>
@@ -32,6 +33,7 @@
     List<ButtonInfo> buttons =
             ButtonsLogic.getButtonsForClass(actionBean.getClass(), list);
     if(buttons != null) {
+        boolean primaryFound = false;
         for(ButtonInfo button : buttons) {
             Method handler = button.getMethod();
             boolean isAdmin = SecurityLogic.isAdministrator(request);
@@ -46,6 +48,13 @@
             XhtmlBuffer buffer = new XhtmlBuffer(out);
             Button theButton = button.getButton();
             boolean hasIcon = !StringUtils.isBlank(theButton.icon());
+            boolean isPrimary = theButton.primary();
+            if(primaryFound && isPrimary) {
+                isPrimary = false;
+                LoggerFactory.getLogger(Button.class).warn("More than one button with primary = true in list " + list + ": " + handler);
+            } else {
+                primaryFound = true;
+            }
             buffer.openElement("button");
             String id = UUID.randomUUID().toString();
             if(hasIcon) {
@@ -61,7 +70,7 @@
             String value = (String) jspContext.getAttribute("__buttonValue");
             jspContext.removeAttribute("__buttonValue");
             buffer.addAttribute("type", "submit");
-            String actualCssClass = "btn ";
+            String actualCssClass = "btn " + (isPrimary ? "btn-primary " : "");
             //TODO icon + text
             if(hasIcon) {
                 actualCssClass += "btn-mini ";

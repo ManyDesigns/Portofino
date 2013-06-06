@@ -53,12 +53,19 @@ public @interface Button {
     double order() default 1.0;
 
     /**
-     * The resource bundle key for the button's label.
+     * The resource bundle key for the button's label. If an icon() is specified, the key is
+     * used as a title instead (shown as a tooltip on most browsers).
      */
     String key() default "";
 
     /**
-     * The name of the button's icon. This is a CSS class that is added to the button element.
+     * The name of the button's icon.
      */
     String icon() default "";
+
+    /**
+     * If this is true, the button is the primary one in its list and can be rendered differently (for example, with
+     * a different background) to emphasize it to the user. Only one button for each list can be marked as primary.
+     */
+    boolean primary() default false;
 }

@@ -259,7 +259,7 @@ License: Apache License v2
 
 JQuery UI
 Site: http://jqueryui.com
-Files: jquery-ui-1.8.21 directory
+Files: jquery-ui directory
 License: MIT
 
 JSON

@@ -14,12 +14,12 @@
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="connectionProviders-search" cssClass="contentButton" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.admin.connectionProviders" />
+    <stripes:layout-component name="portletHeader">
+        <h4><fmt:message key="layouts.admin.connectionProviders" /></h4 >
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="tableForm"/>
-        <h2><fmt:message key="layouts.admin.connectionProviders.list.available_platforms"/></h2>
+        <h4><fmt:message key="layouts.admin.connectionProviders.list.available_platforms"/></h4>
         <mde:write name="actionBean" property="databasePlatformsTableForm"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">

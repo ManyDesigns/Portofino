@@ -285,7 +285,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
 
     @Buttons({
-        @Button(list = "crud-search-form", key = "commons.search", order = 1),
+        @Button(list = "crud-search-form", key = "commons.search", order = 1, primary = true),
         @Button(list = "portlet-default-button", key = "commons.search") //XXX non va bene, posso avere diversi default su form diversi
     })
     public Resolution search() {

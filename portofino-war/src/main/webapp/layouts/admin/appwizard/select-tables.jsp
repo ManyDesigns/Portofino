@@ -13,31 +13,36 @@
     <stripes:layout-component name="contentHeaderContainer">
         <jsp:include page="/skins/default/wizard-content-header.jsp" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="appwizard.step4.title" />
-    </stripes:layout-component>
+    <stripes:layout-component name="portletHeader" />
     <stripes:layout-component name="portletBody">
         <style type="text/css">
             ul li {
                 list-style-type: none;
             }
+            #calendarField label {
+                width: auto; margin-right: 20px;
+            }
         </style>
         <mde:sessionMessages />
         <p><fmt:message key="appwizard.createPages.selectStrategy" /></p>
-        <ul>
-            <li><input type="radio" name="generationStrategy" value="NO" id="generationStrategy_no"
-                       ${actionBean.generationStrategy eq 'NO' ? 'checked="checked"' : ''} />
-                <label for="generationStrategy_no"><fmt:message key="appwizard.createPages.strategy.no" /></label></li>
-            <li><input type="radio" name="generationStrategy" value="AUTO" id="generationStrategy_auto"
-                       ${actionBean.generationStrategy eq 'AUTO' ? 'checked="checked"' : ''} />
-                <label for="generationStrategy_auto"><fmt:message key="appwizard.createPages.strategy.auto" /></label></li>
-            <li><input type="radio" name="generationStrategy" value="MANUAL" id="generationStrategy_manual"
-                       ${actionBean.generationStrategy eq 'MANUAL' ? 'checked="checked"' : ''} />
-                <label for="generationStrategy_manual"><fmt:message key="appwizard.createPages.strategy.manual" /></label></li>
-        </ul>
+        <label class="radio">
+            <input type="radio" name="generationStrategy" value="AUTO" id="generationStrategy_auto"
+                   ${actionBean.generationStrategy eq 'AUTO' ? 'checked="checked"' : ''} />
+            <fmt:message key="appwizard.createPages.strategy.auto" />
+        </label>
+        <label class="radio">
+            <input type="radio" name="generationStrategy" value="MANUAL" id="generationStrategy_manual"
+                   ${actionBean.generationStrategy eq 'MANUAL' ? 'checked="checked"' : ''} />
+            <fmt:message key="appwizard.createPages.strategy.manual" />
+        </label>
+        <label class="radio">
+            <input type="radio" name="generationStrategy" value="NO" id="generationStrategy_no"
+                   ${actionBean.generationStrategy eq 'NO' ? 'checked="checked"' : ''} />
+            <fmt:message key="appwizard.createPages.strategy.no" />
+        </label>
         <div id="rootsFormContainer">
-            <span style="font-weight: bold;"><mde:write name="actionBean" property="generateCalendarField" /></span>
-            <h3><fmt:message key="appwizard.roots.select" /></h3>
+            <span id="calendarField"><mde:write name="actionBean" property="generateCalendarField" /></span>
+            <h4><fmt:message key="appwizard.roots.select" /></h4>
             <mde:write name="actionBean" property="rootsForm"/>
         </div>
         <div style="display: none;">

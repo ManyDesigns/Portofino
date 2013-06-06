@@ -13,8 +13,8 @@
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="root-children" cssClass="contentButton" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.admin.rootChildren" />
+    <stripes:layout-component name="portletHeader">
+        <h4><fmt:message key="layouts.admin.rootChildren" /></h4>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <%@include file="/layouts/page/children-tables.jsp"%>

@@ -16,7 +16,7 @@
              type="com.manydesigns.portofino.application.Application"/>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.dispatcher.AbstractActionBean"/>
 <fmt:setLocale value="${pageContext.request.locale}"/>
-<div id="hd-title" class="span12x">
+<div id="hd-title" class="span12">
     <div id="globalLinks">
         <%
             String loginLink = ShiroUtils.getLoginLink(

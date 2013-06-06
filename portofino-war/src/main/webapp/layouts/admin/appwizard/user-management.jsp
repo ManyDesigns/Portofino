@@ -13,9 +13,7 @@
     <stripes:layout-component name="contentHeaderContainer">
         <jsp:include page="/skins/default/wizard-content-header.jsp" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="appwizard.step3.title" />
-    </stripes:layout-component>
+    <stripes:layout-component name="portletHeader" />
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
         <p><fmt:message key="appwizard.userManagement.warning" /></p>

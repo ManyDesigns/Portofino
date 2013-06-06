@@ -9,13 +9,16 @@
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.ConnectionProvidersAction"/>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="layouts.admin.connectionProviders.edit.select_provider_type"/>: <c:out value="${actionBean.databaseName}"/>
+        <fmt:message key="layouts.admin.connectionProviders.edit.title"/>: <c:out value="${actionBean.databaseName}"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="connectionProviders-edit" cssClass="contentButton" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.admin.connectionProviders.edit.select_provider_type"/>: <c:out value="${actionBean.databaseName}"/>
+    <stripes:layout-component name="portletHeader">
+        <h4>
+            <fmt:message key="layouts.admin.connectionProviders.edit.title"/>:
+            <c:out value="${actionBean.databaseName}"/>
+        </h4>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="form"/>
@@ -24,7 +27,7 @@
         </c:if>
         <c:if test="${actionBean.schemasForm != null}">
             <div class="horizontalSeparator"></div>
-            <h2><fmt:message key="layouts.admin.connectionProviders.read.configured_schemas"/></h2>
+            <h4><fmt:message key="layouts.admin.connectionProviders.read.configured_schemas"/></h4>
             <mde:write name="actionBean" property="schemasForm"/>
         </c:if>
         <stripes:hidden name="databaseName" value="${actionBean.databaseName}"/>

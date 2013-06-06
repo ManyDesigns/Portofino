@@ -13,12 +13,10 @@
     <stripes:layout-component name="contentHeaderContainer">
         <jsp:include page="/skins/default/wizard-content-header.jsp" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="appwizard.step2.title" />
-    </stripes:layout-component>
+    <stripes:layout-component name="portletHeader" />
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
-        <h2><fmt:message key="appwizard.schemas.found" /></h2>
+        <h4><fmt:message key="appwizard.schemas.found" /></h4>
         <mde:write name="actionBean" property="schemasForm"/>
         <div style="display: none;">
             <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />

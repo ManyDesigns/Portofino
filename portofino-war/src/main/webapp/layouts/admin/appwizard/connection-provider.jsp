@@ -13,9 +13,7 @@
     <stripes:layout-component name="contentHeaderContainer">
         <jsp:include page="/skins/default/wizard-content-header.jsp" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="appwizard.step1.title" />
-    </stripes:layout-component>
+    <stripes:layout-component name="portletHeader" />
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
         <script type="text/javascript">
@@ -23,33 +21,40 @@
                 $("#jndiCPForm").toggle();
                 $("#jdbcCPForm").toggle();
             }
+            $(function() {
+                $("label[for='connectionProviderName']").css("width", "auto").css("margin-right", "20px");
+            })
         </script>
         <c:if test="${not empty actionBean.application.model.databases}">
-            <mde:write name="actionBean" property="connectionProviderField" /><br />
+            <mde:write name="actionBean" property="connectionProviderField" />
             <fmt:message key="appwizard.orNewConnectionProvider" />
         </c:if>
         <c:if test="${empty actionBean.application.model.databases}">
             <fmt:message key="appwizard.newConnectionProvider" />
         </c:if>
-        <ul id="connectionProviderTypeForm">
-            <li><input id="jdbc_radio" type="radio" value="JDBC"
+        <div id="connectionProviderTypeForm">
+            <label class="radio inline">
+                <input id="jdbc_radio" type="radio" value="JDBC"
                        name="connectionProviderType"
                        <%= actionBean.isJdbc() ? "checked='checked'" : "" %>
-                       onchange="changeNewSPForm();"
-                    />
-                <label for="jdbc_radio">JDBC</label></li>
-            <li><input id="jndi_radio" type="radio" value="JNDI"
+                       onchange="changeNewSPForm();" />
+                JDBC</label>
+            <label class="radio inline">
+                <input id="jndi_radio" type="radio" value="JNDI"
                        name="connectionProviderType"
                        <%= actionBean.isJndi() ? "checked='checked'" : "" %>
-                       onchange="changeNewSPForm();"/>
-                <label for="jndi_radio">JNDI</label></li>
-        </ul>
-        <div id="jndiCPForm" style='display: <%= actionBean.isJndi() ? "inherit" : "none" %>'>
-            <mde:write name="actionBean" property="jndiCPForm"/>
+                       onchange="changeNewSPForm();" />
+                JNDI</label>
         </div>
-        <div id="jdbcCPForm" style='display: <%= actionBean.isJdbc() ? "inherit" : "none" %>'>
-            <mde:write name="actionBean" property="jdbcCPForm"/>
-        </div>
+        <fieldset>
+            <legend>Connection parameters</legend>
+            <div id="jndiCPForm" style='display: <%= actionBean.isJndi() ? "inherit" : "none" %>'>
+                <mde:write name="actionBean" property="jndiCPForm"/>
+            </div>
+            <div id="jdbcCPForm" style='display: <%= actionBean.isJdbc() ? "inherit" : "none" %>'>
+                <mde:write name="actionBean" property="jdbcCPForm"/>
+            </div>
+        </fieldset>
 
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">

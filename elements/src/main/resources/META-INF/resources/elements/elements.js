@@ -45,12 +45,15 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, meth
     var selectFieldId = setupArguments[4 + selectionProviderIndex];
     var autocompleteObj = $(autocompleteId);
     var selectField = $(selectFieldId);
-    autocompleteObj.autocomplete({
+    autocompleteObj.change(function() {
+        selectField.val(""); //Reset selected object when user types
+    });
+    autocompleteObj.typeahead({
         source: function( request, response ) {
             var data = {
                 relName : relName,
                 selectionProviderIndex : selectionProviderIndex,
-                labelSearch : request.term
+                labelSearch : request
             };
             data[methodName] = '';
             for (var i = 4; i < setupArguments.length; i++ ) {
@@ -67,12 +70,16 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, meth
                 data: data,
                 success: function( responseData ) {
                     response( $.map( responseData, function( item ) {
-                          return {
-                                label: item.l,
-                                value: item.l,
-                                optionValue: item.v
-                            };
-                        }));
+                        var obj = {
+                            label: item.l,
+                            value: item.l,
+                            optionValue: item.v
+                        };
+                        obj.toString = function() {
+                            return JSON.stringify(obj);
+                        };
+                        return obj;
+                    }));
                 },
                 error: function(request, textStatus) {
                     alert(textStatus);
@@ -80,23 +87,27 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, meth
             });
         },
         minLength: 1,
-        select: function( event, ui ) {
-            if (ui.item) {
-                selectField.val(ui.item.optionValue);
+        matcher: function(item) {
+            return true;
+        },
+        sorter: function(items) {
+            return items;
+        },
+        highlighter: function (item) {
+            var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
+            return item.label.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
+                return '<strong>' + match + '</strong>'
+            });
+        },
+        updater: function(item) {
+            if(item) {
+                item = JSON.parse(item);
+                selectField.val(item.optionValue);
+                return item.label;
             } else {
                 selectField.val("");
+                return "";
             }
-        },
-        change: function(event, ui) {
-            if (!ui.item) {
-                selectField.val("");
-            }
-        },
-        open: function() {
-            $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
-        },
-        close: function() {
-            $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
         }
     });
 }

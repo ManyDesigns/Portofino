@@ -82,7 +82,7 @@ public class TableForm implements Element {
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("table");
-        xb.addAttribute("class", "table" + (condensed ? " table-condensed" : ""));
+        xb.addAttribute("class", "table mde-table-form" + (condensed ? " table-condensed" : ""));
         if (caption != null) {
             xb.writeCaption(caption);
         }

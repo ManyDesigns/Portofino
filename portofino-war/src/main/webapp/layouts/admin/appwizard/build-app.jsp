@@ -8,17 +8,17 @@
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
-        <%= actionBean.getMessage("appwizard.step5.title") %>
+        <fmt:message key="appwizard.step5.title" />
     </stripes:layout-component>
     <stripes:layout-component name="contentHeaderContainer">
         <jsp:include page="/skins/default/wizard-content-header.jsp" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <%= actionBean.getMessage("appwizard.step5.title") %>
-    </stripes:layout-component>
+    <stripes:layout-component name="portletHeader" />
     <stripes:layout-component name="portletBody">
         <mde:sessionMessages />
-        <%= actionBean.getMessage("appwizard.finish.text") %>
+        <p>
+            <fmt:message key="appwizard.finish.text" />
+        </p>
         <div style="display: none;">
             <input type="hidden" name="generateCalendar" value="${actionBean.generateCalendar}" />
             <input type="hidden" name="generationStrategy" value="${actionBean.generationStrategy}" />

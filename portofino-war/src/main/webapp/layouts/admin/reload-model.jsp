@@ -12,14 +12,18 @@
         <fmt:message key="layouts.admin.reload-model.title"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
+        <portofino:buttons list="reload-model-bar" cssClass="contentButton" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.admin.reload-model.title"/>
+    <stripes:layout-component name="portletHeader">
+        <h4><fmt:message key="layouts.admin.reload-model.title"/></h4>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <fmt:message key="layouts.admin.reload-model.text"/>
-        <portofino:buttons list="reload-model" cssClass="portletButton" />
+        <p>
+            <fmt:message key="layouts.admin.reload-model.text"/>
+            <portofino:buttons list="reload-model" cssClass="portletButton" />
+        </p>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
+        <portofino:buttons list="reload-model-bar" cssClass="contentButton" />
     </stripes:layout-component>
 </stripes:layout-render>

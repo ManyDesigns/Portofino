@@ -14,8 +14,8 @@
     <stripes:layout-component name="contentHeader">
         <portofino:buttons list="settings" cssClass="contentButton" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.admin.settings.settings"/>
+    <stripes:layout-component name="portletHeader">
+        <h4><fmt:message key="layouts.admin.settings.settings"/></h4>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <mde:write name="actionBean" property="form"/>

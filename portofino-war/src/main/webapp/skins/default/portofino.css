@@ -121,7 +121,6 @@ div.contentBody {
 
 .contentHeader, .contentFooter {
     background-color: #eeeeff;
-    padding-left: 5px;
     padding-top: 5px;
     padding-bottom: 5px;
     clear: both;
@@ -134,6 +133,10 @@ div.contentBody {
 
 .contentHeader form {
     margin: 0;
+}
+
+.contentHeader > div {
+    padding-left: 5px; padding-right: 5px;
 }
 
 .contentFooter {
@@ -155,16 +158,8 @@ table.noBorder td {
     border: none;
 }
 
-.navigation ul {
-    margin: 0;
-}
-
-.navigation li {
-    list-style: none;
-}
-
-.navigation li.selected {
-    font-weight: bold;
+#navigation {
+    margin-bottom: 1em;
 }
 
 /*******************************************************************************
@@ -201,7 +196,7 @@ input.contentButton, button.contentButton, .portletHeaderButtons button {
     background: #EEEEFF;
 }
 
-.contentButton.btn:hover {
+.contentButton.btn:hover, .portletHeaderButtons button.btn:hover {
     border: 1px solid #BEBECF;
     background-color: #D6D6E7;
 }
@@ -492,10 +487,6 @@ div#content-login {
     margin: 12em auto;
 }
 
-div#content-login .userMessages {
-    margin-bottom: 0;
-}
-
 .loginTable {
     margin: 2em auto;
 }
@@ -530,19 +521,6 @@ Forms
 
 fieldset.radio {
     margin-bottom: 0;
-}
-
-table.mde-field-group-table td {
-    border: 0 none;
-    margin-left: 0;
-    padding-left: 0;
-}
-
-table.mde-field-group-table th {
-    border: 0 none;
-    text-align: right;
-    margin: 0;
-    padding: 0;
 }
 
 .horizontalSeparator {
@@ -601,6 +579,10 @@ li.group, li.groupPlaceholder {
 .groupBoxTitle {
     font-weight: normal;
     margin-bottom: 0.5em;
+}
+
+.mde-table-form input[type='checkbox'] {
+    margin: 0;
 }
 
 /*******************************************************************************

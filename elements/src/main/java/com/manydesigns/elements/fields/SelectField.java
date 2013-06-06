@@ -437,6 +437,7 @@ public class SelectField extends AbstractField {
         xb.addAttribute("id", autocompleteId);
         xb.addAttribute("type", "text");
         xb.addAttribute("name", autocompleteInputName);
+        xb.addAttribute("autocomplete", "off");
         xb.addAttribute("value", getStringValue());
         xb.addAttribute("class", null);
         xb.addAttribute("size", null);
