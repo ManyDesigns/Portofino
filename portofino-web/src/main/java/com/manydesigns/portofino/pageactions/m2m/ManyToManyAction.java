@@ -229,10 +229,7 @@ public class ManyToManyAction extends AbstractPageAction {
                 }
                 return forwardTo("/layouts/m2m/checkboxes.jsp");
             default:
-                SessionMessages.addErrorMessage(
-                        "View type " + m2mConfiguration.getActualViewType() +
-                        " is not implemented in the present version, sorry");
-                return forwardToPortletNotConfigured(); //TODO
+                return forwardToPortletNotConfigured();
         }
     }
 
@@ -249,15 +246,19 @@ public class ManyToManyAction extends AbstractPageAction {
         PropertyAccessor manyPropertyAccessor =
                 relationTableAccessor.getProperty(manyPropertyName);
         criteria = criteria.eq(onePropertyAccessor, onePk);
-        QueryStringWithParameters queryString =
-                QueryUtils.mergeQuery(m2mConfiguration.getQuery(), criteria, this);
+        QueryStringWithParameters queryString;
+        try {
+            queryString = QueryUtils.mergeQuery(m2mConfiguration.getQuery(), criteria, this);
+        } catch (RuntimeException e) {
+            SessionMessages.addErrorMessage("Invalid query");
+            throw e;
+        }
         existingAssociations =
                 QueryUtils.runHqlQuery(session, queryString.getQueryString(), queryString.getParameters());
         availableAssociations = new ArrayList<Object>();
         String manyQueryString = ((DatabaseSelectionProvider) manySelectionProvider.getActualSelectionProvider()).getHql();
         if(manyQueryString == null) {
-            logger.error("Couldn't determine many query");
-            return;
+            throw new RuntimeException("Couldn't determine many query");
         }
         QueryStringWithParameters manyQuery =
                 QueryUtils.mergeQuery(manyQueryString, null, this);
@@ -293,7 +294,13 @@ public class ManyToManyAction extends AbstractPageAction {
         if(!correctlyConfigured) {
             return forwardToPortletNotConfigured();
         }
-        loadAssociations();
+        try {
+            loadAssociations();
+        } catch (Exception e) {
+            logger.error("Could not load associations", e);
+            SessionMessages.addErrorMessage("Could not save associations");
+            return view();
+        }
         PkHelper pkHelper = new PkHelper(manyTableAccessor);
         //TODO chiave multipla
         String onePropertyName = m2mConfiguration.getActualOnePropertyName();

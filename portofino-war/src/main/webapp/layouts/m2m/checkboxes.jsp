@@ -18,7 +18,7 @@
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.m2m.ManyToManyAction"/>
-<stripes:layout-render name="/skins/${skin}/portlet.jsp">
+<stripes:layout-render name="/skins/${skin}/portlet.jsp" formClass="form-inline">
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
@@ -39,14 +39,12 @@
             XhtmlBuffer buffer = new XhtmlBuffer(out);
             PkHelper pkHelper = new PkHelper(ca);
             for(Map.Entry<Object, Boolean> entry : actionBean.getBooleanRelation().entrySet()) {
-                buffer.openElement("span");
-                buffer.addAttribute("style", "margin-right: 1em; white-space: nowrap;");
                 String id = RandomUtil.createRandomId();
                 buffer.openElement("label");
+                buffer.addAttribute("class", "checkbox");
                 buffer.addAttribute("for", id);
                 Object obj = entry.getKey();
                 buffer.write(ShortNameUtils.getName(ca, obj));
-                buffer.closeElement("label");
                 buffer.openElement("input");
                 buffer.addAttribute("id", id);
                 buffer.addAttribute("type", "checkbox");
@@ -61,7 +59,7 @@
                     buffer.addAttribute("checked", "t");
                 }
                 buffer.closeElement("input");
-                buffer.closeElement("span");
+                buffer.closeElement("label");
                 if(actionBean.getConfiguration().getActualViewType() == ViewType.CHECKBOXES_VERTICAL) {
                     buffer.writeNoHtmlEscape("<br />");
                 } else {
