@@ -118,7 +118,7 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
             try {
                 CompositeConfiguration appConfiguration = (CompositeConfiguration) application.getAppConfiguration();
                 form.writeToObject(appConfiguration);
-                ((FileConfiguration) appConfiguration.getInMemoryConfiguration()).save();
+                ((FileConfiguration) appConfiguration.getConfiguration(0)).save();
             } catch (Exception e) {
                 logger.error("Configuration not saved", e);
                 SessionMessages.addInfoMessage(getMessage("commons.configuration.notUpdated"));

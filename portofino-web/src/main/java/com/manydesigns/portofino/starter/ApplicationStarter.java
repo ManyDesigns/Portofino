@@ -132,7 +132,7 @@ public class ApplicationStarter {
                 new File(appDir, AppProperties.PROPERTIES_RESOURCE);
         if(appConfigurationFile.exists()) {
             PropertiesConfiguration config = new PropertiesConfiguration(appConfigurationFile);
-            appConfiguration = new CompositeConfiguration(config);
+            appConfiguration = new CompositeConfiguration();
             appConfiguration.addConfiguration(config);
             appConfiguration.addConfiguration(new PropertiesConfiguration(getClass().getResource(AppProperties.PROPERTIES_DEFAULT_RESOURCE)));
         } else {
