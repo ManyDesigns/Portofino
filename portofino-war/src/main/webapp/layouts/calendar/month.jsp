@@ -47,7 +47,7 @@
 %>
 <style type="text/css">
     .calendar-container {
-        position: relative; height: <%= maxEventsPerCell * 120 + 120 %>px;
+        position: relative; height: <%= (maxEventsPerCell + 1) * 22 * 6 %>px;
     }
     .days-table td, .days-table th {
         margin: 0; padding: 0 0 0 10px; border: none; text-align: left;
@@ -106,35 +106,30 @@
         $( ".event-dialog" ).dialog({ autoOpen: false });
     });
 </script>
-<div class="yui-gc" style="width: 100%;">
-    <div class="yui-u first">
+<h3><%= StringUtils.capitalize(monthFormatter.print(monthView.getReferenceDateTime())) %></h3>
+<div>
+    <div class="pull-right" >
+        <button type="submit" name="agendaView" class="btn btn-small">
+            <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-e"></span>
+            <fmt:message key="calendar.agendaView" />
+            <span class="ui-button-icon-secondary ui-icon ui-icon-carat-1-e"></span>
+        </button>
+    </div>
+    <div>
         <%
             Interval monthInterval = monthView.getMonthInterval();
             boolean todayDisabled = monthInterval.contains(new DateTime());
         %>
-        <button type="submit" name="today" <%= todayDisabled ? "disabled='true'" : "" %>
-                class="ui-button ui-widget <%= todayDisabled ? "ui-state-disabled" : "ui-state-default" %> ui-corner-all ui-button-text-only">
-            <span class="ui-button-text"><fmt:message key="calendar.currentMonth" /></span>
+        <button type="submit" name="today" class="btn btn-small"<%= todayDisabled ? " disabled='true'" : "" %>>
+            <fmt:message key="calendar.currentMonth" />
         </button>
-        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary"
-                type="submit" name="prevMonth" role="button" aria-disabled="false">
+        <button type="submit" name="prevMonth" class="btn btn-small">
             <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-w"></span>
-            <span class="ui-button-text"><fmt:message key="calendar.previous" /></span>
+            <fmt:message key="calendar.previous" />
         </button>
-        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-secondary"
-                         type="submit" name="nextMonth" role="button" aria-disabled="false">
-            <span class="ui-button-text"><fmt:message key="calendar.next" /></span>
-            <span class="ui-button-icon-secondary ui-icon ui-icon-carat-1-e"></span>
-        </button>
-        <span style="margin-left: 1em;">
-            <h3 style="margin: 0; display: inline;"><%= StringUtils.capitalize(monthFormatter.print(monthView.getReferenceDateTime())) %></h3>
-        </span>
-    </div>
-    <div class="yui-u" style="text-align: right">
-        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-secondary"
-                         type="submit" name="agendaView" role="button" aria-disabled="false">
-            <span class="ui-button-text"><fmt:message key="calendar.agendaView" /></span>
-            <span class="ui-button-icon-secondary ui-icon ui-icon-carat-1-e"></span>
+        <button type="submit" name="nextMonth" class="btn btn-small">
+            <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-e"></span>
+            <fmt:message key="calendar.next" />
         </button>
     </div>
 </div>
