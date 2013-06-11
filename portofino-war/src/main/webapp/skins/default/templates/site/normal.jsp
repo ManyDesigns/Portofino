@@ -53,9 +53,6 @@
                 </div>
                 <portofino:portlets list="belowNavigation" />
             </div>
-            <script type="text/javascript">
-                fixSideBar();
-            </script>
         </div>
         <div id="ft">
             <jsp:include page="../../footer.jsp"/>

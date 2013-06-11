@@ -16,7 +16,7 @@
                      type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
         <title><c:out value="${actionBean.dispatch.lastPageInstance.page.description}"/></title>
     </head>
-    <body class="yui-skin-sam">
+    <body>
     <jsp:include page="../../header.jsp"/>
     <div class="container">
         <div class="row">

@@ -58,6 +58,7 @@ public class TableForm implements Element {
     protected TextFormat keyTextFormat;
 
     protected boolean condensed = false;
+    protected boolean striped = true;
 
     //**************************************************************************
     // Costruttori
@@ -82,7 +83,10 @@ public class TableForm implements Element {
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("table");
-        xb.addAttribute("class", "table mde-table-form" + (condensed ? " table-condensed" : ""));
+        xb.addAttribute("class",
+                "table mde-table-form" +
+                (condensed ? " table-condensed" : "") +
+                (striped ? " table-striped" : ""));
         if (caption != null) {
             xb.writeCaption(caption);
         }
@@ -239,6 +243,18 @@ public class TableForm implements Element {
 
     public void setCondensed(boolean condensed) {
         this.condensed = condensed;
+    }
+
+    /**
+     * If a table is "striped", it is rendered with rows of alternating background colors.
+     * @return the value of the "striped" property.
+     */
+    public boolean isStriped() {
+        return striped;
+    }
+
+    public void setStriped(boolean striped) {
+        this.striped = striped;
     }
 
     //**************************************************************************

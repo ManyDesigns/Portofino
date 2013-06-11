@@ -303,7 +303,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         try {
             setupSearchForm();
-//            loadObjects();
+            if(maxResults == null) {
+                //Load only the first page if the crud is paginated
+                maxResults = getCrudConfiguration().getRowsPerPage();
+            }
+            loadObjects();
             setupTableForm(Mode.VIEW);
 
             if(isEmbedded()) {
@@ -319,6 +323,29 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         } catch(Exception e) {
             logger.warn("Crud not correctly configured", e);
             return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
+        }
+    }
+
+    public Resolution getSearchResultsPage() {
+        if(!isConfigured()) {
+            logger.debug("Crud not correctly configured");
+            return new ErrorResolution(500, "Crud not correctly configured");
+        }
+
+        try {
+            setupSearchForm();
+            if(maxResults == null) {
+                //Load only the first page if the crud is paginated
+                maxResults = getCrudConfiguration().getRowsPerPage();
+            }
+            loadObjects();
+            setupTableForm(Mode.VIEW);
+
+            context.getRequest().setAttribute("actionBean", this);
+            return new ForwardResolution("/layouts/crud/datatable.jsp");
+        } catch(Exception e) {
+            logger.warn("Crud not correctly configured", e);
+            return new ErrorResolution(500, "Crud not correctly configured");
         }
     }
 
@@ -357,7 +384,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * (first and max results).
      * @return the number of objects.
      */
-    protected abstract long getTotalSearchRecords();
+    public abstract long getTotalSearchRecords();
 
     @Button(list = "crud-search-form", key = "commons.resetSearch", order = 2)
     public Resolution resetSearch() {
@@ -1042,6 +1069,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
         tableForm.setSelectable(true);
+        tableForm.setCondensed(true);
 
         return tableForm;
     }

@@ -7,29 +7,19 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
-<%--<meta http-equiv="Content-Script-Type" content="text/javascript"/>
-<meta http-equiv="Content-Style-Type" content="text/css"/>--%>
-<!--<link rel="stylesheet" type="text/css"
-      href="<stripes:url value="/yui-2.9.0/build/reset-fonts-grids/reset-fonts-grids.css"/>"/>
-<link rel="stylesheet" type="text/css"
-      href="<stripes:url value="/yui-2.9.0/build/base/base-min.css"/>"/>-->
-<link rel="stylesheet" type="text/css"
-      href="<stripes:url value="/yui-2.9.0/build/datatable/assets/skins/sam/datatable.css"/>">
-<link rel="stylesheet" type="text/css"
-      href="<stripes:url value="/yui-2.9.0/build/paginator/assets/skins/sam/paginator.css"/>">
 
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"/>"/>
 
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/elements/bootstrap/css/bootstrap.min.css"/>"/>
+<style type="text/css">
+    body {
+        padding-top: 50px;
+    }
+</style>
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/elements/bootstrap/css/bootstrap-responsive.min.css"/>"/>
-<!--<style type="text/css">
-      body {
-        padding-bottom: 40px;
-      }
-</style>-->
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/elements/datepicker/css/datepicker.css"/>"/>
 
@@ -49,21 +39,6 @@
         src="<stripes:url value="/elements/bootstrap/js/bootstrap.js"/>"></script>
 <script type="text/javascript"
         src="<stripes:url value="/elements/datepicker/js/bootstrap-datepicker.js"/>"></script>
-
-<script type="text/javascript"
-        src="<stripes:url value="/yui-2.9.0/build/yahoo-dom-event/yahoo-dom-event.js"/>"></script>
-<script type="text/javascript"
-        src="<stripes:url value="/yui-2.9.0/build/element/element-min.js"/>"></script>
-<script type="text/javascript"
-        src="<stripes:url value="/yui-2.9.0/build/datasource/datasource-min.js"/>"></script>
-<script type="text/javascript"
-        src="<stripes:url value="/yui-2.9.0/build/json/json-min.js"/>"></script>
-<script type="text/javascript"
-        src="<stripes:url value="/yui-2.9.0/build/connection/connection-min.js"/>"></script>
-<script type="text/javascript"
-        src="<stripes:url value="/yui-2.9.0/build/datatable/datatable-min.js"/>"></script>
-<script type="text/javascript"
-        src="<stripes:url value="/yui-2.9.0/build/paginator/paginator-min.js"/>"></script>
 
 <script type="text/javascript"
         src="<stripes:url value="/elements/elements.js"/>"></script>

@@ -13,7 +13,7 @@
             <stripes:layout-component name="pageTitle" />
         </title>
     </head>
-    <body class="yui-skin-sam">
+    <body>
     <jsp:include page="header.jsp"/>
     <div class="container">
         <div class="row">

@@ -27,15 +27,11 @@
             <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
         </c:if>
         <div class="search_results">
-            <%@include file="datatable.jsp"%>
-            <portofino:buttons list="crud-search" cssClass="portletButton" />
+            <jsp:include page="datatable.jsp" />
         </div>
         <script type="text/javascript">
             <c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
             $(function() {
-                $("#portlet_${pageId} .search_results button[name=bulkDelete]").click(function() {
-                    return confirm ('<fmt:message key="commons.confirm" />');
-                });
                 $("#portlet_${pageId} .search_form_toggle_link").click(makeToggleFunction());
                 function makeToggleFunction() {
                     var visible = ${actionBean.searchVisible};

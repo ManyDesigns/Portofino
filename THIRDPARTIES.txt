@@ -74,6 +74,11 @@ Site: http://asm.ow2.org/
 Files: asm-3.2.jar, asm-analysis-3.2.jar, asm-commons-3.2.jar, asm-tree-3.2.jar, asm-util-3.2.jar
 License: BSD
 
+Bootstrap
+Site: http://twitter.github.io/bootstrap/index.html
+Files: elements/src/main/resources/META-INF/resources/elements/bootstrap/
+License: Apache License v2.0
+
 Bouncy Castle
 Site: http://www.bouncycastle.org/java.html
 Files: bcmail-jdk14-1.38.jar, bcprov-jdk14-1.38.jar, bctsp-jdk14-1.38.jar
@@ -346,8 +351,3 @@ Xalan-Java
 Site: http://xml.apache.org/xalan-j/
 File: xalan-2.6.0.jar
 License: Apache License v2
-
-YUI Library
-Site: http://yuilibrary.com/projects/yui2/
-Files: yui-2.9.0 directory
-License: BSD

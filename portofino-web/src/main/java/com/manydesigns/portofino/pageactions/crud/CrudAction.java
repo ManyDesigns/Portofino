@@ -101,7 +101,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
             LoggerFactory.getLogger(CrudAction.class);
 
     @Override
-    protected long getTotalSearchRecords() {
+    public long getTotalSearchRecords() {
         // calculate totalRecords
         TableCriteria criteria = new TableCriteria(baseTable);
         if(searchForm != null) {

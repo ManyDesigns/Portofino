@@ -9,28 +9,6 @@
     response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_NO_STORE);
     response.setDateHeader(ServletConstants.HTTP_EXPIRES, 0);
 %>
-function fixSideBar() {
-    $(
-        function() {
-            var contentNode = $('#content');
-            var sideBarNode = $('#sidebar');
-            var contentOffsetHeight = contentNode.prop('offsetHeight');
-            var sideBarOffsetHeight = sideBarNode.prop('offsetHeight');
-            if (contentOffsetHeight < sideBarOffsetHeight) {
-                contentNode.css('min-height', (sideBarOffsetHeight + 5) + 'px')
-            }
-
-            contentNode = $('div.search_results.withSearchForm'); //TODO Serve ancora?
-            sideBarNode = contentNode.parent().parent();
-            contentOffsetHeight = contentNode.attr('offsetHeight');
-            sideBarOffsetHeight = sideBarNode.attr('offsetHeight');
-            if (contentOffsetHeight < sideBarOffsetHeight) {
-                contentNode.css('min-height', sideBarOffsetHeight + 'px')
-            }
-        }
-    )
-}
-
 function copyFormAsHiddenFields(source, form) {
     source.find("input, select").each(function(index, elem) {
         elem = $(elem);
@@ -167,3 +145,26 @@ function htmlEscape (string) {
         return HTML_CHARS[match];
     });
 }
+
+$(function() {
+    //Enable AJAX paginators
+    $(".pagination").each(function(index, elem) {
+        function setupPaginator(elem) {
+            elem.find("a.paginator-link").click(function() {
+                $.ajax($(this).attr("href") + "&getSearchResultsPage=", {
+                    dataType: "html",
+                    success: function(data, status, xhr) {
+                        var targetId = "#" + elem.data("for");
+                        $(targetId).replaceWith(data);
+                        setupPaginator($(targetId).find(".pagination"));
+                    },
+                    error: function(xhr, status, errorThrown) {
+                        alert("There was an error fetching the requested data")
+                    }
+                });
+                return false;
+            });
+        }
+        setupPaginator($(elem));
+    });
+});

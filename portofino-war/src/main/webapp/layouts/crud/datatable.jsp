@@ -1,40 +1,45 @@
-<%@ page import="com.manydesigns.elements.forms.TableForm" %>
-<%@ page import="com.manydesigns.elements.reflection.PropertyAccessor" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
-<%@ page import="org.json.JSONWriter" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="mde" uri="/manydesigns-elements" %>
+<%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction" %>
+<%@ page import="java.io.Writer" %>
 <%@ page language="java" %>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"/>
 <c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
-<%
-    AbstractCrudAction crudAction = (AbstractCrudAction) request.getAttribute("actionBean");
-%>
-<div id="<c:out value="tableContainer-${pageId}" />">
-    <table id="<c:out value="table-${pageId}" />">
-        <thead>
-        <tr>
-            <%
-                TableForm tableForm = crudAction.getTableForm();
-                TableForm.Column[] columns = tableForm.getColumns();
-                for (TableForm.Column column : columns) {
-                    out.print("<th>");
-                    out.print(StringEscapeUtils.escapeHtml(column.getActualLabel()));
-                    out.print("</th>");
-                }
-            %>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td colspan="<%=columns.length%>"><fmt:message key="layouts.crud.datatable.loading_data"/></td>
-        </tr>
-        </tbody>
-    </table>
+<div id="tableContainer-${pageId}">
+    <mde:write name="actionBean" property="tableForm" />
+    <c:if test="${empty actionBean.crudConfiguration.rowsPerPage}">
+        <div style="line-height: 8px;">&nbsp;<%-- Reserve space for the missing paginator --%></div>
+    </c:if>
+    <div class="pull-left">
+        <portofino:buttons list="crud-search" cssClass="portletButton" />
+    </div>
+    <c:if test="${not empty actionBean.crudConfiguration.rowsPerPage}">
+        <%
+            int rowsPerPage = actionBean.getCrudConfiguration().getRowsPerPage();
+            long totalSearchRecords = actionBean.getTotalSearchRecords();
+            if(totalSearchRecords <= rowsPerPage) {
+                %><div style="line-height: 8px;">&nbsp;<%-- Reserve space for the missing paginator --%></div><%
+            } else { %>
+                <div class="pagination pagination-right" data-for="tableContainer-${pageId}">
+                    <ul>
+                        <% writePaginator(out, actionBean, rowsPerPage, totalSearchRecords); %>
+                    </ul>
+                </div>
+        <%  } %>
+    </c:if>
+    <input type="hidden" name="sortProperty" value="${actionBean.sortProperty}" />
+    <input type="hidden" name="sortDirection" value="${actionBean.sortDirection}" />
+    <script type="text/javascript">
+        $("#portlet_${pageId} .search_results button[name=bulkDelete]").click(function() {
+            return confirm ('<fmt:message key="commons.confirm" />');
+        });
+    </script>
+    <div style="clear: both;"></div>
 </div>
-<c:if test="${empty actionBean.crudConfiguration.rowsPerPage}">
-    <div style="line-height: 8px;">&nbsp;<%-- Reserve space for the missing paginator --%></div>
-</c:if>
-<input type="hidden" name="sortProperty" value="${actionBean.sortProperty}" />
-<input type="hidden" name="sortDirection" value="${actionBean.sortDirection}" />
+<%--
 <!--<input type="hidden" name="firstResult" value="${actionBean.firstResult}" />
 <input type="hidden" name="maxResults" value="${actionBean.maxResults}" />-->
 <script type="text/javascript">
@@ -185,3 +190,111 @@
     }();
 
 </script>
+--%>
+<%!
+    private void writePaginator(Writer out, AbstractCrudAction actionBean, int rowsPerPage, long totalSearchRecords) {
+        int firstResult = actionBean.getFirstResult() != null ? actionBean.getFirstResult() : 1;
+        int currentPage = firstResult / rowsPerPage;
+        int lastPage = (int) (totalSearchRecords / rowsPerPage);
+        if(totalSearchRecords % rowsPerPage == 0) {
+            lastPage--;
+        }
+
+        XhtmlBuffer buf = new XhtmlBuffer(out);
+
+        //First
+        buf.openElement("li");
+        if(currentPage == 0) {
+            buf.addAttribute("class", "disabled");
+            buf.openElement("a");
+        } else {
+            buf.openElement("a");
+            buf.addAttribute("class", "paginator-link");
+            buf.addAttribute("href", getLinkToPage(actionBean, 0));
+        }
+        buf.addAttribute("title", actionBean.getMessage("commons.first"));
+        buf.writeNoHtmlEscape("&lt;&lt;");
+        buf.closeElement("a");
+        buf.closeElement("li");
+
+        //Prev
+        buf.openElement("li");
+        if(currentPage == 0) {
+            buf.addAttribute("class", "disabled");
+            buf.openElement("a");
+        } else {
+            buf.openElement("a");
+            buf.addAttribute("class", "paginator-link");
+            buf.addAttribute("href", getLinkToPage(actionBean, currentPage - 1));
+        }
+        buf.addAttribute("title", actionBean.getMessage("commons.prev"));
+        buf.writeNoHtmlEscape("&lt;");
+        buf.closeElement("a");
+        buf.closeElement("li");
+
+        int start = currentPage - 2;
+        int end = currentPage + 2;
+        if(start < 0) {
+            end = end - start;
+            start = 0;
+        }
+        if(end > lastPage) {
+            start = start - (end - lastPage);
+            end = lastPage;
+        }
+        if(start < 0) {
+            start = 0;
+        }
+
+        for(int pg = start; pg <= end; pg++) {
+            buf.openElement("li");
+            if(pg == currentPage) {
+                buf.addAttribute("class", "active");
+            }
+            buf.openElement("a");
+            buf.addAttribute("class", "paginator-link");
+            buf.addAttribute("href", getLinkToPage(actionBean, pg));
+            buf.addAttribute("title", "Page " + (pg + 1)); //TODO I18n
+            buf.write("" + (pg + 1));
+            buf.closeElement("a");
+            buf.closeElement("li");
+        }
+
+        //Next
+        buf.openElement("li");
+        if(currentPage == lastPage) {
+            buf.addAttribute("class", "disabled");
+            buf.openElement("a");
+        } else {
+            buf.openElement("a");
+            buf.addAttribute("class", "paginator-link");
+            buf.addAttribute("href", getLinkToPage(actionBean, currentPage + 1));
+        }
+        buf.addAttribute("title", actionBean.getMessage("commons.next"));
+        buf.writeNoHtmlEscape("&gt;");
+        buf.closeElement("a");
+        buf.closeElement("li");
+
+        //Last
+        buf.openElement("li");
+        if(currentPage == lastPage) {
+            buf.addAttribute("class", "disabled");
+            buf.openElement("a");
+        } else {
+            buf.openElement("a");
+            buf.addAttribute("class", "paginator-link");
+            buf.addAttribute("href", getLinkToPage(actionBean, lastPage));
+        }
+        buf.addAttribute("title", actionBean.getMessage("commons.last"));
+        buf.writeNoHtmlEscape("&gt;&gt;");
+        buf.closeElement("a");
+        buf.closeElement("li");
+    }
+
+    private String getLinkToPage(AbstractCrudAction actionBean, int page) {
+        int rowsPerPage = actionBean.getCrudConfiguration().getRowsPerPage();
+        return actionBean.getDispatch().getAbsoluteOriginalPath() +
+                "?firstResult=" + (page * rowsPerPage) +
+                "&maxResults=" + rowsPerPage;
+    }
+%>
