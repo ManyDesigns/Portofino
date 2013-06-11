@@ -386,11 +386,7 @@ Search form
 }
 
 .searchform .control-group {
-    display: inline-block;
-}
-
-.searchform .control-label {
-    margin-left: 1em;
+    display: inline-block; margin-right: 1em;
 }
 
 .searchform label.match_mode {
@@ -402,19 +398,19 @@ Search form
     margin-left: 20px;
 }
 
+.searchform .controls label.checkbox {
+    margin-bottom: 5px;
+    padding: 0;
+}
+
+.searchform .controls label.checkbox input {
+    margin-top: 0; margin-left: 10px; margin-right: 10px;
+}
+
 .searchform fieldset {
     margin: 0;
     padding: 0;
     border: 0 none;
-}
-
-.mde-boolean-search-field {
-    margin-right: 2em;
-}
-
-.mde-boolean-search-field input {
-    margin-left: 0.5em;
-    margin-right: 0.5em;
 }
 
 .search_results {
@@ -578,6 +574,10 @@ li.group, li.groupPlaceholder {
 
 .mde-table-form input[type='checkbox'] {
     margin: 0;
+}
+
+.table.mde-table-form th, .table.mde-table-form td {
+    vertical-align: middle;
 }
 
 /*******************************************************************************

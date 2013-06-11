@@ -123,7 +123,7 @@ public class LoginAction extends AbstractActionBean {
         return new ForwardResolution("/layouts/user/login.jsp");
     }
 
-    @Button(list = "login-buttons", key = "commons.login", order = 1)
+    @Button(list = "login-buttons", key = "commons.login", order = 1, primary = true)
     public Resolution login() {
         Subject subject = SecurityUtils.getSubject();
         Locale locale = context.getLocale();

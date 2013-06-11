@@ -1874,6 +1874,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     new TableFormBuilder(CrudPropertyEdit.class)
                         .configNRows(propertyEdits.length);
             propertiesTableForm = tableFormBuilder.build();
+            propertiesTableForm.setCondensed(true);
         }
 
         if(selectionProviderSupport != null) {
