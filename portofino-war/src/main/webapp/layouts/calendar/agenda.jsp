@@ -60,44 +60,36 @@
         width: 15%; white-space: nowrap;
     }
 </style>
-<div class="yui-g" style="width: 100%;">
-    <div class="yui-u first">
+<div>
+    <div class="pull-right" >
+        <button type="submit" name="monthView" class="btn btn-small">
+            <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-e"></span>
+            <fmt:message key="calendar.monthView" />
+            <span class="ui-button-icon-secondary ui-icon ui-icon-carat-1-e"></span>
+        </button>
+    </div>
+    <div>
         <%
             DateTime today = new DateTime();
             boolean todayDisabled =
                     referenceDateTime.getYear() == today.getYear() && referenceDateTime.getDayOfYear() == today.getDayOfYear();
         %>
-        <button type="submit" name="today" <%= todayDisabled ? "disabled='true'" : "" %>
-                class="ui-button ui-widget <%= todayDisabled ? "ui-state-disabled" : "ui-state-default" %> ui-corner-all ui-button-text-only ui-button">
-            <span class="ui-button-text"><fmt:message key="calendar.today" /></span>
+        <button type="submit" name="today" class="btn btn-small"<%= todayDisabled ? " disabled='true'" : "" %>>
+            <fmt:message key="calendar.today" />
         </button>
-        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary"
-                type="submit" name="prevDay" role="button" aria-disabled="false">
+        <button type="submit" name="prevDay" class="btn btn-small">
             <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-w"></span>
-            <span class="ui-button-text"><fmt:message key="calendar.previous" /></span>
+            <fmt:message key="calendar.previous" />
         </button>
-        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-secondary"
-                         type="submit" name="nextDay" role="button" aria-disabled="false">
-            <span class="ui-button-text"><fmt:message key="calendar.next" /></span>
-            <span class="ui-button-icon-secondary ui-icon ui-icon-carat-1-e"></span>
-        </button>
-    </div>
-    <div class="yui-u" style="text-align: right">
-        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-secondary"
-                         type="submit" name="monthView" role="button" aria-disabled="false">
-            <span class="ui-button-text"><fmt:message key="calendar.monthView" /></span>
-            <span class="ui-button-icon-secondary ui-icon ui-icon-carat-1-e"></span>
+        <button type="submit" name="nextDay" class="btn btn-small">
+            <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-e"></span>
+            <fmt:message key="calendar.next" />
         </button>
     </div>
 </div>
-<div style="white-space: nowrap; clear: both; margin-bottom: 1em;">
+<div>
     <h3 style="margin: 0; text-align: center;"><%= StringUtils.capitalize(dateFormatter.print(referenceDateTime)) %></h3>
 </div>
-<script type="text/javascript">
-    $(function() {
-        $( ".event-dialog" ).dialog({ autoOpen: false });
-    });
-</script>
 <div class="calendar-container">
     <table class="agenda-table">
     <%
@@ -147,8 +139,8 @@
 
         xhtmlBuffer.openElement("a");
         xhtmlBuffer.addAttribute("style", "color: " + event.getCalendar().getForegroundHtmlColor() + ";");
-        xhtmlBuffer.addAttribute("href", "#");
-        xhtmlBuffer.addAttribute("onclick", "$('#" + dialogId + "').dialog('open'); return false;");
+        xhtmlBuffer.addAttribute("href", "#" + dialogId);
+        xhtmlBuffer.addAttribute("data-toggle", "modal");
         xhtmlBuffer.write(event.getDescription());
         xhtmlBuffer.closeElement("a");
         xhtmlBuffer.closeElement("span");
@@ -160,9 +152,26 @@
              DateTime start, DateTime end, ResourceBundle resourceBundle) {
         String dialogId = "event-dialog-" + event.getId() + "-" + day.getDay().getMillis();
 
+        // modal
         xhtmlBuffer.openElement("div");
         xhtmlBuffer.addAttribute("id", dialogId);
-        xhtmlBuffer.addAttribute("class", "event-dialog");
+        xhtmlBuffer.addAttribute("class", "modal hide");
+        xhtmlBuffer.addAttribute("tabindex", "-1");
+        xhtmlBuffer.addAttribute("role", "dialog");
+        xhtmlBuffer.addAttribute("aria-hidden", "true");
+
+        // modal-header
+        xhtmlBuffer.openElement("div");
+        xhtmlBuffer.addAttribute("class", "modal-header");
+
+        xhtmlBuffer.openElement("button");
+        xhtmlBuffer.addAttribute("type", "button");
+        xhtmlBuffer.addAttribute("class", "close");
+        xhtmlBuffer.addAttribute("data-dismiss", "modal");
+        xhtmlBuffer.addAttribute("aria-hidden", "true");
+        xhtmlBuffer.writeNoHtmlEscape("&times;");
+        xhtmlBuffer.closeElement("button");
+
         xhtmlBuffer.openElement("h3");
         if(event.getReadUrl() != null) {
             xhtmlBuffer.writeAnchor(event.getReadUrl(), event.getDescription());
@@ -170,6 +179,11 @@
             xhtmlBuffer.write(event.getDescription());
         }
         xhtmlBuffer.closeElement("h3");
+        xhtmlBuffer.closeElement("div"); // modal-header
+
+        // modal-body
+        xhtmlBuffer.openElement("div");
+        xhtmlBuffer.addAttribute("class", "modal-body");
 
         xhtmlBuffer.openElement("p");
         String timeDescription;
@@ -195,7 +209,20 @@
             xhtmlBuffer.writeAnchor(event.getEditUrl(), editText);
             xhtmlBuffer.closeElement("p");
         }
-        xhtmlBuffer.closeElement("div");
+        xhtmlBuffer.closeElement("div"); // modal-body
+
+        // modal-footer
+        xhtmlBuffer.openElement("div");
+        xhtmlBuffer.addAttribute("class", "modal-footer");
+        xhtmlBuffer.openElement("button");
+        xhtmlBuffer.addAttribute("class", "btn btn-primary");
+        xhtmlBuffer.addAttribute("data-dismiss", "modal");
+        xhtmlBuffer.addAttribute("aria-hidden", "true");
+        xhtmlBuffer.write(resourceBundle.getString("commons.close"));
+        xhtmlBuffer.closeElement("button");
+        xhtmlBuffer.closeElement("div"); // modal-footer
+
+        xhtmlBuffer.closeElement("div"); // modal
         return dialogId;
     }
 
