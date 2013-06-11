@@ -149,22 +149,37 @@ function htmlEscape (string) {
 $(function() {
     //Enable AJAX paginators
     $(".portofino-datatable").each(function(index, elem) {
-        function setupPaginator(elem) {
-            elem.find("a.paginator-link").click(function() {
-                $.ajax($(this).attr("href") + "&getSearchResultsPage=", {
+        function makeLoaderFunction(elem) {
+            return function loadLinkHref() {
+                var href = $(this).attr("href");
+                var eventName = elem.find("input[name=eventName]").val();
+                if(eventName && !(eventName.length == 0)) {
+                    console.log(eventName);
+                    console.log(href);
+                    href = href.replace(eventName + "=&", "");
+                    href = href.replace(eventName + "=", "");
+                    console.log(href);
+                }
+                $.ajax(href + "&getSearchResultsPage=", {
                     dataType: "html",
                     success: function(data, status, xhr) {
                         var targetId = "#" + elem.attr("id");
                         elem.replaceWith(data);
-                        setupPaginator($(targetId));
+                        var target = $(targetId);
+                        setupLinks(target);
                     },
                     error: function(xhr, status, errorThrown) {
                         alert("There was an error fetching the requested data")
                     }
                 });
                 return false;
-            });
+            }
         }
-        setupPaginator($(elem));
+        function setupLinks(elem) {
+            elem.find("a.paginator-link").click(makeLoaderFunction(elem));
+            elem.find("a.sort-link").click(makeLoaderFunction(elem));
+        }
+
+        setupLinks($(elem));
     });
 });

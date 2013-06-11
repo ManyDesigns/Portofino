@@ -491,15 +491,17 @@ public class QueryUtils {
                     new net.sf.jsqlparser.schema.Column(
                             new net.sf.jsqlparser.schema.Table(), propertyName));
             orderByElements.add(orderByElement);
-            for(Object el : parsedQueryString.getOrderByElements()) {
-                OrderByElement toAdd = (OrderByElement) el;
-                if(toAdd.getExpression() instanceof net.sf.jsqlparser.schema.Column) {
-                    net.sf.jsqlparser.schema.Column column = (net.sf.jsqlparser.schema.Column) toAdd.getExpression();
-                    if(StringUtils.isEmpty(column.getTable().getName()) && propertyName.equals(column.getColumnName())) {
-                        continue; //do not add
+            if(parsedQueryString.getOrderByElements() != null) {
+                for(Object el : parsedQueryString.getOrderByElements()) {
+                    OrderByElement toAdd = (OrderByElement) el;
+                    if(toAdd.getExpression() instanceof net.sf.jsqlparser.schema.Column) {
+                        net.sf.jsqlparser.schema.Column column = (net.sf.jsqlparser.schema.Column) toAdd.getExpression();
+                        if(StringUtils.isEmpty(column.getTable().getName()) && propertyName.equals(column.getColumnName())) {
+                            continue; //do not add
+                        }
                     }
+                    orderByElements.add(toAdd);
                 }
-                orderByElements.add(toAdd);
             }
             parsedQueryString.setOrderByElements(orderByElements);
         }

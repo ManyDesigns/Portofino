@@ -47,12 +47,11 @@ div#hd h1 a {
 }
 
 .navbar-fixed-top a {
-    /*color: #aaddff;*/
     color: #ffffff;
 }
 
 .navbar-fixed-top {
-    color: #eeeeee;
+    color: #ffffff;
 }
 
 div#responseTime, div#globalLinks {
@@ -398,6 +397,10 @@ Search form
 .search_results.withSearchForm {
     padding-right: 1em;
     border-right: 1px solid #AAAAAA;
+}
+
+.search_results th a {
+    color: #000000;
 }
 
 .searchFormButtons {

@@ -4,7 +4,11 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction" %>
+<%@ page import="net.sourceforge.stripes.util.UrlBuilder" %>
 <%@ page import="java.io.Writer" %>
+<%@ page import="java.util.Locale" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
 <%@ page language="java" %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"/>
 <c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
@@ -25,6 +29,7 @@
     <%  } %>
     <input type="hidden" name="sortProperty" value="${actionBean.sortProperty}" />
     <input type="hidden" name="sortDirection" value="${actionBean.sortDirection}" />
+    <input type="hidden" name="eventName" value="${actionBean.context.eventName}" />
     <script type="text/javascript">
         $("#portlet_${pageId} .search_results button[name=bulkDelete]").click(function() {
             return confirm ('<fmt:message key="commons.confirm" />');
@@ -134,8 +139,16 @@
 
     private String getLinkToPage(AbstractCrudAction actionBean, int page) {
         int rowsPerPage = actionBean.getCrudConfiguration().getRowsPerPage();
-        return actionBean.getDispatch().getAbsoluteOriginalPath() +
-                "?firstResult=" + (page * rowsPerPage) +
-                "&maxResults=" + rowsPerPage;
+        Map<String, Object> parameters = new HashMap<String, Object>(actionBean.getContext().getRequest().getParameterMap());
+        parameters.put("sortProperty", actionBean.getSortProperty());
+        parameters.put("sortDirection", actionBean.getSortDirection());
+        parameters.put("firstResult", page * rowsPerPage);
+        parameters.put("maxResults", rowsPerPage);
+        parameters.put(AbstractCrudAction.SEARCH_STRING_PARAM, actionBean.getSearchString());
+
+        UrlBuilder urlBuilder =
+                new UrlBuilder(Locale.getDefault(), actionBean.getDispatch().getAbsoluteOriginalPath(), false)
+                        .addParameters(parameters);
+        return urlBuilder.toString();
     }
 %>

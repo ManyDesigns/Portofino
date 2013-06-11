@@ -1064,6 +1064,46 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
+    protected void configureSortLinks(TableFormBuilder tableFormBuilder) {
+        for(PropertyAccessor propertyAccessor : classAccessor.getProperties()) {
+            String propName = propertyAccessor.getName();
+            String sortDirection;
+            if(propName.equals(sortProperty) && "asc".equals(this.sortDirection)) {
+                sortDirection = "desc";
+            } else {
+                sortDirection = "asc";
+            }
+
+            Map<String, Object> parameters = new HashMap<String, Object>(context.getRequest().getParameterMap());
+            parameters.put("sortProperty", propName);
+            parameters.put("sortDirection", sortDirection);
+            parameters.remove("firstResult");
+            parameters.remove("maxResults");
+            parameters.put(context.getEventName(), "");
+            parameters.put(SEARCH_STRING_PARAM, searchString);
+
+            UrlBuilder urlBuilder =
+                    new UrlBuilder(Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
+                            .addParameters(parameters);
+
+            XhtmlBuffer xb = new XhtmlBuffer();
+            xb.openElement("a");
+            xb.addAttribute("class", "sort-link");
+            xb.addAttribute("href", urlBuilder.toString());
+            xb.writeNoHtmlEscape("%{label}");
+            if(propName.equals(sortProperty)) {
+                xb.openElement("i");
+                xb.addAttribute("class", "icon-chevron-" + ("desc".equals(sortDirection) ? "up" : "down"));
+                xb.closeElement("i");
+            }
+            xb.closeElement("a");
+            OgnlTextFormat hrefFormat = OgnlTextFormat.create(xb.toString());
+            String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
+            hrefFormat.setEncoding(encoding);
+            tableFormBuilder.configHeaderTextFormat(propName, hrefFormat);
+        }
+    }
+
     protected TableForm buildTableForm(TableFormBuilder tableFormBuilder) {
         TableForm tableForm = tableFormBuilder.build();
 
@@ -1094,6 +1134,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
 
         configureDetailLink(tableFormBuilder);
+        configureSortLinks(tableFormBuilder);
 
         return tableFormBuilder;
     }

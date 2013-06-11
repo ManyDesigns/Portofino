@@ -53,6 +53,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
     // Fields
     //**************************************************************************
 
+    protected final Map<String, TextFormat> headerTextFormats;
     protected final Map<String, TextFormat> hrefTextFormats;
     protected final Map<String, TextFormat> titleTextFormats;
 
@@ -76,6 +77,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
     public TableFormBuilder(ClassAccessor classAccessor) {
         super(classAccessor);
 
+        headerTextFormats = new HashMap<String, TextFormat>();
         hrefTextFormats = new HashMap<String, TextFormat>();
         titleTextFormats = new HashMap<String, TextFormat>();
         rowSelectionProviders = new ArrayList<Map<String[], SelectionProvider>>(nRows);
@@ -162,6 +164,12 @@ public class TableFormBuilder extends AbstractFormBuilder {
         return true;
     }
 
+    public TableFormBuilder configHeaderTextFormat(
+            String fieldName, TextFormat hrefTextFormat) {
+        headerTextFormats.put(fieldName, hrefTextFormat);
+        return this;
+    }
+
     public TableFormBuilder configHrefTextFormat(
             String fieldName, TextFormat hrefTextFormat) {
         hrefTextFormats.put(fieldName, hrefTextFormat);
@@ -211,6 +219,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
     protected void setupColumns(TableForm tableForm) {
         for (TableForm.Column column : tableForm.getColumns()) {
             String propertyName = column.getPropertyAccessor().getName();
+            column.setHeaderTextFormat(headerTextFormats.get(propertyName));
             column.setHrefTextFormat(hrefTextFormats.get(propertyName));
             column.setTitleTextFormat(titleTextFormats.get(propertyName));
         }

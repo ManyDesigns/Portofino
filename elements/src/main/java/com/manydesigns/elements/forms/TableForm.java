@@ -29,12 +29,15 @@ import com.manydesigns.elements.fields.FieldUtils;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Array;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -104,7 +107,16 @@ public class TableForm implements Element {
             if (column.title != null) {
                 xb.addAttribute("title", column.title);
             }
-            xb.write(column.getActualLabel());
+            PropertyAccessor property = column.getPropertyAccessor();
+            xb.addAttribute("data-property-name", property.getName());
+            if(column.headerTextFormat != null) {
+                Map<String, Object> formatParameters = new HashMap<String, Object>();
+                formatParameters.put("label", StringEscapeUtils.escapeHtml(column.getActualLabel()));
+                formatParameters.put("property", property);
+                xb.writeNoHtmlEscape(column.headerTextFormat.format(formatParameters));
+            } else {
+                xb.write(column.getActualLabel());
+            }
             xb.closeElement("th");
         }
         xb.closeElement("tr");
@@ -360,6 +372,7 @@ public class TableForm implements Element {
 
         protected String label;
         protected String title;
+        protected TextFormat headerTextFormat;
         protected TextFormat hrefTextFormat;
         protected TextFormat titleTextFormat;
 
@@ -401,6 +414,14 @@ public class TableForm implements Element {
             } else {
                 return label;
             }
+        }
+
+        public TextFormat getHeaderTextFormat() {
+            return headerTextFormat;
+        }
+
+        public void setHeaderTextFormat(TextFormat headerTextFormat) {
+            this.headerTextFormat = headerTextFormat;
         }
 
         public TextFormat getHrefTextFormat() {
