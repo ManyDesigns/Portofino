@@ -148,15 +148,15 @@ function htmlEscape (string) {
 
 $(function() {
     //Enable AJAX paginators
-    $(".pagination").each(function(index, elem) {
+    $(".portofino-datatable").each(function(index, elem) {
         function setupPaginator(elem) {
             elem.find("a.paginator-link").click(function() {
                 $.ajax($(this).attr("href") + "&getSearchResultsPage=", {
                     dataType: "html",
                     success: function(data, status, xhr) {
-                        var targetId = "#" + elem.data("for");
-                        $(targetId).replaceWith(data);
-                        setupPaginator($(targetId).find(".pagination"));
+                        var targetId = "#" + elem.attr("id");
+                        elem.replaceWith(data);
+                        setupPaginator($(targetId));
                     },
                     error: function(xhr, status, errorThrown) {
                         alert("There was an error fetching the requested data")

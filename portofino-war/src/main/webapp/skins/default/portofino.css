@@ -47,7 +47,8 @@ div#hd h1 a {
 }
 
 .navbar-fixed-top a {
-    color: #aaddff;
+    /*color: #aaddff;*/
+    color: #ffffff;
 }
 
 .navbar-fixed-top {
