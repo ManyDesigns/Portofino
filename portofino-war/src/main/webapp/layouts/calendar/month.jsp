@@ -105,9 +105,7 @@
 <div>
     <div class="pull-right" >
         <button type="submit" name="agendaView" class="btn btn-small">
-            <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-e"></span>
             <fmt:message key="calendar.agendaView" />
-            <span class="ui-button-icon-secondary ui-icon ui-icon-carat-1-e"></span>
         </button>
     </div>
     <div>
@@ -119,12 +117,12 @@
             <fmt:message key="calendar.currentMonth" />
         </button>
         <button type="submit" name="prevMonth" class="btn btn-small">
-            <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-w"></span>
+            <i class="icon-chevron-left"></i>
             <fmt:message key="calendar.previous" />
         </button>
         <button type="submit" name="nextMonth" class="btn btn-small">
-            <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-e"></span>
             <fmt:message key="calendar.next" />
+            <i class="icon-chevron-right"></i>
         </button>
     </div>
 </div>
