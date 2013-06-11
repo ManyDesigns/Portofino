@@ -47,7 +47,7 @@
 %>
 <style type="text/css">
     .calendar-container {
-        position: relative; height: <%= maxEventsPerCell * 120 + 120 %>px;
+        position: relative; height: <%= ((maxEventsPerCell + 1) * 22) * 6 %>px;
     }
     .days-table td, .days-table th {
         margin: 0; padding: 0 0 0 10px; border: none; text-align: left;
@@ -89,7 +89,7 @@
         padding: 0 0 3px 10px; border: none; text-align: left;
     }
     .event {
-        padding: 0 0 0 8px; white-space: nowrap; overflow: hidden;
+        padding: 0 0 0 4px; white-space: nowrap; overflow: hidden;
     }
     .event a {
         color: #222222;
@@ -101,40 +101,28 @@
         display: none;
     }
 </style>
-<script type="text/javascript">
-    $(function() {
-        $( ".event-dialog" ).dialog({ autoOpen: false });
-    });
-</script>
-<div class="yui-gc" style="width: 100%;">
-    <div class="yui-u first">
+<h3><%= StringUtils.capitalize(monthFormatter.print(monthView.getReferenceDateTime())) %></h3>
+<div>
+    <div class="pull-right" >
+        <button type="submit" name="agendaView" class="btn btn-small">
+            <fmt:message key="calendar.agendaView" />
+        </button>
+    </div>
+    <div>
         <%
             Interval monthInterval = monthView.getMonthInterval();
             boolean todayDisabled = monthInterval.contains(new DateTime());
         %>
-        <button type="submit" name="today" <%= todayDisabled ? "disabled='true'" : "" %>
-                class="ui-button ui-widget <%= todayDisabled ? "ui-state-disabled" : "ui-state-default" %> ui-corner-all ui-button-text-only">
-            <span class="ui-button-text"><fmt:message key="calendar.currentMonth" /></span>
+        <button type="submit" name="today" class="btn btn-small"<%= todayDisabled ? " disabled='true'" : "" %>>
+            <fmt:message key="calendar.currentMonth" />
         </button>
-        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary"
-                type="submit" name="prevMonth" role="button" aria-disabled="false">
-            <span class="ui-button-icon-primary ui-icon ui-icon-carat-1-w"></span>
-            <span class="ui-button-text"><fmt:message key="calendar.previous" /></span>
+        <button type="submit" name="prevMonth" class="btn btn-small">
+            <i class="icon-chevron-left"></i>
+            <fmt:message key="calendar.previous" />
         </button>
-        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-secondary"
-                         type="submit" name="nextMonth" role="button" aria-disabled="false">
-            <span class="ui-button-text"><fmt:message key="calendar.next" /></span>
-            <span class="ui-button-icon-secondary ui-icon ui-icon-carat-1-e"></span>
-        </button>
-        <span style="margin-left: 1em;">
-            <h3 style="margin: 0; display: inline;"><%= StringUtils.capitalize(monthFormatter.print(monthView.getReferenceDateTime())) %></h3>
-        </span>
-    </div>
-    <div class="yui-u" style="text-align: right">
-        <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-secondary"
-                         type="submit" name="agendaView" role="button" aria-disabled="false">
-            <span class="ui-button-text"><fmt:message key="calendar.agendaView" /></span>
-            <span class="ui-button-icon-secondary ui-icon ui-icon-carat-1-e"></span>
+        <button type="submit" name="nextMonth" class="btn btn-small">
+            <fmt:message key="calendar.next" />
+            <i class="icon-chevron-right"></i>
         </button>
     </div>
 </div>
@@ -261,12 +249,50 @@
             dialogId = "more-events-dialog-" + day.getDayStart().getMillis();
             xhtmlBuffer.openElement("div");
             xhtmlBuffer.addAttribute("id", dialogId);
-            xhtmlBuffer.addAttribute("class", "event-dialog");
+            xhtmlBuffer.addAttribute("class", "modal hide");
+            xhtmlBuffer.addAttribute("tabindex", "-1");
+            xhtmlBuffer.addAttribute("role", "dialog");
+            xhtmlBuffer.addAttribute("aria-hidden", "true");
+
+            // modal-header
+            xhtmlBuffer.openElement("div");
+            xhtmlBuffer.addAttribute("class", "modal-header");
+
+            xhtmlBuffer.openElement("button");
+            xhtmlBuffer.addAttribute("type", "button");
+            xhtmlBuffer.addAttribute("class", "close");
+            xhtmlBuffer.addAttribute("data-dismiss", "modal");
+            xhtmlBuffer.addAttribute("aria-hidden", "true");
+            xhtmlBuffer.writeNoHtmlEscape("&times;");
+            xhtmlBuffer.closeElement("button");
+
+            xhtmlBuffer.openElement("h3");
+            xhtmlBuffer.write(resourceBundle.getString("calendar.more.events"));
+            xhtmlBuffer.closeElement("h3");
+            xhtmlBuffer.closeElement("div"); // modal-header
+
+
+            // modal-body
+            xhtmlBuffer.openElement("div");
+            xhtmlBuffer.addAttribute("class", "modal-body");
             int howMany = Math.min(eventsOfTheDay.size(), maxExtraEvents);
             for(int i = maxEventsPerCell - 1; i < howMany; i++) {
                 writeEventDiv(monthView, day, dayOfWeek, i, xhtmlBuffer, resourceBundle);
             }
-            xhtmlBuffer.closeElement("div");
+            xhtmlBuffer.closeElement("div"); // modal-body
+
+            // modal-footer
+            xhtmlBuffer.openElement("div");
+            xhtmlBuffer.addAttribute("class", "modal-footer");
+            xhtmlBuffer.openElement("button");
+            xhtmlBuffer.addAttribute("class", "btn btn-primary");
+            xhtmlBuffer.addAttribute("data-dismiss", "modal");
+            xhtmlBuffer.addAttribute("aria-hidden", "true");
+            xhtmlBuffer.write(resourceBundle.getString("commons.close"));
+            xhtmlBuffer.closeElement("button");
+            xhtmlBuffer.closeElement("div"); // modal-footer
+
+            xhtmlBuffer.closeElement("div"); // modal
         } else if(more == 1) {
             EventWeek eventWeek = eventsOfTheDay.get(eventsOfTheDay.size() - 1);
             //Event content
@@ -280,8 +306,8 @@
         }
         if(dialogId != null) {
             xhtmlBuffer.openElement("a");
-            xhtmlBuffer.addAttribute("href", "#");
-            xhtmlBuffer.addAttribute("onclick", "$('#" + dialogId + "').dialog('open'); return false;");
+            xhtmlBuffer.addAttribute("href", "#" + dialogId);
+            xhtmlBuffer.addAttribute("data-toggle", "modal");
             xhtmlBuffer.write(MessageFormat.format(resourceBundle.getString("calendar.moreEvents"), more));
             xhtmlBuffer.closeElement("a");
         }
@@ -295,19 +321,43 @@
         Event event = eventWeek.getEvent();
         Locale locale = resourceBundle.getLocale();
         String dialogId = "event-dialog-" + event.getId();
+        String dialogLabelId = "event-dialog-label-" + event.getId();
 
+        // modal
         xhtmlBuffer.openElement("div");
         xhtmlBuffer.addAttribute("id", dialogId);
-        xhtmlBuffer.addAttribute("class", "event-dialog");
+        xhtmlBuffer.addAttribute("class", "modal hide");
+        xhtmlBuffer.addAttribute("tabindex", "-1");
+        xhtmlBuffer.addAttribute("role", "dialog");
+        xhtmlBuffer.addAttribute("aria-hidden", "true");
+        xhtmlBuffer.addAttribute("aria-labelledby", dialogLabelId);
+
+        // modal-header
+        xhtmlBuffer.openElement("div");
+        xhtmlBuffer.addAttribute("class", "modal-header");
+
+        xhtmlBuffer.openElement("button");
+        xhtmlBuffer.addAttribute("type", "button");
+        xhtmlBuffer.addAttribute("class", "close");
+        xhtmlBuffer.addAttribute("data-dismiss", "modal");
+        xhtmlBuffer.addAttribute("aria-hidden", "true");
+        xhtmlBuffer.writeNoHtmlEscape("&times;");
+        xhtmlBuffer.closeElement("button");
+
         xhtmlBuffer.openElement("h3");
+        xhtmlBuffer.addAttribute("id", dialogLabelId);
         if(event.getReadUrl() != null) {
             xhtmlBuffer.writeAnchor(event.getReadUrl(), event.getDescription());
         } else {
             xhtmlBuffer.write(event.getDescription());
         }
         xhtmlBuffer.closeElement("h3");
+        xhtmlBuffer.closeElement("div"); // modal-header
 
+        // modal-body
         //Print time interval
+        xhtmlBuffer.openElement("div");
+        xhtmlBuffer.addAttribute("class", "modal-body");
         xhtmlBuffer.openElement("p");
         String timeDescription;
         DateTimeFormatter startFormatter =
@@ -342,8 +392,20 @@
         xhtmlBuffer.addAttribute("style", "font-weight: bold; color: " + event.getCalendar().getForegroundHtmlColor());
         xhtmlBuffer.write(event.getCalendar().getName());
         xhtmlBuffer.closeElement("p");
+        xhtmlBuffer.closeElement("div"); // modal-body
 
-        xhtmlBuffer.closeElement("div");
+        // modal-footer
+        xhtmlBuffer.openElement("div");
+        xhtmlBuffer.addAttribute("class", "modal-footer");
+        xhtmlBuffer.openElement("button");
+        xhtmlBuffer.addAttribute("class", "btn btn-primary");
+        xhtmlBuffer.addAttribute("data-dismiss", "modal");
+        xhtmlBuffer.addAttribute("aria-hidden", "true");
+        xhtmlBuffer.write(resourceBundle.getString("commons.close"));
+        xhtmlBuffer.closeElement("button");
+        xhtmlBuffer.closeElement("div"); // modal-footer
+
+        xhtmlBuffer.closeElement("div"); // modal
         return dialogId;
     }
 
@@ -419,8 +481,9 @@
         } else {
             xhtmlBuffer.addAttribute("style", "float: left;");
         }
-        xhtmlBuffer.addAttribute("href", "#");
-        xhtmlBuffer.addAttribute("onclick", "$('#" + dialogId + "').dialog('open'); return false;");
+        xhtmlBuffer.addAttribute("href", "#" + dialogId);
+        xhtmlBuffer.addAttribute("data-toggle", "modal");
+//        xhtmlBuffer.addAttribute("onclick", "$('#" + dialogId + "').modal(); return false;");
         if(start.getMillisOfDay() > 0) {
             xhtmlBuffer.write(hhmmFormatter.print(start) + " ");
         }
@@ -469,8 +532,9 @@
         xhtmlBuffer.openElement("div");
         xhtmlBuffer.openElement("a");
         xhtmlBuffer.addAttribute("style", "font-weight: bold; color: " + event.getCalendar().getForegroundHtmlColor());
-        xhtmlBuffer.addAttribute("href", "#");
-        xhtmlBuffer.addAttribute("onclick", "$('#" + dialogId + "').dialog('open'); return false;");
+        xhtmlBuffer.addAttribute("href", "#" + dialogId);
+        xhtmlBuffer.addAttribute("data-toggle", "modal");
+//        xhtmlBuffer.addAttribute("onclick", "$('#" + dialogId + "').modal(); return false;");
         if(start.getMillisOfDay() > 0) {
             xhtmlBuffer.write(hhmmFormatter.print(start) + " ");
         }
