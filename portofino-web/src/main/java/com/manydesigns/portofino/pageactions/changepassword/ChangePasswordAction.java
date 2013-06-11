@@ -106,7 +106,7 @@ public class ChangePasswordAction extends AbstractPageAction {
         form.readFromObject(this);
     }
 
-    @Button(list = "changepassword", key = "commons.ok")
+    @Button(list = "changepassword", key = "commons.ok", order = 1, primary = true)
     public Resolution change() {
         prepareForm();
         if(!isConfigurationValid()) {
@@ -145,7 +145,8 @@ public class ChangePasswordAction extends AbstractPageAction {
     @Override
     @Buttons({
         @Button(list = "configuration", key = "commons.cancel", order = 99),
-        @Button(list = "changepassword",  key = "commons.cancel", order = 99)})
+        @Button(list = "changepassword",  key = "commons.cancel", order = 99)
+    })
     public Resolution cancel() {
         return super.cancel();
     }

@@ -14,10 +14,8 @@
         </title>
     </head>
     <body>
+    <jsp:include page="header.jsp"/>
     <div class="container">
-        <div class="row">
-            <jsp:include page="header.jsp"/>
-        </div>
         <div class="row">
             <div class="span2 portofino-sidebar">
                 <div id="navigation">

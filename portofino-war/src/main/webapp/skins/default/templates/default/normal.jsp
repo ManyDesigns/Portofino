@@ -17,10 +17,8 @@
         <title><c:out value="${actionBean.dispatch.lastPageInstance.page.description}"/></title>
     </head>
     <body class="yui-skin-sam">
+    <jsp:include page="../../header.jsp"/>
     <div class="container">
-        <div class="row">
-            <jsp:include page="../../header.jsp"/>
-        </div>
         <div class="row">
             <div class="span2 portofino-sidebar">
                 <portofino:portlets list="aboveNavigation" />
@@ -81,10 +79,8 @@
                 <stripes:layout-component name="contentFooter" />
             </div>
         </div>
-        <div class="row">
-            <jsp:include page="../../footer.jsp"/>
-        </div>
     </div>
+    <jsp:include page="../../footer.jsp"/>
     </body>
     </html>
 </stripes:layout-definition>

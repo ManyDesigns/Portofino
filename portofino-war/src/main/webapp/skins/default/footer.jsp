@@ -7,8 +7,12 @@
              type="org.apache.commons.configuration.Configuration"/>
 <jsp:useBean id="stopWatch" scope="request"
              type="org.apache.commons.lang.time.StopWatch"/>
-<div id="responseTime">
-    <fmt:message key="skins.default.footer.response_time"/>: <c:out value="${stopWatch.time}"/> ms.
-</div>
-Powered by <a href="http://www.manydesigns.com/">Portofino</a>
-<c:out value="${mde:getString(portofinoConfiguration, 'portofino.version')}"/>
+<footer>
+    <div class="container">
+        <div id="responseTime">
+            <fmt:message key="skins.default.footer.response_time"/>: <c:out value="${stopWatch.time}"/> ms.
+        </div>
+        Powered by <a href="http://www.manydesigns.com/">Portofino</a>
+        <c:out value="${mde:getString(portofinoConfiguration, 'portofino.version')}"/>
+    </div>
+</footer>

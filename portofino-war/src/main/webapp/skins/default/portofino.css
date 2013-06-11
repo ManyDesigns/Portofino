@@ -32,52 +32,30 @@ fieldset table {
 }
 
 /*******************************************************************************
-jQuery ui smoothness theme overrides
-*******************************************************************************/
-
-.ui-widget { font-family: Arial,sans-serif; font-size: 1em; }
-.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Arial,sans-serif; font-size: 1em; }
-
-.ui-button-text-only .ui-button-text { padding: .1em .5em; }
-.ui-button-icon-only .ui-button-text, .ui-button-icons-only .ui-button-text { padding: 0; text-indent: -9999999px; }
-
-.ui-button-text-icon-primary .ui-button-text {
-    padding: .1em 0.5em .1em 1.6em;
-}
-
-.ui-button-text-icon-secondary .ui-button-text,
-.ui-button-text-icons .ui-button-text {
-    padding: .1em 1.6em .1em 0.5em;
-}
-
-input.ui-button { padding: .1em .5em; }
-
-button.ui-button-icon-only { width: 1.6em; }
-
-.ui-dialog-content {
-    text-align: left;
-}
-
-/*******************************************************************************
 Header / footer
 *******************************************************************************/
 
-#hd-title {
-    min-height: 3em;
+body {
+    padding-top: 50px;
 }
 
-div#hd-title h1 {
-    margin-bottom: 0.5em;
-}
-
-div#ft {
-    padding-top: .5em;
-    border-top: 1px solid gray;
-    margin-top: 1em;
+footer {
+    background-color: #F5F5F5;
+    border-top: 1px solid #E5E5E5;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 div#hd h1 a {
     color: #166bbf;
+}
+
+.navbar-fixed-top a {
+    color: #aaddff;
+}
+
+.navbar-fixed-top {
+    color: #eeeeee;
 }
 
 div#responseTime, div#globalLinks {
@@ -578,6 +556,10 @@ li.group, li.groupPlaceholder {
 
 .table.mde-table-form th, .table.mde-table-form td {
     vertical-align: middle;
+}
+
+label.control-label.mde-password-confirm-label {
+    display: inline; float: none; margin-left: 1em; margin-right: 1em;
 }
 
 /*******************************************************************************
