@@ -18,9 +18,9 @@
                value='<%= actionBean.getDispatch().getAbsoluteOriginalPath() + "?" + request.getQueryString() %>' />
         <input type="hidden" name="CKEditorFuncNum" value='${actionBean.CKEditorFuncNum}' />
         <fmt:message key="layouts.text.browse.pages"/>:
-        <button class="ui-button ui-widget ui-state-default ui-corner-all contentButton ui-button-text-only"
+        <button class="btn contentButton"
                 type="submit" name="browsePages" role="button" aria-disabled="false">
-            <span class="ui-button-text"><fmt:message key="layouts.text.browse"/></span></button>
+            <fmt:message key="layouts.text.browse"/></span>
     </form>
 <% } %>
 <c:if test="${not empty actionBean.textConfiguration.attachments}">

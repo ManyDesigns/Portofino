@@ -47,16 +47,11 @@
                 margin: 0 3px 3px;
                 padding: 0.4em 0.4em 0.4em 1.5em;
             }
-
-            legend .ui-button-text {
-                font-size: 0.83em;
-            }
         </style>
         <script type="text/javascript">
             $(function() {
-                $("#tabs").tabs();
                 <c:if test="${not empty actionBean.selectedTabId}">
-                    $("#tabs").tabs("select", '<c:out value="${actionBean.selectedTabId}" />');
+                    $("#tabs a[href=#<c:out value="${actionBean.selectedTabId}" />]").tab("show");
                 </c:if>
                 var theSortable = $("#sortable");
                 theSortable.sortable();
@@ -99,12 +94,16 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <div id="tabs">
-            <ul>
-                <li><a href="#tab-table-columns"><fmt:message key="layouts.admin.tables.tableAndColumns" /></a></li>
-                <li><a href="#tab-fk-sp"><fmt:message key="layouts.admin.tables.editTable.foreignKeysAndSelectionProviders" /></a></li>
-            </ul>
-            <div id="tab-table-columns">
+        <ul id="tabs" class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#tab-table-columns">
+                <fmt:message key="layouts.admin.tables.tableAndColumns" />
+            </a></li>
+            <li><a data-toggle="tab" href="#tab-fk-sp">
+                <fmt:message key="layouts.admin.tables.editTable.foreignKeysAndSelectionProviders" />
+            </a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="tab-table-columns" class="tab-pane fade in active">
                 <mde:write name="actionBean" property="tableForm" />
                 <%-- <span id="editShortNameButton"><portofino:buttons list="table-edit-short-name" cssClass="portletButton" /></span> --%>
                 <br />
@@ -112,9 +111,9 @@
                     <fieldset>
                         <legend>
                             <fmt:message key="layouts.admin.tables.editTable.columns" />
-                            <button class="ui-button ui-widget ui-state-default ui-corner-all portletButton ui-button-text-only sortButton"
+                            <button class="btn portletButton sortButton"
                                 type="button" role="button" aria-disabled="false">
-                                <span class="ui-button-text"><fmt:message key="layouts.admin.tables.changeOrder" /></span>
+                                <fmt:message key="layouts.admin.tables.changeOrder" />
                             </button>
                         </legend>
                         <div style="margin-top: 1em;">
@@ -124,13 +123,13 @@
                             <div id="sortableContainer">
                                 <fmt:message key="layouts.admin.tables.changeOrder.help" />
                                 <br /><br />
-                                <button class="ui-button ui-widget ui-state-default ui-corner-all portletButton ui-button-text-only confirmSortButton"
+                                <button class="btn portletButton confirmSortButton"
                                         type="button" role="button" aria-disabled="false">
-                                    <span class="ui-button-text"><fmt:message key="commons.ok" /></span>
+                                    <fmt:message key="commons.ok" />
                                 </button>
-                                <button class="ui-button ui-widget ui-state-default ui-corner-all portletButton ui-button-text-only cancelSortButton"
+                                <button class="btn portletButton cancelSortButton"
                                         type="button" role="button" aria-disabled="false">
-                                    <span class="ui-button-text"><fmt:message key="commons.cancel" /></span>
+                                    <fmt:message key="commons.cancel" />
                                 </button>
                                 <ul id="sortable">
                                     <c:forEach var="col" items="${actionBean.decoratedColumns}" varStatus="status">
@@ -145,7 +144,7 @@
                     </fieldset>
                 </div>
             </div>
-            <div id="tab-fk-sp">
+            <div id="tab-fk-sp" class="tab-pane fade in">
                 <div class="tableForm">
                     <fieldset>
                         <legend><fmt:message key="layouts.admin.tables.editTable.foreignKeys" /></legend>

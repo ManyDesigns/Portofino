@@ -16,13 +16,16 @@
             <%} catch (Throwable t) {
                 LoggerFactory.getLogger(actionBean.getClass()).error("Error in included page", t);
             %>
-                <ul class="errorMessages">
-                    <li>
-                        <fmt:message key="portlet.view.error">
-                            <fmt:param value="${portletInstance.jsp}" />
-                        </fmt:message>
-                    </li>
-                </ul>
+                <div class="alert alert-error">
+                    <button data-dismiss="alert" class="close" type="button">&times;</button>
+                    <ul class="errorMessages">
+                        <li>
+                            <fmt:message key="portlet.view.error">
+                                <fmt:param value="${portletInstance.jsp}" />
+                            </fmt:message>
+                        </li>
+                    </ul>
+                </div>
             <%}%>
         </div>
     </c:forEach>

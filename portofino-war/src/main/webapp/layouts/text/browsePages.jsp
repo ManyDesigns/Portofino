@@ -18,12 +18,12 @@
                         <c:out value='${actionBean.CKEditorFuncNum}'/>,
                         $('#iframe').prop('contentWindow').location.href
                     ); window.close();"
-            class="contentButton">
-        <span class="ui-button-text">Choose</span>
+            class="btn contentButton">
+        Choose
     </button>
     <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
-    <button name="cancel" type="submit" class="contentButton">
-        <span class="ui-button-text">Cancel</span>
+    <button name="cancel" type="submit" class="btn contentButton">
+        Cancel
     </button>
 </form>
 <iframe src="${actionBean.dispatch.absoluteOriginalPath}" id="iframe"
@@ -35,12 +35,12 @@
                         <c:out value='${actionBean.CKEditorFuncNum}'/>,
                         $('#iframe').prop('contentWindow').location.href
                     ); window.close();"
-            class="contentButton">
-        <span class="ui-button-text">Choose</span>
+            class="btn contentButton">
+        Choose
     </button>
     <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
-    <button name="cancel" type="submit" class="contentButton">
-        <span class="ui-button-text">Cancel</span>
+    <button name="cancel" type="submit" class="btn contentButton">
+        Cancel
     </button>
 </form>
 </body>

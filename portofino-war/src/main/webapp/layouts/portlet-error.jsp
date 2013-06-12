@@ -23,13 +23,16 @@
                 pageContext.setAttribute("exceptionString", "unknown");
             }
         %>
-        <ul class="errorMessages">
-            <li>
-                <fmt:message key="portlet.exception">
-                    <fmt:param value="${exceptionString}" />
-                </fmt:message>
-            </li>
-        </ul>
+        <div class="alert alert-error">
+            <button data-dismiss="alert" class="close" type="button">&times;</button>
+            <ul class="errorMessages">
+                <li>
+                    <fmt:message key="portlet.exception">
+                        <fmt:param value="${exceptionString}" />
+                    </fmt:message>
+                </li>
+            </ul>
+        </div>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter" />
 </stripes:layout-render>
