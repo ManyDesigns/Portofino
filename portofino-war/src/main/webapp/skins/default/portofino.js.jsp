@@ -154,8 +154,10 @@ $(function() {
                 var href = $(this).attr("href");
                 var eventName = elem.find("input[name=eventName]").val();
                 if(eventName && !(eventName.length == 0)) {
-                    href = href.replace(eventName + "=&", "");
-                    href = href.replace(eventName + "=", "");
+                    href = href.replace("?" + eventName + "=&", "?");
+                    href = href.replace("&" + eventName + "=&", "&");
+                    href = href.replace("?" + eventName + "=", "?");
+                    href = href.replace("&" + eventName + "=", "&");
                 }
                 $.ajax(href + "&getSearchResultsPage=", {
                     dataType: "html",

@@ -18,6 +18,7 @@ import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import com.manydesigns.portofino.actions.admin.appwizard.User
 
 public class Security extends AbstractApplicationRealmDelegate {
 
@@ -215,12 +216,3 @@ public class Security extends AbstractApplicationRealmDelegate {
 
 }
 
-public class User {
-
-    String username;
-    Serializable databaseId;
-
-    public String toString() {
-        return username
-    }
-}
