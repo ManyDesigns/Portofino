@@ -437,18 +437,9 @@ div.wizardContent {
     background-color: snow;
 }
 
-
 /*******************************************************************************
-Login
+Treetable
 *******************************************************************************/
-
-div#content-login {
-    margin: 12em auto;
-}
-
-.loginTable {
-    margin: 2em auto;
-}
 
 .treeTable {
     width: 100%;
@@ -467,7 +458,6 @@ div#content-login {
 .treeTable tr.expanded td .expander {
     background-image:url("../../jquery-treetable-2.3.0/toggle-collapse-dark.png");
 }
-
 
 /*******************************************************************************
 Forms

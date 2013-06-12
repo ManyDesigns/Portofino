@@ -16,6 +16,34 @@
             #openid_form { width: auto; }
             #openid_username { margin-right: .5em; }
             div#openid_highlight { padding: 0; }
+
+            body {
+                padding-top: 40px;
+                padding-bottom: 40px;
+                background-color: #f5f5f5;
+            }
+
+            #content-login {
+                padding: 19px 29px 29px;
+                margin: 0 auto 20px;
+                background-color: #ffffff;
+                border: 1px solid #e5e5e5;
+                max-width: 400px;
+                -webkit-border-radius: 5px;
+                   -moz-border-radius: 5px;
+                        border-radius: 5px;
+                -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+                   -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+                        box-shadow: 0 1px 2px rgba(0,0,0,.05);
+            }
+
+            #content-login input[type="text"],
+            #content-login input[type="password"] {
+                font-size: 16px;
+                height: auto;
+                margin-bottom: 15px;
+                padding: 7px 9px;
+            }
         </style>
         <script type="text/javascript" src="<stripes:url value="/openid-selector/js/openid-jquery.js" />"></script>
         <script type="text/javascript" src="<stripes:url value="/skins/${skin}/openid-custom.js"/>"></script>
@@ -59,9 +87,8 @@
     <div class="container">
         <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
         <div class="row">
-            <div class="span3 hidden-phone"></div>
-            <div id="content-login" class="span6 contentBody">
-                <div class="portletWrapper noSpacing well">
+            <div id="content-login" class="container contentBody">
+                <div class="portletWrapper noSpacing">
                     <div class="portlet">
                         <div class="portletHeader">
                             <div>
@@ -78,24 +105,14 @@
                             <stripes:layout-component name="portletBody">
                                 <mde:sessionMessages/>
                                 <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction"
-                                              method="post" class="form-horizontal">
+                                              method="post">
                                     <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
-                                    <div class="control-group">
-                                        <label class="control-label" for="userName"><fmt:message key="skins.default.login.username"/>:</label>
-                                        <div class="controls">
-                                            <stripes:text name="userName" id="userName" />
-                                        </div>
-                                    </div>
-                                    <div class="control-group">
-                                        <label class="control-label" for="pwd">Password:</label>
-                                        <div class="controls">
-                                            <input type="password" name="pwd" id="pwd" />
-                                        </div>
-                                    </div>
-                                    <div class="control-group">
-                                        <div class="controls">
-                                            <portofino:buttons list="login-buttons" cssClass="portletButton" />
-                                        </div>
+                                    <input type="text" name="userName" id="userName" class="input-block-level"
+                                           placeholder="<fmt:message key='skins.default.login.username'/>" />
+                                    <input type="text" name="pwd" id="pwd" class="input-block-level"
+                                           placeholder="<fmt:message key='skins.default.login.password'/>" />
+                                    <div style="text-align: center">
+                                        <portofino:buttons list="login-buttons" cssClass="btn-large portletButton" />
                                     </div>
                                     <!--<c:if test="recoverPwd">
                                         <tr>
