@@ -266,39 +266,28 @@ Error/warning/info messages
 
 ul.errorMessages, ul.warningMessages, ul.infoMessages {
     margin: 0;
-    padding: 12px 0 12px 6px;
+    padding: 0;
     font-weight: normal;
     font-style: italic;
     list-style-type: none;
+    background: no-repeat 0 center;
 }
 
 ul.errorMessages li, ul.warningMessages li, ul.infoMessages li {
     list-style-type: none;
-    padding-left: 28px;
+    padding-left: 30px;
 }
 
 ul.errorMessages {
-    border: 1px dashed #c00;
-    background-color: #fff8f0;
     background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-cross-24.png");
-    background-repeat: no-repeat;
-    background-position: 5px center;
 }
 
 ul.warningMessages {
-    border: 1px dashed #880;
-    background-color: #fffff0;
     background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/warning-24.png");
-    background-repeat: no-repeat;
-    background-position: 5px center;
 }
 
 ul.infoMessages {
-    border: 1px dashed #0a0;
-    background-color: #f0fff0;
     background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-check-24.png");
-    background-repeat: no-repeat;
-    background-position: 5px center;
 }
 
 /*******************************************************************************

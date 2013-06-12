@@ -47,21 +47,35 @@ public class SessionMessagesTag extends TagSupport {
                 com.manydesigns.elements.messages.SessionMessages
                         .consumeInfoMessages();
 
-        if (errorMessages.size() == 0 &&
-                warningMessages.size() == 0 &&
-                infoMessages.size() == 0) {
-            return SKIP_BODY;
+        if(!errorMessages.isEmpty()) {
+            xb.openElement("div");
+            xb.addAttribute("class", "alert alert-error fade in");
+            writeCloseButton(xb);
+            writeList(xb, errorMessages, "errorMessages");
+            xb.closeElement("div");
         }
 
-        xb.openElement("div");
-        xb.addAttribute("class", "userMessages");
+        if(!warningMessages.isEmpty()) {
+            xb.openElement("div");
+            xb.addAttribute("class", "alert fade in");
+            writeCloseButton(xb);
+            writeList(xb, warningMessages, "warningMessages");
+            xb.closeElement("div");
+        }
 
-        writeList(xb, errorMessages, "errorMessages");
-        writeList(xb, warningMessages, "warningMessages");
-        writeList(xb, infoMessages, "infoMessages");
+        if(!infoMessages.isEmpty()) {
+            xb.openElement("div");
+            xb.addAttribute("class", "alert alert-success fade in");
+            writeCloseButton(xb);
+            writeList(xb, infoMessages, "infoMessages");
+            xb.closeElement("div");
+        }
 
-        xb.closeElement("div");
         return SKIP_BODY;
+    }
+
+    private void writeCloseButton(XhtmlBuffer xb) {
+        xb.writeNoHtmlEscape("<button data-dismiss=\"alert\" class=\"close\" type=\"button\">&times;</button>");
     }
 
     private void writeList(XhtmlBuffer xb,
