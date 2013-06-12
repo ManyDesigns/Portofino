@@ -54,7 +54,7 @@
         security.groovy file inherits from com.manydesigns.portofino.shiro.GAEApplicationRealmDelegate and that your
         app.properties file contains the following settings:
 
-            login.link={0}/actions/user/login.gae?login=&amp;returnUrl={1}
+            login.link={0}/actions/user/login.gae?login=&returnUrl={1}
             logout.link={0}/actions/user/login.gae?logout=
 
         Those URLs point to the built-in action com.manydesigns.portofino.actions.GAELoginAction which is mapped to

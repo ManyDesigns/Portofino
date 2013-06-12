@@ -146,18 +146,24 @@ function htmlEscape (string) {
 $(function() {
     //Enable AJAX paginators
     $(".portofino-datatable").each(function(index, elem) {
+        function removeQueryStringArgument(href, arg) {
+            href = href.replace(new RegExp("[?]" + arg + "=[^&]*&", "g"), "?");
+            href = href.replace(new RegExp("[?]" + arg + "=[^&]*", "g"), "");
+            href = href.replace(new RegExp("[&]" + arg + "=[^&]*&", "g"), "&");
+            href = href.replace(new RegExp("[&]" + arg + "=[^&]*", "g"), "");
+            return href;
+        }
+
         function makeLoaderFunction(elem) {
             return function loadLinkHref() {
                 var href = $(this).attr("href");
                 var eventName = elem.find("input[name=eventName]").val();
                 if(eventName && !(eventName.length == 0)) {
-                    href = href.replace("?" + eventName + "=&", "?");
-                    href = href.replace("&" + eventName + "=&", "&");
-                    href = href.replace("?" + eventName + "=", "?");
-                    href = href.replace("&" + eventName + "=", "&");
+                    href = removeQueryStringArgument(href, eventName);
                 }
-                $.ajax(href + "&getSearchResultsPage=", {
-                    dataType: "html",
+                var additionalParameters = (href.indexOf("?") > -1 ? "&" : "?") + "getSearchResultsPage=&ajax=true";
+                $.ajax(href + additionalParameters, {
+                    dataType: "text",
                     success: function(data, status, xhr) {
                         var targetId = "#" + elem.attr("id");
                         elem.replaceWith(data);
@@ -165,8 +171,17 @@ $(function() {
                         setupLinks(target);
                     },
                     error: function(xhr, status, errorThrown) {
-                        //TODO
-                        alert("There was an error fetching the requested data");
+                        if(xhr.status == 403) {
+                            var loginUrl = xhr.responseText;
+                            loginUrl = removeQueryStringArgument(loginUrl, "returnUrl");
+                            loginUrl = removeQueryStringArgument(loginUrl, "cancelReturnUrl");
+                            window.location.href =
+                                    loginUrl + (loginUrl.indexOf("?") > -1 ? "&" : "?") + "returnUrl=" +
+                                    encodeURIComponent(window.location.href);
+                        } else {
+                            //TODO
+                            alert("There was an error fetching the requested data");
+                        }
                     }
                 });
                 return false;

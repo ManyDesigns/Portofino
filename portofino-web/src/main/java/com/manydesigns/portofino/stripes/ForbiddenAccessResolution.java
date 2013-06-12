@@ -27,6 +27,7 @@ import com.manydesigns.portofino.shiro.ShiroUtils;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -73,14 +74,24 @@ public class ForbiddenAccessResolution implements Resolution {
         Map parameters = request.getParameterMap();
         urlBuilder.addParameters(parameters);
         String returnUrl = urlBuilder.toString();
-        if (userId == null){
+        boolean ajax = "true".equals(request.getParameter("ajax"));
+        if (userId == null && !ajax) {
             logger.info("Anonymous user not allowed. Redirecting to login.");
             Application application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
             String loginLink = ShiroUtils.getLoginLink(application, request.getContextPath(), returnUrl, "/");
             new RedirectResolution(loginLink, false).execute(request, response);
         } else {
-            logger.warn("User {} not authorized for url {}.", userId, returnUrl);
-            new ErrorResolution(UNAUTHORIZED, errorMessage).execute(request, response);
+            if(ajax) {
+                logger.debug("AJAX call while user disconnected");
+                Application application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
+                //TODO where to redirect?
+                String loginLink = ShiroUtils.getLoginLink(application, request.getContextPath(), "/", "/");
+                response.setStatus(UNAUTHORIZED);
+                new StreamingResolution("text/plain", loginLink).execute(request, response);
+            } else {
+                logger.warn("User {} not authorized for url {}.", userId, returnUrl);
+                new ErrorResolution(UNAUTHORIZED, errorMessage).execute(request, response);
+            }
         }
     }
 }

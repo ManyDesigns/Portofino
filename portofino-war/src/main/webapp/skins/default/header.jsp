@@ -32,9 +32,9 @@
                     <% if(SecurityLogic.isAdministrator(request)) { %>
                         <stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction"><fmt:message key="skins.default.header.administration"/></stripes:link> -
                     <% } %>
-                    <a href="${logoutLink}"><fmt:message key="skins.default.header.log_out"/></a>
+                    <a href="<c:out value='${logoutLink}' />"><fmt:message key="skins.default.header.log_out"/></a>
                 </c:if><c:if test="<%= !SecurityUtils.getSubject().isAuthenticated() %>">
-                    <a href="${loginLink}"><fmt:message key="skins.default.header.log_in"/></a>
+                    <a href="<c:out value='${loginLink}' />"><fmt:message key="skins.default.header.log_in"/></a>
                 </c:if>
             </div>
             <h4><stripes:link href="/"><c:out value="${app.name}"/></stripes:link></h4>

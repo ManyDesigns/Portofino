@@ -156,11 +156,13 @@ public class LoginAction extends AbstractActionBean {
         if (StringUtils.isEmpty(returnUrl)) {
             returnUrl = "/";
         } else try {
-            new URL(returnUrl);
-            logger.warn("Invalid return URL: " + returnUrl);
-            return new RedirectResolution("/");
+            URL url = new URL(returnUrl);
+            if(!context.getRequest().getServerName().equals(url.getHost())) {
+                logger.warn("Forbidding suspicious return URL: " + returnUrl);
+                return new RedirectResolution("/");
+            }
         } catch (MalformedURLException e) {
-            //Ok, it must not be a URL to avoid possible XSS attacks with returnUrl=http://www.evil.com/hack
+            //Ok, if it is not a full URL there's no risk of XSS attacks with returnUrl=http://www.evil.com/hack
         }
         logger.debug("Redirecting to: {}", returnUrl);
         return new RedirectResolution(returnUrl);
