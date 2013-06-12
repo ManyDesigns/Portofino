@@ -267,20 +267,25 @@ Site: http://jqueryui.com
 Files: jquery-ui directory
 License: MIT
 
+JQuery Treetable
+Site: http://ludo.cubicphuse.nl/jquery-treetable/
+Files: jquery-treetable-3.0.1 directory
+License: MIT
+
 JSON
 Site: http://www.json.org
 File: json-20111031.jar
 License: JSON License (http://www.json.org/license.html)
 
+JSoup
+Site: http://jsoup.org/
+File: jsoup-1.7.1.jar
+License: MIT
+
 JSqlParser
 Site: http://jsqlparser.sourceforge.net/home.php
-File: jsqlparser-0.7.0.jar
+File: jsqlparser-0.8.0.jar
 License: LGPL
-
-jTidy
-Site: http://jtidy.sourceforge.net
-File: Tidy-1.0.jar
-License: MIT
 
 JUnit
 Site: http://junit.sourceforge.net
