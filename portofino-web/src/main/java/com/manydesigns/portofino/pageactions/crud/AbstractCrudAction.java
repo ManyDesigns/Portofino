@@ -1093,7 +1093,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             xb.writeNoHtmlEscape("%{label}");
             if(propName.equals(sortProperty)) {
                 xb.openElement("i");
-                xb.addAttribute("class", "icon-chevron-" + ("desc".equals(sortDirection) ? "up" : "down"));
+                xb.addAttribute("class", "pull-right icon-chevron-" + ("desc".equals(sortDirection) ? "up" : "down"));
                 xb.closeElement("i");
             }
             xb.closeElement("a");

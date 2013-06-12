@@ -154,11 +154,8 @@ $(function() {
                 var href = $(this).attr("href");
                 var eventName = elem.find("input[name=eventName]").val();
                 if(eventName && !(eventName.length == 0)) {
-                    console.log(eventName);
-                    console.log(href);
                     href = href.replace(eventName + "=&", "");
                     href = href.replace(eventName + "=", "");
-                    console.log(href);
                 }
                 $.ajax(href + "&getSearchResultsPage=", {
                     dataType: "html",
@@ -169,7 +166,8 @@ $(function() {
                         setupLinks(target);
                     },
                     error: function(xhr, status, errorThrown) {
-                        alert("There was an error fetching the requested data")
+                        //TODO
+                        alert("There was an error fetching the requested data");
                     }
                 });
                 return false;

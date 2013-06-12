@@ -12,10 +12,16 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <c:if test="${not empty actionBean.searchForm}">
-            <a class="search_form_toggle_link" href="#">
-                <c:if test="${actionBean.searchVisible}"><fmt:message key="layouts.crud.search.hideSearch" /></c:if>
-                <c:if test="${!actionBean.searchVisible}"><fmt:message key="layouts.crud.search.showSearch" /></c:if>
-            </a>
+            <c:if test="${actionBean.searchVisible}">
+                <a class="search_form_toggle_link" href="${actionBean.dispatch.absoluteOriginalPath}">
+                    <fmt:message key="layouts.crud.search.hideSearch" />
+                </a>
+            </c:if>
+            <c:if test="${!actionBean.searchVisible}">
+                <a class="search_form_toggle_link" href="${actionBean.dispatch.absoluteOriginalPath}?search=">
+                    <fmt:message key="layouts.crud.search.showSearch" />
+                </a>
+            </c:if>
             <div class="search_form" <c:if test="${!actionBean.searchVisible}">style="display: none;"</c:if>>
                 <mde:write name="actionBean" property="searchForm"/>
                 <div class="searchFormButtons">
