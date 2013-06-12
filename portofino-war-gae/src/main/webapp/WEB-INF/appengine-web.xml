@@ -15,7 +15,7 @@
         <include path="/ckeditor/**" />
         <include path="/ckeditor-custom/**" />
         <include path="/famfamfam_mini_icons/**" />
-        <include path="/jquery-treetable-2.3.0/**" />
+        <include path="/jquery-treetable-3.0.1/**" />
         <include path="/jquery-ui/**" />
         <include path="/openid-selector/**" />
         <include path="/SweetiePlus-v2-SublinkInteractive/**" />

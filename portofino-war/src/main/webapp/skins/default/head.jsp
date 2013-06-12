@@ -36,7 +36,7 @@
         src="<stripes:url value="/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
 <%-- Twitter Bootstrap --%>
 <script type="text/javascript"
-        src="<stripes:url value="/elements/bootstrap/js/bootstrap.js"/>"></script>
+        src="<stripes:url value="/elements/bootstrap/js/bootstrap.min.js"/>"></script>
 <script type="text/javascript"
         src="<stripes:url value="/elements/datepicker/js/bootstrap-datepicker.js"/>"></script>
 

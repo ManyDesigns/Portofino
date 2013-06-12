@@ -12,12 +12,12 @@
 <stripes:layout-render name="/skins/default/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.TablesAction"/>
     <stripes:layout-component name="customScripts">
-        <script type="text/javascript" src="<%= request.getContextPath() %>/jquery-treetable-2.3.0/jquery.treeTable.min.js" >
+        <script type="text/javascript" src="<%= request.getContextPath() %>/jquery-treetable-3.0.1/jquery.treetable.js" >
         </script>
 
         <script type="text/javascript">
             $(function() {
-                $("#tables").treeTable({"clickableNodeNames": true, "expandable":true, "treeColumn":0, "indent":20 });
+                $("#tables").treetable({"clickableNodeNames": true, "expandable":true, "treeColumn":0, "indent":20 });
                 $("button[name=bulkDelete]").click(function() {
                     return confirm('<fmt:message key="commons.confirm" />');
                 });
@@ -51,8 +51,8 @@
                     if(table.getDatabaseName().equals(lastDatabase)) {
                         if(!table.getSchemaName().equals(lastSchema)) {
                             lastSchema = table.getSchemaName(); %>
-                            <tr id="<%= "node-" + lastDatabase + "---" + lastSchema %>"
-                                class="child-of-node-<%= lastDatabase %>">
+                            <tr data-tt-id="<%= lastDatabase + "---" + lastSchema %>"
+                                data-tt-parent-id="<%= lastDatabase %>">
                                 <td colspan="2"><%= table.getSchemaName() %></td>
                             </tr><%
                         }
@@ -69,11 +69,11 @@
 
                         lastDatabase = table.getDatabaseName();
                         lastSchema = table.getSchemaName(); %>
-                        <tr id="<%= "node-" + lastDatabase %>">
+                        <tr data-tt-id="<%= lastDatabase %>">
                             <td colspan="2"><%= table.getDatabaseName() %></td>
                         </tr>
-                        <tr id="<%= "node-" + lastDatabase + "---" + lastSchema %>"
-                            class="child-of-node-<%= lastDatabase %>">
+                        <tr data-tt-id="<%= lastDatabase + "---" + lastSchema %>"
+                            data-tt-parent-id="<%= lastDatabase %>">
                             <td colspan="2"><%= schemaDescr %></td>
                         </tr>
                         <%
@@ -83,8 +83,8 @@
                         tableDescr += " (" + table.getActualEntityName() + ")";
                     }
                     %>
-                    <tr id="<%= "node-" + lastDatabase + "---" + lastSchema + "---" + table.getTableName() %>"
-                        class="child-of-node-<%= lastDatabase + "---" + lastSchema %>">
+                    <tr data-tt-id="<%= lastDatabase + "---" + lastSchema + "---" + table.getTableName() %>"
+                        data-tt-parent-id="<%= lastDatabase + "---" + lastSchema %>">
                         <td></td>
                         <td><a href="tables/<%= lastDatabase %>/<%= lastSchema %>/<%= table.getTableName() %>"
                                 ><%= tableDescr %></a></td>
