@@ -54,12 +54,28 @@ div#hd h1 a {
     color: #ffffff;
 }
 
-div#responseTime, div#globalLinks {
+div#responseTime {
     float: right;
 }
 
-div#globalLinks {
-    margin: 10px 0;
+#app-title {
+    float: left;
+}
+
+div#globalLinks a {
+    color: #ffffff;
+}
+
+@media (min-width: 980px) {
+    div#globalLinks {
+        float: right;
+    }
+}
+
+@media (max-width: 979px) {
+    div#globalLinks {
+        float: none;
+    }
 }
 
 /*******************************************************************************

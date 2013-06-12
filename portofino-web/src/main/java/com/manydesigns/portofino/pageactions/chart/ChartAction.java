@@ -80,8 +80,8 @@ public class ChartAction extends AbstractPageAction {
 
     public String chartId;
 
-    public int width = 400;
-    public int height = 300;
+    public int width = 470;
+    public int height = 354;
     public boolean antiAlias = true;
     public boolean borderVisible = true;
 

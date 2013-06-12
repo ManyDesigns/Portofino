@@ -42,7 +42,6 @@ public class JFreeChartInstance implements XhtmlFragment {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-
     protected final JFreeChart chart;
     protected final File file;
     protected final ChartRenderingInfo renderingInfo;
@@ -69,8 +68,6 @@ public class JFreeChartInstance implements XhtmlFragment {
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("img");
         xb.addAttribute("src", chartUrl);
-        xb.addAttribute("width", "" + width);
-        xb.addAttribute("height", "" + height);
         xb.addAttribute("alt", alt);
         xb.addAttribute("usemap", "#" + mapId);
         xb.addAttribute("style", "border: none;");
@@ -99,7 +96,5 @@ public class JFreeChartInstance implements XhtmlFragment {
             xb.closeElement("area");
         }
         xb.closeElement("map");
-
-
     }
 }

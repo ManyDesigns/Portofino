@@ -19,25 +19,43 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
-            <div id="globalLinks">
-                <%
-                    String loginLink = ShiroUtils.getLoginLink(
-                            app, request.getContextPath(), actionBean.getOriginalPath(), actionBean.getOriginalPath());
-                    String logoutLink = ShiroUtils.getLogoutLink(app, request.getContextPath());
-                    pageContext.setAttribute("loginLink", new UrlBuilder(request.getLocale(), loginLink, true).toString());
-                    pageContext.setAttribute("logoutLink", new UrlBuilder(request.getLocale(), logoutLink, true).toString());
-                %>
-                <c:if test="<%= SecurityUtils.getSubject().isAuthenticated() %>">
-                    <i class="icon-user icon-white"></i><c:out value="<%= ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) %>"/> -
-                    <% if(SecurityLogic.isAdministrator(request)) { %>
-                        <stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction"><fmt:message key="skins.default.header.administration"/></stripes:link> -
-                    <% } %>
-                    <a href="<c:out value='${logoutLink}' />"><fmt:message key="skins.default.header.log_out"/></a>
-                </c:if><c:if test="<%= !SecurityUtils.getSubject().isAuthenticated() %>">
-                    <a href="<c:out value='${loginLink}' />"><fmt:message key="skins.default.header.log_in"/></a>
-                </c:if>
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <h4 id="app-title"><stripes:link href="/"><c:out value="${app.name}"/></stripes:link></h4>
+            <div id="globalLinks" class="nav-collapse collapse">
+                <ul class="nav">
+                    <%
+                        String loginLink = ShiroUtils.getLoginLink(
+                                app, request.getContextPath(), actionBean.getOriginalPath(), actionBean.getOriginalPath());
+                        String logoutLink = ShiroUtils.getLogoutLink(app, request.getContextPath());
+                        pageContext.setAttribute("loginLink", new UrlBuilder(request.getLocale(), loginLink, true).toString());
+                        pageContext.setAttribute("logoutLink", new UrlBuilder(request.getLocale(), logoutLink, true).toString());
+                    %>
+                    <c:if test="<%= SecurityUtils.getSubject().isAuthenticated() %>">
+                        <li>
+                            <a href="#">
+                                <i class="icon-user icon-white"></i><c:out value="<%= ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) %>"/>
+                            </a>
+                        </li>
+                        <li>
+                            <% if(SecurityLogic.isAdministrator(request)) { %>
+                                <stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction"><fmt:message key="skins.default.header.administration"/></stripes:link>
+                            <% } %>
+                        </li>
+                        <li>
+                            <a href="<c:out value='${logoutLink}' />"><fmt:message key="skins.default.header.log_out"/></a>
+                        </li>
+                    </c:if>
+                    <c:if test="<%= !SecurityUtils.getSubject().isAuthenticated() %>">
+                        <li>
+                            <a href="<c:out value='${loginLink}' />"><fmt:message key="skins.default.header.log_in"/></a>
+                        </li>
+                    </c:if>
+                </ul>
             </div>
-            <h4><stripes:link href="/"><c:out value="${app.name}"/></stripes:link></h4>
         </div>
     </div>
 </div>

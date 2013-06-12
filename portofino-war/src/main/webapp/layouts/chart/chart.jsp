@@ -10,7 +10,9 @@
         <c:out value="${actionBean.pageInstance.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <mde:write name="actionBean" property="jfreeChartInstance"/>
+        <div style="text-align: center;">
+            <mde:write name="actionBean" property="jfreeChartInstance"/>
+        </div>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
         <portofino:buttons list="chart-buttons" cssClass="portletButton" />
