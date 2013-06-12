@@ -109,7 +109,7 @@
                                     <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
                                     <input type="text" name="userName" id="userName" class="input-block-level"
                                            placeholder="<fmt:message key='skins.default.login.username'/>" />
-                                    <input type="text" name="pwd" id="pwd" class="input-block-level"
+                                    <input type="password" name="pwd" id="pwd" class="input-block-level"
                                            placeholder="<fmt:message key='skins.default.login.password'/>" />
                                     <div style="text-align: center">
                                         <portofino:buttons list="login-buttons" cssClass="btn-large portletButton" />

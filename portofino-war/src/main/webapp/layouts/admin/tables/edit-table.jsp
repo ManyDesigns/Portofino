@@ -13,23 +13,6 @@
             .tableForm {
                 overflow-x: auto; padding-right: 1px; margin-bottom: 1em;
             }
-            .ui-widget-content a {
-                color: blue;
-            }
-            .ui-tabs {
-                padding: 0; border: 0;
-            }
-            .ui-tabs-nav {
-                border: 0;
-            }
-            .ui-widget-header {
-                background: none;
-                border: 0;
-                color: black;
-            }
-            .ui-tabs .ui-tabs-panel {
-                padding: 1em 0 0 0;
-            }
 
             #sortable {
                 margin-left: 0;
