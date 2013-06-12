@@ -86,46 +86,43 @@ var portofino = {
 
         $('textarea.mde-form-rich-text').data('mdeRichTextConfig', config);
         portofino._setupRichTextEditors();
+    },
+
+    enablePortletDragAndDrop: function(button) {
+        $("div.portletContainer").sortable({
+            connectWith: "div.portletContainer",
+            placeholder: "portletPlaceholder",
+            cursor: "move", // cursor image
+            revert: true, // moves the portlet to its new position with a smooth transition
+            tolerance: "pointer" // mouse pointer overlaps the droppable
+        }).disableSelection().addClass("portletBox");
+
+        var container = $(button).parent();
+        $(button).remove();
+        container.prepend('<button name="cancel" type="submit" class="btn contentButton">Cancel</button> ');
+        container.prepend('<button name="updateLayout" type="submit" class="btn contentButton">Save</button> ');
+        $("button[name=updateLayout]").click(function() {
+            var theButton = $(this);
+            $('div.portletContainer').each(function(index, element) {
+                var wrapper = $(element);
+                var templateHiddenField = wrapper.children("input[type=hidden]").first();
+                var elements = wrapper.sortable('toArray');
+                for(var e in elements) {
+                    var id = elements[e];
+                    var hiddenField = document.createElement("input");
+                    hiddenField.setAttribute("type", "hidden");
+                    hiddenField.setAttribute("name", templateHiddenField.val());
+                    hiddenField.setAttribute("value", id.substring("portletWrapper_".length));
+                    theButton.before(hiddenField);
+                }
+            });
+            return true;
+        });
+
     }
 };
 
 setupRichTextEditors = function() {/* Do nothing (remove default initialization by Elements) */};
-
-function enablePortletDragAndDrop(button) {
-    $("div.portletContainer").sortable({
-        connectWith: "div.portletContainer",
-        placeholder: "portletPlaceholder",
-        cursor: "move", // cursor image
-        revert: true, // moves the portlet to its new position with a smooth transition
-        tolerance: "pointer" // mouse pointer overlaps the droppable
-    }).disableSelection().addClass("portletBox");
-
-    var container = $(button).parent();
-    $(button).remove();
-    container.prepend('<button name="cancel" type="submit" class="contentButton">Cancel</button> ');
-    container.prepend('<button name="updateLayout" type="submit" class="contentButton">Save</button>');
-    //container.children("button[name=cancel]").button();
-    //container.children("button[name=updateLayout]").button();
-    $("button[name=updateLayout]").click(function() {
-        var theButton = $(this);
-        $('div.portletContainer').each(function(index, element) {
-            var wrapper = $(element);
-            var templateHiddenField = wrapper.children("input[type=hidden]").first();
-            var elements = wrapper.sortable('toArray');
-            for(var e in elements) {
-                var id = elements[e];
-                var hiddenField = document.createElement("input");
-                hiddenField.setAttribute("type", "hidden");
-                hiddenField.setAttribute("name", templateHiddenField.val());
-                hiddenField.setAttribute("value", id.substring("portletWrapper_".length));
-                theButton.before(hiddenField);
-            }
-        });
-        return true;
-    });
-
-}
-
 
 var HTML_CHARS = {
     '&': '&amp;',

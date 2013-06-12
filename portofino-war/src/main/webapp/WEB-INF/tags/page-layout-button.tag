@@ -4,7 +4,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
 <% if(SecurityLogic.hasPermissions(actionBean.getPageInstance(), SecurityUtils.getSubject(), AccessLevel.EDIT)) { %>
-<button onclick="enablePortletDragAndDrop(this); return false;"
+<button onclick="portofino.enablePortletDragAndDrop(this); return false;"
         type="submit" class="btn btn-mini" role="button" aria-disabled="false"
         title="Edit page layout">
     <i class="icon-move"></i>
