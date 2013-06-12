@@ -181,8 +181,8 @@ public class TableForm implements Element {
     public void writeToObject(Object obj) {
         Class clazz = obj.getClass();
         if (clazz.isArray()) { // Tratta obj come un array
-            // Scorre tutti gli ellementi dell'array obj,
-            // indipendentemente da quante righe ci sono nell table form.
+            // Scorre tutti gli elementi dell'array obj,
+            // indipendentemente da quante righe ci sono nel table form.
             // Eventualmente lancia Eccezione.
             final int arrayLength = Array.getLength(obj);
             for (int i = 0; i < arrayLength; i++) {
@@ -292,7 +292,7 @@ public class TableForm implements Element {
                 String[] inputNameArgs = {prefix, "selection"};
                 String selection = StringUtils.join(inputNameArgs);
                 xb.openElement("td");
-                xb.writeInputCheckbox(null, selection, key, false);
+                xb.writeInputCheckbox(null, selection, key, false, false, "checkbox");
                 xb.closeElement("td");
             }
 
