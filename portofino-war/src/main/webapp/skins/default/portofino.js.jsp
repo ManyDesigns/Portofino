@@ -161,6 +161,7 @@ $(function() {
                 if(eventName && !(eventName.length == 0)) {
                     href = removeQueryStringArgument(href, eventName);
                 }
+                href = removeQueryStringArgument(href, "ajax");
                 var additionalParameters = (href.indexOf("?") > -1 ? "&" : "?") + "getSearchResultsPage=&ajax=true";
                 $.ajax(href + additionalParameters, {
                     dataType: "text",
