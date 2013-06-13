@@ -56,6 +56,8 @@
         <br/>
         <br/>
         <portofino:buttons list="manage-attachments-upload" cssClass="portletButton" />
+        <br/>
+        <br/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
         <portofino:buttons list="manage-attachments" cssClass="contentButton" />

@@ -29,7 +29,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <!-- Content editor -->
-        <fieldset>
+        <fieldset style="margin-bottom: 2em;">
             <legend><fmt:message key="layouts.text.configure.content"/></legend>
             <stripes:textarea class="mde-form-rich-text" name="content" value="${actionBean.content}"/>
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
