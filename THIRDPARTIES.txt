@@ -79,6 +79,11 @@ Site: http://twitter.github.io/bootstrap/index.html
 Files: elements/src/main/resources/META-INF/resources/elements/bootstrap/
 License: Apache License v2.0
 
+Bootstrap Datepicker
+Site: http://www.eyecon.ro/bootstrap-datepicker/
+Files: elements/src/main/resources/META-INF/resources/elements/datepicker/
+License: Apache License v2.0
+
 Bouncy Castle
 Site: http://www.bouncycastle.org/java.html
 Files: bcmail-jdk14-1.38.jar, bcprov-jdk14-1.38.jar, bctsp-jdk14-1.38.jar
