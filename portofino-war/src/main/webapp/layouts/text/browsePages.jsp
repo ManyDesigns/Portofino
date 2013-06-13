@@ -10,6 +10,11 @@
 <head>
     <title><fmt:message key="layouts.text.browse.browse_server"/></title>
     <jsp:include page="/skins/${skin}/head.jsp" />
+    <style type="text/css">
+        body {
+            padding-top: 0;
+        }
+    </style>
 </head>
 <body style="margin: 0 10px 0 10px; height: 100%;">
 <form action="${actionBean.dispatch.absoluteOriginalPath}" method="post" style="padding-top: 10px;">
