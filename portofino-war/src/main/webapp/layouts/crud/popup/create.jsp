@@ -9,7 +9,7 @@
 <stripes:layout-render name="/skins/${skin}/popup-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"/>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="crud-create" cssClass="contentButton" />
+        <portofino:buttons list="crud-create" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.createTitle}"/>
@@ -25,6 +25,6 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="crud-create" cssClass="contentButton" />
+        <portofino:buttons list="crud-create" />
     </stripes:layout-component>
 </stripes:layout-render>

@@ -68,7 +68,7 @@
             }
         %>
         <br /><br />
-        <portofino:buttons list="m2m-checkboxes-edit" cssClass="portletButton" />
+        <portofino:buttons list="m2m-checkboxes-edit" />
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
     </stripes:layout-component>

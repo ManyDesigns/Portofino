@@ -12,7 +12,7 @@
         <fmt:message key="layouts.admin.settings.settings"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="settings" cssClass="contentButton" />
+        <portofino:buttons list="settings" />
     </stripes:layout-component>
     <stripes:layout-component name="portletHeader">
         <h4><fmt:message key="layouts.admin.settings.settings"/></h4>
@@ -21,6 +21,6 @@
         <mde:write name="actionBean" property="form"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="settings" cssClass="contentButton" />
+        <portofino:buttons list="settings" />
     </stripes:layout-component>
 </stripes:layout-render>

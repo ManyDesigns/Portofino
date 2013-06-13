@@ -11,27 +11,6 @@ Bootstrap overrides
 }
 
 /*******************************************************************************
-Links
-*******************************************************************************/
-
-a, a:visited {
-    color: blue;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-/*******************************************************************************
-Tables within fieldsets have too much margin-bottom
-*******************************************************************************/
-
-fieldset table {
-    margin-bottom: 0;
-}
-
-/*******************************************************************************
 Header / footer
 *******************************************************************************/
 
@@ -104,30 +83,6 @@ span.breadcrumb-item {
 /*******************************************************************************
 Content
 *******************************************************************************/
-
-div.contentBody {
-    padding-top: 1em;
-}
-
-.contentHeader, .contentFooter {
-    background-color: #eeeeff;
-    padding: 5px; /* TODO */
-    clear: both;
-}
-
-.contentHeader {
-    -moz-border-radius: 3px 3px 0 0;
-    border-radius: 3px 3px 0 0;
-}
-
-.contentHeader form {
-    margin: 0;
-}
-
-.contentFooter {
-    -moz-border-radius: 0 0 3px 3px;
-    border-radius: 0 0 3px 3px;
-}
 
 .contentBarButtons, .resultSetNavigation {
     display: inline;
@@ -436,24 +391,6 @@ General
 }
 
 /*******************************************************************************
-Wizard
-*******************************************************************************/
-
-div.wizardStep {
-    background-color: #65a7db;
-    border: 3px double #000;
-    padding: 3px;
-}
-
-div.wizardStep h2 {
-    color: #fffafa;
-}
-
-div.wizardContent {
-    background-color: #fffafa;
-}
-
-/*******************************************************************************
 Treetable
 *******************************************************************************/
 
@@ -554,25 +491,6 @@ table.treetable tr.expanded.accept td span.indenter a {
   background-image: url(../../jquery-treetable-3.0.1/images/collapse-light.png);
 }
 
-/*
-.treetable {
-    width: 100%;
-}
-
-.treetable tr td {
-    padding-left: 1.5em;
-}
-
-.treetable tr td .expander {
-    background: url("../../jquery-treetable-2.3.0/toggle-expand-dark.png") no-repeat left center;
-    cursor: pointer;
-    padding: 0;
-}
-
-.treetable tr.expanded td .expander {
-    background-image:url("../../jquery-treetable-2.3.0/toggle-collapse-dark.png");
-}*/
-
 /*******************************************************************************
 Forms
 *******************************************************************************/
@@ -670,7 +588,7 @@ table#userPermissionTestResults td {
 Wizard
 *******************************************************************************/
 
-.contentHeader.wizard {
+.wizard-header {
     overflow-y: hidden;
     padding-left: 0;
 }
@@ -685,7 +603,7 @@ Wizard
 .wizard-step.first {
     border-radius: 3px 0 0 0;
     background-image: none;
-    padding: 1em 0 1em 1em;
+    padding: 1em 0 1em 0;
 }
 
 .wizard-step.before {

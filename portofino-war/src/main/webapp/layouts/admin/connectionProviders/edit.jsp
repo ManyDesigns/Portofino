@@ -12,7 +12,7 @@
         <fmt:message key="layouts.admin.connectionProviders.edit.title"/>: <c:out value="${actionBean.databaseName}"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="connectionProviders-edit" cssClass="contentButton" />
+        <portofino:buttons list="connectionProviders-edit" />
     </stripes:layout-component>
     <stripes:layout-component name="portletHeader">
         <h4>
@@ -33,6 +33,6 @@
         <stripes:hidden name="databaseName" value="${actionBean.databaseName}"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="connectionProviders-edit" cssClass="contentButton" />
+        <portofino:buttons list="connectionProviders-edit" />
     </stripes:layout-component>
 </stripes:layout-render>

@@ -11,7 +11,7 @@
         <fmt:message key="layouts.admin.rootChildren" />
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="root-children" cssClass="contentButton" />
+        <portofino:buttons list="root-children" />
     </stripes:layout-component>
     <stripes:layout-component name="portletHeader">
         <h4><fmt:message key="layouts.admin.rootChildren" /></h4>
@@ -20,6 +20,6 @@
         <%@include file="/layouts/page/children-tables.jsp"%>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="root-children" cssClass="contentButton" />
+        <portofino:buttons list="root-children" />
     </stripes:layout-component>
 </stripes:layout-render>

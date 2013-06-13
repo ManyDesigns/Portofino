@@ -83,9 +83,9 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
-            {{"id", "navigationRoot", "description", "template", "detailTemplate", "applyTemplateRecursively"}};
+            {{"id", "title", "description", "navigationRoot", "template", "detailTemplate", "applyTemplateRecursively"}};
     public static final String[][] PAGE_CONFIGURATION_FIELDS_NO_DETAIL =
-            {{"id", "navigationRoot", "description", "template", "applyTemplateRecursively"}};
+            {{"id", "title", "description", "navigationRoot", "template", "applyTemplateRecursively"}};
     public static final String PAGE_PORTLET_NOT_CONFIGURED = "/layouts/portlet-not-configured.jsp";
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
@@ -149,7 +149,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Page configuration
     //**************************************************************************
 
-    public String title;
     public Form pageConfigurationForm;
 
     //**************************************************************************
@@ -429,12 +428,12 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         pageConfigurationForm = formBuilder.build();
         EditPage edit = new EditPage();
         edit.id = page.getId();
+        edit.title = page.getTitle();
         edit.description = page.getDescription();
         edit.navigationRoot = page.getActualNavigationRoot();
         edit.template = getPageTemplate(page.getLayout());
         edit.detailTemplate = getPageTemplate(page.getDetailLayout());
         pageConfigurationForm.readFromObject(edit);
-        title = page.getTitle();
 
         if(script == null) {
             prepareScript();
@@ -469,7 +468,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
      */
     protected void readPageConfigurationFromRequest() {
         pageConfigurationForm.readFromRequest(context.getRequest());
-        title = context.getRequest().getParameter("title");
     }
 
     /**
@@ -478,16 +476,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
      * @return true iff the form was valid.
      */
     protected boolean validatePageConfiguration() {
-        boolean valid = true;
-        title = StringUtils.trimToNull(title);
-        if (title == null) {
-            SessionMessages.addErrorMessage(getMessage("commons.configuration.titleEmpty"));
-            valid = false;
-        }
-
-        valid = pageConfigurationForm.validate() && valid;
-
-        return valid;
+        return pageConfigurationForm.validate();
     }
 
     /**
@@ -499,7 +488,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         EditPage edit = new EditPage();
         pageConfigurationForm.writeToObject(edit);
         Page page = pageInstance.getPage();
-        page.setTitle(title);
+        page.setTitle(edit.title);
         page.setDescription(edit.description);
         page.setNavigationRoot(edit.navigationRoot.name());
         page.getLayout().setTemplate(edit.template);
@@ -547,22 +536,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             }
             updateTemplate(child, filter, edit);
         }
-    }
-
-    /**
-     * Accessor for the page title.
-     * @return the title.
-     */
-    public String getTitle() {
-        return title;
-    }
-
-    /**
-     * Accessor for the page title.
-     * @param title the new page title.
-     */
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     //--------------------------------------------------------------------------

@@ -222,7 +222,7 @@ public class PageAdminAction extends AbstractPageAction {
         return new ForwardResolution("/layouts/page-crud/new-page.jsp");
     }
 
-    @Button(list = "page-create", key = "commons.create", order = 1)
+    @Button(list = "page-create", key = "commons.create", order = 1, primary = true)
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution createPage() {
         try {
@@ -732,7 +732,7 @@ public class PageAdminAction extends AbstractPageAction {
         return new String[] { "active", "name", "title", "showInNavigation", "embedded" };
     }
 
-    @Button(list = "page-children-edit", key = "commons.update", order = 1)
+    @Button(list = "page-children-edit", key = "commons.update", order = 1, primary = true)
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updatePageChildren() {
         setupChildPages();
@@ -954,7 +954,7 @@ public class PageAdminAction extends AbstractPageAction {
         }
     }
 
-    @Button(list = "page-permissions-edit", key = "commons.update", order = 1)
+    @Button(list = "page-permissions-edit", key = "commons.update", order = 1, primary = true)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updatePagePermissions() {
         try {

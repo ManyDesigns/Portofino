@@ -11,7 +11,7 @@
         Connection provider: <c:out value="${actionBean.databaseName}"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="connectionProviders-read" cssClass="contentButton" />
+        <portofino:buttons list="connectionProviders-read" />
     </stripes:layout-component>
     <stripes:layout-component name="portletHeader">
         <h4>Connection provider: <c:out value="${actionBean.databaseName}"/></h4>
@@ -44,7 +44,7 @@
         <stripes:hidden name="databaseName" value="${actionBean.databaseName}"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="connectionProviders-read" cssClass="contentButton" />
+        <portofino:buttons list="connectionProviders-read" />
         <script type="text/javascript">
             $("button[name=delete]").click(function() {
                 return confirm ('<fmt:message key="commons.confirm" />');

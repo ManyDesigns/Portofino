@@ -102,6 +102,6 @@
                 toggleNewSPForm();
             });
         </script>
-        <portofino:buttons list="connection-provider" cssClass="contentButton" />
+        <portofino:buttons list="connection-provider" />
     </stripes:layout-component>
 </stripes:layout-render>

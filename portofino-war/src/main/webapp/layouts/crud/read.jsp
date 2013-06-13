@@ -18,10 +18,8 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
         <div class="crudReadButtons">
-            <portofino:buttons list="crud-read" cssClass="portletButton" />
+            <portofino:buttons list="crud-read" />
         </div>
-        <!--<stripes:submit name="duplicate" value="Duplicate" disabled="true" class="portletButton"/>
-        <stripes:submit name="print" value="Print" disabled="true" class="portletButton"/>-->
         <script type="text/javascript">
             $(".crudReadButtons button[name=delete]").click(function() {
                 return confirm ('<fmt:message key="commons.confirm" />');

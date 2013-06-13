@@ -69,7 +69,7 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="table-edit" cssClass="contentButton" />
+        <portofino:buttons list="table-edit" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <fmt:message key="layouts.admin.tables.title">
@@ -94,7 +94,7 @@
                     <fieldset>
                         <legend>
                             <fmt:message key="layouts.admin.tables.editTable.columns" />
-                            <button class="btn portletButton sortButton"
+                            <button class="btn sortButton"
                                 type="button" role="button" aria-disabled="false">
                                 <fmt:message key="layouts.admin.tables.changeOrder" />
                             </button>
@@ -106,11 +106,11 @@
                             <div id="sortableContainer">
                                 <fmt:message key="layouts.admin.tables.changeOrder.help" />
                                 <br /><br />
-                                <button class="btn portletButton confirmSortButton"
+                                <button class="btn confirmSortButton"
                                         type="button" role="button" aria-disabled="false">
                                     <fmt:message key="commons.ok" />
                                 </button>
-                                <button class="btn portletButton cancelSortButton"
+                                <button class="btn cancelSortButton"
                                         type="button" role="button" aria-disabled="false">
                                     <fmt:message key="commons.cancel" />
                                 </button>
@@ -244,7 +244,7 @@
                                 <fmt:message key="layouts.admin.tables.editTable.noSelectionProviders" /><br />
                             </c:if>
                             <br />
-                            <portofino:buttons list="table-selection-providers" cssClass="contentButton" />
+                            <portofino:buttons list="table-selection-providers" />
                         </div>
                     </fieldset>
                 </div>
@@ -252,6 +252,6 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="table-edit" cssClass="contentButton" />
+        <portofino:buttons list="table-edit" />
     </stripes:layout-component>
 </stripes:layout-render>

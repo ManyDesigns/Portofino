@@ -39,6 +39,6 @@
                 });
             });
         </script>
-        <portofino:buttons list="user-management" cssClass="contentButton" />
+        <portofino:buttons list="user-management" />
     </stripes:layout-component>
 </stripes:layout-render>

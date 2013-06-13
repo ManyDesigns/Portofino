@@ -12,7 +12,7 @@
         <fmt:message key="layouts.admin.reload-model.title"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="reload-model-bar" cssClass="contentButton" />
+        <portofino:buttons list="reload-model-bar" />
     </stripes:layout-component>
     <stripes:layout-component name="portletHeader">
         <h4><fmt:message key="layouts.admin.reload-model.title"/></h4>
@@ -20,10 +20,10 @@
     <stripes:layout-component name="portletBody">
         <p>
             <fmt:message key="layouts.admin.reload-model.text"/>
-            <portofino:buttons list="reload-model" cssClass="portletButton" />
+            <portofino:buttons list="reload-model" />
         </p>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="reload-model-bar" cssClass="contentButton" />
+        <portofino:buttons list="reload-model-bar" />
     </stripes:layout-component>
 </stripes:layout-render>

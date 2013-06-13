@@ -27,44 +27,16 @@
                 </div>
             </div>
             <div id="content" class="span10">
-                <c:if test="${empty formActionUrl}">
-                    <c:set var="formActionUrl" value="${dispatch.originalPath}" />
-                </c:if>
-                <stripes:form action="${formActionUrl}" method="post" enctype="multipart/form-data"
-                              class="form-horizontal">
-                    <div class="contentHeader row-fluid">
-                        <stripes:layout-component name="contentHeader" />
-                    </div>
-                    <div class="contentBody row-fluid">
-                        <div class="portletWrapper noSpacing">
-                            <div class="portlet">
-                                <mde:sessionMessages/>
-                                <div class="portletHeader">
-                                    <stripes:layout-component name="portletHeader">
-                                        <div>
-                                            <div class="portletTitle">
-                                                <h4><stripes:layout-component name="portletTitle" /></h4>
-                                            </div>
-                                            <div class="portletHeaderButtons">
-                                                <stripes:layout-component name="portletHeaderButtons" />
-                                            </div>
-                                        </div>
-                                        <div class="portletHeaderSeparator"></div>
-                                    </stripes:layout-component>
-                                </div>
-                                <div class="portletBody">
-                                    <stripes:layout-component name="portletBody" />
-                                </div>
-                                <div class="portletFooter">
-                                    <stripes:layout-component name="portletFooter" />
-                                </div>
-                            </div>
+                <div class="row-fluid">
+                    <div class="portletWrapper noSpacing">
+                        <div class="portlet">
+                            <mde:sessionMessages/>
+                            <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
+                            <h3 style="border-bottom: 1px solid #E5E5E5"><stripes:layout-component name="portletTitle" /></h3>
+                            <stripes:layout-component name="portletBody" />
                         </div>
                     </div>
-                    <div class="contentFooter row-fluid">
-                        <stripes:layout-component name="contentFooter" />
-                    </div>
-                </stripes:form>
+                </div>
             </div>
         </div>
         <div class="row">

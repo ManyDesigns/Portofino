@@ -28,7 +28,7 @@
         Tables
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="tables-list" cssClass="contentButton" />
+        <portofino:buttons list="tables-list" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         Tables
@@ -93,6 +93,6 @@
         </table>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="tables-list" cssClass="contentButton" />
+        <portofino:buttons list="tables-list" />
     </stripes:layout-component>
 </stripes:layout-render>

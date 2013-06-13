@@ -14,7 +14,7 @@
         <fmt:message key="layouts.admin.rootPermissions" />
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="root-permissions" cssClass="contentButton" />
+        <portofino:buttons list="root-permissions" />
     </stripes:layout-component>
     <stripes:layout-component name="portletHeader">
         <h4><fmt:message key="layouts.admin.rootPermissions" /></h4>
@@ -88,6 +88,6 @@
         </table>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="root-permissions" cssClass="contentButton" />
+        <portofino:buttons list="root-permissions" />
     </stripes:layout-component>
 </stripes:layout-render>

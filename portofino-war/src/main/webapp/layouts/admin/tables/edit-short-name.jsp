@@ -13,7 +13,7 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="table-short-name" cssClass="contentButton" />
+        <portofino:buttons list="table-short-name" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <fmt:message key="layouts.admin.tables.editShortName.title">
@@ -25,6 +25,6 @@
         <mde:write name="actionBean" property="tableForm" />
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="table-short-name" cssClass="contentButton" />
+        <portofino:buttons list="table-short-name" />
     </stripes:layout-component>
 </stripes:layout-render>

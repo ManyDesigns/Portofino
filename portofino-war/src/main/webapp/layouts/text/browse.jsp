@@ -19,8 +19,7 @@
                    value='<%= actionBean.getDispatch().getAbsoluteOriginalPath() + "?" + request.getQueryString() %>' />
             <input type="hidden" name="CKEditorFuncNum" value='${actionBean.CKEditorFuncNum}' />
             <fmt:message key="layouts.text.browse.pages"/>:
-            <button class="btn contentButton"
-                    type="submit" name="browsePages" role="button" aria-disabled="false">
+            <button class="btn" type="submit" name="browsePages" role="button" aria-disabled="false">
                 <fmt:message key="layouts.text.browse"/></button>
         </form>
     <% } %>

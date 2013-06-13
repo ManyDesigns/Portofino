@@ -6,7 +6,7 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.wizard.AbstractWizardPageAction "/>
-<div class="contentHeader wizard">
+<div class="wizard-header">
     <c:forEach items="${actionBean.steps}" var="step" varStatus="status">
         <c:set var="baseClass"
                value="wizard-step ${status.first ? 'first' : ''} ${status.last ? 'last' : ''}"

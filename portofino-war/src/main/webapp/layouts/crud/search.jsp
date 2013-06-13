@@ -25,7 +25,7 @@
             <div class="search_form" <c:if test="${!actionBean.searchVisible}">style="display: none;"</c:if>>
                 <mde:write name="actionBean" property="searchForm"/>
                 <div class="searchFormButtons">
-                    <portofino:buttons list="crud-search-form" cssClass="portletButton" />
+                    <portofino:buttons list="crud-search-form" />
                 </div>
             </div>
         </c:if>

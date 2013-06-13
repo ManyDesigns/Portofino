@@ -15,6 +15,6 @@
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
-        <portofino:buttons list="changepassword" cssClass="portletButton" />
+        <portofino:buttons list="changepassword" />
     </stripes:layout-component>
 </stripes:layout-render>

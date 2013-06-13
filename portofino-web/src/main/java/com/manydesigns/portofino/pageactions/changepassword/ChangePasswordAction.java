@@ -211,7 +211,7 @@ public class ChangePasswordAction extends AbstractPageAction {
         return new ForwardResolution("/layouts/changepassword/configure.jsp");
     }
 
-    @Button(list = "configuration", key = "commons.updateConfiguration")
+    @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, primary = true)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() {
         prepareConfigurationForms();

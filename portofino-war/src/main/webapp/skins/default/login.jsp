@@ -66,7 +66,7 @@
                         style = 'background: #FFF url(' + openid.img_path + 'openid-inputicon.gif) no-repeat scroll 0 50%; padding-left:18px;';
                     }
                     html += '<input id="' + id + '" type="text" style="' + style + '" name="' + id + '" value="' + value + '" />' +
-                            '<button id="openid_submit" type="submit" class="btn portletButton">' +
+                            '<button id="openid_submit" type="submit" class="btn">' +
                             openid.signin_text + '/button>';
                     input_area.empty();
                     input_area.append(html);
@@ -87,7 +87,7 @@
     <div class="container">
         <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
         <div class="row">
-            <div id="content-login" class="container contentBody">
+            <div id="content-login" class="container">
                 <div class="portletWrapper noSpacing">
                     <div class="portlet">
                         <div class="portletHeader">
@@ -112,7 +112,7 @@
                                     <input type="password" name="pwd" id="pwd" class="input-block-level"
                                            placeholder="<fmt:message key='skins.default.login.password'/>" />
                                     <div style="text-align: center">
-                                        <portofino:buttons list="login-buttons" cssClass="btn-large portletButton" />
+                                        <portofino:buttons list="login-buttons" cssClass="btn-large" />
                                     </div>
                                     <!--<c:if test="recoverPwd">
                                         <tr>
@@ -136,7 +136,7 @@
                                             </div>
                                             <div id="openid_input_area">
                                                 <input id="openid_identifier" name="openIdUrl" type="text" value="http://" />
-                                                <button id="openid_submit" type="submit" class="btn portletButton">
+                                                <button id="openid_submit" type="submit" class="btn">
                                                     Sign in
                                                 </button>
                                             </div>

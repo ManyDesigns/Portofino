@@ -23,11 +23,11 @@
                         <c:out value='${actionBean.CKEditorFuncNum}'/>,
                         $('#iframe').prop('contentWindow').location.href
                     ); window.close();"
-            class="btn contentButton">
+            class="btn">
         Choose
     </button>
     <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
-    <button name="cancel" type="submit" class="btn contentButton">
+    <button name="cancel" type="submit" class="btn">
         Cancel
     </button>
 </form>
@@ -40,11 +40,11 @@
                         <c:out value='${actionBean.CKEditorFuncNum}'/>,
                         $('#iframe').prop('contentWindow').location.href
                     ); window.close();"
-            class="btn contentButton">
+            class="btn">
         Choose
     </button>
     <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
-    <button name="cancel" type="submit" class="btn contentButton">
+    <button name="cancel" type="submit" class="btn">
         Cancel
     </button>
 </form>

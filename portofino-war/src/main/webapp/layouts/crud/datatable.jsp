@@ -15,7 +15,7 @@
 <div id="datatable-${pageId}" class="portofino-datatable">
     <mde:write name="actionBean" property="tableForm" />
     <div class="pull-left">
-        <portofino:buttons list="crud-search" cssClass="portletButton" />
+        <portofino:buttons list="crud-search" />
     </div>
     <%
         Integer rowsPerPage = actionBean.getCrudConfiguration().getRowsPerPage();

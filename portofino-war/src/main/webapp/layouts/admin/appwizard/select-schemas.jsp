@@ -38,6 +38,6 @@
                 });
             });
         </script>
-        <portofino:buttons list="select-schemas" cssClass="contentButton" />
+        <portofino:buttons list="select-schemas" />
     </stripes:layout-component>
 </stripes:layout-render>

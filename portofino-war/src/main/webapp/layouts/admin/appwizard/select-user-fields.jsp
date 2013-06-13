@@ -40,6 +40,6 @@
                 });
             });
         </script>
-        <portofino:buttons list="select-user-fields" cssClass="contentButton" />
+        <portofino:buttons list="select-user-fields" />
     </stripes:layout-component>
 </stripes:layout-render>

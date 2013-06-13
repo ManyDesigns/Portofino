@@ -37,6 +37,10 @@ public class EditPage {
     @Updatable(false)
     public String id;
 
+    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.title")
+    @Required
+    public String title;
+
     @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.description")
     @Required
     @Multiline

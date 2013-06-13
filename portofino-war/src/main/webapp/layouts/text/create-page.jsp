@@ -26,7 +26,7 @@
             <input type="hidden" name="originalPath" value="<%= path %>" />
             <input type="hidden" name="fragment" value="<%= fragment%>" />
             The page <%= actionBean.getDispatch().getOriginalPath() %> does not exist.
-            <button type="submit" name="newPage" class="portletButton btn">
+            <button type="submit" name="newPage" class="btn">
                 Create it.
             </button>
         </stripes:form>

@@ -26,12 +26,12 @@
                         <c:set var="formActionUrl" value="${dispatch.originalPath}" />
                     </c:if>
                     <stripes:form action="${formActionUrl}" method="post" enctype="multipart/form-data">
-                        <div class="contentHeader">
+                        <div class="row-fluid">
                             <stripes:layout-component name="contentHeader">
                                 Portlet page header
                             </stripes:layout-component>
                         </div>
-                        <div class="contentBody">
+                        <div class="row-fluid">
                             <div class="portletWrapper">
                                 <div class="portlet">
                                     <mde:sessionMessages/>
@@ -64,7 +64,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="contentFooter">
+                        <div class="row-fluid">
                             <stripes:layout-component name="contentFooter">
                                 Portlet page footer
                             </stripes:layout-component>

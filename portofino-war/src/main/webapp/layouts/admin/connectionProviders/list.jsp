@@ -12,7 +12,7 @@
         <fmt:message key="layouts.admin.connectionProviders" />
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="connectionProviders-search" cssClass="contentButton" />
+        <portofino:buttons list="connectionProviders-search" />
     </stripes:layout-component>
     <stripes:layout-component name="portletHeader">
         <h4><fmt:message key="layouts.admin.connectionProviders" /></h4 >
@@ -23,7 +23,7 @@
         <mde:write name="actionBean" property="databasePlatformsTableForm"/>
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="connectionProviders-search" cssClass="contentButton" />
+        <portofino:buttons list="connectionProviders-search" />
         <script type="text/javascript">
             $("button[name=bulkDelete]").click(function() {
                 return confirm ('<fmt:message key="commons.confirm" />');

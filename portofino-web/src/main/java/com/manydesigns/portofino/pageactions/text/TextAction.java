@@ -78,6 +78,7 @@ public class TextAction extends AbstractPageAction {
 
     public static final String PERMISSION_EDIT = "permission.text.edit";
 
+    public String title;
     public String content;
     public String[] selection;
     public String[] downloadable;
@@ -415,7 +416,7 @@ public class TextAction extends AbstractPageAction {
         return new ForwardResolution("/layouts/text/configure.jsp");
     }
 
-    @Button(list = "configuration", key = "commons.updateConfiguration")
+    @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, primary = true)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() throws IOException {
         prepareConfigurationForms();
@@ -572,7 +573,7 @@ public class TextAction extends AbstractPageAction {
         return new ForwardResolution("/layouts/text/manage-attachments.jsp");
     }
 
-    @Button(list = "edit-content", key = "commons.update")
+    @Button(list = "edit-content", key = "commons.update", order = 1, primary = true)
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution updateContent() {
         title = context.getRequest().getParameter("title");
@@ -628,7 +629,7 @@ public class TextAction extends AbstractPageAction {
                 .addParameter("cancelReturnUrl", cancelReturnUrl);
     }
 
-    @Button(list = "manage-attachments", key = "commons.ok", order = 1)
+    @Button(list = "manage-attachments", key = "commons.ok", order = 1, primary = true)
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution saveAttachments() {
         if(downloadable == null) {
@@ -648,6 +649,15 @@ public class TextAction extends AbstractPageAction {
     //**************************************************************************
     // Getters/setters
     //**************************************************************************
+
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public String getContent() {
         return content;

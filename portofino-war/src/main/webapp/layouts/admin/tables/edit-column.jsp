@@ -13,7 +13,7 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="column-edit" cssClass="contentButton" />
+        <portofino:buttons list="column-edit" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <fmt:message key="layouts.admin.tables.editColumn.title">
@@ -25,6 +25,6 @@
         <mde:write name="actionBean" property="tableForm" />
     </stripes:layout-component>
     <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="column-edit" cssClass="contentButton" />
+        <portofino:buttons list="column-edit" />
     </stripes:layout-component>
 </stripes:layout-render>

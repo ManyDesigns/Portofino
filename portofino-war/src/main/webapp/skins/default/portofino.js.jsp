@@ -99,8 +99,8 @@ var portofino = {
 
         var container = $(button).parent();
         $(button).remove();
-        container.prepend('<button name="cancel" type="submit" class="btn contentButton">Cancel</button> ');
-        container.prepend('<button name="updateLayout" type="submit" class="btn contentButton">Save</button> ');
+        container.prepend('<button name="cancel" type="submit" class="btn">Cancel</button> ');
+        container.prepend('<button name="updateLayout" type="submit" class="btn">Save</button> ');
         $("button[name=updateLayout]").click(function() {
             var theButton = $(this);
             $('div.portletContainer').each(function(index, element) {

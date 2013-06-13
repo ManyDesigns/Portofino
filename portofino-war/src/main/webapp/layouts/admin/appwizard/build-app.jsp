@@ -47,6 +47,6 @@
                 });
             });
         </script>
-        <portofino:buttons list="build-app" cssClass="contentButton" />
+        <portofino:buttons list="build-app" />
     </stripes:layout-component>
 </stripes:layout-render>

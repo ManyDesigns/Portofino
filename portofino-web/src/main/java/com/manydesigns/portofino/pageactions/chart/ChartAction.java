@@ -283,40 +283,38 @@ public class ChartAction extends AbstractPageAction {
         form.readFromObject(chartConfiguration);
     }
 
-    @Button(list = "configuration", key = "commons.updateConfiguration")
+    @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, primary = true)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() {
-        synchronized (application) {
-            prepareConfigurationForms();
-            form.readFromObject(chartConfiguration);
-            form.readFromRequest(context.getRequest());
-            readPageConfigurationFromRequest();
-            boolean valid = form.validate();
-            valid = validatePageConfiguration() && valid;
-            Field typeField = form.findFieldByPropertyName("type");
-            String typeValue = typeField.getStringValue();
-            boolean placeHolderValue =
-                    typeValue != null && typeValue.startsWith("--");
-            if(placeHolderValue) {
-                valid = false;
-                String errorMessage =
-                        ElementsThreadLocals.getTextProvider().getText("elements.error.field.required");
-                typeField.getErrors().add(errorMessage);
-                SessionMessages.addErrorMessage("");
+        prepareConfigurationForms();
+        form.readFromObject(chartConfiguration);
+        form.readFromRequest(context.getRequest());
+        readPageConfigurationFromRequest();
+        boolean valid = form.validate();
+        valid = validatePageConfiguration() && valid;
+        Field typeField = form.findFieldByPropertyName("type");
+        String typeValue = typeField.getStringValue();
+        boolean placeHolderValue =
+                typeValue != null && typeValue.startsWith("--");
+        if(placeHolderValue) {
+            valid = false;
+            String errorMessage =
+                    ElementsThreadLocals.getTextProvider().getText("elements.error.field.required");
+            typeField.getErrors().add(errorMessage);
+            SessionMessages.addErrorMessage("");
+        }
+        if (valid) {
+            updatePageConfiguration();
+            if(chartConfiguration == null) {
+                chartConfiguration = new ChartConfiguration();
             }
-            if (valid) {
-                updatePageConfiguration();
-                if(chartConfiguration == null) {
-                    chartConfiguration = new ChartConfiguration();
-                }
-                form.writeToObject(chartConfiguration);
-                saveConfiguration(chartConfiguration);
+            form.writeToObject(chartConfiguration);
+            saveConfiguration(chartConfiguration);
 
-                SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
-                return cancel();
-            } else {
-                return new ForwardResolution("/layouts/chart/configure.jsp");
-            }
+            SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
+            return cancel();
+        } else {
+            return new ForwardResolution("/layouts/chart/configure.jsp");
         }
     }
 

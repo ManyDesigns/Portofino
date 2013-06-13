@@ -52,11 +52,11 @@
                     <stripes:form action="${actionBean.actionPath}" method="post" enctype="multipart/form-data"
                                   class="form-horizontal">
                         <stripes:layout-component name="contentHeaderContainer">
-                            <div class="contentHeader row-fluid">
+                            <div class="row-fluid">
                                 <stripes:layout-component name="contentHeader" />
                             </div>
                         </stripes:layout-component>
-                        <div class="contentBody">
+                        <div class="row-fluid">
                             <div class="portletWrapper noSpacing">
                                 <div class="portlet">
                                     <mde:sessionMessages/>
@@ -84,7 +84,7 @@
                             </div>
                         </div>
                         <stripes:layout-component name="contentFooterContainer">
-                            <div class="contentFooter">
+                            <div class="row-fluid">
                                 <stripes:layout-component name="contentFooter" />
                             </div>
                         </stripes:layout-component>

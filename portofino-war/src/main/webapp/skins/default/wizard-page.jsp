@@ -28,10 +28,10 @@
                 <stripes:form action="${actionBean.dispatch.originalPath}"
                               method="post" enctype="multipart/form-data" class="form-horizontal">
                     <jsp:include page="wizard-content-header.jsp" />
-                    <div class="contentHeader row-fluid">
+                    <div class="row-fluid">
                         <stripes:layout-component name="contentHeader" />
                     </div>
-                    <div class="contentBody row-fluid">
+                    <div class="row-fluid">
                         <div class="portletWrapper noSpacing">
                             <div class="portlet">
                                 <mde:sessionMessages/>
@@ -56,7 +56,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="contentFooter row-fluid">
+                    <div class="row-fluid">
                         <stripes:layout-component name="contentFooter" />
                     </div>
                 </stripes:form>

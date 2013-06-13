@@ -78,6 +78,6 @@
                 $("input[name=generationStrategy]").change(toggleRootsForm);
             });
         </script>
-        <portofino:buttons list="select-tables" cssClass="contentButton" />
+        <portofino:buttons list="select-tables" />
     </stripes:layout-component>
 </stripes:layout-render>

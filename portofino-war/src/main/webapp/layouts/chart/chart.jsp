@@ -15,6 +15,6 @@
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="portletFooter">
-        <portofino:buttons list="chart-buttons" cssClass="portletButton" />
+        <portofino:buttons list="chart-buttons" />
     </stripes:layout-component>
 </stripes:layout-render>

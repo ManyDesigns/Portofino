@@ -489,7 +489,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return getCreateView();
     }
 
-    @Button(list = "crud-create", key = "commons.save", order = 1)
+    @Button(list = "crud-create", key = "commons.save", order = 1, primary = true)
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     public Resolution save() {
         setupForm(Mode.CREATE);
@@ -550,7 +550,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return getEditView();
     }
 
-    @Button(list = "crud-edit", key = "commons.update", order = 1)
+    @Button(list = "crud-edit", key = "commons.update", order = 1, primary = true)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution update() {
         setupForm(Mode.EDIT);
@@ -604,7 +604,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return getBulkEditView();
     }
 
-    @Button(list = "crud-bulk-edit", key = "commons.update", order = 1)
+    @Button(list = "crud-bulk-edit", key = "commons.update", order = 1, primary = true)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkUpdate() {
         setupForm(Mode.BULK_EDIT);
@@ -2033,7 +2033,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    @Button(list = "configuration", key = "commons.updateConfiguration")
+    @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, primary = true)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() {
         prepareConfigurationForms();
