@@ -478,7 +478,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Create/Save
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.create", order = 1)
+    @Button(list = "crud-search", key = "commons.create", icon = "plus", order = 1)
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     public Resolution create() {
         setupForm(Mode.CREATE);
@@ -582,7 +582,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Bulk Edit/Update
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.edit", order = 2)
+    @Button(list = "crud-search", key = "commons.edit", icon="edit", order = 2)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkEdit() {
         if (selection == null || selection.length == 0) {
@@ -663,7 +663,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return new RedirectResolution(appendSearchStringParamIfNecessary(url), false);
     }
 
-    @Button(list = "crud-search", key = "commons.delete", order = 3)
+    @Button(list = "crud-search", key = "commons.delete", icon="trash", order = 3)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution bulkDelete() {
         int deleted = 0;
