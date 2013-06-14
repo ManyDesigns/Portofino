@@ -19,7 +19,7 @@
                         <div class="portletTitle">
                             <h4><stripes:layout-component name="portletTitle" /></h4>
                         </div>
-                        <div class="portletHeaderButtons">
+                        <div class="pull-right">
                             <stripes:layout-component name="portletHeaderButtons">
                                 <portofino:buttons list="portletHeaderButtons" />
                             </stripes:layout-component>

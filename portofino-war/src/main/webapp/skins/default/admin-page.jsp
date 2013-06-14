@@ -68,7 +68,7 @@
                                                     <stripes:layout-component name="portletTitle" />
                                                     </h1>
                                                 </div>
-                                                <div class="portletHeaderButtons">
+                                                <div class="pull-right">
                                                     <portofino:buttons list="portletHeaderButtons" />
                                                 </div>
                                             </div>

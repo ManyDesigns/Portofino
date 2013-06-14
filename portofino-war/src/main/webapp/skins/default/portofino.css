@@ -130,21 +130,6 @@ Portlet
     width: 100%;
 }
 
-/* page hader/footer buttons*/
-input.contentButton, button.contentButton, .portletHeaderButtons button {
-    border: 1px solid #D6D6E7;
-    background: #EEEEFF;
-}
-
-.contentButton.btn:hover, .portletHeaderButtons button.btn:hover {
-    border: 1px solid #BEBECF;
-    background-color: #D6D6E7;
-}
-
-.portletHeaderButtons {
-    float:right;
-}
-
 .portletTitle {
     float: left;
 }

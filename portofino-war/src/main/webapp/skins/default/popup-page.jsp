@@ -45,7 +45,7 @@
                                                     </stripes:layout-component>
                                                     </h1>
                                                 </div>
-                                                <div class="portletHeaderButtons">
+                                                <div class="pull-right">
                                                     <stripes:layout-component name="portletHeaderButtons" />
                                                 </div>
                                             </div>

@@ -12,7 +12,7 @@
             <a class="change-password-link" href="${actionBean.dispatch.absoluteOriginalPath}">
                 <fmt:message key="changepasswordaction.change.link" />
             </a>
-            <div class="portletHeaderButtons">
+            <div class="pull-right">
                 <stripes:layout-component name="portletHeaderButtons">
                     <portofino:buttons list="portletHeaderButtons" />
                 </stripes:layout-component>

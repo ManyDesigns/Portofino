@@ -1,7 +1,5 @@
-<%@ page import="java.util.Map"
-%>
-<%@ page import="net.sourceforge.stripes.util.UrlBuilder" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
+<%@ page import="net.sourceforge.stripes.util.UrlBuilder"
+%><%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
@@ -11,8 +9,6 @@
     <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
     <head>
         <jsp:include page="../../head.jsp"/>
-        <!--<link rel="stylesheet" type="text/css"
-              href="<stripes:url value="/skins/${skin}/templates/site/site.css"/>"/>-->
         <stripes:layout-component name="customScripts"/>
         <jsp:useBean id="actionBean" scope="request"
                      type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
