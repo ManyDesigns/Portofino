@@ -12,19 +12,19 @@
             <fmt:param value="${actionBean.column.qualifiedName}" />
         </fmt:message>
     </stripes:layout-component>
-    <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="column-edit" />
-    </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <fmt:message key="layouts.admin.tables.editColumn.title">
             <fmt:param value="${actionBean.column.qualifiedName}" />
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <mde:write name="actionBean" property="columnForm" />
-        <mde:write name="actionBean" property="tableForm" />
-    </stripes:layout-component>
-    <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="column-edit" />
+        <stripes:form action="${actionBean.actionPath}"
+                      method="post" enctype="multipart/form-data" class="form-horizontal">
+            <mde:write name="actionBean" property="columnForm" />
+            <mde:write name="actionBean" property="tableForm" />
+            <div class="form-actions">
+                <portofino:buttons list="column-edit" />
+            </div>
+        </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

@@ -6,78 +6,80 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
+    <jsp:useBean id="actionBean" scope="request"
+                 type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
         <fmt:message key="appwizard.step4.title" />
     </stripes:layout-component>
-    <stripes:layout-component name="contentHeaderContainer">
+    <stripes:layout-component name="portletHeader">
         <jsp:include page="/skins/default/wizard-content-header.jsp" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletHeader" />
     <stripes:layout-component name="portletBody">
-        <style type="text/css">
-            ul li {
-                list-style-type: none;
-            }
-            #calendarField label {
-                width: auto; margin-right: 20px;
-            }
-        </style>
-        <mde:sessionMessages />
-        <p><fmt:message key="appwizard.createPages.selectStrategy" /></p>
-        <label class="radio">
-            <input type="radio" name="generationStrategy" value="AUTO" id="generationStrategy_auto"
-                   ${actionBean.generationStrategy eq 'AUTO' ? 'checked="checked"' : ''} />
-            <fmt:message key="appwizard.createPages.strategy.auto" />
-        </label>
-        <label class="radio">
-            <input type="radio" name="generationStrategy" value="MANUAL" id="generationStrategy_manual"
-                   ${actionBean.generationStrategy eq 'MANUAL' ? 'checked="checked"' : ''} />
-            <fmt:message key="appwizard.createPages.strategy.manual" />
-        </label>
-        <label class="radio">
-            <input type="radio" name="generationStrategy" value="NO" id="generationStrategy_no"
-                   ${actionBean.generationStrategy eq 'NO' ? 'checked="checked"' : ''} />
-            <fmt:message key="appwizard.createPages.strategy.no" />
-        </label>
-        <div id="rootsFormContainer">
-            <span id="calendarField"><mde:write name="actionBean" property="generateCalendarField" /></span>
-            <h4><fmt:message key="appwizard.roots.select" /></h4>
-            <mde:write name="actionBean" property="rootsForm"/>
-        </div>
-        <div style="display: none;">
-            <mde:write name="actionBean" property="userManagementSetupForm"/>
-            <mde:write name="actionBean" property="userAndGroupTablesForm"/>
-            <mde:write name="actionBean" property="schemasForm"/>
-            <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
-            <mde:write name="actionBean" property="connectionProviderField" />
-            <mde:write name="actionBean" property="jndiCPForm"/>
-            <mde:write name="actionBean" property="jdbcCPForm"/>
-        </div>
-    </stripes:layout-component>
-    <stripes:layout-component name="contentFooter">
-        <script type="text/javascript">
-            function toggleRootsForm() {
-                if($("#generationStrategy_manual").prop("checked")) {
-                    $("#rootsFormContainer").show();
-                } else {
-                    $("#rootsFormContainer").hide();
+        <stripes:form beanclass="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"
+                      method="post" enctype="multipart/form-data">
+            <style type="text/css">
+                ul li {
+                    list-style-type: none;
                 }
-            }
+                #calendarField label {
+                    width: auto; margin-right: 20px;
+                }
+            </style>
+            <p><fmt:message key="appwizard.createPages.selectStrategy" /></p>
+            <label class="radio">
+                <input type="radio" name="generationStrategy" value="AUTO" id="generationStrategy_auto"
+                       ${actionBean.generationStrategy eq 'AUTO' ? 'checked="checked"' : ''} />
+                <fmt:message key="appwizard.createPages.strategy.auto" />
+            </label>
+            <label class="radio">
+                <input type="radio" name="generationStrategy" value="MANUAL" id="generationStrategy_manual"
+                       ${actionBean.generationStrategy eq 'MANUAL' ? 'checked="checked"' : ''} />
+                <fmt:message key="appwizard.createPages.strategy.manual" />
+            </label>
+            <label class="radio">
+                <input type="radio" name="generationStrategy" value="NO" id="generationStrategy_no"
+                       ${actionBean.generationStrategy eq 'NO' ? 'checked="checked"' : ''} />
+                <fmt:message key="appwizard.createPages.strategy.no" />
+            </label>
+            <div id="rootsFormContainer">
+                <span id="calendarField"><mde:write name="actionBean" property="generateCalendarField" /></span>
+                <h4><fmt:message key="appwizard.roots.select" /></h4>
+                <mde:write name="actionBean" property="rootsForm"/>
+            </div>
+            <div style="display: none;">
+                <mde:write name="actionBean" property="userManagementSetupForm"/>
+                <mde:write name="actionBean" property="userAndGroupTablesForm"/>
+                <mde:write name="actionBean" property="schemasForm"/>
+                <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
+                <mde:write name="actionBean" property="connectionProviderField" />
+                <mde:write name="actionBean" property="jndiCPForm"/>
+                <mde:write name="actionBean" property="jdbcCPForm"/>
+            </div>
+            <script type="text/javascript">
+                function toggleRootsForm() {
+                    if($("#generationStrategy_manual").prop("checked")) {
+                        $("#rootsFormContainer").show();
+                    } else {
+                        $("#rootsFormContainer").hide();
+                    }
+                }
 
-            $(function() {
-                var buttons = $(".contentFooter button");
-                buttons.click(function() {
-                    buttons.unbind("click");
+                $(function() {
+                    var buttons = $(".form-actions button");
                     buttons.click(function() {
-                        alert("<fmt:message key='commons.waitOperation' />");
-                        return false;
+                        buttons.unbind("click");
+                        buttons.click(function() {
+                            alert("<fmt:message key='commons.waitOperation' />");
+                            return false;
+                        });
                     });
+                    toggleRootsForm();
+                    $("input[name=generationStrategy]").change(toggleRootsForm);
                 });
-                toggleRootsForm();
-                $("input[name=generationStrategy]").change(toggleRootsForm);
-            });
-        </script>
-        <portofino:buttons list="select-tables" />
+            </script>
+            <div class="form-actions">
+                <portofino:buttons list="select-tables" />
+            </div>
+        </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

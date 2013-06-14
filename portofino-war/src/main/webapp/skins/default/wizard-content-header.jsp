@@ -34,3 +34,4 @@
         </c:if>
     </c:forEach>
 </div>
+<div style="border-bottom: solid 1px #E5E5E5; margin-top: 10px; margin-bottom: 10px;"></div>

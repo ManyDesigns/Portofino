@@ -15,7 +15,11 @@
             Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);
             pageContext.setAttribute("dispatch", dispatch);
         %>
-        <title><c:out value="${dispatch.lastPageInstance.page.description}"/></title>
+        <title>
+            <stripes:layout-component name="pageTitle">
+                <c:out value="${dispatch.lastPageInstance.page.description}"/>
+            </stripes:layout-component>
+        </title>
     </head>
     <body>
     <jsp:include page="../../header.jsp"/>
@@ -32,7 +36,11 @@
                         <div class="portlet">
                             <mde:sessionMessages/>
                             <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
-                            <h3 style="border-bottom: 1px solid #E5E5E5"><stripes:layout-component name="portletTitle" /></h3>
+                            <stripes:layout-component name="portletHeader">
+                                <h3 style="border-bottom: 1px solid #E5E5E5">
+                                    <stripes:layout-component name="portletTitle" />
+                                </h3>
+                            </stripes:layout-component>
                             <stripes:layout-component name="portletBody" />
                         </div>
                     </div>

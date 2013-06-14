@@ -80,8 +80,6 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
                 }
 
                 if (currentColumn == 0) {
-                    xb.openElement("div");
-                    xb.addAttribute("class", "row-fluid");
                     rowOpened = true;
                 }
                 current.toXhtml(xb);
@@ -109,7 +107,6 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
                     Integer.toString((nColumns - currentColumn) * 2) );
             xb.closeElement("td");
         }*/
-        xb.closeElement("div");
         currentColumn = 0;
         rowOpened = false;
     }

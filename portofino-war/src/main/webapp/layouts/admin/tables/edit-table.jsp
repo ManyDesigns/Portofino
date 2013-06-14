@@ -11,7 +11,7 @@
     <stripes:layout-component name="customScripts">
         <style type="text/css">
             .tableForm {
-                overflow-x: auto; padding-right: 1px; margin-bottom: 1em;
+                overflow-x: auto;
             }
 
             #sortable {
@@ -68,190 +68,190 @@
             <fmt:param value="${actionBean.table.qualifiedName}" />
         </fmt:message>
     </stripes:layout-component>
-    <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="table-edit" />
-    </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <fmt:message key="layouts.admin.tables.title">
             <fmt:param value="${actionBean.table.qualifiedName}" />
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <ul id="tabs" class="nav nav-tabs">
-            <li class="active"><a data-toggle="tab" href="#tab-table-columns">
-                <fmt:message key="layouts.admin.tables.tableAndColumns" />
-            </a></li>
-            <li><a data-toggle="tab" href="#tab-fk-sp">
-                <fmt:message key="layouts.admin.tables.editTable.foreignKeysAndSelectionProviders" />
-            </a></li>
-        </ul>
-        <div class="tab-content">
-            <div id="tab-table-columns" class="tab-pane fade in active">
-                <mde:write name="actionBean" property="tableForm" />
-                <%-- <span id="editShortNameButton"><portofino:buttons list="table-edit-short-name" cssClass="portletButton" /></span> --%>
-                <br />
-                <div class="tableForm">
-                    <fieldset>
-                        <legend>
-                            <fmt:message key="layouts.admin.tables.editTable.columns" />
-                            <button class="btn sortButton"
-                                type="button" role="button" aria-disabled="false">
-                                <fmt:message key="layouts.admin.tables.changeOrder" />
-                            </button>
-                        </legend>
-                        <div style="margin-top: 1em;">
-                            <div id="columns">
-                                <mde:write name="actionBean" property="columnsTableForm" />
-                            </div>
-                            <div id="sortableContainer">
-                                <fmt:message key="layouts.admin.tables.changeOrder.help" />
-                                <br /><br />
-                                <button class="btn confirmSortButton"
-                                        type="button" role="button" aria-disabled="false">
-                                    <fmt:message key="commons.ok" />
+        <stripes:form action="${actionBean.actionPath}"
+                      method="post" enctype="multipart/form-data">
+            <ul id="tabs" class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#tab-table-columns">
+                    <fmt:message key="layouts.admin.tables.tableAndColumns" />
+                </a></li>
+                <li><a data-toggle="tab" href="#tab-fk-sp">
+                    <fmt:message key="layouts.admin.tables.editTable.foreignKeysAndSelectionProviders" />
+                </a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="tab-table-columns" class="tab-pane fade in active">
+                    <div class="controls-row">
+                        <mde:write name="actionBean" property="tableForm" />
+                    </div>
+                    <div class="tableForm">
+                        <fieldset>
+                            <legend>
+                                <fmt:message key="layouts.admin.tables.editTable.columns" />
+                                <button class="btn sortButton"
+                                    type="button" role="button" aria-disabled="false">
+                                    <fmt:message key="layouts.admin.tables.changeOrder" />
                                 </button>
-                                <button class="btn cancelSortButton"
-                                        type="button" role="button" aria-disabled="false">
-                                    <fmt:message key="commons.cancel" />
-                                </button>
-                                <ul id="sortable">
-                                    <c:forEach var="col" items="${actionBean.decoratedColumns}" varStatus="status">
-                                        <li class="ui-state-default" id="col_${status.index}">
-                                            <c:out value="${col.columnName}" />
-                                            <input type="hidden" name="sortedColumnNames[]" value="${col.columnName}" />
-                                        </li>
-                                    </c:forEach>
-                                </ul>
+                            </legend>
+                            <div style="margin-top: 1em;">
+                                <div id="columns">
+                                    <mde:write name="actionBean" property="columnsTableForm" />
+                                </div>
+                                <div id="sortableContainer">
+                                    <fmt:message key="layouts.admin.tables.changeOrder.help" />
+                                    <br /><br />
+                                    <button class="btn confirmSortButton"
+                                            type="button" role="button" aria-disabled="false">
+                                        <fmt:message key="commons.ok" />
+                                    </button>
+                                    <button class="btn cancelSortButton"
+                                            type="button" role="button" aria-disabled="false">
+                                        <fmt:message key="commons.cancel" />
+                                    </button>
+                                    <ul id="sortable">
+                                        <c:forEach var="col" items="${actionBean.decoratedColumns}" varStatus="status">
+                                            <li class="ui-state-default" id="col_${status.index}">
+                                                <c:out value="${col.columnName}" />
+                                                <input type="hidden" name="sortedColumnNames[]" value="${col.columnName}" />
+                                            </li>
+                                        </c:forEach>
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
-                    </fieldset>
+                        </fieldset>
+                    </div>
+                </div>
+                <div id="tab-fk-sp" class="tab-pane fade in">
+                    <div class="tableForm">
+                        <fieldset>
+                            <legend><fmt:message key="layouts.admin.tables.editTable.foreignKeys" /></legend>
+                            <div style="margin-top: 1em;">
+                                <c:if test="${not empty actionBean.table.foreignKeys}">
+                                    <table>
+                                        <tr>
+                                            <th><fmt:message key="layouts.admin.tables.editTable.name" /></th>
+                                            <th><fmt:message key="layouts.admin.tables.editTable.onePropertyName" /></th>
+                                            <th><fmt:message key="layouts.admin.tables.editTable.manyPropertyName" /></th>
+                                            <th><fmt:message key="layouts.admin.tables.editTable.columns" /></th>
+                                            <th><fmt:message key="layouts.admin.tables.editTable.refTable" /></th>
+                                            <th><fmt:message key="layouts.admin.tables.editTable.refColumns" /></th>
+                                        </tr>
+                                        <c:forEach items="${actionBean.table.foreignKeys}" var="fk">
+                                            <tr>
+                                                <td rowspan="${fn:length(fk.references)}"><c:out value="${fk.name}" /></td>
+                                                <td rowspan="${fn:length(fk.references)}">
+                                                    <input name="fkOnePropertyNames[${fk.name}]" type="text" value="${actionBean.fkOnePropertyNames[fk.name]}"/>
+                                                </td>
+                                                <td rowspan="${fn:length(fk.references)}">
+                                                    <input name="fkManyPropertyNames[${fk.name}]" type="text" value="${actionBean.fkManyPropertyNames[fk.name]}"/>
+                                                </td>
+                                                <td>
+                                                    <a href="<stripes:url value="${actionBean.actionPath}/${fk.references[0].actualFromColumn.columnName}"/>">
+                                                        <c:out value="${fk.references[0].actualFromColumn.columnName}" />
+                                                    </a>
+                                                </td>
+                                                <td rowspan="${fn:length(fk.references)}">
+                                                    <a href="<stripes:url value="${actionBean.baseActionPath}/${fk.toTable.databaseName}/${fk.toTable.schemaName}/${fk.toTable.tableName}"/>">
+                                                        <c:out value="${fk.toTable.tableName}" />
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="<stripes:url value="${actionBean.baseActionPath}/${fk.toTable.databaseName}/${fk.toTable.schemaName}/${fk.toTable.tableName}/${fk.references[0].actualToColumn.columnName}"/>">
+                                                        <c:out value="${fk.references[0].actualToColumn.columnName}" />
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <c:forEach items="${fk.references}" var="ref" varStatus="status">
+                                                <c:if test="${not status.first}">
+                                                    <tr>
+                                                        <td>
+                                                            <a href="<stripes:url value="${actionBean.actionPath}/${ref.actualFromColumn.columnName}"/>">
+                                                                <c:out value="${ref.actualFromColumn.columnName}" />
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <a href="<stripes:url value="${actionBean.baseActionPath}/${ref.actualToColumn.databaseName}/${ref.actualToColumn.schemaName}/${ref.actualToColumn.tableName}/${ref.actualToColumn.columnName}"/>">
+                                                                <c:out value="${ref.actualToColumn.columnName}" />
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </c:if>
+                                            </c:forEach>
+                                        </c:forEach>
+                                    </table>
+                                </c:if>
+                                <c:if test="${empty actionBean.table.foreignKeys}">
+                                    <fmt:message key="layouts.admin.tables.editTable.noForeignKeys" />
+                                </c:if>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="tableForm">
+                        <fieldset>
+                            <legend><fmt:message key="layouts.admin.tables.editTable.selectionProviders" /></legend>
+                            <div style="margin-top: 1em;">
+                                <c:if test="${not empty actionBean.table.selectionProviders}">
+                                    <table>
+                                        <tr>
+                                            <th><fmt:message key="layouts.admin.tables.editTable.name" /></th>
+                                            <th><fmt:message key="layouts.admin.tables.editTable.columns" /></th>
+                                            <th><fmt:message key="layouts.admin.tables.editTable.database" /></th>
+                                            <th><fmt:message key="layouts.admin.tables.editTable.query" /></th>
+                                        </tr>
+                                        <c:forEach items="${actionBean.table.selectionProviders}" var="sp">
+                                            <tr>
+                                                <td rowspan="${fn:length(sp.references)}">
+                                                    <a href="<stripes:url value="${actionBean.actionPath}?editSelectionProvider=&amp;selectionProviderName=${sp.name}&amp;selectedTabId=tab-fk-sp"/>">
+                                                        <c:out value="${sp.name}" />
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="<stripes:url value="${actionBean.actionPath}/${sp.references[0].actualFromColumn.columnName}"/>">
+                                                        <c:out value="${sp.references[0].actualFromColumn.columnName}" />
+                                                    </a>
+                                                </td>
+                                                <td rowspan="${fn:length(sp.references)}"><c:out value="${sp.toDatabase}" /></td>
+                                                <td rowspan="${fn:length(sp.references)}">
+                                                    <c:if test="${not empty sp.hql}">
+                                                        <b>HQL:</b> <c:out value="${sp.hql}" /><br />
+                                                    </c:if>
+                                                    <c:if test="${not empty sp.sql}">
+                                                        <b>SQL:</b> <c:out value="${sp.sql}" />
+                                                    </c:if>
+                                                </td>
+                                            </tr>
+                                            <c:forEach items="${sp.references}" var="ref" varStatus="status">
+                                                <c:if test="${not status.first}">
+                                                    <tr>
+                                                        <td>
+                                                            <a href="<stripes:url value="${actionBean.actionPath}/${ref.actualFromColumn.columnName}"/>">
+                                                                <c:out value="${ref.actualFromColumn.columnName}" />
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </c:if>
+                                            </c:forEach>
+                                        </c:forEach>
+                                    </table>
+                                </c:if>
+                                <c:if test="${empty actionBean.table.selectionProviders}">
+                                    <fmt:message key="layouts.admin.tables.editTable.noSelectionProviders" /><br />
+                                </c:if>
+                                <br />
+                                <portofino:buttons list="table-selection-providers" />
+                            </div>
+                        </fieldset>
+                    </div>
                 </div>
             </div>
-            <div id="tab-fk-sp" class="tab-pane fade in">
-                <div class="tableForm">
-                    <fieldset>
-                        <legend><fmt:message key="layouts.admin.tables.editTable.foreignKeys" /></legend>
-                        <div style="margin-top: 1em;">
-                            <c:if test="${not empty actionBean.table.foreignKeys}">
-                                <table>
-                                    <tr>
-                                        <th><fmt:message key="layouts.admin.tables.editTable.name" /></th>
-                                        <th><fmt:message key="layouts.admin.tables.editTable.onePropertyName" /></th>
-                                        <th><fmt:message key="layouts.admin.tables.editTable.manyPropertyName" /></th>
-                                        <th><fmt:message key="layouts.admin.tables.editTable.columns" /></th>
-                                        <th><fmt:message key="layouts.admin.tables.editTable.refTable" /></th>
-                                        <th><fmt:message key="layouts.admin.tables.editTable.refColumns" /></th>
-                                    </tr>
-                                    <c:forEach items="${actionBean.table.foreignKeys}" var="fk">
-                                        <tr>
-                                            <td rowspan="${fn:length(fk.references)}"><c:out value="${fk.name}" /></td>
-                                            <td rowspan="${fn:length(fk.references)}">
-                                                <input name="fkOnePropertyNames[${fk.name}]" type="text" value="${actionBean.fkOnePropertyNames[fk.name]}"/>
-                                            </td>
-                                            <td rowspan="${fn:length(fk.references)}">
-                                                <input name="fkManyPropertyNames[${fk.name}]" type="text" value="${actionBean.fkManyPropertyNames[fk.name]}"/>
-                                            </td>
-                                            <td>
-                                                <a href="<stripes:url value="${actionBean.actionPath}/${fk.references[0].actualFromColumn.columnName}"/>">
-                                                    <c:out value="${fk.references[0].actualFromColumn.columnName}" />
-                                                </a>
-                                            </td>
-                                            <td rowspan="${fn:length(fk.references)}">
-                                                <a href="<stripes:url value="${actionBean.baseActionPath}/${fk.toTable.databaseName}/${fk.toTable.schemaName}/${fk.toTable.tableName}"/>">
-                                                    <c:out value="${fk.toTable.tableName}" />
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <a href="<stripes:url value="${actionBean.baseActionPath}/${fk.toTable.databaseName}/${fk.toTable.schemaName}/${fk.toTable.tableName}/${fk.references[0].actualToColumn.columnName}"/>">
-                                                    <c:out value="${fk.references[0].actualToColumn.columnName}" />
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        <c:forEach items="${fk.references}" var="ref" varStatus="status">
-                                            <c:if test="${not status.first}">
-                                                <tr>
-                                                    <td>
-                                                        <a href="<stripes:url value="${actionBean.actionPath}/${ref.actualFromColumn.columnName}"/>">
-                                                            <c:out value="${ref.actualFromColumn.columnName}" />
-                                                        </a>
-                                                    </td>
-                                                    <td>
-                                                        <a href="<stripes:url value="${actionBean.baseActionPath}/${ref.actualToColumn.databaseName}/${ref.actualToColumn.schemaName}/${ref.actualToColumn.tableName}/${ref.actualToColumn.columnName}"/>">
-                                                            <c:out value="${ref.actualToColumn.columnName}" />
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            </c:if>
-                                        </c:forEach>
-                                    </c:forEach>
-                                </table>
-                            </c:if>
-                            <c:if test="${empty actionBean.table.foreignKeys}">
-                                <fmt:message key="layouts.admin.tables.editTable.noForeignKeys" />
-                            </c:if>
-                        </div>
-                    </fieldset>
-                </div>
-                <div class="tableForm">
-                    <fieldset>
-                        <legend><fmt:message key="layouts.admin.tables.editTable.selectionProviders" /></legend>
-                        <div style="margin-top: 1em;">
-                            <c:if test="${not empty actionBean.table.selectionProviders}">
-                                <table>
-                                    <tr>
-                                        <th><fmt:message key="layouts.admin.tables.editTable.name" /></th>
-                                        <th><fmt:message key="layouts.admin.tables.editTable.columns" /></th>
-                                        <th><fmt:message key="layouts.admin.tables.editTable.database" /></th>
-                                        <th><fmt:message key="layouts.admin.tables.editTable.query" /></th>
-                                    </tr>
-                                    <c:forEach items="${actionBean.table.selectionProviders}" var="sp">
-                                        <tr>
-                                            <td rowspan="${fn:length(sp.references)}">
-                                                <a href="<stripes:url value="${actionBean.actionPath}?editSelectionProvider=&amp;selectionProviderName=${sp.name}&amp;selectedTabId=tab-fk-sp"/>">
-                                                    <c:out value="${sp.name}" />
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <a href="<stripes:url value="${actionBean.actionPath}/${sp.references[0].actualFromColumn.columnName}"/>">
-                                                    <c:out value="${sp.references[0].actualFromColumn.columnName}" />
-                                                </a>
-                                            </td>
-                                            <td rowspan="${fn:length(sp.references)}"><c:out value="${sp.toDatabase}" /></td>
-                                            <td rowspan="${fn:length(sp.references)}">
-                                                <c:if test="${not empty sp.hql}">
-                                                    <b>HQL:</b> <c:out value="${sp.hql}" /><br />
-                                                </c:if>
-                                                <c:if test="${not empty sp.sql}">
-                                                    <b>SQL:</b> <c:out value="${sp.sql}" />
-                                                </c:if>
-                                            </td>
-                                        </tr>
-                                        <c:forEach items="${sp.references}" var="ref" varStatus="status">
-                                            <c:if test="${not status.first}">
-                                                <tr>
-                                                    <td>
-                                                        <a href="<stripes:url value="${actionBean.actionPath}/${ref.actualFromColumn.columnName}"/>">
-                                                            <c:out value="${ref.actualFromColumn.columnName}" />
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            </c:if>
-                                        </c:forEach>
-                                    </c:forEach>
-                                </table>
-                            </c:if>
-                            <c:if test="${empty actionBean.table.selectionProviders}">
-                                <fmt:message key="layouts.admin.tables.editTable.noSelectionProviders" /><br />
-                            </c:if>
-                            <br />
-                            <portofino:buttons list="table-selection-providers" />
-                        </div>
-                    </fieldset>
-                </div>
+            <div class="form-actions">
+                <portofino:buttons list="table-edit" />
             </div>
-        </div>
-    </stripes:layout-component>
-    <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="table-edit" />
+        </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

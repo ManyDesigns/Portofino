@@ -27,9 +27,6 @@
     <stripes:layout-component name="pageTitle">
         Tables
     </stripes:layout-component>
-    <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="tables-list" />
-    </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         Tables
     </stripes:layout-component>
@@ -91,8 +88,11 @@
                     </tr><%
                 } %>
         </table>
-    </stripes:layout-component>
-    <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="tables-list" />
+        <stripes:form beanclass="com.manydesigns.portofino.actions.admin.TablesAction"
+                      method="post" enctype="multipart/form-data">
+            <div class="form-actions">
+                <portofino:buttons list="tables-list" />
+            </div>
+        </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

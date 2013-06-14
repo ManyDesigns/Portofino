@@ -37,7 +37,6 @@ import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.servlets.ServerInfo;
 import net.sourceforge.stripes.action.*;
-import net.sourceforge.stripes.controller.ActionResolver;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.FileConfiguration;
@@ -57,7 +56,7 @@ import java.util.ResourceBundle;
  */
 @RequiresAdministrator
 @UrlBinding("/actions/admin/settings")
-public class SettingsAction extends AbstractActionBean implements AdminAction {
+public class SettingsAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -109,7 +108,7 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
         form.readFromObject(appConfiguration);
     }
 
-    @Button(list = "settings", key = "commons.update", order = 1)
+    @Button(list = "settings", key = "commons.update", order = 1, primary = true)
     public Resolution update() {
         setupFormAndBean();
         form.readFromRequest(context.getRequest());
@@ -178,10 +177,6 @@ public class SettingsAction extends AbstractActionBean implements AdminAction {
 
     public Form getForm() {
         return form;
-    }
-
-    public String getActionPath() {
-        return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
     }
 
 }

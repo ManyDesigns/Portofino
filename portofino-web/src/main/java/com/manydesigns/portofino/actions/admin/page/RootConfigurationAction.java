@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.actions.admin.page;
 
-import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.actions.admin.SettingsAction;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
@@ -45,7 +44,7 @@ import java.io.File;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresAdministrator
-public abstract class RootConfigurationAction extends PageAdminAction implements AdminAction {
+public abstract class RootConfigurationAction extends PageAdminAction {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 

@@ -65,7 +65,7 @@ import java.util.ResourceBundle;
 */
 @RequiresAdministrator
 @UrlBinding("/actions/admin/connection-providers")
-public class ConnectionProvidersAction extends AbstractActionBean implements AdminAction {
+public class ConnectionProvidersAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -295,7 +295,7 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
         return new ForwardResolution("/layouts/admin/connectionProviders/edit.jsp");
     }
 
-    @Button(list = "connectionProviders-edit", key = "commons.update", order = 1)
+    @Button(list = "connectionProviders-edit", key = "commons.update", order = 1, primary = true)
     public Resolution update() {
         connectionProvider = application.getConnectionProvider(databaseName);
         databasePlatform = connectionProvider.getDatabasePlatform();
@@ -458,10 +458,6 @@ public class ConnectionProvidersAction extends AbstractActionBean implements Adm
     @Button(list = "connectionProviders-search", key = "commons.returnToPages", order = 3)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
-    }
-
-    public String getActionPath() {
-        return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
     }
 
     protected String getMessage(String key, Object... args) {

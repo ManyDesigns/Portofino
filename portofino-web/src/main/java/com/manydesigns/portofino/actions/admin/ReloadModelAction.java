@@ -31,7 +31,6 @@ import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.servlets.ServerInfo;
 import net.sourceforge.stripes.action.*;
-import net.sourceforge.stripes.controller.ActionResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +45,7 @@ import java.util.ResourceBundle;
  */
 @RequiresAdministrator
 @UrlBinding("/actions/admin/reload-model")
-public class ReloadModelAction extends AbstractActionBean implements AdminAction {
+public class ReloadModelAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -72,7 +71,7 @@ public class ReloadModelAction extends AbstractActionBean implements AdminAction
         return new ForwardResolution("/layouts/admin/reload-model.jsp");
     }
 
-    @Button(list = "reload-model", key = "model.reload", order = 1)
+    @Button(list = "reload-model", key = "model.reload", order = 1, primary = true)
     @RequiresAdministrator
     public Resolution reloadModel() {
         synchronized (application) {
@@ -92,10 +91,6 @@ public class ReloadModelAction extends AbstractActionBean implements AdminAction
     @Button(list = "reload-model-bar", key = "commons.returnToPages", order = 1)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
-    }
-
-    public String getActionPath() {
-        return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
     }
 
 }

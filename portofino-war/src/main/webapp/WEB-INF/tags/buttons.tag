@@ -49,10 +49,11 @@
             Button theButton = button.getButton();
             boolean hasIcon = !StringUtils.isBlank(theButton.icon());
             boolean isPrimary = theButton.primary();
-            if(primaryFound && isPrimary) {
-                isPrimary = false;
-                LoggerFactory.getLogger(Button.class).warn("More than one button with primary = true in list " + list + ": " + handler);
-            } else {
+            if(isPrimary) {
+                if(primaryFound) {
+                    isPrimary = false;
+                    LoggerFactory.getLogger(Button.class).warn("More than one button with primary = true in list " + list + ": " + handler);
+                }
                 primaryFound = true;
             }
             buffer.openElement("button");

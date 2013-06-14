@@ -50,13 +50,9 @@ public class RootPermissionsAction extends RootConfigurationAction {
         return new ForwardResolution("/layouts/admin/rootPermissions.jsp");
     }
 
-    @Button(list = "root-permissions", key = "commons.update", order = 1)
+    @Button(list = "root-permissions", key = "commons.update", order = 1, primary = true)
     public Resolution updatePagePermissions() {
         return super.updatePagePermissions();
-    }
-
-    public String getActionPath() {
-        return "/actions/admin/root-page/permissions";
     }
 
 }

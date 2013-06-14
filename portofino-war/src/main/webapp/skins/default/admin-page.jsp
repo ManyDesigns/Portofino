@@ -48,50 +48,22 @@
                 </div>
             </div>
             <div id="content" class="span10">
-                    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.AdminAction"/>
-                    <stripes:form action="${actionBean.actionPath}" method="post" enctype="multipart/form-data"
-                                  class="form-horizontal">
-                        <stripes:layout-component name="contentHeaderContainer">
-                            <div class="row-fluid">
-                                <stripes:layout-component name="contentHeader" />
-                            </div>
-                        </stripes:layout-component>
-                        <div class="row-fluid">
-                            <div class="portletWrapper noSpacing">
-                                <div class="portlet">
-                                    <mde:sessionMessages/>
-                                    <div class="portletHeader">
-                                        <stripes:layout-component name="portletHeader">
-                                            <div>
-                                                <div class="portletTitle">
-                                                    <h1>
-                                                    <stripes:layout-component name="portletTitle" />
-                                                    </h1>
-                                                </div>
-                                                <div class="pull-right">
-                                                    <portofino:buttons list="portletHeaderButtons" />
-                                                </div>
-                                            </div>
-                                        </stripes:layout-component>
-                                    </div>
-                                    <div class="portletBody">
-                                        <stripes:layout-component name="portletBody" />
-                                    </div>
-                                    <div class="portletFooter">
-                                        <stripes:layout-component name="portletFooter" />
-                                    </div>
-                                </div>
-                            </div>
+                <div class="row-fluid">
+                    <div class="portletWrapper noSpacing">
+                        <div class="portlet">
+                            <mde:sessionMessages/>
+                            <stripes:layout-component name="portletHeader">
+                                <h3 style="border-bottom: 1px solid #E5E5E5">
+                                    <stripes:layout-component name="portletTitle" />
+                                </h3>
+                            </stripes:layout-component>
+                            <stripes:layout-component name="portletBody" />
                         </div>
-                        <stripes:layout-component name="contentFooterContainer">
-                            <div class="row-fluid">
-                                <stripes:layout-component name="contentFooter" />
-                            </div>
-                        </stripes:layout-component>
-                    </stripes:form>
+                    </div>
                 </div>
+            </div>
         </div>
-    </div>
+    </div
     <jsp:include page="footer.jsp"/>
     </body>
     </html>

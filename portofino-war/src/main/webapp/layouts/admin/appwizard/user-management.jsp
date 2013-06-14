@@ -6,39 +6,41 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
+    <jsp:useBean id="actionBean" scope="request"
+                 type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
         <fmt:message key="appwizard.step3.title" />
     </stripes:layout-component>
-    <stripes:layout-component name="contentHeaderContainer">
+    <stripes:layout-component name="portletHeader">
         <jsp:include page="/skins/default/wizard-content-header.jsp" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletHeader" />
     <stripes:layout-component name="portletBody">
-        <mde:sessionMessages />
-        <p><fmt:message key="appwizard.userManagement.warning" /></p>
-        <mde:write name="actionBean" property="userAndGroupTablesForm"/>
-        <div style="display: none;">
-            <mde:write name="actionBean" property="schemasForm"/>
-            <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
-            <mde:write name="actionBean" property="connectionProviderField" />
-            <mde:write name="actionBean" property="jndiCPForm"/>
-            <mde:write name="actionBean" property="jdbcCPForm"/>
-        </div>
-    </stripes:layout-component>
-    <stripes:layout-component name="contentFooter">
-        <script type="text/javascript">
-            $(function() {
-                var buttons = $(".contentFooter button");
-                buttons.click(function() {
-                    buttons.unbind("click");
+        <stripes:form beanclass="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"
+                      method="post" enctype="multipart/form-data" class="form-horizontal">
+            <p><fmt:message key="appwizard.userManagement.warning" /></p>
+            <mde:write name="actionBean" property="userAndGroupTablesForm"/>
+            <div style="display: none;">
+                <mde:write name="actionBean" property="schemasForm"/>
+                <input type="hidden" name="connectionProviderType" value="${actionBean.connectionProviderType}" />
+                <mde:write name="actionBean" property="connectionProviderField" />
+                <mde:write name="actionBean" property="jndiCPForm"/>
+                <mde:write name="actionBean" property="jdbcCPForm"/>
+            </div>
+            <script type="text/javascript">
+                $(function() {
+                    var buttons = $(".form-actions button");
                     buttons.click(function() {
-                        alert("<fmt:message key='commons.waitOperation' />");
-                        return false;
+                        buttons.unbind("click");
+                        buttons.click(function() {
+                            alert("<fmt:message key='commons.waitOperation' />");
+                            return false;
+                        });
                     });
                 });
-            });
-        </script>
-        <portofino:buttons list="user-management" />
+            </script>
+            <div class="form-actions" style="padding-left: 20px;">
+                <portofino:buttons list="user-management" />
+            </div>
+        </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

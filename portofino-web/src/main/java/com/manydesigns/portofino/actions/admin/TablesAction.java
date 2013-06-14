@@ -74,7 +74,7 @@ import java.util.*;
 */
 @RequiresAdministrator
 @UrlBinding(TablesAction.BASE_ACTION_PATH + "/{databaseName}/{schemaName}/{tableName}/{columnName}")
-public class TablesAction extends AbstractActionBean implements AdminAction {
+public class TablesAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -179,7 +179,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         return new ForwardResolution("/layouts/admin/tables/edit-column.jsp");
     }
 
-    @Button(key = "commons.save", list = "table-edit", order = 1)
+    @Button(key = "commons.save", list = "table-edit", order = 1, primary = true)
     public Resolution saveTable() {
         com.manydesigns.portofino.actions.admin.tables.forms.TableForm tf = setupTableForm(Mode.EDIT);
         setupColumnsForm(Mode.EDIT);
@@ -273,7 +273,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         return new RedirectResolution(BASE_ACTION_PATH);
     }
 
-    @Button(key = "commons.save", list = "column-edit", order = 1)
+    @Button(key = "commons.save", list = "column-edit", order = 1, primary = true)
     public Resolution saveColumn() {
         setupTableForm(Mode.HIDDEN);
         tableForm.readFromRequest(context.getRequest());
@@ -396,7 +396,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
         return databaseSelectionProviderForm;
     }
 
-    @Button(key = "commons.save", list = "table-selection-provider", order = 1)
+    @Button(key = "commons.save", list = "table-selection-provider", order = 1, primary = true)
     public Resolution saveSelectionProvider() {
         table = findTable();
         Mode mode = selectionProviderName == null ? Mode.CREATE : Mode.EDIT;
@@ -539,6 +539,7 @@ public class TablesAction extends AbstractActionBean implements AdminAction {
                 .configMode(mode)
                 .build();
         columnsTableForm.setSelectable(false);
+        columnsTableForm.setCondensed(true);
         for(int i = 0; i < decoratedColumns.size(); i++) {
             TableForm.Row row = columnsTableForm.getRows()[i];
             Column column = decoratedColumns.get(i);

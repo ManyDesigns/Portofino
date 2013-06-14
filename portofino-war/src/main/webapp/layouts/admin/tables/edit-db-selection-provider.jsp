@@ -29,9 +29,6 @@
             </fmt:message>
         </c:if>
     </stripes:layout-component>
-    <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="table-selection-provider" />
-    </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <c:if test="${empty actionBean.selectionProviderName}">
             <fmt:message key="layouts.admin.tables.addSelectionProvider.title">
@@ -45,12 +42,15 @@
         </c:if>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <mde:write name="actionBean" property="dbSelectionProviderForm" />
-        <mde:write name="actionBean" property="tableForm" />
-        <input name="selectionProviderName" type="hidden" value="${actionBean.selectionProviderName}" />
-        <input name="selectedTabId" type="hidden" value="tab-fk-sp" />
-    </stripes:layout-component>
-    <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="table-selection-provider" />
+        <stripes:form action="${actionBean.actionPath}"
+                      method="post" enctype="multipart/form-data" class="form-horizontal">
+            <mde:write name="actionBean" property="dbSelectionProviderForm" />
+            <mde:write name="actionBean" property="tableForm" />
+            <input name="selectionProviderName" type="hidden" value="${actionBean.selectionProviderName}" />
+            <input name="selectedTabId" type="hidden" value="tab-fk-sp" />
+            <div class="form-actions">
+                <portofino:buttons list="table-selection-provider" />
+            </div>
+        </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

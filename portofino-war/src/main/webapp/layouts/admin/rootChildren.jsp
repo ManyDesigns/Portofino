@@ -6,20 +6,21 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/skins/default/admin-page.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.page.RootConfigurationAction"/>
+    <jsp:useBean id="actionBean" scope="request"
+                 type="com.manydesigns.portofino.actions.admin.page.RootConfigurationAction"/>
     <stripes:layout-component name="pageTitle">
         <fmt:message key="layouts.admin.rootChildren" />
     </stripes:layout-component>
-    <stripes:layout-component name="contentHeader">
-        <portofino:buttons list="root-children" />
-    </stripes:layout-component>
-    <stripes:layout-component name="portletHeader">
-        <h4><fmt:message key="layouts.admin.rootChildren" /></h4>
+    <stripes:layout-component name="portletTitle">
+        <fmt:message key="layouts.admin.rootChildren" />
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <%@include file="/layouts/page/children-tables.jsp"%>
-    </stripes:layout-component>
-    <stripes:layout-component name="contentFooter">
-        <portofino:buttons list="root-children" />
+        <stripes:form beanclass="com.manydesigns.portofino.actions.admin.page.RootChildrenAction"
+                      method="post" enctype="multipart/form-data">
+            <%@include file="/layouts/page/children-tables.jsp"%>
+            <div class="form-actions">
+                <portofino:buttons list="root-children" />
+            </div>
+        </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

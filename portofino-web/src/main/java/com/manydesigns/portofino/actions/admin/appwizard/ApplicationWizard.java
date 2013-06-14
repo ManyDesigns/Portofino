@@ -37,7 +37,6 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.actions.admin.AdminAction;
 import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderForm;
 import com.manydesigns.portofino.actions.forms.SelectableSchema;
@@ -70,7 +69,6 @@ import groovy.text.TemplateEngine;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import net.sourceforge.stripes.action.*;
-import net.sourceforge.stripes.controller.ActionResolver;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
@@ -97,7 +95,7 @@ import java.util.List;
  */
 @RequiresAdministrator
 @UrlBinding("/actions/admin/wizard")
-public class ApplicationWizard extends AbstractWizardPageAction implements AdminAction {
+public class ApplicationWizard extends AbstractWizardPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
     public static final String JDBC = "JDBC";
@@ -251,7 +249,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         return configureConnectionProvider();
     }
 
-    @Button(list = "connection-provider", key="wizard.next", order = 2)
+    @Button(list = "connection-provider", key="wizard.next", order = 1, primary = true)
     public Resolution configureConnectionProvider() {
         buildCPForms();
         if(connectionProviderField.validate()) {
@@ -333,7 +331,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
     }
 
     @Buttons({
-        @Button(list = "select-schemas", key="wizard.next", order = 2),
+        @Button(list = "select-schemas", key="wizard.next", order = 2, primary = true),
         @Button(list = "select-user-fields", key="wizard.prev", order = 1)
     })
     public Resolution selectSchemas() {
@@ -498,7 +496,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         return new ForwardResolution("/layouts/admin/appwizard/user-management.jsp");
     }
 
-    @Button(list = "user-management", key="wizard.next", order = 2)
+    @Button(list = "user-management", key="wizard.next", order = 2, primary = true)
     public Resolution setupUserManagement() {
         selectSchemas();
 
@@ -651,7 +649,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         }
     }
 
-    @Button(list = "select-user-fields", key="wizard.next", order = 2)
+    @Button(list = "select-user-fields", key="wizard.next", order = 2, primary = true)
     public Resolution selectUserFields() {
         setupUserManagement();
         if(userTable != null) {
@@ -770,7 +768,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         return roots;
     }
 
-    @Button(list = "select-tables", key="wizard.next", order = 2)
+    @Button(list = "select-tables", key="wizard.next", order = 2, primary = true)
     public Resolution selectTables() {
         selectUserFields();
 
@@ -810,7 +808,7 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
         return selectTablesForm();
     }
 
-    @Button(list = "build-app", key="wizard.finish", order = 2)
+    @Button(list = "build-app", key="wizard.finish", order = 2, primary = true)
     public Resolution buildApplication() {
         selectTables();
         Database oldDatabase =
@@ -1468,10 +1466,6 @@ public class ApplicationWizard extends AbstractWizardPageAction implements Admin
 
     public boolean isJndi() {
         return StringUtils.equals(connectionProviderType, JNDI);
-    }
-
-    public String getActionPath() {
-        return (String) getContext().getRequest().getAttribute(ActionResolver.RESOLVED_ACTION);
     }
 
     public String getConnectionProviderType() {

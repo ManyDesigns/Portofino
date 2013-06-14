@@ -53,7 +53,7 @@ public class RootChildrenAction extends RootConfigurationAction {
     }
 
     @Override
-    @Button(list = "root-children", key = "commons.update", order = 1)
+    @Button(list = "root-children", key = "commons.update", order = 1, primary = true)
     public Resolution updatePageChildren() {
         return super.updatePageChildren();
     }
@@ -67,10 +67,6 @@ public class RootChildrenAction extends RootConfigurationAction {
     @Override
     protected String[] getChildPagesFormFields() {
         return new String[] { "active", "name", "title", "showInNavigation", };
-    }
-
-    public String getActionPath() {
-        return "/actions/admin/root-page/children";
     }
 
 }
