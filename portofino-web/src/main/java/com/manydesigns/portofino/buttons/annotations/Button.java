@@ -53,10 +53,14 @@ public @interface Button {
     double order() default 1.0;
 
     /**
-     * The resource bundle key for the button's label. If an icon() is specified, the key is
-     * used as a title instead (shown as a tooltip on most browsers).
+     * The resource bundle key for the button's label.
      */
     String key() default "";
+
+    /**
+     * The resource bundle key for the button's title (shown as a tooltip on most browsers).
+     */
+    String titleKey() default "";
 
     /**
      * The name of the button's icon.

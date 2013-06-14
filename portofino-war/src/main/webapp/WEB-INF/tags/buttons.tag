@@ -47,7 +47,9 @@
             }
             XhtmlBuffer buffer = new XhtmlBuffer(out);
             Button theButton = button.getButton();
+            boolean hasText = !StringUtils.isBlank(theButton.key());
             boolean hasIcon = !StringUtils.isBlank(theButton.icon());
+            boolean hasTitle = !StringUtils.isBlank(theButton.titleKey());
             boolean isPrimary = theButton.primary();
             if(isPrimary) {
                 if(primaryFound) {
@@ -57,36 +59,40 @@
                 primaryFound = true;
             }
             buffer.openElement("button");
-            String id = UUID.randomUUID().toString();
-            if(hasIcon) {
-                buffer.addAttribute("id", id);
-            }
             if(!ButtonsLogic.doGuardsPass(actionBean, handler, GuardType.ENABLED)) {
                 buffer.addAttribute("disabled", "disabled");
             }
             buffer.addAttribute("name", handler.getName());
-            %>
-                <fmt:message key="<%= theButton.key() %>" var="__buttonValue" scope="page" />
-            <%
-            String value = (String) jspContext.getAttribute("__buttonValue");
-            jspContext.removeAttribute("__buttonValue");
+
+            if(hasTitle) {
+                %>
+                    <fmt:message key="<%= theButton.titleKey() %>" var="__buttonTitle" scope="page" />
+                <%
+                String title = (String) jspContext.getAttribute("__buttonTitle");
+                jspContext.removeAttribute("__buttonTitle");
+                buffer.addAttribute("title", title);
+            }
+
             buffer.addAttribute("type", "submit");
-            String actualCssClass = "btn " + (isPrimary ? "btn-primary " : "");
-            //TODO icon + text
-            if(hasIcon) {
+            String actualCssClass = "btn " + (isPrimary ? "btn-primary " : "btn-default ");
+            if(hasIcon && !hasText) {
                 actualCssClass += "btn-mini ";
             }
             if(cssClass != null) {
                 actualCssClass += cssClass;
             }
             buffer.addAttribute("class", actualCssClass);
-            //TODO icon + text
             if(hasIcon) {
-                buffer.addAttribute("title", value);
                 buffer.openElement("i");
                 buffer.addAttribute("class", "icon-" + theButton.icon());
                 buffer.closeElement("i");
-            } else {
+            }
+            if(hasText) {
+                %>
+                    <fmt:message key="<%= theButton.key() %>" var="__buttonValue" scope="page" />
+                <%
+                String value = (String) jspContext.getAttribute("__buttonValue");
+                jspContext.removeAttribute("__buttonValue");
                 buffer.write(value);
             }
             buffer.closeElement("button");

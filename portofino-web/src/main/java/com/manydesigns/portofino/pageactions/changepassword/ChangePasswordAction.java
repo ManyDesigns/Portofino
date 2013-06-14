@@ -204,7 +204,7 @@ public class ChangePasswordAction extends AbstractPageAction {
         return oldPassword;
     }
 
-    @Button(list = "portletHeaderButtons", key = "commons.configure", order = 1, icon = "wrench")
+    @Button(list = "portletHeaderButtons", titleKey = "commons.configure", order = 1, icon = "wrench")
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();
