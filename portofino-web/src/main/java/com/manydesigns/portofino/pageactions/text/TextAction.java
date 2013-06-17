@@ -416,7 +416,7 @@ public class TextAction extends AbstractPageAction {
         return new ForwardResolution("/layouts/text/configure.jsp");
     }
 
-    @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, primary = true)
+    @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() throws IOException {
         prepareConfigurationForms();
@@ -573,7 +573,7 @@ public class TextAction extends AbstractPageAction {
         return new ForwardResolution("/layouts/text/manage-attachments.jsp");
     }
 
-    @Button(list = "edit-content", key = "commons.update", order = 1, primary = true)
+    @Button(list = "edit-content", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution updateContent() {
         title = context.getRequest().getParameter("title");
@@ -629,7 +629,7 @@ public class TextAction extends AbstractPageAction {
                 .addParameter("cancelReturnUrl", cancelReturnUrl);
     }
 
-    @Button(list = "manage-attachments", key = "commons.ok", order = 1, primary = true)
+    @Button(list = "manage-attachments", key = "commons.ok", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution saveAttachments() {
         if(downloadable == null) {

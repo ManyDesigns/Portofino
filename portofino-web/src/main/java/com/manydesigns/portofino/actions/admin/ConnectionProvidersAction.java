@@ -295,7 +295,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
         return new ForwardResolution("/layouts/admin/connectionProviders/edit.jsp");
     }
 
-    @Button(list = "connectionProviders-edit", key = "commons.update", order = 1, primary = true)
+    @Button(list = "connectionProviders-edit", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution update() {
         connectionProvider = application.getConnectionProvider(databaseName);
         databasePlatform = connectionProvider.getDatabasePlatform();

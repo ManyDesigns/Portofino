@@ -285,7 +285,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
 
     @Buttons({
-        @Button(list = "crud-search-form", key = "commons.search", order = 1, primary = true),
+        @Button(list = "crud-search-form", key = "commons.search", order = 1, type = Button.TYPE_PRIMARY),
         @Button(list = "portlet-default-button", key = "commons.search") //XXX non va bene, posso avere diversi default su form diversi
     })
     public Resolution search() {
@@ -478,7 +478,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Create/Save
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.create", icon = "plus", order = 1)
+    @Button(list = "crud-search", key = "commons.create", icon = "plus icon-white", order = 1, type = Button.TYPE_SUCCESS)
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     public Resolution create() {
         setupForm(Mode.CREATE);
@@ -489,7 +489,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return getCreateView();
     }
 
-    @Button(list = "crud-create", key = "commons.save", order = 1, primary = true)
+    @Button(list = "crud-create", key = "commons.save", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     public Resolution save() {
         setupForm(Mode.CREATE);
@@ -541,7 +541,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Edit/Update
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "commons.edit", order = 1)
+    @Button(list = "crud-read", key = "commons.edit", order = 1, icon = "edit")
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution edit() {
         setupForm(Mode.EDIT);
@@ -550,7 +550,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return getEditView();
     }
 
-    @Button(list = "crud-edit", key = "commons.update", order = 1, primary = true)
+    @Button(list = "crud-edit", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution update() {
         setupForm(Mode.EDIT);
@@ -582,7 +582,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Bulk Edit/Update
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.edit", icon="edit", order = 2)
+    @Button(list = "crud-search", key = "commons.edit", icon = "edit", order = 2)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkEdit() {
         if (selection == null || selection.length == 0) {
@@ -604,7 +604,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return getBulkEditView();
     }
 
-    @Button(list = "crud-bulk-edit", key = "commons.update", order = 1, primary = true)
+    @Button(list = "crud-bulk-edit", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkUpdate() {
         setupForm(Mode.BULK_EDIT);
@@ -641,7 +641,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Delete
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "commons.delete", order = 2)
+    @Button(list = "crud-read", key = "commons.delete", order = 2, icon = "trash")
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution delete() {
         String url = calculateBaseSearchUrl();
@@ -2033,7 +2033,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, primary = true)
+    @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() {
         prepareConfigurationForms();

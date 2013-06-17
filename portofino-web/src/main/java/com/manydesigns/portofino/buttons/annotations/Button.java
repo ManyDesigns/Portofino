@@ -42,6 +42,15 @@ public @interface Button {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
+    public static final String
+        TYPE_DEFAULT = "",
+        TYPE_PRIMARY = "primary",
+        TYPE_INFO = "info",
+        TYPE_SUCCESS = "success",
+        TYPE_WARNING = "warning",
+        TYPE_ERROR = "danger",
+        TYPE_LINK = "link";
+
     /**
      * The list where this button is to be placed. Web pages will include lists of buttons by name.
      */
@@ -63,13 +72,13 @@ public @interface Button {
     String titleKey() default "";
 
     /**
-     * The name of the button's icon.
+     * The name of the button's icon. You can add " icon-white" after the name to produce a white icon instead of
+     * a black one.
      */
     String icon() default "";
 
     /**
-     * If this is true, the button is the primary one in its list and can be rendered differently (for example, with
-     * a different background) to emphasize it to the user. Only one button for each list can be marked as primary.
+     * Allows to specify the type of button to render: for example "primary", "link" or "success".
      */
-    boolean primary() default false;
+    String type() default TYPE_DEFAULT;
 }

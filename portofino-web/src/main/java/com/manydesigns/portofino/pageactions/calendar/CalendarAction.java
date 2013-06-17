@@ -111,7 +111,7 @@ public class CalendarAction extends CustomAction {
         return new ForwardResolution("/layouts/calendar/configure.jsp");
     }
 
-    @Button(list = "configuration", key = "commons.updateConfiguration", primary = true)
+    @Button(list = "configuration", key = "commons.updateConfiguration", type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() {
         prepareConfigurationForms();

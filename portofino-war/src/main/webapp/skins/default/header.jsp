@@ -37,7 +37,7 @@
                     <ul id="page-menu" class="nav">
                         <li class="dropdown">
                              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                 Page <b class="caret"></b>
+                                 <i class="icon-file icon-white"></i> Page <b class="caret"></b>
                              </a>
                             <ul class="dropdown-menu">
                                 <li>

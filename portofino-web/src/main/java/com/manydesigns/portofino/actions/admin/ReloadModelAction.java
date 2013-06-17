@@ -71,7 +71,7 @@ public class ReloadModelAction extends AbstractActionBean {
         return new ForwardResolution("/layouts/admin/reload-model.jsp");
     }
 
-    @Button(list = "reload-model", key = "model.reload", order = 1, primary = true)
+    @Button(list = "reload-model", key = "model.reload", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresAdministrator
     public Resolution reloadModel() {
         synchronized (application) {

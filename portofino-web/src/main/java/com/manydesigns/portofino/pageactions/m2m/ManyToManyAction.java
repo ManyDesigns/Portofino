@@ -367,7 +367,7 @@ public class ManyToManyAction extends AbstractPageAction {
         return new ForwardResolution("/layouts/m2m/configure.jsp");
     }
 
-    @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, primary = true)
+    @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() {
         prepareConfigurationForms();

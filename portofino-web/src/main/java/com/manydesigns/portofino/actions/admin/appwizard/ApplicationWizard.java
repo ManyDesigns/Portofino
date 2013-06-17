@@ -249,7 +249,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         return configureConnectionProvider();
     }
 
-    @Button(list = "connection-provider", key="wizard.next", order = 1, primary = true)
+    @Button(list = "connection-provider", key="wizard.next", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution configureConnectionProvider() {
         buildCPForms();
         if(connectionProviderField.validate()) {
@@ -331,7 +331,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     }
 
     @Buttons({
-        @Button(list = "select-schemas", key="wizard.next", order = 2, primary = true),
+        @Button(list = "select-schemas", key="wizard.next", order = 2, type = Button.TYPE_PRIMARY),
         @Button(list = "select-user-fields", key="wizard.prev", order = 1)
     })
     public Resolution selectSchemas() {
@@ -496,7 +496,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         return new ForwardResolution("/layouts/admin/appwizard/user-management.jsp");
     }
 
-    @Button(list = "user-management", key="wizard.next", order = 2, primary = true)
+    @Button(list = "user-management", key="wizard.next", order = 2, type = Button.TYPE_PRIMARY)
     public Resolution setupUserManagement() {
         selectSchemas();
 
@@ -649,7 +649,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         }
     }
 
-    @Button(list = "select-user-fields", key="wizard.next", order = 2, primary = true)
+    @Button(list = "select-user-fields", key="wizard.next", order = 2, type = Button.TYPE_PRIMARY)
     public Resolution selectUserFields() {
         setupUserManagement();
         if(userTable != null) {
@@ -768,7 +768,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         return roots;
     }
 
-    @Button(list = "select-tables", key="wizard.next", order = 2, primary = true)
+    @Button(list = "select-tables", key="wizard.next", order = 2, type = Button.TYPE_PRIMARY)
     public Resolution selectTables() {
         selectUserFields();
 
@@ -808,7 +808,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         return selectTablesForm();
     }
 
-    @Button(list = "build-app", key="wizard.finish", order = 2, primary = true)
+    @Button(list = "build-app", key="wizard.finish", order = 2, type = Button.TYPE_PRIMARY)
     public Resolution buildApplication() {
         selectTables();
         Database oldDatabase =

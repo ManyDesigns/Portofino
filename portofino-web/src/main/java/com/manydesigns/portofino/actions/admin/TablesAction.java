@@ -179,7 +179,7 @@ public class TablesAction extends AbstractActionBean {
         return new ForwardResolution("/layouts/admin/tables/edit-column.jsp");
     }
 
-    @Button(key = "commons.save", list = "table-edit", order = 1, primary = true)
+    @Button(key = "commons.save", list = "table-edit", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution saveTable() {
         com.manydesigns.portofino.actions.admin.tables.forms.TableForm tf = setupTableForm(Mode.EDIT);
         setupColumnsForm(Mode.EDIT);
@@ -273,7 +273,7 @@ public class TablesAction extends AbstractActionBean {
         return new RedirectResolution(BASE_ACTION_PATH);
     }
 
-    @Button(key = "commons.save", list = "column-edit", order = 1, primary = true)
+    @Button(key = "commons.save", list = "column-edit", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution saveColumn() {
         setupTableForm(Mode.HIDDEN);
         tableForm.readFromRequest(context.getRequest());
@@ -396,7 +396,7 @@ public class TablesAction extends AbstractActionBean {
         return databaseSelectionProviderForm;
     }
 
-    @Button(key = "commons.save", list = "table-selection-provider", order = 1, primary = true)
+    @Button(key = "commons.save", list = "table-selection-provider", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution saveSelectionProvider() {
         table = findTable();
         Mode mode = selectionProviderName == null ? Mode.CREATE : Mode.EDIT;

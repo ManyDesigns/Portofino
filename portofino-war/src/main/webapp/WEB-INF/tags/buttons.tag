@@ -50,14 +50,6 @@
             boolean hasText = !StringUtils.isBlank(theButton.key());
             boolean hasIcon = !StringUtils.isBlank(theButton.icon());
             boolean hasTitle = !StringUtils.isBlank(theButton.titleKey());
-            boolean isPrimary = theButton.primary();
-            if(isPrimary) {
-                if(primaryFound) {
-                    isPrimary = false;
-                    LoggerFactory.getLogger(Button.class).warn("More than one button with primary = true in list " + list + ": " + handler);
-                }
-                primaryFound = true;
-            }
             buffer.openElement("button");
             if(!ButtonsLogic.doGuardsPass(actionBean, handler, GuardType.ENABLED)) {
                 buffer.addAttribute("disabled", "disabled");
@@ -74,7 +66,8 @@
             }
 
             buffer.addAttribute("type", "submit");
-            String actualCssClass = "btn " + (isPrimary ? "btn-primary " : "btn-default ");
+            String type = theButton.type();
+            String actualCssClass = "btn " + (StringUtils.isBlank(type) ? "" : "btn-" + type + " ");
             if(hasIcon && !hasText) {
                 actualCssClass += "btn-mini ";
             }

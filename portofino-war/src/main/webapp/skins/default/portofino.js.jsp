@@ -73,7 +73,7 @@ var portofino = {
                     $("textarea.mde-form-rich-text").offset().top -
                     $("#ft").height() -
                     $(".contentFooter").height() -
-                    250; //250 ~= toolbar 3 righe + footer + margine tolleranza
+                    350; //350 ~= toolbar 3 righe + footer + margine tolleranza
         }
 
         config = $.extend(baseConfig, {
