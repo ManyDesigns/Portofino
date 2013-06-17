@@ -1,12 +1,11 @@
 <%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.Dispatcher" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.DispatcherUtil" %>
 <%@ page import="java.net.MalformedURLException" %>
 <%@ page import="java.net.URL" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.DispatcherUtil" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.PageAction" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="stylesheet" type="text/css"
       href="<stripes:url value="/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"/>"/>

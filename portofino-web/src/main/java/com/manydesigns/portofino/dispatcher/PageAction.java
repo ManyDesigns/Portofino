@@ -23,6 +23,8 @@ package com.manydesigns.portofino.dispatcher;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.Resolution;
 
+import java.util.Map;
+
 /**
  * An extension of ActionBean from the Stripes framework to handle Portofino's hierarchical page structure.
  *
@@ -77,5 +79,8 @@ public interface PageAction extends ActionBean {
      * @return true if the page is embedded, false otherwise.
      */
     boolean isEmbedded();
-    
+
+    String getReturnToParentTarget();
+
+    Map<String, String> getReturnToParentParams();
 }

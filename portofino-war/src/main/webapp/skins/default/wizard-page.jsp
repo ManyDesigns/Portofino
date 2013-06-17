@@ -32,27 +32,22 @@
                         <stripes:layout-component name="contentHeader" />
                     </div>
                     <div class="row-fluid">
-                        <div class="portletWrapper noSpacing">
-                            <div class="portlet">
-                                <mde:sessionMessages/>
-                                <div class="portletHeader">
-                                    <stripes:layout-component name="portletHeader">
-                                        <div>
-                                            <div class="portletTitle">
-                                                <h4><stripes:layout-component name="portletTitle" /></h4>
-                                            </div>
-                                            <div class="pull-right">
-                                                <portofino:buttons list="portletHeaderButtons" />
-                                            </div>
+                        <div>
+                            <mde:sessionMessages/>
+                            <div class="portletHeader">
+                                <stripes:layout-component name="portletHeader">
+                                    <div>
+                                        <div class="portletTitle">
+                                            <h4><stripes:layout-component name="portletTitle" /></h4>
                                         </div>
-                                    </stripes:layout-component>
-                                </div>
-                                <div class="portletBody">
-                                    <stripes:layout-component name="portletBody" />
-                                </div>
-                                <div class="portletFooter">
-                                    <stripes:layout-component name="portletFooter" />
-                                </div>
+                                        <div class="pull-right">
+                                            <portofino:buttons list="portletHeaderButtons" />
+                                        </div>
+                                    </div>
+                                </stripes:layout-component>
+                            </div>
+                            <div class="portletBody">
+                                <stripes:layout-component name="portletBody" />
                             </div>
                         </div>
                     </div>

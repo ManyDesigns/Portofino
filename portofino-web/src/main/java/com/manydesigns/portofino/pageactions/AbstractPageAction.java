@@ -127,7 +127,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // UI
     //--------------------------------------------------------------------------
 
-    public final MultiMap portlets = new MultiHashMap();
+    public final MultiMap embeddedPageActions = new MultiHashMap();
     public String returnToParentTarget;
     public final Map<String, String> returnToParentParams = new HashMap<String, String>();
     protected boolean embedded;
@@ -136,7 +136,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Navigation
     //--------------------------------------------------------------------------
 
-    protected ResultSetNavigation resultSetNavigation;
     public String cancelReturnUrl;
 
     //**************************************************************************
@@ -242,28 +241,22 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         this.dispatch = dispatch;
     }
 
+    @Override
     public String getReturnToParentTarget() {
         return returnToParentTarget;
     }
 
+    @Override
     public Map<String, String> getReturnToParentParams() {
         return returnToParentParams;
     }
 
-    public MultiMap getPortlets() {
-        return portlets;
+    public MultiMap getEmbeddedPageActions() {
+        return embeddedPageActions;
     }
 
     public boolean isMultipartRequest() {
         return false;
-    }
-
-    public ResultSetNavigation getResultSetNavigation() {
-        return resultSetNavigation;
-    }
-
-    public void setResultSetNavigation(ResultSetNavigation resultSetNavigation) {
-        this.resultSetNavigation = resultSetNavigation;
     }
 
     public Form getPageConfigurationForm() {
@@ -274,21 +267,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         this.pageConfigurationForm = pageConfigurationForm;
     }
 
-    protected void setupPortlets(PageInstance pageInstance, String myself) {
+    protected void setupEmbeddedPageActions(PageInstance pageInstance) {
         Layout layout = pageInstance.getLayout();
-        if(layout == null) {
-            PortletInstance myPortletInstance = new PortletInstance("p", 0, myself);
-            portlets.put(DEFAULT_LAYOUT_CONTAINER, myPortletInstance);
-            return;
-        }
-        Self self = layout.getSelf();
-        int myOrder = self.getActualOrder();
-        PortletInstance myPortletInstance = new PortletInstance("p", myOrder, myself);
-        String layoutContainer = self.getContainer();
-        if (layoutContainer == null) {
-            layoutContainer = DEFAULT_LAYOUT_CONTAINER;
-        }
-        portlets.put(layoutContainer, myPortletInstance);
         for(ChildPage page : layout.getChildPages()) {
             String layoutContainerInParent = page.getContainer();
             if(layoutContainerInParent != null) {
@@ -299,10 +279,10 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
                                 page.getActualOrder(),
                                 newPath);
 
-                portlets.put(layoutContainerInParent, portletInstance);
+                embeddedPageActions.put(layoutContainerInParent, portletInstance);
             }
         }
-        for(Object entryObj : portlets.entrySet()) {
+        for(Object entryObj : embeddedPageActions.entrySet()) {
             Map.Entry entry = (Map.Entry) entryObj;
             List portletContainer = (List) entry.getValue();
             Collections.sort(portletContainer);
@@ -310,10 +290,10 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     }
 
     protected Resolution forwardToPortletPage(String pageJsp) {
-        setupPortlets(pageInstance, pageJsp);
+        setupEmbeddedPageActions(pageInstance);
         HttpServletRequest request = context.getRequest();
         request.setAttribute("cancelReturnUrl", getCancelReturnUrl());
-        return new ForwardResolution("/layouts/normal.jsp");
+        return new ForwardResolution(pageJsp);
     }
 
     public String getPageTemplate() {

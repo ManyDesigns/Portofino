@@ -18,7 +18,7 @@
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.m2m.ManyToManyAction"/>
-<stripes:layout-render name="/skins/${skin}/portlet.jsp" formClass="form-inline">
+<stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/normal.jsp" formClass="form-inline">
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
@@ -69,7 +69,5 @@
         %>
         <br /><br />
         <portofino:buttons list="m2m-checkboxes-edit" />
-    </stripes:layout-component>
-    <stripes:layout-component name="portletFooter">
     </stripes:layout-component>
 </stripes:layout-render>

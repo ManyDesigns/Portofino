@@ -49,17 +49,13 @@
             </div>
             <div id="content" class="span10">
                 <div class="row-fluid">
-                    <div class="portletWrapper noSpacing">
-                        <div class="portlet">
-                            <mde:sessionMessages/>
-                            <stripes:layout-component name="portletHeader">
-                                <h3 style="border-bottom: 1px solid #E5E5E5">
-                                    <stripes:layout-component name="portletTitle" />
-                                </h3>
-                            </stripes:layout-component>
-                            <stripes:layout-component name="portletBody" />
-                        </div>
-                    </div>
+                    <mde:sessionMessages/>
+                    <stripes:layout-component name="portletHeader">
+                        <h3 style="border-bottom: 1px solid #E5E5E5">
+                            <stripes:layout-component name="portletTitle" />
+                        </h3>
+                    </stripes:layout-component>
+                    <stripes:layout-component name="portletBody" />
                 </div>
             </div>
         </div>

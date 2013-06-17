@@ -25,25 +25,24 @@
     <jsp:include page="../../header.jsp"/>
     <div class="container">
         <div class="row">
-            <div class="span2 portofino-sidebar">
+            <div class="span2">
                 <div id="navigation">
                     <jsp:include page="../../navigation.jsp" />
                 </div>
             </div>
             <div id="content" class="span10">
                 <div class="row-fluid">
-                    <div class="portletWrapper noSpacing">
-                        <div class="portlet">
-                            <mde:sessionMessages/>
-                            <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
-                            <stripes:layout-component name="portletHeader">
-                                <h3 style="border-bottom: 1px solid #E5E5E5">
-                                    <stripes:layout-component name="portletTitle" />
-                                </h3>
-                            </stripes:layout-component>
-                            <stripes:layout-component name="portletBody" />
-                        </div>
+                    <mde:sessionMessages/>
+                    <div class="pull-right">
+                        <jsp:include page="/skins/${skin}/return-to-parent.jsp" />
                     </div>
+                    <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
+                    <stripes:layout-component name="portletHeader">
+                        <h3 style="border-bottom: 1px solid #E5E5E5">
+                            <stripes:layout-component name="portletTitle" />
+                        </h3>
+                    </stripes:layout-component>
+                    <stripes:layout-component name="portletBody" />
                 </div>
             </div>
         </div>

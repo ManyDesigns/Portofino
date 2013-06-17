@@ -18,10 +18,8 @@
     String path = actionBean.getDispatch().getOriginalPath();
     path = path.substring(0, path.length() - fragment.length());
 %><stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/normal.jsp">
-    <stripes:layout-component name="contentHeader">
+    <stripes:layout-component name="mainPageAction">
         <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
-    </stripes:layout-component>
-    <stripes:layout-component name="contentBody">
         <stripes:form action="/actions/admin/page" method="post">
             <input type="hidden" name="originalPath" value="<%= path %>" />
             <input type="hidden" name="fragment" value="<%= fragment%>" />
@@ -31,7 +29,5 @@
             </button>
         </stripes:form>
         <br />
-    </stripes:layout-component>
-    <stripes:layout-component name="contentFooter">
     </stripes:layout-component>
 </stripes:layout-render>

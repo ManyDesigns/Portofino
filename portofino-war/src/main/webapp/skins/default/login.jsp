@@ -88,70 +88,66 @@
         <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
         <div class="row">
             <div id="content-login" class="container">
-                <div class="portletWrapper noSpacing">
-                    <div class="portlet">
-                        <div class="portletHeader">
-                            <div>
-                                <div class="portletTitle">
-                                    <h4><fmt:message key="skins.default.login.login_to"/>: <c:out value="${applicationName}"/></h4>
-                                </div>
-                                <div class="pull-right">
-                                    <stripes:layout-component name="portletHeaderButtons" />
-                                </div>
-                            </div>
-                            <div class="portletHeaderSeparator"></div>
+                <div class="portletHeader">
+                    <div>
+                        <div class="portletTitle">
+                            <h4><fmt:message key="skins.default.login.login_to"/>: <c:out value="${applicationName}"/></h4>
                         </div>
-                        <div class="portletBody">
-                            <stripes:layout-component name="portletBody">
-                                <mde:sessionMessages/>
-                                <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction"
-                                              method="post">
-                                    <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
-                                    <input type="text" name="userName" id="userName" class="input-block-level"
-                                           placeholder="<fmt:message key='skins.default.login.username'/>" />
-                                    <input type="password" name="pwd" id="pwd" class="input-block-level"
-                                           placeholder="<fmt:message key='skins.default.login.password'/>" />
-                                    <div style="text-align: center">
-                                        <portofino:buttons list="login-buttons" cssClass="btn-large" />
-                                    </div>
-                                    <!--<c:if test="recoverPwd">
-                                        <tr>
-                                            <td colspan="2">
-                                                <fmt:message key="skins.default.login.forgot_pwd"/> <a href="PwdRecovery.action"><fmt:message key="skins.default.login.retrieve_pwd"/></a>
-                                            </td>
-                                        </tr>
-                                    </c:if>-->
-                                    <stripes:hidden name="returnUrl"/>
-                                </stripes:form>
-                                <c:if test="${actionBean.openIdEnabled}">
-                                    <div style="border-top: 1px solid #ddd; padding-top: 0.5em">
-                                        <fmt:message key="skins.default.login.openId"/>:
-                                        <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction" method="post"
-                                                      id="openid_form">
-                                            <stripes:hidden name="returnUrl"/>
-                                            <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
-                                            <input type="hidden" name="showOpenIDForm" value="do" />
-                                            <div id="openid_choice">
-                                                <div id="openid_btns"></div>
-                                            </div>
-                                            <div id="openid_input_area">
-                                                <input id="openid_identifier" name="openIdUrl" type="text" value="http://" />
-                                                <button id="openid_submit" type="submit" class="btn">
-                                                    Sign in
-                                                </button>
-                                            </div>
-                                        </stripes:form>
-                                    </div>
-                                </c:if>
-                            </stripes:layout-component>
-                        </div>
-                        <div class="portletFooter" style="border-top: 1px solid #ddd; padding-top: 0.5em">
-                            <jsp:useBean id="portofinoConfiguration" scope="application"
-                                         type="org.apache.commons.configuration.Configuration"/>
-                            Powered by <a href="http://www.manydesigns.com/">Portofino</a>
-                            <c:out value="${mde:getString(portofinoConfiguration, 'portofino.version')}"/>
+                        <div class="pull-right">
+                            <stripes:layout-component name="portletHeaderButtons" />
                         </div>
                     </div>
+                    <div class="portletHeaderSeparator"></div>
+                </div>
+                <div class="portletBody">
+                    <stripes:layout-component name="portletBody">
+                        <mde:sessionMessages/>
+                        <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction"
+                                      method="post">
+                            <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
+                            <input type="text" name="userName" id="userName" class="input-block-level"
+                                   placeholder="<fmt:message key='skins.default.login.username'/>" />
+                            <input type="password" name="pwd" id="pwd" class="input-block-level"
+                                   placeholder="<fmt:message key='skins.default.login.password'/>" />
+                            <div style="text-align: center">
+                                <portofino:buttons list="login-buttons" cssClass="btn-large" />
+                            </div>
+                            <!--<c:if test="recoverPwd">
+                                <tr>
+                                    <td colspan="2">
+                                        <fmt:message key="skins.default.login.forgot_pwd"/> <a href="PwdRecovery.action"><fmt:message key="skins.default.login.retrieve_pwd"/></a>
+                                    </td>
+                                </tr>
+                            </c:if>-->
+                            <stripes:hidden name="returnUrl"/>
+                        </stripes:form>
+                        <c:if test="${actionBean.openIdEnabled}">
+                            <div style="border-top: 1px solid #ddd; padding-top: 0.5em">
+                                <fmt:message key="skins.default.login.openId"/>:
+                                <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction" method="post"
+                                              id="openid_form">
+                                    <stripes:hidden name="returnUrl"/>
+                                    <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
+                                    <input type="hidden" name="showOpenIDForm" value="do" />
+                                    <div id="openid_choice">
+                                        <div id="openid_btns"></div>
+                                    </div>
+                                    <div id="openid_input_area">
+                                        <input id="openid_identifier" name="openIdUrl" type="text" value="http://" />
+                                        <button id="openid_submit" type="submit" class="btn">
+                                            Sign in
+                                        </button>
+                                    </div>
+                                </stripes:form>
+                            </div>
+                        </c:if>
+                    </stripes:layout-component>
+                </div>
+                <div style="border-top: 1px solid #ddd; padding-top: 0.5em">
+                    <jsp:useBean id="portofinoConfiguration" scope="application"
+                                 type="org.apache.commons.configuration.Configuration"/>
+                    Powered by <a href="http://www.manydesigns.com/">Portofino</a>
+                    <c:out value="${mde:getString(portofinoConfiguration, 'portofino.version')}"/>
                 </div>
             </div>
         </div>

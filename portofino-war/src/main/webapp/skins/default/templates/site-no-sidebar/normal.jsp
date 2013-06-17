@@ -33,12 +33,12 @@
                         <stripes:layout-component name="contentBody">
                             <div class="portlets">
                                 <mde:sessionMessages/>
-                                <portofino:portlets list="default" />
+                                <portofino:embedded-page-actions list="default" />
                                 <div class="yui-g first">
-                                    <portofino:portlets list="contentLayoutLeft" cssClass="yui-u first" />
-                                    <portofino:portlets list="contentLayoutRight" cssClass="yui-u" />
+                                    <portofino:embedded-page-actions list="contentLayoutLeft" cssClass="yui-u first" />
+                                    <portofino:embedded-page-actions list="contentLayoutRight" cssClass="yui-u" />
                                 </div>
-                                <portofino:portlets list="contentLayoutBottom" />
+                                <portofino:embedded-page-actions list="contentLayoutBottom" />
                             </div>
                         </stripes:layout-component>
                     </div>

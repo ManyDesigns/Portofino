@@ -93,11 +93,6 @@ span.breadcrumb-item {
 Content
 *******************************************************************************/
 
-.contentBarButtons, .resultSetNavigation {
-    display: inline;
-    margin-left: 1em;
-}
-
 #pageAdminForm {
     display: inline;
 }
@@ -114,17 +109,6 @@ table.noBorder td {
 /*******************************************************************************
 Portlet
 *******************************************************************************/
-
-.portletWrapper {
-    margin-bottom: 3em;
-    width: 100%;
-}
-
-.portletWrapper.noSpacing {
-    margin-bottom: 0;
-}
-
-.portlet {}
 
 .portletHeader {
     margin-bottom: 12px;
@@ -151,8 +135,6 @@ Portlet
 .portletBody {
     clear: left;
 }
-
-.portletFooter {}
 
 .portletPlaceholder {
     border: 1px solid #fcefa1;

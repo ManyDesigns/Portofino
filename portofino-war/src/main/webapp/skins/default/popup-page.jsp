@@ -32,36 +32,28 @@
                             </stripes:layout-component>
                         </div>
                         <div class="row-fluid">
-                            <div class="portletWrapper">
-                                <div class="portlet">
-                                    <mde:sessionMessages/>
-                                    <div class="portletHeader">
-                                        <stripes:layout-component name="portletHeader">
-                                            <div>
-                                                <div class="portletTitle">
-                                                    <h1>
-                                                    <stripes:layout-component name="portletTitle">
-                                                        portletTitle
-                                                    </stripes:layout-component>
-                                                    </h1>
-                                                </div>
-                                                <div class="pull-right">
-                                                    <stripes:layout-component name="portletHeaderButtons" />
-                                                </div>
-                                            </div>
-                                            <div class="portletHeaderSeparator"></div>
-                                        </stripes:layout-component>
+                            <mde:sessionMessages/>
+                            <div class="portletHeader">
+                                <stripes:layout-component name="portletHeader">
+                                    <div>
+                                        <div class="portletTitle">
+                                            <h1>
+                                            <stripes:layout-component name="portletTitle">
+                                                portletTitle
+                                            </stripes:layout-component>
+                                            </h1>
+                                        </div>
+                                        <div class="pull-right">
+                                            <stripes:layout-component name="portletHeaderButtons" />
+                                        </div>
                                     </div>
-                                    <div class="portletBody">
-                                        <stripes:layout-component name="portletBody">
-                                            Portlet body
-                                        </stripes:layout-component>
-                                    </div>
-                                    <div class="portletFooter">
-                                        <stripes:layout-component name="portletFooter">
-                                        </stripes:layout-component>
-                                    </div>
-                                </div>
+                                    <div class="portletHeaderSeparator"></div>
+                                </stripes:layout-component>
+                            </div>
+                            <div class="portletBody">
+                                <stripes:layout-component name="portletBody">
+                                    Portlet body
+                                </stripes:layout-component>
                             </div>
                         </div>
                         <div class="row-fluid">

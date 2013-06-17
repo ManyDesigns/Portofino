@@ -9,8 +9,8 @@
              type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
 <div class="${cssClass} portletContainer">
     <input type="hidden" name="portletWrapperName_${list}" value="portletWrapper_${list}" />
-    <c:forEach var="portletInstance" items="${ actionBean.portlets[list] }">
-        <div class="portletWrapper" id="portletWrapper_<c:out value='${portletInstance.id}' />">
+    <c:forEach var="portletInstance" items="${ actionBean.embeddedPageActions[list] }">
+        <div id="portletWrapper_<c:out value='${portletInstance.id}' />">
             <% try {%>
                 <jsp:include page="${portletInstance.jsp}" flush="false" />
             <%} catch (Throwable t) {

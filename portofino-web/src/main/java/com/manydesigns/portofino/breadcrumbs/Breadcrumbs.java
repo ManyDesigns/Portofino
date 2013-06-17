@@ -61,8 +61,6 @@ public class Breadcrumbs {
         }
         for (int i = start; i < upto; i++) {
             PageInstance current = dispatch.getPageInstancePath()[i];
-            //Resolve references to treat Crud pages differently below
-            //TODO current = current.dereference();
             sb.append("/");
             Page page = current.getPage();
             sb.append(current.getName());

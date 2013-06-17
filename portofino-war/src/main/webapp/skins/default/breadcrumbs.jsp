@@ -1,13 +1,13 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page import="com.manydesigns.portofino.breadcrumbs.BreadcrumbItem" %>
-<%@ page import="com.manydesigns.portofino.breadcrumbs.Breadcrumbs" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.Dispatch" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.DispatcherUtil" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.PageAction" %>
-<%@ page import="java.util.List" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%@
+    taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%@
+    page import="com.manydesigns.portofino.breadcrumbs.BreadcrumbItem" %><%@
+    page import="com.manydesigns.portofino.breadcrumbs.Breadcrumbs" %><%@
+    page import="com.manydesigns.portofino.dispatcher.Dispatch" %><%@
+    page import="com.manydesigns.portofino.dispatcher.DispatcherUtil" %><%@
+    page import="java.util.List" %><%@
+    page contentType="text/html;charset=UTF-8" language="java"
+%><jsp:useBean id="actionBean" scope="request" type="net.sourceforge.stripes.action.ActionBean" />
 <div class="breadcrumbs">
-<jsp:useBean id="actionBean" scope="request" type="net.sourceforge.stripes.action.ActionBean" />
     <%
         Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);
         Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);

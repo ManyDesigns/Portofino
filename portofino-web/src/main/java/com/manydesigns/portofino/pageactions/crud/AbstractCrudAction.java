@@ -221,6 +221,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public TableForm selectionProvidersForm;
     public CrudSelectionProviderEdit[] selectionProviderEdits;
 
+    //--------------------------------------------------------------------------
+    // Navigation
+    //--------------------------------------------------------------------------
+
+    protected ResultSetNavigation resultSetNavigation;
 
     //--------------------------------------------------------------------------
     // Crud operations
@@ -2601,6 +2606,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public void setPopupCloseCallback(String popupCloseCallback) {
         this.popupCloseCallback = popupCloseCallback;
+    }
+
+    public ResultSetNavigation getResultSetNavigation() {
+        return resultSetNavigation;
+    }
+
+    public void setResultSetNavigation(ResultSetNavigation resultSetNavigation) {
+        this.resultSetNavigation = resultSetNavigation;
     }
 
 }

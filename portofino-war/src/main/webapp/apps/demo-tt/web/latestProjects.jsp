@@ -14,7 +14,7 @@
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"/>
-<stripes:layout-render name="/skins/${skin}/portlet.jsp">
+<stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
@@ -50,7 +50,5 @@
                 <% }
             %>
         </ul>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletFooter">
     </stripes:layout-component>
 </stripes:layout-render>

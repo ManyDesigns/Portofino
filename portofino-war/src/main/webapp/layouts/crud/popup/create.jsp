@@ -23,7 +23,6 @@
         <input type="hidden" name="popup" value="true" />
         <input type="hidden" name="popupCloseCallback" value="${actionBean.popupCloseCallback}" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletFooter"/>
     <stripes:layout-component name="contentFooter">
         <portofino:buttons list="crud-create" />
     </stripes:layout-component>

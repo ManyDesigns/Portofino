@@ -4,7 +4,7 @@
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="/skins/${skin}/portlet.jsp">
+<stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/normal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.changepassword.ChangePasswordAction"/>
     <stripes:layout-component name="portletHeader"></stripes:layout-component>
     <stripes:layout-component name="portletBody">

@@ -9,7 +9,7 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"/>
-<stripes:layout-render name="/skins/${skin}/portlet.jsp">
+<stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
@@ -63,5 +63,4 @@
             $("#projectTree").treetable({"clickableNodeNames": true, "expandable":true, "treeColumn":0, "indent":20 });
         </script>
     </stripes:layout-component>
-    <stripes:layout-component name="portletFooter" />
 </stripes:layout-render>

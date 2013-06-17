@@ -4,7 +4,7 @@
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="/skins/${skin}/portlet.jsp">
+<stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/normal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.chart.ChartAction"/>
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.pageInstance.page.title}"/>
@@ -13,8 +13,6 @@
         <div style="text-align: center;">
             <mde:write name="actionBean" property="jfreeChartInstance"/>
         </div>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletFooter">
         <portofino:buttons list="chart-buttons" />
     </stripes:layout-component>
 </stripes:layout-render>
