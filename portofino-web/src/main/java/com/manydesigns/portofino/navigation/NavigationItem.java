@@ -20,8 +20,6 @@
 
 package com.manydesigns.portofino.navigation;
 
-import com.manydesigns.portofino.pages.Page;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +33,8 @@ public class NavigationItem {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    protected final Page page;
+    protected final String title;
+    protected final String description;
     protected final String path;
     protected final boolean inPath;
     protected final boolean selected;
@@ -43,8 +42,10 @@ public class NavigationItem {
 
     protected final List<NavigationItem> childNavigationItems;
 
-    public NavigationItem(Page page, String path, boolean inPath, boolean selected, boolean ghost) {
-        this.page = page;
+    public NavigationItem(
+            String title, String description, String path, boolean inPath, boolean selected, boolean ghost) {
+        this.title = title;
+        this.description = description;
         this.path = path;
         this.inPath = inPath;
         this.selected = selected;
@@ -56,9 +57,12 @@ public class NavigationItem {
     // Getters
     //------------------------------------------------------------------------
 
+    public String getTitle() {
+        return title;
+    }
 
-    public Page getPage() {
-        return page;
+    public String getDescription() {
+        return description;
     }
 
     public String getPath() {

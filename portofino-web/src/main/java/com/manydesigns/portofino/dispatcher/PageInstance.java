@@ -225,7 +225,7 @@ public class PageInstance {
     }
 
     public String getDescription() {
-        return description != null ? description : getName();
+        return description != null ? description : page.getTitle();
     }
 
     public void setDescription(String description) {

@@ -5,7 +5,7 @@
      type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"/>
 <c:set var="resultSetNavigation" scope="request" value="${actionBean.resultSetNavigation}"/>
 <c:if test="${not empty resultSetNavigation}">
-    <div class="pagination pagination-right" style="display: inline; padding-right: 1em;">
+    <div class="pagination pagination-small" style="display: inline; padding-right: 1em;">
         <ul style="display: inline;">
             <c:if test="${not empty resultSetNavigation.firstUrl}">
                 <li>

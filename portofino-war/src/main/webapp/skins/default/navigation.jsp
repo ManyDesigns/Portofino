@@ -63,7 +63,7 @@
                     xb.addAttribute("class", "active");
                     nextNavigationItem = current;
                 }
-                xb.writeAnchor(current.getPath(), current.getPage().getTitle());
+                xb.writeAnchor(current.getPath(), current.getTitle());
                 xb.closeElement("li");
             } else if (current.isInPath()) {
                 nextNavigationItem = current;
@@ -71,7 +71,7 @@
         }
         if (nextNavigationItem != null && level < maxLevel) {
             navigationItems = nextNavigationItem.getChildNavigationItems();
-            title = nextNavigationItem.getPage().getTitle();
+            title = nextNavigationItem.getDescription();
         } else {
             navigationItems = Collections.EMPTY_LIST;
         }

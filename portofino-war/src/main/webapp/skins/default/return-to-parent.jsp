@@ -12,7 +12,7 @@
         urlBuilder.addParameters(pageAction.getReturnToParentParams());
         urlBuilder.setEvent("returnToParent");
     %>
-    <a href="<%= urlBuilder.toString() %>" class="btn">
+    <a href="<%= urlBuilder.toString() %>" class="btn btn-small">
         &lt;&lt;
         <fmt:message key="commons.returnToParent">
             <fmt:param value="<%= pageAction.getReturnToParentTarget() %>" />

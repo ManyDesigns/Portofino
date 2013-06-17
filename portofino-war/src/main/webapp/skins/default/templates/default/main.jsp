@@ -23,7 +23,7 @@
                     <stripes:layout-component name="mainPageActionHeader">
                         <div class="row-fluid"><mde:sessionMessages /></div>
                         <div class="pull-right">
-                            <jsp:include page="/skins/${skin}/return-to-parent.jsp" />
+
                         </div>
                         <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
                     </stripes:layout-component>
