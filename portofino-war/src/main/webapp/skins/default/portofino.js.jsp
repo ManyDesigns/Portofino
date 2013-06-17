@@ -1,5 +1,5 @@
 <%@ page import="com.manydesigns.elements.servlet.ServletConstants"%><%@page contentType="text/javascript; UTF-8"
-%><%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%
     // Avoid caching of dynamic pages
@@ -88,7 +88,7 @@ var portofino = {
         portofino._setupRichTextEditors();
     },
 
-    enablePortletDragAndDrop: function(button) {
+    enablePortletDragAndDrop: function(button, originalPath) {
         $("div.portletContainer").sortable({
             connectWith: "div.portletContainer",
             placeholder: "portletPlaceholder",
@@ -97,10 +97,14 @@ var portofino = {
             tolerance: "pointer" // mouse pointer overlaps the droppable
         }).disableSelection().addClass("portletBox");
 
-        var container = $(button).parent();
-        $(button).remove();
-        container.prepend('<button name="cancel" type="submit" class="btn">Cancel</button> ');
-        container.prepend('<button name="updateLayout" type="submit" class="btn">Save</button> ');
+        var container = $("#content");
+        container.prepend('\
+            <form action="${pageContext.request.contextPath}/actions/admin/page" method="post">\
+                Edit page layout: \
+                <input type="hidden" name="originalPath" value="' + originalPath + '" />\
+                <button name="updateLayout" type="submit" class="btn btn-primary">Save</button>\
+                <button name="cancel" type="submit" class="btn btn-default">Cancel</button>\
+            </form>');
         $("button[name=updateLayout]").click(function() {
             var theButton = $(this);
             $('div.portletContainer').each(function(index, element) {
@@ -118,7 +122,7 @@ var portofino = {
             });
             return true;
         });
-
+        button.off("click");
     }
 };
 

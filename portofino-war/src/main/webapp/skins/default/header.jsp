@@ -7,7 +7,7 @@
 %><%@ page import="org.apache.shiro.SecurityUtils"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><stripes:url var="profileUrl" value="/actions/profile"/>
@@ -30,9 +30,9 @@
             </button>
             <div id="header-menu" class="nav-collapse collapse">
                 <c:if test="<%= actionBean instanceof AbstractPageAction && ((AbstractPageAction) actionBean).getDispatch() != null %>"><%
-                        AbstractPageAction pageAction = (AbstractPageAction) actionBean;
-                        pageContext.setAttribute("pageAction", pageAction);
-                    %>
+                    AbstractPageAction pageAction = (AbstractPageAction) actionBean;
+                    pageContext.setAttribute("pageAction", pageAction);
+                    if(SecurityLogic.hasPermissions(pageAction.getPageInstance(), SecurityUtils.getSubject(), AccessLevel.EDIT)) { %>
                     <!-- Admin buttons -->
                     <ul id="page-menu" class="nav">
                         <li class="dropdown">
@@ -40,9 +40,8 @@
                                  Page <b class="caret"></b>
                              </a>
                             <ul class="dropdown-menu">
-                                <% if(SecurityLogic.hasPermissions(pageAction.getPageInstance(), SecurityUtils.getSubject(), AccessLevel.EDIT)) { %>
                                 <li>
-                                    <a onclick="portofino.enablePortletDragAndDrop(this); return false;" title="Edit page layout">
+                                    <a onclick="portofino.enablePortletDragAndDrop($(this), '${pageAction.dispatch.originalPath}'); return false;" title="Edit page layout">
                                         <i class="icon-move icon-white"></i> Edit page layout
                                     </a>
                                 </li>
@@ -85,7 +84,6 @@
                                         <i class="icon-share icon-white"></i> Move page
                                     </a>
                                 </li>
-                                <% } %>
                                 <% if(SecurityLogic.hasPermissions(pageAction.getPageInstance(), SecurityUtils.getSubject(), AccessLevel.DEVELOP)) { %>
                                 <li>
                                     <stripes:link href="/actions/admin/page" event="pagePermissions" title="Page permissions">
@@ -98,6 +96,7 @@
                         </li>
                     </ul>
                     <!-- End admin buttons -->
+                <%  } %>
                 </c:if>
                 <ul id="user-menu" class="nav">
                     <%
