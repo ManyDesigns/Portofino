@@ -1,17 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ page import="com.manydesigns.portofino.logic.SecurityLogic"
 %><%@ page import="com.manydesigns.portofino.pageactions.AbstractPageAction"
+%><%@ page import="com.manydesigns.portofino.security.AccessLevel"
 %><%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"
 %><%@ page import="net.sourceforge.stripes.util.UrlBuilder"
-%>
-<%@ page import="org.apache.shiro.SecurityUtils" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ page import="org.apache.shiro.SecurityUtils"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
-%>
-<stripes:url var="profileUrl" value="/actions/profile"/>
+%><stripes:url var="profileUrl" value="/actions/profile"/>
 <jsp:useBean id="portofinoConfiguration" scope="application"
              type="org.apache.commons.configuration.Configuration"/>
 <jsp:useBean id="model" scope="request"
@@ -23,33 +22,84 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
+            <h4 id="app-title" class="pull-left"><stripes:link href="/"><c:out value="${app.name}"/></stripes:link></h4>
             <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <h4 id="app-title"><stripes:link href="/"><c:out value="${app.name}"/></stripes:link></h4>
-            <c:if test="<%= actionBean instanceof AbstractPageAction && ((AbstractPageAction) actionBean).getDispatch() != null %>">
-                <%-- Skip in the admin section --%>
-                <div id="app-menu" class="nav-collapse collapse">
-                    <stripes:form action="/actions/admin/page" method="post" id="pageAdminForm" class="form-horizontal">
-                        <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
-                        <!-- Admin buttons -->
-                        <ul class="nav">
-                            <li><portofino:page-layout-button /></li>
-                            <li><portofino:page-children-button /></li>
-                            <li><portofino:page-permissions-button /></li>
-                            <li><portofino:page-copy-button /></li>
-                            <li><portofino:page-new-button /></li>
-                            <li><portofino:page-delete-button /></li>
-                            <li><portofino:page-move-button /></li>
-                        </ul>
-                    </stripes:form>
+            <div id="header-menu" class="nav-collapse collapse">
+                <c:if test="<%= actionBean instanceof AbstractPageAction && ((AbstractPageAction) actionBean).getDispatch() != null %>"><%
+                        AbstractPageAction pageAction = (AbstractPageAction) actionBean;
+                        pageContext.setAttribute("pageAction", pageAction);
+                    %>
+                    <!-- Admin buttons -->
+                    <ul id="page-menu" class="nav">
+                        <li class="dropdown">
+                             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                 Page <b class="caret"></b>
+                             </a>
+                            <ul class="dropdown-menu">
+                                <% if(SecurityLogic.hasPermissions(pageAction.getPageInstance(), SecurityUtils.getSubject(), AccessLevel.EDIT)) { %>
+                                <li>
+                                    <a onclick="portofino.enablePortletDragAndDrop(this); return false;" title="Edit page layout">
+                                        <i class="icon-move icon-white"></i> Edit page layout
+                                    </a>
+                                </li>
+                                <li>
+                                    <stripes:link href="/actions/admin/page" event="pageChildren" title="Page children">
+                                        <stripes:param name="originalPath" value="${pageAction.dispatch.originalPath}" />
+                                        <i class="icon-folder-open icon-white"></i> Page children
+                                    </stripes:link>
+                                </li>
+                                <li>
+                                    <stripes:link href="/actions/admin/page" event="newPage" title="Add new page">
+                                        <stripes:param name="originalPath" value="${pageAction.dispatch.originalPath}" />
+                                        <i class="icon-plus icon-white"></i> Add new page
+                                    </stripes:link>
+                                </li>
+                                <li>
+                                    <a onclick="confirmDeletePage(
+                                            '<%= pageAction.getDispatch().getLastPageInstance().getPathFromRoot() %>',
+                                            '<%= request.getContextPath() %>');
+                                            return false;"
+                                    title="Delete page">
+                                        <i class="icon-minus icon-white"></i> Delete page
+                                    </a>
+                                </li>
+                                <li>
+                                    <a onclick="showCopyPageDialog(
+                                            '<%= pageAction.getDispatch().getLastPageInstance().getPathFromRoot() %>',
+                                            '<%= request.getContextPath() %>');
+                                        return false;"
+                                    title="Copy page">
+                                        <i class="icon-file icon-white"></i> Copy page
+                                    </a>
+                                </li>
+                                <li>
+                                    <a onclick="showMovePageDialog(
+                                            '<%= pageAction.getDispatch().getLastPageInstance().getPathFromRoot() %>',
+                                            '<%= request.getContextPath() %>');
+                                            return false;"
+                                    title="Move page">
+                                        <i class="icon-share icon-white"></i> Move page
+                                    </a>
+                                </li>
+                                <% } %>
+                                <% if(SecurityLogic.hasPermissions(pageAction.getPageInstance(), SecurityUtils.getSubject(), AccessLevel.DEVELOP)) { %>
+                                <li>
+                                    <stripes:link href="/actions/admin/page" event="pagePermissions" title="Page permissions">
+                                        <stripes:param name="originalPath" value="${pageAction.dispatch.originalPath}" />
+                                        <i class="icon-user icon-white"></i> Page permissions
+                                    </stripes:link>
+                                </li>
+                                <% } %>
+                            </ul>
+                        </li>
+                    </ul>
                     <!-- End admin buttons -->
-                </div>
-            </c:if>
-            <div id="globalLinks" class="nav-collapse collapse">
-                <ul class="nav">
+                </c:if>
+                <ul id="user-menu" class="nav">
                     <%
                         String loginLink = ShiroUtils.getLoginLink(
                                 app, request.getContextPath(), actionBean.getOriginalPath(), actionBean.getOriginalPath());
