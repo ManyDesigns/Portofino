@@ -41,8 +41,10 @@ import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
+import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.files.TempFile;
 import com.manydesigns.portofino.files.TempFileService;
@@ -590,7 +592,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Bulk Edit/Update
     //**************************************************************************
 
+    public boolean isBulkOperationsEnabled() {
+        return (objects != null && !objects.isEmpty()) ||
+                "bulkEdit".equals(context.getEventName()) ||
+                "bulkDelete".equals(context.getEventName());
+    }
+
     @Button(list = "crud-search", key = "commons.edit", order = 2, icon = Button.ICON_EDIT, group = "crud")
+    @Guard(test = "isBulkOperationsEnabled()", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkEdit() {
         if (selection == null || selection.length == 0) {
@@ -672,6 +681,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     @Button(list = "crud-search", key = "commons.delete", order = 3, icon = Button.ICON_TRASH, group = "crud")
+    @Guard(test = "isBulkOperationsEnabled()", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution bulkDelete() {
         int deleted = 0;
