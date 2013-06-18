@@ -31,7 +31,6 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.chart.ChartGenerator;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
@@ -146,7 +145,6 @@ public class ChartAction extends AbstractPageAction {
         if (isEmbedded()) {
             return new ForwardResolution("/layouts/chart/chart.jsp");
         } else {
-            setupReturnToParentTarget();
             return forwardToPortletPage("/layouts/chart/chart.jsp");
         }
     }
@@ -176,23 +174,6 @@ public class ChartAction extends AbstractPageAction {
         inputStream = new FileInputStream(file);
         return new StreamingResolution("image/png", inputStream);
     }
-
-
-    public Resolution returnToParent() {
-        PageInstance[] pageInstancePath =
-                getDispatch().getPageInstancePath();
-        int previousPos = pageInstancePath.length - 2;
-        RedirectResolution resolution;
-        if (previousPos >= 0) {
-            PageInstance previousPage = pageInstancePath[previousPos];
-            String url = previousPage.getPath();
-            return new RedirectResolution(url, true);
-        } else {
-            throw new Error("No parent for root page");
-        }
-    }
-
-
 
     //**************************************************************************
     // Configuration

@@ -82,9 +82,6 @@
 
             buffer.addAttribute("type", "submit");
             String actualCssClass = "btn " + theButton.type();
-            if(hasIcon && !hasText) {
-                actualCssClass += " btn-mini ";
-            }
             if(cssClass != null) {
                 actualCssClass += cssClass;
             }

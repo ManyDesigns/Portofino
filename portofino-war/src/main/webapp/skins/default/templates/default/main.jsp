@@ -21,8 +21,11 @@
             <div id="content" class="span10">
                 <stripes:layout-component name="mainPageAction">
                     <stripes:layout-component name="mainPageActionHeader">
-                        <div class="row-fluid"><mde:sessionMessages /></div>
+                        <stripes:layout-component name="beforeSessionMessages" />
+                        <mde:sessionMessages />
+                        <stripes:layout-component name="beforeBreadcrumbs" />
                         <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
+                        <stripes:layout-component name="afterBreadcrumbs" />
                     </stripes:layout-component>
                     <stripes:layout-component name="mainPageActionBody">
                         <div id="portlet_${actionBean.pageInstance.page.id}">
@@ -36,7 +39,7 @@
                                         <h3>
                                             <span class="pull-right btn-group">
                                                 <stripes:layout-component name="portletHeaderButtons">
-                                                    <portofino:buttons list="portletHeaderButtons" />
+                                                    <portofino:buttons list="portletHeaderButtons" cssClass="btn-mini" />
                                                 </stripes:layout-component>
                                             </span>
                                             <stripes:layout-component name="portletTitle" />

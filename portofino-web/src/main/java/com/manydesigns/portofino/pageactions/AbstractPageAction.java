@@ -36,8 +36,10 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
-import com.manydesigns.portofino.navigation.ResultSetNavigation;
-import com.manydesigns.portofino.pages.*;
+import com.manydesigns.portofino.pages.ChildPage;
+import com.manydesigns.portofino.pages.Layout;
+import com.manydesigns.portofino.pages.NavigationRoot;
+import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
@@ -128,8 +130,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     //--------------------------------------------------------------------------
 
     public final MultiMap embeddedPageActions = new MultiHashMap();
-    public String returnToParentTarget;
-    public final Map<String, String> returnToParentParams = new HashMap<String, String>();
     protected boolean embedded;
 
     //--------------------------------------------------------------------------
@@ -176,38 +176,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return pageInstance.getName();
     }
 
-    /**
-     * <p>Detects the parent page to return to (using the return to... button). This can be another PageAction,
-     * or, at the discretion of subclasses, a different view of the same action.</p>
-     * <p>This method assigns a value to the returnToParentTarget field.</p>
-     */
-    protected void setupReturnToParentTarget() {
-        PageInstance[] pageInstancePath =
-                dispatch.getPageInstancePath();
-        boolean hasPrevious = getPage().getActualNavigationRoot() == NavigationRoot.INHERIT;
-        hasPrevious = hasPrevious && pageInstancePath.length > 1;
-        if(hasPrevious) {
-            Page parentPage = pageInstancePath[pageInstancePath.length - 2].getPage();
-            hasPrevious = parentPage.getActualNavigationRoot() != NavigationRoot.GHOST_ROOT;
-        }
-        returnToParentTarget = null;
-        if (hasPrevious) {
-            int previousPos = pageInstancePath.length - 2;
-            PageInstance previousPageInstance = pageInstancePath[previousPos];
-            //Page previousPage = previousPageInstance.getPage();
-
-            //TODO ripristinare
-            /*if(!previousPage.isShowInNavigation()) {
-                return;
-            }*/
-
-            PageAction actionBean = previousPageInstance.getActionBean();
-            if(actionBean != null) {
-                returnToParentTarget = actionBean.getDescription();
-            }
-        }
-    }
-
     //--------------------------------------------------------------------------
     // Admin methods
     //--------------------------------------------------------------------------
@@ -239,16 +207,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     public void setDispatch(Dispatch dispatch) {
         this.dispatch = dispatch;
-    }
-
-    @Override
-    public String getReturnToParentTarget() {
-        return returnToParentTarget;
-    }
-
-    @Override
-    public Map<String, String> getReturnToParentParams() {
-        return returnToParentParams;
     }
 
     public MultiMap getEmbeddedPageActions() {
@@ -634,12 +592,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
      * configured.
      */
     public Resolution forwardToPortletNotConfigured() {
-        if (isEmbedded()) {
-            return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
-        } else {
-            setupReturnToParentTarget();
-            return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
-        }
+        return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
     }
 
     /**

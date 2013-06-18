@@ -9,7 +9,7 @@
                 <h4>
                     <span class="pull-right btn-group">
                         <stripes:layout-component name="portletHeaderButtons">
-                            <portofino:buttons list="portletHeaderButtons" />
+                            <portofino:buttons list="portletHeaderButtons" cssClass="btn-mini" />
                         </stripes:layout-component>
                     </span>
                     <stripes:layout-component name="portletTitle" />

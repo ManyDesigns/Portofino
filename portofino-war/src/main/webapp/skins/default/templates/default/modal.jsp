@@ -32,17 +32,19 @@
             </div>
             <div id="content" class="span10">
                 <div class="row-fluid">
-                    <mde:sessionMessages/>
-                    <div class="pull-right">
-                        <jsp:include page="/skins/${skin}/return-to-parent.jsp" />
-                    </div>
+                    <stripes:layout-component name="beforeSessionMessages" />
+                    <mde:sessionMessages />
+                    <stripes:layout-component name="beforeBreadcrumbs" />
                     <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
-                    <stripes:layout-component name="portletHeader">
-                        <h3 style="border-bottom: 1px solid #E5E5E5">
-                            <stripes:layout-component name="portletTitle" />
-                        </h3>
-                    </stripes:layout-component>
-                    <stripes:layout-component name="portletBody" />
+                    <stripes:layout-component name="afterBreadcrumbs" />
+                    <div>
+                        <stripes:layout-component name="portletHeader">
+                            <h3 style="border-bottom: 1px solid #E5E5E5">
+                                <stripes:layout-component name="portletTitle" />
+                            </h3>
+                        </stripes:layout-component>
+                        <stripes:layout-component name="portletBody" />
+                    </div>
                 </div>
             </div>
         </div>

@@ -225,6 +225,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Navigation
     //--------------------------------------------------------------------------
 
+    public String returnToParentTarget;
+    public final Map<String, String> returnToParentParams = new HashMap<String, String>();
     protected ResultSetNavigation resultSetNavigation;
 
     //--------------------------------------------------------------------------
@@ -1216,24 +1218,52 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    @Override
+    /**
+     * <p>Detects the parent page to return to (using the return to... button). This can be another PageAction,
+     * or, at the discretion of subclasses, a different view of the same action.</p>
+     * <p>This method assigns a value to the returnToParentTarget field.</p>
+     */
     public void setupReturnToParentTarget() {
-        if(!StringUtils.isBlank(searchString)) {
-            returnToParentParams.put(SEARCH_STRING_PARAM, searchString);
-        }
         if (pk != null) {
+            if(!StringUtils.isBlank(searchString)) {
+                returnToParentParams.put(SEARCH_STRING_PARAM, searchString);
+            }
             returnToParentTarget = getMessage("layouts.crud.search");
-        } else {
-            super.setupReturnToParentTarget();
-        }
+        }/* else {
+            PageInstance[] pageInstancePath =
+                dispatch.getPageInstancePath();
+            boolean hasPrevious = getPage().getActualNavigationRoot() == NavigationRoot.INHERIT;
+            hasPrevious = hasPrevious && pageInstancePath.length > 1;
+            if(hasPrevious) {
+                Page parentPage = pageInstancePath[pageInstancePath.length - 2].getPage();
+                hasPrevious = parentPage.getActualNavigationRoot() != NavigationRoot.GHOST_ROOT;
+            }
+            returnToParentTarget = null;
+            if (hasPrevious) {
+                int previousPos = pageInstancePath.length - 2;
+                PageInstance previousPageInstance = pageInstancePath[previousPos];
+                //Page previousPage = previousPageInstance.getPage();
+
+                //TODO ripristinare
+                //if(!previousPage.isShowInNavigation()) {
+                //    return;
+                //}
+
+                PageAction actionBean = previousPageInstance.getActionBean();
+                if(actionBean != null) {
+                    returnToParentTarget = actionBean.getDescription();
+                }
+            }
+        }*/
     }
 
     public Resolution returnToParent() throws Exception {
-        RedirectResolution resolution;
         if (pk != null) {
-            resolution = new RedirectResolution(
+            return new RedirectResolution(
                     appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
         } else {
+            return new ErrorResolution(500);
+        }/* else {
             PageInstance[] pageInstancePath =
                     getDispatch().getPageInstancePath();
             int previousPos = pageInstancePath.length - 2;
@@ -1245,9 +1275,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 resolution = new RedirectResolution(
                         appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
             }
-        }
-
-        return resolution;
+        }*/
     }
 
     @Override
@@ -2370,6 +2398,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public String getSearchTitle() {
         String title = crudConfiguration.getSearchTitle();
+        if(StringUtils.isBlank(title)) {
+            title = getPage().getTitle();
+        }
         OgnlTextFormat textFormat = OgnlTextFormat.create(StringUtils.defaultString(title));
         return textFormat.format(this);
     }
@@ -2615,6 +2646,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public void setResultSetNavigation(ResultSetNavigation resultSetNavigation) {
         this.resultSetNavigation = resultSetNavigation;
+    }
+
+    public String getReturnToParentTarget() {
+        return returnToParentTarget;
+    }
+
+    public Map<String, String> getReturnToParentParams() {
+        return returnToParentParams;
     }
 
 }

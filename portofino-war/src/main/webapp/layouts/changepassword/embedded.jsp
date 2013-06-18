@@ -14,7 +14,7 @@
             </a>
             <div class="pull-right">
                 <stripes:layout-component name="portletHeaderButtons">
-                    <portofino:buttons list="portletHeaderButtons" />
+                    <portofino:buttons list="portletHeaderButtons" cssClass="btn-mini" />
                 </stripes:layout-component>
             </div>
         </div>

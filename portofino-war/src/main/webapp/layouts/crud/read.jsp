@@ -7,13 +7,11 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/normal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"/>
-    <stripes:layout-component name="mainPageActionHeader">
-        <div class="row-fluid"><mde:sessionMessages /></div>
+    <stripes:layout-component name="beforeBreadcrumbs">
         <div class="pull-right">
             <jsp:include page="result-set-navigation.jsp" />
-            <jsp:include page="/skins/${skin}/return-to-parent.jsp" />
+            <jsp:include page="return-to-parent.jsp" />
         </div>
-        <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.readTitle}"/>
@@ -23,6 +21,12 @@
         <c:if test="${not empty actionBean.searchString}">
             <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
         </c:if>
+        <style type="text/css">
+            .crudReadButtons {
+                border-top: solid 1px #E5E5E5;
+                padding-top: 10px;
+            }
+        </style>
         <div class="crudReadButtons">
             <portofino:buttons list="crud-read" />
         </div>

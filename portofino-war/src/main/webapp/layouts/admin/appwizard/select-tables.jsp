@@ -16,7 +16,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"
-                      method="post" enctype="multipart/form-data">
+                      method="post" enctype="multipart/form-data" class="form-horizontal">
             <style type="text/css">
                 ul li {
                     list-style-type: none;
@@ -77,7 +77,7 @@
                     $("input[name=generationStrategy]").change(toggleRootsForm);
                 });
             </script>
-            <div class="form-actions">
+            <div class="form-actions" style="padding-left: 20px;">
                 <portofino:buttons list="select-tables" />
             </div>
         </stripes:form>

@@ -38,7 +38,7 @@
                                 <stripes:layout-component name="portletHeader">
                                     <h4>
                                         <span class="pull-right btn-group">
-                                            <portofino:buttons list="portletHeaderButtons" />
+                                            <portofino:buttons list="portletHeaderButtons" cssClass="btn-mini" />
                                         </span>
                                         <stripes:layout-component name="portletTitle" />
                                     </h4>
