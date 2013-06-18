@@ -33,7 +33,8 @@
     List<ButtonInfo> buttons =
             ButtonsLogic.getButtonsForClass(actionBean.getClass(), list);
     if(buttons != null) {
-        boolean primaryFound = false;
+        String group = null;
+        XhtmlBuffer buffer = new XhtmlBuffer(out);
         for(ButtonInfo button : buttons) {
             Method handler = button.getMethod();
             boolean isAdmin = SecurityLogic.isAdministrator(request);
@@ -45,11 +46,25 @@
             if(!ButtonsLogic.doGuardsPass(actionBean, handler, GuardType.VISIBLE)) {
                 continue;
             }
-            XhtmlBuffer buffer = new XhtmlBuffer(out);
             Button theButton = button.getButton();
             boolean hasText = !StringUtils.isBlank(theButton.key());
             boolean hasIcon = !StringUtils.isBlank(theButton.icon());
             boolean hasTitle = !StringUtils.isBlank(theButton.titleKey());
+            if(!StringUtils.isBlank(theButton.group())) {
+                if(!theButton.group().equals(group)) {
+                    if(group != null) {
+                        buffer.closeElement("div");
+                    }
+                    buffer.openElement("div");
+                    buffer.addAttribute("class", "btn-group");
+                }
+                group = theButton.group();
+            } else {
+                if(group != null) {
+                    buffer.closeElement("div");
+                }
+                group = null;
+            }
             buffer.openElement("button");
             if(!ButtonsLogic.doGuardsPass(actionBean, handler, GuardType.ENABLED)) {
                 buffer.addAttribute("disabled", "disabled");
@@ -89,6 +104,9 @@
             }
             buffer.closeElement("button");
             buffer.write(" ");
+        }
+        if(group != null) {
+            buffer.closeElement("div");
         }
     }
 %>

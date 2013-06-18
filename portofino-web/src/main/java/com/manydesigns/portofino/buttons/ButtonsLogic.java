@@ -34,6 +34,7 @@ import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import ognl.OgnlContext;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.subject.Subject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -83,6 +84,22 @@ public class ButtonsLogic {
             }
         }
         Collections.sort(buttons, new ButtonComparatorByOrder());
+        //Group together buttons of the same group
+        for(int i = 0; i < buttons.size() - 1; i++) {
+            ButtonInfo info = buttons.get(i);
+            String group = info.getButton().group();
+            if(!StringUtils.isBlank(group)) {
+                int count = 1;
+                for(int j = i + 1; j < buttons.size(); j++) {
+                    ButtonInfo info2 = buttons.get(j);
+                    if(info2.getButton().group().equals(group)) {
+                        buttons.remove(j);
+                        buttons.add(i + count, info2);
+                        count++;
+                    }
+                }
+            }
+        }
         return buttons;
     }
 

@@ -23,7 +23,7 @@
         <c:if test="${not empty actionBean.searchString}">
             <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
         </c:if>
-        <div class="crudReadButtons form-actions">
+        <div class="crudReadButtons">
             <portofino:buttons list="crud-read" />
         </div>
         <script type="text/javascript">

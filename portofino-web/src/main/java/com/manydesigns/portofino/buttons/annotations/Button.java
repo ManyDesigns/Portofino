@@ -90,4 +90,10 @@ public @interface Button {
      * Allows to specify the type of button to render: for example "primary", "link" or "success".
      */
     String type() default TYPE_DEFAULT;
+
+    /**
+     * The group this button belongs to. Buttons in the same group are rendered close together to separate them
+     * from other groups.
+     */
+    String group() default "";
 }

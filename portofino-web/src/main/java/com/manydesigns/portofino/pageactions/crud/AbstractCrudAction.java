@@ -484,7 +484,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
 
     @Button(list = "crud-search", key = "commons.create", order = 1, type = Button.TYPE_SUCCESS,
-            icon = Button.ICON_PLUS + Button.ICON_WHITE)
+            icon = Button.ICON_PLUS + Button.ICON_WHITE, group = "crud")
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     public Resolution create() {
         setupForm(Mode.CREATE);
@@ -547,7 +547,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Edit/Update
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "commons.edit", order = 1, icon = Button.ICON_EDIT)
+    @Button(list = "crud-read", key = "commons.edit", order = 1, icon = Button.ICON_EDIT, group = "crud")
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution edit() {
         setupForm(Mode.EDIT);
@@ -588,7 +588,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Bulk Edit/Update
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.edit", order = 2, icon = Button.ICON_EDIT)
+    @Button(list = "crud-search", key = "commons.edit", order = 2, icon = Button.ICON_EDIT, group = "crud")
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkEdit() {
         if (selection == null || selection.length == 0) {
@@ -647,7 +647,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Delete
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "commons.delete", order = 2, icon = Button.ICON_TRASH)
+    @Button(list = "crud-read", key = "commons.delete", order = 2, icon = Button.ICON_TRASH, group = "crud")
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution delete() {
         String url = calculateBaseSearchUrl();
@@ -669,7 +669,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return new RedirectResolution(appendSearchStringParamIfNecessary(url), false);
     }
 
-    @Button(list = "crud-search", key = "commons.delete", order = 3, icon = Button.ICON_TRASH)
+    @Button(list = "crud-search", key = "commons.delete", order = 3, icon = Button.ICON_TRASH, group = "crud")
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution bulkDelete() {
         int deleted = 0;
@@ -1344,7 +1344,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // ExportSearch
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.exportExcel", order = 5)
+    @Button(list = "crud-search", key = "commons.exportExcel", order = 5, group = "export")
     public Resolution exportSearchExcel() {
         try {
             TempFileService fileService = TempFileService.getInstance();
@@ -1417,7 +1417,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // ExportRead
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "commons.exportExcel", order = 4)
+    @Button(list = "crud-read", key = "commons.exportExcel", order = 4, group = "export")
     public Resolution exportReadExcel() {
         try {
             TempFileService fileService = TempFileService.getInstance();
@@ -1582,7 +1582,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // exportSearchPdf
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.exportPdf", order = 4)
+    @Button(list = "crud-search", key = "commons.exportPdf", order = 4, group = "export")
     public Resolution exportSearchPdf() {
         try {
             //final File tmpFile = File.createTempFile(crudConfiguration.getName() + ".search", ".pdf");
@@ -1890,7 +1890,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    @Button(list = "crud-read", key = "commons.exportPdf", order = 3)
+    @Button(list = "crud-read", key = "commons.exportPdf", order = 3, group = "export")
     public Resolution exportReadPdf() {
         try {
             final File tmpFile = File.createTempFile("export." + crudConfiguration.getName(), ".read.pdf");
