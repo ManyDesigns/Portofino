@@ -199,10 +199,7 @@ public class PageAdminAction extends AbstractPageAction {
         }
         for(int i = 0; i < portletWrapperIds.length; i++) {
             String current = portletWrapperIds[i];
-            if("p".equals(current)) {
-                layout.getSelf().setContainer(layoutContainer);
-                layout.getSelf().setOrder(i + "");
-            } else if (current.startsWith("c")) {
+            if (current.startsWith("c")) { //Retaggio di quando avevamo self (non serve piu')
                 String pageFragment = current.substring(1); //current = c...
                 for(ChildPage p : layout.getChildPages()) {
                     if(pageFragment.equals(p.getName())) {

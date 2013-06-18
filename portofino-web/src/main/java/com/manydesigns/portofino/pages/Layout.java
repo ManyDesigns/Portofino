@@ -42,7 +42,6 @@ public class Layout {
     //**************************************************************************
 
     protected String template;
-    protected Self self;
     protected final ArrayList<ChildPage> childPages;
 
     //**************************************************************************
@@ -60,10 +59,6 @@ public class Layout {
     }
 
     public void init() {
-        if(self == null) {
-            self = new Self();
-        }
-        self.init();
         for (ChildPage current : childPages) {
             current.init();
         }
@@ -80,15 +75,6 @@ public class Layout {
 
     public void setTemplate(String template) {
         this.template = template;
-    }
-
-    @XmlElement
-    public Self getSelf() {
-        return self;
-    }
-
-    public void setSelf(Self self) {
-        this.self = self;
     }
 
     @XmlElementWrapper(name="childPages")
