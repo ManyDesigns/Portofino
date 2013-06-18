@@ -89,15 +89,7 @@
         <div class="row">
             <div id="content-login" class="container">
                 <div class="portletHeader">
-                    <div>
-                        <div class="portletTitle">
-                            <h4><fmt:message key="skins.default.login.login_to"/>: <c:out value="${applicationName}"/></h4>
-                        </div>
-                        <div class="pull-right">
-                            <stripes:layout-component name="portletHeaderButtons" />
-                        </div>
-                    </div>
-                    <div class="portletHeaderSeparator"></div>
+                    <h4><fmt:message key="skins.default.login.login_to"/>: <c:out value="${applicationName}"/></h4>
                 </div>
                 <div class="portletBody">
                     <stripes:layout-component name="portletBody">

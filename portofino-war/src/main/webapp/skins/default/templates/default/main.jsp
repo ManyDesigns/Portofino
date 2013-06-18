@@ -22,9 +22,6 @@
                 <stripes:layout-component name="mainPageAction">
                     <stripes:layout-component name="mainPageActionHeader">
                         <div class="row-fluid"><mde:sessionMessages /></div>
-                        <div class="pull-right">
-
-                        </div>
                         <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
                     </stripes:layout-component>
                     <stripes:layout-component name="mainPageActionBody">
@@ -35,16 +32,20 @@
                                 <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
                                 <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
                                 <stripes:layout-component name="portletHeader">
-                                    <h3 style="border-bottom: 1px solid #E5E5E5">
-                                        <div class="pull-right btn-group">
-                                            <stripes:layout-component name="portletHeaderButtons">
-                                                <portofino:buttons list="portletHeaderButtons" />
-                                            </stripes:layout-component>
-                                        </div>
-                                        <stripes:layout-component name="portletTitle" />
-                                    </h3>
+                                    <div class="portletHeader" style="padding-bottom: 0;">
+                                        <h3>
+                                            <span class="pull-right btn-group">
+                                                <stripes:layout-component name="portletHeaderButtons">
+                                                    <portofino:buttons list="portletHeaderButtons" />
+                                                </stripes:layout-component>
+                                            </span>
+                                            <stripes:layout-component name="portletTitle" />
+                                        </h3>
+                                    </div>
                                 </stripes:layout-component>
-                                <stripes:layout-component name="portletBody" />
+                                <div class="portletBody">
+                                    <stripes:layout-component name="portletBody" />
+                                </div>
                             </stripes:form>
                         </div>
                     </stripes:layout-component>

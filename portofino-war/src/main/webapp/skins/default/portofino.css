@@ -21,10 +21,6 @@ footer {
     padding-bottom: 10px;
 }
 
-div#hd h1 a {
-    color: #166bbf;
-}
-
 .navbar-fixed-top a {
     color: #ffffff;
 }
@@ -33,37 +29,41 @@ div#hd h1 a {
     color: #ffffff;
 }
 
-div#responseTime {
+#responseTime {
     float: right;
 }
 
-div#header-menu li > a {
+#header-menu li > a {
     color: #ffffff;
 }
 
-div#header-menu li.dropdown > .dropdown-toggle .caret {
+#header-menu li.dropdown > .dropdown-toggle .caret {
     border-bottom-color: #ffffff;
     border-top-color: #ffffff;
 }
 
 @media (min-width: 980px) {
-    div#header-menu {
+    #header-menu {
         float: right;
     }
 
-    div#header-menu .nav > li > .dropdown-menu:after {
+    #header-menu .nav > li > .dropdown-menu:after {
         border-bottom: 6px solid #555555;
     }
 
-    div#header-menu .dropdown-menu {
+    #header-menu .dropdown-menu {
         background-color: #555555;
     }
 }
 
 @media (max-width: 979px) {
-    div#header-menu {
+    #header-menu {
         float: none;
     }
+}
+
+#user-menu {
+    margin-right: 0;
 }
 
 /*******************************************************************************
@@ -114,22 +114,12 @@ Portlet
     margin-bottom: 12px;
     float: left;
     width: 100%;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #E5E5E5
 }
 
-.portletHeaderSeparator {
-    border-bottom: solid 3px #EEEEFF;
-    padding-bottom: 3px;
-    float: left;
-    width: 100%;
-}
-
-.portletTitle {
-    float: left;
-}
-
-.portletTitle h4 {
-    margin: 0;
-    color: #166BBF;
+.portletHeader h3, .portletHeader h4 {
+    margin-bottom: 0;
 }
 
 .portletBody {
@@ -142,7 +132,6 @@ Portlet
     color: #363636;
     height: 10em;
 }
-
 
 /*******************************************************************************
 Side bar

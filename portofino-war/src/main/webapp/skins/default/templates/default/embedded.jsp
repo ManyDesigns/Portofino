@@ -6,17 +6,14 @@
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
         <div class="portletHeader">
             <stripes:layout-component name="portletHeader">
-                <div>
-                    <div class="portletTitle">
-                        <h4><stripes:layout-component name="portletTitle" /></h4>
-                    </div>
-                    <div class="pull-right btn-group">
+                <h4>
+                    <span class="pull-right btn-group">
                         <stripes:layout-component name="portletHeaderButtons">
                             <portofino:buttons list="portletHeaderButtons" />
                         </stripes:layout-component>
-                    </div>
-                </div>
-                <div class="portletHeaderSeparator"></div>
+                    </span>
+                    <stripes:layout-component name="portletTitle" />
+                </h4>
             </stripes:layout-component>
         </div>
         <div class="portletBody">
