@@ -483,7 +483,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Create/Save
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.create", icon = "plus icon-white", order = 1, type = Button.TYPE_SUCCESS)
+    @Button(list = "crud-search", key = "commons.create", order = 1, type = Button.TYPE_SUCCESS,
+            icon = Button.ICON_PLUS + Button.ICON_WHITE)
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     public Resolution create() {
         setupForm(Mode.CREATE);
@@ -546,7 +547,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Edit/Update
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "commons.edit", order = 1, icon = "edit")
+    @Button(list = "crud-read", key = "commons.edit", order = 1, icon = Button.ICON_EDIT)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution edit() {
         setupForm(Mode.EDIT);
@@ -587,7 +588,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Bulk Edit/Update
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.edit", icon = "edit", order = 2)
+    @Button(list = "crud-search", key = "commons.edit", order = 2, icon = Button.ICON_EDIT)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkEdit() {
         if (selection == null || selection.length == 0) {
@@ -646,7 +647,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Delete
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "commons.delete", order = 2, icon = "trash")
+    @Button(list = "crud-read", key = "commons.delete", order = 2, icon = Button.ICON_TRASH)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution delete() {
         String url = calculateBaseSearchUrl();
@@ -668,7 +669,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return new RedirectResolution(appendSearchStringParamIfNecessary(url), false);
     }
 
-    @Button(list = "crud-search", key = "commons.delete", icon="trash", order = 3)
+    @Button(list = "crud-search", key = "commons.delete", order = 3, icon = Button.ICON_TRASH)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution bulkDelete() {
         int deleted = 0;
@@ -1915,7 +1916,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Configuration
     //**************************************************************************
 
-    @Button(list = "portletHeaderButtons", titleKey = "commons.configure", order = 1, icon = "wrench")
+    @Button(list = "portletHeaderButtons", titleKey = "commons.configure", order = 1, icon = Button.ICON_WRENCH)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();

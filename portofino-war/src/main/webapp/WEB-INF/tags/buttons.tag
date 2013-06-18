@@ -66,10 +66,9 @@
             }
 
             buffer.addAttribute("type", "submit");
-            String type = theButton.type();
-            String actualCssClass = "btn " + (StringUtils.isBlank(type) ? "" : "btn-" + type + " ");
+            String actualCssClass = "btn " + theButton.type();
             if(hasIcon && !hasText) {
-                actualCssClass += "btn-mini ";
+                actualCssClass += " btn-mini ";
             }
             if(cssClass != null) {
                 actualCssClass += cssClass;
@@ -77,7 +76,7 @@
             buffer.addAttribute("class", actualCssClass);
             if(hasIcon) {
                 buffer.openElement("i");
-                buffer.addAttribute("class", "icon-" + theButton.icon());
+                buffer.addAttribute("class", theButton.icon());
                 buffer.closeElement("i");
             }
             if(hasText) {

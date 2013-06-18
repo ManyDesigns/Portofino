@@ -44,13 +44,22 @@ public @interface Button {
 
     public static final String
         TYPE_DEFAULT = "",
-        TYPE_PRIMARY = "primary",
-        TYPE_INFO = "info",
-        TYPE_SUCCESS = "success",
-        TYPE_WARNING = "warning",
-        TYPE_ERROR = "danger",
-        TYPE_LINK = "link";
+        TYPE_PRIMARY = " btn-primary ",
+        TYPE_INFO = " btn-info ",
+        TYPE_SUCCESS = " btn-success ",
+        TYPE_WARNING = " btn-warning ",
+        TYPE_ERROR = " btn-danger ",
+        TYPE_LINK = " btn-link ";
 
+    public static final String
+        ICON_WHITE = " icon-white ",
+        ICON_EDIT = " icon-edit ",
+        ICON_PLUS = " icon-plus ",
+        ICON_MINUS = " icon-minus ",
+        ICON_TRASH = " icon-trash ",
+        ICON_WRENCH = " icon-wrench ",
+        ICON_PICTURE = " icon-picture ";
+    
     /**
      * The list where this button is to be placed. Web pages will include lists of buttons by name.
      */
