@@ -34,6 +34,9 @@
                     pageContext.setAttribute("pageAction", pageAction);
                     if(SecurityLogic.hasPermissions(pageAction.getPageInstance(), SecurityUtils.getSubject(), AccessLevel.EDIT)) { %>
                     <!-- Admin buttons -->
+                    <form id="pageAdminForm" action="${pageContext.request.contextPath}/actions/admin/page" method="post">
+                        <input type="hidden" name="originalPath" value="${pageAction.dispatch.originalPath}" />
+                    </form>
                     <ul id="page-menu" class="nav">
                         <li class="dropdown">
                              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
