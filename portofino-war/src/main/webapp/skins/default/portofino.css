@@ -1,16 +1,4 @@
 /*******************************************************************************
-Bootstrap overrides
-*******************************************************************************/
-
-.row-fluid [class*="span"] {
-    min-height: 0;
-}
-
-.breadcrumb {
-    margin-bottom: 0;
-}
-
-/*******************************************************************************
 Header / footer
 *******************************************************************************/
 
@@ -97,11 +85,6 @@ Content
     display: inline;
 }
 
-table.noBorder th,
-table.noBorder td {
-    border: none;
-}
-
 #navigation {
     margin-bottom: 1em;
 }
@@ -131,65 +114,6 @@ Portlet
     background: #fbf9ee;
     color: #363636;
     height: 10em;
-}
-
-/*******************************************************************************
-Side bar
-*******************************************************************************/
-
-div#sidebar {
-    margin-top: 0.5em;
-}
-
-div#sidebar ul {
-    margin: 0;
-    list-style-type: none;
-}
-
-div#sidebar li {
-    padding: 0 0.5em;
-    list-style-type: none;
-}
-
-div#sidebar ul a {
-    color: black;
-}
-
-div#sidebar ul li.selected, div#sidebar ul li.selected a {
-    color: white;
-    background-color: #65a7db;
-    font-weight: bold;
-}
-
-div#sidebar ul li.path, div#sidebar ul li.path a {
-    margin-right: 1em;
-    color: black;
-    background-color: #eef;
-    font-weight: bold;
-}
-
-
-div#sidebar.adminSidebar li {
-    padding: 0;
-}
-
-div#sidebar.adminSidebar li li {
-    padding: 0 0.5em;
-}
-
-
-.navigationHeader {
-    margin-top: 0.5em;
-    padding-top: 0.5em;
-    border-top: 1px solid #eeeeee;
-    color: #555555;
-    font-weight: bold;
-}
-
-.navigationHeader.first {
-    margin-top: 0;
-    padding-top: 0;
-    border-top: 0 none;
 }
 
 /*******************************************************************************
@@ -266,8 +190,6 @@ ul.errors li {
     color: red;
     font-weight: bold;
 }
-
-
 
 /*******************************************************************************
 Search form
@@ -499,32 +421,6 @@ fieldset.radio {
     border: 1px dashed gray;
     margin-bottom: 1em;
     min-height: 12em;
-}
-
-ul.groupBox {
-    list-style-type: none;
-    border: 1px dashed gray;
-    min-height: 12em;
-    margin: 0;
-}
-
-li.group, li.groupPlaceholder {
-    list-style-type: none;
-    margin: 0 0 5px 0;
-    padding: 5px;
-    height: 1.5em;
-    font-weight: bold;
-}
-
-.groupPlaceholder {
-    border: 1px solid #fcefa1;
-    background: #fbf9ee;
-    color: #363636;
-}
-
-.groupBoxTitle {
-    font-weight: normal;
-    margin-bottom: 0.5em;
 }
 
 .mde-table-form input[type='checkbox'] {

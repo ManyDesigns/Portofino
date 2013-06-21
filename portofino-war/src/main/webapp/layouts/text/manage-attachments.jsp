@@ -20,7 +20,7 @@
             <c:if test="${not empty actionBean.textConfiguration.attachments}">
                 <fmt:message key="commons.attachments"/>:
                 <br/>
-                <table class="noBorder">
+                <table>
                     <c:forEach var="attachment" items="${actionBean.textConfiguration.attachments}">
                         <tr>
                             <td>

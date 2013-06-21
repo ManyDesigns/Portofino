@@ -17,7 +17,7 @@
     <jsp:include page="header.jsp"/>
     <div class="container">
         <div class="row">
-            <div class="span2 portofino-sidebar">
+            <div class="span2">
                 <div id="navigation">
                     <jsp:include page="navigation.jsp" />
                 </div>
