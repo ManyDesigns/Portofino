@@ -118,6 +118,7 @@ public class PortofinoListener
         servletContext = servletContextEvent.getServletContext();
 
         serverInfo = new ServerInfo(servletContext);
+        servletContext.setAttribute(ApplicationAttributes.SERVLET_CONTEXT, servletContext);
         servletContext.setAttribute(ApplicationAttributes.SERVER_INFO, serverInfo);
 
         setupCommonsConfiguration();

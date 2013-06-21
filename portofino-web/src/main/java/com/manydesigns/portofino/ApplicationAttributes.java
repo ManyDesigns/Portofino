@@ -34,6 +34,7 @@ public class ApplicationAttributes {
 
     public final static String ELEMENTS_CONFIGURATION = "elementsConfiguration";
     public final static String PORTOFINO_CONFIGURATION = "portofinoConfiguration";
+    public final static String SERVLET_CONTEXT = "servletContext";
     public final static String SERVER_INFO = "serverInfo";
     public final static String APPLICATION_STARTER = "applicationStarter";
     public final static String MAIL_QUEUE = "mailQueue";
