@@ -25,11 +25,9 @@
         <c:out value="${actionBean.createTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <p>
-            <c:if test="${actionBean.requiredFieldsPresent}">
-                <fmt:message key="commons.fields_required"/>.
-            </c:if>
-        </p>
+        <c:if test="${actionBean.requiredFieldsPresent}">
+            <p><fmt:message key="commons.fields_required"/>.</p>
+        </c:if>
         <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data"
                       class="form-horizontal">
             <mde:write name="actionBean" property="form"/>
