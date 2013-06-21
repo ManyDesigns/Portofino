@@ -309,7 +309,7 @@ public class LoginAction extends AbstractActionBean {
     }
 
     public boolean isOpenIdEnabled() {
-        return getApplication().getAppConfiguration().getBoolean(AppProperties.OPENID_ENABLED, false);
+        return getApplication().getConfiguration().getBoolean(AppProperties.OPENID_ENABLED, false);
     }
 
     //**************************************************************************

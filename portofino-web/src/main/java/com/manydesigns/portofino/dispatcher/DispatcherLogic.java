@@ -445,7 +445,7 @@ public class DispatcherLogic {
     }
 
     public static Class<? extends PageAction> getFallbackActionClass(Application application) {
-        Configuration configuration = application.getPortofinoProperties();
+        Configuration configuration = application.getConfiguration();
         String className = configuration.getString(PortofinoProperties.FALLBACK_ACTION_CLASS);
         try {
             Class<?> aClass = Class.forName(className);

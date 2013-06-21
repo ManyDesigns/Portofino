@@ -121,11 +121,11 @@ public class PageAdminAction extends AbstractPageAction {
         dispatch = dispatcher.getDispatch(contextPath, originalPath);
         pageInstance = dispatch.getLastPageInstance();
 
-        List<String> knownPageActions = application.getPortofinoProperties().getList("pageactions");
+        List<String> knownPageActions = application.getConfiguration().getList("pageactions");
         for(String pageAction : knownPageActions) {
             tryToRegisterPageAction(pageAction);
         }
-        knownPageActions = application.getAppConfiguration().getList("pageactions");
+        knownPageActions = application.getConfiguration().getList("pageactions");
         if(knownPageActions != null) {
             for(String pageAction : knownPageActions) {
                 tryToRegisterPageAction(pageAction);
@@ -390,7 +390,7 @@ public class PageAdminAction extends AbstractPageAction {
         } else {
             Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
             String contextPath = context.getRequest().getContextPath();
-            String landingPagePath = application.getAppConfiguration().getString(AppProperties.LANDING_PAGE);
+            String landingPagePath = application.getConfiguration().getString(AppProperties.LANDING_PAGE);
             Dispatch landingPageDispatch = dispatcher.getDispatch(contextPath, landingPagePath);
             if(landingPageDispatch != null &&
                landingPageDispatch.getLastPageInstance().getDirectory().equals(pageInstance.getDirectory())) {
@@ -477,7 +477,7 @@ public class PageAdminAction extends AbstractPageAction {
             logger.debug("Checking if we've been asked to move the landing page...");
             Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
             String contextPath = context.getRequest().getContextPath();
-            String landingPagePath = application.getAppConfiguration().getString(AppProperties.LANDING_PAGE);
+            String landingPagePath = application.getConfiguration().getString(AppProperties.LANDING_PAGE);
             Dispatch landingPageDispatch = dispatcher.getDispatch(contextPath, landingPagePath);
             if(landingPageDispatch != null &&
                landingPageDispatch.getLastPageInstance().getDirectory().equals(pageInstance.getDirectory())) {
@@ -586,7 +586,7 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     private void prepareNewPageForm() throws Exception {
-        application.getPortofinoProperties().getProperties("");
+        application.getConfiguration().getProperties("");
         DefaultSelectionProvider classSelectionProvider = new DefaultSelectionProvider("actionClassName");
         for(PageActionInfo info : registry) {
             classSelectionProvider.appendRow(info.actionClass.getName(), info.description, true);
@@ -936,7 +936,7 @@ public class PageAdminAction extends AbstractPageAction {
         } catch (Exception e) {
             logger.warn("Could not load groups, falling back to default ones", e);
             groups = new LinkedHashSet<String>();
-            Configuration conf = application.getAppConfiguration();
+            Configuration conf = application.getConfiguration();
             groups.add(conf.getString(AppProperties.GROUP_ALL));
             groups.add(conf.getString(AppProperties.GROUP_ANONYMOUS));
             groups.add(conf.getString(AppProperties.GROUP_REGISTERED));

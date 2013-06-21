@@ -91,7 +91,7 @@ public class SettingsAction extends AbstractActionBean {
         SelectionProvider pagesSelectionProvider =
                 DispatcherLogic.createPagesSelectionProvider(application, application.getPagesDir());
 
-        Configuration appConfiguration = application.getAppConfiguration();
+        Configuration appConfiguration = application.getConfiguration();
         CommonsConfigurationAccessor accessor = new CommonsConfigurationAccessor(appConfiguration);
         form = new FormBuilder(accessor)
                 .configFields(AppProperties.APPLICATION_NAME, AppProperties.SKIN, AppProperties.LANDING_PAGE)
@@ -115,9 +115,10 @@ public class SettingsAction extends AbstractActionBean {
         if (form.validate()) {
             logger.debug("Applying settings to model");
             try {
-                CompositeConfiguration appConfiguration = (CompositeConfiguration) application.getAppConfiguration();
-                form.writeToObject(appConfiguration);
-                ((FileConfiguration) appConfiguration.getConfiguration(0)).save();
+                CompositeConfiguration appConfiguration = (CompositeConfiguration) application.getConfiguration();
+                FileConfiguration fileConfiguration = (FileConfiguration) appConfiguration.getConfiguration(0);
+                form.writeToObject(fileConfiguration);
+                fileConfiguration.save();
             } catch (Exception e) {
                 logger.error("Configuration not saved", e);
                 SessionMessages.addInfoMessage(getMessage("commons.configuration.notUpdated"));

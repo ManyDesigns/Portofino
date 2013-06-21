@@ -29,17 +29,13 @@ import com.manydesigns.portofino.application.DefaultApplication;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.starter.migration.text.MigrateTo408;
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import java.io.File;
-import java.io.FileNotFoundException;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -68,7 +64,6 @@ public class ApplicationStarter {
     //--------------------------------------------------------------------------
 
     protected final Configuration portofinoConfiguration;
-    protected CompositeConfiguration appConfiguration;
 
     protected Status status;
 
@@ -93,50 +88,18 @@ public class ApplicationStarter {
     // Contructor
     //--------------------------------------------------------------------------
 
-    public ApplicationStarter(ServletContext servletContext, Configuration portofinoConfiguration) {
-        this(servletContext, portofinoConfiguration, portofinoConfiguration.getString(PortofinoProperties.APP_ID));
-    }
-
     public ApplicationStarter(ServletContext servletContext, Configuration portofinoConfiguration, String appId) {
         this.appId = appId;
         this.portofinoConfiguration = portofinoConfiguration;
         this.servletContext = servletContext;
         this.status = Status.UNINITIALIZED;
-
-        String appsDirPath =
-            portofinoConfiguration.getString(
-                PortofinoProperties.APPS_DIR_PATH);
-        File appsDir = new File(appsDirPath);
-        logger.info("Apps dir: {}", appsDir.getAbsolutePath());
-        logger.info("App id: {}", appId);
-        appDir = new File(appsDir, appId);
-        try {
-            loadAppConfiguration();
-            boolean initNow = appConfiguration.getBoolean(AppProperties.INIT_AT_STARTUP, false);
-            if(initNow) {
-                logger.info("Trying to initialize the application (init-at-startup = true)");
-                logger.debug("Setting up default OGNL context");
-                ElementsThreadLocals.setupDefaultElementsContext();
-                initializeApplication();
-                ElementsThreadLocals.removeElementsContext();
-            }
-        } catch (ConfigurationException e) {
-            logger.error("Couldn't load app configuration", e);
-        } catch (FileNotFoundException e) {
-            logger.warn("Application configuration file not found", e);
-        }
-    }
-
-    protected void loadAppConfiguration() throws ConfigurationException, FileNotFoundException {
-        File appConfigurationFile =
-                new File(appDir, AppProperties.PROPERTIES_RESOURCE);
-        if(appConfigurationFile.exists()) {
-            PropertiesConfiguration config = new PropertiesConfiguration(appConfigurationFile);
-            appConfiguration = new CompositeConfiguration();
-            appConfiguration.addConfiguration(config);
-            appConfiguration.addConfiguration(new PropertiesConfiguration(getClass().getResource(AppProperties.PROPERTIES_DEFAULT_RESOURCE)));
-        } else {
-            throw new FileNotFoundException(appConfigurationFile.getAbsolutePath());
+        boolean initNow = portofinoConfiguration.getBoolean(AppProperties.INIT_AT_STARTUP, false);
+        if(initNow) {
+            logger.info("Trying to initialize the application (init-at-startup = true)");
+            logger.debug("Setting up default OGNL context");
+            ElementsThreadLocals.setupDefaultElementsContext();
+            initializeApplication();
+            ElementsThreadLocals.removeElementsContext();
         }
     }
 
@@ -220,15 +183,6 @@ public class ApplicationStarter {
         logger.info("Application dir: {}", appDir.getAbsolutePath());
         success &= ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(appDir);
 
-        if(success) {
-            try {
-                loadAppConfiguration();
-            } catch (Exception e) {
-                success = false;
-                logger.error("Couldn't load app configuration", e);
-            }
-        }
-
         if (success) {
             success = setupDatabasePlatformsManager();
         }
@@ -272,9 +226,7 @@ public class ApplicationStarter {
     public boolean setupApplication() {
         logger.info("Creating application instance...");
         try {
-            tmpApplication = new DefaultApplication(appId,
-                    portofinoConfiguration, appConfiguration, databasePlatformsManager,
-                    appDir);
+            tmpApplication = new DefaultApplication(appId, portofinoConfiguration, databasePlatformsManager, appDir);
             tmpApplication.loadXmlModel();
         } catch (Throwable e) {
             logger.error(ExceptionUtils.getRootCauseMessage(e), e);

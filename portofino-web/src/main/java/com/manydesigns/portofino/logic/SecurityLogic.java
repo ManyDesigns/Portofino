@@ -157,7 +157,7 @@ public class SecurityLogic {
     public static boolean hasPermissions
             (Application application, Permissions configuration, Subject subject, AccessLevel level, String... permissions) {
         if(subject.isAuthenticated()) {
-            Configuration conf = application.getAppConfiguration();
+            Configuration conf = application.getConfiguration();
             String administratorsGroup = conf.getString(AppProperties.GROUP_ADMINISTRATORS);
             if(isUserInGroup(administratorsGroup)) {
                 return true;
@@ -185,7 +185,7 @@ public class SecurityLogic {
     public static boolean hasAnonymousPermissions
             (Application application, Permissions configuration, AccessLevel level, String... permissions) {
         PagePermission pagePermission = new PagePermission(configuration, level, permissions);
-        Configuration conf = application.getAppConfiguration();
+        Configuration conf = application.getConfiguration();
         List<String> groups = new ArrayList<String>();
         groups.add(conf.getString(AppProperties.GROUP_ALL));
         groups.add(conf.getString(AppProperties.GROUP_ANONYMOUS));
@@ -203,7 +203,7 @@ public class SecurityLogic {
     }
 
     public static boolean isAdministrator(Application application) {
-        Configuration conf = application.getAppConfiguration();
+        Configuration conf = application.getConfiguration();
         String administratorsGroup = conf.getString(AppProperties.GROUP_ADMINISTRATORS);
         return isUserInGroup(administratorsGroup);
     }

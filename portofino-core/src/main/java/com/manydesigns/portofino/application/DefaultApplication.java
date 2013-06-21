@@ -83,8 +83,7 @@ public class DefaultApplication implements Application {
     // Fields
     //**************************************************************************
 
-    protected final org.apache.commons.configuration.Configuration portofinoConfiguration;
-    protected final org.apache.commons.configuration.Configuration appConfiguration;
+    protected final org.apache.commons.configuration.Configuration configuration;
     protected final DatabasePlatformsManager databasePlatformsManager;
     protected Model model;
     protected final Map<String, HibernateDatabaseSetup> setups;
@@ -112,18 +111,16 @@ public class DefaultApplication implements Application {
     //**************************************************************************
 
     public DefaultApplication(String appId,
-                              org.apache.commons.configuration.Configuration portofinoConfiguration,
-                              org.apache.commons.configuration.Configuration appConfiguration,
+                              org.apache.commons.configuration.Configuration configuration,
                               DatabasePlatformsManager databasePlatformsManager,
                               File appDir
     ) throws Exception {
         this.appId = appId;
-        this.portofinoConfiguration = portofinoConfiguration;
+        this.configuration = configuration;
         this.databasePlatformsManager = databasePlatformsManager;
         this.appDir = appDir;
 
         resourceBundleManager = new ResourceBundleManager(appDir);
-        this.appConfiguration = appConfiguration;
 
         appDbsDir = new File(appDir, APP_DBS_DIR);
         logger.info("Application dbs dir: {}",
@@ -170,7 +167,7 @@ public class DefaultApplication implements Application {
             model = (Model) um.unmarshal(appModelFile);
             boolean syncOnStart = false;
             initModel();
-            if(portofinoConfiguration.getBoolean(PortofinoProperties.LIQUIBASE_ENABLED)) {
+            if(configuration.getBoolean(PortofinoProperties.LIQUIBASE_ENABLED)) {
                 runLiquibaseScripts();
             }
             if (syncOnStart) {
@@ -282,7 +279,7 @@ public class DefaultApplication implements Application {
             if (connectionProvider.getStatus()
                     .equals(ConnectionProvider.STATUS_CONNECTED)) {
                 HibernateConfig builder =
-                        new HibernateConfig(connectionProvider, portofinoConfiguration);
+                        new HibernateConfig(connectionProvider, configuration);
                 String trueString = database.getTrueString();
                 if(trueString != null) {
                     builder.setTrueString(
@@ -320,7 +317,16 @@ public class DefaultApplication implements Application {
     }
 
     public org.apache.commons.configuration.Configuration getPortofinoProperties() {
-        return portofinoConfiguration;
+        return configuration;
+    }
+
+    @Override
+    public org.apache.commons.configuration.Configuration getAppConfiguration() {
+        return configuration;
+    }
+
+    public org.apache.commons.configuration.Configuration getConfiguration() {
+        return configuration;
     }
 
     public DatabasePlatformsManager getDatabasePlatformsManager() {
@@ -445,7 +451,7 @@ public class DefaultApplication implements Application {
     }
 
     public String getName() {
-        return getAppConfiguration().getString(AppProperties.APPLICATION_NAME);
+        return getPortofinoProperties().getString(AppProperties.APPLICATION_NAME);
     }
 
     public File getAppDir() {
@@ -470,10 +476,6 @@ public class DefaultApplication implements Application {
 
     public File getAppWebDir() {
         return appWebDir;
-    }
-
-    public org.apache.commons.configuration.Configuration getAppConfiguration() {
-        return appConfiguration;
     }
 
     //**************************************************************************

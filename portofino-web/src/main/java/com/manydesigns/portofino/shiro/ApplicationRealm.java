@@ -112,7 +112,7 @@ public class ApplicationRealm extends AuthorizingRealm implements UsersGroupsDAO
     }
 
     public boolean isOpenIDEnabled() {
-        return getApplication().getAppConfiguration().getBoolean(AppProperties.OPENID_ENABLED, false);
+        return getApplication().getConfiguration().getBoolean(AppProperties.OPENID_ENABLED, false);
     }
 
     public Application getApplication() {

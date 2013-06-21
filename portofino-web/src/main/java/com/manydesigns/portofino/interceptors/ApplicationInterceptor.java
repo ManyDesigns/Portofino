@@ -81,7 +81,7 @@ public class ApplicationInterceptor implements Interceptor {
 
         logger.debug("Setting skin");
         if(request.getAttribute(RequestAttributes.SKIN) == null) {
-            String skin = application.getAppConfiguration().getString(AppProperties.SKIN);
+            String skin = application.getConfiguration().getString(AppProperties.SKIN);
             request.setAttribute(RequestAttributes.SKIN, skin);
         }
 

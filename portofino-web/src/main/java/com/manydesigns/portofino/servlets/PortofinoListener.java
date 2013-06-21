@@ -26,6 +26,7 @@ import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.files.TempFileService;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
@@ -35,6 +36,7 @@ import net.sf.ehcache.CacheManager;
 import ognl.OgnlRuntime;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -53,6 +55,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
+import java.io.File;
 import java.nio.charset.Charset;
 
 
@@ -80,7 +83,7 @@ public class PortofinoListener
     //**************************************************************************
 
     protected Configuration elementsConfiguration;
-    protected CompositeConfiguration portofinoConfiguration;
+    protected CompositeConfiguration configuration;
 
     protected ServletContext servletContext;
     protected ServerInfo serverInfo;
@@ -129,17 +132,20 @@ public class PortofinoListener
         servletContext.setAttribute(
                 ApplicationAttributes.ELEMENTS_CONFIGURATION, elementsConfiguration);
 
-        portofinoConfiguration = new CompositeConfiguration();
-        addConfiguration(PortofinoProperties.CUSTOM_PROPERTIES_RESOURCE);
-        addConfiguration(PortofinoProperties.PROPERTIES_RESOURCE);
+        try {
+            loadConfiguration();
+        } catch (ConfigurationException e) {
+            logger.error("Could not load configuration", e);
+            throw new Error(e);
+        }
         servletContext.setAttribute(
-                ApplicationAttributes.PORTOFINO_CONFIGURATION, portofinoConfiguration);
+                ApplicationAttributes.PORTOFINO_CONFIGURATION, configuration);
 
         logger.debug("Initializing dispatcher");
-        DispatcherLogic.init(portofinoConfiguration);
+        DispatcherLogic.init(configuration);
 
         logger.debug("Setting up temporary file service");
-        String tempFileServiceClass = portofinoConfiguration.getString(PortofinoProperties.TEMP_FILE_SERVICE_CLASS);
+        String tempFileServiceClass = configuration.getString(PortofinoProperties.TEMP_FILE_SERVICE_CLASS);
         try {
             TempFileService.setInstance((TempFileService) Class.forName(tempFileServiceClass).newInstance());
         } catch (Exception e) {
@@ -155,11 +161,12 @@ public class PortofinoListener
         }
 
         logger.info("Creating the application starter...");
-        applicationStarter = new ApplicationStarter(servletContext, portofinoConfiguration);
+        String appId = configuration.getString(PortofinoProperties.APP_ID);
+        applicationStarter = new ApplicationStarter(servletContext, configuration, appId);
         servletContext.setAttribute(
                 ApplicationAttributes.APPLICATION_STARTER, applicationStarter);
 
-        String encoding = portofinoConfiguration.getString(PortofinoProperties.URL_ENCODING);
+        String encoding = configuration.getString(PortofinoProperties.URL_ENCODING);
         logger.info("URL character encoding is set to " + encoding + ". Make sure the web server uses the same encoding to parse URLs.");
         if(!Charset.isSupported(encoding)) {
             logger.error("The encoding is not supported by the JVM!");
@@ -197,7 +204,7 @@ public class PortofinoListener
                 lineSeparator + "--- Real path: {}" +
                 lineSeparator + SEPARATOR,
                 new String[]{
-                        portofinoConfiguration.getString(
+                        configuration.getString(
                                 PortofinoProperties.PORTOFINO_VERSION),
                         serverInfo.getContextPath(),
                         serverInfo.getRealPath()
@@ -257,11 +264,28 @@ public class PortofinoListener
     // Setup
     //**************************************************************************
 
-    public void addConfiguration(String resource) {
+    protected void loadConfiguration() throws ConfigurationException {
+        CompositeConfiguration portofinoConfiguration = new CompositeConfiguration();
+        addConfiguration(portofinoConfiguration, PortofinoProperties.CUSTOM_PROPERTIES_RESOURCE);
+        addConfiguration(portofinoConfiguration, PortofinoProperties.PROPERTIES_RESOURCE);
+        String appId = portofinoConfiguration.getString(PortofinoProperties.APP_ID);
+        String appsDirPath = portofinoConfiguration.getString(PortofinoProperties.APPS_DIR_PATH);
+        File appsDir = new File(appsDirPath);
+        logger.info("Apps dir: {}", appsDir.getAbsolutePath());
+        logger.info("App id: {}", appId);
+        File appDir = new File(appsDir, appId);
+        File appConfigurationFile = new File(appDir, AppProperties.PROPERTIES_RESOURCE);
+        configuration = new CompositeConfiguration();
+        PropertiesConfiguration appConfig = new PropertiesConfiguration(appConfigurationFile);
+        configuration.addConfiguration(appConfig);
+        configuration.addConfiguration(portofinoConfiguration);
+    }
+
+    public void addConfiguration(CompositeConfiguration configuration, String resource) {
         try {
             PropertiesConfiguration propertiesConfiguration =
                     new PropertiesConfiguration(resource);
-            portofinoConfiguration.addConfiguration(propertiesConfiguration);
+            configuration.addConfiguration(propertiesConfiguration);
         } catch (Throwable e) {
             String errorMessage = ExceptionUtils.getRootCauseMessage(e);
             logger.warn(errorMessage);

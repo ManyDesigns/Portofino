@@ -103,7 +103,7 @@ public abstract class AbstractApplicationRealmDelegate implements ApplicationRea
     public AuthorizationInfo getAuthorizationInfo(ApplicationRealm realm, Object principal) {
         Application application = realm.getApplication();
         Set<String> groups = new HashSet<String>();
-        Configuration conf = application.getAppConfiguration();
+        Configuration conf = application.getConfiguration();
         groups.add(conf.getString(AppProperties.GROUP_ALL));
         if (principal == null) {
             groups.add(conf.getString(AppProperties.GROUP_ANONYMOUS));
@@ -175,7 +175,7 @@ public abstract class AbstractApplicationRealmDelegate implements ApplicationRea
      * @return
      */
     protected String getAdministratorsGroup(ApplicationRealm realm) {
-        return realm.getApplication().getAppConfiguration().getString(AppProperties.GROUP_ADMINISTRATORS);
+        return realm.getApplication().getConfiguration().getString(AppProperties.GROUP_ADMINISTRATORS);
     }
 
     /**
@@ -223,7 +223,7 @@ public abstract class AbstractApplicationRealmDelegate implements ApplicationRea
     public Set<String> getGroups(ApplicationRealm realm) {
         Application application = realm.getApplication();
         Set<String> groups = new LinkedHashSet<String>();
-        Configuration conf = application.getAppConfiguration();
+        Configuration conf = application.getConfiguration();
         String group = conf.getString(AppProperties.GROUP_ALL);
         groups.add(group);
         group = conf.getString(AppProperties.GROUP_ANONYMOUS);

@@ -977,7 +977,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             createCrudPage(dir, userTable, childPages, template);
         }
 
-        Configuration conf = application.getAppConfiguration();
+        Configuration conf = application.getConfiguration();
         List<Reference> references = (List<Reference>) children.get(userTable);
         if(references != null) {
             for(Reference ref : references) {

@@ -151,7 +151,7 @@ public class ApplicationFilter implements Filter {
 
             //Setup Elements blob manager
             File appBlobsDir;
-            Configuration portofinoConfiguration = application.getPortofinoProperties();
+            Configuration portofinoConfiguration = application.getConfiguration();
             if(portofinoConfiguration.containsKey(PortofinoProperties.BLOBS_DIR_PATH)) {
                 appBlobsDir = new File(portofinoConfiguration.getString(PortofinoProperties.BLOBS_DIR_PATH));
             } else {

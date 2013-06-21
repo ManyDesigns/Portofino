@@ -120,6 +120,7 @@ public interface Application {
     /**
      * Returns the global Configuration object for the entire Portofino instance.
      */
+    @Deprecated
     Configuration getPortofinoProperties();
 
     //**************************************************************************
@@ -209,7 +210,13 @@ public interface Application {
     /**
      * Returns the application's {@link Configuration}.
      */
+    @Deprecated
     Configuration getAppConfiguration();
+
+    /**
+     * Returns the application's {@link Configuration}.
+     */
+    Configuration getConfiguration();
 
     /**
      * Resets and initializes the model.

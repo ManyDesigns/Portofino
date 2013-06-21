@@ -105,9 +105,9 @@ public class ShiroUtils {
     }
 
     public static String getLoginLink(Application application, String contextPath, String returnUrl, String cancelReturnUrl) {
-        Configuration conf = application.getAppConfiguration();
+        Configuration conf = application.getConfiguration();
         String loginLink = conf.getString(AppProperties.LOGIN_LINK);
-        String encoding = application.getPortofinoProperties().getString(PortofinoProperties.URL_ENCODING);
+        String encoding = application.getConfiguration().getString(PortofinoProperties.URL_ENCODING);
         try {
             String encodedReturnUrl = URLEncoder.encode(returnUrl, encoding);
             String encodedCancelReturnUrl = URLEncoder.encode(cancelReturnUrl, encoding);
@@ -118,7 +118,7 @@ public class ShiroUtils {
     }
 
     public static String getLogoutLink(Application application, String contextPath) {
-        Configuration conf = application.getAppConfiguration();
+        Configuration conf = application.getConfiguration();
         String logoutLink = conf.getString(AppProperties.LOGOUT_LINK);
         return MessageFormat.format(logoutLink, contextPath);
     }
