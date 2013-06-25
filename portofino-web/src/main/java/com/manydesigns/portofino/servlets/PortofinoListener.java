@@ -131,8 +131,6 @@ public class PortofinoListener
 
         setupCommonsConfiguration();
 
-        LiquibaseUtils.setup();
-
         elementsConfiguration = ElementsProperties.getConfiguration();
         servletContext.setAttribute(
                 ApplicationAttributes.ELEMENTS_CONFIGURATION, elementsConfiguration);
@@ -145,18 +143,6 @@ public class PortofinoListener
         }
         servletContext.setAttribute(
                 ApplicationAttributes.PORTOFINO_CONFIGURATION, configuration);
-
-        logger.debug("Initializing dispatcher");
-        DispatcherLogic.init(configuration);
-
-        logger.debug("Setting up temporary file service");
-        String tempFileServiceClass = configuration.getString(PortofinoProperties.TEMP_FILE_SERVICE_CLASS);
-        try {
-            TempFileService.setInstance((TempFileService) Class.forName(tempFileServiceClass).newInstance());
-        } catch (Exception e) {
-            logger.error("Could not set up temp file service", e);
-            throw new Error(e);
-        }
 
         logger.info("Servlet API version is " + serverInfo.getServletApiVersion());
         if (serverInfo.getServletApiMajor() < 3) {
@@ -171,10 +157,19 @@ public class PortofinoListener
         servletContext.setAttribute(ApplicationAttributes.MODULE_REGISTRY, moduleRegistry);
         moduleRegistry.migrateAndInit();
 
-        logger.info("Creating the application starter...");
-        String appId = configuration.getString(PortofinoProperties.APP_ID);
-        applicationStarter = new ApplicationStarter(servletContext, configuration, appId);
-        servletContext.setAttribute(ApplicationAttributes.APPLICATION_STARTER, applicationStarter);
+        logger.debug("Initializing dispatcher");
+        DispatcherLogic.init(configuration);
+
+        LiquibaseUtils.setup();
+
+        logger.debug("Setting up temporary file service");
+        String tempFileServiceClass = configuration.getString(PortofinoProperties.TEMP_FILE_SERVICE_CLASS);
+        try {
+            TempFileService.setInstance((TempFileService) Class.forName(tempFileServiceClass).newInstance());
+        } catch (Exception e) {
+            logger.error("Could not set up temp file service", e);
+            throw new Error(e);
+        }
 
         String encoding = configuration.getString(PortofinoProperties.URL_ENCODING);
         logger.info("URL character encoding is set to " + encoding + ". Make sure the web server uses the same encoding to parse URLs.");
@@ -185,19 +180,6 @@ public class PortofinoListener
             logger.warn("URL encoding is not UTF-8, but the Stripes framework always generates UTF-8 encoded URLs. URLs with non-ASCII characters may not work.");
         }
 
-        logger.info("Initializing Shiro environment");
-        WebEnvironment environment = environmentLoader.initEnvironment(servletContext);
-        logger.debug("Publishing the Application Realm in the servlet context");
-        RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
-        
-        Realm realm = new ApplicationRealm(applicationStarter);
-        LifecycleUtils.init(realm);
-        rsm.setRealm(realm);
-
-        logger.info("Initializing ehcache service");
-        cacheManager = CacheManager.newInstance();
-        servletContext.setAttribute(ApplicationAttributes.EHCACHE_MANAGER, cacheManager);
-
         setupMailQueue();
 
         //Disabilitazione security manager per funzionare su GAE. Il security manager permette di valutare
@@ -206,6 +188,24 @@ public class PortofinoListener
         //espressioni OGNL arbitrarie, pertanto il security manager può essere disabilitato in sicurezza.
         logger.info("Disabling OGNL security manager");
         OgnlRuntime.setSecurityManager(null);
+
+        logger.info("Initializing ehcache service");
+        cacheManager = CacheManager.newInstance();
+        servletContext.setAttribute(ApplicationAttributes.EHCACHE_MANAGER, cacheManager);
+
+        logger.info("Creating the application starter...");
+        String appId = configuration.getString(PortofinoProperties.APP_ID);
+        applicationStarter = new ApplicationStarter(servletContext, configuration, appId);
+        servletContext.setAttribute(ApplicationAttributes.APPLICATION_STARTER, applicationStarter);
+
+        logger.info("Initializing Shiro environment");
+        WebEnvironment environment = environmentLoader.initEnvironment(servletContext);
+        logger.debug("Publishing the Application Realm in the servlet context");
+        RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
+        
+        Realm realm = new ApplicationRealm(applicationStarter);
+        LifecycleUtils.init(realm);
+        rsm.setRealm(realm);
 
         String lineSeparator = System.getProperty("line.separator", "\n");
         logger.info(lineSeparator + SEPARATOR +
