@@ -32,7 +32,6 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -173,7 +172,7 @@ public class DispatcherLogic {
         return pageFile;
     }
 
-    public static void init(CompositeConfiguration portofinoConfiguration) {
+    public static void init(Configuration portofinoConfiguration) {
         int maxSize, refreshCheckFrequency;
         maxSize = portofinoConfiguration.getInt(PortofinoProperties.PAGE_CACHE_SIZE, 1000);
         refreshCheckFrequency =

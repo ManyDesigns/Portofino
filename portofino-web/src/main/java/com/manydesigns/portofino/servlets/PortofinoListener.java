@@ -22,30 +22,16 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.configuration.BeanLookup;
-import com.manydesigns.mail.queue.MailQueue;
-import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.di.Injections;
-import com.manydesigns.portofino.dispatcher.DispatcherLogic;
-import com.manydesigns.portofino.files.TempFileService;
-import com.manydesigns.portofino.liquibase.LiquibaseUtils;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleRegistry;
-import com.manydesigns.portofino.shiro.ApplicationRealm;
-import com.manydesigns.portofino.starter.ApplicationStarter;
-import net.sf.ehcache.CacheManager;
 import net.sourceforge.stripes.util.ResolverUtil;
-import ognl.OgnlRuntime;
 import org.apache.commons.configuration.*;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.shiro.mgt.RealmSecurityManager;
-import org.apache.shiro.realm.Realm;
-import org.apache.shiro.util.LifecycleUtils;
-import org.apache.shiro.web.env.EnvironmentLoader;
-import org.apache.shiro.web.env.WebEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -92,12 +78,6 @@ public class PortofinoListener
     protected ServerInfo serverInfo;
 
     protected ModuleRegistry moduleRegistry;
-
-    protected ApplicationStarter applicationStarter;
-
-    protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
-
-    protected CacheManager cacheManager;
 
     //**************************************************************************
     // Logging
@@ -157,20 +137,6 @@ public class PortofinoListener
         servletContext.setAttribute(ApplicationAttributes.MODULE_REGISTRY, moduleRegistry);
         moduleRegistry.migrateAndInit();
 
-        logger.debug("Initializing dispatcher");
-        DispatcherLogic.init(configuration);
-
-        LiquibaseUtils.setup();
-
-        logger.debug("Setting up temporary file service");
-        String tempFileServiceClass = configuration.getString(PortofinoProperties.TEMP_FILE_SERVICE_CLASS);
-        try {
-            TempFileService.setInstance((TempFileService) Class.forName(tempFileServiceClass).newInstance());
-        } catch (Exception e) {
-            logger.error("Could not set up temp file service", e);
-            throw new Error(e);
-        }
-
         String encoding = configuration.getString(PortofinoProperties.URL_ENCODING);
         logger.info("URL character encoding is set to " + encoding + ". Make sure the web server uses the same encoding to parse URLs.");
         if(!Charset.isSupported(encoding)) {
@@ -179,33 +145,6 @@ public class PortofinoListener
         if(!"UTF-8".equals(encoding)) {
             logger.warn("URL encoding is not UTF-8, but the Stripes framework always generates UTF-8 encoded URLs. URLs with non-ASCII characters may not work.");
         }
-
-        setupMailQueue();
-
-        //Disabilitazione security manager per funzionare su GAE. Il security manager permette di valutare
-        //in sicurezza espressioni OGNL provenienti da fonti non sicure, configurando i necessari permessi
-        //(invoke.<declaring-class>.<method-name>). In Portofino non permettiamo agli utenti finali di valutare
-        //espressioni OGNL arbitrarie, pertanto il security manager può essere disabilitato in sicurezza.
-        logger.info("Disabling OGNL security manager");
-        OgnlRuntime.setSecurityManager(null);
-
-        logger.info("Initializing ehcache service");
-        cacheManager = CacheManager.newInstance();
-        servletContext.setAttribute(ApplicationAttributes.EHCACHE_MANAGER, cacheManager);
-
-        logger.info("Creating the application starter...");
-        String appId = configuration.getString(PortofinoProperties.APP_ID);
-        applicationStarter = new ApplicationStarter(servletContext, configuration, appId);
-        servletContext.setAttribute(ApplicationAttributes.APPLICATION_STARTER, applicationStarter);
-
-        logger.info("Initializing Shiro environment");
-        WebEnvironment environment = environmentLoader.initEnvironment(servletContext);
-        logger.debug("Publishing the Application Realm in the servlet context");
-        RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
-        
-        Realm realm = new ApplicationRealm(applicationStarter);
-        LifecycleUtils.init(realm);
-        rsm.setRealm(realm);
 
         String lineSeparator = System.getProperty("line.separator", "\n");
         logger.info(lineSeparator + SEPARATOR +
@@ -239,37 +178,9 @@ public class PortofinoListener
         }
     }
 
-    protected void setupMailQueue() {
-        MailQueueSetup mailQueueSetup = new MailQueueSetup();
-        mailQueueSetup.setup();
-
-        MailQueue mailQueue = mailQueueSetup.getMailQueue();
-        if(mailQueue == null) {
-            logger.info("Mail queue not enabled");
-            return;
-        }
-
-        servletContext.setAttribute(ApplicationAttributes.MAIL_QUEUE, mailQueue);
-        servletContext.setAttribute(ApplicationAttributes.MAIL_SENDER, mailQueueSetup.getMailSender());
-        servletContext.setAttribute(ApplicationAttributes.MAIL_CONFIGURATION, mailQueueSetup.getMailConfiguration());
-
-        try {
-            //In classe separata per permettere al Listener di essere caricato anche in assenza di Quartz a runtime
-            MailScheduler.setupMailScheduler(mailQueueSetup);
-        } catch (NoClassDefFoundError e) {
-            logger.debug(e.getMessage(), e);
-            logger.info("Quartz is not available, mail scheduler not started");
-        }
-    }
-
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         MDC.clear();
         logger.info("ManyDesigns Portofino stopping...");
-        applicationStarter.destroy();
-        logger.info("Destroying Shiro environment...");
-        environmentLoader.destroyEnvironment(servletContext);
-        logger.info("Shutting down cache...");
-        cacheManager.shutdown();
         logger.info("Destroying modules...");
         moduleRegistry.destroy();
         logger.info("ManyDesigns Portofino stopped.");
