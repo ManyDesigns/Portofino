@@ -5,7 +5,7 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-%><stripes:layout-render name="/skins/default/admin-page.jsp">
+%><stripes:layout-render name="/portofino-base/admin-theme/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.ReloadModelAction"/>
     <stripes:layout-component name="pageTitle">
         <fmt:message key="layouts.admin.reload-model.title"/>

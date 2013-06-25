@@ -5,7 +5,7 @@
     Application app =
             (Application) request.getAttribute(
                     RequestAttributes.APPLICATION);
-    String landingPage = app.getAppConfiguration().getString(AppProperties.LANDING_PAGE);
+    String landingPage = app.getConfiguration().getString(AppProperties.LANDING_PAGE);
     String redirectURL = request.getContextPath() + landingPage;
     response.sendRedirect(redirectURL);
 %>

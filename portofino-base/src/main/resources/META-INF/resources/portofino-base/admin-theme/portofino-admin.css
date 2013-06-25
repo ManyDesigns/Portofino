@@ -1,0 +1,290 @@
+/*******************************************************************************
+Header / footer
+*******************************************************************************/
+
+footer {
+/*    background-color: #F5F5F5;*/
+    border-top: 1px solid #E5E5E5;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.navbar-fixed-top a {
+    color: #ffffff;
+}
+
+.navbar-fixed-top {
+    color: #ffffff;
+}
+
+/*******************************************************************************
+Content
+*******************************************************************************/
+
+#navigation {
+    margin-bottom: 1em;
+}
+
+/*******************************************************************************
+Error/warning/info messages
+*******************************************************************************/
+
+.userMessages {
+    margin-bottom: 1em;
+}
+
+ul.errorMessages, ul.warningMessages, ul.infoMessages {
+    margin: 0;
+    padding: 0;
+    font-weight: normal;
+    font-style: italic;
+    list-style-type: none;
+    background: no-repeat 0 center;
+}
+
+ul.errorMessages li, ul.warningMessages li, ul.infoMessages li {
+    list-style-type: none;
+    padding-left: 30px;
+}
+
+ul.errorMessages {
+    background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-cross-24.png");
+}
+
+ul.warningMessages {
+    background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/warning-24.png");
+}
+
+ul.infoMessages {
+    background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-check-24.png");
+}
+
+/*******************************************************************************
+Forms
+*******************************************************************************/
+
+.hidden-submit {
+    border: 0 none;
+    height: 0;
+    width: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+.controls .value {
+    padding-top: 5px;
+}
+
+.form-horizontal .control-group.readonly {
+    margin-bottom: 10px;
+}
+
+/*******************************************************************************
+Inline form errors
+*******************************************************************************/
+
+ul.errors {
+    display: inline;
+    padding: 5px 0;
+    border: 0 none;
+    margin: 0;
+}
+
+ul.errors li {
+    display: inline;
+    margin: 0;
+    padding: 0 0 0 16px;
+    border: 0 none;
+    color: red;
+    font-weight: bold;
+}
+
+/*******************************************************************************
+General
+*******************************************************************************/
+
+/* status */
+.status_red {
+    color: red;
+    font-weight: bold;
+}
+.status_amber {
+    color: #880;
+    font-weight: bold;
+}
+.status_green {
+    color: green;
+    font-weight: bold;
+}
+
+.error {
+    color: gray;
+    font-weight: bold;
+}
+
+/*******************************************************************************
+Treetable
+*******************************************************************************/
+
+table.treetable span.indenter {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+  user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  -webkit-user-select: none;
+  width: 19px;
+}
+
+table.treetable span.indenter a {
+  background-position: left center;
+  background-repeat: no-repeat;
+  display: inline-block;
+  text-decoration: none;
+  width: 19px;
+}
+
+table.treetable {
+  border: 1px solid #888;
+  border-collapse: collapse;
+  margin: .6em 0 1.8em 0;
+  width: 100%;
+}
+
+table.treetable caption {
+  font-weight: bold;
+  margin-bottom: .2em;
+}
+
+table.treetable thead {
+  background: #aaa url(../../jquery-treetable-3.0.1/images/bg-table-thead.png) repeat-x top left;
+}
+
+table.treetable thead tr th {
+  border: 1px solid #888;
+  font-weight: normal;
+  padding: .3em 1em .1em 1em;
+  text-align: left;
+}
+
+table.treetable tbody tr td {
+  cursor: default;
+  padding: .3em 1em;
+}
+
+table.treetable span {
+  background-position: center left;
+  background-repeat: no-repeat;
+  padding: .2em 0 .2em 1.5em;
+}
+
+table.treetable span.file {
+  background-image: url(../../jquery-treetable-3.0.1/images/file.png);
+}
+
+table.treetable span.folder {
+  background-image: url(../../jquery-treetable-3.0.1/images/folder.png);
+}
+
+table.treetable tr.collapsed span.indenter a {
+  background-image: url(../../jquery-treetable-3.0.1/images/expand.png);
+}
+
+table.treetable tr.expanded span.indenter a {
+  background-image: url(../../jquery-treetable-3.0.1/images/collapse.png);
+}
+
+table.treetable tr.selected {
+  background-color: #3875d7;
+  color: #fff;
+}
+
+table.treetable tr.collapsed.selected span.indenter a {
+  background-image: url(../../jquery-treetable-3.0.1/images/expand-light.png);
+}
+
+table.treetable tr.expanded.selected span.indenter a {
+  background-image: url(../../jquery-treetable-3.0.1/images/collapse-light.png);
+}
+
+table.treetable tr.accept {
+  background-color: #a3bce4;
+  color: #fff
+}
+
+table.treetable tr.collapsed.accept td span.indenter a {
+  background-image: url(../../jquery-treetable-3.0.1/images/expand-light.png);
+}
+
+table.treetable tr.expanded.accept td span.indenter a {
+  background-image: url(../../jquery-treetable-3.0.1/images/collapse-light.png);
+}
+
+/*******************************************************************************
+Forms
+*******************************************************************************/
+
+fieldset.radio {
+    margin-bottom: 0;
+}
+
+.horizontalSeparator {
+    border-top: 1px solid #eeeeee;
+    margin: 1.5em 0;
+    clear: both;
+}
+
+.mde-table-form input[type='checkbox'] {
+    margin: 0;
+}
+
+.table.mde-table-form th, .table.mde-table-form td {
+    vertical-align: middle;
+}
+
+label.control-label.mde-password-confirm-label {
+    display: inline; float: none; margin-left: 1em; margin-right: 1em;
+}
+
+/*******************************************************************************
+Wizard
+*******************************************************************************/
+
+.wizard-header {
+    overflow-y: hidden;
+    padding-left: 0;
+}
+
+.wizard-step {
+    font-weight: bold;
+    font-size: 1.2em;
+    background: #F8F8FF url('images/wizard-arrow.png') left center no-repeat;
+    padding: 1em 0 1em 2.5em;
+}
+
+.wizard-step.first {
+    border-radius: 3px 0 0 0;
+    background-image: none;
+    padding: 1em 0 1em 0;
+}
+
+.wizard-step.before {
+    color: #555555;
+}
+
+.wizard-step.current {
+    color: #166BBF;
+    background-color: white;
+}
+
+.wizard-step.immediately-after-current {
+    background: #F8F8FF url('images/wizard-current-arrow.png') left center no-repeat;
+}
+
+wizard-step.after {
+    color: black;
+}
