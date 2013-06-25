@@ -30,14 +30,14 @@ import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.files.TempFileService;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
+import com.manydesigns.portofino.modules.Module;
+import com.manydesigns.portofino.modules.ModuleRegistry;
 import com.manydesigns.portofino.shiro.ApplicationRealm;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import net.sf.ehcache.CacheManager;
+import net.sourceforge.stripes.util.ResolverUtil;
 import ognl.OgnlRuntime;
-import org.apache.commons.configuration.CompositeConfiguration;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.*;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.shiro.mgt.RealmSecurityManager;
@@ -57,6 +57,7 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.Set;
 
 
 /*
@@ -84,9 +85,12 @@ public class PortofinoListener
 
     protected Configuration elementsConfiguration;
     protected CompositeConfiguration configuration;
+    protected FileConfiguration appConfiguration;
 
     protected ServletContext servletContext;
     protected ServerInfo serverInfo;
+
+    protected ModuleRegistry moduleRegistry;
 
     protected ApplicationStarter applicationStarter;
 
@@ -160,6 +164,12 @@ public class PortofinoListener
             throw new InternalError(msg);
         }
 
+        logger.info("Loading modules...");
+        moduleRegistry = new ModuleRegistry(appConfiguration);
+        servletContext.setAttribute(ApplicationAttributes.MODULE_REGISTRY, moduleRegistry);
+        discoverModules(moduleRegistry);
+        moduleRegistry.migrateAndInit();
+
         logger.info("Creating the application starter...");
         String appId = configuration.getString(PortofinoProperties.APP_ID);
         applicationStarter = new ApplicationStarter(servletContext, configuration, appId);
@@ -212,6 +222,21 @@ public class PortofinoListener
         );
     }
 
+    protected void discoverModules(ModuleRegistry moduleRegistry) {
+        ResolverUtil<Module> resolver = new ResolverUtil<Module>();
+        resolver.findImplementations(Module.class, Module.class.getPackage().getName());
+        Set<Class<? extends Module>> classes = resolver.getClasses();
+        classes.remove(Module.class);
+        for(Class<? extends Module> moduleClass : classes) {
+            try {
+                logger.debug("Adding discovered module " + moduleClass);
+                moduleRegistry.getModules().add(moduleClass.newInstance());
+            } catch (Throwable e) {
+                logger.error("Could not register module " + moduleClass, e);
+            }
+        }
+    }
+
     protected void setupMailQueue() {
         MailQueueSetup mailQueueSetup = new MailQueueSetup();
         mailQueueSetup.setup();
@@ -243,6 +268,8 @@ public class PortofinoListener
         environmentLoader.destroyEnvironment(servletContext);
         logger.info("Shutting down cache...");
         cacheManager.shutdown();
+        logger.info("Destroying modules...");
+        moduleRegistry.destroy();
         logger.info("ManyDesigns Portofino stopped.");
     }
 
@@ -276,8 +303,8 @@ public class PortofinoListener
         File appDir = new File(appsDir, appId);
         File appConfigurationFile = new File(appDir, AppProperties.PROPERTIES_RESOURCE);
         configuration = new CompositeConfiguration();
-        PropertiesConfiguration appConfig = new PropertiesConfiguration(appConfigurationFile);
-        configuration.addConfiguration(appConfig);
+        appConfiguration = new PropertiesConfiguration(appConfigurationFile);
+        configuration.addConfiguration(appConfiguration);
         configuration.addConfiguration(portofinoConfiguration);
     }
 

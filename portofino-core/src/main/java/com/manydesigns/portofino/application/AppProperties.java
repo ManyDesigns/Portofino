@@ -34,8 +34,6 @@ public class AppProperties {
     // Default location
     //**************************************************************************
 
-    public final static String PROPERTIES_DEFAULT_RESOURCE =
-            "/app.default.properties";
     public final static String PROPERTIES_RESOURCE =
             "app.properties";
 

@@ -41,4 +41,5 @@ public class ApplicationAttributes {
     public final static String MAIL_SENDER = "mailSender";
     public final static String MAIL_CONFIGURATION = "mailConfiguration";
     public static final String EHCACHE_MANAGER = "portofino.ehcache.manager";
+    public final static String MODULE_REGISTRY = "com.manydesigns.portofino.modules.ModuleRegistry";
 }
