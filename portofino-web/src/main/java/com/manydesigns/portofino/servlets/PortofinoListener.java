@@ -27,6 +27,7 @@ import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.application.AppProperties;
+import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.files.TempFileService;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
@@ -166,8 +167,8 @@ public class PortofinoListener
 
         logger.info("Loading modules...");
         moduleRegistry = new ModuleRegistry(appConfiguration);
-        servletContext.setAttribute(ApplicationAttributes.MODULE_REGISTRY, moduleRegistry);
         discoverModules(moduleRegistry);
+        servletContext.setAttribute(ApplicationAttributes.MODULE_REGISTRY, moduleRegistry);
         moduleRegistry.migrateAndInit();
 
         logger.info("Creating the application starter...");
@@ -230,7 +231,9 @@ public class PortofinoListener
         for(Class<? extends Module> moduleClass : classes) {
             try {
                 logger.debug("Adding discovered module " + moduleClass);
-                moduleRegistry.getModules().add(moduleClass.newInstance());
+                Module module = moduleClass.newInstance();
+                Injections.inject(module, servletContext, null);
+                moduleRegistry.getModules().add(module);
             } catch (Throwable e) {
                 logger.error("Could not register module " + moduleClass, e);
             }

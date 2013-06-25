@@ -51,8 +51,8 @@ public class Injections {
             new HashMap<Class, Field[]>();
 
     public static void inject(Object obj,
-                              ServletContext servletContext,
-                              HttpServletRequest request) {
+                              @Nullable ServletContext servletContext,
+                              @Nullable HttpServletRequest request) {
         if (obj == null) {
             logger.debug("Object is null");
             return;

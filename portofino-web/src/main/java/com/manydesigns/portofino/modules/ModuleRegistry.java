@@ -83,13 +83,14 @@ public class ModuleRegistry {
 
             try { //Migrate
                 while(installedVersion < migrationVersion) {
-                    logger.info("Migrating module " + printModule(module) + "...");
+                    logger.info("Migrating module " + printModule(module) + " from version " + installedVersion + "...");
                     Method method = module.getClass().getMethod("migrateFrom" + installedVersion);
                     if(!Integer.TYPE.equals(method.getReturnType())) {
                         throw new RuntimeException("Migration method " + method + " does not return int");
                     }
                     Integer result = (Integer) method.invoke(module);
                     if(result > installedVersion) {
+                        installedVersion = result;
                         configuration.setProperty(key, result);
                         configuration.save();
                         logger.info("Migrated module " + printModule(module));
