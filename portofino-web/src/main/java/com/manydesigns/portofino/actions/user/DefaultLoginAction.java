@@ -30,7 +30,10 @@
 package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.AppProperties;
+import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.shiro.openid.OpenIDToken;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
@@ -69,9 +72,12 @@ public class DefaultLoginAction extends LoginAction {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
+    @Inject(RequestAttributes.APPLICATION)
+    public Application application;
+
     public static final String URL_BINDING = "/actions/user/login";
 
-        public Resolution showOpenIDForm()
+    public Resolution showOpenIDForm()
             throws ConsumerException, MessageException, DiscoveryException, MalformedURLException {
         if(!isOpenIdEnabled()) {
             return new ErrorResolution(403);
@@ -178,8 +184,16 @@ public class DefaultLoginAction extends LoginAction {
         }
     }
 
-    public boolean isOpenIdEnabled() {
-        return getApplication().getConfiguration().getBoolean(AppProperties.OPENID_ENABLED, false);
+    public Application getApplication() {
+        return application;
     }
 
+    public boolean isOpenIdEnabled() {
+        return application.getConfiguration().getBoolean(AppProperties.OPENID_ENABLED, false);
+    }
+
+    @Override
+    protected ResourceBundle getResourceBundle(Locale locale) {
+        return application.getBundle(locale);
+    }
 }

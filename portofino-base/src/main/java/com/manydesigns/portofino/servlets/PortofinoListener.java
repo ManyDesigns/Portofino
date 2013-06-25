@@ -24,7 +24,6 @@ import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleRegistry;
@@ -65,6 +64,8 @@ public class PortofinoListener
     public static final String SEPARATOR =
             "----------------------------------------" +
                     "----------------------------------------";
+    
+    public static final String APP_PROPERTIES = "app.properties";
 
     //**************************************************************************
     // Fields
@@ -214,7 +215,7 @@ public class PortofinoListener
         logger.info("Apps dir: {}", appsDir.getAbsolutePath());
         logger.info("App id: {}", appId);
         File appDir = new File(appsDir, appId);
-        File appConfigurationFile = new File(appDir, AppProperties.PROPERTIES_RESOURCE);
+        File appConfigurationFile = new File(appDir, APP_PROPERTIES);
         configuration = new CompositeConfiguration();
         appConfiguration = new PropertiesConfiguration(appConfigurationFile);
         configuration.addConfiguration(appConfiguration);

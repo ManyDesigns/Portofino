@@ -94,8 +94,7 @@
                 <div class="portletBody">
                     <stripes:layout-component name="portletBody">
                         <mde:sessionMessages/>
-                        <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction"
-                                      method="post">
+                        <stripes:form beanclass="<%= actionBean.getClass().getName() %>" method="post">
                             <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
                             <input type="text" name="userName" id="userName" class="input-block-level"
                                    placeholder="<fmt:message key='skins.default.login.username'/>" />
@@ -104,19 +103,12 @@
                             <div style="text-align: center">
                                 <portofino:buttons list="login-buttons" cssClass="btn-large" />
                             </div>
-                            <!--<c:if test="recoverPwd">
-                                <tr>
-                                    <td colspan="2">
-                                        <fmt:message key="skins.default.login.forgot_pwd"/> <a href="PwdRecovery.action"><fmt:message key="skins.default.login.retrieve_pwd"/></a>
-                                    </td>
-                                </tr>
-                            </c:if>-->
                             <stripes:hidden name="returnUrl"/>
                         </stripes:form>
                         <c:if test="${actionBean.openIdEnabled}">
                             <div style="border-top: 1px solid #ddd; padding-top: 0.5em">
                                 <fmt:message key="skins.default.login.openId"/>:
-                                <stripes:form beanclass="com.manydesigns.portofino.actions.user.LoginAction" method="post"
+                                <stripes:form beanclass="<%= actionBean.getClass().getName() %>" method="post"
                                               id="openid_form">
                                     <stripes:hidden name="returnUrl"/>
                                     <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />

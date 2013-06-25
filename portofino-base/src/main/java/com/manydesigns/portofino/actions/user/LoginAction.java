@@ -22,22 +22,16 @@ package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.AbstractActionBean;
-import com.manydesigns.portofino.shiro.ShiroUtils;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.*;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.DisabledAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +40,7 @@ import javax.servlet.http.HttpSession;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -59,7 +54,7 @@ import java.util.ResourceBundle;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public abstract class LoginAction extends AbstractActionBean {
+public abstract class LoginAction implements ActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -69,9 +64,6 @@ public abstract class LoginAction extends AbstractActionBean {
     //**************************************************************************
     // Injections
     //**************************************************************************
-
-    @Inject(RequestAttributes.APPLICATION)
-    public Application application;
 
     @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
@@ -93,6 +85,20 @@ public abstract class LoginAction extends AbstractActionBean {
     public String returnUrl;
     public String cancelReturnUrl;
 
+    //**************************************************************************
+    // ActionBean implementation
+    //**************************************************************************
+
+    protected ActionBeanContext context;
+
+    public void setContext(ActionBeanContext context) {
+        this.context = context;
+    }
+
+    public ActionBeanContext getContext() {
+        return context;
+    }
+
     public static final Logger logger =
             LoggerFactory.getLogger(LoginAction.class);
 
@@ -113,7 +119,7 @@ public abstract class LoginAction extends AbstractActionBean {
     public Resolution login() {
         Subject subject = SecurityUtils.getSubject();
         Locale locale = context.getLocale();
-        ResourceBundle bundle = application.getBundle(locale);
+        ResourceBundle bundle = getResourceBundle(locale);
         try {
             subject.login(new UsernamePasswordToken(userName, pwd));
             logger.info("User {} login", userName);
@@ -133,6 +139,8 @@ public abstract class LoginAction extends AbstractActionBean {
             return new ForwardResolution("/layouts/user/login.jsp");
         }
     }
+
+    protected abstract ResourceBundle getResourceBundle(Locale locale);
 
     protected Resolution redirectToReturnUrl() {
         return redirectToReturnUrl(returnUrl);
@@ -166,7 +174,7 @@ public abstract class LoginAction extends AbstractActionBean {
     }
 
     public Resolution logout() {
-        String userName = ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) + "";
+        String userName = getPrimaryPrincipal(SecurityUtils.getSubject()) + "";
         SecurityUtils.getSubject().logout();
         HttpSession session = getSession();
         if (session != null) {
@@ -174,12 +182,45 @@ public abstract class LoginAction extends AbstractActionBean {
         }
 
         Locale locale = context.getLocale();
-        ResourceBundle bundle = application.getBundle(locale);
+        ResourceBundle bundle = getResourceBundle(locale);
         String msg = bundle.getString("user.logout");
         SessionMessages.addInfoMessage(msg);
         logger.info("User {} logout", userName);
 
         return new RedirectResolution("/");
+    }
+
+    //TODO copiato da ShiroUtils
+    /**
+     * Returns the primary principal for a Subject - that is, in Portofino, the username.
+     * @param s the subject
+     * @return the username.
+     */
+    public static Object getPrimaryPrincipal(Subject s) {
+        return getPrincipal(s, 0);
+    }
+
+    /**
+     * Returns the nth principal of the given Subject. Custom security.groovy implementations might assign
+     * more than one principal to a Subject.
+     * @param s the subject
+     * @param i the zero-based index of the principal
+     * @return the principal
+     * @throws IndexOutOfBoundsException if the index is greather than the number of principals associated with the
+     * subject.
+     */
+    public static Object getPrincipal(Subject s, int i) {
+        Object principal = s.getPrincipal();
+        if(principal instanceof PrincipalCollection) {
+            List principals = ((PrincipalCollection) principal).asList();
+            return principals.get(i);
+        } else {
+            if(i == 0) {
+                return principal;
+            } else {
+                throw new IndexOutOfBoundsException("The subject has only 1 principal, index " + i + " is not valid");
+            }
+        }
     }
 
     // do not expose this method publicly
@@ -205,10 +246,6 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public void setCancelReturnUrl(String cancelReturnUrl) {
         this.cancelReturnUrl = cancelReturnUrl;
-    }
-
-    public Application getApplication() {
-        return application;
     }
 
     public Configuration getPortofinoConfiguration() {

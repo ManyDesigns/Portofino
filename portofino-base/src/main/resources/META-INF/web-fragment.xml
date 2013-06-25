@@ -1,0 +1,14 @@
+<web-fragment>
+    <name>portofino-base</name>
+    <ordering>
+        <after><name>manydesigns-elements</name></after>
+    </ordering>
+
+    <listener>
+        <description>Application context and session listener</description>
+        <listener-class>
+            com.manydesigns.portofino.servlets.PortofinoListener
+        </listener-class>
+    </listener>
+
+</web-fragment>

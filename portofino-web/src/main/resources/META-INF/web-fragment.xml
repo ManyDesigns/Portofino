@@ -1,15 +1,8 @@
 <web-fragment>
     <name>portofino-web</name>
     <ordering>
-        <after><name>manydesigns-elements</name></after>
+        <after><name>portofino-base</name></after>
     </ordering>
-
-    <listener>
-        <description>Application context and session listener</description>
-        <listener-class>
-            com.manydesigns.portofino.servlets.PortofinoListener
-        </listener-class>
-    </listener>
 
     <filter>
         <filter-name>encoding-filter</filter-name>
