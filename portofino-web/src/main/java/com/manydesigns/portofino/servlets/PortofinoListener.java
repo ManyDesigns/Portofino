@@ -174,8 +174,7 @@ public class PortofinoListener
         logger.info("Creating the application starter...");
         String appId = configuration.getString(PortofinoProperties.APP_ID);
         applicationStarter = new ApplicationStarter(servletContext, configuration, appId);
-        servletContext.setAttribute(
-                ApplicationAttributes.APPLICATION_STARTER, applicationStarter);
+        servletContext.setAttribute(ApplicationAttributes.APPLICATION_STARTER, applicationStarter);
 
         String encoding = configuration.getString(PortofinoProperties.URL_ENCODING);
         logger.info("URL character encoding is set to " + encoding + ". Make sure the web server uses the same encoding to parse URLs.");
