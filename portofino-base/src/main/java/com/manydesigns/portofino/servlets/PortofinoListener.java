@@ -75,6 +75,8 @@ public class PortofinoListener
     protected CompositeConfiguration configuration;
     protected FileConfiguration appConfiguration;
 
+    protected File applicationDirectory;
+
     protected ServletContext servletContext;
     protected ServerInfo serverInfo;
 
@@ -122,8 +124,8 @@ public class PortofinoListener
             logger.error("Could not load configuration", e);
             throw new Error(e);
         }
-        servletContext.setAttribute(
-                ApplicationAttributes.PORTOFINO_CONFIGURATION, configuration);
+        servletContext.setAttribute(ApplicationAttributes.APPLICATION_DIRECTORY, applicationDirectory);
+        servletContext.setAttribute(ApplicationAttributes.PORTOFINO_CONFIGURATION, configuration);
 
         logger.info("Servlet API version is " + serverInfo.getServletApiVersion());
         if (serverInfo.getServletApiMajor() < 3) {
@@ -214,8 +216,8 @@ public class PortofinoListener
         File appsDir = new File(appsDirPath);
         logger.info("Apps dir: {}", appsDir.getAbsolutePath());
         logger.info("App id: {}", appId);
-        File appDir = new File(appsDir, appId);
-        File appConfigurationFile = new File(appDir, APP_PROPERTIES);
+        applicationDirectory = new File(appsDir, appId);
+        File appConfigurationFile = new File(applicationDirectory, APP_PROPERTIES);
         configuration = new CompositeConfiguration();
         appConfiguration = new PropertiesConfiguration(appConfigurationFile);
         configuration.addConfiguration(appConfiguration);

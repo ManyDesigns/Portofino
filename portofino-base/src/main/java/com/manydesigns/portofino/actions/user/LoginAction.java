@@ -24,6 +24,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -37,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpSession;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -65,8 +67,13 @@ public abstract class LoginAction implements ActionBean {
     // Injections
     //**************************************************************************
 
+    @Inject(ApplicationAttributes.APPLICATION_DIRECTORY)
+    public File applicationDirectory;
+
     @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
+
+    protected ResourceBundleManager resourceBundleManager;
 
     //**************************************************************************
     // Request parameters
@@ -93,6 +100,7 @@ public abstract class LoginAction implements ActionBean {
 
     public void setContext(ActionBeanContext context) {
         this.context = context;
+        resourceBundleManager = new ResourceBundleManager(applicationDirectory);
     }
 
     public ActionBeanContext getContext() {
@@ -140,7 +148,9 @@ public abstract class LoginAction implements ActionBean {
         }
     }
 
-    protected abstract ResourceBundle getResourceBundle(Locale locale);
+    protected ResourceBundle getResourceBundle(Locale locale) {
+        return resourceBundleManager.getBundle(locale);
+    }
 
     protected Resolution redirectToReturnUrl() {
         return redirectToReturnUrl(returnUrl);

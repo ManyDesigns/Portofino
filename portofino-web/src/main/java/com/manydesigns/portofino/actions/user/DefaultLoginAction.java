@@ -192,8 +192,4 @@ public class DefaultLoginAction extends LoginAction {
         return application.getConfiguration().getBoolean(AppProperties.OPENID_ENABLED, false);
     }
 
-    @Override
-    protected ResourceBundle getResourceBundle(Locale locale) {
-        return application.getBundle(locale);
-    }
 }

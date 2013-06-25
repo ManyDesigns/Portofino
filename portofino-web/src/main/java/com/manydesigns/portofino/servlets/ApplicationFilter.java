@@ -61,8 +61,8 @@ public class ApplicationFilter implements Filter {
 
     protected ServletContext servletContext;
 
-        public final static Logger logger =
-            LoggerFactory.getLogger(ApplicationFilter.class);
+    public final static Logger logger =
+        LoggerFactory.getLogger(ApplicationFilter.class);
 
     public void init(FilterConfig filterConfig) throws ServletException {
         servletContext = filterConfig.getServletContext();
@@ -159,7 +159,7 @@ public class ApplicationFilter implements Filter {
             }
             logger.debug("Setting blobs directory");
             BlobManager blobManager = ElementsThreadLocals.getBlobManager();
-            //TODO!!! blobManager.setBlobsDir(appBlobsDir);
+            blobManager.setBlobsDir(appBlobsDir);
         }
     }
 
