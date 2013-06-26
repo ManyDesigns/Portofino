@@ -45,7 +45,7 @@ public interface Module {
 
     double getPriority();
 
-    String getId(); // un nome tecnico senza spazi e caratteri strani ( in genere coincidente con l'artifact id).
+    String getId(); // un nome tecnico senza spazi e caratteri strani (in genere coincidente con l'artifact id).
 
     String getName();
 

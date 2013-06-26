@@ -18,24 +18,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.actions.admin;
+package com.manydesigns.portofino.actions.admin.modules;
 
-import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.Status;
+import com.manydesigns.elements.forms.TableForm;
+import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.stripes.AbstractActionBean;
-import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.modules.Module;
+import com.manydesigns.portofino.modules.ModuleRegistry;
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.servlets.ServerInfo;
+import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -44,25 +45,24 @@ import java.util.ResourceBundle;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresAdministrator
-@UrlBinding(ReloadModelAction.URL_BINDING)
-public class ReloadModelAction extends AbstractActionBean {
+@UrlBinding(ModulesAction.URL_BINDING)
+public class ModulesAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    public static final String URL_BINDING = "/actions/admin/reload-model";
+    public static final String URL_BINDING = "/actions/admin/modules";
 
-    @Inject(RequestAttributes.APPLICATION)
-    Application application;
+    @Inject(ApplicationAttributes.MODULE_REGISTRY)
+    ModuleRegistry moduleRegistry;
 
-    @Inject(ApplicationAttributes.SERVER_INFO)
-    ServerInfo serverInfo;
+    TableForm form;
 
     //--------------------------------------------------------------------------
     // Logging
     //--------------------------------------------------------------------------
 
     public final static Logger logger =
-            LoggerFactory.getLogger(ReloadModelAction.class);
+            LoggerFactory.getLogger(ModulesAction.class);
 
     //--------------------------------------------------------------------------
     // Action events
@@ -70,29 +70,43 @@ public class ReloadModelAction extends AbstractActionBean {
 
     @DefaultHandler
     public Resolution execute() {
-        return new ForwardResolution("/layouts/admin/reload-model.jsp");
+        setupForm();
+        return new ForwardResolution("/portofino-base/actions/admin/modules/list.jsp");
     }
 
-    @Button(list = "reload-model", key = "model.reload", order = 1, type = Button.TYPE_PRIMARY)
-    @RequiresAdministrator
-    public Resolution reloadModel() {
-        synchronized (application) {
-            application.loadXmlModel();
-            DispatcherLogic.clearConfigurationCache();
-            SessionMessages.addInfoMessage(getMessage("model.reloaded"));
-            return new ForwardResolution("/layouts/admin/reload-model.jsp");
+    protected void setupForm() {
+        TableFormBuilder builder = new TableFormBuilder(ModuleView.class);
+        builder.configNRows(moduleRegistry.getModules().size());
+        builder.configMode(Mode.VIEW);
+        form = builder.build();
+        List<ModuleView> modules = new ArrayList<ModuleView>();
+        for(Module module : moduleRegistry.getModules()) {
+            ModuleView view = new ModuleView();
+            view.id = module.getId();
+            view.name = module.getName();
+            view.status = module.getStatus().name();
+            view.version = module.getModuleVersion();
+            modules.add(view);
         }
+        form.readFromObject(modules);
     }
 
-    private String getMessage(String key) {
-        Locale locale = context.getLocale();
-        ResourceBundle bundle = application.getBundle(locale);
-        return bundle.getString(key);
-    }
-
-    @Button(list = "reload-model-bar", key = "commons.returnToPages", order = 1)
+    @Button(list = "settings", key = "commons.returnToPages", order = 2)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }
 
+    public TableForm getForm() {
+        return form;
+    }
+
+    public static final class ModuleView {
+
+        public String id;
+        public String name;
+        public String version;
+        @Status(red = { "FAILED" }, amber = { "CREATED" }, green = { "ACTIVE" })
+        public String status;
+
+    }
 }

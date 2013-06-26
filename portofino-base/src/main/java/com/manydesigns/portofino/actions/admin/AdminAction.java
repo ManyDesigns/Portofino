@@ -20,22 +20,23 @@
 
 package com.manydesigns.portofino.actions.admin;
 
-import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.annotations.Status;
+import com.manydesigns.elements.forms.TableForm;
+import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.stripes.AbstractActionBean;
-import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.menu.*;
+import com.manydesigns.portofino.modules.Module;
+import com.manydesigns.portofino.modules.ModuleRegistry;
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.servlets.ServerInfo;
+import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -44,25 +45,22 @@ import java.util.ResourceBundle;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresAdministrator
-@UrlBinding(ReloadModelAction.URL_BINDING)
-public class ReloadModelAction extends AbstractActionBean {
+@UrlBinding(AdminAction.URL_BINDING)
+public class AdminAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    public static final String URL_BINDING = "/actions/admin/reload-model";
+    public static final String URL_BINDING = "/actions/admin";
 
-    @Inject(RequestAttributes.APPLICATION)
-    Application application;
-
-    @Inject(ApplicationAttributes.SERVER_INFO)
-    ServerInfo serverInfo;
+    @Inject(ApplicationAttributes.ADMIN_MENU)
+    MenuBuilder adminMenu;
 
     //--------------------------------------------------------------------------
     // Logging
     //--------------------------------------------------------------------------
 
     public final static Logger logger =
-            LoggerFactory.getLogger(ReloadModelAction.class);
+            LoggerFactory.getLogger(AdminAction.class);
 
     //--------------------------------------------------------------------------
     // Action events
@@ -70,29 +68,17 @@ public class ReloadModelAction extends AbstractActionBean {
 
     @DefaultHandler
     public Resolution execute() {
-        return new ForwardResolution("/layouts/admin/reload-model.jsp");
-    }
-
-    @Button(list = "reload-model", key = "model.reload", order = 1, type = Button.TYPE_PRIMARY)
-    @RequiresAdministrator
-    public Resolution reloadModel() {
-        synchronized (application) {
-            application.loadXmlModel();
-            DispatcherLogic.clearConfigurationCache();
-            SessionMessages.addInfoMessage(getMessage("model.reloaded"));
-            return new ForwardResolution("/layouts/admin/reload-model.jsp");
+        Menu menu = adminMenu.build();
+        for(MenuItem item : menu.items) {
+            if(item instanceof MenuLink) {
+                return new RedirectResolution(((MenuLink) item).link);
+            } else if(item instanceof MenuGroup) {
+                List<MenuLink> menuLinks = ((MenuGroup) item).menuLinks;
+                if(!menuLinks.isEmpty()) {
+                    return new RedirectResolution(menuLinks.get(0).link);
+                }
+            }
         }
+        throw new Error("BUG! There should be at least one registered admin menu item");
     }
-
-    private String getMessage(String key) {
-        Locale locale = context.getLocale();
-        ResourceBundle bundle = application.getBundle(locale);
-        return bundle.getString(key);
-    }
-
-    @Button(list = "reload-model-bar", key = "commons.returnToPages", order = 1)
-    public Resolution returnToPages() {
-        return new RedirectResolution("/");
-    }
-
 }

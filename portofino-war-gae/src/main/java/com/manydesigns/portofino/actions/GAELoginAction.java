@@ -25,7 +25,7 @@ import com.google.appengine.api.users.UserServiceFactory;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.dispatcher.AbstractActionBean;
+import com.manydesigns.portofino.stripes.AbstractActionBean;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;

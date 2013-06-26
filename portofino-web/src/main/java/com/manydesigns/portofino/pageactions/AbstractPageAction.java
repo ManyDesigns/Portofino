@@ -43,6 +43,7 @@ import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
+import com.manydesigns.portofino.stripes.AbstractActionBean;
 import com.manydesigns.portofino.stripes.ModelActionResolver;
 import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.ErrorResolution;

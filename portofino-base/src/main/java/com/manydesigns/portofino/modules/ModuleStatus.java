@@ -37,7 +37,7 @@ package com.manydesigns.portofino.modules;
  */
 public enum ModuleStatus {
 
-    CREATED, INITIALIZED, FAILED, DESTROYED;
+    CREATED, ACTIVE, FAILED, DESTROYED;
 
     public static final String copyright=
             "Copyright (c) 2005-2013, ManyDesigns srl";

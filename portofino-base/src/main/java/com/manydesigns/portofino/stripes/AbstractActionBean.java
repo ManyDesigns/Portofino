@@ -18,9 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.dispatcher;
+package com.manydesigns.portofino.stripes;
 
-import com.manydesigns.elements.servlet.ServletUtils;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 
@@ -37,21 +36,13 @@ public abstract class AbstractActionBean implements ActionBean {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     protected ActionBeanContext context;
-    protected String originalPath;
 
     public void setContext(ActionBeanContext context) {
         this.context = context;
-        originalPath = ServletUtils.getOriginalPath(context.getRequest());
     }
 
     public ActionBeanContext getContext() {
         return context;
     }
 
-    /**
-     * Returns the original request path that led to the invocation of this ActionBean.
-     */
-    public String getOriginalPath() {
-        return originalPath;
-    }
 }

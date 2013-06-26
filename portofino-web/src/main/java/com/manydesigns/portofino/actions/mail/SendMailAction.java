@@ -22,7 +22,7 @@ package com.manydesigns.portofino.actions.mail;
 
 import com.manydesigns.mail.sender.MailSender;
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.dispatcher.AbstractActionBean;
+import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.Resolution;

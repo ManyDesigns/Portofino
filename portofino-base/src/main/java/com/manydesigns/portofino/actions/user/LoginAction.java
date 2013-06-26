@@ -25,6 +25,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -52,7 +53,7 @@ import java.util.Map;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public abstract class LoginAction implements ActionBean {
+public abstract class LoginAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -82,20 +83,6 @@ public abstract class LoginAction implements ActionBean {
 
     public String returnUrl;
     public String cancelReturnUrl;
-
-    //**************************************************************************
-    // ActionBean implementation
-    //**************************************************************************
-
-    protected ActionBeanContext context;
-
-    public void setContext(ActionBeanContext context) {
-        this.context = context;
-    }
-
-    public ActionBeanContext getContext() {
-        return context;
-    }
 
     public static final Logger logger =
             LoggerFactory.getLogger(LoginAction.class);

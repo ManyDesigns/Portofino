@@ -31,7 +31,10 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.actions.admin.modules.ModulesAction;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.menu.MenuBuilder;
+import com.manydesigns.portofino.menu.SimpleMenuAppender;
 import org.apache.commons.configuration.Configuration;
 
 /**
@@ -48,6 +51,9 @@ public class BaseModule implements Module {
 
     @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
+
+    @Inject(ApplicationAttributes.ADMIN_MENU)
+    public MenuBuilder adminMenu;
 
     @Override
     public String getModuleVersion() {
@@ -81,7 +87,14 @@ public class BaseModule implements Module {
 
     @Override
     public void init() {
-        status = ModuleStatus.INITIALIZED;
+        SimpleMenuAppender group = SimpleMenuAppender.group("configuration", null, "Configuration");
+        adminMenu.menuAppenders.add(group);
+
+        SimpleMenuAppender link = SimpleMenuAppender.link(
+                "configuration", "modules", null, "Modules", ModulesAction.URL_BINDING);
+        adminMenu.menuAppenders.add(link);
+
+        status = ModuleStatus.ACTIVE;
     }
 
     @Override

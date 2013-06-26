@@ -53,11 +53,12 @@
         </title>
     </head>
     <body>
-    <fmt:setLocale value="${pageContext.request.locale}"/>
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
-                <h4 id="app-title" class="pull-left"><stripes:link href="/">Administration</stripes:link></h4>
+                <h4 id="app-title" class="pull-left">
+                    <stripes:link href="/actions/admin">Administration</stripes:link>
+                </h4>
             </div>
         </div>
     </div>
@@ -66,30 +67,6 @@
             <div class="span2">
                 <div id="navigation">
                     <ul class="nav nav-list portofino-sidenav">
-                        <%--<li class="nav-header">Security</li>
-                        <stripes:layout-render name="admin-link.jsp"
-                                               text="Root permissions"
-                                               link="/actions/admin/root-page/permissions"/>
-                        <li class="nav-header">Configuration</li>
-                        <stripes:layout-render name="admin-link.jsp"
-                                               text="Settings"
-                                               link="/actions/admin/settings"/>
-                        <stripes:layout-render name="admin-link.jsp"
-                                               text="Top-level pages"
-                                               link="/actions/admin/root-page/children"/>
-                        <li class="nav-header">Data modeling</li>
-                        <stripes:layout-render name="admin-link.jsp"
-                                               text="Wizard"
-                                               link="/actions/admin/wizard"/>
-                        <stripes:layout-render name="admin-link.jsp"
-                                               text="Connection providers"
-                                               link="/actions/admin/connection-providers"/>
-                        <stripes:layout-render name="admin-link.jsp"
-                                               text="Tables"
-                                               link="/actions/admin/tables"/>
-                        <stripes:layout-render name="admin-link.jsp"
-                                               text="Reload model"
-                                               link="/actions/admin/reload-model"/>--%>
                         <%
                             MenuBuilder adminMenuBuilder =
                                     (MenuBuilder) application.getAttribute(ApplicationAttributes.ADMIN_MENU);

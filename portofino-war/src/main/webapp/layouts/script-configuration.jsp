@@ -2,7 +2,7 @@
 <%@ page import="com.manydesigns.portofino.security.AccessLevel" %>
 <%@ page import="org.apache.shiro.SecurityUtils" %>
 <%@ page import="org.apache.shiro.subject.Subject" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.AbstractActionBean" %>
+<%@ page import="com.manydesigns.portofino.stripes.AbstractActionBean" %>
 <%@ page import="com.manydesigns.portofino.pageactions.AbstractPageAction" %>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%

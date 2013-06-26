@@ -125,7 +125,7 @@ public class ModuleRegistry {
 
     public void destroy() {
         for(Module module : modules.descendingSet()) { //Iterate backwards
-            if(module.getStatus() == ModuleStatus.INITIALIZED) {
+            if(module.getStatus() == ModuleStatus.ACTIVE) {
                 try {
                     logger.debug("Destroying module " + printModule(module) + "...");
                     module.destroy();

@@ -32,7 +32,7 @@ import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.AbstractActionBean;
+import com.manydesigns.portofino.stripes.AbstractActionBean;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.servlets.ServerInfo;

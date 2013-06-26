@@ -1,11 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
+%><%@ page import="com.manydesigns.elements.servlet.ServletUtils"
 %><%@ page import="com.manydesigns.portofino.logic.SecurityLogic"
 %><%@ page import="com.manydesigns.portofino.pageactions.AbstractPageAction"
 %><%@ page import="com.manydesigns.portofino.security.AccessLevel"
 %><%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"
 %><%@ page import="net.sourceforge.stripes.util.UrlBuilder"
-%><%@ page import="org.apache.shiro.SecurityUtils"
-%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%>
+<%@ page import="org.apache.shiro.SecurityUtils" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
@@ -17,7 +19,7 @@
              type="com.manydesigns.portofino.model.Model"/>
 <jsp:useBean id="app" scope="request"
              type="com.manydesigns.portofino.application.Application"/>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.dispatcher.AbstractActionBean"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.stripes.AbstractActionBean"/>
 <fmt:setLocale value="${pageContext.request.locale}"/>
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
@@ -103,8 +105,9 @@
                 </c:if>
                 <ul id="user-menu" class="nav">
                     <%
+                        String originalPath = ServletUtils.getOriginalPath(actionBean.getContext().getRequest());
                         String loginLink = ShiroUtils.getLoginLink(
-                                app, request.getContextPath(), actionBean.getOriginalPath(), actionBean.getOriginalPath());
+                                app, request.getContextPath(), originalPath, originalPath);
                         String logoutLink = ShiroUtils.getLogoutLink(app, request.getContextPath());
                         pageContext.setAttribute("loginLink", new UrlBuilder(request.getLocale(), loginLink, true).toString());
                         pageContext.setAttribute("logoutLink", new UrlBuilder(request.getLocale(), logoutLink, true).toString());

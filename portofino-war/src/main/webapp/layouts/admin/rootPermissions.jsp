@@ -18,6 +18,11 @@
         <fmt:message key="layouts.admin.rootPermissions" />
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
+        <style type="text/css">
+            select {
+                margin-bottom: 0 !important;
+            }
+        </style>
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.page.RootPermissionsAction"
                       method="post" enctype="multipart/form-data">
             <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />

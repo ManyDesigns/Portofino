@@ -24,7 +24,7 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.dispatcher.AbstractActionBean;
+import com.manydesigns.portofino.stripes.AbstractActionBean;
 import com.manydesigns.portofino.servlets.ServerInfo;
 import com.manydesigns.portofino.di.Inject;
 

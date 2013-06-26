@@ -179,9 +179,6 @@ public class PortofinoWebModule implements Module {
         adminMenu.menuAppenders.add(link);
 
 
-        group = SimpleMenuAppender.group("configuration", null, "Configuration");
-        adminMenu.menuAppenders.add(group);
-
         link = SimpleMenuAppender.link(
                 "configuration", "settings", null, "Settings", SettingsAction.URL_BINDING);
         adminMenu.menuAppenders.add(link);
@@ -206,7 +203,7 @@ public class PortofinoWebModule implements Module {
                 "dataModeling", "reloadModel", null, "Reload model", ReloadModelAction.URL_BINDING);
         adminMenu.menuAppenders.add(link);
 
-        status = ModuleStatus.INITIALIZED;
+        status = ModuleStatus.ACTIVE;
     }
 
         protected void setupMailQueue() {
