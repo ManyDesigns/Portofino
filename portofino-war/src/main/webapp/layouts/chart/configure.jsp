@@ -18,7 +18,7 @@
         <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data"
                       class="form-horizontal">
             <mde:write name="actionBean" property="pageConfigurationForm"/>
-            <mde:write name="actionBean" property="configurationForm" />
+            <mde:write name="actionBean" property="form" />
             <br />
             <h4>SQL Query parameters</h4>
             <ul>
