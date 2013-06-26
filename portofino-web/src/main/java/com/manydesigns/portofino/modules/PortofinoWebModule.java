@@ -24,10 +24,19 @@ import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
+import com.manydesigns.portofino.actions.admin.ReloadModelAction;
+import com.manydesigns.portofino.actions.admin.SettingsAction;
+import com.manydesigns.portofino.actions.admin.TablesAction;
+import com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard;
+import com.manydesigns.portofino.actions.admin.page.RootChildrenAction;
+import com.manydesigns.portofino.actions.admin.page.RootPermissionsAction;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.files.TempFileService;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
+import com.manydesigns.portofino.menu.MenuBuilder;
+import com.manydesigns.portofino.menu.SimpleMenuAppender;
 import com.manydesigns.portofino.servlets.MailScheduler;
 import com.manydesigns.portofino.shiro.ApplicationRealm;
 import com.manydesigns.portofino.starter.ApplicationStarter;
@@ -64,6 +73,9 @@ public class PortofinoWebModule implements Module {
     @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
+    @Inject(ApplicationAttributes.ADMIN_MENU)
+    public MenuBuilder adminMenu;
+
     protected ApplicationStarter applicationStarter;
 
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
@@ -78,33 +90,6 @@ public class PortofinoWebModule implements Module {
 
     public static final Logger logger =
             LoggerFactory.getLogger(PortofinoWebModule.class);
-
-    //**************************************************************************
-    // ServletContextListener implementation
-    //**************************************************************************
-
-    protected void setupMailQueue() {
-        MailQueueSetup mailQueueSetup = new MailQueueSetup();
-        mailQueueSetup.setup();
-
-        MailQueue mailQueue = mailQueueSetup.getMailQueue();
-        if(mailQueue == null) {
-            logger.info("Mail queue not enabled");
-            return;
-        }
-
-        servletContext.setAttribute(ApplicationAttributes.MAIL_QUEUE, mailQueue);
-        servletContext.setAttribute(ApplicationAttributes.MAIL_SENDER, mailQueueSetup.getMailSender());
-        servletContext.setAttribute(ApplicationAttributes.MAIL_CONFIGURATION, mailQueueSetup.getMailConfiguration());
-
-        try {
-            //In classe separata per permettere al Listener di essere caricato anche in assenza di Quartz a runtime
-            MailScheduler.setupMailScheduler(mailQueueSetup);
-        } catch (NoClassDefFoundError e) {
-            logger.debug(e.getMessage(), e);
-            logger.info("Quartz is not available, mail scheduler not started");
-        }
-    }
 
     @Override
     public String getModuleVersion() {
@@ -182,7 +167,69 @@ public class PortofinoWebModule implements Module {
         LifecycleUtils.init(realm);
         rsm.setRealm(realm);
 
+        //Admin menu
+        SimpleMenuAppender group;
+        SimpleMenuAppender link;
+
+        group = SimpleMenuAppender.group("security", null, "Security");
+        adminMenu.menuAppenders.add(group);
+
+        link = SimpleMenuAppender.link(
+                "security", "rootPermissions", null, "Root permissions", RootPermissionsAction.URL_BINDING);
+        adminMenu.menuAppenders.add(link);
+
+
+        group = SimpleMenuAppender.group("configuration", null, "Configuration");
+        adminMenu.menuAppenders.add(group);
+
+        link = SimpleMenuAppender.link(
+                "configuration", "settings", null, "Settings", SettingsAction.URL_BINDING);
+        adminMenu.menuAppenders.add(link);
+        link = SimpleMenuAppender.link(
+                "configuration", "topLevelPages", null, "Top-level pages", RootChildrenAction.URL_BINDING);
+        adminMenu.menuAppenders.add(link);
+
+
+        group = SimpleMenuAppender.group("dataModeling", null, "Data modeling");
+        adminMenu.menuAppenders.add(group);
+
+        link = SimpleMenuAppender.link(
+                "dataModeling", "wizard", null, "Wizard", ApplicationWizard.URL_BINDING);
+        adminMenu.menuAppenders.add(link);
+        link = SimpleMenuAppender.link(
+                "dataModeling", "connectionProviders", null, "Connection providers", ConnectionProvidersAction.URL_BINDING);
+        adminMenu.menuAppenders.add(link);
+        link = SimpleMenuAppender.link(
+                "dataModeling", "tables", null, "Tables", TablesAction.BASE_ACTION_PATH);
+        adminMenu.menuAppenders.add(link);
+        link = SimpleMenuAppender.link(
+                "dataModeling", "reloadModel", null, "Reload model", ReloadModelAction.URL_BINDING);
+        adminMenu.menuAppenders.add(link);
+
         status = ModuleStatus.INITIALIZED;
+    }
+
+        protected void setupMailQueue() {
+        MailQueueSetup mailQueueSetup = new MailQueueSetup();
+        mailQueueSetup.setup();
+
+        MailQueue mailQueue = mailQueueSetup.getMailQueue();
+        if(mailQueue == null) {
+            logger.info("Mail queue not enabled");
+            return;
+        }
+
+        servletContext.setAttribute(ApplicationAttributes.MAIL_QUEUE, mailQueue);
+        servletContext.setAttribute(ApplicationAttributes.MAIL_SENDER, mailQueueSetup.getMailSender());
+        servletContext.setAttribute(ApplicationAttributes.MAIL_CONFIGURATION, mailQueueSetup.getMailConfiguration());
+
+        try {
+            //In classe separata per permettere al Listener di essere caricato anche in assenza di Quartz a runtime
+            MailScheduler.setupMailScheduler(mailQueueSetup);
+        } catch (NoClassDefFoundError e) {
+            logger.debug(e.getMessage(), e);
+            logger.info("Quartz is not available, mail scheduler not started");
+        }
     }
 
     @Override

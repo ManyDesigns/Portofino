@@ -44,7 +44,6 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import net.sourceforge.stripes.action.*;
-import net.sourceforge.stripes.controller.ActionResolver;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,10 +63,12 @@ import java.util.ResourceBundle;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 @RequiresAdministrator
-@UrlBinding("/actions/admin/connection-providers")
+@UrlBinding(ConnectionProvidersAction.URL_BINDING)
 public class ConnectionProvidersAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
+
+    public static final String URL_BINDING = "/actions/admin/connection-providers";
 
     public ConnectionProvider connectionProvider;
     public DatabasePlatform[] databasePlatforms;

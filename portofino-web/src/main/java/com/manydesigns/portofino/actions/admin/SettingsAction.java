@@ -55,10 +55,12 @@ import java.util.ResourceBundle;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresAdministrator
-@UrlBinding("/actions/admin/settings")
+@UrlBinding(SettingsAction.URL_BINDING)
 public class SettingsAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
+
+    public static final String URL_BINDING = "/actions/admin/settings";
 
     @Inject(RequestAttributes.APPLICATION)
     Application application;

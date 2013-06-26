@@ -20,11 +20,11 @@
 
 package com.manydesigns.portofino.actions.user;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -38,14 +38,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpSession;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.MessageFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 /**
  * Action that handles the standard Portofino login form. It supports two login methods: username + password
@@ -67,13 +63,8 @@ public abstract class LoginAction implements ActionBean {
     // Injections
     //**************************************************************************
 
-    @Inject(ApplicationAttributes.APPLICATION_DIRECTORY)
-    public File applicationDirectory;
-
     @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
-
-    protected ResourceBundleManager resourceBundleManager;
 
     //**************************************************************************
     // Request parameters
@@ -100,7 +91,6 @@ public abstract class LoginAction implements ActionBean {
 
     public void setContext(ActionBeanContext context) {
         this.context = context;
-        resourceBundleManager = new ResourceBundleManager(applicationDirectory);
     }
 
     public ActionBeanContext getContext() {
@@ -126,30 +116,23 @@ public abstract class LoginAction implements ActionBean {
     @Button(list = "login-buttons", key = "commons.login", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution login() {
         Subject subject = SecurityUtils.getSubject();
-        Locale locale = context.getLocale();
-        ResourceBundle bundle = getResourceBundle(locale);
         try {
             subject.login(new UsernamePasswordToken(userName, pwd));
             logger.info("User {} login", userName);
-            String successMsg = MessageFormat.format(
-                    bundle.getString("user.login.success"), userName);
+            String successMsg = ElementsThreadLocals.getText("user.login.success", userName);
             SessionMessages.addInfoMessage(successMsg);
             return redirectToReturnUrl();
         } catch (DisabledAccountException e) {
-            String errMsg = MessageFormat.format(bundle.getString("user.not.active"), userName);
+            String errMsg = ElementsThreadLocals.getText("user.not.active", userName);
             SessionMessages.addErrorMessage(errMsg);
             logger.warn(errMsg, e);
             return new ForwardResolution("/layouts/user/login.jsp");
         } catch (AuthenticationException e) {
-            String errMsg = MessageFormat.format(bundle.getString("user.login.failed"), userName);
+            String errMsg = ElementsThreadLocals.getText("user.login.failed", userName);
             SessionMessages.addErrorMessage(errMsg);
             logger.warn(errMsg, e);
             return new ForwardResolution("/layouts/user/login.jsp");
         }
-    }
-
-    protected ResourceBundle getResourceBundle(Locale locale) {
-        return resourceBundleManager.getBundle(locale);
     }
 
     protected Resolution redirectToReturnUrl() {
@@ -191,9 +174,7 @@ public abstract class LoginAction implements ActionBean {
             session.invalidate();
         }
 
-        Locale locale = context.getLocale();
-        ResourceBundle bundle = getResourceBundle(locale);
-        String msg = bundle.getString("user.logout");
+        String msg = ElementsThreadLocals.getText("user.logout");
         SessionMessages.addInfoMessage(msg);
         logger.info("User {} logout", userName);
 

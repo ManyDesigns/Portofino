@@ -35,10 +35,12 @@ import java.io.File;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@UrlBinding("/actions/admin/root-page/children")
+@UrlBinding(RootChildrenAction.URL_BINDING)
 public class RootChildrenAction extends RootConfigurationAction {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
+
+    public static final String URL_BINDING = "/actions/admin/root-page/children";
 
     @Override
     @DefaultHandler

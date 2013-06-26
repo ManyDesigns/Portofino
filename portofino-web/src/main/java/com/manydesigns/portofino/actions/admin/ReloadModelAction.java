@@ -44,10 +44,12 @@ import java.util.ResourceBundle;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresAdministrator
-@UrlBinding("/actions/admin/reload-model")
+@UrlBinding(ReloadModelAction.URL_BINDING)
 public class ReloadModelAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
+
+    public static final String URL_BINDING = "/actions/admin/reload-model";
 
     @Inject(RequestAttributes.APPLICATION)
     Application application;

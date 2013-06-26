@@ -25,6 +25,7 @@ import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.di.Injections;
+import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleRegistry;
 import net.sourceforge.stripes.util.ResolverUtil;
@@ -133,6 +134,11 @@ public class PortofinoListener
             logger.error(msg);
             throw new InternalError(msg);
         }
+
+        servletContext.setAttribute(ApplicationAttributes.CLASS_LOADER, getClass().getClassLoader());
+        MenuBuilder adminMenuBuilder = new MenuBuilder();
+        servletContext.setAttribute(ApplicationAttributes.ADMIN_MENU, adminMenuBuilder);
+        //servletContext.setAttribute(ApplicationAttributes.LOGIN_DELEGATE_CLASS_NAME, TODO);
 
         logger.info("Loading modules...");
         moduleRegistry = new ModuleRegistry(appConfiguration);

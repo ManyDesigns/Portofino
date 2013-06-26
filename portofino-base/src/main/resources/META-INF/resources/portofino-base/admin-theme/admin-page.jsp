@@ -1,4 +1,6 @@
-<%@ page import="org.apache.shiro.SecurityUtils" %>
+<%@ page import="com.manydesigns.portofino.ApplicationAttributes" %>
+<%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
+<%@ page import="com.manydesigns.portofino.menu.*" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
@@ -64,30 +66,56 @@
             <div class="span2">
                 <div id="navigation">
                     <ul class="nav nav-list portofino-sidenav">
-                        <li class="nav-header">Security</li>
-                        <stripes:layout-render name="adminLink.jsp"
+                        <%--<li class="nav-header">Security</li>
+                        <stripes:layout-render name="admin-link.jsp"
                                                text="Root permissions"
                                                link="/actions/admin/root-page/permissions"/>
                         <li class="nav-header">Configuration</li>
-                        <stripes:layout-render name="adminLink.jsp"
+                        <stripes:layout-render name="admin-link.jsp"
                                                text="Settings"
                                                link="/actions/admin/settings"/>
-                        <stripes:layout-render name="adminLink.jsp"
+                        <stripes:layout-render name="admin-link.jsp"
                                                text="Top-level pages"
                                                link="/actions/admin/root-page/children"/>
                         <li class="nav-header">Data modeling</li>
-                        <stripes:layout-render name="adminLink.jsp"
+                        <stripes:layout-render name="admin-link.jsp"
                                                text="Wizard"
                                                link="/actions/admin/wizard"/>
-                        <stripes:layout-render name="adminLink.jsp"
+                        <stripes:layout-render name="admin-link.jsp"
                                                text="Connection providers"
                                                link="/actions/admin/connection-providers"/>
-                        <stripes:layout-render name="adminLink.jsp"
+                        <stripes:layout-render name="admin-link.jsp"
                                                text="Tables"
                                                link="/actions/admin/tables"/>
-                        <stripes:layout-render name="adminLink.jsp"
+                        <stripes:layout-render name="admin-link.jsp"
                                                text="Reload model"
-                                               link="/actions/admin/reload-model"/>
+                                               link="/actions/admin/reload-model"/>--%>
+                        <%
+                            MenuBuilder adminMenuBuilder =
+                                    (MenuBuilder) application.getAttribute(ApplicationAttributes.ADMIN_MENU);
+                            Menu adminMenu = adminMenuBuilder.build();
+                            for(MenuItem item : adminMenu.items) {
+                                if(item instanceof MenuGroup) {
+                                    %><li class="nav-header"><%= item.label %></li><%
+                                    for(MenuLink link : ((MenuGroup) item).menuLinks) {
+                                        %>
+                                        <jsp:include page="admin-link.jsp">
+                                            <jsp:param name="text" value="<%= link.label %>" />
+                                            <jsp:param name="link" value="<%= link.link %>" />
+                                        </jsp:include>
+                                        <%
+                                    }
+                                } else {
+                                    MenuLink link = (MenuLink) item;
+                                    %>
+                                    <jsp:include page="admin-link.jsp">
+                                        <jsp:param name="text" value="<%= link.label %>" />
+                                        <jsp:param name="link" value="<%= link.link %>" />
+                                    </jsp:include>
+                                    <%
+                                }
+                            }
+                        %>
                     </ul>
                 </div>
             </div>

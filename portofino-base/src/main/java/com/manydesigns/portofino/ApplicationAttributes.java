@@ -32,6 +32,7 @@ public class ApplicationAttributes {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
+    public final static String CLASS_LOADER = "com.manydesigns.portofino.application.classLoader";
     public final static String ELEMENTS_CONFIGURATION = "elementsConfiguration";
     public final static String PORTOFINO_CONFIGURATION = "portofinoConfiguration";
     public final static String SERVLET_CONTEXT = "servletContext";
@@ -41,6 +42,7 @@ public class ApplicationAttributes {
     public final static String MAIL_QUEUE = "mailQueue";
     public final static String MAIL_SENDER = "mailSender";
     public final static String MAIL_CONFIGURATION = "mailConfiguration";
-    public static final String EHCACHE_MANAGER = "portofino.ehcache.manager";
+    public final static String EHCACHE_MANAGER = "portofino.ehcache.manager";
     public final static String MODULE_REGISTRY = "com.manydesigns.portofino.modules.ModuleRegistry";
+    public final static String ADMIN_MENU = "com.manydesigns.portofino.menu.Menu.admin";
 }

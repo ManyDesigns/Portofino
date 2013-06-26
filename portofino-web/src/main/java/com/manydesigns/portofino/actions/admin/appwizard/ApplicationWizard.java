@@ -94,10 +94,13 @@ import java.util.List;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresAdministrator
-@UrlBinding("/actions/admin/wizard")
+@UrlBinding(ApplicationWizard.URL_BINDING)
 public class ApplicationWizard extends AbstractWizardPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
+
+    public static final String URL_BINDING = "/actions/admin/wizard";
+
     public static final String JDBC = "JDBC";
     public static final String JNDI = "JNDI";
     @SuppressWarnings({"RedundantStringConstructorCall"})
