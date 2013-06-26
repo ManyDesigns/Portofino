@@ -159,7 +159,7 @@ public class ApplicationFilter implements Filter {
             }
             logger.debug("Setting blobs directory");
             BlobManager blobManager = ElementsThreadLocals.getBlobManager();
-            //TODO!!! blobManager.setBlobsDir(appBlobsDir);
+            blobManager.setBlobsDir(appBlobsDir);
         }
     }
 
