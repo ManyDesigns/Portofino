@@ -59,6 +59,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -72,10 +73,22 @@ public class DefaultLoginAction extends LoginAction {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
+    public static final String OPENID_DISCOVERED = "openID.discovered";
+    public static final String OPENID_CONSUMER_MANAGER = "openID.consumerManager";
+
     @Inject(RequestAttributes.APPLICATION)
     public Application application;
 
     public static final String URL_BINDING = "/actions/user/login";
+
+    public String openIdUrl;
+    public String openIdDestinationUrl;
+    public Map openIdParameterMap;
+
+    @Override
+    protected String getLoginPage() {
+        return "/layouts/user/login.jsp";
+    }
 
     public Resolution showOpenIDForm()
             throws ConsumerException, MessageException, DiscoveryException, MalformedURLException {
@@ -192,4 +205,29 @@ public class DefaultLoginAction extends LoginAction {
         return application.getConfiguration().getBoolean(AppProperties.OPENID_ENABLED, false);
     }
 
+    public String getOpenIdUrl() {
+        return openIdUrl;
+    }
+
+    public void setOpenIdUrl(String openIdUrl) {
+        this.openIdUrl = openIdUrl;
+    }
+
+    public String getOpenIdDestinationUrl() {
+        return openIdDestinationUrl;
+    }
+
+    public Map getOpenIdParameterMap() {
+        return openIdParameterMap;
+    }
+
+    //For openID selector
+    public void setOpenid_identifier(String openIdUrl) {
+        this.openIdUrl = openIdUrl;
+    }
+
+    @Override
+    public String getApplicationName() {
+        return application.getName();
+    }
 }

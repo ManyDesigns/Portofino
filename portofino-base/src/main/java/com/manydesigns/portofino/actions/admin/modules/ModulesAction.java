@@ -29,9 +29,9 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleRegistry;
-import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,6 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@RequiresAdministrator
 @UrlBinding(ModulesAction.URL_BINDING)
 public class ModulesAction extends AbstractActionBean {
     public static final String copyright =
@@ -69,6 +68,7 @@ public class ModulesAction extends AbstractActionBean {
     //--------------------------------------------------------------------------
 
     @DefaultHandler
+    @RequiresPermissions("com.manydesigns.portofino.modules:list")
     public Resolution execute() {
         setupForm();
         return new ForwardResolution("/portofino-base/actions/admin/modules/list.jsp");
@@ -91,7 +91,7 @@ public class ModulesAction extends AbstractActionBean {
         form.readFromObject(modules);
     }
 
-    @Button(list = "settings", key = "commons.returnToPages", order = 2)
+    @Button(list = "modules", key = "commons.returnToPages", order = 2)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

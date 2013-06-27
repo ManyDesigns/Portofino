@@ -121,6 +121,9 @@ public abstract class AbstractApplicationRealmDelegate implements ApplicationRea
         }
 
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(groups);
+        if(groups.contains(getAdministratorsGroup(realm))) {
+            info.addStringPermission("*");
+        }
         Permission permission = new GroupPermission(groups);
         info.setObjectPermissions(Collections.singleton(permission));
         return info;

@@ -16,6 +16,9 @@
 <%@ tag import="java.util.MissingResourceException" %>
 <%@ tag import="java.util.UUID" %>
 <%@ tag import="org.slf4j.LoggerFactory" %>
+<%@ tag import="org.jetbrains.annotations.NotNull" %>
+<%@ tag import="com.manydesigns.portofino.security.RequiresPermissions" %>
+<%@ tag import="com.manydesigns.portofino.pages.Permissions" %>
 
 <%@ attribute name="list" required="true" %>
 <%@ attribute name="cssClass" required="false" %>
@@ -39,7 +42,7 @@
             Method handler = button.getMethod();
             boolean isAdmin = SecurityLogic.isAdministrator(request);
             if(!isAdmin &&
-               ((currentPageInstance != null && !ButtonsLogic.hasPermissions(button, currentPageInstance, subject)) ||
+               ((currentPageInstance != null && !hasPermissions(button, currentPageInstance, subject)) ||
                 !SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler))) {
                 continue;
             }
@@ -108,6 +111,19 @@
     }
 %>
 <%!
+    protected static boolean hasPermissions
+            (@NotNull ButtonInfo button, @NotNull PageInstance pageInstance, @NotNull Subject subject) {
+        RequiresPermissions requiresPermissions =
+                    SecurityLogic.getRequiresPermissionsAnnotation(button.getMethod(), button.getFallbackClass());
+        if(requiresPermissions != null) {
+            Permissions permissions = SecurityLogic.calculateActualPermissions(pageInstance);
+            return SecurityLogic.hasPermissions
+                    (pageInstance.getApplication(), permissions, subject, requiresPermissions);
+        } else {
+            return true;
+        }
+    }
+
     protected String getValue(ButtonInfo button, LocalizationContext localizationContext) {
         String key = button.getButton().key();
         if(!StringUtils.isEmpty(key)) {

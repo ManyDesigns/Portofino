@@ -20,9 +20,8 @@
 
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.portofino.buttons.ButtonsLogic;
-import net.sourceforge.stripes.action.ActionBean;
-import net.sourceforge.stripes.action.ErrorResolution;
+import com.manydesigns.portofino.di.Injections;
+import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
@@ -31,37 +30,34 @@ import net.sourceforge.stripes.controller.LifecycleStage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
- *
- * Runs guards on the selected action bean handler.
  */
-@Intercepts(LifecycleStage.EventHandling)
-public class GuardsInterceptor implements Interceptor {
+@Intercepts(LifecycleStage.BindingAndValidation)
+public class InjectionInterceptor implements Interceptor {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     public final static Logger logger =
-            LoggerFactory.getLogger(GuardsInterceptor.class);
-
-    private static final int CONFLICT = 409;
+            LoggerFactory.getLogger(InjectionInterceptor.class);
 
     public Resolution intercept(ExecutionContext context) throws Exception {
         logger.debug("Retrieving Stripes objects");
-        ActionBean actionBean = context.getActionBean();
-        Method handler = context.getHandler();
+        Object action = context.getActionBean();
+        ActionBeanContext actionContext = context.getActionBeanContext();
 
-        logger.debug("Checking guards on {}", handler);
-        if(ButtonsLogic.doGuardsPass(actionBean, handler)) {
-            return context.proceed();
-        } else {
-            logger.warn("Operation not authorized.");
-            return new ErrorResolution(CONFLICT);
-        }
+        logger.debug("Retrieving Servlet API objects");
+        HttpServletRequest request = actionContext.getRequest();
+        ServletContext servletContext = actionContext.getServletContext();
+
+        Injections.inject(action, servletContext, request);
+
+        return context.proceed();
     }
 }

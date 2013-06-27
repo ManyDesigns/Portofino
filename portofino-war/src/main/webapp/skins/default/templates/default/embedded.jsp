@@ -4,8 +4,8 @@
         <%-- Hidden submit so that ENTER on a form executes the default action --%>
         <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
         <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
-        <div class="portletHeader">
-            <stripes:layout-component name="portletHeader">
+        <stripes:layout-component name="portletHeader">
+            <div class="portletHeader">
                 <h4>
                     <span class="pull-right btn-group">
                         <stripes:layout-component name="portletHeaderButtons">
@@ -14,11 +14,10 @@
                     </span>
                     <stripes:layout-component name="portletTitle" />
                 </h4>
-            </stripes:layout-component>
-        </div>
+            </div>
+        </stripes:layout-component>
         <div class="portletBody">
-            <stripes:layout-component name="portletBody">
-            </stripes:layout-component>
+            <stripes:layout-component name="portletBody" />
         </div>
     </stripes:form>
 </div>

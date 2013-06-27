@@ -20,14 +20,13 @@
 
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.DispatcherUtil;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.pages.Permissions;
-import com.manydesigns.portofino.shiro.SecurityUtilsBean;
+import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.stripes.ForbiddenAccessResolution;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -36,12 +35,10 @@ import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
-import ognl.OgnlContext;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -52,7 +49,7 @@ import java.lang.reflect.Method;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@Intercepts(LifecycleStage.CustomValidation)
+@Intercepts(LifecycleStage.BindingAndValidation)
 public class
         SecurityInterceptor implements Interceptor {
     public static final String copyright =
@@ -70,30 +67,7 @@ public class
         logger.debug("Retrieving Servlet API objects");
         HttpServletRequest request = actionContext.getRequest();
 
-        logger.debug("Retrieving Portofino application");
-        Application application =
-                (Application) request.getAttribute(
-                        RequestAttributes.APPLICATION);
-
-        logger.debug("Retrieving user");
-        String userId = null;
         Subject subject = SecurityUtils.getSubject();
-        if (subject.isAuthenticated()) {
-            userId = subject.getPrincipal().toString();
-            logger.debug("Retrieved userId={}", userId);
-        } else {
-            logger.debug("No user found");
-        }
-
-        logger.debug("Publishing securityUtils in OGNL context");
-        OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
-        ognlContext.put("securityUtils", new SecurityUtilsBean());
-
-        logger.debug("Setting up logging MDC");
-        MDC.clear();
-        if(userId != null) { //Issue #755
-            MDC.put("userId", userId);
-        }
 
         if (!SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler)) {
             return new ForbiddenAccessResolution();
@@ -110,12 +84,21 @@ public class
                 resource = dispatch.getLastPageInstance().getPath();
                 allowed = SecurityLogic.hasPermissions(dispatch, subject, handler);
             } else {
+                logger.debug("Retrieving Portofino application");
+                Application application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
                 resource = request.getRequestURI();
                 permissions = new Permissions();
                 allowed = SecurityLogic.hasPermissions
                         (application, permissions, subject, handler, actionBean.getClass());
             }
             if(!allowed) {
+                String userId = null;
+                if (subject.isAuthenticated()) {
+                    userId = ShiroUtils.getPrimaryPrincipal(subject).toString();
+                    logger.debug("Retrieved userId={}", userId);
+                } else {
+                    logger.debug("No user found");
+                }
                 logger.info("User {} is not allowed for {}", userId, resource);
                 return new ForbiddenAccessResolution();
             }

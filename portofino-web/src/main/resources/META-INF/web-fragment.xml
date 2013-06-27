@@ -100,53 +100,6 @@
     </filter-mapping>
 
     <filter>
-        <description>Stripes Filter</description>
-        <display-name>Stripes Filter</display-name>
-        <filter-name>StripesFilter</filter-name>
-        <filter-class>
-            net.sourceforge.stripes.controller.StripesFilter
-        </filter-class>
-        <init-param>
-            <param-name>ActionResolver.Class</param-name>
-            <param-value>com.manydesigns.portofino.stripes.ModelActionResolver</param-value>
-        </init-param>
-        <init-param>
-            <param-name>ActionResolver.Packages</param-name>
-            <param-value>com.manydesigns.portofino.actions,com.manydesigns.portofino.pageactions.safemode</param-value>
-        </init-param>
-        <init-param>
-            <param-name>Extension.Packages</param-name>
-            <param-value>com.manydesigns.portofino.stripes</param-value>
-        </init-param>
-        <init-param>
-            <param-name>Interceptor.Classes</param-name>
-            <param-value>
-                com.manydesigns.portofino.interceptors.NoCacheInterceptor,
-                com.manydesigns.portofino.interceptors.SecurityInterceptor,
-                com.manydesigns.portofino.interceptors.ApplicationInterceptor,
-                com.manydesigns.portofino.interceptors.InjectionInterceptor,
-                com.manydesigns.portofino.interceptors.GuardsInterceptor
-            </param-value>
-        </init-param>
-        <init-param>
-            <param-name>LocalePicker.Locales</param-name>
-            <param-value>en,it</param-value>
-        </init-param>
-        <init-param>
-            <param-name>MultipartWrapper.Class</param-name>
-            <param-value>com.manydesigns.portofino.stripes.StreamingCommonsMultipartWrapper</param-value>
-        </init-param>
-    </filter>
-
-    <filter-mapping>
-        <filter-name>StripesFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
-    </filter-mapping>
-
-    <filter>
         <filter-name>portofino-application-filter</filter-name>
         <filter-class>
             com.manydesigns.portofino.servlets.ApplicationFilter
@@ -184,20 +137,4 @@
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
 
-    <filter>
-        <description>Dynamically maps URLs to ActionBeans.</description>
-        <display-name>Stripes Dynamic Mapping Filter</display-name>
-        <filter-name>DynamicMappingFilter</filter-name>
-        <filter-class>
-            net.sourceforge.stripes.controller.DynamicMappingFilter
-        </filter-class>
-    </filter>
-
-    <filter-mapping>
-        <filter-name>DynamicMappingFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
-    </filter-mapping>
 </web-fragment>

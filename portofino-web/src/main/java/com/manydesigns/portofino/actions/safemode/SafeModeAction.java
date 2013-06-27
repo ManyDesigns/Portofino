@@ -18,20 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.interceptors;
+package com.manydesigns.portofino.actions.safemode;
 
-import com.manydesigns.portofino.di.Injections;
-import net.sourceforge.stripes.action.ActionBeanContext;
+import com.manydesigns.portofino.pageactions.custom.CustomAction;
+import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.controller.ExecutionContext;
-import net.sourceforge.stripes.controller.Interceptor;
-import net.sourceforge.stripes.controller.Intercepts;
-import net.sourceforge.stripes.controller.LifecycleStage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
+import net.sourceforge.stripes.action.UrlBinding;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -39,25 +31,15 @@ import javax.servlet.http.HttpServletRequest;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@Intercepts(LifecycleStage.CustomValidation)
-public class InjectionInterceptor implements Interceptor {
+@UrlBinding("/actions/safemode.action")
+public class SafeModeAction extends CustomAction {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    public final static Logger logger =
-            LoggerFactory.getLogger(InjectionInterceptor.class);
-
-    public Resolution intercept(ExecutionContext context) throws Exception {
-        logger.debug("Retrieving Stripes objects");
-        Object action = context.getActionBean();
-        ActionBeanContext actionContext = context.getActionBeanContext();
-
-        logger.debug("Retrieving Servlet API objects");
-        HttpServletRequest request = actionContext.getRequest();
-        ServletContext servletContext = actionContext.getServletContext();
-
-        Injections.inject(action, servletContext, request);
-
-        return context.proceed();
+    @DefaultHandler
+    public Resolution execute() {
+        String fwd = "/layouts/safemode/safemode.jsp";
+        return forwardTo(fwd);
     }
+
 }

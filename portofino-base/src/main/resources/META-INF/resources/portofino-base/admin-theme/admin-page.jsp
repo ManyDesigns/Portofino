@@ -1,6 +1,11 @@
 <%@ page import="com.manydesigns.portofino.ApplicationAttributes" %>
-<%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="com.manydesigns.portofino.menu.*" %>
+<%@ page import="com.manydesigns.portofino.shiro.ShiroUtils" %>
+<%@ page import="net.sourceforge.stripes.controller.ActionResolver" %>
+<%@ page import="net.sourceforge.stripes.util.UrlBuilder" %>
+<%@ page import="org.apache.commons.configuration.Configuration" %>
+<%@ page import="org.apache.shiro.SecurityUtils" %>
+<%@ page import="java.util.Locale" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
@@ -59,6 +64,45 @@
                 <h4 id="app-title" class="pull-left">
                     <stripes:link href="/actions/admin">Administration</stripes:link>
                 </h4>
+                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <div id="header-menu" class="nav-collapse collapse">
+                    <ul id="user-menu" class="nav">
+                        <%
+                            Configuration conf =
+                                    (Configuration) application.getAttribute(ApplicationAttributes.PORTOFINO_CONFIGURATION);
+                            String loginLink = ShiroUtils.getLoginLink(
+                                    conf, request.getContextPath(), "/actions/admin", "/actions/admin");
+                            String logoutLink = ShiroUtils.getLogoutLink(conf, request.getContextPath());
+                            Locale locale = request.getLocale();
+                            pageContext.setAttribute("loginLink", new UrlBuilder(locale, loginLink, true).toString());
+                            pageContext.setAttribute("logoutLink", new UrlBuilder(locale, logoutLink, true).toString());
+                        %>
+                        <c:if test="<%= SecurityUtils.getSubject().isAuthenticated() %>">
+                            <li>
+                                <a href="#">
+                                    <i class="icon-user icon-white"></i><c:out value="<%= ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) %>"/>
+                                </a>
+                            </li>
+                            <li>
+                                <stripes:link beanclass="com.manydesigns.portofino.actions.admin.AdminAction">
+                                    <fmt:message key="skins.default.header.administration"/>
+                                </stripes:link>
+                            </li>
+                            <li>
+                                <a href="<c:out value='${logoutLink}' />"><fmt:message key="skins.default.header.log_out"/></a>
+                            </li>
+                        </c:if>
+                        <c:if test="<%= !SecurityUtils.getSubject().isAuthenticated() %>">
+                            <li>
+                                <a href="<c:out value='${loginLink}' />"><fmt:message key="skins.default.header.log_in"/></a>
+                            </li>
+                        </c:if>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -75,20 +119,24 @@
                                 if(item instanceof MenuGroup) {
                                     %><li class="nav-header"><%= item.label %></li><%
                                     for(MenuLink link : ((MenuGroup) item).menuLinks) {
+                                        String adminLinkClass = getLinkClass(link, request);
                                         %>
-                                        <jsp:include page="admin-link.jsp">
-                                            <jsp:param name="text" value="<%= link.label %>" />
-                                            <jsp:param name="link" value="<%= link.link %>" />
-                                        </jsp:include>
+                                        <li class="<%= adminLinkClass %>">
+                                            <stripes:link href="<%= link.link %>">
+                                                <c:out value="<%= link.label %>"/>
+                                            </stripes:link>
+                                        </li>
                                         <%
                                     }
                                 } else {
                                     MenuLink link = (MenuLink) item;
+                                    String adminLinkClass = getLinkClass(link, request);
                                     %>
-                                    <jsp:include page="admin-link.jsp">
-                                        <jsp:param name="text" value="<%= link.label %>" />
-                                        <jsp:param name="link" value="<%= link.link %>" />
-                                    </jsp:include>
+                                    <li class="<%= adminLinkClass %>">
+                                        <stripes:link href="<%= link.link %>">
+                                            <c:out value="<%= link.label %>"/>
+                                        </stripes:link>
+                                    </li>
                                     <%
                                 }
                             }
@@ -118,3 +166,13 @@
     </body>
     </html>
 </stripes:layout-definition>
+<%!
+    protected String getLinkClass(MenuLink link, HttpServletRequest request) {
+        String adminLinkClass = "";
+        String actionPath = (String) request.getAttribute(ActionResolver.RESOLVED_ACTION);
+        if(!"/".equals(link.link) && actionPath.startsWith(link.link)) {
+            adminLinkClass = "active";
+        }
+        return adminLinkClass;
+    }
+%>

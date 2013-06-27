@@ -26,7 +26,10 @@ import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
-import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -42,7 +45,6 @@ import javax.servlet.http.HttpSession;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Action that handles the standard Portofino login form. It supports two login methods: username + password
@@ -57,9 +59,6 @@ public abstract class LoginAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    public static final String OPENID_DISCOVERED = "openID.discovered";
-    public static final String OPENID_CONSUMER_MANAGER = "openID.consumerManager";
-
     //**************************************************************************
     // Injections
     //**************************************************************************
@@ -73,9 +72,6 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public String userName;
     public String pwd;
-    public String openIdUrl;
-    public String openIdDestinationUrl;
-    public Map openIdParameterMap;
 
     //**************************************************************************
     // Presentation elements
@@ -97,7 +93,11 @@ public abstract class LoginAction extends AbstractActionBean {
             return redirectToReturnUrl();
         }
 
-        return new ForwardResolution("/layouts/user/login.jsp");
+        return new ForwardResolution(getLoginPage());
+    }
+
+    protected String getLoginPage() {
+        return "/portofino-base/layouts/user/login.jsp";
     }
 
     @Button(list = "login-buttons", key = "commons.login", order = 1, type = Button.TYPE_PRIMARY)
@@ -113,12 +113,12 @@ public abstract class LoginAction extends AbstractActionBean {
             String errMsg = ElementsThreadLocals.getText("user.not.active", userName);
             SessionMessages.addErrorMessage(errMsg);
             logger.warn(errMsg, e);
-            return new ForwardResolution("/layouts/user/login.jsp");
+            return new ForwardResolution(getLoginPage());
         } catch (AuthenticationException e) {
             String errMsg = ElementsThreadLocals.getText("user.login.failed", userName);
             SessionMessages.addErrorMessage(errMsg);
             logger.warn(errMsg, e);
-            return new ForwardResolution("/layouts/user/login.jsp");
+            return new ForwardResolution(getLoginPage());
         }
     }
 
@@ -210,6 +210,8 @@ public abstract class LoginAction extends AbstractActionBean {
     // Getters/setters
     //**************************************************************************
 
+    public abstract String getApplicationName();
+
     public String getReturnUrl() {
         return returnUrl;
     }
@@ -230,24 +232,4 @@ public abstract class LoginAction extends AbstractActionBean {
         return portofinoConfiguration;
     }
 
-    public String getOpenIdUrl() {
-        return openIdUrl;
-    }
-
-    public void setOpenIdUrl(String openIdUrl) {
-        this.openIdUrl = openIdUrl;
-    }
-
-    public String getOpenIdDestinationUrl() {
-        return openIdDestinationUrl;
-    }
-
-    public Map getOpenIdParameterMap() {
-        return openIdParameterMap;
-    }
-
-    //For openID selector
-    public void setOpenid_identifier(String openIdUrl) {
-        this.openIdUrl = openIdUrl;
-    }
 }

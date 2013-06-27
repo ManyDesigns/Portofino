@@ -21,13 +21,7 @@
 package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.application.AppProperties;
-import com.manydesigns.portofino.application.Application;
 import org.apache.commons.configuration.Configuration;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.mgt.RealmSecurityManager;
-import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 
@@ -85,7 +79,7 @@ public class ShiroUtils {
      * authorization information.
      * @param principals the principals associated with a user.
      */
-    public static void clearCache(PrincipalCollection principals) {
+    /*public static void clearCache(PrincipalCollection principals) {
         SecurityManager securityManager = SecurityUtils.getSecurityManager();
         if(securityManager instanceof RealmSecurityManager) {
             RealmSecurityManager rsm = (RealmSecurityManager) securityManager;
@@ -95,19 +89,18 @@ public class ShiroUtils {
                 }
             }
         }
-    }
+    }*/
 
     /**
      * Clears the Shiro cache for the current Subject.
      */
-    public static void clearCacheForCurrentSubject() {
+    /*public static void clearCacheForCurrentSubject() {
         clearCache(SecurityUtils.getSubject().getPrincipals());
-    }
+    }*/
 
-    public static String getLoginLink(Application application, String contextPath, String returnUrl, String cancelReturnUrl) {
-        Configuration conf = application.getConfiguration();
-        String loginLink = conf.getString(AppProperties.LOGIN_LINK);
-        String encoding = application.getConfiguration().getString(PortofinoProperties.URL_ENCODING);
+    public static String getLoginLink(Configuration conf, String contextPath, String returnUrl, String cancelReturnUrl) {
+        String loginLink = conf.getString(PortofinoProperties.LOGIN_LINK);
+        String encoding = conf.getString(PortofinoProperties.URL_ENCODING);
         try {
             String encodedReturnUrl = URLEncoder.encode(returnUrl, encoding);
             String encodedCancelReturnUrl = URLEncoder.encode(cancelReturnUrl, encoding);
@@ -117,9 +110,8 @@ public class ShiroUtils {
         }
     }
 
-    public static String getLogoutLink(Application application, String contextPath) {
-        Configuration conf = application.getConfiguration();
-        String logoutLink = conf.getString(AppProperties.LOGOUT_LINK);
+    public static String getLogoutLink(Configuration conf, String contextPath) {
+        String logoutLink = conf.getString(PortofinoProperties.LOGOUT_LINK);
         return MessageFormat.format(logoutLink, contextPath);
     }
 

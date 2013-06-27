@@ -21,19 +21,20 @@
 package com.manydesigns.portofino.stripes;
 
 import com.manydesigns.elements.servlet.ServletUtils;
-import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.util.UrlBuilder;
+import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Locale;
@@ -71,21 +72,22 @@ public class ForbiddenAccessResolution implements Resolution {
         String originalPath = ServletUtils.getOriginalPath(request);
         UrlBuilder urlBuilder =
                 new UrlBuilder(Locale.getDefault(), originalPath, false);
-        Map parameters = request.getParameterMap();
+        Map<?, ?> parameters = request.getParameterMap();
         urlBuilder.addParameters(parameters);
         String returnUrl = urlBuilder.toString();
         boolean ajax = "true".equals(request.getParameter("ajax"));
+        ServletContext servletContext = request.getServletContext();
+        Configuration configuration =
+                (Configuration) servletContext.getAttribute(ApplicationAttributes.PORTOFINO_CONFIGURATION);
         if (userId == null && !ajax) {
             logger.info("Anonymous user not allowed. Redirecting to login.");
-            Application application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
-            String loginLink = ShiroUtils.getLoginLink(application, request.getContextPath(), returnUrl, "/");
+            String loginLink = ShiroUtils.getLoginLink(configuration, request.getContextPath(), returnUrl, "/");
             new RedirectResolution(loginLink, false).execute(request, response);
         } else {
             if(ajax) {
                 logger.debug("AJAX call while user disconnected");
-                Application application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
                 //TODO where to redirect?
-                String loginLink = ShiroUtils.getLoginLink(application, request.getContextPath(), "/", "/");
+                String loginLink = ShiroUtils.getLoginLink(configuration, request.getContextPath(), "/", "/");
                 response.setStatus(UNAUTHORIZED);
                 new StreamingResolution("text/plain", loginLink).execute(request, response);
             } else {

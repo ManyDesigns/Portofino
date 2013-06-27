@@ -29,14 +29,8 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.buttons.annotations.Guards;
-import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.pages.Permissions;
-import com.manydesigns.portofino.security.RequiresPermissions;
 import ognl.OgnlContext;
 import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.subject.Subject;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Method;
@@ -159,19 +153,6 @@ public class ButtonsLogic {
             }
         }
         return null;
-    }
-
-    public static boolean hasPermissions
-            (@NotNull ButtonInfo button, @NotNull PageInstance pageInstance, @NotNull Subject subject) {
-        RequiresPermissions requiresPermissions =
-                    SecurityLogic.getRequiresPermissionsAnnotation(button.getMethod(), button.getFallbackClass());
-        if(requiresPermissions != null) {
-            Permissions permissions = SecurityLogic.calculateActualPermissions(pageInstance);
-            return SecurityLogic.hasPermissions
-                    (pageInstance.getApplication(), permissions, subject, requiresPermissions);
-        } else {
-            return true;
-        }
     }
 
     public static boolean doGuardsPass(Object actionBean, Method method) {

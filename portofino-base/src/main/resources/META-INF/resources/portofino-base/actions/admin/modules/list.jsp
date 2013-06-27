@@ -13,9 +13,12 @@
         <fmt:message key="layouts.admin.modules.title"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
+        <mde:write name="actionBean" property="form"/>
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.modules.ModulesAction"
-                      method="post" enctype="multipart/form-data" class="form-horizontal">
-            <mde:write name="actionBean" property="form"/>
+                      method="post" enctype="multipart/form-data">
+            <div class="form-actions">
+                <button name="returnToPages" type="submit" class="btn">Return to pages</button>
+            </div>
         </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

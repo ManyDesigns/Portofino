@@ -7,6 +7,7 @@
 %><%@ page import="net.sourceforge.stripes.util.UrlBuilder"
 %>
 <%@ page import="org.apache.shiro.SecurityUtils" %>
+<%@ page import="org.apache.commons.configuration.Configuration" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
@@ -105,10 +106,11 @@
                 </c:if>
                 <ul id="user-menu" class="nav">
                     <%
-                        String originalPath = ServletUtils.getOriginalPath(actionBean.getContext().getRequest());
+                        String originalPath = actionBean.getOriginalPath();
+                        Configuration conf = app.getConfiguration();
                         String loginLink = ShiroUtils.getLoginLink(
-                                app, request.getContextPath(), originalPath, originalPath);
-                        String logoutLink = ShiroUtils.getLogoutLink(app, request.getContextPath());
+                                conf, request.getContextPath(), originalPath, originalPath);
+                        String logoutLink = ShiroUtils.getLogoutLink(conf, request.getContextPath());
                         pageContext.setAttribute("loginLink", new UrlBuilder(request.getLocale(), loginLink, true).toString());
                         pageContext.setAttribute("logoutLink", new UrlBuilder(request.getLocale(), logoutLink, true).toString());
                     %>
@@ -120,7 +122,9 @@
                         </li>
                         <li>
                             <% if(SecurityLogic.isAdministrator(request)) { %>
-                                <stripes:link beanclass="com.manydesigns.portofino.actions.admin.SettingsAction"><fmt:message key="skins.default.header.administration"/></stripes:link>
+                                <stripes:link beanclass="com.manydesigns.portofino.actions.admin.AdminAction">
+                                    <fmt:message key="skins.default.header.administration"/>
+                                </stripes:link>
                             <% } %>
                         </li>
                         <li>

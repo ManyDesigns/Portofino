@@ -20,22 +20,17 @@
 
 package com.manydesigns.portofino.actions.admin;
 
-import com.manydesigns.elements.annotations.Status;
-import com.manydesigns.elements.forms.TableForm;
-import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.menu.*;
-import com.manydesigns.portofino.modules.Module;
-import com.manydesigns.portofino.modules.ModuleRegistry;
-import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
-import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.action.DefaultHandler;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.UrlBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,7 +39,6 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@RequiresAdministrator
 @UrlBinding(AdminAction.URL_BINDING)
 public class AdminAction extends AbstractActionBean {
     public static final String copyright =
@@ -79,6 +73,6 @@ public class AdminAction extends AbstractActionBean {
                 }
             }
         }
-        throw new Error("BUG! There should be at least one registered admin menu item");
+        throw new Error("BUG! There should be at least one registered admin menu item!");
     }
 }

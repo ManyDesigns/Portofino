@@ -26,7 +26,7 @@ import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.pageactions.safemode.SafeModeAction;
+import com.manydesigns.portofino.actions.safemode.SafeModeAction;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import net.sourceforge.stripes.action.Before;
