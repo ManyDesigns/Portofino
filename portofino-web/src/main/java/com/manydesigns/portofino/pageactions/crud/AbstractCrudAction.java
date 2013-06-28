@@ -48,7 +48,6 @@ import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.files.TempFile;
 import com.manydesigns.portofino.files.TempFileService;
-import com.manydesigns.portofino.navigation.ResultSetNavigation;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;

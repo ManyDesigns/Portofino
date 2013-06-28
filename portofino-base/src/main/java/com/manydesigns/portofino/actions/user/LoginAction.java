@@ -25,6 +25,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -36,7 +37,6 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.DisabledAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,6 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpSession;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 
 /**
  * Action that handles the standard Portofino login form. It supports two login methods: username + password
@@ -154,7 +153,7 @@ public abstract class LoginAction extends AbstractActionBean {
     }
 
     public Resolution logout() {
-        String userName = getPrimaryPrincipal(SecurityUtils.getSubject()) + "";
+        String userName = ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) + "";
         SecurityUtils.getSubject().logout();
         HttpSession session = getSession();
         if (session != null) {
@@ -166,39 +165,6 @@ public abstract class LoginAction extends AbstractActionBean {
         logger.info("User {} logout", userName);
 
         return new RedirectResolution("/");
-    }
-
-    //TODO copiato da ShiroUtils
-    /**
-     * Returns the primary principal for a Subject - that is, in Portofino, the username.
-     * @param s the subject
-     * @return the username.
-     */
-    public static Object getPrimaryPrincipal(Subject s) {
-        return getPrincipal(s, 0);
-    }
-
-    /**
-     * Returns the nth principal of the given Subject. Custom security.groovy implementations might assign
-     * more than one principal to a Subject.
-     * @param s the subject
-     * @param i the zero-based index of the principal
-     * @return the principal
-     * @throws IndexOutOfBoundsException if the index is greather than the number of principals associated with the
-     * subject.
-     */
-    public static Object getPrincipal(Subject s, int i) {
-        Object principal = s.getPrincipal();
-        if(principal instanceof PrincipalCollection) {
-            List principals = ((PrincipalCollection) principal).asList();
-            return principals.get(i);
-        } else {
-            if(i == 0) {
-                return principal;
-            } else {
-                throw new IndexOutOfBoundsException("The subject has only 1 principal, index " + i + " is not valid");
-            }
-        }
     }
 
     // do not expose this method publicly
