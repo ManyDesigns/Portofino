@@ -89,7 +89,7 @@
         <junit.version>3.8.1</junit.version>
         <shiro.version>1.2.2</shiro.version>
         <tuckey.version>4.0.4</tuckey.version>
-        <!--<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <modules>
         <module>elements</module>
@@ -104,20 +104,6 @@
         <module>mail</module>
     </modules>
 
-    <!--
-    <profiles>
-        <profile>
-            <id>jdk16</id>
-            <activation>
-                <jdk>1.6</jdk>
-            </activation>
-            <modules>
-                <module>portofino-war-gae</module>
-            </modules>
-        </profile>
-    </profiles>
-    -->
-    
     <build>
         <plugins>
             <plugin>
@@ -184,8 +170,8 @@
                 </executions>
             </plugin>
             <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.8.1</version>
                 <configuration>
                     <links>
@@ -195,15 +181,15 @@
                         <link>http://docs.jboss.org/hibernate/orm/3.5/api/</link>
                     </links>
                 </configuration>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                <groupId>org.codehaus.mojo</groupId>
                <artifactId>cobertura-maven-plugin</artifactId>
@@ -212,24 +198,4 @@
       </plugins>
     </build>
 
-<!--
-    <repositories>
-        <repository>
-            <id>java.net</id>
-            <name>Java.net Repository for Maven</name>
-            <url>http://download.java.net/maven/2/</url>
-            <layout>default</layout>
-        </repository>
-        <repository>
-            <id>jboss</id>
-            <url>http://repository.jboss.com/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
--->
 </project>
