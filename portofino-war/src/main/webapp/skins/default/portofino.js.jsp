@@ -20,33 +20,6 @@ function copyFormAsHiddenFields(source, form) {
     });
 }
 
-function confirmDeletePage(pagePath, contextPath) {
-    var dialogDiv = $("<div></div>").appendTo($("body"));
-    dialogDiv.load(contextPath + "/actions/admin/page?confirmDelete&originalPath=" + pagePath, function() {
-        var dialog = dialogDiv.find("#dialog-confirm-delete-page");
-        dialog.modal({ backdrop: 'static'});
-    });
-    return false;
-}
-
-function showMovePageDialog(pagePath, contextPath) {
-    var dialogDiv = $("<div></div>").appendTo($("body"));
-    dialogDiv.load(contextPath + "/actions/admin/page?chooseNewLocation&originalPath=" + pagePath, function() {
-        var dialog = dialogDiv.find("#dialog-move-page");
-        dialog.modal({ backdrop: 'static'});
-    });
-    return false;
-}
-
-function showCopyPageDialog(pagePath, contextPath) {
-    var dialogDiv = $("<div></div>").appendTo($("body"));
-    dialogDiv.load(contextPath + "/actions/admin/page?copyPageDialog&originalPath=" + pagePath, function() {
-        var dialog = dialogDiv.find("#dialog-copy-page");
-        dialog.modal({ backdrop: 'static'});
-    });
-    return false;
-}
-
 var portofino = {
     _setupRichTextEditors: setupRichTextEditors,
 
@@ -123,6 +96,30 @@ var portofino = {
             return true;
         });
         button.off("click");
+    },
+
+    confirmDeletePage: function(pagePath, contextPath) {
+        var dialogDiv = $("<div></div>").appendTo($("body"));
+        dialogDiv.load(contextPath + "/actions/admin/page?confirmDelete&originalPath=" + pagePath, function() {
+            var dialog = dialogDiv.find("#dialog-confirm-delete-page");
+            dialog.modal({ backdrop: 'static'});
+        });
+    },
+
+    showMovePageDialog: function(pagePath, contextPath) {
+        var dialogDiv = $("<div></div>").appendTo($("body"));
+        dialogDiv.load(contextPath + "/actions/admin/page?chooseNewLocation&originalPath=" + pagePath, function() {
+            var dialog = dialogDiv.find("#dialog-move-page");
+            dialog.modal({ backdrop: 'static'});
+        });
+    },
+
+    showCopyPageDialog: function(pagePath, contextPath) {
+        var dialogDiv = $("<div></div>").appendTo($("body"));
+        dialogDiv.load(contextPath + "/actions/admin/page?copyPageDialog&originalPath=" + pagePath, function() {
+            var dialog = dialogDiv.find("#dialog-copy-page");
+            dialog.modal({ backdrop: 'static'});
+        });
     }
 };
 
@@ -177,6 +174,7 @@ $(function() {
                     },
                     error: function(xhr, status, errorThrown) {
                         if(xhr.status == 403) {
+                            //Redirect to login page (link included in the response)
                             var loginUrl = xhr.responseText;
                             loginUrl = removeQueryStringArgument(loginUrl, "returnUrl");
                             loginUrl = removeQueryStringArgument(loginUrl, "cancelReturnUrl");

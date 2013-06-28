@@ -135,10 +135,16 @@ public class PortofinoListener
             throw new InternalError(msg);
         }
 
+        logger.debug("Registering application class loader");
         servletContext.setAttribute(ApplicationAttributes.CLASS_LOADER, getClass().getClassLoader());
+
+        logger.debug("Installing standard menu builders");
         MenuBuilder adminMenuBuilder = new MenuBuilder();
         servletContext.setAttribute(ApplicationAttributes.ADMIN_MENU, adminMenuBuilder);
-        //servletContext.setAttribute(ApplicationAttributes.LOGIN_DELEGATE_CLASS_NAME, TODO);
+        MenuBuilder userMenuBuilder = new MenuBuilder();
+        servletContext.setAttribute(ApplicationAttributes.USER_MENU, userMenuBuilder);
+        MenuBuilder appMenuBuilder = new MenuBuilder();
+        servletContext.setAttribute(ApplicationAttributes.APP_MENU, appMenuBuilder);
 
         logger.info("Loading modules...");
         moduleRegistry = new ModuleRegistry(appConfiguration);

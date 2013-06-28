@@ -20,31 +20,37 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
-import com.manydesigns.portofino.actions.admin.ReloadModelAction;
-import com.manydesigns.portofino.actions.admin.SettingsAction;
-import com.manydesigns.portofino.actions.admin.TablesAction;
+import com.manydesigns.portofino.actions.admin.*;
 import com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard;
+import com.manydesigns.portofino.actions.admin.page.PageAdminAction;
 import com.manydesigns.portofino.actions.admin.page.RootChildrenAction;
 import com.manydesigns.portofino.actions.admin.page.RootPermissionsAction;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.files.TempFileService;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
-import com.manydesigns.portofino.menu.MenuBuilder;
-import com.manydesigns.portofino.menu.SimpleMenuAppender;
+import com.manydesigns.portofino.logic.SecurityLogic;
+import com.manydesigns.portofino.menu.*;
+import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.servlets.MailScheduler;
 import com.manydesigns.portofino.shiro.ApplicationRealm;
+import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.starter.ApplicationStarter;
+import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sf.ehcache.CacheManager;
+import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlRuntime;
 import org.apache.commons.configuration.Configuration;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.WebEnvironment;
@@ -52,6 +58,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -75,6 +83,12 @@ public class PortofinoWebModule implements Module {
 
     @Inject(ApplicationAttributes.ADMIN_MENU)
     public MenuBuilder adminMenu;
+
+    @Inject(ApplicationAttributes.USER_MENU)
+    public MenuBuilder userMenu;
+
+    @Inject(ApplicationAttributes.APP_MENU)
+    public MenuBuilder appMenu;
 
     protected ApplicationStarter applicationStarter;
 
@@ -123,9 +137,6 @@ public class PortofinoWebModule implements Module {
 
     @Override
     public void init() {
-                Configuration configuration =
-                (Configuration) servletContext.getAttribute(ApplicationAttributes.PORTOFINO_CONFIGURATION);
-
         logger.debug("Initializing dispatcher");
         DispatcherLogic.init(configuration);
 
@@ -167,7 +178,154 @@ public class PortofinoWebModule implements Module {
         LifecycleUtils.init(realm);
         rsm.setRealm(realm);
 
-        //Admin menu
+        appendToAdminMenu();
+        appendToUserMenu();
+        appendToAppMenu();
+
+        status = ModuleStatus.ACTIVE;
+    }
+
+    protected void appendToAppMenu() {
+        appMenu.menuAppenders.add(new MenuAppender() {
+            @Override
+            public void append(Menu menu) {
+                HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
+                if(!(request.getAttribute("actionBean") instanceof PageAction)) {
+                    return;
+                }
+                PageAction pageAction = (PageAction) request.getAttribute("actionBean");
+                if(pageAction.getDispatch() != null &&
+                   SecurityLogic.hasPermissions(
+                           pageAction.getPageInstance(), SecurityUtils.getSubject(), AccessLevel.EDIT)) {
+                    MenuGroup pageGroup = new MenuGroup("page", "icon-file icon-white", "Page");
+                    menu.items.add(pageGroup);
+                }
+            }
+        });
+
+        appMenu.menuAppenders.add(new PageMenuAppender() {
+            @Override
+            public void append(MenuGroup pageMenu, PageAction pageAction) {
+                HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
+
+                MenuLink link = new MenuLink(
+                        "editLayout",
+                        "icon-file icon-white",
+                        "Edit layout",
+                        "javascript:portofino.enablePortletDragAndDrop($(this), '" +
+                                pageAction.getDispatch().getOriginalPath() +
+                                "');");
+                pageMenu.menuLinks.add(link);
+
+                UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, false);
+                urlBuilder.setEvent("pageChildren");
+                urlBuilder.addParameter("originalPath", pageAction.getDispatch().getOriginalPath());
+                link = new MenuLink(
+                        "pageChildren",
+                        "icon-folder-open icon-white",
+                        "Page children",
+                        request.getContextPath() + urlBuilder.toString());
+                pageMenu.menuLinks.add(link);
+
+                urlBuilder.setEvent("newPage");
+                link = new MenuLink(
+                        "newPage",
+                        "icon-plus icon-white",
+                        "Add new page",
+                        request.getContextPath() + urlBuilder.toString());
+                pageMenu.menuLinks.add(link);
+
+                String jsArgs = "('" +
+                        pageAction.getDispatch().getOriginalPath() + "', '" +
+                        request.getContextPath() + "');";
+
+                link = new MenuLink(
+                        "deletePage",
+                        "icon-minus icon-white",
+                        "Delete page",
+                        "javascript:portofino.confirmDeletePage" + jsArgs);
+                pageMenu.menuLinks.add(link);
+
+                link = new MenuLink(
+                        "copyPage",
+                        "icon-file icon-white",
+                        "Copy page",
+                        "javascript:portofino.showCopyPageDialog" + jsArgs);
+                pageMenu.menuLinks.add(link);
+
+                link = new MenuLink(
+                        "movePage",
+                        "icon-share icon-white",
+                        "Move page",
+                        "javascript:portofino.showMovePageDialog" + jsArgs);
+                pageMenu.menuLinks.add(link);
+
+                if(!SecurityLogic.hasPermissions(
+                        pageAction.getPageInstance(), SecurityUtils.getSubject(), AccessLevel.DEVELOP)) {
+                    return;
+                }
+                urlBuilder.setEvent("pagePermissions");
+                link = new MenuLink(
+                        "pagePermissions",
+                        "icon-user icon-white",
+                        "Page permissions",
+                        request.getContextPath() + urlBuilder.toString());
+                pageMenu.menuLinks.add(link);
+            }
+        });
+
+    }
+
+    protected void appendToUserMenu() {
+        userMenu.menuAppenders.add(new MenuAppender() {
+            @Override
+            public void append(Menu menu) {
+                Subject subject = SecurityUtils.getSubject();
+                if(!subject.isAuthenticated()) {
+                    HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
+                    String originalPath = "/";
+                    if(request.getAttribute("actionBean") instanceof AbstractActionBean) {
+                        AbstractActionBean actionBean = (AbstractActionBean) request.getAttribute("actionBean");
+                        originalPath = actionBean.getOriginalPath();
+                    }
+                    String loginLinkHref = ShiroUtils.getLoginLink(
+                            configuration, request.getContextPath(), originalPath, originalPath);
+                    MenuLink loginLink =
+                            new MenuLink("login", null,
+                                         ElementsThreadLocals.getText("skins.default.header.log_in"),
+                                         loginLinkHref);
+                    menu.items.add(loginLink);
+                }
+
+            }
+        });
+
+        userMenu.menuAppenders.add(new MenuAppender() {
+            @Override
+            public void append(Menu menu) {
+                HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
+                if(SecurityLogic.isAdministrator(request)) {
+                    int index = 0;
+                    for(MenuItem item : menu.items) {
+                        if("logout".equals(item.id)) {
+                            break;
+                        }
+                        index++;
+                    }
+
+                    UrlBuilder urlBuilder = new UrlBuilder(request.getLocale(), AdminAction.class, false);
+                    MenuLink adminLink =
+                            new MenuLink("admin", null,
+                                         ElementsThreadLocals.getText("skins.default.header.administration"),
+                                         request.getContextPath() + urlBuilder.toString());
+                    menu.items.add(index, adminLink);
+                }
+
+            }
+        });
+    }
+
+    protected void appendToAdminMenu() {
         SimpleMenuAppender group;
         SimpleMenuAppender link;
 
@@ -202,11 +360,32 @@ public class PortofinoWebModule implements Module {
         link = SimpleMenuAppender.link(
                 "dataModeling", "reloadModel", null, "Reload model", ReloadModelAction.URL_BINDING);
         adminMenu.menuAppenders.add(link);
-
-        status = ModuleStatus.ACTIVE;
     }
 
-        protected void setupMailQueue() {
+    public static abstract class PageMenuAppender implements MenuAppender {
+        @Override
+        public void append(Menu menu) {
+            for(MenuItem item : menu.items) {
+                if("page".equals(item.id) && item instanceof MenuGroup) {
+                    HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
+                    if(!(request.getAttribute("actionBean") instanceof PageAction)) {
+                        return;
+                    }
+                    PageAction pageAction = (PageAction) request.getAttribute("actionBean");
+                    if(pageAction.getDispatch() != null &&
+                       SecurityLogic.hasPermissions(
+                               pageAction.getPageInstance(), SecurityUtils.getSubject(), AccessLevel.EDIT)) {
+                        append((MenuGroup) item, pageAction);
+                    }
+                    break;
+                }
+            }
+        }
+
+        protected abstract void append(MenuGroup pageMenu, PageAction pageAction);
+    }
+
+    protected void setupMailQueue() {
         MailQueueSetup mailQueueSetup = new MailQueueSetup();
         mailQueueSetup.setup();
 

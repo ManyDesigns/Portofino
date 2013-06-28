@@ -1,11 +1,7 @@
 <%@ page import="com.manydesigns.portofino.ApplicationAttributes" %>
 <%@ page import="com.manydesigns.portofino.menu.*" %>
-<%@ page import="com.manydesigns.portofino.shiro.ShiroUtils" %>
 <%@ page import="net.sourceforge.stripes.controller.ActionResolver" %>
-<%@ page import="net.sourceforge.stripes.util.UrlBuilder" %>
-<%@ page import="org.apache.commons.configuration.Configuration" %>
-<%@ page import="org.apache.shiro.SecurityUtils" %>
-<%@ page import="java.util.Locale" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
@@ -71,36 +67,9 @@
                 </button>
                 <div id="header-menu" class="nav-collapse collapse">
                     <ul id="user-menu" class="nav">
-                        <%
-                            Configuration conf =
-                                    (Configuration) application.getAttribute(ApplicationAttributes.PORTOFINO_CONFIGURATION);
-                            String loginLink = ShiroUtils.getLoginLink(
-                                    conf, request.getContextPath(), "/actions/admin", "/actions/admin");
-                            String logoutLink = ShiroUtils.getLogoutLink(conf, request.getContextPath());
-                            Locale locale = request.getLocale();
-                            pageContext.setAttribute("loginLink", new UrlBuilder(locale, loginLink, true).toString());
-                            pageContext.setAttribute("logoutLink", new UrlBuilder(locale, logoutLink, true).toString());
-                        %>
-                        <c:if test="<%= SecurityUtils.getSubject().isAuthenticated() %>">
-                            <li>
-                                <a href="#">
-                                    <i class="icon-user icon-white"></i><c:out value="<%= ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) %>"/>
-                                </a>
-                            </li>
-                            <li>
-                                <stripes:link beanclass="com.manydesigns.portofino.actions.admin.AdminAction">
-                                    <fmt:message key="skins.default.header.administration"/>
-                                </stripes:link>
-                            </li>
-                            <li>
-                                <a href="<c:out value='${logoutLink}' />"><fmt:message key="skins.default.header.log_out"/></a>
-                            </li>
-                        </c:if>
-                        <c:if test="<%= !SecurityUtils.getSubject().isAuthenticated() %>">
-                            <li>
-                                <a href="<c:out value='${loginLink}' />"><fmt:message key="skins.default.header.log_in"/></a>
-                            </li>
-                        </c:if>
+                        <jsp:include page="../layouts/render-menu.jsp">
+                            <jsp:param name="menu" value="<%= ApplicationAttributes.USER_MENU %>" />
+                        </jsp:include>
                     </ul>
                 </div>
             </div>
@@ -112,6 +81,7 @@
                 <div id="navigation">
                     <ul class="nav nav-list portofino-sidenav">
                         <%
+                            //Admin menu
                             MenuBuilder adminMenuBuilder =
                                     (MenuBuilder) application.getAttribute(ApplicationAttributes.ADMIN_MENU);
                             Menu adminMenu = adminMenuBuilder.build();
@@ -122,7 +92,7 @@
                                         String adminLinkClass = getLinkClass(link, request);
                                         %>
                                         <li class="<%= adminLinkClass %>">
-                                            <stripes:link href="<%= link.link %>">
+                                            <stripes:link href='<%= StringUtils.defaultString(link.link, "#") %>'>
                                                 <c:out value="<%= link.label %>"/>
                                             </stripes:link>
                                         </li>
@@ -133,7 +103,7 @@
                                     String adminLinkClass = getLinkClass(link, request);
                                     %>
                                     <li class="<%= adminLinkClass %>">
-                                        <stripes:link href="<%= link.link %>">
+                                        <stripes:link href='<%= StringUtils.defaultString(link.link, "#") %>'>
                                             <c:out value="<%= link.label %>"/>
                                         </stripes:link>
                                     </li>

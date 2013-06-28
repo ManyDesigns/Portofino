@@ -45,4 +45,6 @@ public class ApplicationAttributes {
     public final static String EHCACHE_MANAGER = "portofino.ehcache.manager";
     public final static String MODULE_REGISTRY = "com.manydesigns.portofino.modules.ModuleRegistry";
     public final static String ADMIN_MENU = "com.manydesigns.portofino.menu.Menu.admin";
+    public final static String USER_MENU = "com.manydesigns.portofino.menu.Menu.user";
+    public final static String APP_MENU = "com.manydesigns.portofino.menu.Menu.app";
 }
