@@ -67,9 +67,8 @@
                 </button>
                 <div id="header-menu" class="nav-collapse collapse">
                     <ul id="user-menu" class="nav">
-                        <jsp:include page="../layouts/render-menu.jsp">
-                            <jsp:param name="menu" value="<%= ApplicationAttributes.USER_MENU %>" />
-                        </jsp:include>
+                        <% request.setAttribute("menu", ApplicationAttributes.USER_MENU); %>
+                        <jsp:include page="../layouts/render-menu.jsp" />
                     </ul>
                 </div>
             </div>

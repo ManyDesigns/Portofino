@@ -33,14 +33,12 @@
                     </form>
                 </c:if>
                 <ul id="app-menu" class="nav">
-                    <jsp:include page="/portofino-base/layouts/render-menu.jsp">
-                        <jsp:param name="menu" value="<%= ApplicationAttributes.APP_MENU %>" />
-                    </jsp:include>
+                    <% request.setAttribute("menu", ApplicationAttributes.APP_MENU); %>
+                    <jsp:include page="/portofino-base/layouts/render-menu.jsp" />
                 </ul>
                 <ul id="user-menu" class="nav">
-                    <jsp:include page="/portofino-base/layouts/render-menu.jsp">
-                        <jsp:param name="menu" value="<%= ApplicationAttributes.USER_MENU %>" />
-                    </jsp:include>
+                    <% request.setAttribute("menu", ApplicationAttributes.USER_MENU); %>
+                    <jsp:include page="/portofino-base/layouts/render-menu.jsp" />
                 </ul>
             </div>
         </div>

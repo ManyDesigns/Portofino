@@ -3,7 +3,7 @@
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%
-    MenuBuilder menuBuilder = (MenuBuilder) application.getAttribute(request.getParameter("menu"));
+    MenuBuilder menuBuilder = (MenuBuilder) application.getAttribute(request.getAttribute("menu").toString());
     Menu menu = menuBuilder.build();
     for(MenuItem item : menu.items) {
         if(item instanceof MenuGroup) { %>
