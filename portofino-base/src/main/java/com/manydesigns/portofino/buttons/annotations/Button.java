@@ -27,9 +27,6 @@ import java.lang.annotation.Target;
 
 /**
  * Declares that the method on which this annotation is attached is to be exposed as a button on a web page.
- * This annotation is only supposed to work on handler methods in a
- * {@link com.manydesigns.portofino.actions.admin.page.PageAdminAction}.
- *
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com

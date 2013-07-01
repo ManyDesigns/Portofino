@@ -59,7 +59,7 @@ Content
 }
 
 /*******************************************************************************
-Error/warning/info messages - TODO SweetiePlus includere in portofino-base? in Elements?
+Error/warning/info messages
 *******************************************************************************/
 
 .userMessages {
@@ -81,15 +81,15 @@ ul.errorMessages li, ul.warningMessages li, ul.infoMessages li {
 }
 
 ul.errorMessages {
-    background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-cross-24.png");
+    background-image: url("../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-cross-24.png");
 }
 
 ul.warningMessages {
-    background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/warning-24.png");
+    background-image: url("../SweetiePlus-v2-SublinkInteractive/with-shadows/warning-24.png");
 }
 
 ul.infoMessages {
-    background-image: url("../../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-check-24.png");
+    background-image: url("../SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-check-24.png");
 }
 
 /*******************************************************************************
@@ -111,6 +111,10 @@ Forms
 
 .form-horizontal .control-group.readonly {
     margin-bottom: 10px;
+}
+
+input.mde-text-field-with-explicit-size, textarea.mde-text-field-with-explicit-size {
+    width: auto;
 }
 
 /*******************************************************************************

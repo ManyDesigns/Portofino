@@ -22,6 +22,7 @@
 package com.manydesigns.elements.xml;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -261,11 +262,11 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
         if(placeholder != null) {
             addAttribute("placeholder", placeholder);
         }
-        addAttribute("class", htmlClass);
         if (size != null) {
             addAttribute("size", Integer.toString(size));
-            addAttribute("style", "width: auto;");
+            htmlClass = StringUtils.defaultString(htmlClass) + " mde-text-field-with-explicit-size";
         }
+        addAttribute("class", htmlClass);
         if (maxLength != null) {
             addAttribute("maxlength", Integer.toString(maxLength));
         }

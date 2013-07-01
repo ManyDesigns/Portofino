@@ -30,6 +30,7 @@ import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.regex.Matcher;
@@ -55,7 +56,7 @@ public class TextField extends AbstractTextField {
     protected boolean highlightLinks = false;
     protected boolean multiline = false;
     protected boolean richText = false;
-    protected int textAreaWidth = 70;
+    protected Integer textAreaWidth;
     protected int textAreaMinRows = 4;
     protected String[] red;
     protected String[] amber;
@@ -145,11 +146,18 @@ public class TextField extends AbstractTextField {
             xb.openElement("textarea");
             xb.addAttribute("id", id);
             xb.addAttribute("name", inputName);
-            xb.addAttribute("cols", Integer.toString(textAreaWidth));
+            String htmlClass = "";
+            if(textAreaWidth != null) {
+                xb.addAttribute("cols", Integer.toString(textAreaWidth));
+                htmlClass = "mde-text-field-with-explicit-size ";
+            }
             xb.addAttribute("rows", Integer.toString(
                     numRowTextArea(stringValue, textAreaWidth)));
             if(richText) {
-                xb.addAttribute("class", "mde-form-rich-text");
+                htmlClass += "mde-form-rich-text";
+            }
+            if(!StringUtils.isEmpty(htmlClass)) {
+                xb.addAttribute("class", htmlClass);
             }
             xb.write(stringValue);
             xb.closeElement("textarea");
