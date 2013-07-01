@@ -28,7 +28,7 @@
                 margin: 0 auto 20px;
                 background-color: #ffffff;
                 border: 1px solid #e5e5e5;
-                max-width: 400px;
+                max-width: 360px;
                 -webkit-border-radius: 5px;
                    -moz-border-radius: 5px;
                         border-radius: 5px;
