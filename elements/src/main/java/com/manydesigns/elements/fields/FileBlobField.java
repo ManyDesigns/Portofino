@@ -159,21 +159,21 @@ public class FileBlobField extends AbstractField
             xb.closeElement("div");
 
             String radioId = id + UPLOAD_KEEP;
-            String script = "var inptxt = document.getElementById('"
+            String script = "var inptxt = this.ownerDocument.getElementById('"
                     + StringEscapeUtils.escapeJavaScript(innerId) + "');"
                     + "inptxt.disabled=true;inptxt.value='';";
             printRadio(xb, radioId, "elements.field.upload.keep",
                     UPLOAD_KEEP, true, script);
 
             radioId = id + UPLOAD_MODIFY;
-            script = "var inptxt = document.getElementById('"
+            script = "var inptxt = this.ownerDocument.getElementById('"
                     + StringEscapeUtils.escapeJavaScript(innerId) + "');"
                     + "inptxt.disabled=false;inptxt.value='';";
             printRadio(xb, radioId, "elements.field.upload.update",
                     UPLOAD_MODIFY, false, script);
 
             radioId = id + UPLOAD_DELETE;
-            script = "var inptxt = document.getElementById('"
+            script = "var inptxt = this.ownerDocument.getElementById('"
                     + StringEscapeUtils.escapeJavaScript(innerId) + "');"
                     + "inptxt.disabled=true;inptxt.value='';";
             printRadio(xb, radioId, "elements.field.upload.delete",
@@ -187,13 +187,15 @@ public class FileBlobField extends AbstractField
     }
 
     protected void printRadio(XhtmlBuffer xb, String radioId, String labelKey,
-                              String value, boolean checked, String script
-    ) {
+                              String value, boolean checked, String script) {
+        xb.openElement("label");
+        xb.addAttribute("for", radioId);
+        xb.addAttribute("class", "radio");
         xb.writeInputRadio(radioId, operationInputName, value,
                 checked, false, script);
         xb.writeNbsp();
-        xb.writeLabel(getText(labelKey), radioId, null);
-        xb.writeBr();
+        xb.write(getText(labelKey));
+        xb.closeElement("label");
     }
 
     //**************************************************************************

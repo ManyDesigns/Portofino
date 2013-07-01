@@ -264,6 +264,7 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
         addAttribute("class", htmlClass);
         if (size != null) {
             addAttribute("size", Integer.toString(size));
+            addAttribute("style", "width: auto;");
         }
         if (maxLength != null) {
             addAttribute("maxlength", Integer.toString(maxLength));
