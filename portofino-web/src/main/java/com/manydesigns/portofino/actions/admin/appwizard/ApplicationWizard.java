@@ -367,10 +367,10 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         return atLeastOneSelected;
     }
 
-    protected void saveModelFailed(Exception e) {
-        logger.error("Could not save model", e);
+    protected void updateModelFailed(Exception e) {
+        logger.error("Could not update model", e);
         SessionMessages.addErrorMessage(
-                getMessage("appwizard.error.saveModelFailed", ExceptionUtils.getRootCauseMessage(e)));
+                getMessage("appwizard.error.updateModelFailed", ExceptionUtils.getRootCauseMessage(e)));
         if(isNewConnectionProvider()) {
             application.getModel().getDatabases().remove(connectionProvider.getDatabase());
         }
@@ -822,7 +822,12 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         model.getDatabases().add(database);
         connectionProvider.setDatabase(database);
         database.setConnectionProvider(connectionProvider);
-        application.initModel();
+        try {
+            application.initModel();
+        } catch (Exception e) {
+            updateModelFailed(e);
+            return buildAppForm();
+        }
         if(!generationStrategy.equals("NO")) {
             if(generationStrategy.equals("AUTO")) {
                 generateCalendar = true;
@@ -864,7 +869,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             application.initModel();
             application.saveXmlModel();
         } catch (Exception e) {
-            saveModelFailed(e);
+            updateModelFailed(e);
             return buildAppForm();
         }
         SessionMessages.addInfoMessage(getMessage("appwizard.finished"));
