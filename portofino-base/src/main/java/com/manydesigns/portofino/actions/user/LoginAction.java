@@ -21,6 +21,9 @@
 package com.manydesigns.portofino.actions.user;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.buttons.annotations.Button;
@@ -76,6 +79,7 @@ public abstract class LoginAction extends AbstractActionBean {
     // Presentation elements
     //**************************************************************************
 
+    protected Form signUpForm;
     public String returnUrl;
     public String cancelReturnUrl;
 
@@ -83,6 +87,10 @@ public abstract class LoginAction extends AbstractActionBean {
             LoggerFactory.getLogger(LoginAction.class);
 
     public LoginAction() {}
+
+    //**************************************************************************
+    // Login
+    //**************************************************************************
 
     @DefaultHandler
     public Resolution execute() {
@@ -95,15 +103,19 @@ public abstract class LoginAction extends AbstractActionBean {
         return new ForwardResolution(getLoginPage());
     }
 
-    protected String getLoginPage() {
-        return "/portofino-base/layouts/user/login.jsp";
-    }
-
     @Button(list = "login-buttons", key = "commons.login", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution login() {
         Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
+            logger.debug("Already logged in");
+            return redirectToReturnUrl();
+        }
+
         try {
-            subject.login(new UsernamePasswordToken(userName, pwd));
+            UsernamePasswordToken usernamePasswordToken =
+                    new UsernamePasswordToken(userName, pwd);
+            usernamePasswordToken.setRememberMe(true);
+            subject.login(usernamePasswordToken);
             logger.info("User {} login", userName);
             String successMsg = ElementsThreadLocals.getText("user.login.success", userName);
             SessionMessages.addInfoMessage(successMsg);
@@ -120,6 +132,124 @@ public abstract class LoginAction extends AbstractActionBean {
             return new ForwardResolution(getLoginPage());
         }
     }
+
+    protected String getLoginPage() {
+        return "/portofino-base/layouts/user/login.jsp";
+    }
+
+
+    //**************************************************************************
+    // Cancel
+    //**************************************************************************
+
+    @Button(list = "login-buttons", key = "commons.cancel", order = 2)
+    public Resolution cancel() {
+        String url = "/";
+        if(!StringUtils.isBlank(cancelReturnUrl)) {
+            url = cancelReturnUrl;
+        } else if(!StringUtils.isBlank(returnUrl)) {
+            url = returnUrl;
+        }
+        return redirectToReturnUrl(url);
+    }
+
+    //**************************************************************************
+    // Logout
+    //**************************************************************************
+
+    public Resolution logout() {
+        String userName = ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) + "";
+        SecurityUtils.getSubject().logout();
+        HttpSession session = getSession();
+        if (session != null) {
+            session.invalidate();
+        }
+
+        String msg = ElementsThreadLocals.getText("user.logout");
+        SessionMessages.addInfoMessage(msg);
+        logger.info("User {} logout", userName);
+
+        return new RedirectResolution("/");
+    }
+
+    //**************************************************************************
+    // Forgot password
+    //**************************************************************************
+
+    public Resolution forgotPassword() {
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
+            logger.debug("Already logged in");
+            return redirectToReturnUrl();
+        }
+
+        return new ForwardResolution(getForgotPasswordPage());
+    }
+
+    public Resolution forgotPassword2() {
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
+            logger.debug("Already logged in");
+            return redirectToReturnUrl();
+        }
+
+        SessionMessages.addInfoMessage("Check your mailbox and follow the instructions");
+        return new RedirectResolution(getOriginalPath());
+    }
+
+    protected String getForgotPasswordPage() {
+        return "/portofino-base/layouts/user/forgotPassword.jsp";
+    }
+
+    //**************************************************************************
+    // Sign up
+    //**************************************************************************
+
+    public Resolution signUp() {
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
+            logger.debug("Already logged in");
+            return redirectToReturnUrl();
+        }
+
+        setupSignUpForm();
+        return new ForwardResolution(getSignUpPage());
+    }
+
+    public Resolution signUp2() {
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
+            logger.debug("Already logged in");
+            return redirectToReturnUrl();
+        }
+
+        setupSignUpForm();
+        signUpForm.readFromRequest(context.getRequest());
+        if (signUpForm.validate()) {
+            SessionMessages.addInfoMessage("Check your mailbox and follow the instructions");
+            return new RedirectResolution(getOriginalPath());
+        } else {
+            SessionMessages.addErrorMessage("Correct the errors before proceding");
+            return new ForwardResolution(getSignUpPage());
+        }
+    }
+
+    protected String getSignUpPage() {
+        return "/portofino-base/layouts/user/signUp.jsp";
+    }
+
+    protected void setupSignUpForm() {
+        FormBuilder formBuilder = new FormBuilder(User.class)
+                .configMode(Mode.CREATE)
+                .configReflectiveFields();
+        signUpForm = formBuilder.build();
+    }
+
+
+
+    //**************************************************************************
+    // Utility methods
+    //**************************************************************************
 
     protected Resolution redirectToReturnUrl() {
         return redirectToReturnUrl(returnUrl);
@@ -139,32 +269,6 @@ public abstract class LoginAction extends AbstractActionBean {
         }
         logger.debug("Redirecting to: {}", returnUrl);
         return new RedirectResolution(returnUrl);
-    }
-
-    @Button(list = "login-buttons", key = "commons.cancel", order = 2)
-    public Resolution cancel() {
-        String url = "/";
-        if(!StringUtils.isBlank(cancelReturnUrl)) {
-            url = cancelReturnUrl;
-        } else if(!StringUtils.isBlank(returnUrl)) {
-            url = returnUrl;
-        }
-        return redirectToReturnUrl(url);
-    }
-
-    public Resolution logout() {
-        String userName = ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) + "";
-        SecurityUtils.getSubject().logout();
-        HttpSession session = getSession();
-        if (session != null) {
-            session.invalidate();
-        }
-
-        String msg = ElementsThreadLocals.getText("user.logout");
-        SessionMessages.addInfoMessage(msg);
-        logger.info("User {} logout", userName);
-
-        return new RedirectResolution("/");
     }
 
     // do not expose this method publicly
@@ -198,4 +302,7 @@ public abstract class LoginAction extends AbstractActionBean {
         return portofinoConfiguration;
     }
 
+    public Form getSignUpForm() {
+        return signUpForm;
+    }
 }
