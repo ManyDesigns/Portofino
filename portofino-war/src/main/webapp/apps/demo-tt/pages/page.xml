@@ -7,6 +7,7 @@
             <childPage name="welcome" showInNavigation="true"/>
             <childPage name="projects" showInNavigation="true"/>
             <childPage name="people" showInNavigation="true"/>
+            <childPage name="login" showInNavigation="false"/>
         </childPages>
     </layout>
 </page>

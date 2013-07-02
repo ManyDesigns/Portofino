@@ -27,6 +27,7 @@ import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.DefaultApplication;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.starter.migration.text.MigrateTo408;
 import org.apache.commons.configuration.Configuration;
@@ -245,6 +246,7 @@ public class ApplicationStarter {
                 if(o instanceof ApplicationListener) {
                     applicationListener = (ApplicationListener) o;
                     logger.info("Invoking application listener defined in {}", appListenerFile.getAbsolutePath());
+                    Injections.inject(applicationListener, servletContext, null);
                     success = applicationListener.applicationStarting(tmpApplication, servletContext);
                 } else {
                     logger.error("Candidate app listener " + o +

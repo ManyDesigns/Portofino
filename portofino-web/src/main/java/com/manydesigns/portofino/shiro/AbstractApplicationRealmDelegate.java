@@ -240,4 +240,44 @@ public abstract class AbstractApplicationRealmDelegate implements ApplicationRea
         }
         return groups;
     }
+
+    @Override
+    public void verifyUser(ApplicationRealm realm, Object user) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void approveUser(ApplicationRealm realm, Object user) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void rejectUser(ApplicationRealm realm, Object user) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void lockUser(ApplicationRealm realm, Object user) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void unlockUser(ApplicationRealm realm, Object user) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void validateToken(ApplicationRealm realm, Object user, AuthenticationToken token) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void changePassword(ApplicationRealm realm, Object user, String newPassword) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String generateOneTimeToken(ApplicationRealm realm, Object user) {
+        throw new UnsupportedOperationException();
+    }
 }

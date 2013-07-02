@@ -59,6 +59,89 @@ public interface ApplicationRealmDelegate {
      */
     AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, AuthenticationToken token);
 
+    //--------------------------------------------------------------------------
+    // User workflow
+    //--------------------------------------------------------------------------
+
+    /**
+     * Marks the user as verified as a consequence of a user's action, e.g.
+     * clicking on a verification email or entering a verification code.
+     * This method is called in during the user's self-registration process.
+     * @param realm the ApplicationRealm.
+     * @param user the user object.
+     */
+    void verifyUser(ApplicationRealm realm, Object user);
+
+    /**
+     * Marks the user as approved as a consequence of an administrator's action
+     * This method is called in during the user's self-registration process.
+     * @param realm the ApplicationRealm.
+     * @param user the user object.
+     */
+    void approveUser(ApplicationRealm realm, Object user);
+
+    /**
+     * Marks the user as rejected as a consequence of an administrator's action
+     * This method is called in during the user's self-registration process.
+     * @param realm the ApplicationRealm.
+     * @param user the user object.
+     */
+    void rejectUser(ApplicationRealm realm, Object user);
+
+    /**
+     * Locks the user and prevents him from logging in. A user is locked either
+     * when an administrator performs a manual operation or when triggered
+     * by an automatic condition.
+     * @param realm the ApplicationRealm.
+     * @param user the user object.
+     */
+    void lockUser(ApplicationRealm realm, Object user);
+
+    /**
+     * Unlocks the user and re-enables logging in. A user is usually unlocked
+     * when an administrator performs a manual operation.
+     * @param realm the ApplicationRealm.
+     * @param user the user object.
+     */
+    void unlockUser(ApplicationRealm realm, Object user);
+
+    //--------------------------------------------------------------------------
+    // User password management
+    //--------------------------------------------------------------------------
+
+    /**
+     * Validates the token (password) for a user. The same verification is
+     * performed as during login, but without actually logging in.
+     * Useful for special operations that require re-entering the password
+     * as a confirmation, e.g., during a password change.
+     * @param realm the ApplicationRealm.
+     * @param user the user object.
+     * @param token the user's password.
+     */
+    void validateToken(ApplicationRealm realm, Object user, AuthenticationToken token);
+
+    /**
+     * Changes a user's password
+     * @param realm the ApplicationRealm.
+     * @param user the user object.
+     * @param newPassword the new password.
+     */
+    void changePassword(ApplicationRealm realm, Object user, String newPassword);
+
+    /**
+     * Generates a one-time token, for use in email validation and password reset
+     * Unlike a password, which needs to be associated to a login,
+     * a token is a user's full credentials.
+     * @param realm the ApplicationRealm.
+     * @param user the user object.
+     * @return the one-time token
+     */
+    String generateOneTimeToken(ApplicationRealm realm, Object user);
+
+    //--------------------------------------------------------------------------
+    // Users CRUD
+    //--------------------------------------------------------------------------
+
     /**
      * Returns the list of users known to the system. This is used by the framework when presenting a list of
      * possible users, e.g. when configuring permissions for a page.
@@ -66,6 +149,10 @@ public interface ApplicationRealmDelegate {
      * @return a set of users, represented as strings (the usernames used to log in).
      */
     Set<String> getUsers(ApplicationRealm realm);
+
+    //--------------------------------------------------------------------------
+    // Groups CRUD
+    //--------------------------------------------------------------------------
 
     /**
      * Returns the list of groups known to the system. This is used by the framework when presenting a list of
