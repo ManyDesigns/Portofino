@@ -173,7 +173,9 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
         if (disabed)
             addAttribute("disabled", "disabled");
 
-        addAttribute("class", cssClass);
+        if(cssClass != null) {
+            addAttribute("class", cssClass);
+        }
 
         closeElement("input");
     }

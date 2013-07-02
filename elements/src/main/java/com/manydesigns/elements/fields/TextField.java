@@ -149,10 +149,11 @@ public class TextField extends AbstractTextField {
             String htmlClass = "";
             if(textAreaWidth != null) {
                 xb.addAttribute("cols", Integer.toString(textAreaWidth));
+                xb.addAttribute("rows", Integer.toString(numRowTextArea(stringValue, textAreaWidth)));
                 htmlClass = "mde-text-field-with-explicit-size ";
+            } else {
+                xb.addAttribute("rows", Integer.toOctalString(textAreaMinRows));
             }
-            xb.addAttribute("rows", Integer.toString(
-                    numRowTextArea(stringValue, textAreaWidth)));
             if(richText) {
                 htmlClass += "mde-form-rich-text";
             }

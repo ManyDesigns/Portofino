@@ -292,7 +292,7 @@ public class TableForm implements Element {
                 String[] inputNameArgs = {prefix, "selection"};
                 String selection = StringUtils.join(inputNameArgs);
                 xb.openElement("td");
-                xb.writeInputCheckbox(null, selection, key, false, false, "checkbox");
+                xb.writeInputCheckbox(null, selection, key, false, false, null);
                 xb.closeElement("td");
             }
 

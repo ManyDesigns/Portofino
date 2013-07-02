@@ -46,7 +46,7 @@
                     });
                 </script>
             </c:if><c:if test="${empty actionBean.textConfiguration.attachments}">
-                <fmt:message key="layouts.text.manage-attachments.manage_attachments_for_page"/>
+                <fmt:message key="layouts.text.manage-attachments.there_are_no_attachments"/>
             </c:if>
             <div class="horizontalSeparator"></div>
             <fmt:message key="layouts.text.manage-attachments.upload_new_file"/>:

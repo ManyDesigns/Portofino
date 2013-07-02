@@ -26,7 +26,6 @@ a.breadcrumb-item {
 }
 
 span.breadcrumb-item {
-/*    color: #808080; */
     color: #333333;
     font-weight: bold;
 }
@@ -344,23 +343,6 @@ Wizard
   border-left: 14px solid #F1F6FC;
 }
 
-
-.wizard-header ul li .number {
-    margin-right: 8px;
-    background-color: #3A87AD;
-    border-radius: 9px;
-    padding-left: 9px;
-    padding-right: 9px;
-    color: #FFFFFF;
-    display: inline-block;
-    font-size: 11.844px;
-    font-weight: bold;
-    line-height: 16px;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-    vertical-align: baseline;
-    white-space: nowrap;
-}
-
 .wizard-header ul li.first {
     padding-left: 10px;
 }
@@ -372,8 +354,4 @@ Wizard
 
 .wizard-header ul li.before .chevron:before {
   border-left: 14px solid #F3F4F5;
-}
-
-.wizard-header ul li.before .number {
-    background-color: #468847;
 }
