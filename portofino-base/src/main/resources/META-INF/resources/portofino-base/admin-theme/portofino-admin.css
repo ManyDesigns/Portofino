@@ -3,7 +3,6 @@ Header / footer
 *******************************************************************************/
 
 footer {
-/*    background-color: #F5F5F5;*/
     border-top: 1px solid #E5E5E5;
     padding-top: 10px;
     padding-bottom: 10px;
@@ -59,7 +58,7 @@ Content
 }
 
 /*******************************************************************************
-Error/warning/info messages
+Error/warning/info messages (Elements)
 *******************************************************************************/
 
 .userMessages {
@@ -93,7 +92,7 @@ ul.infoMessages {
 }
 
 /*******************************************************************************
-Forms
+Forms (Elements)
 *******************************************************************************/
 
 .hidden-submit {
@@ -117,8 +116,30 @@ input.mde-text-field-with-explicit-size, textarea.mde-text-field-with-explicit-s
     width: auto;
 }
 
+fieldset.radio {
+    margin-bottom: 0;
+}
+
+.horizontalSeparator {
+    border-top: 1px solid #eeeeee;
+    margin: 1.5em 0;
+    clear: both;
+}
+
+.mde-table-form input[type='checkbox'] {
+    margin: 0;
+}
+
+.table.mde-table-form th, .table.mde-table-form td {
+    vertical-align: middle;
+}
+
+label.control-label.mde-password-confirm-label {
+    display: inline; float: none; margin-left: 1em; margin-right: 1em;
+}
+
 /*******************************************************************************
-Inline form errors
+Inline form errors (Elements)
 *******************************************************************************/
 
 ul.errors {
@@ -158,69 +179,4 @@ General
 .error {
     color: gray;
     font-weight: bold;
-}
-
-/*******************************************************************************
-Forms
-*******************************************************************************/
-
-fieldset.radio {
-    margin-bottom: 0;
-}
-
-.horizontalSeparator {
-    border-top: 1px solid #eeeeee;
-    margin: 1.5em 0;
-    clear: both;
-}
-
-.mde-table-form input[type='checkbox'] {
-    margin: 0;
-}
-
-.table.mde-table-form th, .table.mde-table-form td {
-    vertical-align: middle;
-}
-
-label.control-label.mde-password-confirm-label {
-    display: inline; float: none; margin-left: 1em; margin-right: 1em;
-}
-
-/*******************************************************************************
-Wizard
-*******************************************************************************/
-
-.wizard-header {
-    overflow-y: hidden;
-    padding-left: 0;
-}
-
-.wizard-step {
-    font-weight: bold;
-    font-size: 1.2em;
-    background: #F8F8FF url('images/wizard-arrow.png') left center no-repeat;
-    padding: 1em 0 1em 2.5em;
-}
-
-.wizard-step.first {
-    border-radius: 3px 0 0 0;
-    background-image: none;
-    padding: 1em 0 1em 0;
-}
-
-.wizard-step.before {
-    color: #555555;
-}
-
-.wizard-step.current {
-    color: #166BBF;
-    background-color: white;
-}
-
-.wizard-step.immediately-after-current {
-    background: #F8F8FF url('images/wizard-current-arrow.png') left center no-repeat;
-}
-
-wizard-step.after {
-    color: black;
 }
