@@ -9,17 +9,6 @@
     response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_NO_STORE);
     response.setDateHeader(ServletConstants.HTTP_EXPIRES, 0);
 %>
-function copyFormAsHiddenFields(source, form) {
-    source.find("input, select").each(function(index, elem) {
-        elem = $(elem);
-        var hiddenField = document.createElement("input");
-        hiddenField.setAttribute("type", "hidden");
-        hiddenField.setAttribute("name", elem.attr('name'));
-        hiddenField.setAttribute("value", elem.val());
-        form.append(hiddenField);
-    });
-}
-
 var portofino = {
     _setupRichTextEditors: setupRichTextEditors,
 
@@ -59,6 +48,17 @@ var portofino = {
 
         $('textarea.mde-form-rich-text').data('mdeRichTextConfig', config);
         portofino._setupRichTextEditors();
+    },
+
+    copyFormAsHiddenFields: function(source, form) {
+        source.find("input, select").each(function(index, elem) {
+            elem = $(elem);
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", elem.attr('name'));
+            hiddenField.setAttribute("value", elem.val());
+            form.append(hiddenField);
+        });
     },
 
     enablePortletDragAndDrop: function(button, originalPath) {

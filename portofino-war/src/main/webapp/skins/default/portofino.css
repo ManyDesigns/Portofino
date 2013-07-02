@@ -297,32 +297,83 @@ Wizard
     padding-left: 0;
 }
 
-.wizard-step {
+.wizard-header ul {
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+}
+
+.wizard-header ul li {
+    height: 46px;
+    line-height: 46px;
+    margin: 0;
+    padding: 0 10px 0 30px;
+    position: relative;
+    float: left;
+    background-color: #F8F8FF;
+}
+
+.wizard-header ul li .chevron {
+  position: absolute;
+  top: 0;
+  right: -14px;
+  display: block;
+  border: 24px solid transparent;
+  border-right: 0;
+  border-left: 14px solid #d4d4d4;
+}
+
+.wizard-header ul li .chevron:before {
+  position: absolute;
+  top: -24px;
+  right: 1px;
+  display: block;
+  border: 24px solid transparent;
+  border-right: 0;
+  border-left: 14px solid #F8F8FF;
+  content: "";
+}
+
+.wizard-header ul li.active {
+    background: none repeat scroll 0 0 #F1F6FC;
+    color: #3A87AD;
     font-weight: bold;
-    font-size: 1.2em;
-    background: #F8F8FF url('images/wizard-arrow.png') left center no-repeat;
-    padding: 1em 0 1em 2.5em;
 }
 
-.wizard-step.first {
-    border-radius: 3px 0 0 0;
-    background-image: none;
-    padding: 1em 0 1em 0;
+.wizard-header ul li.active .chevron:before {
+  border-left: 14px solid #F1F6FC;
 }
 
-.wizard-step.before {
-    color: #555555;
+
+.wizard-header ul li .number {
+    margin-right: 8px;
+    background-color: #3A87AD;
+    border-radius: 9px;
+    padding-left: 9px;
+    padding-right: 9px;
+    color: #FFFFFF;
+    display: inline-block;
+    font-size: 11.844px;
+    font-weight: bold;
+    line-height: 16px;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    vertical-align: baseline;
+    white-space: nowrap;
 }
 
-.wizard-step.current {
-    color: #166BBF;
-    background-color: white;
+.wizard-header ul li.first {
+    padding-left: 10px;
 }
 
-.wizard-step.immediately-after-current {
-    background: #F8F8FF url('images/wizard-current-arrow.png') left center no-repeat;
+.wizard-header ul li.before {
+    color: #468847;
+    background-color: #F3F4F5;
 }
 
-wizard-step.after {
-    color: black;
+.wizard-header ul li.before .chevron:before {
+  border-left: 14px solid #F3F4F5;
+}
+
+.wizard-header ul li.before .number {
+    background-color: #468847;
 }

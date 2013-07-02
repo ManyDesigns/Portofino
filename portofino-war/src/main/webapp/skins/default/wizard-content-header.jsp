@@ -7,31 +7,24 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.wizard.AbstractWizardPageAction "/>
 <div class="wizard-header">
+    <ul>
     <c:forEach items="${actionBean.steps}" var="step" varStatus="status">
-        <c:set var="baseClass"
-               value="wizard-step ${status.first ? 'first' : ''} ${status.last ? 'last' : ''}"
-        />
-        <c:if test="${status.index eq actionBean.currentStepIndex}">
-            <span class="${baseClass} current">
+        <li style="z-index: ${20 - status.index}"
+            class="${status.first ? 'first' : ''}
+                   ${status.index < actionBean.currentStepIndex ? 'before' : ''}
+                   ${status.index eq actionBean.currentStepIndex ? 'active' : ''}">
+            <span class="number"><c:out value="${step.number}" /></span>
+            <c:if test="${status.index eq actionBean.currentStepIndex}">
                 <c:out value="${step.title}" />
-            </span>
-            <c:if test="${status.last}">
-                <span class="wizard-step immediately-after-current" style="background-color: transparent;">&nbsp;</span>
             </c:if>
-        </c:if>
-        <c:if test="${status.index < actionBean.currentStepIndex}">
-            <span class="${baseClass} before">
-                <c:out value="${step.number}" />
-            </span>
-        </c:if>
-        <c:if test="${status.index > actionBean.currentStepIndex}">
-            <span class="${baseClass} after ${status.index eq actionBean.currentStepIndex + 1 ? 'immediately-after-current' : ''}">
-                <c:out value="${step.number}" />
-            </span>
-            <c:if test="${status.last}">
-                <span class="wizard-step" style="background-color: transparent;">&nbsp;</span>
+            <c:if test="${not (status.index eq actionBean.currentStepIndex)}">
+                <fmt:message key="wizard.step">
+                    <fmt:param value="${step.number}" />
+                </fmt:message>
             </c:if>
-        </c:if>
+            <span class="chevron"></span>
+        </li>
     </c:forEach>
+    </ul>
 </div>
 <div style="border-bottom: solid 1px #E5E5E5; margin-top: 10px; margin-bottom: 10px;"></div>

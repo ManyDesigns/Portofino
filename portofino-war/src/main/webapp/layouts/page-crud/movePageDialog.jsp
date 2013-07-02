@@ -6,7 +6,7 @@
     <script type="text/javascript">
         $("#confirmMovePageButton").click(function() {
             var form = $("#pageAdminForm");
-            copyFormAsHiddenFields($("#dialog-move-page"), form);
+            portofino.copyFormAsHiddenFields($("#dialog-move-page"), form);
             form.submit();
         });
 

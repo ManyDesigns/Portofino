@@ -10,7 +10,7 @@
     <script type="text/javascript">
         $("#confirmDeletePageButton").click(function() {
             var form = $("#pageAdminForm");
-            copyFormAsHiddenFields($("#dialog-confirm-delete-page"), form);
+            portofino.copyFormAsHiddenFields($("#dialog-confirm-delete-page"), form);
             form.submit();
         });
 

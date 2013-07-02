@@ -1635,14 +1635,14 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     @Override
     public List<Step> getSteps() {
         List<Step> steps = new ArrayList<Step>();
-        steps.add(new Step(getMessage("appwizard.step1"), getMessage("appwizard.step1.title")));
-        steps.add(new Step(getMessage("appwizard.step2"), getMessage("appwizard.step2.title")));
-        steps.add(new Step(getMessage("appwizard.step3"), getMessage("appwizard.step3.title")));
+        steps.add(new Step("1", getMessage("appwizard.step1.title")));
+        steps.add(new Step("2", getMessage("appwizard.step2.title")));
+        steps.add(new Step("3", getMessage("appwizard.step3.title")));
         if(userTable != null) {
-            steps.add(new Step(getMessage("appwizard.step3a"), getMessage("appwizard.step3a.title")));
+            steps.add(new Step("3a", getMessage("appwizard.step3a.title")));
         }
-        steps.add(new Step(getMessage("appwizard.step4"), getMessage("appwizard.step4.title")));
-        steps.add(new Step(getMessage("appwizard.step5"), getMessage("appwizard.step5.title")));
+        steps.add(new Step("4", getMessage("appwizard.step4.title")));
+        steps.add(new Step("5", getMessage("appwizard.step5.title")));
         return steps;
     }
 
