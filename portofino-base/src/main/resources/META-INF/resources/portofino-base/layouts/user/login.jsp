@@ -15,7 +15,7 @@
                 <div class="portletBody">
                     <stripes:layout-component name="portletBody">
                         <mde:sessionMessages/>
-                        <stripes:form beanclass="<%= actionBean.getClass().getName() %>" method="post">
+                        <stripes:form action="<%= actionBean.getOriginalPath() %>" method="post">
                             <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
                             <input type="text" name="userName" id="userName" class="input-block-level"
                                    placeholder="<fmt:message key='skins.default.login.username'/>" />

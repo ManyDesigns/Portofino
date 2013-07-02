@@ -25,7 +25,10 @@ import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.admin.*;
+import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
+import com.manydesigns.portofino.actions.admin.ReloadModelAction;
+import com.manydesigns.portofino.actions.admin.SettingsAction;
+import com.manydesigns.portofino.actions.admin.TablesAction;
 import com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard;
 import com.manydesigns.portofino.actions.admin.page.PageAdminAction;
 import com.manydesigns.portofino.actions.admin.page.RootChildrenAction;
@@ -40,9 +43,7 @@ import com.manydesigns.portofino.menu.*;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.servlets.MailScheduler;
 import com.manydesigns.portofino.shiro.ApplicationRealm;
-import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.starter.ApplicationStarter;
-import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sf.ehcache.CacheManager;
 import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlRuntime;
@@ -50,7 +51,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.realm.Realm;
-import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.WebEnvironment;
@@ -83,9 +83,6 @@ public class PortofinoWebModule implements Module {
 
     @Inject(ApplicationAttributes.ADMIN_MENU)
     public MenuBuilder adminMenu;
-
-    @Inject(ApplicationAttributes.USER_MENU)
-    public MenuBuilder userMenu;
 
     @Inject(ApplicationAttributes.APP_MENU)
     public MenuBuilder appMenu;
@@ -179,7 +176,6 @@ public class PortofinoWebModule implements Module {
         rsm.setRealm(realm);
 
         appendToAdminMenu();
-        appendToUserMenu();
         appendToAppMenu();
 
         status = ModuleStatus.ACTIVE;
@@ -218,8 +214,8 @@ public class PortofinoWebModule implements Module {
                 pageMenu.menuLinks.add(link);
 
                 UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, false);
-                urlBuilder.setEvent("pageChildren");
                 urlBuilder.addParameter("originalPath", pageAction.getDispatch().getOriginalPath());
+                urlBuilder.setEvent("pageChildren");
                 link = new MenuLink(
                         "pageChildren",
                         "icon-folder-open icon-white",
@@ -227,6 +223,8 @@ public class PortofinoWebModule implements Module {
                         request.getContextPath() + urlBuilder.toString());
                 pageMenu.menuLinks.add(link);
 
+                urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, false);
+                urlBuilder.addParameter("originalPath", pageAction.getDispatch().getOriginalPath());
                 urlBuilder.setEvent("newPage");
                 link = new MenuLink(
                         "newPage",
@@ -262,67 +260,19 @@ public class PortofinoWebModule implements Module {
 
                 if(!SecurityLogic.hasPermissions(
                         pageAction.getPageInstance(), SecurityUtils.getSubject(), AccessLevel.DEVELOP)) {
-                    return;
+                    urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, false);
+                    urlBuilder.addParameter("originalPath", pageAction.getDispatch().getOriginalPath());
+                    urlBuilder.setEvent("pagePermissions");
+                    link = new MenuLink(
+                            "pagePermissions",
+                            "icon-user icon-white",
+                            "Page permissions",
+                            request.getContextPath() + urlBuilder.toString());
+                    pageMenu.menuLinks.add(link);
                 }
-                urlBuilder.setEvent("pagePermissions");
-                link = new MenuLink(
-                        "pagePermissions",
-                        "icon-user icon-white",
-                        "Page permissions",
-                        request.getContextPath() + urlBuilder.toString());
-                pageMenu.menuLinks.add(link);
             }
         });
 
-    }
-
-    protected void appendToUserMenu() {
-        userMenu.menuAppenders.add(new MenuAppender() {
-            @Override
-            public void append(Menu menu) {
-                Subject subject = SecurityUtils.getSubject();
-                if(!subject.isAuthenticated()) {
-                    HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-                    String originalPath = "/";
-                    if(request.getAttribute("actionBean") instanceof AbstractActionBean) {
-                        AbstractActionBean actionBean = (AbstractActionBean) request.getAttribute("actionBean");
-                        originalPath = actionBean.getOriginalPath();
-                    }
-                    String loginLinkHref = ShiroUtils.getLoginLink(
-                            configuration, request.getContextPath(), originalPath, originalPath);
-                    MenuLink loginLink =
-                            new MenuLink("login", null,
-                                         ElementsThreadLocals.getText("skins.default.header.log_in"),
-                                         loginLinkHref);
-                    menu.items.add(loginLink);
-                }
-
-            }
-        });
-
-        userMenu.menuAppenders.add(new MenuAppender() {
-            @Override
-            public void append(Menu menu) {
-                HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-                if(SecurityLogic.isAdministrator(request)) {
-                    int index = 0;
-                    for(MenuItem item : menu.items) {
-                        if("logout".equals(item.id)) {
-                            break;
-                        }
-                        index++;
-                    }
-
-                    UrlBuilder urlBuilder = new UrlBuilder(request.getLocale(), AdminAction.class, false);
-                    MenuLink adminLink =
-                            new MenuLink("admin", null,
-                                         ElementsThreadLocals.getText("skins.default.header.administration"),
-                                         request.getContextPath() + urlBuilder.toString());
-                    menu.items.add(index, adminLink);
-                }
-
-            }
-        });
     }
 
     protected void appendToAdminMenu() {

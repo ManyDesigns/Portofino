@@ -27,16 +27,28 @@
 *
 */
 
-package com.manydesigns.portofino.actions.user;
+package com.manydesigns.portofino.pageactions.login;
 
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.RequestAttributes;
+import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.PageAction;
+import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.pageactions.PageActionName;
+import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.shiro.openid.OpenIDToken;
-import net.sourceforge.stripes.action.*;
+import net.sourceforge.stripes.action.ErrorResolution;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.util.UrlBuilder;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -68,27 +80,50 @@ import java.util.ResourceBundle;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@UrlBinding(DefaultLoginAction.URL_BINDING)
-public class DefaultLoginAction extends LoginAction {
+@ScriptTemplate("script_template.groovy")
+@PageActionName("Login")
+public class DefaultLoginAction extends LoginAction implements PageAction {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     public static final String OPENID_DISCOVERED = "openID.discovered";
     public static final String OPENID_CONSUMER_MANAGER = "openID.consumerManager";
 
+    //--------------------------------------------------------------------------
+    // Properties
+    //--------------------------------------------------------------------------
+
+    /**
+     * The dispatch property. Injected.
+     */
+    public Dispatch dispatch;
+
+    /**
+     * The PageInstance property. Injected.
+     */
+    public PageInstance pageInstance;
+
+    /**
+     * The application object. Injected.
+     */
     @Inject(RequestAttributes.APPLICATION)
     public Application application;
 
-    public static final String URL_BINDING = "/actions/user/login";
+    /**
+     * The model object. Injected.
+     */
+    @Inject(RequestAttributes.MODEL)
+    public Model model;
+
+    /**
+     * The global configuration object. Injected.
+     */
+    @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
+    public Configuration portofinoConfiguration;
 
     public String openIdUrl;
     public String openIdDestinationUrl;
     public Map openIdParameterMap;
-
-    @Override
-    protected String getLoginPage() {
-        return "/layouts/user/login.jsp";
-    }
 
     public Resolution showOpenIDForm()
             throws ConsumerException, MessageException, DiscoveryException, MalformedURLException {
@@ -104,7 +139,7 @@ public class DefaultLoginAction extends LoginAction {
         // and retrieve one service endpoint for authentication
         DiscoveryInformation discovered = manager.associate(discoveries);
 
-        UrlBuilder urlBuilder = new UrlBuilder(context.getLocale(), URL_BINDING, false);
+        UrlBuilder urlBuilder = new UrlBuilder(context.getLocale(), getOriginalPath(), false);
         urlBuilder.setEvent("handleOpenIDLogin");
         urlBuilder.addParameter("returnUrl", returnUrl);
         urlBuilder.addParameter("cancelReturnUrl", cancelReturnUrl);
@@ -229,5 +264,40 @@ public class DefaultLoginAction extends LoginAction {
     @Override
     public String getApplicationName() {
         return application.getName();
+    }
+
+    @Override
+    public Resolution preparePage() {
+        return null;
+    }
+
+    @Override
+    public String getDescription() {
+        return pageInstance.getName();
+    }
+
+    @Override
+    public PageInstance getPageInstance() {
+        return pageInstance;
+    }
+
+    @Override
+    public void setPageInstance(PageInstance pageInstance) {
+        this.pageInstance = pageInstance;
+    }
+
+    @Override
+    public void setDispatch(Dispatch dispatch) {
+        this.dispatch = dispatch;
+    }
+
+    @Override
+    public Dispatch getDispatch() {
+        return dispatch;
+    }
+
+    @Override
+    public boolean isEmbedded() {
+        return false;
     }
 }
