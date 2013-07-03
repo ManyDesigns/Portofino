@@ -3,7 +3,11 @@
     <head>
         <jsp:include page="../../head.jsp"/>
         <stripes:layout-component name="customScripts"/>
-        <title><c:out value="${actionBean.dispatch.lastPageInstance.page.description}"/></title>
+        <title>
+            <stripes:layout-component name="pageTitle">
+                <c:out value="${actionBean.dispatch.lastPageInstance.page.description}"/>
+            </stripes:layout-component>
+        </title>
     </head>
     <body>
     <jsp:include page="../../header.jsp"/>

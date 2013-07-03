@@ -1399,7 +1399,7 @@
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="projects">
+                        <table tableName="projects" shortName="%{name}">
                             <annotations/>
                             <columns>
 <column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
