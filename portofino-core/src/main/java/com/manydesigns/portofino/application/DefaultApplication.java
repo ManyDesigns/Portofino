@@ -220,7 +220,7 @@ public class DefaultApplication implements Application {
                             DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
                     lqDatabase.setDefaultSchemaName(schemaName);
                     String relativeChangelogPath =
-                            ElementsFileUtils.getRelativePath(appDir, changelogFile);
+                            ElementsFileUtils.getRelativePath(appDir, changelogFile, System.getProperty("file.separator"));
                     if(new File(relativeChangelogPath).isAbsolute()) {
                         logger.warn("The application dbs dir {} is not inside the apps dir {}; using an absolute path for Liquibase update",
                                 appDbsDir, appDir);

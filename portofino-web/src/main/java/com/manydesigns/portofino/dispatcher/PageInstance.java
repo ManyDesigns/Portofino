@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.pages.Layout;
 import com.manydesigns.portofino.pages.Page;
@@ -218,10 +217,6 @@ public class PageInstance {
 
     public String getName() {
         return directory.getName();
-    }
-
-    public String getPathFromRoot() {
-        return ElementsFileUtils.getRelativePath(application.getPagesDir(), directory);
     }
 
     public String getDescription() {
