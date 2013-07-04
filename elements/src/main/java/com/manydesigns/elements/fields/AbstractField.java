@@ -202,9 +202,6 @@ public abstract class AbstractField implements Field {
             cssClass += " readonly";
         }
         xb.addAttribute("class", cssClass);
-        if (mode.isBulk() && mode.isEdit() && !mode.isView(insertable, updatable)) {
-            xb.writeInputCheckbox(null, bulkCheckboxName, "checked", bulkChecked, false, "pull-left");
-        }
         labelToXhtml(xb);
         xb.openElement("div");
         xb.addAttribute("class", "controls");
@@ -224,6 +221,9 @@ public abstract class AbstractField implements Field {
         xb.openElement("label");
         xb.addAttribute("for", id);
         xb.addAttribute("class", FORM_LABEL_CLASS);
+        if (mode.isBulk() && mode.isEdit() && !mode.isView(insertable, updatable)) {
+            xb.writeInputCheckbox(null, bulkCheckboxName, "checked", bulkChecked, false, "pull-left");
+        }
         if (hasRequiredFields()) {
             xb.openElement("span");
             xb.addAttribute("class", "required");
