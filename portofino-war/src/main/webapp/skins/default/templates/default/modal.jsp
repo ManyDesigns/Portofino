@@ -1,6 +1,4 @@
-<%@ page import="com.manydesigns.portofino.dispatcher.Dispatch"
-%><%@ page import="com.manydesigns.portofino.dispatcher.DispatcherUtil"
-%><%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
@@ -10,14 +8,10 @@
     <head>
         <jsp:include page="../../head.jsp"/>
         <stripes:layout-component name="customScripts"/>
-        <jsp:useBean id="actionBean" scope="request" type="net.sourceforge.stripes.action.ActionBean" />
-        <%
-            Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);
-            pageContext.setAttribute("dispatch", dispatch);
-        %>
+        <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.dispatcher.PageAction" />
         <title>
             <stripes:layout-component name="pageTitle">
-                <c:out value="${dispatch.lastPageInstance.page.description}"/>
+                <c:out value="${actionBean.dispatch.lastPageInstance.page.description}"/>
             </stripes:layout-component>
         </title>
     </head>
@@ -26,32 +20,41 @@
     <div class="container">
         <div class="row">
             <div class="span2">
-                <div id="navigation">
-                    <jsp:include page="../../navigation.jsp" />
-                </div>
+                <stripes:layout-component name="sidebar">
+                    <div id="navigation">
+                        <jsp:include page="../../navigation.jsp" />
+                    </div>
+                </stripes:layout-component>
             </div>
             <div id="content" class="span10">
-                <div class="row-fluid">
-                    <stripes:layout-component name="beforeSessionMessages" />
-                    <mde:sessionMessages />
-                    <stripes:layout-component name="beforeBreadcrumbs" />
-                    <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
-                    <stripes:layout-component name="afterBreadcrumbs" />
-                    <div>
-                        <stripes:layout-component name="portletHeader">
-                            <h3 style="border-bottom: 1px solid #E5E5E5">
-                                <stripes:layout-component name="portletTitle" />
-                            </h3>
-                        </stripes:layout-component>
-                        <stripes:layout-component name="portletBody" />
-                    </div>
-                </div>
+                <stripes:layout-component name="mainPageAction">
+                    <stripes:layout-component name="mainPageActionHeader">
+                        <stripes:layout-component name="beforeSessionMessages" />
+                        <mde:sessionMessages />
+                        <stripes:layout-component name="beforeBreadcrumbs" />
+                        <jsp:include page="/skins/${skin}/breadcrumbs.jsp" />
+                        <stripes:layout-component name="afterBreadcrumbs" />
+                    </stripes:layout-component>
+                    <stripes:layout-component name="mainPageActionBody">
+                        <div>
+                            <stripes:layout-component name="portletHeader">
+                                <div class="portletHeader" style="padding-bottom: 0;">
+                                    <h3>
+                                        <stripes:layout-component name="portletTitle" />
+                                    </h3>
+                                </div>
+                            </stripes:layout-component>
+                            <div class="portletBody">
+                                <stripes:layout-component name="portletBody" />
+                            </div>
+                        </div>
+                    </stripes:layout-component>
+                    <stripes:layout-component name="mainPageActionFooter" />
+                </stripes:layout-component>
             </div>
         </div>
-        <div class="row">
-            <jsp:include page="../../footer.jsp"/>
-        </div>
     </div>
+    <jsp:include page="../../footer.jsp"/>
     </body>
     </html>
 </stripes:layout-definition>

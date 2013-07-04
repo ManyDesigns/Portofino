@@ -47,7 +47,7 @@ public class ElementsFileUtils {
     //**************************************************************************
 
     public static String getRelativePath(File ancestor, File file) {
-        return getRelativePath(ancestor, file, System.getProperty("file.separator"));
+        return getRelativePath(ancestor, file, "/");
     }
 
     public static String getRelativePath(File ancestor, File file, String separator) {

@@ -1459,7 +1459,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         try {
             TempFileService fileService = TempFileService.getInstance();
             TempFile tempFile =
-                    fileService.newTempFile("application/vnd.ms-excel", crudConfiguration.getReadTitle() + ".xls");
+                    fileService.newTempFile("application/vnd.ms-excel", getReadTitle() + ".xls");
             OutputStream outputStream = tempFile.getOutputStream();
             exportReadExcel(outputStream);
             outputStream.flush();
@@ -1492,8 +1492,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             workbookSettings.setUseTemporaryFileDuringWrite(false);
             workbook = Workbook.createWorkbook(outputStream, workbookSettings);
             WritableSheet sheet =
-                workbook.createSheet(crudConfiguration.getReadTitle(),
-                        workbook.getNumberOfSheets());
+                workbook.createSheet(getReadTitle(), workbook.getNumberOfSheets());
 
             addHeaderToReadSheet(sheet);
 
@@ -1941,7 +1940,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                         logger.warn("Temporary file {} could not be deleted", tmpFile.getAbsolutePath());
                     }
                 }
-            }.setFilename(crudConfiguration.getReadTitle() + ".pdf");
+            }.setFilename(getReadTitle() + ".pdf");
         } catch (Exception e) {
             logger.error("PDF export failed", e);
             SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
@@ -2401,8 +2400,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public String getReadTitle() {
         String title = crudConfiguration.getReadTitle();
-        OgnlTextFormat textFormat = OgnlTextFormat.create(StringUtils.defaultString(title));
-        return textFormat.format(this);
+        if(StringUtils.isEmpty(title)) {
+            return ShortNameUtils.getName(getClassAccessor(), object);
+        } else {
+            OgnlTextFormat textFormat = OgnlTextFormat.create(title);
+            return textFormat.format(this);
+        }
     }
 
     public String getSearchTitle() {
