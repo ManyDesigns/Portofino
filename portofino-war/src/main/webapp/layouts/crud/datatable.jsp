@@ -31,8 +31,10 @@
     <input type="hidden" name="sortDirection" value="${actionBean.sortDirection}" />
     <input type="hidden" name="eventName" value="${actionBean.context.eventName}" />
     <script type="text/javascript">
-        $("#portlet_${pageId} .search_results button[name=bulkDelete]").click(function() {
-            return confirm ('<fmt:message key="commons.confirm" />');
+        $(function() {
+            $("#portlet_${pageId} .search_results button[name=bulkDelete]").click(function() {
+                return confirm ('<fmt:message key="commons.confirm" />');
+            });
         });
     </script>
     <div style="clear: both;"></div>
@@ -100,7 +102,7 @@
             buf.openElement("a");
             buf.addAttribute("class", "paginator-link");
             buf.addAttribute("href", getLinkToPage(actionBean, pg));
-            buf.addAttribute("title", "Page " + (pg + 1)); //TODO I18n
+            buf.addAttribute("title", actionBean.getMessage("commons.pageNumber", (pg + 1)));
             buf.write("" + (pg + 1));
             buf.closeElement("a");
             buf.closeElement("li");
@@ -131,7 +133,7 @@
             buf.addAttribute("class", "paginator-link");
             buf.addAttribute("href", getLinkToPage(actionBean, lastPage));
         }
-        buf.addAttribute("title", actionBean.getMessage("commons.last"));
+        buf.addAttribute("title", actionBean.getMessage("commons.last") + " (" + (lastPage + 1) + ")");
         buf.writeNoHtmlEscape("&gt;&gt;");
         buf.closeElement("a");
         buf.closeElement("li");
