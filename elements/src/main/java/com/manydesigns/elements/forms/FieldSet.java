@@ -37,7 +37,7 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    protected final int nColumns; //TODO recuperare form a n colonne
+    protected final int nColumns;
     protected final Mode mode;
 
     protected String name;
@@ -61,37 +61,39 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
             }
         } else {
             xb.openElement("fieldset");
-            if (name == null) {
-                //xb.addAttribute("class", "mde-form-fieldset mde-no-legend");
-            } else {
-                //xb.addAttribute("class", "mde-form-fieldset");
+            if (name != null) {
                 xb.writeLegend(name, null);
             }
-            //xb.openElement("table");
-            //xb.addAttribute("class", "mde-form-table");
 
             currentColumn = 0;
             rowOpened = false;
 
             for (FormElement current : this) {
+                int colSpan = Math.min(current.getColSpan(), nColumns);
                 if (current.isForceNewRow()
-                        || currentColumn + current.getColSpan() > nColumns) {
+                        || currentColumn + colSpan > nColumns) {
                     closeCurrentRow(xb);
                 }
 
                 if (currentColumn == 0) {
+                    xb.openElement("div");
+                    xb.addAttribute("class", "row-fluid");
                     rowOpened = true;
                 }
-                current.toXhtml(xb);
 
-                currentColumn = currentColumn + current.getColSpan();
+                xb.openElement("div");
+                xb.addAttribute("class", "span" + (colSpan * (12 / nColumns)));
+                current.toXhtml(xb);
+                xb.closeElement("div");
+
+                currentColumn = currentColumn + colSpan;
 
                 if (currentColumn >= nColumns) {
                     closeCurrentRow(xb);
                 }
             }
-            closeCurrentRow(xb);
 
+            xb.closeElement("div");
             xb.closeElement("fieldset");
         }
     }
@@ -100,13 +102,12 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
         if (!rowOpened) {
             return;
         }
-        /*
         if (currentColumn < nColumns) {
-            xb.openElement("td");
-            xb.addAttribute("colspan",
-                    Integer.toString((nColumns - currentColumn) * 2) );
-            xb.closeElement("td");
-        }*/
+            xb.openElement("div");
+            xb.addAttribute("class", "span" + ((nColumns - currentColumn) * (12 / nColumns)));
+            xb.closeElement("div");
+        }
+        xb.closeElement("div");
         currentColumn = 0;
         rowOpened = false;
     }

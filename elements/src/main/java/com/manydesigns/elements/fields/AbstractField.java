@@ -208,10 +208,6 @@ public abstract class AbstractField implements Field {
         labelToXhtml(xb);
         xb.openElement("div");
         xb.addAttribute("class", "controls");
-        //TODO recuperare form multi column
-        /*if (colSpan != 1) {
-            xb.addAttribute("colspan", Integer.toString(colSpan * 2 - 1));
-        }*/
     }
 
     /**

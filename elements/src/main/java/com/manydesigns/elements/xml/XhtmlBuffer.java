@@ -99,7 +99,7 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
         closeElement("caption");
     }
 
-    public void writeLegend(String text, String htmlClass) {
+    public void writeLegend(String text, @Nullable String htmlClass) {
         openElement("legend");
         addAttribute("class", htmlClass);
         write(text);
