@@ -1,7 +1,6 @@
 <page description="Issues" id="3" title="Issues">
     <permissions />
     <layout>
-        <self container="default"/>
         <childPages/>
     </layout>
 </page>

@@ -1,7 +1,6 @@
 <page description="Summary of project's members" id="bse6c8595zv1tty06eahfc1aa" title="Members">
     <permissions />
     <layout>
-        <self container="default" order="0"/>
         <childPages/>
     </layout>
 </page>

@@ -12,13 +12,11 @@
             <childPage showInNavigation="false" order="1" name="memberSummary" container="contentLayoutRight"/>
             <childPage showInNavigation="true" name="versions"/>
         </childPages>
-        <self order="1" container="contentLayoutLeft"/>
     </detailLayout>
     <layout>
         <childPages>
             <childPage showInNavigation="true" name="report"/>
         </childPages>
-        <self order="2" container="default"/>
     </layout>
     <permissions/>
 </page>
