@@ -73,8 +73,7 @@ public final class PortofinoProperties {
     public static final String CONFIGURATION_CACHE_CHECK_FREQUENCY = "configuration.cache.check.frequency";
 
     //Login
-    public static final String LOGIN_LINK = "login.link";
-    public static final String LOGOUT_LINK = "logout.link";
+    public static final String LOGIN_PAGE = "login.page";
 
     private PortofinoProperties() {}
 }

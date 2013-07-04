@@ -22,7 +22,7 @@ package com.manydesigns.portofino.stripes;
 
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.shiro.ShiroUtils;
+import com.manydesigns.portofino.PortofinoProperties;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -81,15 +81,20 @@ public class ForbiddenAccessResolution implements Resolution {
                 (Configuration) servletContext.getAttribute(ApplicationAttributes.PORTOFINO_CONFIGURATION);
         if (userId == null && !ajax) {
             logger.info("Anonymous user not allowed. Redirecting to login.");
-            String loginLink = ShiroUtils.getLoginLink(configuration, request.getContextPath(), returnUrl, "/");
-            new RedirectResolution(loginLink, false).execute(request, response);
+            String loginPage = configuration.getString(PortofinoProperties.LOGIN_PAGE);
+            RedirectResolution redirectResolution =
+                    new RedirectResolution(loginPage, true);
+            redirectResolution.addParameter("returnUrl", returnUrl);
+            redirectResolution.execute(request, response);
         } else {
             if(ajax) {
                 logger.debug("AJAX call while user disconnected");
                 //TODO where to redirect?
-                String loginLink = ShiroUtils.getLoginLink(configuration, request.getContextPath(), "/", "/");
+                String loginPage = configuration.getString(PortofinoProperties.LOGIN_PAGE);
+                UrlBuilder loginUrlBuilder =
+                        new UrlBuilder(Locale.getDefault(), loginPage, false);
                 response.setStatus(UNAUTHORIZED);
-                new StreamingResolution("text/plain", loginLink).execute(request, response);
+                new StreamingResolution("text/plain", loginUrlBuilder.toString()).execute(request, response);
             } else {
                 logger.warn("User {} not authorized for url {}.", userId, returnUrl);
                 new ErrorResolution(UNAUTHORIZED, errorMessage).execute(request, response);

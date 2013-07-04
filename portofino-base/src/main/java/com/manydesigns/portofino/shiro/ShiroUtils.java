@@ -20,14 +20,9 @@
 
 package com.manydesigns.portofino.shiro;
 
-import com.manydesigns.portofino.PortofinoProperties;
-import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.text.MessageFormat;
 import java.util.List;
 
 /**
@@ -97,22 +92,5 @@ public class ShiroUtils {
     /*public static void clearCacheForCurrentSubject() {
         clearCache(SecurityUtils.getSubject().getPrincipals());
     }*/
-
-    public static String getLoginLink(Configuration conf, String contextPath, String returnUrl, String cancelReturnUrl) {
-        String loginLink = conf.getString(PortofinoProperties.LOGIN_LINK);
-        String encoding = conf.getString(PortofinoProperties.URL_ENCODING);
-        try {
-            String encodedReturnUrl = URLEncoder.encode(returnUrl, encoding);
-            String encodedCancelReturnUrl = URLEncoder.encode(cancelReturnUrl, encoding);
-            return MessageFormat.format(loginLink, contextPath, encodedReturnUrl, encodedCancelReturnUrl);
-        } catch (UnsupportedEncodingException e) {
-            throw new Error(e);
-        }
-    }
-
-    public static String getLogoutLink(Configuration conf, String contextPath) {
-        String logoutLink = conf.getString(PortofinoProperties.LOGOUT_LINK);
-        return MessageFormat.format(logoutLink, contextPath);
-    }
 
 }

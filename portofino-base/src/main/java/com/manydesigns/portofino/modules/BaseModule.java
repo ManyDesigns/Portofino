@@ -29,18 +29,13 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.modules.ModulesAction;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.menu.*;
-import com.manydesigns.portofino.shiro.ShiroUtils;
+import com.manydesigns.portofino.menu.MenuBuilder;
+import com.manydesigns.portofino.menu.SimpleMenuAppender;
 import org.apache.commons.configuration.Configuration;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -59,9 +54,6 @@ public class BaseModule implements Module {
 
     @Inject(ApplicationAttributes.ADMIN_MENU)
     public MenuBuilder adminMenu;
-
-    @Inject(ApplicationAttributes.USER_MENU)
-    public MenuBuilder userMenu;
 
     @Override
     public String getModuleVersion() {
@@ -101,37 +93,6 @@ public class BaseModule implements Module {
         SimpleMenuAppender link = SimpleMenuAppender.link(
                 "configuration", "modules", null, "Modules", ModulesAction.URL_BINDING);
         adminMenu.menuAppenders.add(link);
-
-        userMenu.menuAppenders.add(new MenuAppender() {
-            @Override
-            public void append(Menu menu) {
-                Subject subject = SecurityUtils.getSubject();
-                if(subject.isAuthenticated()) {
-                    MenuLink userLink =
-                            new MenuLink("user", "icon-user icon-white",
-                                         ShiroUtils.getPrimaryPrincipal(subject).toString(),
-                                         null);
-                    menu.items.add(userLink);
-                }
-
-            }
-        });
-
-        userMenu.menuAppenders.add(new MenuAppender() {
-            @Override
-            public void append(Menu menu) {
-                Subject subject = SecurityUtils.getSubject();
-                HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-                if(subject.isAuthenticated()) {
-                    MenuLink userLink =
-                            new MenuLink("logout", null,
-                                         ElementsThreadLocals.getText("skins.default.header.log_out"),
-                                         ShiroUtils.getLogoutLink(configuration, request.getContextPath()));
-                    menu.items.add(userLink);
-                }
-
-            }
-        });
 
         status = ModuleStatus.ACTIVE;
     }
