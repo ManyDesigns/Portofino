@@ -1,31 +1,26 @@
-<%@ tag import="com.manydesigns.elements.xml.XhtmlBuffer" %>
-<%@ tag import="com.manydesigns.portofino.buttons.ButtonInfo" %>
-<%@ tag import="com.manydesigns.portofino.buttons.ButtonsLogic" %>
-<%@ tag import="com.manydesigns.portofino.buttons.GuardType" %>
-<%@ tag import="com.manydesigns.portofino.buttons.annotations.Button" %>
-<%@ tag import="com.manydesigns.portofino.dispatcher.PageAction" %>
-<%@ tag import="com.manydesigns.portofino.dispatcher.PageInstance" %>
-<%@ tag import="com.manydesigns.portofino.logic.SecurityLogic" %>
-<%@ tag import="net.sourceforge.stripes.action.ActionBean" %>
-<%@ tag import="org.apache.commons.lang.StringUtils" %>
-<%@ tag import="org.apache.shiro.SecurityUtils" %>
-<%@ tag import="org.apache.shiro.subject.Subject" %>
-<%@ tag import="javax.servlet.jsp.jstl.fmt.LocalizationContext" %>
-<%@ tag import="java.lang.reflect.Method" %>
-<%@ tag import="java.util.List" %>
-<%@ tag import="java.util.MissingResourceException" %>
-<%@ tag import="java.util.UUID" %>
-<%@ tag import="org.slf4j.LoggerFactory" %>
-<%@ tag import="org.jetbrains.annotations.NotNull" %>
-<%@ tag import="com.manydesigns.portofino.security.RequiresPermissions" %>
-<%@ tag import="com.manydesigns.portofino.pages.Permissions" %>
-
-<%@ attribute name="list" required="true" %>
-<%@ attribute name="cssClass" required="false" %>
-
-<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%
+<%@ tag import="com.manydesigns.elements.xml.XhtmlBuffer"
+%><%@ tag import="com.manydesigns.portofino.buttons.ButtonInfo"
+%><%@ tag import="com.manydesigns.portofino.buttons.ButtonsLogic"
+%><%@ tag import="com.manydesigns.portofino.buttons.GuardType"
+%><%@ tag import="com.manydesigns.portofino.buttons.annotations.Button"
+%><%@ tag import="com.manydesigns.portofino.dispatcher.PageAction"
+%><%@ tag import="com.manydesigns.portofino.dispatcher.PageInstance"
+%><%@ tag import="com.manydesigns.portofino.logic.SecurityLogic"
+%><%@ tag import="com.manydesigns.portofino.pages.Permissions"
+%><%@ tag import="com.manydesigns.portofino.security.RequiresPermissions"
+%><%@ tag import="net.sourceforge.stripes.action.ActionBean"
+%><%@ tag import="org.apache.commons.lang.StringUtils"
+%><%@ tag import="org.apache.shiro.SecurityUtils"
+%><%@ tag import="org.apache.shiro.subject.Subject"
+%><%@ tag import="org.jetbrains.annotations.NotNull"
+%><%@ tag import="javax.servlet.jsp.jstl.fmt.LocalizationContext"
+%><%@ tag import="java.lang.reflect.Method"
+%><%@ tag import="java.util.List"
+%><%@ tag import="java.util.MissingResourceException"
+%><%@ attribute name="list" required="true"
+%><%@ attribute name="cssClass" required="false"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
+%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%
     ActionBean actionBean = (ActionBean) request.getAttribute("actionBean");
     Subject subject = SecurityUtils.getSubject();
 
@@ -109,8 +104,7 @@
             buffer.closeElement("div");
         }
     }
-%>
-<%!
+%><%!
     protected static boolean hasPermissions
             (@NotNull ButtonInfo button, @NotNull PageInstance pageInstance, @NotNull Subject subject) {
         RequiresPermissions requiresPermissions =
