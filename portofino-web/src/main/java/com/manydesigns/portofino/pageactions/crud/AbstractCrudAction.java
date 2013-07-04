@@ -306,7 +306,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected Resolution doSearch() {
         if(!isConfigured()) {
             logger.debug("Crud not correctly configured");
-            return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
+            return forwardTo(PAGE_PORTLET_NOT_CONFIGURED);
         }
 
         try {
@@ -330,7 +330,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }
         } catch(Exception e) {
             logger.warn("Crud not correctly configured", e);
-            return forwardToPortletPage(PAGE_PORTLET_NOT_CONFIGURED);
+            return forwardTo(PAGE_PORTLET_NOT_CONFIGURED);
         }
     }
 
@@ -812,7 +812,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * Returns the Resolution used to show the Read page.
      */
     protected Resolution getReadView() {
-        return forwardToPortletPage("/layouts/crud/read.jsp");
+        return forwardTo("/layouts/crud/read.jsp");
     }
 
     /**
@@ -826,7 +826,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * Returns the Resolution used to show the Search page.
      */
     protected Resolution getSearchView() {
-        return forwardToPortletPage("/layouts/crud/search.jsp");
+        return forwardTo("/layouts/crud/search.jsp");
     }
 
     /**

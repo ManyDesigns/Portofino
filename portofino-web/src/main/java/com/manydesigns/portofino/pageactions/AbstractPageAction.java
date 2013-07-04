@@ -33,7 +33,10 @@ import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.*;
+import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.dispatcher.PageAction;
+import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.pages.ChildPage;
@@ -130,7 +133,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // UI
     //--------------------------------------------------------------------------
 
-    public final MultiMap embeddedPageActions = new MultiHashMap();
+    private MultiMap embeddedPageActions;
     protected boolean embedded;
 
     //--------------------------------------------------------------------------
@@ -211,6 +214,29 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     }
 
     public MultiMap getEmbeddedPageActions() {
+        if(embeddedPageActions == null) {
+            MultiMap mm = new MultiHashMap();
+            Layout layout = pageInstance.getLayout();
+            for(ChildPage page : layout.getChildPages()) {
+                String layoutContainerInParent = page.getContainer();
+                if(layoutContainerInParent != null) {
+                    String newPath = getDispatch().getOriginalPath() + "/" + page.getName();
+                    PortletInstance portletInstance =
+                            new PortletInstance(
+                                    "c" + page.getName(),
+                                    page.getActualOrder(),
+                                    newPath);
+
+                    mm.put(layoutContainerInParent, portletInstance);
+                }
+            }
+            for(Object entryObj : mm.entrySet()) {
+                Map.Entry entry = (Map.Entry) entryObj;
+                List portletContainer = (List) entry.getValue();
+                Collections.sort(portletContainer);
+            }
+            embeddedPageActions = mm;
+        }
         return embeddedPageActions;
     }
 
@@ -226,33 +252,9 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         this.pageConfigurationForm = pageConfigurationForm;
     }
 
-    protected void setupEmbeddedPageActions(PageInstance pageInstance) {
-        Layout layout = pageInstance.getLayout();
-        for(ChildPage page : layout.getChildPages()) {
-            String layoutContainerInParent = page.getContainer();
-            if(layoutContainerInParent != null) {
-                String newPath = getDispatch().getOriginalPath() + "/" + page.getName();
-                PortletInstance portletInstance =
-                        new PortletInstance(
-                                "c" + page.getName(),
-                                page.getActualOrder(),
-                                newPath);
-
-                embeddedPageActions.put(layoutContainerInParent, portletInstance);
-            }
-        }
-        for(Object entryObj : embeddedPageActions.entrySet()) {
-            Map.Entry entry = (Map.Entry) entryObj;
-            List portletContainer = (List) entry.getValue();
-            Collections.sort(portletContainer);
-        }
-    }
-
+    @Deprecated
     protected Resolution forwardToPortletPage(String pageJsp) {
-        setupEmbeddedPageActions(pageInstance);
-        HttpServletRequest request = context.getRequest();
-        request.setAttribute("cancelReturnUrl", getCancelReturnUrl());
-        return new ForwardResolution(pageJsp);
+        return forwardTo(pageJsp);
     }
 
     public String getPageTemplate() {
@@ -576,16 +578,15 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     }
 
     /**
-     * Returns a ForwardResolution to the given page, taking into account whether this page is embedded in its parent
-     * (the Resolution is different in that case).
+     * Returns a ForwardResolution to the given page, and sets up internal parameters that need to be propagated in case
+     * of embedding.
      * @param page the path to the page, from the root of the webapp.
+     * @return a Resolution that forwards to the given page.
      */
     public Resolution forwardTo(String page) {
-        if(isEmbedded()) {
-            return new ForwardResolution(page);
-        } else {
-            return forwardToPortletPage(page);
-        }
+        HttpServletRequest request = context.getRequest();
+        request.setAttribute("cancelReturnUrl", getCancelReturnUrl());
+        return new ForwardResolution(page);
     }
 
     /**

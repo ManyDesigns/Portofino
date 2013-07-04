@@ -142,11 +142,7 @@ public class ChartAction extends AbstractPageAction {
             return forwardToPortletError(e);
         }
 
-        if (isEmbedded()) {
-            return new ForwardResolution("/layouts/chart/chart.jsp");
-        } else {
-            return forwardToPortletPage("/layouts/chart/chart.jsp");
-        }
+        return forwardTo("/layouts/chart/chart.jsp");
     }
 
     public void generateChart() {

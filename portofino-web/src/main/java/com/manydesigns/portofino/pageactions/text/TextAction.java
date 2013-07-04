@@ -139,11 +139,7 @@ public class TextAction extends AbstractPageAction {
         if (StringUtils.isEmpty(content)) {
             content = "<em>Empty content. To add content, configure this page.</em>";
         }
-        if (isEmbedded()) {
-            return new ForwardResolution("/layouts/text/read.jsp");
-        } else {
-            return forwardToPortletPage("/layouts/text/read.jsp");
-        }
+        return forwardTo("/layouts/text/read.jsp");
     }
 
     /**
