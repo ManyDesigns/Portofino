@@ -93,7 +93,7 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
                 }
             }
 
-            xb.closeElement("div");
+            closeCurrentRow(xb);
             xb.closeElement("fieldset");
         }
     }
