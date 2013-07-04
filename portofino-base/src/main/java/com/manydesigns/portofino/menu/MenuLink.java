@@ -41,8 +41,8 @@ public class MenuLink extends MenuItem {
 
     public final String link;
 
-    public MenuLink(String id, String icon, String title, String link) {
-        super(id, icon, title);
+    public MenuLink(String id, String icon, String title, String link, double order) {
+        super(id, icon, title, order);
         this.link = link;
     }
 
