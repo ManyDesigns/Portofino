@@ -4,11 +4,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction" %>
-<%@ page import="net.sourceforge.stripes.util.UrlBuilder" %>
 <%@ page import="java.io.Writer" %>
-<%@ page import="java.util.Locale" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.HashMap" %>
 <%@ page language="java" %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"/>
 <c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
@@ -58,7 +54,7 @@
         } else {
             buf.openElement("a");
             buf.addAttribute("class", "paginator-link");
-            buf.addAttribute("href", getLinkToPage(actionBean, 0));
+            buf.addAttribute("href", actionBean.getLinkToPage(0));
         }
         buf.addAttribute("title", actionBean.getMessage("commons.first"));
         buf.writeNoHtmlEscape("&lt;&lt;");
@@ -73,7 +69,7 @@
         } else {
             buf.openElement("a");
             buf.addAttribute("class", "paginator-link");
-            buf.addAttribute("href", getLinkToPage(actionBean, currentPage - 1));
+            buf.addAttribute("href", actionBean.getLinkToPage(currentPage - 1));
         }
         buf.addAttribute("title", actionBean.getMessage("commons.prev"));
         buf.writeNoHtmlEscape("&lt;");
@@ -101,7 +97,7 @@
             }
             buf.openElement("a");
             buf.addAttribute("class", "paginator-link");
-            buf.addAttribute("href", getLinkToPage(actionBean, pg));
+            buf.addAttribute("href", actionBean.getLinkToPage(pg));
             buf.addAttribute("title", actionBean.getMessage("commons.pageNumber", (pg + 1)));
             buf.write("" + (pg + 1));
             buf.closeElement("a");
@@ -116,7 +112,7 @@
         } else {
             buf.openElement("a");
             buf.addAttribute("class", "paginator-link");
-            buf.addAttribute("href", getLinkToPage(actionBean, currentPage + 1));
+            buf.addAttribute("href", actionBean.getLinkToPage(currentPage + 1));
         }
         buf.addAttribute("title", actionBean.getMessage("commons.next"));
         buf.writeNoHtmlEscape("&gt;");
@@ -131,26 +127,11 @@
         } else {
             buf.openElement("a");
             buf.addAttribute("class", "paginator-link");
-            buf.addAttribute("href", getLinkToPage(actionBean, lastPage));
+            buf.addAttribute("href", actionBean.getLinkToPage(lastPage));
         }
         buf.addAttribute("title", actionBean.getMessage("commons.last") + " (" + (lastPage + 1) + ")");
         buf.writeNoHtmlEscape("&gt;&gt;");
         buf.closeElement("a");
         buf.closeElement("li");
-    }
-
-    private String getLinkToPage(AbstractCrudAction actionBean, int page) {
-        int rowsPerPage = actionBean.getCrudConfiguration().getRowsPerPage();
-        Map<String, Object> parameters = new HashMap<String, Object>(actionBean.getContext().getRequest().getParameterMap());
-        parameters.put("sortProperty", actionBean.getSortProperty());
-        parameters.put("sortDirection", actionBean.getSortDirection());
-        parameters.put("firstResult", page * rowsPerPage);
-        parameters.put("maxResults", rowsPerPage);
-        parameters.put(AbstractCrudAction.SEARCH_STRING_PARAM, actionBean.getSearchString());
-
-        UrlBuilder urlBuilder =
-                new UrlBuilder(Locale.getDefault(), actionBean.getDispatch().getAbsoluteOriginalPath(), false)
-                        .addParameters(parameters);
-        return urlBuilder.toString();
     }
 %>

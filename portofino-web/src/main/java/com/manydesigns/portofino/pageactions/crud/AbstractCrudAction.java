@@ -297,8 +297,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         @Button(list = "portlet-default-button", key = "commons.search") //XXX non va bene, posso avere diversi default su form diversi
     })
     public Resolution search() {
-        //If embedded, search is always closed by default
-        searchVisible = !isEmbedded();
+        searchVisible = true;
         searchString = null;
         return doSearch();
     }
@@ -1091,13 +1090,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 sortDirection = "asc";
             }
 
-            Map<String, Object> parameters = new HashMap<String, Object>(context.getRequest().getParameterMap());
+            Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put("sortProperty", propName);
             parameters.put("sortDirection", sortDirection);
-            parameters.remove("firstResult");
-            parameters.remove("maxResults");
+            if(!isEmbedded()) {
+                parameters.put(SEARCH_STRING_PARAM, searchString);
+            }
             parameters.put(context.getEventName(), "");
-            parameters.put(SEARCH_STRING_PARAM, searchString);
 
             UrlBuilder urlBuilder =
                     new UrlBuilder(Locale.getDefault(), dispatch.getAbsoluteOriginalPath(), false)
@@ -1119,6 +1118,23 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             hrefFormat.setEncoding(encoding);
             tableFormBuilder.configHeaderTextFormat(propName, hrefFormat);
         }
+    }
+
+    public String getLinkToPage(int page) {
+        int rowsPerPage = getCrudConfiguration().getRowsPerPage();
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("sortProperty", getSortProperty());
+        parameters.put("sortDirection", getSortDirection());
+        parameters.put("firstResult", page * rowsPerPage);
+        parameters.put("maxResults", rowsPerPage);
+        if(!isEmbedded()) {
+            parameters.put(AbstractCrudAction.SEARCH_STRING_PARAM, getSearchString());
+        }
+
+        UrlBuilder urlBuilder =
+                new UrlBuilder(Locale.getDefault(), getDispatch().getAbsoluteOriginalPath(), false)
+                        .addParameters(parameters);
+        return urlBuilder.toString();
     }
 
     protected TableForm buildTableForm(TableFormBuilder tableFormBuilder) {
@@ -2601,7 +2617,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     public boolean isSearchVisible() {
-        return searchVisible;
+        //If embedded, search is always closed by default
+        return searchVisible && !isEmbedded();
     }
 
     public void setSearchVisible(boolean searchVisible) {
