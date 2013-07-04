@@ -71,8 +71,6 @@ public class Navigation {
         this.subject = subject;
         this.skipPermissions = skipPermissions;
 
-        //TODO gestire deploy sotto ROOT
-
         buildTree();
     }
 
