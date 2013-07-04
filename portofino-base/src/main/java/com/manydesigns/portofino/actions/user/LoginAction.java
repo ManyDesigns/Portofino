@@ -74,6 +74,7 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public String userName;
     public String pwd;
+    public String email;
 
     //**************************************************************************
     // Presentation elements
@@ -111,6 +112,7 @@ public abstract class LoginAction extends AbstractActionBean {
             return redirectToReturnUrl();
         }
 
+        userName = StringUtils.defaultString(userName);
         try {
             UsernamePasswordToken usernamePasswordToken =
                     new UsernamePasswordToken(userName, pwd);
