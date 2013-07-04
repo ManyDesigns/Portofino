@@ -63,6 +63,8 @@ public class TableForm implements Element {
     protected boolean condensed = false;
     protected boolean striped = true;
 
+    private static final String SELECTION_CELL_CLASS = "selection-cell";
+
     //**************************************************************************
     // Costruttori
     //**************************************************************************
@@ -98,7 +100,13 @@ public class TableForm implements Element {
 
         if (selectable) {
             xb.openElement("th");
-            xb.writeNbsp();
+            xb.openElement("input");
+            xb.addAttribute("type", "checkbox");
+            String js =
+                    //       th       tr       thead    table
+                    "$(this).parent().parent().parent().parent().find('td." + SELECTION_CELL_CLASS + " input').prop('checked', $(this).prop('checked'));";
+            xb.addAttribute("onchange", js);
+            xb.closeElement("input");
             xb.closeElement("th");
         }
 
@@ -122,11 +130,13 @@ public class TableForm implements Element {
         xb.closeElement("tr");
         xb.closeElement("thead");
 
-        xb.openElement("tbody");
-        for (Row row : rows) {
-            row.toXhtml(xb);
+        if(rows.length > 0) {
+            xb.openElement("tbody");
+            for (Row row : rows) {
+                row.toXhtml(xb);
+            }
+            xb.closeElement("tbody");
         }
-        xb.closeElement("tbody");
 
         xb.closeElement("table");
     }
@@ -292,6 +302,7 @@ public class TableForm implements Element {
                 String[] inputNameArgs = {prefix, "selection"};
                 String selection = StringUtils.join(inputNameArgs);
                 xb.openElement("td");
+                xb.addAttribute("class", SELECTION_CELL_CLASS);
                 xb.writeInputCheckbox(null, selection, key, false, false, null);
                 xb.closeElement("td");
             }
