@@ -232,8 +232,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             }
             for(Object entryObj : mm.entrySet()) {
                 Map.Entry entry = (Map.Entry) entryObj;
-                List portletContainer = (List) entry.getValue();
-                Collections.sort(portletContainer);
+                List pageActionContainer = (List) entry.getValue();
+                Collections.sort(pageActionContainer);
             }
             embeddedPageActions = mm;
         }

@@ -62,9 +62,9 @@ var portofino = {
     },
 
     enablePortletDragAndDrop: function(button, originalPath) {
-        $("div.portletContainer").sortable({
-            connectWith: "div.portletContainer",
-            placeholder: "portletPlaceholder",
+        $("div.pageActionContainer").sortable({
+            connectWith: "div.pageActionContainer",
+            placeholder: "pageActionPlaceholder",
             cursor: "move", // cursor image
             revert: true, // moves the portlet to its new position with a smooth transition
             tolerance: "pointer" // mouse pointer overlaps the droppable
@@ -80,7 +80,7 @@ var portofino = {
             </form>');
         $("button[name=updateLayout]").click(function() {
             var theButton = $(this);
-            $('div.portletContainer').each(function(index, element) {
+            $('div.pageActionContainer').each(function(index, element) {
                 var wrapper = $(element);
                 var templateHiddenField = wrapper.children("input[type=hidden]").first();
                 var elements = wrapper.sortable('toArray');
