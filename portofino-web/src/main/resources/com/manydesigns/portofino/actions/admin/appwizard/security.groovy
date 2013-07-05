@@ -37,38 +37,38 @@ public class Security extends AbstractPortofinoRealm {
 
     protected String adminGroupName = "$adminGroupName";
 
-    @Override
-    protected Collection<String> loadAuthorizationInfo(PrincipalCollection principalCollection) {
-        def groups = []
-        if(StringUtils.isEmpty(userGroupTableEntityName) || StringUtils.isEmpty(groupTableEntityName)) {
-            /////////////////////////////////////////////////////////////////
-            //NB admin is hardcoded for the wizard to work - remove it in production!
-            /////////////////////////////////////////////////////////////////
-            if("admin".equals(principalCollection.asList().get(0))) {
-                logger.warn("Generated security.groovy is using the hardcoded 'admin' user; " +
-                            "remember to disable it in production!")
-                groups.add(getAdministratorsGroup())
-            }
-            /////////////////////////////////////////////////////////////////
-        } else {
-            Session session = application.getSession(databaseName)
-            def queryString = """
-                select distinct g.${groupNameProperty}
-                from ${groupTableEntityName} g, ${userGroupTableEntityName} ug
-                where g.${groupIdProperty} = ug.${groupLinkProperty}
-                and ug.${userLinkProperty} = :userId
-            """
-            def query = session.createQuery(queryString)
-            query.setParameter("userId", principalCollection.asList().get(1).getDatabaseId())
-            groups.addAll(query.list())
-
-            if(!StringUtils.isEmpty(adminGroupName) && groups.contains(adminGroupName)) {
-                groups.add(getAdministratorsGroup())
-            }
-        }
-        return groups
-    }
-
+//    @Override
+//    protected Collection<String> loadAuthorizationInfo(PrincipalCollection principalCollection) {
+//        def groups = []
+//        if(StringUtils.isEmpty(userGroupTableEntityName) || StringUtils.isEmpty(groupTableEntityName)) {
+//            /////////////////////////////////////////////////////////////////
+//            //NB admin is hardcoded for the wizard to work - remove it in production!
+//            /////////////////////////////////////////////////////////////////
+//            if("admin".equals(principalCollection.asList().get(0))) {
+//                logger.warn("Generated security.groovy is using the hardcoded 'admin' user; " +
+//                            "remember to disable it in production!")
+//                groups.add(getAdministratorsGroup())
+//            }
+//            /////////////////////////////////////////////////////////////////
+//        } else {
+//            Session session = application.getSession(databaseName)
+//            def queryString = """
+//                select distinct g.${groupNameProperty}
+//                from ${groupTableEntityName} g, ${userGroupTableEntityName} ug
+//                where g.${groupIdProperty} = ug.${groupLinkProperty}
+//                and ug.${userLinkProperty} = :userId
+//            """
+//            def query = session.createQuery(queryString)
+//            query.setParameter("userId", principalCollection.asList().get(1).getDatabaseId())
+//            groups.addAll(query.list())
+//
+//            if(!StringUtils.isEmpty(adminGroupName) && groups.contains(adminGroupName)) {
+//                groups.add(getAdministratorsGroup())
+//            }
+//        }
+//        return groups
+//    }
+//
     @Override
     protected Collection<String> loadAuthorizationInfo(String principal) {
         def groups = []

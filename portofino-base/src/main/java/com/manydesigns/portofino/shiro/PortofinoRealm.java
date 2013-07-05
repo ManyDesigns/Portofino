@@ -20,10 +20,10 @@
 
 package com.manydesigns.portofino.shiro;
 
-import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.Authorizer;
 import org.apache.shiro.realm.Realm;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -52,66 +52,27 @@ public interface PortofinoRealm extends Realm, Authorizer {
      * This method is called in during the user's self-registration process.
      * @param user the user object.
      */
-    void verifyUser(Object user);
-
-    /**
-     * Marks the user as approved as a consequence of an administrator's action
-     * This method is called in during the user's self-registration process.
-     * @param user the user object.
-     */
-    void approveUser(Object user);
-
-    /**
-     * Marks the user as rejected as a consequence of an administrator's action
-     * This method is called in during the user's self-registration process.
-     * @param user the user object.
-     */
-    void rejectUser(Object user);
-
-    /**
-     * Locks the user and prevents him from logging in. A user is locked either
-     * when an administrator performs a manual operation or when triggered
-     * by an automatic condition.
-     * @param user the user object.
-     */
-    void lockUser(Object user);
-
-    /**
-     * Unlocks the user and re-enables logging in. A user is usually unlocked
-     * when an administrator performs a manual operation.
-     * @param user the user object.
-     */
-    void unlockUser(Object user);
+    void verifyUser(Serializable user);
 
     //--------------------------------------------------------------------------
     // User password management
     //--------------------------------------------------------------------------
 
     /**
-     * Validates the token (password) for a user. The same verification is
-     * performed as during login, but without actually logging in.
-     * Useful for special operations that require re-entering the password
-     * as a confirmation, e.g., during a password change.
-     * @param user the user object.
-     * @param token the user's password.
-     */
-    void validateToken(Object user, AuthenticationToken token);
-
-    /**
      * Changes a user's password
      * @param user the user object.
      * @param newPassword the new password.
      */
-    void changePassword(Object user, String newPassword);
+    void changePassword(Serializable user, String newPassword);
 
     /**
      * Generates a one-time token, for use in email validation and password reset
-     * Unlike a password, which needs to be associated to a login,
-     * a token is a user's full credentials.
+     * Unlike a password, which needs to be associated to a login to be a ShiroToken
+     * a one-time token is valid ShiroToken.
      * @param user the user object.
      * @return the one-time token
      */
-    String generateOneTimeToken(Object user);
+    String generateOneTimeToken(Serializable user);
 
     //--------------------------------------------------------------------------
     // Users CRUD
@@ -123,6 +84,7 @@ public interface PortofinoRealm extends Realm, Authorizer {
      * @return a set of users, represented as strings (the usernames used to log in).
      */
     Set<String> getUsers();
+    //TODO: List<Serializable> getUsers();
 
     //--------------------------------------------------------------------------
     // Groups CRUD
@@ -134,4 +96,12 @@ public interface PortofinoRealm extends Realm, Authorizer {
      * @return a set of groups.
      */
     Set<String> getGroups();
+
+    String getAllGroup();
+
+    String getAnonymousGroup();
+
+    String getRegisteredGroup();
+
+    String getAdministratorsGroup();
 }

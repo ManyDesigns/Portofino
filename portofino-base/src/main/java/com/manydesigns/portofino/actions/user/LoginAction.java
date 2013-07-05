@@ -28,6 +28,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.shiro.PortofinoRealm;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -46,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -272,7 +274,11 @@ public abstract class LoginAction extends AbstractActionBean {
             throw new Exception("You must be logged in to change your password");
         }
 
+        Serializable principal = (Serializable) subject.getPrincipal();
         if (ObjectUtils.equals(newPassword, confirmNewPassword)) {
+            PortofinoRealm portofinoRealm =
+                    ShiroUtils.getPortofinoRealm();
+            portofinoRealm.changePassword(principal, newPassword);
             SessionMessages.addInfoMessage("Password changed successfully");
             return redirectToReturnUrl();
 

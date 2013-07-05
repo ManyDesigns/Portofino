@@ -7,7 +7,6 @@ import com.manydesigns.portofino.menu.Menu
 import com.manydesigns.portofino.menu.MenuAppender
 import com.manydesigns.portofino.menu.MenuGroup
 import com.manydesigns.portofino.menu.MenuLink
-import com.manydesigns.portofino.shiro.ShiroUtils
 import com.manydesigns.portofino.stripes.AbstractActionBean
 import javax.servlet.http.HttpServletRequest
 import net.sourceforge.stripes.util.UrlBuilder
@@ -36,9 +35,11 @@ public class UserMenuAppender implements MenuAppender {
 
         Subject subject = SecurityUtils.getSubject();
         if(subject.isAuthenticated()) {
+            Object principal = subject.getPrincipal();
+            String prettyName = "$principal.firstname $principal.lastname";
             MenuGroup userGroup =
                     new MenuGroup("user", "icon-user icon-white",
-                                 ShiroUtils.getPrimaryPrincipal(subject).toString(), 1.0);
+                                 prettyName, 10.0);
             menu.items.add(userGroup);
 
 
@@ -80,7 +81,7 @@ public class UserMenuAppender implements MenuAppender {
                 MenuLink adminLink =
                         new MenuLink("admin", null,
                                      ElementsThreadLocals.getText("skins.default.header.administration"),
-                                     request.getContextPath() + urlBuilder.toString(), 2.0);
+                                     request.getContextPath() + urlBuilder.toString(), 1.0);
                 menu.items.add(adminLink);
             }
         } else {

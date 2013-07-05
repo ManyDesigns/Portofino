@@ -20,19 +20,33 @@
 
 package com.manydesigns.portofino.shiro;
 
-import java.util.Set;
+import org.apache.shiro.authc.AuthenticationToken;
 
 /**
+ * A one-time token used in email verification and password reset
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface UsersGroupsDAO {
+public class OneTimeToken implements AuthenticationToken {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    Set<String> getUsers();
+    final String token;
 
-    Set<String> getGroups();
+    public OneTimeToken(String token) {
+        this.token = token;
+    }
+
+    @Override
+    public Object getPrincipal() {
+        return token;
+    }
+
+    @Override
+    public Object getCredentials() {
+        return token;
+    }
 }

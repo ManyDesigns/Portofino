@@ -55,18 +55,17 @@ import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
-import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
+import com.manydesigns.portofino.shiro.PortofinoRealm;
+import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.stripes.ForbiddenAccessResolution;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.HttpUtil;
 import ognl.OgnlContext;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
@@ -857,16 +856,10 @@ public class PageAdminAction extends AbstractPageAction {
     public Resolution pagePermissions() {
         setupGroups();
 
-        RealmSecurityManager securityManager = (RealmSecurityManager) SecurityUtils.getSecurityManager();
-        SecurityGroovyRealm securityGroovyRealm = (SecurityGroovyRealm) securityManager.getRealms().iterator().next();
-
+        PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
         users = new LinkedHashSet<String>();
         users.add(null);
-        try {
-            users.addAll(securityGroovyRealm.getUsers());
-        } catch (Exception e) {
-            logger.error("Could not load users", e);
-        }
+        users.addAll(portofinoRealm.getUsers());
 
         return forwardToPagePermissions();
     }
@@ -929,26 +922,8 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     protected void setupGroups() {
-        RealmSecurityManager securityManager = (RealmSecurityManager) SecurityUtils.getSecurityManager();
-        SecurityGroovyRealm securityGroovyRealm = (SecurityGroovyRealm) securityManager.getRealms().iterator().next();
-        try {
-            groups = securityGroovyRealm.getGroups();
-        } catch (Exception e) {
-            logger.warn("Could not load groups, falling back to default ones", e);
-            groups = new LinkedHashSet<String>();
-            Configuration conf = application.getConfiguration();
-            groups.add(conf.getString(AppProperties.GROUP_ALL));
-            groups.add(conf.getString(AppProperties.GROUP_ANONYMOUS));
-            groups.add(conf.getString(AppProperties.GROUP_REGISTERED));
-            groups.add(conf.getString(AppProperties.GROUP_ADMINISTRATORS));
-            Permissions permissions = SecurityLogic.calculateActualPermissions(getPageInstance());
-            for(String group : permissions.getActualLevels().keySet()) {
-                groups.add(group);
-            }
-            for(String group : permissions.getActualPermissions().keySet()) {
-                groups.add(group);
-            }
-        }
+        PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
+        groups = portofinoRealm.getGroups();
     }
 
     @Button(list = "page-permissions-edit", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)

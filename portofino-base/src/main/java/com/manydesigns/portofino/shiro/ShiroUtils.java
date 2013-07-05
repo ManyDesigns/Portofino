@@ -95,11 +95,11 @@ public class ShiroUtils {
         clearCache(SecurityUtils.getSubject().getPrincipals());
     }*/
 
-    public Object getPortofinoRealm() {
+    public static PortofinoRealm getPortofinoRealm() {
         RealmSecurityManager realmSecurityManager =
                 (RealmSecurityManager)SecurityUtils.getSecurityManager();
-        Object portofinoRealm =
-                realmSecurityManager.getRealms().iterator().next();
+        PortofinoRealm portofinoRealm =
+                (PortofinoRealm) realmSecurityManager.getRealms().iterator().next();
         return portofinoRealm;
     }
 

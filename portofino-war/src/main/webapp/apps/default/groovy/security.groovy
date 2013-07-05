@@ -13,6 +13,10 @@ class Security extends AbstractPortofinoRealm {
     private static final String GUEST_LOGIN = "guest";
     private static final String GUEST_PASSWORD = "guest";
 
+    //--------------------------------------------------------------------------
+    // Authentication
+    //--------------------------------------------------------------------------
+
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
         return loadAuthenticationInfo(token);
@@ -31,8 +35,12 @@ class Security extends AbstractPortofinoRealm {
         }
     }
 
+    //--------------------------------------------------------------------------
+    // Authorization
+    //--------------------------------------------------------------------------
+
     @Override
-    protected Collection<String> loadAuthorizationInfo(String principal) {
+    protected Collection<String> loadAuthorizationInfo(Serializable principal) {
         if (ADMIN_LOGIN.equals(principal)) {
             return [ getAdministratorsGroup() ]
         } else {

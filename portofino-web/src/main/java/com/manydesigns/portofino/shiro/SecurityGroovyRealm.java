@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import java.io.File;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -119,42 +120,17 @@ public class SecurityGroovyRealm implements PortofinoRealm {
     //--------------------------------------------------------------------------
     
     @Override
-    public void verifyUser(Object user) {
+    public void verifyUser(Serializable user) {
         ensureDelegate().verifyUser(user);
     }
 
     @Override
-    public void approveUser(Object user) {
-        ensureDelegate().approveUser(user);
-    }
-
-    @Override
-    public void rejectUser(Object user) {
-        ensureDelegate().rejectUser(user);
-    }
-
-    @Override
-    public void lockUser(Object user) {
-        ensureDelegate().lockUser(user);
-    }
-
-    @Override
-    public void unlockUser(Object user) {
-        ensureDelegate().unlockUser(user);
-    }
-
-    @Override
-    public void validateToken(Object user, AuthenticationToken token) {
-        ensureDelegate().validateToken(user, token);
-    }
-
-    @Override
-    public void changePassword(Object user, String newPassword) {
+    public void changePassword(Serializable user, String newPassword) {
         ensureDelegate().changePassword(user, newPassword);
     }
 
     @Override
-    public String generateOneTimeToken(Object user) {
+    public String generateOneTimeToken(Serializable user) {
         return ensureDelegate().generateOneTimeToken(user);
     }
 
@@ -166,6 +142,26 @@ public class SecurityGroovyRealm implements PortofinoRealm {
     @Override
     public Set<String> getGroups() {
         return ensureDelegate().getGroups();
+    }
+
+    @Override
+    public String getAllGroup() {
+        return ensureDelegate().getAllGroup();
+    }
+
+    @Override
+    public String getAnonymousGroup() {
+        return ensureDelegate().getAnonymousGroup();
+    }
+
+    @Override
+    public String getRegisteredGroup() {
+        return ensureDelegate().getRegisteredGroup();
+    }
+
+    @Override
+    public String getAdministratorsGroup() {
+        return ensureDelegate().getAdministratorsGroup();
     }
 
     //--------------------------------------------------------------------------

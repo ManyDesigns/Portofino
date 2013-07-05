@@ -26,15 +26,14 @@ import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
 import org.apache.commons.configuration.Configuration;
-import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.openid4java.discovery.Identifier;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -66,27 +65,21 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     /**
      * {@inheritDoc}
      * <p>This default implementation handles built-in groups (all, anonymous, registered, etc.), delegating
-     * to loadAuthorizationInfo methods the actual loading of application-specific groups.</p>
+     * to loadAuthorizationInfo method the actual loading of application-specific groups.</p>
      *
      * @return
      */
     public AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         Object principal = principals.getPrimaryPrincipal();
         Set<String> groups = new HashSet<String>();
-        groups.add(portofinoConfiguration.getString(AppProperties.GROUP_ALL));
+        groups.add(getAllGroup());
         if (principal == null) {
-            groups.add(portofinoConfiguration.getString(AppProperties.GROUP_ANONYMOUS));
-        } else if(principal instanceof PrincipalCollection) {
-            groups.add(portofinoConfiguration.getString(AppProperties.GROUP_REGISTERED));
-            groups.addAll(loadAuthorizationInfo((PrincipalCollection) principal));
-        } else if(principal instanceof String) {
-            groups.add(portofinoConfiguration.getString(AppProperties.GROUP_REGISTERED));
-            groups.addAll(loadAuthorizationInfo((String) principal));
-//        } else if(isOpenIDEnabled() && (principal instanceof Identifier)) {
-//            groups.add(portofinoConfiguration.getString(AppProperties.GROUP_EXTERNALLY_AUTHENTICATED));
-//            groups.addAll(loadAuthorizationInfo((Identifier) principal));
+            groups.add(getAnonymousGroup());
+        } else if (principal instanceof Serializable) {
+            groups.add(getRegisteredGroup());
+            groups.addAll(loadAuthorizationInfo((Serializable) principal));
         } else {
-            groups.addAll(loadAuthorizationInfo(principal));
+            throw new AuthorizationException("Invalid principal: " + principal);
         }
 
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(groups);
@@ -99,48 +92,51 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     }
 
     /**
-     * Loads the groups associated to a PrincipalCollection. This might include, besides the username, other
-     * principals like an internal user ID.
-     * @param principalCollection
-     * @return
-     */
-    protected Collection<String> loadAuthorizationInfo(PrincipalCollection principalCollection) {
-        return Collections.emptySet();
-    }
-
-    /**
      * Loads the groups associated to a given username.
      * @param principal
      * @return
      */
-    protected Collection<String> loadAuthorizationInfo(String principal) {
+    protected Collection<String> loadAuthorizationInfo(Serializable principal) {
         return Collections.emptySet();
     }
 
+    //--------------------------------------------------------------------------
+    // Groups CRUD
+    //--------------------------------------------------------------------------
+
     /**
-     * Loads the groups associated to an OpenID identifier.
-     * @param principal
-     * @return
+     * Returns the name of the All group as defined in app.properties.
+     * @return the name of the All group
      */
-    protected Collection<String> loadAuthorizationInfo(Identifier principal) {
-        return Collections.emptySet();
+    @Override
+    public String getAllGroup() {
+        return portofinoConfiguration.getString(AppProperties.GROUP_ALL);
     }
 
     /**
-     * Loads the groups associated to a principal of an unknown type. This implementation throws an
-     * AuthorizationException, but you can override it to handle your custom principal type.
-     * @param principal
-     * @return
+     * Returns the name of the Anonymous group as defined in app.properties.
+     * @return the name of the Anonymous
      */
-    protected Collection<String> loadAuthorizationInfo(Object principal) {
-        throw new AuthorizationException("Invalid principal: " + principal);
+    @Override
+    public String getAnonymousGroup() {
+        return portofinoConfiguration.getString(AppProperties.GROUP_ANONYMOUS);
     }
 
     /**
-     * Returns the name of the administrators group as defined in app.properties.
-     * @return
+     * Returns the name of the Registered group as defined in app.properties.
+     * @return the name of the Registered group
      */
-    protected String getAdministratorsGroup() {
+    @Override
+    public String getRegisteredGroup() {
+        return portofinoConfiguration.getString(AppProperties.GROUP_REGISTERED);
+    }
+
+    /**
+     * Returns the name of the Administrators group as defined in app.properties.
+     * @return the name of the Administrators group
+     */
+    @Override
+    public String getAdministratorsGroup() {
         return portofinoConfiguration.getString(AppProperties.GROUP_ADMINISTRATORS);
     }
 
@@ -153,57 +149,33 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
      */
     public Set<String> getGroups() {
         Set<String> groups = new LinkedHashSet<String>();
-        String group = portofinoConfiguration.getString(AppProperties.GROUP_ALL);
-        groups.add(group);
-        group = portofinoConfiguration.getString(AppProperties.GROUP_ANONYMOUS);
-        groups.add(group);
-        group = portofinoConfiguration.getString(AppProperties.GROUP_REGISTERED);
-        groups.add(group);
-        group = portofinoConfiguration.getString(AppProperties.GROUP_ADMINISTRATORS);
-        groups.add(group);
-//        if(isOpenIDEnabled()) {
-//            groups.add(portofinoConfiguration.getString(AppProperties.GROUP_EXTERNALLY_AUTHENTICATED));
-//        }
+        groups.add(getAllGroup());
+        groups.add(getAnonymousGroup());
+        groups.add(getRegisteredGroup());
+        groups.add(getAdministratorsGroup());
         return groups;
     }
 
+    //--------------------------------------------------------------------------
+    // User workflow
+    //--------------------------------------------------------------------------
+
     @Override
-    public void verifyUser(Object user) {
+    public void verifyUser(Serializable user) {
+        throw new UnsupportedOperationException();
+    }
+
+    //--------------------------------------------------------------------------
+    // User password management
+    //--------------------------------------------------------------------------
+
+    @Override
+    public void changePassword(Serializable user, String newPassword) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void approveUser(Object user) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void rejectUser(Object user) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void lockUser(Object user) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void unlockUser(Object user) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void validateToken(Object user, AuthenticationToken token) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void changePassword(Object user, String newPassword) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String generateOneTimeToken(Object user) {
+    public String generateOneTimeToken(Serializable user) {
         throw new UnsupportedOperationException();
     }
 }

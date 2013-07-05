@@ -1,8 +1,6 @@
 import com.manydesigns.portofino.application.AppProperties
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import java.security.MessageDigest
-import org.apache.shiro.subject.PrincipalCollection
-import org.apache.shiro.subject.SimplePrincipalCollection
 import org.hibernate.SQLQuery
 import org.hibernate.Session
 import org.hibernate.criterion.Restrictions
@@ -14,6 +12,9 @@ class Security extends AbstractPortofinoRealm {
 
     private static final Logger logger = LoggerFactory.getLogger(Security.class);
 
+    //--------------------------------------------------------------------------
+    // Authentication
+    //--------------------------------------------------------------------------
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
@@ -38,53 +39,40 @@ class Security extends AbstractPortofinoRealm {
         criteria.add(Restrictions.eq("login", userName));
         criteria.add(Restrictions.eq("hashed_password", hashedPassword));
 
-        List result = criteria.list();
+        Serializable principal = criteria.uniqueResult();
 
-        if (result.size() == 1) {
-            def user = result.get(0);
-            PrincipalCollection loginAndId = new SimplePrincipalCollection(userName, getName());
-            loginAndId.add(user.id, getName());
-            SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(loginAndId, password.toCharArray(), getName());
-            return info;
-        } else {
+        if (principal == null) {
             throw new AuthenticationException("Login failed");
+        } else {
+            SimpleAuthenticationInfo info =
+                    new SimpleAuthenticationInfo(
+                            principal, password.toCharArray(), getName());
+            return info;
         }
     }
+
+    //--------------------------------------------------------------------------
+    // Authorization
+    //--------------------------------------------------------------------------
+
+    @Override
+    protected Collection<String> loadAuthorizationInfo(Serializable principal) {
+        if("admin".equals(principal.login)) {
+            return [portofinoConfiguration.getString(AppProperties.GROUP_ADMINISTRATORS)]
+        } else {
+            return []
+        }
+    }
+
+    //--------------------------------------------------------------------------
+    // Users crud
+    //--------------------------------------------------------------------------
 
     @Override
     Set<String> getUsers() {
         Session session = application.getSession("redmine");
         SQLQuery query = session.createSQLQuery("select \"login\" from \"users\"");
         return new LinkedHashSet<String>(query.list());
-    }
-
-    @Override
-    protected Collection<String> loadAuthorizationInfo(
-            PrincipalCollection principalCollection) {
-        Session session = application.getSession("redmine");
-        def userId = (Integer) principalCollection.asList().get(1);
-        logger.debug("Loading user with id = {}", userId);
-        def user = session.load("users", userId);
-        if("admin".equals(user.login)) {
-            return [portofinoConfiguration.getString(AppProperties.GROUP_ADMINISTRATORS)]
-        } else {
-            return []
-        }
-    }
-
-    @Override
-    protected Collection<String> loadAuthorizationInfo(String principal) {
-        Session session = application.getSession("redmine");
-        logger.debug("Loading user with login = {}", principal);
-        org.hibernate.Criteria criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("login", principal));
-        def user = criteria.uniqueResult();
-        if(user != null && "admin".equals(user.login)) {
-            return [portofinoConfiguration.getString(AppProperties.GROUP_ADMINISTRATORS)]
-        } else {
-            return []
-        }
     }
 
 }
