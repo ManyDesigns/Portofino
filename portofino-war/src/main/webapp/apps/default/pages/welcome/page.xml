@@ -1,7 +1,6 @@
 <page description="Homepage" id="zpAUFstfgEUSzsEX9HoO" title="Homepage">
     <permissions />
     <layout>
-        <self container="default" order="0"/>
         <childPages/>
     </layout>
 </page>

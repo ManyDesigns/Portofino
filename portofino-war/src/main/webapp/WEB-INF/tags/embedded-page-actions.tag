@@ -1,13 +1,12 @@
-<%@ tag import="org.slf4j.LoggerFactory" %>
-<%@ tag import="com.manydesigns.portofino.pageactions.AbstractPageAction" %>
-<%@ attribute name="list" required="true" %>
-<%@ attribute name="cssClass" required="false" %>
-<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ tag import="org.slf4j.LoggerFactory"
+%><%@ attribute name="list" required="true"
+%><%@ attribute name="cssClass" required="false"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
+%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
-<div class="${cssClass} portletContainer">
+<div class="${cssClass} pageActionContainer">
     <input type="hidden" name="portletWrapperName_${list}" value="portletWrapper_${list}" />
     <c:forEach var="portletInstance" items="${ actionBean.embeddedPageActions[list] }">
         <div id="portletWrapper_<c:out value='${portletInstance.id}' />">

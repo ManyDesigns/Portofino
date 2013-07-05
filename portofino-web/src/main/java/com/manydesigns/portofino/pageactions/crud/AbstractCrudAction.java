@@ -36,6 +36,7 @@ import com.manydesigns.elements.options.SearchDisplayMode;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -54,7 +55,6 @@ import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import com.manydesigns.portofino.servlets.DummyHttpServletRequest;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import jxl.Workbook;
@@ -993,8 +993,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 searchVisible = true;
             }
         } else {
-            DummyHttpServletRequest dummyRequest =
-                    new DummyHttpServletRequest();
+            MutableHttpServletRequest dummyRequest = new MutableHttpServletRequest();
             String[] parts = searchString.split(",");
             Pattern pattern = Pattern.compile("(.*)=(.*)");
             for (String part : parts) {

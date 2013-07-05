@@ -1,7 +1,6 @@
 <page description="Tickets" title="Tickets">
     <permissions />
     <layout>
-        <self container="default" order="0"/>
         <childPages/>
     </layout>
 </page>

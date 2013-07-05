@@ -43,7 +43,7 @@ Content
 }
 
 /*******************************************************************************
-Portlet
+PageActions
 *******************************************************************************/
 
 .portletHeader {
@@ -62,7 +62,7 @@ Portlet
     clear: left;
 }
 
-.portletPlaceholder {
+.pageActionPlaceholder {
     border: 1px solid #fcefa1;
     background: #fbf9ee;
     color: #363636;

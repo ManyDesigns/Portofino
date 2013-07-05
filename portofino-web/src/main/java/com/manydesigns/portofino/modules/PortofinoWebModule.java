@@ -193,7 +193,7 @@ public class PortofinoWebModule implements Module {
                 if(pageAction.getDispatch() != null &&
                    SecurityLogic.hasPermissions(
                            pageAction.getPageInstance(), SecurityUtils.getSubject(), AccessLevel.EDIT)) {
-                    MenuGroup pageGroup = new MenuGroup("page", "icon-file icon-white", "Page");
+                    MenuGroup pageGroup = new MenuGroup("page", "icon-file icon-white", "Page", 1.0);
                     menu.items.add(pageGroup);
                 }
             }
@@ -210,7 +210,8 @@ public class PortofinoWebModule implements Module {
                         "Edit layout",
                         "javascript:portofino.enablePortletDragAndDrop($(this), '" +
                                 pageAction.getDispatch().getOriginalPath() +
-                                "');");
+                                "');",
+                        1.0);
                 pageMenu.menuLinks.add(link);
 
                 UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, false);
@@ -220,7 +221,8 @@ public class PortofinoWebModule implements Module {
                         "pageChildren",
                         "icon-folder-open icon-white",
                         "Page children",
-                        request.getContextPath() + urlBuilder.toString());
+                        request.getContextPath() + urlBuilder.toString(),
+                        2.0);
                 pageMenu.menuLinks.add(link);
 
                 urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, false);
@@ -230,7 +232,8 @@ public class PortofinoWebModule implements Module {
                         "newPage",
                         "icon-plus icon-white",
                         "Add new page",
-                        request.getContextPath() + urlBuilder.toString());
+                        request.getContextPath() + urlBuilder.toString(),
+                        3.0);
                 pageMenu.menuLinks.add(link);
 
                 String jsArgs = "('" +
@@ -241,24 +244,27 @@ public class PortofinoWebModule implements Module {
                         "deletePage",
                         "icon-minus icon-white",
                         "Delete page",
-                        "javascript:portofino.confirmDeletePage" + jsArgs);
+                        "javascript:portofino.confirmDeletePage" + jsArgs,
+                        4.0);
                 pageMenu.menuLinks.add(link);
 
                 link = new MenuLink(
                         "copyPage",
                         "icon-file icon-white",
                         "Copy page",
-                        "javascript:portofino.showCopyPageDialog" + jsArgs);
+                        "javascript:portofino.showCopyPageDialog" + jsArgs,
+                        5.0);
                 pageMenu.menuLinks.add(link);
 
                 link = new MenuLink(
                         "movePage",
                         "icon-share icon-white",
                         "Move page",
-                        "javascript:portofino.showMovePageDialog" + jsArgs);
+                        "javascript:portofino.showMovePageDialog" + jsArgs,
+                        6.0);
                 pageMenu.menuLinks.add(link);
 
-                if(!SecurityLogic.hasPermissions(
+                if(SecurityLogic.hasPermissions(
                         pageAction.getPageInstance(), SecurityUtils.getSubject(), AccessLevel.DEVELOP)) {
                     urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, false);
                     urlBuilder.addParameter("originalPath", pageAction.getDispatch().getOriginalPath());
@@ -267,7 +273,8 @@ public class PortofinoWebModule implements Module {
                             "pagePermissions",
                             "icon-user icon-white",
                             "Page permissions",
-                            request.getContextPath() + urlBuilder.toString());
+                            request.getContextPath() + urlBuilder.toString(),
+                        7.0);
                     pageMenu.menuLinks.add(link);
                 }
             }
@@ -279,36 +286,36 @@ public class PortofinoWebModule implements Module {
         SimpleMenuAppender group;
         SimpleMenuAppender link;
 
-        group = SimpleMenuAppender.group("security", null, "Security");
+        group = SimpleMenuAppender.group("security", null, "Security", 2.0);
         adminMenu.menuAppenders.add(group);
 
         link = SimpleMenuAppender.link(
-                "security", "rootPermissions", null, "Root permissions", RootPermissionsAction.URL_BINDING);
+                "security", "rootPermissions", null, "Root permissions", RootPermissionsAction.URL_BINDING, 1.0);
         adminMenu.menuAppenders.add(link);
 
 
         link = SimpleMenuAppender.link(
-                "configuration", "settings", null, "Settings", SettingsAction.URL_BINDING);
+                "configuration", "settings", null, "Settings", SettingsAction.URL_BINDING, 2.0);
         adminMenu.menuAppenders.add(link);
         link = SimpleMenuAppender.link(
-                "configuration", "topLevelPages", null, "Top-level pages", RootChildrenAction.URL_BINDING);
+                "configuration", "topLevelPages", null, "Top-level pages", RootChildrenAction.URL_BINDING, 3.0);
         adminMenu.menuAppenders.add(link);
 
 
-        group = SimpleMenuAppender.group("dataModeling", null, "Data modeling");
+        group = SimpleMenuAppender.group("dataModeling", null, "Data modeling", 3.0);
         adminMenu.menuAppenders.add(group);
 
         link = SimpleMenuAppender.link(
-                "dataModeling", "wizard", null, "Wizard", ApplicationWizard.URL_BINDING);
+                "dataModeling", "wizard", null, "Wizard", ApplicationWizard.URL_BINDING, 1.0);
         adminMenu.menuAppenders.add(link);
         link = SimpleMenuAppender.link(
-                "dataModeling", "connectionProviders", null, "Connection providers", ConnectionProvidersAction.URL_BINDING);
+                "dataModeling", "connectionProviders", null, "Connection providers", ConnectionProvidersAction.URL_BINDING, 2.0);
         adminMenu.menuAppenders.add(link);
         link = SimpleMenuAppender.link(
-                "dataModeling", "tables", null, "Tables", TablesAction.BASE_ACTION_PATH);
+                "dataModeling", "tables", null, "Tables", TablesAction.BASE_ACTION_PATH, 3.0);
         adminMenu.menuAppenders.add(link);
         link = SimpleMenuAppender.link(
-                "dataModeling", "reloadModel", null, "Reload model", ReloadModelAction.URL_BINDING);
+                "dataModeling", "reloadModel", null, "Reload model", ReloadModelAction.URL_BINDING, 4.0);
         adminMenu.menuAppenders.add(link);
     }
 

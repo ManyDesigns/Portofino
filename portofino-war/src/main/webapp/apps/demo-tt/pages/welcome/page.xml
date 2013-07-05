@@ -2,7 +2,6 @@
 <page title="Welcome" navigationRoot="INHERIT" id="tkwxs2rtbixy6c6hy2b3h3n0i" description="Welcome to Ticket Tracker">
     <detailLayout>
         <childPages/>
-        <self/>
     </detailLayout>
     <layout>
         <childPages>
@@ -13,7 +12,6 @@
             <childPage showInNavigation="false" order="2" name="issues-by-priority-bar" container="contentLayoutLeft"/>
             <childPage showInNavigation="false" order="1" name="prjstatus" container="contentLayoutBottom"/>
         </childPages>
-        <self order="1" container="contentLayoutLeft"/>
     </layout>
     <permissions/>
 </page>

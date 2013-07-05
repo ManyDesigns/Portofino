@@ -38,7 +38,7 @@ public class UserMenuAppender implements MenuAppender {
         if(subject.isAuthenticated()) {
             MenuGroup userGroup =
                     new MenuGroup("user", "icon-user icon-white",
-                                 ShiroUtils.getPrimaryPrincipal(subject).toString());
+                                 ShiroUtils.getPrimaryPrincipal(subject).toString(), 1.0);
             menu.items.add(userGroup);
 
 
@@ -48,7 +48,7 @@ public class UserMenuAppender implements MenuAppender {
             MenuLink profileLink =
                     new MenuLink("profile", null,
                                  ElementsThreadLocals.getText("skins.default.header.profile"),
-                                 profileUrl);
+                                 profileUrl, 1.0);
             userGroup.menuLinks.add(profileLink);
 
             UrlBuilder changePasswordUrlBuilder =
@@ -60,7 +60,7 @@ public class UserMenuAppender implements MenuAppender {
             MenuLink changePasswordLink =
                     new MenuLink("change-password", null,
                                  ElementsThreadLocals.getText("skins.default.header.change.password"),
-                                 changePasswordUrl);
+                                 changePasswordUrl, 2.0);
             userGroup.menuLinks.add(changePasswordLink);
 
             UrlBuilder logoutUrlBuilder =
@@ -72,7 +72,7 @@ public class UserMenuAppender implements MenuAppender {
             MenuLink logoutLink =
                     new MenuLink("logout", null,
                                  ElementsThreadLocals.getText("skins.default.header.log_out"),
-                                 logoutUrl);
+                                 logoutUrl, 3.0);
             userGroup.menuLinks.add(logoutLink);
 
             if(SecurityLogic.isAdministrator(request)) {
@@ -80,7 +80,7 @@ public class UserMenuAppender implements MenuAppender {
                 MenuLink adminLink =
                         new MenuLink("admin", null,
                                      ElementsThreadLocals.getText("skins.default.header.administration"),
-                                     request.getContextPath() + urlBuilder.toString());
+                                     request.getContextPath() + urlBuilder.toString(), 2.0);
                 menu.items.add(adminLink);
             }
         } else {
@@ -92,7 +92,7 @@ public class UserMenuAppender implements MenuAppender {
             MenuLink loginLink =
                     new MenuLink("login", null,
                                  ElementsThreadLocals.getText("skins.default.header.log_in"),
-                                 loginUrl);
+                                 loginUrl, 1.0);
             menu.items.add(loginLink);
 
         }

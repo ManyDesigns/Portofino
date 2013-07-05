@@ -87,11 +87,11 @@ public class BaseModule implements Module {
 
     @Override
     public void init() {
-        SimpleMenuAppender group = SimpleMenuAppender.group("configuration", null, "Configuration");
+        SimpleMenuAppender group = SimpleMenuAppender.group("configuration", null, "Configuration", 1.0);
         adminMenu.menuAppenders.add(group);
 
         SimpleMenuAppender link = SimpleMenuAppender.link(
-                "configuration", "modules", null, "Modules", ModulesAction.URL_BINDING);
+                "configuration", "modules", null, "Modules", ModulesAction.URL_BINDING, 1.0);
         adminMenu.menuAppenders.add(link);
 
         status = ModuleStatus.ACTIVE;
