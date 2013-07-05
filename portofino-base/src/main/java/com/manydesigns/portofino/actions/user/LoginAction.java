@@ -35,6 +35,7 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -74,7 +75,11 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public String userName;
     public String pwd;
+
     public String email;
+
+    public String newPassword;
+    public String confirmNewPassword;
 
     //**************************************************************************
     // Presentation elements
@@ -247,7 +252,35 @@ public abstract class LoginAction extends AbstractActionBean {
         signUpForm = formBuilder.build();
     }
 
+    //**************************************************************************
+    // Change password
+    //**************************************************************************
 
+    public Resolution changePassword() throws Exception {
+        Subject subject = SecurityUtils.getSubject();
+        if (!subject.isAuthenticated()) {
+            throw new Exception("You must be logged in to change your password");
+        }
+
+        return new ForwardResolution("/portofino-base/layouts/user/changePassword.jsp");
+    }
+
+    @Button(list = "changepassword", key = "commons.ok", order = 1, type = Button.TYPE_PRIMARY)
+    public Resolution changePassword2() throws Exception {
+        Subject subject = SecurityUtils.getSubject();
+        if (!subject.isAuthenticated()) {
+            throw new Exception("You must be logged in to change your password");
+        }
+
+        if (ObjectUtils.equals(newPassword, confirmNewPassword)) {
+            SessionMessages.addInfoMessage("Password changed successfully");
+            return redirectToReturnUrl();
+
+        } else {
+            SessionMessages.addInfoMessage("New password fields do not match");
+            return new ForwardResolution("/portofino-base/layouts/user/changePassword.jsp");
+        }
+    }
 
     //**************************************************************************
     // Utility methods
@@ -306,5 +339,45 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public Form getSignUpForm() {
         return signUpForm;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPwd() {
+        return pwd;
+    }
+
+    public void setPwd(String pwd) {
+        this.pwd = pwd;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public String getConfirmNewPassword() {
+        return confirmNewPassword;
+    }
+
+    public void setConfirmNewPassword(String confirmNewPassword) {
+        this.confirmNewPassword = confirmNewPassword;
     }
 }

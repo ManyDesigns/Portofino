@@ -1,11 +1,6 @@
-import com.manydesigns.portofino.PortofinoProperties
-import com.manydesigns.portofino.application.Application
-import com.manydesigns.portofino.shiro.AbstractApplicationRealmDelegate
-import com.manydesigns.portofino.shiro.ApplicationRealm
+import com.manydesigns.portofino.application.AppProperties
+import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import java.security.MessageDigest
-import org.apache.shiro.authc.AuthenticationException
-import org.apache.shiro.authc.AuthenticationInfo
-import org.apache.shiro.authc.SimpleAuthenticationInfo
 import org.apache.shiro.subject.PrincipalCollection
 import org.apache.shiro.subject.SimplePrincipalCollection
 import org.hibernate.SQLQuery
@@ -13,13 +8,22 @@ import org.hibernate.Session
 import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import com.manydesigns.portofino.application.AppProperties
+import org.apache.shiro.authc.*
 
-class Security extends AbstractApplicationRealmDelegate {
+class Security extends AbstractPortofinoRealm {
 
     private static final Logger logger = LoggerFactory.getLogger(Security.class);
 
-    AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, String userName, String password) {
+
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
+        return loadAuthenticationInfo(token);
+    }
+
+
+    public AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {
+        String userName = usernamePasswordToken.username;
+        String password = new String(usernamePasswordToken.password);
         MessageDigest md = MessageDigest.getInstance("SHA-1");
         md.update(password.getBytes("UTF-8"));
         byte[] raw = md.digest();
@@ -29,7 +33,6 @@ class Security extends AbstractApplicationRealmDelegate {
         }
         String hashedPassword = sb.toString().toLowerCase();
 
-        Application application = realm.application;
         Session session = application.getSession("redmine");
         org.hibernate.Criteria criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq("login", userName));
@@ -39,18 +42,18 @@ class Security extends AbstractApplicationRealmDelegate {
 
         if (result.size() == 1) {
             def user = result.get(0);
-            PrincipalCollection loginAndId = new SimplePrincipalCollection(userName, realm.name);
-            loginAndId.add(user.id, realm.name);
+            PrincipalCollection loginAndId = new SimplePrincipalCollection(userName, getName());
+            loginAndId.add(user.id, getName());
             SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(loginAndId, password.toCharArray(), realm.name);
+                    new SimpleAuthenticationInfo(loginAndId, password.toCharArray(), getName());
             return info;
         } else {
             throw new AuthenticationException("Login failed");
         }
     }
 
-    Set<String> getUsers(ApplicationRealm realm) {
-        Application application = realm.application;
+    @Override
+    Set<String> getUsers() {
         Session session = application.getSession("redmine");
         SQLQuery query = session.createSQLQuery("select \"login\" from \"users\"");
         return new LinkedHashSet<String>(query.list());
@@ -58,27 +61,27 @@ class Security extends AbstractApplicationRealmDelegate {
 
     @Override
     protected Collection<String> loadAuthorizationInfo(
-            ApplicationRealm realm, PrincipalCollection principalCollection) {
-        Session session = realm.application.getSession("redmine");
+            PrincipalCollection principalCollection) {
+        Session session = application.getSession("redmine");
         def userId = (Integer) principalCollection.asList().get(1);
         logger.debug("Loading user with id = {}", userId);
         def user = session.load("users", userId);
         if("admin".equals(user.login)) {
-            return [realm.application.appConfiguration.getString(AppProperties.GROUP_ADMINISTRATORS)]
+            return [portofinoConfiguration.getString(AppProperties.GROUP_ADMINISTRATORS)]
         } else {
             return []
         }
     }
 
     @Override
-    protected Collection<String> loadAuthorizationInfo(ApplicationRealm realm, String principal) {
-        Session session = realm.application.getSession("redmine");
+    protected Collection<String> loadAuthorizationInfo(String principal) {
+        Session session = application.getSession("redmine");
         logger.debug("Loading user with login = {}", principal);
         org.hibernate.Criteria criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq("login", principal));
         def user = criteria.uniqueResult();
         if(user != null && "admin".equals(user.login)) {
-            return [realm.application.appConfiguration.getString(AppProperties.GROUP_ADMINISTRATORS)]
+            return [portofinoConfiguration.getString(AppProperties.GROUP_ADMINISTRATORS)]
         } else {
             return []
         }

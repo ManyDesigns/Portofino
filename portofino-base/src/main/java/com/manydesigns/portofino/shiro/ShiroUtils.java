@@ -20,6 +20,8 @@
 
 package com.manydesigns.portofino.shiro;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 
@@ -92,5 +94,13 @@ public class ShiroUtils {
     /*public static void clearCacheForCurrentSubject() {
         clearCache(SecurityUtils.getSubject().getPrincipals());
     }*/
+
+    public Object getPortofinoRealm() {
+        RealmSecurityManager realmSecurityManager =
+                (RealmSecurityManager)SecurityUtils.getSecurityManager();
+        Object portofinoRealm =
+                realmSecurityManager.getRealms().iterator().next();
+        return portofinoRealm;
+    }
 
 }

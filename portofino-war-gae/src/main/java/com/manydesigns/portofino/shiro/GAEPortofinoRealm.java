@@ -40,17 +40,17 @@ import java.util.Set;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class GAEApplicationRealmDelegate extends AbstractApplicationRealmDelegate {
+public class GAEPortofinoRealm extends AbstractPortofinoRealm {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     @Override
-    protected AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, String userName, String password) {
+    protected AuthenticationInfo getAuthenticationInfo(SecurityGroovyRealm realm, String userName, String password) {
         throw new UnsupportedOperationException("Login with username and password is not supported");
     }
 
     @Override
-    protected AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, ServletContainerToken token) {
+    protected AuthenticationInfo getAuthenticationInfo(SecurityGroovyRealm realm, ServletContainerToken token) {
         //On GAE, if the user was logged by the container, it is also known to the UserService
         UserService userService = UserServiceFactory.getUserService();
         User user = userService.getCurrentUser();
@@ -65,7 +65,7 @@ public class GAEApplicationRealmDelegate extends AbstractApplicationRealmDelegat
     }
 
     @Override
-    protected Collection<String> loadAuthorizationInfo(ApplicationRealm realm, PrincipalCollection principalCollection) {
+    protected Collection<String> loadAuthorizationInfo(SecurityGroovyRealm realm, PrincipalCollection principalCollection) {
         Set<String> authz = new HashSet<String>(super.loadAuthorizationInfo(realm, principalCollection));
         User user = principalCollection.oneByType(User.class);
         UserService userService = UserServiceFactory.getUserService();
@@ -77,7 +77,7 @@ public class GAEApplicationRealmDelegate extends AbstractApplicationRealmDelegat
         return authz;
     }
 
-    public Set<String> getUsers(ApplicationRealm realm) {
+    public Set<String> getUsers(SecurityGroovyRealm realm) {
         return new HashSet<String>();
     }
 }

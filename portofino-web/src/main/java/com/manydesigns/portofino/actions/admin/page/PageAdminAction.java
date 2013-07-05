@@ -55,7 +55,7 @@ import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
-import com.manydesigns.portofino.shiro.ApplicationRealm;
+import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
 import com.manydesigns.portofino.stripes.ForbiddenAccessResolution;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.HttpUtil;
@@ -858,12 +858,12 @@ public class PageAdminAction extends AbstractPageAction {
         setupGroups();
 
         RealmSecurityManager securityManager = (RealmSecurityManager) SecurityUtils.getSecurityManager();
-        ApplicationRealm applicationRealm = (ApplicationRealm) securityManager.getRealms().iterator().next();
+        SecurityGroovyRealm securityGroovyRealm = (SecurityGroovyRealm) securityManager.getRealms().iterator().next();
 
         users = new LinkedHashSet<String>();
         users.add(null);
         try {
-            users.addAll(applicationRealm.getUsers());
+            users.addAll(securityGroovyRealm.getUsers());
         } catch (Exception e) {
             logger.error("Could not load users", e);
         }
@@ -930,9 +930,9 @@ public class PageAdminAction extends AbstractPageAction {
 
     protected void setupGroups() {
         RealmSecurityManager securityManager = (RealmSecurityManager) SecurityUtils.getSecurityManager();
-        ApplicationRealm applicationRealm = (ApplicationRealm) securityManager.getRealms().iterator().next();
+        SecurityGroovyRealm securityGroovyRealm = (SecurityGroovyRealm) securityManager.getRealms().iterator().next();
         try {
-            groups = applicationRealm.getGroups();
+            groups = securityGroovyRealm.getGroups();
         } catch (Exception e) {
             logger.warn("Could not load groups, falling back to default ones", e);
             groups = new LinkedHashSet<String>();

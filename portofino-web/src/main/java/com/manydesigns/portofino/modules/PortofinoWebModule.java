@@ -42,7 +42,7 @@ import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.menu.*;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.servlets.MailScheduler;
-import com.manydesigns.portofino.shiro.ApplicationRealm;
+import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import net.sf.ehcache.CacheManager;
 import net.sourceforge.stripes.util.UrlBuilder;
@@ -171,7 +171,7 @@ public class PortofinoWebModule implements Module {
         logger.debug("Publishing the Application Realm in the servlet context");
         RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
 
-        Realm realm = new ApplicationRealm(applicationStarter);
+        Realm realm = new SecurityGroovyRealm(applicationStarter);
         LifecycleUtils.init(realm);
         rsm.setRealm(realm);
 

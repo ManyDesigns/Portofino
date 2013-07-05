@@ -1,12 +1,8 @@
 import com.manydesigns.elements.messages.SessionMessages
-import com.manydesigns.portofino.application.Application
-import com.manydesigns.portofino.shiro.AbstractApplicationRealmDelegate
-import com.manydesigns.portofino.shiro.ApplicationRealm
+import com.manydesigns.portofino.actions.admin.appwizard.User
+import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import java.security.MessageDigest
 import org.apache.commons.lang.StringUtils
-import org.apache.shiro.authc.AuthenticationInfo
-import org.apache.shiro.authc.IncorrectCredentialsException
-import org.apache.shiro.authc.SimpleAuthenticationInfo
 import org.apache.shiro.codec.Base64
 import org.apache.shiro.codec.Hex
 import org.apache.shiro.subject.PrincipalCollection
@@ -18,9 +14,9 @@ import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import com.manydesigns.portofino.actions.admin.appwizard.User
+import org.apache.shiro.authc.*
 
-public class Security extends AbstractApplicationRealmDelegate {
+public class Security extends AbstractPortofinoRealm {
 
     public static final Logger logger = LoggerFactory.getLogger(Security.class);
 
@@ -42,8 +38,7 @@ public class Security extends AbstractApplicationRealmDelegate {
     protected String adminGroupName = "$adminGroupName";
 
     @Override
-    protected Collection<String> loadAuthorizationInfo(
-            ApplicationRealm realm, PrincipalCollection principalCollection) {
+    protected Collection<String> loadAuthorizationInfo(PrincipalCollection principalCollection) {
         def groups = []
         if(StringUtils.isEmpty(userGroupTableEntityName) || StringUtils.isEmpty(groupTableEntityName)) {
             /////////////////////////////////////////////////////////////////
@@ -52,11 +47,11 @@ public class Security extends AbstractApplicationRealmDelegate {
             if("admin".equals(principalCollection.asList().get(0))) {
                 logger.warn("Generated security.groovy is using the hardcoded 'admin' user; " +
                             "remember to disable it in production!")
-                groups.add(getAdministratorsGroup(realm))
+                groups.add(getAdministratorsGroup())
             }
             /////////////////////////////////////////////////////////////////
         } else {
-            Session session = realm.application.getSession(databaseName)
+            Session session = application.getSession(databaseName)
             def queryString = """
                 select distinct g.${groupNameProperty}
                 from ${groupTableEntityName} g, ${userGroupTableEntityName} ug
@@ -68,14 +63,14 @@ public class Security extends AbstractApplicationRealmDelegate {
             groups.addAll(query.list())
 
             if(!StringUtils.isEmpty(adminGroupName) && groups.contains(adminGroupName)) {
-                groups.add(getAdministratorsGroup(realm))
+                groups.add(getAdministratorsGroup())
             }
         }
         return groups
     }
 
     @Override
-    protected Collection<String> loadAuthorizationInfo(ApplicationRealm realm, String principal) {
+    protected Collection<String> loadAuthorizationInfo(String principal) {
         def groups = []
         if(StringUtils.isEmpty(userGroupTableEntityName) || StringUtils.isEmpty(groupTableEntityName)) {
             /////////////////////////////////////////////////////////////////
@@ -84,11 +79,11 @@ public class Security extends AbstractApplicationRealmDelegate {
             if("admin".equals(principal)) {
                 logger.warn("Generated security.groovy is using the hardcoded 'admin' user; " +
                             "remember to disable it in production!")
-                groups.add(getAdministratorsGroup(realm));
+                groups.add(getAdministratorsGroup());
             }
             /////////////////////////////////////////////////////////////////
         } else {
-            Session session = realm.application.getSession(databaseName)
+            Session session = application.getSession(databaseName)
             def queryString = """
                 select distinct g.${groupNameProperty}
                 from ${groupTableEntityName} g, ${userGroupTableEntityName} ug, ${userTableEntityName} u
@@ -101,16 +96,23 @@ public class Security extends AbstractApplicationRealmDelegate {
             groups.addAll(query.list())
 
             if(!StringUtils.isEmpty(adminGroupName) && groups.contains(adminGroupName)) {
-                groups.add(getAdministratorsGroup(realm));
+                groups.add(getAdministratorsGroup());
             }
         }
         return groups
     }
 
-    AuthenticationInfo getAuthenticationInfo(ApplicationRealm realm, String userName, String password) {
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
+        return loadAuthenticationInfo(token);
+    }
+
+    AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {
+        String userName = usernamePasswordToken.username;
+        String password = new String(usernamePasswordToken.password);
+
         String hashedPassword = encryptPassword(password);
 
-        Application application = realm.application;
         Session session = application.getSession(databaseName);
         org.hibernate.Criteria criteria = session.createCriteria(userTableEntityName);
         criteria.add(Restrictions.eq(userNameProperty, userName));
@@ -122,10 +124,10 @@ public class Security extends AbstractApplicationRealmDelegate {
             def user = new User();
             user.username = userName;
             user.databaseId = result.get(0).get(userIdProperty);
-            PrincipalCollection loginAndUser = new SimplePrincipalCollection(userName, realm.name);
-            loginAndUser.add(user, realm.name);
+            PrincipalCollection loginAndUser = new SimplePrincipalCollection(userName, getName());
+            loginAndUser.add(user, getName());
             SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(loginAndUser, password.toCharArray(), realm.name);
+                    new SimpleAuthenticationInfo(loginAndUser, password.toCharArray(), getName());
             return info;
         } else {
             /////////////////////////////////////////////////////////////////
@@ -137,7 +139,7 @@ public class Security extends AbstractApplicationRealmDelegate {
                 SessionMessages.addWarningMessage("Generated security.groovy is using the hardcoded 'admin' user; " +
                                                   "remember to disable it in production!")
                 SimpleAuthenticationInfo info =
-                        new SimpleAuthenticationInfo(userName, password.toCharArray(), realm.name);
+                        new SimpleAuthenticationInfo(userName, password.toCharArray(), getName());
                 return info;
             }
             /////////////////////////////////////////////////////////////////
@@ -149,8 +151,7 @@ public class Security extends AbstractApplicationRealmDelegate {
         return this.$encryptionAlgorithm(password)
     }
 
-    Set<String> getUsers(ApplicationRealm realm) {
-        Application application = realm.application;
+    Set<String> getUsers() {
         def users = new HashSet<String>();
         Session session = application.getSession(databaseName);
         Query query = session.createQuery("select " + userNameProperty + " from " + userTableEntityName);
@@ -158,9 +159,8 @@ public class Security extends AbstractApplicationRealmDelegate {
         return users;
     }
 
-    Set<String> getGroups(ApplicationRealm realm) {
-        Application application = realm.application;
-        def groups = super.getGroups(realm)
+    Set<String> getGroups() {
+        def groups = super.getGroups()
 
         if(!StringUtils.isEmpty(groupTableEntityName)) {
             Session session = application.getSession(databaseName)

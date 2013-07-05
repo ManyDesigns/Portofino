@@ -29,13 +29,9 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.buttons.annotations.Buttons;
-import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.Database;
-import com.manydesigns.portofino.model.database.Table;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
@@ -44,10 +40,8 @@ import com.manydesigns.portofino.pageactions.changepassword.configuration.Change
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import net.sourceforge.stripes.action.*;
-import org.hibernate.NonUniqueResultException;
-import org.hibernate.Query;
-import org.hibernate.Session;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,131 +72,6 @@ public class ChangePasswordAction extends AbstractPageAction {
     //Conf
     protected ChangePasswordConfiguration configuration;
     protected Form configurationForm;
-
-    @DefaultHandler
-    public Resolution execute() {
-        prepareForm();
-        if(!isConfigurationValid()) {
-            return forwardToPortletNotConfigured();
-        }
-        if(isEmbedded()) {
-            return forwardTo("/layouts/changepassword/embedded.jsp");
-        } else {
-            return forwardTo("/layouts/changepassword/change.jsp");
-        }
-    }
-
-    protected boolean isConfigurationValid() {
-        return configuration != null &&
-               configuration.getActualDatabase() != null &&
-               configuration.getActualTable() != null &&
-               configuration.getProperty() != null;
-    }
-
-    protected void prepareForm() {
-        form = new FormBuilder(getClass())
-                    .configFields("oldPassword", "newPassword")
-                    .build();
-        form.readFromObject(this);
-    }
-
-    @Button(list = "changepassword", key = "commons.ok", order = 1, type = Button.TYPE_PRIMARY)
-    public Resolution change() {
-        prepareForm();
-        if(!isConfigurationValid()) {
-            return forwardToPortletNotConfigured();
-        }
-        form.readFromRequest(context.getRequest());
-        if(form.validate()) {
-            form.writeToObject(this);
-            Object user = loadUser();
-            if(user != null) {
-                try {
-                    PropertyAccessor pwdAccessor = getPasswordPropertyAccessor();
-                    String oldPwd = getOldPasswordFromUser(user, pwdAccessor);
-                    if(encrypt(oldPassword).equals(oldPwd)) {
-                        savePassword(user, pwdAccessor);
-                        //Empty fields
-                        oldPassword = null;
-                        newPassword = null;
-                        form.readFromObject(this);
-                        SessionMessages.addInfoMessage(getMessage("changepasswordaction.password.changed"));
-                    } else {
-                        SessionMessages.addErrorMessage(getMessage("changepasswordaction.wrong.password"));
-                    }
-                } catch (NoSuchFieldException e) {
-                    logger.error("Password property accessor: no such field", e);
-                    return forwardToPortletNotConfigured();
-                }
-            } else {
-                return forwardToPortletNotConfigured();
-            }
-        }
-        String fwd = "/layouts/changepassword/change.jsp";
-        return forwardTo(fwd);
-    }
-
-    @Override
-    @Buttons({
-        @Button(list = "configuration", key = "commons.cancel", order = 99),
-        @Button(list = "changepassword",  key = "commons.cancel", order = 99)
-    })
-    public Resolution cancel() {
-        return super.cancel();
-    }
-
-    @Override
-    protected String getDefaultCancelReturnUrl() {
-        PageInstance parent = getDispatch().getLastPageInstance().getParent();
-        if(parent != null) {
-            return context.getRequest().getContextPath() + "/" +
-                   parent.getPath();
-        } else {
-            return super.getDefaultCancelReturnUrl();
-        }
-    }
-
-    //Implementation/hooks
-
-    protected String getOldPasswordFromUser(Object user, PropertyAccessor pwdAccessor) {
-        //TODO check type
-        return (String) pwdAccessor.get(user);
-    }
-
-    protected Object loadUser() {
-        Session session = application.getSession(configuration.getActualDatabase().getDatabaseName());
-        OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(configuration.getQuery());
-        final String queryString = sqlFormat.getFormatString();
-        final Object[] parameters = sqlFormat.evaluateOgnlExpressions(this);
-        Query query = session.createQuery(queryString);
-        for (int i = 0; i < parameters.length; i++) {
-            query.setParameter(i, parameters[i]);
-        }
-        try {
-            return query.uniqueResult();
-        } catch (NonUniqueResultException e) {
-            logger.error("The query did not return a unique result", e);
-            return null;
-        }
-    }
-
-    protected PropertyAccessor getPasswordPropertyAccessor() throws NoSuchFieldException {
-        Table table = configuration.getActualTable();
-        TableAccessor accessor = new TableAccessor(table);
-        return accessor.getProperty(configuration.getProperty());
-    }
-
-    protected void savePassword(Object user, PropertyAccessor pwdAccessor) {
-        Session session = application.getSession(configuration.getActualDatabase().getDatabaseName());
-        Table table = configuration.getActualTable();
-        pwdAccessor.set(user, encrypt(newPassword));
-        session.save(table.getActualEntityName(), user);
-        session.getTransaction().commit();
-    }
-
-    protected String encrypt(String oldPassword) {
-        return oldPassword;
-    }
 
     @Button(list = "portletHeaderButtons", titleKey = "commons.configure", order = 1, icon = Button.ICON_WRENCH)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
