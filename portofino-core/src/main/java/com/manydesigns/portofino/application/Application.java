@@ -77,10 +77,6 @@ public interface Application {
      */
     File getAppModelFile();
     /**
-     * Returns the scripts directory of the application.
-     */
-    File getAppScriptsDir();
-    /**
      * Returns the web pages directory of the application.
      */
     File getAppWebDir();

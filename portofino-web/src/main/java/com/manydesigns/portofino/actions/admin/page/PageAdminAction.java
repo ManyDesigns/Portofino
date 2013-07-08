@@ -34,6 +34,7 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.forms.CopyPage;
 import com.manydesigns.portofino.actions.forms.MovePage;
@@ -147,7 +148,8 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     protected Class<?> getActionClass(String className) throws ClassNotFoundException {
-        return Class.forName(className, true, ScriptingUtil.GROOVY_SCRIPT_ENGINE.getGroovyClassLoader());
+        ClassLoader classLoader = (ClassLoader) context.getServletContext().getAttribute(ApplicationAttributes.CLASS_LOADER);
+        return Class.forName(className, true, classLoader);
     }
 
     public String getMessage(String key, Object... args) {

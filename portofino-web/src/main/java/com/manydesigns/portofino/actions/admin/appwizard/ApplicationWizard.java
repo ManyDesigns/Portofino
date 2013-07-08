@@ -52,6 +52,7 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.modules.PortofinoWebModule;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
@@ -1037,7 +1038,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     protected void setupUsers() {
         try {
             TemplateEngine engine = new SimpleTemplateEngine();
-            Template secTemplate = engine.createTemplate(ApplicationWizard.class.getResource("security.groovy"));
+            Template secTemplate = engine.createTemplate(ApplicationWizard.class.getResource("Security.groovy"));
             Map<String, String> bindings = new HashMap<String, String>();
             bindings.put("databaseName", connectionProvider.getDatabase().getDatabaseName());
             bindings.put("userTableEntityName", userTable.getActualEntityName());
@@ -1057,7 +1058,8 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             bindings.put("adminGroupName", StringUtils.defaultString(adminGroupName));
 
             bindings.put("encryptionAlgorithm", encryptionAlgorithm);
-            FileWriter fw = new FileWriter(new File(application.getAppScriptsDir(), "security.groovy"));
+            File gcp = (File) context.getServletContext().getAttribute(PortofinoWebModule.GROOVY_CLASS_PATH);
+            FileWriter fw = new FileWriter(new File(gcp, "Security.groovy"));
             secTemplate.make(bindings).writeTo(fw);
             IOUtils.closeQuietly(fw);
         } catch (Exception e) {

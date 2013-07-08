@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.shiro;
 
 import org.apache.shiro.authz.Authorizer;
+import org.apache.shiro.cache.CacheManagerAware;
 import org.apache.shiro.realm.Realm;
 
 import java.io.Serializable;
@@ -36,7 +37,7 @@ import java.util.Set;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface PortofinoRealm extends Realm, Authorizer {
+public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 

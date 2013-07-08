@@ -21,21 +21,19 @@
 package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.portofino.ApplicationAttributes;
-import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Injections;
-import com.manydesigns.portofino.scripting.ScriptingUtil;
-import com.manydesigns.portofino.starter.ApplicationStarter;
+import groovy.util.GroovyScriptEngine;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.Permission;
+import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.util.LifecycleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.Serializable;
 import java.util.Collection;
@@ -62,14 +60,19 @@ public class SecurityGroovyRealm implements PortofinoRealm {
     // Properties
     //--------------------------------------------------------------------------
 
-    protected final ApplicationStarter applicationStarter;
+    protected final File classpath;
+    protected final GroovyScriptEngine scriptEngine;
+    protected PortofinoRealm security;
+
+    protected CacheManager cacheManager;
 
     //--------------------------------------------------------------------------
     // Constructors
     //--------------------------------------------------------------------------
 
-    public SecurityGroovyRealm(ApplicationStarter applicationStarter) {
-        this.applicationStarter = applicationStarter;
+    public SecurityGroovyRealm(GroovyScriptEngine scriptEngine, File classpath) {
+        this.scriptEngine = scriptEngine;
+        this.classpath = classpath;
     }
 
     //--------------------------------------------------------------------------
@@ -77,42 +80,36 @@ public class SecurityGroovyRealm implements PortofinoRealm {
     //--------------------------------------------------------------------------
 
     private PortofinoRealm ensureDelegate() {
-        Application application = getApplication();
-        File file = new File(application.getAppScriptsDir(), "security.groovy");
-        Object groovyObject;
-        if(file.exists()) {
-            try {
-                groovyObject = ScriptingUtil.getGroovyObject(file);
+        try {
+            File scriptFile = new File(classpath, "Security.groovy");
+            Class<?> scriptClass = scriptEngine.loadScriptByName(scriptFile.toURI().toString());
+            Object security = this.security;
+            if(!scriptClass.isInstance(security)) try {
+                logger.info("Refreshing Portofino Realm Delegate instance (Security.groovy)");
+                security = scriptClass.newInstance();
             } catch (Exception e) {
-                logger.error("Couldn't load security script", e);
-                throw new Error("Security script missing or invalid: " + file.getAbsolutePath(), e);
+                throw new Error("Couldn't load security script", e);
             }
-            Injections.inject(groovyObject,
-                    ElementsThreadLocals.getServletContext(),
-                    ElementsThreadLocals.getHttpServletRequest()
-                    );
-            if(groovyObject instanceof PortofinoRealm) {
-                return (PortofinoRealm) groovyObject;
+            if(security instanceof PortofinoRealm) {
+                PortofinoRealm realm = (PortofinoRealm) security;
+                configureDelegate(realm);
+                this.security = realm;
+                return realm;
             } else {
-                 throw new Error("Security object is not an instance of " + PortofinoRealm.class +
-                                ": " + groovyObject);
+                 throw new Error("Security object is not an instance of " + PortofinoRealm.class + ": " + security);
             }
-        } else {
-            throw new Error("Security object file not found: " + file.getAbsolutePath());
+        } catch (Exception e) {
+            throw new Error("Security.groovy not found or not loadable", e);
         }
     }
 
-    public Application getApplication() {
-        Application application;
-        try {
-            ServletContext servletContext = ElementsThreadLocals.getServletContext();
-            ApplicationStarter applicationStarter =
-                    (ApplicationStarter) servletContext.getAttribute(ApplicationAttributes.APPLICATION_STARTER);
-            application = applicationStarter.getApplication();
-        } catch (Exception e) {
-            throw new AuthenticationException("Couldn't get application", e);
-        }
-        return application;
+    protected void configureDelegate(PortofinoRealm security) {
+        Injections.inject(
+                security,
+                ElementsThreadLocals.getServletContext(),
+                ElementsThreadLocals.getHttpServletRequest());
+        security.setCacheManager(cacheManager);
+        LifecycleUtils.init(security);
     }
 
     //--------------------------------------------------------------------------
@@ -266,5 +263,11 @@ public class SecurityGroovyRealm implements PortofinoRealm {
     @Override
     public void checkRoles(PrincipalCollection subjectPrincipal, String... roleIdentifiers) throws AuthorizationException {
         ensureDelegate().checkRoles(subjectPrincipal, roleIdentifiers);
+    }
+
+    @Override
+    public void setCacheManager(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+        ensureDelegate().setCacheManager(cacheManager);
     }
 }

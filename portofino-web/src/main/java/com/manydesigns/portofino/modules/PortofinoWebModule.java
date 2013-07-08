@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.modules;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.ApplicationAttributes;
@@ -40,25 +41,30 @@ import com.manydesigns.portofino.files.TempFileService;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.menu.*;
+import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.servlets.MailScheduler;
 import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
 import com.manydesigns.portofino.starter.ApplicationStarter;
+import groovy.util.GroovyScriptEngine;
 import net.sf.ehcache.CacheManager;
 import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlRuntime;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.RealmSecurityManager;
-import org.apache.shiro.realm.Realm;
 import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.WebEnvironment;
+import org.codehaus.groovy.control.CompilerConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Locale;
 
 /*
@@ -94,6 +100,13 @@ public class PortofinoWebModule implements Module {
     protected CacheManager cacheManager;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
+
+    //**************************************************************************
+    // Constants
+    //**************************************************************************
+
+    public static final String GROOVY_SCRIPT_ENGINE = "GROOVY_SCRIPT_ENGINE";
+    public static final String GROOVY_CLASS_PATH = "GROOVY_CLASS_PATH";
 
     //**************************************************************************
     // Logging
@@ -171,7 +184,21 @@ public class PortofinoWebModule implements Module {
         logger.debug("Publishing the Application Realm in the servlet context");
         RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
 
-        Realm realm = new SecurityGroovyRealm(applicationStarter);
+        logger.info("Initializing Groovy script engine");
+        String appsDirPath = configuration.getString(PortofinoProperties.APPS_DIR_PATH);
+        File appsDir = new File(appsDirPath);
+        File appDir = new File(appsDir, appId);
+        File groovyClasspath = new File(appDir, "groovy");
+        ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(groovyClasspath);
+
+        servletContext.setAttribute(GROOVY_CLASS_PATH, groovyClasspath);
+        GroovyScriptEngine groovyScriptEngine = createScriptEngine(groovyClasspath);
+        servletContext.setAttribute(GROOVY_SCRIPT_ENGINE, groovyScriptEngine);
+
+        ClassLoader classLoader = groovyScriptEngine.getGroovyClassLoader();
+        servletContext.setAttribute(ApplicationAttributes.CLASS_LOADER, classLoader);
+
+        SecurityGroovyRealm realm = new SecurityGroovyRealm(groovyScriptEngine, groovyClasspath);
         LifecycleUtils.init(realm);
         rsm.setRealm(realm);
 
@@ -180,6 +207,25 @@ public class PortofinoWebModule implements Module {
 
         status = ModuleStatus.ACTIVE;
     }
+
+    protected static GroovyScriptEngine createScriptEngine(File classpathFile) {
+        CompilerConfiguration cc = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
+        String classpath = classpathFile.getAbsolutePath();
+        logger.info("Groovy classpath: " + classpath);
+        cc.setClasspath(classpath);
+        cc.setRecompileGroovySource(true);
+        GroovyScriptEngine scriptEngine;
+        try {
+            scriptEngine =
+                    new GroovyScriptEngine(new URL[] { classpathFile.toURI().toURL() },
+                                           ScriptingUtil.class.getClassLoader());
+        } catch (IOException e) {
+            throw new Error(e);
+        }
+        scriptEngine.setConfig(cc);
+        return scriptEngine;
+    }
+
 
     protected void appendToAppMenu() {
         appMenu.menuAppenders.add(new MenuAppender() {
@@ -373,6 +419,11 @@ public class PortofinoWebModule implements Module {
         environmentLoader.destroyEnvironment(servletContext);
         logger.info("Shutting down cache...");
         cacheManager.shutdown();
+        logger.info("Removing Groovy classloader...");
+        servletContext.removeAttribute(GROOVY_SCRIPT_ENGINE);
+        servletContext.removeAttribute(GROOVY_CLASS_PATH);
+        //TODO
+        servletContext.setAttribute(ApplicationAttributes.CLASS_LOADER, PortofinoWebModule.class.getClassLoader());
         logger.info("ManyDesigns Portofino web module stopped.");
         status = ModuleStatus.DESTROYED;
     }

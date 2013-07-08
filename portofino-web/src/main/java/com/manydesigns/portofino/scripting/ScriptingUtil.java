@@ -23,7 +23,7 @@ package com.manydesigns.portofino.scripting;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.RandomUtil;
-import com.manydesigns.portofino.application.Application;
+import com.manydesigns.portofino.modules.PortofinoWebModule;
 import groovy.lang.Binding;
 import groovy.lang.GroovyObject;
 import groovy.lang.GroovyShell;
@@ -31,13 +31,11 @@ import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import ognl.OgnlContext;
-import org.codehaus.groovy.control.CompilerConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -73,12 +71,6 @@ public class ScriptingUtil {
         }
     }
 
-    public static GroovyObject getGroovyObject(File storageDir, String pageId)
-            throws IOException, ScriptException, ResourceException {
-        File file = getGroovyScriptFile(storageDir, pageId);
-        return getGroovyObject(file);
-    }
-
     public static GroovyObject getGroovyObject(File file) throws IOException, ScriptException, ResourceException {
         if(!file.exists()) {
             return null;
@@ -97,36 +89,14 @@ public class ScriptingUtil {
         return RandomUtil.getCodeFile(storageDir, GROOVY_FILE_NAME_PATTERN, pageId);
     }
 
-    public static GroovyScriptEngine GROOVY_SCRIPT_ENGINE =
-            new GroovyScriptEngine(new URL[] { ScriptingUtil.class.getResource("/") },
-                                               ScriptingUtil.class.getClassLoader());
-
     public static Class<?> getGroovyClass(File scriptFile) throws IOException, ScriptException, ResourceException {
         if(!scriptFile.exists()) {
             return null;
         }
-        return GROOVY_SCRIPT_ENGINE.loadScriptByName(scriptFile.toURI().toString());
+        GroovyScriptEngine scriptEngine =
+                (GroovyScriptEngine) ElementsThreadLocals.getServletContext().getAttribute(
+                        PortofinoWebModule.GROOVY_SCRIPT_ENGINE);
+        return scriptEngine.loadScriptByName(scriptFile.toURI().toString());
     }
 
-    //TODO mappa application -> classloader (multi-app)
-    public static void initBaseClassLoader(Application application) {
-        CompilerConfiguration cc = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
-        File classpathFile = application.getAppScriptsDir();
-        String classpath = classpathFile.getAbsolutePath();
-        logger.info("Base classpath for application " + application.getAppId() + " is " + classpath);
-        cc.setClasspath(classpath);
-        cc.setRecompileGroovySource(true);
-        try {
-            GROOVY_SCRIPT_ENGINE =
-                    new GroovyScriptEngine(new URL[] { classpathFile.toURI().toURL() },
-                                           ScriptingUtil.class.getClassLoader());
-        } catch (IOException e) {
-            throw new Error(e);
-        }
-        GROOVY_SCRIPT_ENGINE.setConfig(cc);
-    }
-
-    public static void removeBaseClassLoader(Application application) {
-        GROOVY_SCRIPT_ENGINE = new GroovyScriptEngine(new URL[0], ScriptingUtil.class.getClassLoader());
-    }
 }

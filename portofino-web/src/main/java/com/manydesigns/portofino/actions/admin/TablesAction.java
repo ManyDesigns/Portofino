@@ -32,6 +32,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.tables.forms.ColumnForm;
 import com.manydesigns.portofino.actions.admin.tables.forms.DatabaseSelectionProviderForm;
@@ -43,14 +44,13 @@ import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.stripes.AbstractActionBean;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
-import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.RequiresAdministrator;
+import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -256,7 +256,9 @@ public class TablesAction extends AbstractActionBean {
             String javaClass = javaClassField.getStringValue();
             if(!StringUtils.isBlank(javaClass)) {
                 try {
-                    Class.forName(javaClass, true, ScriptingUtil.GROOVY_SCRIPT_ENGINE.getGroovyClassLoader());
+                    ClassLoader classLoader =
+                            (ClassLoader) context.getServletContext().getAttribute(ApplicationAttributes.CLASS_LOADER);
+                    Class.forName(javaClass, true, classLoader);
                 } catch (ClassNotFoundException e) {
                     javaClassField.getErrors().add(getMessage("layouts.admin.tables.classNotFound"));
                     return false;

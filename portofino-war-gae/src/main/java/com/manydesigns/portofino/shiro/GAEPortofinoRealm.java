@@ -26,10 +26,11 @@ import com.google.appengine.api.users.UserServiceFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
-import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.authc.pam.UnsupportedTokenException;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -45,39 +46,34 @@ public class GAEPortofinoRealm extends AbstractPortofinoRealm {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     @Override
-    protected AuthenticationInfo getAuthenticationInfo(SecurityGroovyRealm realm, String userName, String password) {
-        throw new UnsupportedOperationException("Login with username and password is not supported");
-    }
-
-    @Override
-    protected AuthenticationInfo getAuthenticationInfo(SecurityGroovyRealm realm, ServletContainerToken token) {
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
+        if(!(token instanceof ServletContainerToken)) {
+            throw new UnsupportedTokenException("Token not supported: " + token);
+        }
         //On GAE, if the user was logged by the container, it is also known to the UserService
         UserService userService = UserServiceFactory.getUserService();
         User user = userService.getCurrentUser();
         if(user == null) {
             throw new AuthenticationException("User is authenticated to the container, but is not known to the UserService");
         }
-        SimplePrincipalCollection coll = new SimplePrincipalCollection();
-        String realmName = realm.getName();
-        coll.add(user.getEmail(), realmName);
-        coll.add(user, realmName);
-        return new SimpleAuthenticationInfo(coll, token.getCredentials(), realmName);
+        //TODO verifica utilizzo User come principal direttamente
+        return new SimpleAuthenticationInfo(user, token.getCredentials(), getName());
     }
 
     @Override
-    protected Collection<String> loadAuthorizationInfo(SecurityGroovyRealm realm, PrincipalCollection principalCollection) {
-        Set<String> authz = new HashSet<String>(super.loadAuthorizationInfo(realm, principalCollection));
-        User user = principalCollection.oneByType(User.class);
+    protected Collection<String> loadAuthorizationInfo(Serializable principal) {
+        Set<String> authz = new HashSet<String>(super.loadAuthorizationInfo(principal));
+        User user = (User) principal;
         UserService userService = UserServiceFactory.getUserService();
         if(user != null &&
            userService.isUserAdmin() && 
            StringUtils.equals(userService.getCurrentUser().getUserId(), user.getUserId())) {
-            authz.add(getAdministratorsGroup(realm));
+            authz.add(getAdministratorsGroup());
         }
         return authz;
     }
 
-    public Set<String> getUsers(SecurityGroovyRealm realm) {
+    public Set<String> getUsers() {
         return new HashSet<String>();
     }
 }

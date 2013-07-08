@@ -6,13 +6,13 @@ Template del contenuto di local.py:
 
 #! /usr/bin/env python
 
-portofino_version = "4.0.9"
-tomcat_dir = "apache-tomcat-6.0.36"
+portofino_version = "4.1"
+tomcat_dir = "apache-tomcat-7.0.41"
 portofino_path = "~/projects/portofino4"
-tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-6/v6.0.35/bin/apache-tomcat-6.0.35.zip"
-drivers = [["postgresql/postgresql/9.1-901.jdbc3/", "postgresql-9.1-901.jdbc3.jar"],
-           ["mysql/mysql-connector-java/5.1.15/", "mysql-connector-java-5.1.15.jar"],
-           ["net/sourceforge/jtds/jtds/1.2.4/", "jtds-1.2.4.jar"]]
+tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-7/v7.0.41/bin/apache-tomcat-7.0.41.zip"
+drivers = [["postgresql/postgresql/9.2-1003-jdbc4/", "postgresql-9.2-1003-jdbc4.jar"],
+           ["mysql/mysql-connector-java/5.1.25/", "mysql-connector-java-5.1.25.jar"],
+           ["net/sourceforge/jtds/jtds/1.2.8/", "jtds-1.2.8.jar"]]
 
 '''
 

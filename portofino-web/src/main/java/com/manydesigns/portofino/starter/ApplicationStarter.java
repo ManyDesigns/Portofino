@@ -28,6 +28,7 @@ import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.application.DefaultApplication;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Injections;
+import com.manydesigns.portofino.modules.PortofinoWebModule;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.starter.migration.text.MigrateTo408;
 import org.apache.commons.configuration.Configuration;
@@ -155,8 +156,6 @@ public class ApplicationStarter {
                 logger.error("Application listener threw an exception during shutdown", t);
             }
         }
-        logger.info("Removing base classloader for application {}", application.getAppId());
-        ScriptingUtil.removeBaseClassLoader(application);
     }
 
     public Status getStatus() {
@@ -176,7 +175,7 @@ public class ApplicationStarter {
         tmpApplication = null;
 
         String appsDirPath =
-        portofinoConfiguration.getString(PortofinoProperties.APPS_DIR_PATH);
+            portofinoConfiguration.getString(PortofinoProperties.APPS_DIR_PATH);
         File appsDir = new File(appsDirPath);
         boolean success = ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(appsDir);
 
@@ -236,9 +235,9 @@ public class ApplicationStarter {
 
         runMigrations(tmpApplication);
 
-        logger.info("Initializing base classloader for application {}", tmpApplication.getAppId());
-        ScriptingUtil.initBaseClassLoader(tmpApplication);
-        File appListenerFile = new File(tmpApplication.getAppScriptsDir(), "AppListener.groovy");
+        File cp = (File) servletContext.getAttribute(PortofinoWebModule.GROOVY_CLASS_PATH);
+
+        File appListenerFile = new File(cp, "AppListener.groovy");
         boolean success = true;
         try {
             Object o = ScriptingUtil.getGroovyObject(appListenerFile);
@@ -259,11 +258,6 @@ public class ApplicationStarter {
         } catch (Throwable e) {
             logger.error("Could not invoke app listener", e);
             success = false;
-        }
-        if(!success) {
-            //Clean up
-            logger.info("Removing base classloader for application {}", tmpApplication.getAppId());
-            ScriptingUtil.removeBaseClassLoader(tmpApplication);
         }
         return success;
     }

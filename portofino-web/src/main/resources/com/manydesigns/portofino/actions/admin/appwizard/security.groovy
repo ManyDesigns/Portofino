@@ -45,7 +45,7 @@ public class Security extends AbstractPortofinoRealm {
 //            //NB admin is hardcoded for the wizard to work - remove it in production!
 //            /////////////////////////////////////////////////////////////////
 //            if("admin".equals(principalCollection.asList().get(0))) {
-//                logger.warn("Generated security.groovy is using the hardcoded 'admin' user; " +
+//                logger.warn("Generated Security.groovy is using the hardcoded 'admin' user; " +
 //                            "remember to disable it in production!")
 //                groups.add(getAdministratorsGroup())
 //            }
@@ -77,7 +77,7 @@ public class Security extends AbstractPortofinoRealm {
             //NB admin is hardcoded for the wizard to work - remove it in production!
             /////////////////////////////////////////////////////////////////
             if("admin".equals(principal)) {
-                logger.warn("Generated security.groovy is using the hardcoded 'admin' user; " +
+                logger.warn("Generated Security.groovy is using the hardcoded 'admin' user; " +
                             "remember to disable it in production!")
                 groups.add(getAdministratorsGroup());
             }
@@ -134,9 +134,9 @@ public class Security extends AbstractPortofinoRealm {
             //NB admin is hardcoded for the wizard to work - remove it in production!
             /////////////////////////////////////////////////////////////////
             if("admin".equals(userName) && "admin".equals(password)) {
-                logger.warn("Generated security.groovy is using the hardcoded 'admin' user; " +
+                logger.warn("Generated Security.groovy is using the hardcoded 'admin' user; " +
                             "remember to disable it in production!")
-                SessionMessages.addWarningMessage("Generated security.groovy is using the hardcoded 'admin' user; " +
+                SessionMessages.addWarningMessage("Generated Security.groovy is using the hardcoded 'admin' user; " +
                                                   "remember to disable it in production!")
                 SimpleAuthenticationInfo info =
                         new SimpleAuthenticationInfo(userName, password.toCharArray(), getName());
