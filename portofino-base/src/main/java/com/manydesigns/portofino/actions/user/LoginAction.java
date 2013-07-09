@@ -41,6 +41,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.DisabledAccountException;
+import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -278,8 +279,18 @@ public abstract class LoginAction extends AbstractActionBean {
         if (ObjectUtils.equals(newPassword, confirmNewPassword)) {
             PortofinoRealm portofinoRealm =
                     ShiroUtils.getPortofinoRealm();
-            portofinoRealm.changePassword(principal, newPassword);
-            SessionMessages.addInfoMessage("Password changed successfully");
+            try {
+                portofinoRealm.changePassword(principal, pwd, newPassword);
+                SessionMessages.addInfoMessage("Password changed successfully");
+            } catch (IncorrectCredentialsException e) {
+                logger.error("Password update failed", e);
+                SessionMessages.addErrorMessage("Your current password does not match.");
+                return new ForwardResolution("/portofino-base/layouts/user/changePassword.jsp");
+            } catch (Exception e) {
+                logger.error("Password update failed", e);
+                SessionMessages.addErrorMessage("Could not change password.");
+                return new ForwardResolution("/portofino-base/layouts/user/changePassword.jsp");
+            }
             return redirectToReturnUrl();
 
         } else {

@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.shiro;
 
+import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authz.Authorizer;
 import org.apache.shiro.cache.CacheManagerAware;
 import org.apache.shiro.realm.Realm;
@@ -62,9 +63,12 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
     /**
      * Changes a user's password
      * @param user the user object.
+     * @param oldPassword the old password provided by the user. Must match with the stored one.
      * @param newPassword the new password.
+     * @throws org.apache.shiro.authc.IncorrectCredentialsException if the old password does not match with the one
+     * known by the system (e.g. as stored on a LDAP directory).
      */
-    void changePassword(Serializable user, String newPassword);
+    void changePassword(Serializable user, String oldPassword, String newPassword) throws IncorrectCredentialsException;
 
     /**
      * Generates a one-time token, for use in email validation and password reset

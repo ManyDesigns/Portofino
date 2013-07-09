@@ -92,9 +92,9 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     }
 
     /**
-     * Loads the groups associated to a given username.
-     * @param principal
-     * @return
+     * Loads the groups associated to a given user.
+     * @param principal the user object.
+     * @return the groups as a collection of strings.
      */
     protected Collection<String> loadAuthorizationInfo(Serializable principal) {
         return Collections.emptySet();
@@ -170,7 +170,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     //--------------------------------------------------------------------------
 
     @Override
-    public void changePassword(Serializable user, String newPassword) {
+    public void changePassword(Serializable user, String oldPassword, String newPassword) {
         throw new UnsupportedOperationException();
     }
 

@@ -18,8 +18,6 @@ public class UserMenuAppender implements MenuAppender {
 
     public final Configuration configuration;
 
-
-
     UserMenuAppender(Configuration configuration) {
         this.configuration = configuration
     }

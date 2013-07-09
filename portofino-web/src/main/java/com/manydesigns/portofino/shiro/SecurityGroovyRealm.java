@@ -127,8 +127,8 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     }
 
     @Override
-    public void changePassword(Serializable user, String newPassword) {
-        ensureDelegate().changePassword(user, newPassword);
+    public void changePassword(Serializable user, String oldPassword, String newPassword) {
+        ensureDelegate().changePassword(user, oldPassword, newPassword);
     }
 
     @Override

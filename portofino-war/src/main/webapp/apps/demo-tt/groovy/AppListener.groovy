@@ -22,8 +22,6 @@ public class AppListener implements ApplicationListener {
         return true;
     }
 
-    void applicationDestroying(Application application, ServletContext servletContext) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+    void applicationDestroying(Application application, ServletContext servletContext) {}
 
 }
