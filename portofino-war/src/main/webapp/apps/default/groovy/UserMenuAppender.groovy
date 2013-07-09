@@ -34,20 +34,16 @@ public class UserMenuAppender implements MenuAppender {
         Subject subject = SecurityUtils.getSubject();
         if(subject.isAuthenticated()) {
             Object principal = subject.getPrincipal();
-            String prettyName = "$principal.firstname $principal.lastname";
+            String prettyName;
+            if(principal instanceof String) {
+                prettyName = principal;
+            } else {
+                prettyName = "user"; //TODO
+            }
             MenuGroup userGroup =
                     new MenuGroup("user", "icon-user icon-white",
                                  prettyName, 10.0);
             menu.items.add(userGroup);
-
-            UrlBuilder profileUrlBuilder =
-                    new UrlBuilder(Locale.getDefault(), "/", false);
-            String profileUrl = Util.getAbsoluteUrl(profileUrlBuilder.toString());
-            MenuLink profileLink =
-                    new MenuLink("profile", null,
-                                 ElementsThreadLocals.getText("skins.default.header.profile"),
-                                 profileUrl, 1.0);
-            userGroup.menuLinks.add(profileLink);
 
             UrlBuilder changePasswordUrlBuilder =
                     new UrlBuilder(Locale.getDefault(), loginPage, false);

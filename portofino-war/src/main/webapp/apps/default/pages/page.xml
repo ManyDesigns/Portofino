@@ -5,6 +5,7 @@
     <layout>
         <childPages>
             <childPage name="welcome" showInNavigation="true"/>
+            <childPage name="login" showInNavigation="false"/>
         </childPages>
     </layout>
 </page>

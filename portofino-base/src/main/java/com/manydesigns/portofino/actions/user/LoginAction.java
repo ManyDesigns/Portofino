@@ -124,7 +124,7 @@ public abstract class LoginAction extends AbstractActionBean {
         try {
             UsernamePasswordToken usernamePasswordToken =
                     new UsernamePasswordToken(userName, pwd);
-            usernamePasswordToken.setRememberMe(true);
+            usernamePasswordToken.setRememberMe(false);
             subject.login(usernamePasswordToken);
             logger.info("User {} login", userName);
             String successMsg = ElementsThreadLocals.getText("user.login.success", userName);
@@ -168,7 +168,7 @@ public abstract class LoginAction extends AbstractActionBean {
     //**************************************************************************
 
     public Resolution logout() {
-        String userName = ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) + "";
+        String userName = "user"; //TODO ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) + "";
         SecurityUtils.getSubject().logout();
         HttpSession session = getSession();
         if (session != null) {

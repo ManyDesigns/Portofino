@@ -22,9 +22,7 @@ package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
-import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.stripes.ForbiddenAccessResolution;
-import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
@@ -61,7 +59,7 @@ public class ShiroInterceptor implements Interceptor {
         String userId = null;
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
-            userId = ShiroUtils.getPrimaryPrincipal(subject).toString();
+            //TODO userId = ShiroUtils.getPrimaryPrincipal(subject).toString();
             logger.debug("Retrieved userId={}", userId);
         } else {
             logger.debug("No user found");

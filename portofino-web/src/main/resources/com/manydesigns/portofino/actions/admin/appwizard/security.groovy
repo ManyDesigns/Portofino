@@ -1,12 +1,9 @@
 import com.manydesigns.elements.messages.SessionMessages
-import com.manydesigns.portofino.actions.admin.appwizard.User
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import java.security.MessageDigest
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.codec.Base64
 import org.apache.shiro.codec.Hex
-import org.apache.shiro.subject.PrincipalCollection
-import org.apache.shiro.subject.SimplePrincipalCollection
 import org.hibernate.Query
 import org.hibernate.Session
 import org.hibernate.criterion.Order
@@ -37,46 +34,15 @@ public class Security extends AbstractPortofinoRealm {
 
     protected String adminGroupName = "$adminGroupName";
 
-//    @Override
-//    protected Collection<String> loadAuthorizationInfo(PrincipalCollection principalCollection) {
-//        def groups = []
-//        if(StringUtils.isEmpty(userGroupTableEntityName) || StringUtils.isEmpty(groupTableEntityName)) {
-//            /////////////////////////////////////////////////////////////////
-//            //NB admin is hardcoded for the wizard to work - remove it in production!
-//            /////////////////////////////////////////////////////////////////
-//            if("admin".equals(principalCollection.asList().get(0))) {
-//                logger.warn("Generated Security.groovy is using the hardcoded 'admin' user; " +
-//                            "remember to disable it in production!")
-//                groups.add(getAdministratorsGroup())
-//            }
-//            /////////////////////////////////////////////////////////////////
-//        } else {
-//            Session session = application.getSession(databaseName)
-//            def queryString = """
-//                select distinct g.${groupNameProperty}
-//                from ${groupTableEntityName} g, ${userGroupTableEntityName} ug
-//                where g.${groupIdProperty} = ug.${groupLinkProperty}
-//                and ug.${userLinkProperty} = :userId
-//            """
-//            def query = session.createQuery(queryString)
-//            query.setParameter("userId", principalCollection.asList().get(1).getDatabaseId())
-//            groups.addAll(query.list())
-//
-//            if(!StringUtils.isEmpty(adminGroupName) && groups.contains(adminGroupName)) {
-//                groups.add(getAdministratorsGroup())
-//            }
-//        }
-//        return groups
-//    }
-//
     @Override
-    protected Collection<String> loadAuthorizationInfo(String principal) {
+    protected Collection<String> loadAuthorizationInfo(Serializable principal) {
         def groups = []
         if(StringUtils.isEmpty(userGroupTableEntityName) || StringUtils.isEmpty(groupTableEntityName)) {
             /////////////////////////////////////////////////////////////////
             //NB admin is hardcoded for the wizard to work - remove it in production!
             /////////////////////////////////////////////////////////////////
-            if("admin".equals(principal)) {
+            if("admin".equals(principal) ||
+               (principal instanceof Map && "admin".equals(principal[userNameProperty]))) {
                 logger.warn("Generated Security.groovy is using the hardcoded 'admin' user; " +
                             "remember to disable it in production!")
                 groups.add(getAdministratorsGroup());
@@ -89,10 +55,10 @@ public class Security extends AbstractPortofinoRealm {
                 from ${groupTableEntityName} g, ${userGroupTableEntityName} ug, ${userTableEntityName} u
                 where g.${groupIdProperty} = ug.${groupLinkProperty}
                 and ug.${userLinkProperty} = u.${userIdProperty}
-                and u.${userNameProperty} = :principal
+                and u.${userIdProperty} = :userId
             """
             def query = session.createQuery(queryString)
-            query.setParameter("principal", principal)
+            query.setParameter("userId", principal[userIdProperty])
             groups.addAll(query.list())
 
             if(!StringUtils.isEmpty(adminGroupName) && groups.contains(adminGroupName)) {
@@ -111,25 +77,7 @@ public class Security extends AbstractPortofinoRealm {
         String userName = usernamePasswordToken.username;
         String password = new String(usernamePasswordToken.password);
 
-        String hashedPassword = encryptPassword(password);
-
-        Session session = application.getSession(databaseName);
-        org.hibernate.Criteria criteria = session.createCriteria(userTableEntityName);
-        criteria.add(Restrictions.eq(userNameProperty, userName));
-        criteria.add(Restrictions.eq(passwordProperty, hashedPassword));
-
-        List result = criteria.list();
-
-        if (result.size() == 1) {
-            def user = new User();
-            user.username = userName;
-            user.databaseId = result.get(0).get(userIdProperty);
-            PrincipalCollection loginAndUser = new SimplePrincipalCollection(userName, getName());
-            loginAndUser.add(user, getName());
-            SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(loginAndUser, password.toCharArray(), getName());
-            return info;
-        } else {
+        if(StringUtils.isEmpty(userTableEntityName)) {
             /////////////////////////////////////////////////////////////////
             //NB admin is hardcoded for the wizard to work - remove it in production!
             /////////////////////////////////////////////////////////////////
@@ -143,9 +91,50 @@ public class Security extends AbstractPortofinoRealm {
                 return info;
             }
             /////////////////////////////////////////////////////////////////
+        }
+
+        String hashedPassword = encryptPassword(password);
+
+        Session session = application.getSession(databaseName);
+        org.hibernate.Criteria criteria = session.createCriteria(userTableEntityName);
+        criteria.add(Restrictions.eq(userNameProperty, userName));
+        criteria.add(Restrictions.eq(passwordProperty, hashedPassword));
+
+        List result = criteria.list();
+
+        if (result.size() == 1) {
+            SimpleAuthenticationInfo info =
+                    new SimpleAuthenticationInfo(result.get(0), password.toCharArray(), getName());
+            return info;
+        } else {
             throw new IncorrectCredentialsException("Login failed");
         }
     }
+
+    @Override
+    void changePassword(Serializable user, String oldPassword, String newPassword) {
+        if(StringUtils.isEmpty(userTableEntityName)) {
+            throw new UnsupportedOperationException("User table is not configured");
+        }
+        Session session = application.getSession(databaseName);
+        def q = session.createQuery("""
+                update $userTableEntityName set $passwordProperty = :newPwd
+                where $userIdProperty = :id and $passwordProperty = :oldPwd""");
+        q.setParameter("newPwd", encryptPassword(newPassword));
+        q.setParameter("id", user[userIdProperty]);
+        q.setParameter("oldPwd", encryptPassword(oldPassword));
+        int rows = q.executeUpdate();
+        if(rows == 0) {
+            //Probably the password did not match
+            throw new IncorrectCredentialsException("The password update query modified 0 rows. This most probably means that the old password is wrong. It may also mean that the user has been deleted.");
+        } else if(rows > 1) {
+            throw new Error("Password update query modified more than 1 row! Rolling back.");
+        } else {
+            session.transaction.commit();
+        }
+    }
+
+
 
     String encryptPassword(String password) {
         return this.$encryptionAlgorithm(password)

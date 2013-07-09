@@ -92,7 +92,7 @@ class Security extends AbstractPortofinoRealm {
             //Probably the password did not match
             throw new IncorrectCredentialsException("The password update query modified 0 rows. This most probably means that the old password is wrong. It may also mean that the user has been deleted.");
         } else if(rows > 1) {
-            throw new Error("Password update query updated more than 1 row! Rolling back.");
+            throw new Error("Password update query modified more than 1 row! Rolling back.");
         } else {
             session.transaction.commit();
         }

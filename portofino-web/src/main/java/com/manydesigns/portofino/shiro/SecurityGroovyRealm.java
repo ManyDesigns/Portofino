@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -100,7 +101,10 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
                     LifecycleUtils.destroy(oldSecurity);
                     return realm;
                 } else {
-                     throw new Error("Security object is not an instance of " + PortofinoRealm.class + ": " + security);
+                     throw new Error(
+                             "Security object is not an instance of " + PortofinoRealm.class + ": " + security +
+                             " (" + security.getClass().getSuperclass() + " " +
+                             Arrays.asList(security.getClass().getInterfaces()) + ")");
                 }
             }
         } catch (Exception e) {
