@@ -35,7 +35,6 @@ import org.apache.shiro.util.LifecycleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -61,7 +60,7 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     // Properties
     //--------------------------------------------------------------------------
 
-    protected final File classpath;
+    protected final String securityGroovyPath;
     protected final GroovyScriptEngine scriptEngine;
     protected volatile PortofinoRealm security;
     protected volatile boolean destroyed = false;
@@ -72,9 +71,9 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     // Constructors
     //--------------------------------------------------------------------------
 
-    public SecurityGroovyRealm(GroovyScriptEngine scriptEngine, File classpath) {
+    public SecurityGroovyRealm(GroovyScriptEngine scriptEngine, String securityGroovyPath) {
         this.scriptEngine = scriptEngine;
-        this.classpath = classpath;
+        this.securityGroovyPath = securityGroovyPath;
     }
 
     //--------------------------------------------------------------------------
@@ -86,8 +85,7 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
             throw new IllegalStateException("This realm has been destroyed.");
         }
         try {
-            File scriptFile = new File(classpath, "Security.groovy");
-            Class<?> scriptClass = scriptEngine.loadScriptByName(scriptFile.toURI().toString());
+            Class<?> scriptClass = scriptEngine.loadScriptByName(securityGroovyPath);
             Object security = this.security;
             if(scriptClass.isInstance(security)) { //Class did not change
                 return this.security;

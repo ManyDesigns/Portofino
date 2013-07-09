@@ -198,7 +198,8 @@ public class PortofinoWebModule implements Module {
         ClassLoader classLoader = groovyScriptEngine.getGroovyClassLoader();
         servletContext.setAttribute(ApplicationAttributes.CLASS_LOADER, classLoader);
 
-        SecurityGroovyRealm realm = new SecurityGroovyRealm(groovyScriptEngine, groovyClasspath);
+        File scriptFile = new File(groovyClasspath, "Security.groovy");
+        SecurityGroovyRealm realm = new SecurityGroovyRealm(groovyScriptEngine, scriptFile.toURI().toString());
         LifecycleUtils.init(realm);
         rsm.setRealm(realm);
 
