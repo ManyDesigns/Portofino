@@ -3,7 +3,6 @@ package com.manydesigns.portofino.pageactions.login;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
@@ -53,7 +52,7 @@ import java.util.ResourceBundle;
  */
 @ScriptTemplate("script_template.groovy")
 @PageActionName("OpenID Login")
-public class OpenIdLoginAction  extends LoginAction implements PageAction {
+public class OpenIdLoginAction extends DefaultLoginAction implements PageAction {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 

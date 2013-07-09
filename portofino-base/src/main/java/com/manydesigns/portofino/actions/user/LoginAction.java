@@ -28,6 +28,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.shiro.PasswordResetToken;
 import com.manydesigns.portofino.shiro.PortofinoRealm;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
@@ -53,8 +54,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Action that handles the standard Portofino login form. It supports two login methods: username + password
- * and OpenID.
+ * Action that handles the standard Portofino login form.
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -83,6 +83,8 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public String newPassword;
     public String confirmNewPassword;
+
+    public String token;
 
     //**************************************************************************
     // Presentation elements
@@ -203,9 +205,51 @@ public abstract class LoginAction extends AbstractActionBean {
             return redirectToReturnUrl();
         }
 
+        PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
+        Serializable user = portofinoRealm.getUserByEmail(email);
+        String token = portofinoRealm.generateOneTimeToken(user);
+        sendForgotPasswordEmail(email, token);
+
         SessionMessages.addInfoMessage("Check your mailbox and follow the instructions");
         return new RedirectResolution(getOriginalPath());
     }
+
+    public Resolution resetPassword() {
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
+            logger.debug("Already logged in");
+            return redirectToReturnUrl();
+        }
+
+        return new ForwardResolution("/portofino-base/layouts/user/resetPassword.jsp");
+    }
+
+    public Resolution resetPassword2() {
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
+            logger.debug("Already logged in");
+            return redirectToReturnUrl();
+        }
+
+        if (ObjectUtils.equals(newPassword, confirmNewPassword)) {
+            PasswordResetToken token = new PasswordResetToken(this.token, newPassword);
+            try {
+                subject.login(token);
+                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("user.passwordReset.success"));
+                return redirectToReturnUrl();
+            } catch (AuthenticationException e) {
+                String errMsg = ElementsThreadLocals.getText("user.passwordReset.invalidToken");
+                SessionMessages.addErrorMessage(errMsg);
+                logger.warn(errMsg, e);
+                return new ForwardResolution(getLoginPage());
+            }
+        } else {
+            SessionMessages.addErrorMessage("Passwords do not match");
+            return resetPassword();
+        }
+    }
+
+    protected abstract void sendForgotPasswordEmail(String email, String token);
 
     protected String getForgotPasswordPage() {
         return "/portofino-base/layouts/user/forgotPassword.jsp";
@@ -396,5 +440,13 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public void setConfirmNewPassword(String confirmNewPassword) {
         this.confirmNewPassword = confirmNewPassword;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

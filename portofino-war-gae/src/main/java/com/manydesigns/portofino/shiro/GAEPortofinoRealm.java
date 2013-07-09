@@ -76,4 +76,9 @@ public class GAEPortofinoRealm extends AbstractPortofinoRealm {
     public Set<String> getUsers() {
         return new HashSet<String>();
     }
+
+    @Override
+    public Serializable getUserByEmail(String email) {
+        throw new UnsupportedOperationException(); //TODO
+    }
 }

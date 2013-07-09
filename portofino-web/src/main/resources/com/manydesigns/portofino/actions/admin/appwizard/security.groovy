@@ -1,5 +1,7 @@
 import com.manydesigns.elements.messages.SessionMessages
+import com.manydesigns.elements.util.RandomUtil
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
+import com.manydesigns.portofino.shiro.PasswordResetToken
 import java.security.MessageDigest
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.codec.Base64
@@ -22,6 +24,8 @@ public class Security extends AbstractPortofinoRealm {
     protected String userTableEntityName = "$userTableEntityName";
     protected String userIdProperty = "$userIdProperty";
     protected String userNameProperty = "$userNameProperty";
+    protected String userEmailProperty = "$userEmailProperty";
+    protected String userTokenProperty = "$userTokenProperty";
     protected String passwordProperty = "$passwordProperty";
 
     protected String groupTableEntityName = "$groupTableEntityName";
@@ -111,6 +115,39 @@ public class Security extends AbstractPortofinoRealm {
         }
     }
 
+    AuthenticationInfo loadAuthenticationInfo(PasswordResetToken passwordResetToken) {
+        if(StringUtils.isEmpty(userTokenProperty)) {
+            throw new AuthenticationException("User token property is not configured; password reset is not supported by this application.");
+        }
+
+        Session session = application.getSession(databaseName);
+        org.hibernate.Criteria criteria = session.createCriteria(userTableEntityName);
+        criteria.add(Restrictions.eq(userTokenProperty, passwordResetToken.principal));
+
+        List result = criteria.list();
+
+        if (result.size() == 1) {
+            def user = result.get(0);
+            user[userTokenProperty] = null; //Consume token
+            user[passwordProperty] = encryptPassword(passwordResetToken.newPassword);
+            session.update(userTableEntityName, (Object) user);
+            session.transaction.commit();
+            SimpleAuthenticationInfo info =
+                    new SimpleAuthenticationInfo(user, passwordResetToken.credentials, getName());
+            return info;
+        } else {
+            throw new IncorrectCredentialsException("Invalid token");
+        }
+    }
+
+    @Override
+    boolean supports(AuthenticationToken token) {
+        if(token instanceof PasswordResetToken) {
+            return !StringUtils.isEmpty(userTokenProperty);
+        }
+        return super.supports(token)
+    }
+
     @Override
     void changePassword(Serializable user, String oldPassword, String newPassword) {
         if(StringUtils.isEmpty(userTableEntityName)) {
@@ -118,8 +155,8 @@ public class Security extends AbstractPortofinoRealm {
         }
         Session session = application.getSession(databaseName);
         def q = session.createQuery("""
-                update $userTableEntityName set $passwordProperty = :newPwd
-                where $userIdProperty = :id and $passwordProperty = :oldPwd""");
+                update $userTableEntityName set ${passwordProperty} = :newPwd
+                where $userIdProperty = :id and ${passwordProperty} = :oldPwd""");
         q.setParameter("newPwd", encryptPassword(newPassword));
         q.setParameter("id", user[userIdProperty]);
         q.setParameter("oldPwd", encryptPassword(oldPassword));
@@ -134,8 +171,6 @@ public class Security extends AbstractPortofinoRealm {
         }
     }
 
-
-
     String encryptPassword(String password) {
         return this.$encryptionAlgorithm(password)
     }
@@ -146,6 +181,30 @@ public class Security extends AbstractPortofinoRealm {
         Query query = session.createQuery("select " + userNameProperty + " from " + userTableEntityName);
         users.addAll(query.list());
         return users;
+    }
+
+    Serializable getUserByEmail(String email) {
+        if(StringUtils.isEmpty(userEmailProperty)) {
+            throw new UnsupportedOperationException("Email property not configured.");
+        }
+        Session session = application.getSession(databaseName);
+        def criteria = session.createCriteria(userTableEntityName);
+        criteria.add(Restrictions.eq(userEmailProperty, email));
+        return (Serializable) criteria.uniqueResult();
+    }
+
+    @Override
+    String generateOneTimeToken(Serializable user) {
+        if(StringUtils.isEmpty(userTokenProperty)) {
+            throw new UnsupportedOperationException("Token property not configured.");
+        }
+        Session session = application.getSession(databaseName);
+        user = (Serializable) session.get(userTableEntityName, user[userIdProperty]);
+        String token = RandomUtil.createRandomId(20);
+        user[userTokenProperty] = token;
+        session.update(user);
+        session.transaction.commit();
+        return token;
     }
 
     Set<String> getGroups() {

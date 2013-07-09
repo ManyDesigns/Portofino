@@ -140,6 +140,8 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     protected String userGroupTableName;
 
     protected String userNameProperty;
+    protected String userEmailProperty;
+    protected String userTokenProperty;
     protected String userIdProperty;
     protected String userPasswordProperty;
     protected String encryptionAlgorithm;
@@ -581,11 +583,21 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             Field encryptionAlgorithmField = new SelectField(propertyAccessor, algoSelectionProvider, mode, "");
             encryptionAlgorithmField.setRequired(true);
 
+            propertyAccessor = classAccessor.getProperty("userEmailProperty");
+            Field userEmailPropertyField = new SelectField(propertyAccessor, userSelectionProvider, mode, "");
+            userEmailPropertyField.setRequired(false);
+
+            propertyAccessor = classAccessor.getProperty("userTokenProperty");
+            Field userTokenPropertyField = new SelectField(propertyAccessor, userSelectionProvider, mode, "");
+            userTokenPropertyField.setRequired(false);
+
             FieldSet uFieldSet = new FieldSet(getMessage("appwizard.userTable"), 1, mode);
             uFieldSet.add(userIdPropertyField);
             uFieldSet.add(userNamePropertyField);
             uFieldSet.add(userPasswordPropertyField);
             uFieldSet.add(encryptionAlgorithmField);
+            uFieldSet.add(userEmailPropertyField);
+            uFieldSet.add(userTokenPropertyField);
             userManagementSetupForm.add(uFieldSet);
 
             userIdProperty = userTable.getPrimaryKey().getColumns().get(0).getActualPropertyName();
@@ -1045,6 +1057,8 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             bindings.put("userIdProperty", userIdProperty);
             bindings.put("userNameProperty", userNameProperty);
             bindings.put("passwordProperty", userPasswordProperty);
+            bindings.put("userEmailProperty", userEmailProperty);
+            bindings.put("userTokenProperty", userTokenProperty);
 
             bindings.put("groupTableEntityName",
                     groupTable != null ? groupTable.getActualEntityName() : "");
@@ -1531,6 +1545,24 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     public void setUserNameProperty(String userNameProperty) {
         this.userNameProperty = userNameProperty;
+    }
+
+    @LabelI18N("appwizard.userTable.emailProperty")
+    public String getUserEmailProperty() {
+        return userEmailProperty;
+    }
+
+    public void setUserEmailProperty(String userEmailProperty) {
+        this.userEmailProperty = userEmailProperty;
+    }
+
+    @LabelI18N("appwizard.userTable.tokenProperty")
+    public String getUserTokenProperty() {
+        return userTokenProperty;
+    }
+
+    public void setUserTokenProperty(String userTokenProperty) {
+        this.userTokenProperty = userTokenProperty;
     }
 
     @LabelI18N("appwizard.userTable.idProperty")

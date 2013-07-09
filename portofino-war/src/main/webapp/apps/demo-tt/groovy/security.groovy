@@ -21,7 +21,6 @@ class Security extends AbstractPortofinoRealm {
         return loadAuthenticationInfo(token);
     }
 
-
     public AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {
         String userName = usernamePasswordToken.username;
         String password = new String(usernamePasswordToken.password);
@@ -32,7 +31,7 @@ class Security extends AbstractPortofinoRealm {
         criteria.add(Restrictions.eq("login", userName));
         criteria.add(Restrictions.eq("hashed_password", hashedPassword));
 
-        Serializable principal = criteria.uniqueResult();
+        Serializable principal = (Serializable) criteria.uniqueResult();
 
         if (principal == null) {
             throw new AuthenticationException("Login failed");
@@ -83,14 +82,18 @@ class Security extends AbstractPortofinoRealm {
     @Override
     void changePassword(Serializable user, String oldPassword, String newPassword) {
         def session = application.getSession("redmine")
-        def q = session.createQuery("update users set hashed_password = :newPwd where id = :id and hashed_password = :oldPwd");
+        def q = session.createQuery(
+                "update users set hashed_password = :newPwd where id = :id and hashed_password = :oldPwd");
         q.setParameter("newPwd", hashPassword(newPassword));
         q.setParameter("oldPwd", hashPassword(oldPassword));
         q.setParameter("id", user.id);
         int rows = q.executeUpdate();
         if(rows == 0) {
             //Probably the password did not match
-            throw new IncorrectCredentialsException("The password update query modified 0 rows. This most probably means that the old password is wrong. It may also mean that the user has been deleted.");
+            throw new IncorrectCredentialsException(
+                    "The password update query modified 0 rows. " +
+                    "This most probably means that the old password is wrong. " +
+                    "It may also mean that the user has been deleted.");
         } else if(rows > 1) {
             throw new Error("Password update query modified more than 1 row! Rolling back.");
         } else {

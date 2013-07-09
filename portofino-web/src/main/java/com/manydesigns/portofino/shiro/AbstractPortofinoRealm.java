@@ -156,6 +156,11 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         return groups;
     }
 
+    @Override
+    public Serializable getUserByEmail(String email) {
+        throw new UnsupportedOperationException();
+    }
+
     //--------------------------------------------------------------------------
     // User workflow
     //--------------------------------------------------------------------------

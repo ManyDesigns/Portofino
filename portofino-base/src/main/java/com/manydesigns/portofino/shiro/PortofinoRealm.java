@@ -91,6 +91,8 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
     Set<String> getUsers();
     //TODO: List<Serializable> getUsers();
 
+    Serializable getUserByEmail(String email);
+
     //--------------------------------------------------------------------------
     // Groups CRUD
     //--------------------------------------------------------------------------

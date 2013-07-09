@@ -43,7 +43,11 @@
         <stripes:layout-component name="customScripts"/>
         <jsp:useBean id="app" scope="request"
                      type="com.manydesigns.portofino.application.Application"/>
-        <title><fmt:message key="skins.default.login.login_to"/> <c:out value="${app.name}"/></title>
+        <title>
+            <stripes:layout-component name="pageTitle">
+                <fmt:message key="skins.default.login.login_to"/> <c:out value="${app.name}"/>
+            </stripes:layout-component>
+        </title>
     </head>
     <body>
     <stripes:layout-component name="loginContainer" >
