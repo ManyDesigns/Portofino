@@ -92,7 +92,16 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     //--------------------------------------------------------------------------
 
     @Override
-    protected void sendForgotPasswordEmail(String emailAddress, String subject, String body) {
+    protected void sendForgotPasswordEmail(String email, String subject, String body) {
+        sendMail(email, subject, body);
+    }
+
+    @Override
+    protected void sendSignupConfirmationEmail(String email, String subject, String body) {
+        sendMail(email, subject, body);
+    }
+
+    protected void sendMail(String emailAddress, String subject, String body) {
         if(mailQueue == null) {
             throw new UnsupportedOperationException("Mail queue is not enabled");
         }
@@ -100,6 +109,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
         Email email = new Email();
         email.getRecipients().add(new Recipient(Recipient.Type.TO, emailAddress));
         email.setFrom(application.getConfiguration().getString("mail.from", "example@example.com")); //TODO
+        email.setSubject(subject);
         email.setHtmlBody(body);
         try {
             mailQueue.enqueue(email);

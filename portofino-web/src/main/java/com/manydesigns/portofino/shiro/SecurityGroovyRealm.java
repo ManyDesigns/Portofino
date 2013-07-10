@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.di.Injections;
 import groovy.util.GroovyScriptEngine;
 import org.apache.shiro.authc.AuthenticationException;
@@ -148,6 +149,16 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     @Override
     public Serializable getUserByEmail(String email) {
         return ensureDelegate().getUserByEmail(email);
+    }
+
+    @Override
+    public ClassAccessor getUserClassAccessor() {
+        return ensureDelegate().getUserClassAccessor();
+    }
+
+    @Override
+    public String saveSelfRegisteredUser(Object user) {
+        return ensureDelegate().saveSelfRegisteredUser(user);
     }
 
     @Override

@@ -9567,4 +9567,8 @@
             <column name="token" type="varchar(25)"/>
         </addColumn>
     </changeSet>
+    <changeSet author="portofino (generated)" id="autoregistration">
+        <addUniqueConstraint tableName="users" columnNames="mail" />
+        <addUniqueConstraint tableName="users" columnNames="login" />
+    </changeSet>
 </databaseChangeLog>

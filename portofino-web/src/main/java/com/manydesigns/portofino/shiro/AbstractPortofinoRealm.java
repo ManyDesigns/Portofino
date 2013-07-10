@@ -20,6 +20,8 @@
 
 package com.manydesigns.portofino.shiro;
 
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.AppProperties;
@@ -143,7 +145,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     /**
      * {@inheritDoc}
      * <p>This default implementation returns the built-in groups
-     * (all, anonymous, registered, administrators, externally authenticated).
+     * (all, anonymous, registered, administrators).
      * You can override it to add custom groups for your application.</p>
      * @return
      */
@@ -156,9 +158,18 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         return groups;
     }
 
+    //--------------------------------------------------------------------------
+    // Users CRUD
+    //--------------------------------------------------------------------------
+
     @Override
     public Serializable getUserByEmail(String email) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ClassAccessor getUserClassAccessor() {
+        return JavaClassAccessor.getClassAccessor(User.class);
     }
 
     //--------------------------------------------------------------------------
@@ -181,6 +192,11 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
 
     @Override
     public String generateOneTimeToken(Serializable user) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String saveSelfRegisteredUser(Object user) {
         throw new UnsupportedOperationException();
     }
 }

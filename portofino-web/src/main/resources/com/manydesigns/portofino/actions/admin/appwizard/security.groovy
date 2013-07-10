@@ -2,10 +2,13 @@ import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.elements.util.RandomUtil
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import com.manydesigns.portofino.shiro.PasswordResetToken
+import com.manydesigns.portofino.shiro.SignUpToken
+import com.manydesigns.portofino.shiro.User
 import java.security.MessageDigest
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.codec.Base64
 import org.apache.shiro.codec.Hex
+import org.hibernate.Criteria
 import org.hibernate.Query
 import org.hibernate.Session
 import org.hibernate.criterion.Order
@@ -120,20 +123,32 @@ public class Security extends AbstractPortofinoRealm {
             throw new AuthenticationException("User token property is not configured; password reset is not supported by this application.");
         }
 
+        return setNewPassword(passwordResetToken)
+    }
+
+    AuthenticationInfo loadAuthenticationInfo(SignUpToken signUpToken) {
+        if(StringUtils.isEmpty(userTokenProperty)) {
+            throw new AuthenticationException("User token property is not configured; self registration is not supported by this application.");
+        }
+
+        return setNewPassword(signUpToken)
+    }
+
+    protected SimpleAuthenticationInfo setNewPassword(token) {
         Session session = application.getSession(databaseName);
-        org.hibernate.Criteria criteria = session.createCriteria(userTableEntityName);
-        criteria.add(Restrictions.eq(userTokenProperty, passwordResetToken.principal));
+        Criteria criteria = session.createCriteria(userTableEntityName);
+        criteria.add(Restrictions.eq(userTokenProperty, token.principal));
 
         List result = criteria.list();
 
         if (result.size() == 1) {
             def user = result.get(0);
             user[userTokenProperty] = null; //Consume token
-            user[passwordProperty] = encryptPassword(passwordResetToken.newPassword);
+            user[passwordProperty] = encryptPassword(token.newPassword);
             session.update(userTableEntityName, (Object) user);
             session.transaction.commit();
             SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(user, passwordResetToken.credentials, getName());
+            new SimpleAuthenticationInfo(user, token.credentials, getName());
             return info;
         } else {
             throw new IncorrectCredentialsException("Invalid token");
@@ -142,10 +157,10 @@ public class Security extends AbstractPortofinoRealm {
 
     @Override
     boolean supports(AuthenticationToken token) {
-        if(token instanceof PasswordResetToken) {
+        if(token instanceof PasswordResetToken || token instanceof SignUpToken) {
             return !StringUtils.isEmpty(userTokenProperty);
         }
-        return super.supports(token)
+        return super.supports(token);
     }
 
     @Override
@@ -203,6 +218,26 @@ public class Security extends AbstractPortofinoRealm {
         String token = RandomUtil.createRandomId(20);
         user[userTokenProperty] = token;
         session.update(userTableEntityName, (Object) user);
+        session.transaction.commit();
+        return token;
+    }
+
+    String saveSelfRegisteredUser(Object user) {
+        if(StringUtils.isEmpty(userTokenProperty)) {
+            throw new UnsupportedOperationException("Token property not configured.");
+        }
+        User theUser = (User) user;
+        Session session = application.getSession(databaseName);
+        Map persistentUser = new HashMap();
+        persistentUser[userNameProperty] = theUser.username;
+        if(!StringUtils.isEmpty(userEmailProperty)) {
+            persistentUser[userEmailProperty] = theUser.email;
+        }
+
+        String token = RandomUtil.createRandomId(20);
+        persistentUser[userTokenProperty] = token;
+
+        session.save(userTableEntityName, (Object) persistentUser);
         session.transaction.commit();
         return token;
     }

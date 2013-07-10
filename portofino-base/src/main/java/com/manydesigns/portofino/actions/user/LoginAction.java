@@ -32,6 +32,7 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.shiro.PasswordResetToken;
 import com.manydesigns.portofino.shiro.PortofinoRealm;
 import com.manydesigns.portofino.shiro.ShiroUtils;
+import com.manydesigns.portofino.shiro.SignUpToken;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -304,7 +305,7 @@ public abstract class LoginAction extends AbstractActionBean {
             return redirectToReturnUrl();
         }
 
-        setupSignUpForm();
+        setupSignUpForm(ShiroUtils.getPortofinoRealm());
         return new ForwardResolution(getSignUpPage());
     }
 
@@ -315,10 +316,32 @@ public abstract class LoginAction extends AbstractActionBean {
             return redirectToReturnUrl();
         }
 
-        setupSignUpForm();
+        PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
+        setupSignUpForm(portofinoRealm);
         signUpForm.readFromRequest(context.getRequest());
-        if (signUpForm.validate()) {
-            SessionMessages.addInfoMessage("Check your mailbox and follow the instructions");
+        if (signUpForm.validate()) { //TODO captcha
+            try {
+                Object user = portofinoRealm.getUserClassAccessor().newInstance();
+                signUpForm.writeToObject(user);
+                String token = portofinoRealm.saveSelfRegisteredUser(user);
+
+                HttpServletRequest req = context.getRequest();
+                String url = req.getRequestURL().toString();
+                UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), url, true);
+                urlBuilder.setEvent("confirmSignUp");
+                urlBuilder.addParameter("token", token);
+
+                String siteUrl = ServletUtils.getApplicationBaseUrl(req);
+                String changePasswordLink = urlBuilder.toString();
+
+                String body = getConfirmSignUpEmailBody(siteUrl, changePasswordLink);
+
+                sendSignupConfirmationEmail(email, "Confirm signup", body);
+                SessionMessages.addInfoMessage("Check your mailbox and follow the instructions");
+            } catch (Exception e) {
+                logger.error("Error during sign-up", e);
+                SessionMessages.addErrorMessage("Sign-up failed. Maybe an user with the same username or email already exists in the system.");
+            }
             return new RedirectResolution(getOriginalPath());
         } else {
             SessionMessages.addErrorMessage("Correct the errors before proceding");
@@ -326,12 +349,61 @@ public abstract class LoginAction extends AbstractActionBean {
         }
     }
 
+    protected String getConfirmSignUpEmailBody(String siteUrl, String confirmSignUpLink) throws IOException {
+        String countryIso = context.getLocale().getCountry().toLowerCase();
+        InputStream is = LoginAction.class.getResourceAsStream("confirmSignUpEmail." + countryIso + ".html");
+        if(is == null) {
+            is = LoginAction.class.getResourceAsStream("confirmSignUpEmail.en.html");
+        }
+        String template = IOUtils.toString(is);
+        IOUtils.closeQuietly(is);
+        String body = template.replace("$link", confirmSignUpLink).replace("$site", siteUrl);
+        return body;
+    }
+
+    protected abstract void sendSignupConfirmationEmail(String email, String subject, String body);
+
+    public Resolution confirmSignUp() {
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
+            logger.debug("Already logged in");
+            return redirectToReturnUrl();
+        }
+
+        return new ForwardResolution("/portofino-base/layouts/user/confirmSignUp.jsp");
+    }
+
+    public Resolution confirmSignUp2() {
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
+            logger.debug("Already logged in");
+            return redirectToReturnUrl();
+        }
+
+        if (ObjectUtils.equals(newPassword, confirmNewPassword)) {
+            SignUpToken token = new SignUpToken(this.token, newPassword);
+            try {
+                subject.login(token);
+                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("user.signUp.success"));
+                return redirectToReturnUrl();
+            } catch (AuthenticationException e) {
+                String errMsg = ElementsThreadLocals.getText("user.signUp.invalidToken");
+                SessionMessages.addErrorMessage(errMsg);
+                logger.warn(errMsg, e);
+                return new ForwardResolution(getLoginPage());
+            }
+        } else {
+            SessionMessages.addErrorMessage("Passwords do not match");
+            return confirmSignUp();
+        }
+    }
+
     protected String getSignUpPage() {
         return "/portofino-base/layouts/user/signUp.jsp";
     }
 
-    protected void setupSignUpForm() {
-        FormBuilder formBuilder = new FormBuilder(User.class)
+    protected void setupSignUpForm(PortofinoRealm realm) {
+        FormBuilder formBuilder = new FormBuilder(realm.getUserClassAccessor())
                 .configMode(Mode.CREATE)
                 .configReflectiveFields();
         signUpForm = formBuilder.build();

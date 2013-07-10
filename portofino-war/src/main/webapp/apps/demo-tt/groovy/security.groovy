@@ -2,6 +2,7 @@ import com.manydesigns.elements.util.RandomUtil
 import com.manydesigns.portofino.application.AppProperties
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import com.manydesigns.portofino.shiro.PasswordResetToken
+import com.manydesigns.portofino.shiro.User
 import java.security.MessageDigest
 import org.hibernate.SQLQuery
 import org.hibernate.Session
@@ -9,6 +10,10 @@ import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.apache.shiro.authc.*
+import com.manydesigns.portofino.shiro.SignUpToken
+import org.hibernate.Criteria
+import com.manydesigns.elements.reflection.ClassAccessor
+import com.manydesigns.elements.reflection.JavaClassAccessor
 
 class Security extends AbstractPortofinoRealm {
 
@@ -42,6 +47,35 @@ class Security extends AbstractPortofinoRealm {
                     new SimpleAuthenticationInfo(
                             principal, password.toCharArray(), getName());
             return info;
+        }
+    }
+
+    AuthenticationInfo loadAuthenticationInfo(PasswordResetToken passwordResetToken) {
+        return setNewPassword(passwordResetToken)
+    }
+
+    AuthenticationInfo loadAuthenticationInfo(SignUpToken signUpToken) {
+        return setNewPassword(signUpToken)
+    }
+
+    protected SimpleAuthenticationInfo setNewPassword(token) {
+        Session session = application.getSession("redmine");
+        Criteria criteria = session.createCriteria("users");
+        criteria.add(Restrictions.eq("token", token.principal));
+
+        List result = criteria.list();
+
+        if (result.size() == 1) {
+            def user = result.get(0);
+            user.token = null; //Consume token
+            user.hashed_password = hashPassword(token.newPassword);
+            session.update("users", (Object) user);
+            session.transaction.commit();
+            SimpleAuthenticationInfo info =
+                new SimpleAuthenticationInfo(user, token.credentials, getName());
+            return info;
+        } else {
+            throw new IncorrectCredentialsException("Invalid token");
         }
     }
 
@@ -121,30 +155,35 @@ class Security extends AbstractPortofinoRealm {
         return token;
     }
 
-    AuthenticationInfo loadAuthenticationInfo(PasswordResetToken passwordResetToken) {
+    String saveSelfRegisteredUser(Object user) {
+        DemoUser theUser = (DemoUser) user;
         Session session = application.getSession("redmine");
-        org.hibernate.Criteria criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("token", passwordResetToken.principal));
+        Map persistentUser = new HashMap();
+        persistentUser.login = theUser.username;
+        persistentUser.mail = theUser.email;
+        persistentUser.hashed_password = RandomUtil.createRandomId(32);
+        persistentUser.firstname = theUser.firstname;
+        persistentUser.lastname = theUser.lastname;
+        persistentUser.admin = false;
+        persistentUser.status = 0;
+        persistentUser.mail_notification = "";
 
-        List result = criteria.list();
+        String token = RandomUtil.createRandomId(20);
+        persistentUser.token = token;
 
-        if (result.size() == 1) {
-            def user = result.get(0);
-            user.token = null; //Consume token
-            user.hashed_password = hashPassword(passwordResetToken.newPassword);
-            session.update("users", (Object) user);
-            session.transaction.commit();
-            SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(user, passwordResetToken.credentials, getName());
-            return info;
-        } else {
-            throw new IncorrectCredentialsException("Invalid token");
-        }
+        session.save("users", (Object) persistentUser);
+        session.transaction.commit();
+        return token;
+    }
+
+    @Override
+    ClassAccessor getUserClassAccessor() {
+        return JavaClassAccessor.getClassAccessor(DemoUser.class)
     }
 
     @Override
     boolean supports(AuthenticationToken token) {
-        return (token instanceof PasswordResetToken) || super.supports(token);
+        return (token instanceof PasswordResetToken) || (token instanceof SignUpToken) || super.supports(token);
     }
 
 }

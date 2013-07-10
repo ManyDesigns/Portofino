@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.shiro;
 
+import com.manydesigns.elements.reflection.ClassAccessor;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authz.Authorizer;
 import org.apache.shiro.cache.CacheManagerAware;
@@ -92,6 +93,10 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
     //TODO: List<Serializable> getUsers();
 
     Serializable getUserByEmail(String email);
+
+    ClassAccessor getUserClassAccessor();
+
+    String saveSelfRegisteredUser(Object user);
 
     //--------------------------------------------------------------------------
     // Groups CRUD

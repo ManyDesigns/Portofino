@@ -18,9 +18,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.actions.user;
+package com.manydesigns.portofino.shiro;
 
-import com.manydesigns.elements.annotations.Password;
 import com.manydesigns.elements.annotations.Required;
 
 import java.util.Date;
@@ -30,27 +29,9 @@ public class User {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     @Required
+    public String username;
+
+    @Required
     public String email;
 
-    @Required
-    @Password
-    public String password;
-
-    @Required
-    @Password
-    public String confermaPassword;
-
-    @Required
-    public String nome;
-
-    @Required
-    public String cognome;
-
-    @Required
-    public String luogoDiNascita;
-
-    @Required
-    public Date dataDiNascita;
-
-    public String codiceFiscale;
 }
