@@ -45,9 +45,6 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.util.UrlBuilder;
-
-import java.util.Locale;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -95,7 +92,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     //--------------------------------------------------------------------------
 
     @Override
-    protected void sendForgotPasswordEmail(String emailAddress, String token) {
+    protected void sendForgotPasswordEmail(String emailAddress, String subject, String body) {
         if(mailQueue == null) {
             throw new UnsupportedOperationException("Mail queue is not enabled");
         }
@@ -103,13 +100,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
         Email email = new Email();
         email.getRecipients().add(new Recipient(Recipient.Type.TO, emailAddress));
         email.setFrom(application.getConfiguration().getString("mail.from", "example@example.com")); //TODO
-
-        String url = context.getRequest().getRequestURL().toString();
-        UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), url, true);
-        urlBuilder.setEvent("resetPassword");
-        urlBuilder.addParameter("token", token);
-
-        email.setHtmlBody(urlBuilder.toString()); //TODO
+        email.setHtmlBody(body);
         try {
             mailQueue.enqueue(email);
         } catch (QueueException e) {

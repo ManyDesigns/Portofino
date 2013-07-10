@@ -68,4 +68,17 @@ public class ServletUtils {
 
     }
 
+    public static String getApplicationBaseUrl(HttpServletRequest req) {
+        String scheme = req.getScheme();
+        int port = req.getServerPort();
+        String portString;
+        if((scheme.equals("http") && port == 80) ||
+           (scheme.equals("https") && port == 443)) {
+            portString = "";
+        } else {
+            portString = ":" + port;
+        }
+        return scheme + "://" + req.getServerName() + portString + req.getContextPath();
+    }
+
 }

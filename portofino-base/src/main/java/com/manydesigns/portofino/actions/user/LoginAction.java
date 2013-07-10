@@ -25,6 +25,7 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
@@ -36,7 +37,9 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -48,10 +51,14 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 
 /**
  * Action that handles the standard Portofino login form.
@@ -199,6 +206,7 @@ public abstract class LoginAction extends AbstractActionBean {
     }
 
     public Resolution forgotPassword2() {
+        //TODO I18n
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
             logger.debug("Already logged in");
@@ -210,7 +218,18 @@ public abstract class LoginAction extends AbstractActionBean {
             Serializable user = portofinoRealm.getUserByEmail(email);
             if(user != null) {
                 String token = portofinoRealm.generateOneTimeToken(user);
-                sendForgotPasswordEmail(email, token);
+                HttpServletRequest req = context.getRequest();
+                String url = req.getRequestURL().toString();
+                UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), url, true);
+                urlBuilder.setEvent("resetPassword");
+                urlBuilder.addParameter("token", token);
+
+                String siteUrl = ServletUtils.getApplicationBaseUrl(req);
+                String changePasswordLink = urlBuilder.toString();
+
+                String body = getResetPasswordEmailBody(siteUrl, changePasswordLink);
+
+                sendForgotPasswordEmail(email, "Password reset", body);
             }
 
             SessionMessages.addInfoMessage("Check your mailbox and follow the instructions");
@@ -219,6 +238,18 @@ public abstract class LoginAction extends AbstractActionBean {
             SessionMessages.addErrorMessage("Password reset failed");
         }
         return new RedirectResolution(getOriginalPath());
+    }
+
+    protected String getResetPasswordEmailBody(String siteUrl, String changePasswordLink) throws IOException {
+        String countryIso = context.getLocale().getCountry().toLowerCase();
+        InputStream is = LoginAction.class.getResourceAsStream("passwordResetEmail." + countryIso + ".html");
+        if(is == null) {
+            is = LoginAction.class.getResourceAsStream("passwordResetEmail.en.html");
+        }
+        String template = IOUtils.toString(is);
+        IOUtils.closeQuietly(is);
+        String body = template.replace("$link", changePasswordLink).replace("$site", siteUrl);
+        return body;
     }
 
     public Resolution resetPassword() {
@@ -256,7 +287,7 @@ public abstract class LoginAction extends AbstractActionBean {
         }
     }
 
-    protected abstract void sendForgotPasswordEmail(String email, String token);
+    protected abstract void sendForgotPasswordEmail(String email, String subject, String body);
 
     protected String getForgotPasswordPage() {
         return "/portofino-base/layouts/user/forgotPassword.jsp";
