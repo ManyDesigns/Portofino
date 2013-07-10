@@ -202,7 +202,7 @@ public class Security extends AbstractPortofinoRealm {
         user = (Serializable) session.get(userTableEntityName, user[userIdProperty]);
         String token = RandomUtil.createRandomId(20);
         user[userTokenProperty] = token;
-        session.update(user);
+        session.update(userTableEntityName, (Object) user);
         session.transaction.commit();
         return token;
     }

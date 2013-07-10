@@ -9562,4 +9562,9 @@
             <column name="rgt"/>
         </insert>
     </changeSet>
+    <changeSet author="portofino (generated)" id="password-reset">
+        <addColumn tableName="users">
+            <column name="token" type="varchar(25)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

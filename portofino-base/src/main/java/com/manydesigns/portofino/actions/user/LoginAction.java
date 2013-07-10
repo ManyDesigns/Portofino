@@ -206,11 +206,18 @@ public abstract class LoginAction extends AbstractActionBean {
         }
 
         PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
-        Serializable user = portofinoRealm.getUserByEmail(email);
-        String token = portofinoRealm.generateOneTimeToken(user);
-        sendForgotPasswordEmail(email, token);
+        try {
+            Serializable user = portofinoRealm.getUserByEmail(email);
+            if(user != null) {
+                String token = portofinoRealm.generateOneTimeToken(user);
+                sendForgotPasswordEmail(email, token);
+            }
 
-        SessionMessages.addInfoMessage("Check your mailbox and follow the instructions");
+            SessionMessages.addInfoMessage("Check your mailbox and follow the instructions");
+        } catch (Exception e) {
+            logger.error("Error during password reset", e);
+            SessionMessages.addErrorMessage("Password reset failed");
+        }
         return new RedirectResolution(getOriginalPath());
     }
 

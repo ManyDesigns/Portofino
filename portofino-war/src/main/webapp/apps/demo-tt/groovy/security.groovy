@@ -1,5 +1,7 @@
+import com.manydesigns.elements.util.RandomUtil
 import com.manydesigns.portofino.application.AppProperties
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
+import com.manydesigns.portofino.shiro.PasswordResetToken
 import java.security.MessageDigest
 import org.hibernate.SQLQuery
 import org.hibernate.Session
@@ -79,6 +81,13 @@ class Security extends AbstractPortofinoRealm {
         return new LinkedHashSet<String>(query.list());
     }
 
+    Serializable getUserByEmail(String email) {
+        Session session = application.getSession("redmine");
+        def criteria = session.createCriteria("users");
+        criteria.add(Restrictions.eq("mail", email));
+        return (Serializable) criteria.uniqueResult();
+    }
+
     @Override
     void changePassword(Serializable user, String oldPassword, String newPassword) {
         def session = application.getSession("redmine")
@@ -99,6 +108,43 @@ class Security extends AbstractPortofinoRealm {
         } else {
             session.transaction.commit();
         }
+    }
+
+    @Override
+    String generateOneTimeToken(Serializable user) {
+        Session session = application.getSession("redmine");
+        user = (Serializable) session.get("users", user.id);
+        String token = RandomUtil.createRandomId(20);
+        user.token = token;
+        session.update("users", (Object) user);
+        session.transaction.commit();
+        return token;
+    }
+
+    AuthenticationInfo loadAuthenticationInfo(PasswordResetToken passwordResetToken) {
+        Session session = application.getSession("redmine");
+        org.hibernate.Criteria criteria = session.createCriteria("users");
+        criteria.add(Restrictions.eq("token", passwordResetToken.principal));
+
+        List result = criteria.list();
+
+        if (result.size() == 1) {
+            def user = result.get(0);
+            user.token = null; //Consume token
+            user.hashed_password = hashPassword(passwordResetToken.newPassword);
+            session.update("users", (Object) user);
+            session.transaction.commit();
+            SimpleAuthenticationInfo info =
+                    new SimpleAuthenticationInfo(user, passwordResetToken.credentials, getName());
+            return info;
+        } else {
+            throw new IncorrectCredentialsException("Invalid token");
+        }
+    }
+
+    @Override
+    boolean supports(AuthenticationToken token) {
+        return (token instanceof PasswordResetToken) || super.supports(token);
     }
 
 }

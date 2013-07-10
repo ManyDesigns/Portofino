@@ -6,6 +6,9 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/skins/${skin}/login.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
+    <stripes:layout-component name="pageTitle">
+        Forgot your password?
+    </stripes:layout-component>
     <stripes:layout-component name="loginTitle">
         Forgot your password?
     </stripes:layout-component>
