@@ -37,10 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -142,8 +139,13 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     }
 
     @Override
-    public Set<String> getUsers() {
+    public Map<Serializable, String> getUsers() {
         return ensureDelegate().getUsers();
+    }
+
+    @Override
+    public Serializable getUserById(String encodedUserId) {
+        return ensureDelegate().getUserById(encodedUserId);
     }
 
     @Override
@@ -152,13 +154,18 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     }
 
     @Override
-    public ClassAccessor getUserClassAccessor() {
-        return ensureDelegate().getUserClassAccessor();
+    public ClassAccessor getSelfRegisteredUserClassAccessor() {
+        return ensureDelegate().getSelfRegisteredUserClassAccessor();
     }
 
     @Override
     public String saveSelfRegisteredUser(Object user) {
         return ensureDelegate().saveSelfRegisteredUser(user);
+    }
+
+    @Override
+    public String getUserPrettyName(Serializable user) {
+        return ensureDelegate().getUserPrettyName(user);
     }
 
     @Override

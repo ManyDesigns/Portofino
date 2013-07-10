@@ -157,9 +157,9 @@
                     <c:if test="${actionBean.users != null}">
                         <select name="testUserId" id="testUserIdSelect">
                             <c:forEach var="user" items="${actionBean.users}">
-                                <option value="${user}"
-                                        <c:if test="${actionBean.testUserId eq user}">selected="selected"</c:if>
-                                        ><c:out value="${empty user ? '(anonymous)' : user}" /></option>
+                                <option value="${user.key}"
+                                        <c:if test="${actionBean.testUserId eq user.key}">selected="selected"</c:if>
+                                        ><c:out value="${user.value}" /></option>
                             </c:forEach>
                         </select>
                     </c:if>

@@ -78,6 +78,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileWriter;
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -850,7 +851,7 @@ public class PageAdminAction extends AbstractPageAction {
     protected Map<String, List<String>> permissions = new HashMap<String, List<String>>();
 
     protected String testUserId;
-    protected Set<String> users;
+    protected Map<Serializable, String> users;
     protected AccessLevel testedAccessLevel;
     protected Set<String> testedPermissions;
 
@@ -859,9 +860,9 @@ public class PageAdminAction extends AbstractPageAction {
         setupGroups();
 
         PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
-        users = new LinkedHashSet<String>();
-        users.add(null);
-        users.addAll(portofinoRealm.getUsers());
+        users = new LinkedHashMap<Serializable, String>();
+        users.put(null, "(anonymous)");
+        users.putAll(portofinoRealm.getUsers());
 
         return forwardToPagePermissions();
     }
@@ -870,9 +871,11 @@ public class PageAdminAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution testUserPermissions() {
         testUserId = StringUtils.defaultIfEmpty(testUserId, null);
+        PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
         PrincipalCollection principalCollection;
         if(!StringUtils.isEmpty(testUserId)) {
-            principalCollection = new SimplePrincipalCollection(testUserId, "realm");
+            Serializable user = portofinoRealm.getUserById(testUserId);
+            principalCollection = new SimplePrincipalCollection(user, "realm");
         } else {
             principalCollection = null;
         }
@@ -1069,7 +1072,7 @@ public class PageAdminAction extends AbstractPageAction {
         this.testUserId = testUserId;
     }
 
-    public Set<String> getUsers() {
+    public Map<Serializable, String> getUsers() {
         return users;
     }
 

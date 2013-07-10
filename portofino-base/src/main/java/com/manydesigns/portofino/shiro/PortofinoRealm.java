@@ -27,6 +27,7 @@ import org.apache.shiro.cache.CacheManagerAware;
 import org.apache.shiro.realm.Realm;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -42,8 +43,6 @@ import java.util.Set;
 public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
-
-
 
     //--------------------------------------------------------------------------
     // User workflow
@@ -87,16 +86,29 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
     /**
      * Returns the list of users known to the system. This is used by the framework when presenting a list of
      * possible users, e.g. when configuring permissions for a page.
-     * @return a set of users, represented as strings (the usernames used to log in).
+     * @return a map of user id -> pretty name. The pretty name might be the username, email address, full name, etc.
      */
-    Set<String> getUsers();
-    //TODO: List<Serializable> getUsers();
+    Map<Serializable, String> getUsers();
 
+    Serializable getUserById(String encodedUserId);
+
+    /**
+     * Loads a user by email address.
+     * @param email the email address of the user.
+     * @return
+     */
     Serializable getUserByEmail(String email);
 
-    ClassAccessor getUserClassAccessor();
+    /**
+     * Returns a ClassAccessor that describes the properties which a self-registered user must or can provide to
+     * initiate the sign up process.
+     * @return the ClassAccessor.
+     */
+    ClassAccessor getSelfRegisteredUserClassAccessor();
 
     String saveSelfRegisteredUser(Object user);
+
+    String getUserPrettyName(Serializable user);
 
     //--------------------------------------------------------------------------
     // Groups CRUD

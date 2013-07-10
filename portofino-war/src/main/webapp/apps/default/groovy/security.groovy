@@ -48,11 +48,17 @@ class Security extends AbstractPortofinoRealm {
         }
     }
 
-    Set<String> getUsers() {
-        Set<String> result = new LinkedHashSet<String>();
-        result.add(ADMIN_LOGIN);
-        result.add(GUEST_LOGIN);
+    Map<Serializable, String> getUsers() {
+        def result = new LinkedHashMap();
+        result.put(ADMIN_LOGIN, ADMIN_LOGIN);
+        result.put(GUEST_LOGIN, GUEST_LOGIN);
         return result;
     }
+
+    @Override
+    String getUserPrettyName(Serializable user) {
+        return user;
+    }
+
 
 }

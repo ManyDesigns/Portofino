@@ -7,6 +7,7 @@ import com.manydesigns.portofino.menu.Menu
 import com.manydesigns.portofino.menu.MenuAppender
 import com.manydesigns.portofino.menu.MenuGroup
 import com.manydesigns.portofino.menu.MenuLink
+import com.manydesigns.portofino.shiro.ShiroUtils
 import com.manydesigns.portofino.stripes.AbstractActionBean
 import javax.servlet.http.HttpServletRequest
 import net.sourceforge.stripes.util.UrlBuilder
@@ -34,7 +35,7 @@ public class UserMenuAppender implements MenuAppender {
         Subject subject = SecurityUtils.getSubject();
         if(subject.isAuthenticated()) {
             Object principal = subject.getPrincipal();
-            String prettyName = "$principal.firstname $principal.lastname";
+            String prettyName = ShiroUtils.getPortofinoRealm().getUserPrettyName(principal);
             MenuGroup userGroup =
                     new MenuGroup("user", "icon-user icon-white",
                                  prettyName, 10.0);

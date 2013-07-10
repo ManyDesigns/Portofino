@@ -109,10 +109,20 @@ class Security extends AbstractPortofinoRealm {
     //--------------------------------------------------------------------------
 
     @Override
-    Set<String> getUsers() {
+    Map<Serializable, String> getUsers() {
         Session session = application.getSession("redmine");
-        SQLQuery query = session.createSQLQuery("select \"login\" from \"users\"");
-        return new LinkedHashSet<String>(query.list());
+        SQLQuery query = session.createSQLQuery("select \"id\", \"login\" from \"users\" order by \"login\"");
+        def users = new LinkedHashMap();
+        for(Object[] user : query.list()) {
+            users.put(user[0], user[1]);
+        }
+        return users;
+    }
+
+    @Override
+    Serializable getUserById(String encodedUserId) {
+        Session session = application.getSession("redmine");
+        return (Serializable) session.get("users", Integer.parseInt(encodedUserId));
     }
 
     Serializable getUserByEmail(String email) {
@@ -120,6 +130,11 @@ class Security extends AbstractPortofinoRealm {
         def criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq("mail", email));
         return (Serializable) criteria.uniqueResult();
+    }
+
+    @Override
+    String getUserPrettyName(Serializable user) {
+        return "${user.firstname} ${user.lastname}";
     }
 
     @Override
@@ -177,7 +192,7 @@ class Security extends AbstractPortofinoRealm {
     }
 
     @Override
-    ClassAccessor getUserClassAccessor() {
+    ClassAccessor getSelfRegisteredUserClassAccessor() {
         return JavaClassAccessor.getClassAccessor(DemoUser.class)
     }
 

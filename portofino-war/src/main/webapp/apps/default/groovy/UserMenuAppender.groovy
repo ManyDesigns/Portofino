@@ -13,6 +13,7 @@ import net.sourceforge.stripes.util.UrlBuilder
 import org.apache.commons.configuration.Configuration
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.subject.Subject
+import com.manydesigns.portofino.shiro.ShiroUtils
 
 public class UserMenuAppender implements MenuAppender {
 
@@ -34,12 +35,7 @@ public class UserMenuAppender implements MenuAppender {
         Subject subject = SecurityUtils.getSubject();
         if(subject.isAuthenticated()) {
             Object principal = subject.getPrincipal();
-            String prettyName;
-            if(principal instanceof String) {
-                prettyName = principal;
-            } else {
-                prettyName = "user"; //TODO
-            }
+            String prettyName = ShiroUtils.getPortofinoRealm().getUserPrettyName(principal);
             MenuGroup userGroup =
                     new MenuGroup("user", "icon-user icon-white",
                                  prettyName, 10.0);

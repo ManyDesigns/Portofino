@@ -162,14 +162,25 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     // Users CRUD
     //--------------------------------------------------------------------------
 
+
+    @Override
+    public Serializable getUserById(String encodedUserId) {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public Serializable getUserByEmail(String email) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ClassAccessor getUserClassAccessor() {
+    public ClassAccessor getSelfRegisteredUserClassAccessor() {
         return JavaClassAccessor.getClassAccessor(User.class);
+    }
+
+    @Override
+    public String getUserPrettyName(Serializable user) {
+        return user.toString();
     }
 
     //--------------------------------------------------------------------------

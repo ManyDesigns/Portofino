@@ -1,9 +1,14 @@
 import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.elements.util.RandomUtil
+import com.manydesigns.portofino.model.database.Database
+import com.manydesigns.portofino.model.database.DatabaseLogic
+import com.manydesigns.portofino.model.database.Table
+import com.manydesigns.portofino.reflection.TableAccessor
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import com.manydesigns.portofino.shiro.PasswordResetToken
 import com.manydesigns.portofino.shiro.SignUpToken
 import com.manydesigns.portofino.shiro.User
+import com.manydesigns.portofino.util.PkHelper
 import java.security.MessageDigest
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.codec.Base64
@@ -190,12 +195,27 @@ public class Security extends AbstractPortofinoRealm {
         return this.$encryptionAlgorithm(password)
     }
 
-    Set<String> getUsers() {
-        def users = new HashSet<String>();
+    Map<Serializable, String> getUsers() {
+        def users = new LinkedHashMap();
         Session session = application.getSession(databaseName);
-        Query query = session.createQuery("select " + userNameProperty + " from " + userTableEntityName);
-        users.addAll(query.list());
+        Query query = session.createQuery(
+                "select ${userIdProperty}, ${userNameProperty} from ${userTableEntityName} order by ${userNameProperty}");
+        for(Object[] user : query.list()) {
+            users.put(user[0], user[1]);
+        }
         return users;
+    }
+
+    Serializable getUserById(String encodedId) {
+        Database database =
+            DatabaseLogic.findDatabaseByName(application.model, databaseName);
+        Table table =
+            DatabaseLogic.findTableByEntityName(database, userTableEntityName);
+        PkHelper pkHelper = new PkHelper(new TableAccessor(table));
+        Serializable id = pkHelper.getPrimaryKey(encodedId);
+
+        Session session = application.getSession(databaseName);
+        return (Serializable) session.get(userTableEntityName, id);
     }
 
     Serializable getUserByEmail(String email) {
@@ -206,6 +226,11 @@ public class Security extends AbstractPortofinoRealm {
         def criteria = session.createCriteria(userTableEntityName);
         criteria.add(Restrictions.eq(userEmailProperty, email));
         return (Serializable) criteria.uniqueResult();
+    }
+
+    @Override
+    String getUserPrettyName(Serializable user) {
+        return user[userNameProperty];
     }
 
     @Override

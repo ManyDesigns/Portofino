@@ -31,9 +31,7 @@ import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -73,12 +71,12 @@ public class GAEPortofinoRealm extends AbstractPortofinoRealm {
         return authz;
     }
 
-    public Set<String> getUsers() {
-        return new HashSet<String>();
+    public Map<Serializable, String> getUsers() {
+        return new HashMap<Serializable, String>();
     }
 
     @Override
     public Serializable getUserByEmail(String email) {
-        throw new UnsupportedOperationException(); //TODO
+        throw new UnsupportedOperationException(); //TODO verificare
     }
 }

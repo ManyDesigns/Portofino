@@ -321,7 +321,7 @@ public abstract class LoginAction extends AbstractActionBean {
         signUpForm.readFromRequest(context.getRequest());
         if (signUpForm.validate()) { //TODO captcha
             try {
-                Object user = portofinoRealm.getUserClassAccessor().newInstance();
+                Object user = portofinoRealm.getSelfRegisteredUserClassAccessor().newInstance();
                 signUpForm.writeToObject(user);
                 String token = portofinoRealm.saveSelfRegisteredUser(user);
 
@@ -403,7 +403,7 @@ public abstract class LoginAction extends AbstractActionBean {
     }
 
     protected void setupSignUpForm(PortofinoRealm realm) {
-        FormBuilder formBuilder = new FormBuilder(realm.getUserClassAccessor())
+        FormBuilder formBuilder = new FormBuilder(realm.getSelfRegisteredUserClassAccessor())
                 .configMode(Mode.CREATE)
                 .configReflectiveFields();
         signUpForm = formBuilder.build();
