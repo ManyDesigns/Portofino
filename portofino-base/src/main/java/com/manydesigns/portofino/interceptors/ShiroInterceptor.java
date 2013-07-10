@@ -22,6 +22,7 @@ package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
+import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.stripes.ForbiddenAccessResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
@@ -38,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 
 /**
@@ -59,7 +61,8 @@ public class ShiroInterceptor implements Interceptor {
         String userId = null;
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
-            //TODO userId = ShiroUtils.getPrimaryPrincipal(subject).toString();
+            Serializable principal = (Serializable) ShiroUtils.getPrimaryPrincipal(subject);
+            userId = ShiroUtils.getPortofinoRealm().getUserPrettyName(principal);
             logger.debug("Retrieved userId={}", userId);
         } else {
             logger.debug("No user found");

@@ -178,8 +178,10 @@ public abstract class LoginAction extends AbstractActionBean {
     //**************************************************************************
 
     public Resolution logout() {
-        String userName = "user"; //TODO ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) + "";
-        SecurityUtils.getSubject().logout();
+        Subject subject = SecurityUtils.getSubject();
+        Serializable principal = (Serializable) ShiroUtils.getPrimaryPrincipal(subject);
+        String userName = ShiroUtils.getPortofinoRealm().getUserPrettyName(principal);
+        subject.logout();
         HttpSession session = getSession();
         if (session != null) {
             session.invalidate();
