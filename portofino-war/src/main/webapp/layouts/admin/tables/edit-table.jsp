@@ -9,6 +9,12 @@
 <stripes:layout-render name="/portofino-base/admin-theme/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.TablesAction"/>
     <stripes:layout-component name="customScripts">
+        <link rel="stylesheet" type="text/css"
+              href="<stripes:url value="/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"/>"/>
+
+        <script type="text/javascript"
+                src="<stripes:url value="/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
+
         <style type="text/css">
             .tableForm {
                 overflow-x: auto;

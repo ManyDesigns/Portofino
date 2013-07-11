@@ -15,9 +15,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <link rel="stylesheet" type="text/css"
-              href="<stripes:url value="/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"/>"/>
-
-        <link rel="stylesheet" type="text/css"
               href="<stripes:url value="/elements/bootstrap/css/bootstrap.min.css"/>"/>
         <style type="text/css">
             body {
@@ -38,8 +35,6 @@
         <%-- jQuery & jQuery UI (for draggable/droppable) --%>
         <script type="text/javascript"
                 src="<stripes:url value="/elements/jquery/jquery.min.js"/>"></script>
-        <%--<script type="text/javascript"
-                src="<stripes:url value="/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"/>"></script>--%>
         <%-- Twitter Bootstrap --%>
         <script type="text/javascript"
                 src="<stripes:url value="/elements/bootstrap/js/bootstrap.min.js"/>"></script>
