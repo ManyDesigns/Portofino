@@ -35,7 +35,7 @@
                     }
                     html += '<input id="' + id + '" type="text" style="' + style + '" name="' + id + '" value="' + value + '" />' +
                             '<button id="openid_submit" type="submit" class="btn">' +
-                            openid.signin_text + '/button>';
+                            openid.signin_text + '</button>';
                     input_area.empty();
                     input_area.append(html);
                     $('#' + id).focus();
@@ -52,6 +52,7 @@
             <stripes:hidden name="returnUrl"/>
             <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
             <input type="hidden" name="showOpenIDForm" value="do" />
+            Please choose your OpenID provider below:
             <div id="openid_choice">
                 <div id="openid_btns"></div>
             </div>
