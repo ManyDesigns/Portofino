@@ -227,7 +227,7 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
         PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
         setupSignUpForm(portofinoRealm);
         signUpForm.readFromRequest(context.getRequest());
-        if (signUpForm.validate()) { //TODO captcha?
+        if (signUpForm.validate() && validateCaptcha()) {
             try {
                 Object user = portofinoRealm.getSelfRegisteredUserClassAccessor().newInstance();
                 signUpForm.writeToObject(user);

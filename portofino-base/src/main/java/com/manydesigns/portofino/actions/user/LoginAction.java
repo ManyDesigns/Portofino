@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.actions.user;
 
+import com.github.cage.Cage;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.forms.Form;
@@ -34,10 +35,7 @@ import com.manydesigns.portofino.shiro.PortofinoRealm;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.shiro.SignUpToken;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
@@ -53,6 +51,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
@@ -101,6 +100,13 @@ public abstract class LoginAction extends AbstractActionBean {
     protected Form signUpForm;
     public String returnUrl;
     public String cancelReturnUrl;
+
+    //**************************************************************************
+    // Captcha
+    //**************************************************************************
+
+    private static final Cage cage = new CaptchaGenerator();
+    public static final String CAPTCHA_SESSION_ATTRIBUTE = "LoginAction.captcha";
 
     public static final Logger logger =
             LoggerFactory.getLogger(LoginAction.class);
@@ -181,7 +187,7 @@ public abstract class LoginAction extends AbstractActionBean {
         Serializable principal = (Serializable) ShiroUtils.getPrimaryPrincipal(subject);
         String userName = ShiroUtils.getPortofinoRealm().getUserPrettyName(principal);
         subject.logout();
-        HttpSession session = getSession();
+        HttpSession session = context.getRequest().getSession(false);
         if (session != null) {
             session.invalidate();
         }
@@ -299,6 +305,33 @@ public abstract class LoginAction extends AbstractActionBean {
     // Sign up
     //**************************************************************************
 
+    public Resolution captcha() {
+        final String token = cage.getTokenGenerator().next();
+        context.getRequest().getSession().setAttribute(CAPTCHA_SESSION_ATTRIBUTE, token);
+        if(token != null) {
+            return new StreamingResolution("image/" + cage.getFormat()) {
+
+                @Override
+                protected void applyHeaders(HttpServletResponse response) {
+                    super.applyHeaders(response);
+                    response.setHeader("Cache-Control", "no-cache, no-store");
+                    response.setHeader("Pragma", "no-cache");
+                    long time = System.currentTimeMillis();
+                    response.setDateHeader("Last-Modified", time);
+                    response.setDateHeader("Date", time);
+                    response.setDateHeader("Expires", time);
+                }
+
+                @Override
+                protected void stream(HttpServletResponse response) throws Exception {
+                    cage.draw(token, response.getOutputStream());
+                }
+            };
+        } else {
+            return new ErrorResolution(404);
+        }
+    }
+
     public Resolution signUp() {
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
@@ -320,7 +353,7 @@ public abstract class LoginAction extends AbstractActionBean {
         PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
         setupSignUpForm(portofinoRealm);
         signUpForm.readFromRequest(context.getRequest());
-        if (signUpForm.validate()) { //TODO captcha
+        if (signUpForm.validate() && validateCaptcha()) {
             try {
                 Object user = portofinoRealm.getSelfRegisteredUserClassAccessor().newInstance();
                 signUpForm.writeToObject(user);
@@ -348,6 +381,16 @@ public abstract class LoginAction extends AbstractActionBean {
             SessionMessages.addErrorMessage("Correct the errors before proceding");
             return new ForwardResolution(getSignUpPage());
         }
+    }
+
+    protected boolean validateCaptcha() {
+        HttpServletRequest request = context.getRequest();
+        HttpSession session = request.getSession();
+        boolean valid = StringUtils.equalsIgnoreCase(
+                request.getParameter("captchaText"),
+                (String) session.getAttribute(CAPTCHA_SESSION_ATTRIBUTE));
+        session.removeAttribute(CAPTCHA_SESSION_ATTRIBUTE);
+        return valid;
     }
 
     protected String getConfirmSignUpEmailBody(String siteUrl, String confirmSignUpLink) throws IOException {
@@ -476,11 +519,6 @@ public abstract class LoginAction extends AbstractActionBean {
         }
         logger.debug("Redirecting to: {}", returnUrl);
         return new RedirectResolution(returnUrl);
-    }
-
-    // do not expose this method publicly
-    protected HttpSession getSession() {
-        return context.getRequest().getSession(false);
     }
 
     //**************************************************************************
