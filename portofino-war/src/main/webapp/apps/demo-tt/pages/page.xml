@@ -8,6 +8,7 @@
             <childPage name="projects" showInNavigation="true"/>
             <childPage name="people" showInNavigation="true"/>
             <childPage name="login" showInNavigation="false"/>
+            <childPage name="openidlogin" showInNavigation="false"/>
         </childPages>
     </layout>
 </page>

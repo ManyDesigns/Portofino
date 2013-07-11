@@ -157,7 +157,6 @@ public abstract class LoginAction extends AbstractActionBean {
         return "/portofino-base/layouts/user/login.jsp";
     }
 
-
     //**************************************************************************
     // Cancel
     //**************************************************************************

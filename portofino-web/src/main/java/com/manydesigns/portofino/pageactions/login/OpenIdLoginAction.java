@@ -12,6 +12,8 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
+import com.manydesigns.portofino.shiro.PortofinoRealm;
+import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.shiro.openid.OpenIDToken;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -22,6 +24,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.subject.Subject;
 import org.openid4java.association.AssociationException;
 import org.openid4java.consumer.ConsumerException;
@@ -36,6 +39,7 @@ import org.openid4java.message.ParameterList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -50,7 +54,7 @@ import java.util.ResourceBundle;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@ScriptTemplate("script_template.groovy")
+@ScriptTemplate("script_template_openid.groovy")
 @PageActionName("OpenID Login")
 public class OpenIdLoginAction extends DefaultLoginAction implements PageAction {
     public static final String copyright =
@@ -58,6 +62,7 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
 
     public static final String OPENID_DISCOVERED = "openID.discovered";
     public static final String OPENID_CONSUMER_MANAGER = "openID.consumerManager";
+    public static final String OPENID_IDENTIFIER = "openID.identifier";
 
     //--------------------------------------------------------------------------
     // Properties
@@ -94,6 +99,10 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
     public String openIdUrl;
     public String openIdDestinationUrl;
     public Map openIdParameterMap;
+
+    protected String getLoginPage() {
+        return "/layouts/login/openIdLogin.jsp";
+    }
 
     public Resolution showOpenIDForm()
             throws ConsumerException, MessageException, DiscoveryException, MalformedURLException {
@@ -133,10 +142,10 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
             if(authReq.isVersion2()) {
                 openIdDestinationUrl = authReq.getDestinationUrl(false);
                 openIdParameterMap = authReq.getParameterMap();
-                return new ForwardResolution("/layouts/user/openIDFormRedirect.jsp");
+                return new ForwardResolution("/layouts/login/openIDFormRedirect.jsp");
             } else {
                 SessionMessages.addErrorMessage("Cannot login, payload too big and OpenID version 2 not supported.");
-                return new ForwardResolution("/layouts/user/login.jsp");
+                return new ForwardResolution(getLoginPage());
             }
         } else {
             return new RedirectResolution(destinationUrl, false);
@@ -169,19 +178,19 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
         VerificationResult verification = manager.verify(receivingURL.toString(), openidResp, discovered);
 
         // examine the verification result and extract the verified identifier
-        Identifier verified = verification.getVerifiedId();
+        Identifier identifier = verification.getVerifiedId();
         Locale locale = context.getLocale();
         ResourceBundle bundle = application.getBundle(locale);
 
-        if (verified != null) {
+        if (identifier != null) {
             // success, use the verified identifier to identify the user
             // OpenID authentication failed
             Subject subject = SecurityUtils.getSubject();
             try {
-                subject.login(new OpenIDToken(verification));
-                String userId = verification.getVerifiedId().getIdentifier();
-                logger.info("User {} login", userId);
-                String successMsg = MessageFormat.format(bundle.getString("user.login.success"), userId);
+                subject.login(new OpenIDToken(identifier, null));
+                String name = ShiroUtils.getPortofinoRealm().getUserPrettyName((Serializable) subject.getPrincipal());
+                logger.info("User {} login", identifier.getIdentifier());
+                String successMsg = MessageFormat.format(bundle.getString("user.login.success"), name);
                 SessionMessages.addInfoMessage(successMsg);
                 if (StringUtils.isEmpty(returnUrl)) {
                     returnUrl = "/";
@@ -189,16 +198,55 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
                 session.removeAttribute(OPENID_DISCOVERED);
                 session.removeAttribute(OPENID_CONSUMER_MANAGER);
                 return redirectToReturnUrl(returnUrl);
+            } catch (UnknownAccountException e) {
+                //The user is not present in the system
+                session.removeAttribute(OPENID_DISCOVERED);
+                session.removeAttribute(OPENID_CONSUMER_MANAGER);
+                session.setAttribute(OPENID_IDENTIFIER, identifier);
+                return signUp();
             } catch (AuthenticationException e) {
                 String errMsg = MessageFormat.format(bundle.getString("user.login.failed"), userName);
                 SessionMessages.addErrorMessage(errMsg);
                 logger.warn(errMsg, e);
-                return new ForwardResolution("/layouts/user/login.jsp");
+                return new ForwardResolution(getLoginPage());
             }
         } else {
             String errMsg = MessageFormat.format(bundle.getString("user.login.failed"), userName);
             SessionMessages.addErrorMessage(errMsg);
-            return new ForwardResolution("/layouts/user/login.jsp");
+            return new ForwardResolution(getLoginPage());
+        }
+    }
+
+    public Resolution signUp2() {
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
+            logger.debug("Already logged in");
+            return redirectToReturnUrl();
+        }
+
+        PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
+        setupSignUpForm(portofinoRealm);
+        signUpForm.readFromRequest(context.getRequest());
+        if (signUpForm.validate()) { //TODO captcha?
+            try {
+                Object user = portofinoRealm.getSelfRegisteredUserClassAccessor().newInstance();
+                signUpForm.writeToObject(user);
+                String token = portofinoRealm.saveSelfRegisteredUser(user);
+                HttpSession session = context.getRequest().getSession();
+                Identifier identifier = (Identifier) session.getAttribute(OPENID_IDENTIFIER);
+
+                OpenIDToken openIDToken = new OpenIDToken(identifier, token);
+                subject.login(openIDToken);
+                session.removeAttribute(OPENID_IDENTIFIER);
+                return redirectToReturnUrl();
+            } catch (Exception e) {
+                logger.error("Error during sign-up", e);
+                SessionMessages.addErrorMessage("Sign-up failed.");
+                return new ForwardResolution(getSignUpPage());
+            }
+        } else {
+            SessionMessages.addErrorMessage("Correct the errors before proceding");
+            return new ForwardResolution(getSignUpPage());
         }
     }
 

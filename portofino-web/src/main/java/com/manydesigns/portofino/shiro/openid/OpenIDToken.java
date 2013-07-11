@@ -20,9 +20,10 @@
 
 package com.manydesigns.portofino.shiro.openid;
 
-import org.apache.shiro.authc.HostAuthenticationToken;
-import org.apache.shiro.authc.RememberMeAuthenticationToken;
-import org.openid4java.consumer.VerificationResult;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.openid4java.discovery.Identifier;
+
+import java.io.Serializable;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -30,39 +31,31 @@ import org.openid4java.consumer.VerificationResult;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class OpenIDToken implements HostAuthenticationToken, RememberMeAuthenticationToken {
+public class OpenIDToken implements AuthenticationToken, Serializable {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    protected String host;
-    protected boolean rememberMe;
-    protected VerificationResult verificationResult;
+    protected final Identifier identifier;
+    protected final String firstLoginToken;
 
-    public static final String NO_CREDENTIALS = "OpenID does not require authentication credentials.";
-
-    public OpenIDToken(VerificationResult verificationResult, boolean rememberMe, String host) {
-        this.verificationResult = verificationResult;
-        this.rememberMe = rememberMe;
-        this.host = host;
+    public OpenIDToken(Identifier identifier, String firstLoginToken) {
+        this.identifier = identifier;
+        this.firstLoginToken = firstLoginToken;
     }
 
-    public OpenIDToken(VerificationResult verificationResult) {
-        this.verificationResult = verificationResult;
+    public Identifier getPrincipal() {
+        return identifier;
     }
 
-    public String getHost() {
-        return host;
+    public Identifier getCredentials() {
+        return identifier;
     }
 
-    public boolean isRememberMe() {
-        return rememberMe;
+    public Identifier getIdentifier() {
+        return identifier;
     }
 
-    public VerificationResult getPrincipal() {
-        return verificationResult;
-    }
-
-    public Object getCredentials() {
-        return NO_CREDENTIALS;
+    public String getFirstLoginToken() {
+        return firstLoginToken;
     }
 }

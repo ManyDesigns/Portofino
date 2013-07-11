@@ -14,6 +14,7 @@ import com.manydesigns.portofino.shiro.SignUpToken
 import org.hibernate.Criteria
 import com.manydesigns.elements.reflection.ClassAccessor
 import com.manydesigns.elements.reflection.JavaClassAccessor
+import com.manydesigns.portofino.shiro.openid.OpenIDToken
 
 class Security extends AbstractPortofinoRealm {
 
@@ -46,6 +47,34 @@ class Security extends AbstractPortofinoRealm {
             SimpleAuthenticationInfo info =
                     new SimpleAuthenticationInfo(
                             principal, password.toCharArray(), getName());
+            return info;
+        }
+    }
+
+    public AuthenticationInfo loadAuthenticationInfo(OpenIDToken openIDToken) {
+        Session session = application.getSession("redmine");
+        org.hibernate.Criteria criteria = session.createCriteria("users");
+        if(openIDToken.firstLoginToken != null) {
+            criteria.add(Restrictions.eq("token", openIDToken.firstLoginToken));
+        } else {
+            criteria.add(Restrictions.eq("identity_url", openIDToken.principal.identifier));
+        }
+
+        Serializable principal = (Serializable) criteria.uniqueResult();
+
+        if (principal == null) {
+            throw new UnknownAccountException();
+        } else {
+            if(openIDToken.firstLoginToken != null) {
+                session.beginTransaction();
+                principal.token = null; //Consume token
+                principal.identity_url = openIDToken.principal.identifier;
+                session.update("users", (Object) principal);
+                session.transaction.commit();
+            }
+            SimpleAuthenticationInfo info =
+                    new SimpleAuthenticationInfo(
+                            principal, openIDToken.credentials, getName());
             return info;
         }
     }
@@ -198,7 +227,10 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     boolean supports(AuthenticationToken token) {
-        return (token instanceof PasswordResetToken) || (token instanceof SignUpToken) || super.supports(token);
+        return (token instanceof PasswordResetToken) ||
+               (token instanceof SignUpToken) ||
+               (token instanceof OpenIDToken) ||
+               super.supports(token);
     }
 
 }

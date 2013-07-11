@@ -45,39 +45,23 @@
         </script>
         <!-- /Simple OpenID Selector -->
     </stripes:layout-component>
-
-    <stripes:layout-component name="loginForm">
-        <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
-        <div class="row">
-            <div id="content-login" class="container">
-                <div class="portletHeader">
-                    <h4><fmt:message key="skins.default.login.login_to"/>: <c:out value="${actionBean.applicationName}"/></h4>
-                </div>
-                <div class="portletBody">
-                    <stripes:layout-component name="portletBody">
-                        <mde:sessionMessages/>
-                        <stripes:form action="<%= actionBean.getOriginalPath() %>" method="post">
-                            <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
-                            <input type="text" name="userName" id="userName" class="input-block-level"
-                                   placeholder="<fmt:message key='skins.default.login.username'/>" />
-                            <input type="password" name="pwd" id="pwd" class="input-block-level"
-                                   placeholder="<fmt:message key='skins.default.login.password'/>" />
-                            <div style="text-align: center">
-                                <button type="submit" name="login" class="btn btn-large btn-primary">Login</button>
-                                <button type="submit" name="cancel" class="btn btn-large">Cancel</button>
-                            </div>
-                            <stripes:hidden name="returnUrl"/>
-                        </stripes:form>
-                    </stripes:layout-component>
-                </div>
-                <div style="border-top: 1px solid #ddd; padding-top: 0.5em">
-                    <jsp:useBean id="portofinoConfiguration" scope="application"
-                                 type="org.apache.commons.configuration.Configuration"/>
-                    Powered by <a href="http://www.manydesigns.com/">Portofino</a>
-                    <c:out value="${mde:getString(portofinoConfiguration, 'portofino.version')}"/>
-                </div>
+    <stripes:layout-component name="loginBody">
+        <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.login.OpenIdLoginAction"/>
+        <stripes:form action="${actionBean.dispatch.absoluteOriginalPath}" method="post"
+                      id="openid_form">
+            <stripes:hidden name="returnUrl"/>
+            <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
+            <input type="hidden" name="showOpenIDForm" value="do" />
+            <div id="openid_choice">
+                <div id="openid_btns"></div>
             </div>
-        </div>
+            <div id="openid_input_area">
+                <input id="openid_identifier" name="openIdUrl" type="text" value="http://" />
+                <button id="openid_submit" type="submit" class="btn">
+                    Sign in
+                </button>
+            </div>
+        </stripes:form>
         <script type="text/javascript">
             $('#userName').focus();
         </script>

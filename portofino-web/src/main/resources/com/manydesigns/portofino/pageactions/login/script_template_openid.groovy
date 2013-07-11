@@ -1,6 +1,6 @@
-import com.manydesigns.portofino.pageactions.login.DefaultLoginAction
+import com.manydesigns.portofino.pageactions.login.OpenIdLoginAction
 
-class MyLoginAction extends DefaultLoginAction {
+class MyOpenIdLoginAction extends OpenIdLoginAction {
 
     //Automatically generated on %{new java.util.Date()} by ManyDesigns Portofino
     //Write your code here

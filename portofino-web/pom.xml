@@ -86,14 +86,8 @@
         </dependency>
         <dependency>
             <groupId>org.openid4java</groupId>
-            <artifactId>openid4java-consumer</artifactId>
-            <!--artifactId>openid4java-server</artifactId-->
-            <!--artifactId>openid4java-infocard</artifactId-->
-            <!--artifactId>openid4java-xri</artifactId-->
-            <!--artifactId>openid4java</artifactId-->
-            <!--artifactId>openid4java-full</artifactId-->
-            <version>0.9.6</version>
-            <type>pom</type>
+            <artifactId>openid4java</artifactId>
+            <version>0.9.8</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
