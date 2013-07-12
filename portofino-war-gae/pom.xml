@@ -44,13 +44,6 @@
             <version>${google.appengine.sdk.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- stuff for testing -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     <build>
         <resources>
@@ -59,12 +52,6 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <filtering>true</filtering>
-            </testResource>
-        </testResources>
         <plugins>
             <plugin>
                 <groupId>com.google.appengine</groupId>
