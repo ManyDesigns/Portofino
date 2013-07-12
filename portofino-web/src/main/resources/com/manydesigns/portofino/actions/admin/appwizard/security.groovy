@@ -233,6 +233,10 @@ public class Security extends AbstractPortofinoRealm {
         return user[userNameProperty];
     }
 
+    Serializable getUserId(Serializable user) {
+        return user[userIdProperty];
+    }
+
     @Override
     String generateOneTimeToken(Serializable user) {
         if(StringUtils.isEmpty(userTokenProperty)) {

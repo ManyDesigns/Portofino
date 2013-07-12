@@ -60,5 +60,8 @@ class Security extends AbstractPortofinoRealm {
         return user;
     }
 
+    Serializable getUserId(Serializable user) {
+        return user;
+    }
 
 }

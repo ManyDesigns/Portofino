@@ -22,8 +22,8 @@
             <div class="login-buttons spacingTop">
                 <button type="submit" id="confirmSignUp2" name="confirmSignUp2" class="btn btn-primary">Sign up</button>
             </div>
-            <stripes:hidden name="returnUrl"/>
-            <stripes:hidden name="cancelReturnUrl"/>
+            <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
+            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
         </stripes:form>
         <script type="text/javascript">
             $('#newPassword').focus();

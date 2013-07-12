@@ -21,8 +21,8 @@
                 <button type="submit" id="changePassword2" name="changePassword2" class="btn btn-primary">Change password</button>
                 <button type="submit" name="cancel" class="btn btn-link">Cancel</button>
             </div>
-            <stripes:hidden name="returnUrl"/>
-            <stripes:hidden name="cancelReturnUrl"/>
+            <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
+            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
         </stripes:form>
         <script type="text/javascript">
             $('#pwd').focus();

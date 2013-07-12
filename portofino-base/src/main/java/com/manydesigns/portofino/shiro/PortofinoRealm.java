@@ -90,12 +90,19 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
      */
     Map<Serializable, String> getUsers();
 
+    /**
+     * Loads a user by id. The id depends on the application's security implementation: it can be, for example, a
+     * primary key in a database table, or a path in a LDAP directory.
+     * @param encodedUserId the user id as a String. The security implementation is expected to convert the String
+     * to a value of the appropriate type.
+     * @return the user object.
+     */
     Serializable getUserById(String encodedUserId);
 
     /**
      * Loads a user by email address.
      * @param email the email address of the user.
-     * @return
+     * @return the user object.
      */
     Serializable getUserByEmail(String email);
 
@@ -109,6 +116,8 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
     String saveSelfRegisteredUser(Object user);
 
     String getUserPrettyName(Serializable user);
+
+    Serializable getUserId(Serializable user);
 
     //--------------------------------------------------------------------------
     // Groups CRUD

@@ -1,20 +1,19 @@
+import com.manydesigns.elements.reflection.ClassAccessor
+import com.manydesigns.elements.reflection.JavaClassAccessor
 import com.manydesigns.elements.util.RandomUtil
 import com.manydesigns.portofino.application.AppProperties
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import com.manydesigns.portofino.shiro.PasswordResetToken
-import com.manydesigns.portofino.shiro.User
+import com.manydesigns.portofino.shiro.SignUpToken
+import com.manydesigns.portofino.shiro.openid.OpenIDToken
 import java.security.MessageDigest
+import org.hibernate.Criteria
 import org.hibernate.SQLQuery
 import org.hibernate.Session
 import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.apache.shiro.authc.*
-import com.manydesigns.portofino.shiro.SignUpToken
-import org.hibernate.Criteria
-import com.manydesigns.elements.reflection.ClassAccessor
-import com.manydesigns.elements.reflection.JavaClassAccessor
-import com.manydesigns.portofino.shiro.openid.OpenIDToken
 
 class Security extends AbstractPortofinoRealm {
 
@@ -164,6 +163,10 @@ class Security extends AbstractPortofinoRealm {
     @Override
     String getUserPrettyName(Serializable user) {
         return "${user.firstname} ${user.lastname}";
+    }
+
+    Serializable getUserId(Serializable user) {
+        return user.id;
     }
 
     @Override

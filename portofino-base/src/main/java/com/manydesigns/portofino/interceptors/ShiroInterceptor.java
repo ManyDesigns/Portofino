@@ -58,11 +58,11 @@ public class ShiroInterceptor implements Interceptor {
 
     public Resolution intercept(final ExecutionContext context) throws Exception {
         logger.debug("Retrieving user");
-        String userId = null;
+        Serializable userId = null;
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
             Serializable principal = (Serializable) ShiroUtils.getPrimaryPrincipal(subject);
-            userId = ShiroUtils.getPortofinoRealm().getUserPrettyName(principal);
+            userId = ShiroUtils.getPortofinoRealm().getUserId(principal);
             logger.debug("Retrieved userId={}", userId);
         } else {
             logger.debug("No user found");
@@ -75,7 +75,7 @@ public class ShiroInterceptor implements Interceptor {
         logger.debug("Setting up logging MDC");
         MDC.clear();
         if(userId != null) { //Issue #755
-            MDC.put("userId", userId);
+            MDC.put("userId", userId.toString());
         }
 
         try {

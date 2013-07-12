@@ -15,8 +15,8 @@
             <div class="login-buttons">
                 <button type="submit" name="login" class="btn btn-primary">Log in</button>
             </div>
-            <stripes:hidden name="returnUrl"/>
-            <stripes:hidden name="cancelReturnUrl"/>
+            <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
+            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
         </stripes:form>
         <div class="login-links spacingWithDividerTop">
             <div class="login-link">
