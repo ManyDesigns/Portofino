@@ -187,8 +187,6 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public Resolution logout() {
         Subject subject = SecurityUtils.getSubject();
-        Serializable principal = (Serializable) ShiroUtils.getPrimaryPrincipal(subject);
-        Serializable userId = ShiroUtils.getPortofinoRealm().getUserId(principal);
         subject.logout();
         HttpSession session = context.getRequest().getSession(false);
         if (session != null) {
@@ -197,7 +195,7 @@ public abstract class LoginAction extends AbstractActionBean {
 
         String msg = ElementsThreadLocals.getText("user.logout");
         SessionMessages.addInfoMessage(msg);
-        logger.info("User {} logout", userId);
+        logger.info("User logout");
 
         return new RedirectResolution("/");
     }
