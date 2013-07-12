@@ -99,6 +99,12 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
      */
     Serializable getUserById(String encodedUserId);
 
+    Serializable saveUser(Serializable user);
+
+    Serializable updateUser(Serializable user);
+
+    ClassAccessor getUserClassAccessor();
+
     /**
      * Loads a user by email address.
      * @param email the email address of the user.

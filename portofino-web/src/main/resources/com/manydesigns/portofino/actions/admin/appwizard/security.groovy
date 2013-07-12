@@ -207,15 +207,21 @@ public class Security extends AbstractPortofinoRealm {
     }
 
     Serializable getUserById(String encodedId) {
-        Database database =
-            DatabaseLogic.findDatabaseByName(application.model, databaseName);
-        Table table =
-            DatabaseLogic.findTableByEntityName(database, userTableEntityName);
-        PkHelper pkHelper = new PkHelper(new TableAccessor(table));
+        TableAccessor accessor = getUserClassAccessor();
+        PkHelper pkHelper = new PkHelper(accessor);
         Serializable id = pkHelper.getPrimaryKey(encodedId);
 
         Session session = application.getSession(databaseName);
         return (Serializable) session.get(userTableEntityName, id);
+    }
+
+    TableAccessor getUserClassAccessor() {
+        Database database =
+        DatabaseLogic.findDatabaseByName(application.model, databaseName);
+        Table table =
+        DatabaseLogic.findTableByEntityName(database, userTableEntityName);
+        def accessor = new TableAccessor(table)
+        return accessor
     }
 
     Serializable getUserByEmail(String email) {

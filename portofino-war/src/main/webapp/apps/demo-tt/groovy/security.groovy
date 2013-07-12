@@ -2,6 +2,9 @@ import com.manydesigns.elements.reflection.ClassAccessor
 import com.manydesigns.elements.reflection.JavaClassAccessor
 import com.manydesigns.elements.util.RandomUtil
 import com.manydesigns.portofino.application.AppProperties
+import com.manydesigns.portofino.model.database.Database
+import com.manydesigns.portofino.model.database.DatabaseLogic
+import com.manydesigns.portofino.model.database.Table
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import com.manydesigns.portofino.shiro.PasswordResetToken
 import com.manydesigns.portofino.shiro.SignUpToken
@@ -14,6 +17,7 @@ import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.apache.shiro.authc.*
+import com.manydesigns.portofino.reflection.TableAccessor
 
 class Security extends AbstractPortofinoRealm {
 
@@ -166,7 +170,32 @@ class Security extends AbstractPortofinoRealm {
     }
 
     Serializable getUserId(Serializable user) {
-        return user.id;
+        return user.id
+    }
+
+    @Override
+    Serializable saveUser(Serializable user) {
+        def session = application.getSession("redmine");
+        session.save("users", (Object) user);
+        session.transaction.commit();
+        return user;
+    }
+
+    @Override
+    Serializable updateUser(Serializable user) {
+        def session = application.getSession("redmine");
+        session.update("users", (Object) user);
+        session.transaction.commit();
+        return user;
+    }
+
+    @Override
+    ClassAccessor getUserClassAccessor() {
+        Database database =
+            DatabaseLogic.findDatabaseByName(application.model, "redmine");
+        Table table =
+            DatabaseLogic.findTableByEntityName(database, "users");
+        return new TableAccessor(table);
     }
 
     @Override

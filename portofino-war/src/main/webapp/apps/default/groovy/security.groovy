@@ -48,6 +48,10 @@ class Security extends AbstractPortofinoRealm {
         }
     }
 
+    //--------------------------------------------------------------------------
+    // Users CRUD
+    //--------------------------------------------------------------------------
+
     Map<Serializable, String> getUsers() {
         def result = new LinkedHashMap();
         result.put(ADMIN_LOGIN, ADMIN_LOGIN);

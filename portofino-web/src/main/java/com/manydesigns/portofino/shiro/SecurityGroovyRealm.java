@@ -149,6 +149,21 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     }
 
     @Override
+    public Serializable saveUser(Serializable user) {
+        return ensureDelegate().saveUser(user);
+    }
+
+    @Override
+    public Serializable updateUser(Serializable user) {
+        return ensureDelegate().updateUser(user);
+    }
+
+    @Override
+    public ClassAccessor getUserClassAccessor() {
+        return ensureDelegate().getUserClassAccessor();
+    }
+
+    @Override
     public Serializable getUserByEmail(String email) {
         return ensureDelegate().getUserByEmail(email);
     }

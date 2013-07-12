@@ -23,6 +23,8 @@ package com.manydesigns.portofino.shiro;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.manydesigns.elements.fields.search.Criteria;
+import com.manydesigns.elements.reflection.ClassAccessor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -34,6 +36,9 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
+ * Abstract realm that leverages Google App Engine's UserService. This realm is only able to authenticate users; CRUD
+ * operations are not supported.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -71,12 +76,42 @@ public class GAEPortofinoRealm extends AbstractPortofinoRealm {
         return authz;
     }
 
-    public Map<Serializable, String> getUsers() {
+    public Map<Serializable, String> getUsers(Criteria criteria) {
         return new HashMap<Serializable, String>();
+    }
+
+    @Override
+    public Serializable saveUser(Serializable user) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Serializable updateUser(Serializable user) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ClassAccessor getUserClassAccessor() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean supports(AuthenticationToken token) {
+        return token instanceof ServletContainerToken;
     }
 
     @Override
     public Serializable getUserByEmail(String email) {
         throw new UnsupportedOperationException(); //TODO verificare
+    }
+
+    @Override
+    public Serializable getUserId(Serializable user) {
+        return ((User) user).getUserId();
+    }
+
+    @Override
+    public String getUserPrettyName(Serializable user) {
+        return ((User) user).getNickname();
     }
 }
