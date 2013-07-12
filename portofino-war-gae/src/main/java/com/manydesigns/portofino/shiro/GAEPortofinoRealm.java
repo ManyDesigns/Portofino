@@ -23,7 +23,6 @@ package com.manydesigns.portofino.shiro;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
-import com.manydesigns.elements.fields.search.Criteria;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -76,7 +75,7 @@ public class GAEPortofinoRealm extends AbstractPortofinoRealm {
         return authz;
     }
 
-    public Map<Serializable, String> getUsers(Criteria criteria) {
+    public Map<Serializable, String> getUsers() {
         return new HashMap<Serializable, String>();
     }
 
