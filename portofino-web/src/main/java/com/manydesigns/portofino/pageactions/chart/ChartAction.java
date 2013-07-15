@@ -46,6 +46,7 @@ import org.jfree.chart.JFreeChart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -99,7 +100,6 @@ public class ChartAction extends AbstractPageAction {
     public JFreeChart chart;
     public JFreeChartInstance jfreeChartInstance;
     public File file;
-    public InputStream inputStream;
 
     public static final Logger logger =
             LoggerFactory.getLogger(ChartAction.class);
@@ -166,9 +166,29 @@ public class ChartAction extends AbstractPageAction {
 
     public Resolution chart() throws FileNotFoundException {
         final File file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
+        if(!file.exists()) {
+            return new ErrorResolution(404);
+        }
+        final InputStream inputStream = new FileInputStream(file);
 
-        inputStream = new FileInputStream(file);
-        return new StreamingResolution("image/png", inputStream);
+        //Cache the file, expire after 12h
+        int expiresAfter = 12 * 60 * 60 * 1000;
+        long now = System.currentTimeMillis();
+        HttpServletResponse response = context.getResponse();
+        response.setHeader("Cache-Control", "max-age=" + expiresAfter);
+        response.setDateHeader("Last-Modified", now);
+        response.setDateHeader("Expires", now + expiresAfter);
+        response.setHeader("Pragma", "");
+
+        return new StreamingResolution("image/png", inputStream) {
+            @Override
+            protected void stream(HttpServletResponse response) throws Exception {
+                super.stream(response);
+                if(!file.delete()) {
+                    logger.warn("Could not delete temporary file for chart: " + file.getAbsolutePath());
+                }
+            }
+        };
     }
 
     //**************************************************************************
@@ -390,14 +410,6 @@ public class ChartAction extends AbstractPageAction {
 
     public void setJfreeChartInstance(JFreeChartInstance jfreeChartInstance) {
         this.jfreeChartInstance = jfreeChartInstance;
-    }
-
-    public InputStream getInputStream() {
-        return inputStream;
-    }
-
-    public void setInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
     }
 
 }
