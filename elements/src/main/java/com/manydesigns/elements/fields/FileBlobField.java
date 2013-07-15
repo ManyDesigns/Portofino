@@ -62,6 +62,8 @@ public class FileBlobField extends AbstractField
     protected Blob blob;
     protected String blobError;
 
+    protected boolean wasReadFromObject = false;
+
     //**************************************************************************
     // Costruttori
     //**************************************************************************
@@ -172,12 +174,14 @@ public class FileBlobField extends AbstractField
             printRadio(xb, radioId, "elements.field.upload.update",
                     UPLOAD_MODIFY, false, script);
 
-            radioId = id + UPLOAD_DELETE;
-            script = "var inptxt = this.ownerDocument.getElementById('"
-                    + StringEscapeUtils.escapeJavaScript(innerId) + "');"
-                    + "inptxt.disabled=true;inptxt.value='';";
-            printRadio(xb, radioId, "elements.field.upload.delete",
-                    UPLOAD_DELETE, false, script);
+            if(!isRequired()) {
+                radioId = id + UPLOAD_DELETE;
+                script = "var inptxt = this.ownerDocument.getElementById('"
+                        + StringEscapeUtils.escapeJavaScript(innerId) + "');"
+                        + "inptxt.disabled=true;inptxt.value='';";
+                printRadio(xb, radioId, "elements.field.upload.delete",
+                        UPLOAD_DELETE, false, script);
+            }
 
             xb.writeInputFile(innerId, inputName, true);
             xb.writeInputHidden(codeInputName, blob.getCode());
@@ -208,20 +212,30 @@ public class FileBlobField extends AbstractField
             return;
         }
 
+        String code = req.getParameter(codeInputName);
         String updateTypeStr = req.getParameter(operationInputName);
         if (UPLOAD_MODIFY.equals(updateTypeStr)) {
             saveUpload(req);
         } else if (UPLOAD_DELETE.equals(updateTypeStr)) {
+            BlobManager blobManager = ElementsThreadLocals.getBlobManager();
+            blobManager.deleteBlob(code);
             blob = null;
         } else {
             // in all other cases (updateTypeStr is UPLOAD_KEEP,
             // null, or other values) keep the existing blob
-            String code = req.getParameter(codeInputName);
-            safeLoadBlob(code);
+            if(blob == null) {
+                safeLoadBlob(code);
+            }
         }
     }
 
     private void saveUpload(HttpServletRequest req) {
+        if(!wasReadFromObject) {
+            logger.warn(
+                    "You are calling readFromRequest saving a new blob without having called readFromObject first. " +
+                    "If you are overwriting an existing blob, the old one won't be deleted.");
+        }
+
         WebFramework webFramework = ElementsThreadLocals.getWebFramework();
 
         BlobManager blobManager = ElementsThreadLocals.getBlobManager();
@@ -236,6 +250,9 @@ public class FileBlobField extends AbstractField
             if (upload == null) {
                 blob = null;
             } else {
+                if(blob != null) {
+                    blobManager.deleteBlob(blob.getCode());
+                }
                 String code = RandomUtil.createRandomId();
                 blob = blobManager.saveBlob(
                         code,
@@ -275,6 +292,7 @@ public class FileBlobField extends AbstractField
             String code = (String) accessor.get(obj);
             safeLoadBlob(code);
         }
+        wasReadFromObject = true;
     }
 
     protected void safeLoadBlob(String code) {
