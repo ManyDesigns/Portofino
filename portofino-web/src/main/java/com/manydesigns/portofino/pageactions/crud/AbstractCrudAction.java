@@ -622,6 +622,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Button(list = "crud-bulk-edit", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkUpdate() {
+        int updated = 0;
         setupForm(Mode.BULK_EDIT);
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
@@ -631,8 +632,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 writeFormToObject();
                 if(editValidate(object)) {
                     doUpdate(object);
+                    editPostProcess(object);
+                    updated++;
                 }
-                editPostProcess(object);
             }
             try {
                 commitTransaction();
@@ -642,9 +644,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 SessionMessages.addErrorMessage(rootCauseMessage);
                 return getBulkEditView();
             }
-            SessionMessages.addInfoMessage(getMessage(
-                    "commons.bulkUpdate.successful",
-                    selection.length));
+            SessionMessages.addInfoMessage(
+                    getMessage("commons.bulkUpdate.successful", updated));
             return new RedirectResolution(
                     appendSearchStringParamIfNecessary(getDispatch().getOriginalPath()));
         } else {
@@ -665,9 +666,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             try {
                 deletePostProcess(object);
                 commitTransaction();
+                deleteBlobs(object);
                 SessionMessages.addInfoMessage(getMessage("commons.delete.successful"));
 
-                // invalidate the pk on this crud unit
+                // invalidate the pk on this crud
                 pk = null;
             } catch (Exception e) {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
@@ -687,6 +689,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             SessionMessages.addWarningMessage(getMessage("commons.bulkDelete.nothingSelected"));
             return new RedirectResolution(appendSearchStringParamIfNecessary(getDispatch().getOriginalPath()));
         }
+        List<T> objects = new ArrayList<T>(selection.length);
         for (String current : selection) {
             String[] pkArr = current.split("/");
             Serializable pkObject = pkHelper.getPrimaryKey(pkArr);
@@ -694,11 +697,15 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             if(deleteValidate(obj)) {
                 doDelete(obj);
                 deletePostProcess(obj);
+                objects.add(obj);
                 deleted++;
             }
         }
         try {
             commitTransaction();
+            for(T obj : objects) {
+                deleteBlobs(obj);
+            }
             SessionMessages.addInfoMessage(getMessage("commons.bulkDelete.successful", deleted));
         } catch (Exception e) {
             logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
@@ -706,6 +713,24 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
 
         return new RedirectResolution(appendSearchStringParamIfNecessary(getDispatch().getOriginalPath()));
+    }
+
+    protected void deleteBlobs(T object) {
+        setupForm(Mode.VIEW);
+        form.readFromObject(object);
+        BlobManager blobManager = ElementsThreadLocals.getBlobManager();
+        for(FieldSet fieldSet : form) {
+            for(FormElement field : fieldSet) {
+                if(field instanceof FileBlobField) {
+                    Blob blob = ((FileBlobField) field).getValue();
+                    if(blob != null) {
+                        if(!blobManager.deleteBlob(blob.getCode())) {
+                            logger.warn("Could not delete blob: " + blob.getCode());
+                        }
+                    }
+                }
+            }
+        }
     }
 
     //**************************************************************************
