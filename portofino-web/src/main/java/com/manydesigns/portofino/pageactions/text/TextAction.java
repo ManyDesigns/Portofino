@@ -524,7 +524,7 @@ public class TextAction extends AbstractPageAction {
             HttpServletResponse response = context.getResponse();
             ServletUtils.markCacheableForever(response);
 
-            //Suggerisce al browser di usare la risorsa che ha in cache invece di riscaricarla
+            //Suggerisce al browser di usare la risorsa che ha in cache invece di riscaricarla - serve ancora?
             HttpServletRequest request = context.getRequest();
             if(request.getHeader("If-Modified-Since") != null) {
                 long ifModifiedSince = request.getDateHeader("If-Modified-Since");
