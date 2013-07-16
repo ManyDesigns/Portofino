@@ -22,6 +22,7 @@ package com.manydesigns.portofino.pageactions.text;
 
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.servlet.ServletConstants;
+import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.PortofinoProperties;
@@ -521,11 +522,7 @@ public class TextAction extends AbstractPageAction {
 
             //Cache
             HttpServletResponse response = context.getResponse();
-            response.setHeader(ServletConstants.HTTP_PRAGMA, "");
-            response.setHeader(ServletConstants.HTTP_CACHE_CONTROL, "");
-            response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_PRIVATE);
-            response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_MUST_REVALIDATE);
-            response.setHeader(ServletConstants.HTTP_EXPIRES, "");
+            ServletUtils.markCacheableForever(response);
 
             //Suggerisce al browser di usare la risorsa che ha in cache invece di riscaricarla
             HttpServletRequest request = context.getRequest();

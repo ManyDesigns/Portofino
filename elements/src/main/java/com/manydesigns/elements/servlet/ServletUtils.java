@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
 
 /**
@@ -79,6 +80,23 @@ public class ServletUtils {
             portString = ":" + port;
         }
         return scheme + "://" + req.getServerName() + portString + req.getContextPath();
+    }
+
+    /**
+     * Marks the resource returned to a web client to be stored in cache for a very long time.
+     * The resource is marked to be cached privately, i.e. on the client only, not in intermediate caches like proxies.
+     * @param response the HTTP response whose headers are set.
+     */
+    public static void markCacheableForever(HttpServletResponse response) {
+        int expiresAfter = 365 * 24 * 60 * 60; //1 year
+        response.setHeader(ServletConstants.HTTP_PRAGMA, "");
+        response.setDateHeader(ServletConstants.HTTP_EXPIRES, expiresAfter);
+        response.setHeader(ServletConstants.HTTP_CACHE_CONTROL, "");
+        //Private - only authorized users can cache the content
+        response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_PRIVATE);
+        response.addHeader(
+                ServletConstants.HTTP_CACHE_CONTROL,
+                ServletConstants.HTTP_CACHE_CONTROL_MAX_AGE + expiresAfter);
     }
 
 }

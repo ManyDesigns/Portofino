@@ -37,6 +37,7 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
+import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -1354,8 +1355,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     FileBlobField fileBlobField = (FileBlobField) field;
                     Blob blob = fileBlobField.getValue();
                     if (blob != null) {
-                        String url = getBlobDownloadUrl(
-                                fileBlobField.getPropertyAccessor());
+                        String url = getBlobDownloadUrl(fileBlobField);
                         field.setHref(url);
                     }
                 }
@@ -1383,8 +1383,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     }
 
                     UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), baseUrl, false)
-                        .addParameter("downloadBlob","")
-                        .addParameter("propertyName", field.getPropertyAccessor().getName());
+                        .addParameter("downloadBlob", "")
+                        .addParameter("propertyName", field.getPropertyAccessor().getName())
+                        .addParameter("code", ((FileBlobField) field).getValue().getCode());
 
                     field.setHref(urlBuilder.toString());
                 }
@@ -1392,11 +1393,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    public String getBlobDownloadUrl(PropertyAccessor propertyAccessor) {
+    public String getBlobDownloadUrl(FileBlobField field) {
         UrlBuilder urlBuilder = new UrlBuilder(
                 Locale.getDefault(), getDispatch().getAbsoluteOriginalPath(), false)
                 .addParameter("downloadBlob","")
-                .addParameter("propertyName", propertyAccessor.getName());
+                .addParameter("propertyName", field.getPropertyAccessor().getName())
+                .addParameter("code", field.getValue().getCode());
         return urlBuilder.toString();
     }
 
@@ -1411,6 +1413,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         String contentType = blob.getContentType();
         InputStream inputStream = new FileInputStream(blob.getDataFile());
         String fileName = blob.getFilename();
+
+        //Cache blobs (they're immutable)
+        HttpServletResponse response = context.getResponse();
+        ServletUtils.markCacheableForever(response);
+
         return new StreamingResolution(contentType, inputStream)
                 .setFilename(fileName)
                 .setLength(contentLength)
