@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.quartz;
+package com.manydesigns.mail.quartz;
 
 import org.quartz.*;
 import org.slf4j.Logger;

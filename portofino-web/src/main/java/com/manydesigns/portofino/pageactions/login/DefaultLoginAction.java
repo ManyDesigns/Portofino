@@ -33,15 +33,16 @@ import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.queue.QueueException;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.user.LoginAction;
+import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.modules.MailModule;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import net.sourceforge.stripes.action.Resolution;
@@ -84,7 +85,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     @Inject(RequestAttributes.MODEL)
     public Model model;
 
-    @Inject(ApplicationAttributes.MAIL_QUEUE)
+    @Inject(MailModule.MAIL_QUEUE)
     public MailQueue mailQueue;
 
     //--------------------------------------------------------------------------
@@ -108,7 +109,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
 
         Email email = new Email();
         email.getRecipients().add(new Recipient(Recipient.Type.TO, emailAddress));
-        email.setFrom(application.getConfiguration().getString("mail.from", "example@example.com")); //TODO
+        email.setFrom(application.getConfiguration().getString(AppProperties.MAIL_FROM, "example@example.com"));
         email.setSubject(subject);
         email.setHtmlBody(body);
         try {

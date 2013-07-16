@@ -21,8 +21,8 @@
 package com.manydesigns.portofino.stripes;
 
 import com.manydesigns.elements.servlet.ServletUtils;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.modules.BaseModule;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -78,7 +78,7 @@ public class ForbiddenAccessResolution implements Resolution {
         boolean ajax = "true".equals(request.getParameter("ajax"));
         ServletContext servletContext = request.getServletContext();
         Configuration configuration =
-                (Configuration) servletContext.getAttribute(ApplicationAttributes.PORTOFINO_CONFIGURATION);
+                (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
         if (userId == null && !ajax) {
             logger.info("Anonymous user not allowed. Redirecting to login.");
             String loginPage = configuration.getString(PortofinoProperties.LOGIN_PAGE);

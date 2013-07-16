@@ -34,14 +34,9 @@ public class ApplicationAttributes {
 
     public final static String CLASS_LOADER = "com.manydesigns.portofino.application.classLoader";
     public final static String ELEMENTS_CONFIGURATION = "elementsConfiguration";
-    public final static String PORTOFINO_CONFIGURATION = "portofinoConfiguration";
-    public final static String SERVLET_CONTEXT = "servletContext";
     public final static String SERVER_INFO = "serverInfo";
     public final static String APPLICATION_DIRECTORY = "com.manydesigns.portofino.application.directory";
     public final static String APPLICATION_STARTER = "applicationStarter";
-    public final static String MAIL_QUEUE = "mailQueue";
-    public final static String MAIL_SENDER = "mailSender";
-    public final static String MAIL_CONFIGURATION = "mailConfiguration";
     public final static String EHCACHE_MANAGER = "portofino.ehcache.manager";
     public final static String MODULE_REGISTRY = "com.manydesigns.portofino.modules.ModuleRegistry";
     public final static String ADMIN_MENU = "com.manydesigns.portofino.menu.Menu.admin";

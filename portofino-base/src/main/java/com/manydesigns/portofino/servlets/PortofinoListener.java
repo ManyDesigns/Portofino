@@ -26,6 +26,7 @@ import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.menu.MenuBuilder;
+import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleRegistry;
 import net.sourceforge.stripes.util.ResolverUtil;
@@ -110,7 +111,7 @@ public class PortofinoListener
         servletContext = servletContextEvent.getServletContext();
 
         serverInfo = new ServerInfo(servletContext);
-        servletContext.setAttribute(ApplicationAttributes.SERVLET_CONTEXT, servletContext);
+        servletContext.setAttribute(BaseModule.SERVLET_CONTEXT, servletContext);
         servletContext.setAttribute(ApplicationAttributes.SERVER_INFO, serverInfo);
 
         setupCommonsConfiguration();
@@ -126,7 +127,7 @@ public class PortofinoListener
             throw new Error(e);
         }
         servletContext.setAttribute(ApplicationAttributes.APPLICATION_DIRECTORY, applicationDirectory);
-        servletContext.setAttribute(ApplicationAttributes.PORTOFINO_CONFIGURATION, configuration);
+        servletContext.setAttribute(BaseModule.PORTOFINO_CONFIGURATION, configuration);
 
         logger.info("Servlet API version is " + serverInfo.getServletApiVersion());
         if (serverInfo.getServletApiMajor() < 3) {
@@ -151,6 +152,7 @@ public class PortofinoListener
         discoverModules(moduleRegistry);
         servletContext.setAttribute(ApplicationAttributes.MODULE_REGISTRY, moduleRegistry);
         moduleRegistry.migrateAndInit();
+        logger.info("All modules loaded.");
 
         String encoding = configuration.getString(PortofinoProperties.URL_ENCODING);
         logger.info("URL character encoding is set to " + encoding + ". Make sure the web server uses the same encoding to parse URLs.");

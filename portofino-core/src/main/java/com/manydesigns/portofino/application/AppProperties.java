@@ -48,7 +48,9 @@ public class AppProperties {
     public static final String GROUP_ALL = "group.all";
     public static final String GROUP_ANONYMOUS = "group.anonymous";
     public static final String GROUP_REGISTERED = "group.registered";
-    public static final String GROUP_EXTERNALLY_AUTHENTICATED = "group.externallyAuthenticated";
     public static final String GROUP_ADMINISTRATORS = "group.administrators";
+
+    //The mail address used as the from: field in email messages sent by the application (e.g. password change)
+    public static final String MAIL_FROM = "mail.from";
 
 }

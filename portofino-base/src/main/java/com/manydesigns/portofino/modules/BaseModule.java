@@ -49,7 +49,18 @@ public class BaseModule implements Module {
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
-    @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
+    //**************************************************************************
+    // Constants
+    //**************************************************************************
+
+    public final static String SERVLET_CONTEXT = "servletContext";
+    public final static String PORTOFINO_CONFIGURATION = "portofinoConfiguration";
+
+    //**************************************************************************
+    // Injected objects
+    //**************************************************************************
+
+    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
     @Inject(ApplicationAttributes.ADMIN_MENU)

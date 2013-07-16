@@ -18,15 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.actions.mail;
+package com.manydesigns.mail.stripes;
 
 import com.manydesigns.mail.sender.MailSender;
-import com.manydesigns.portofino.ApplicationAttributes;
+import com.manydesigns.portofino.modules.MailModule;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +41,7 @@ import java.util.HashSet;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@UrlBinding("/actions/mail-sender-run")
-public class SendMailAction extends AbstractActionBean {
+public abstract class SendMailAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -63,7 +61,7 @@ public class SendMailAction extends AbstractActionBean {
             return new ErrorResolution(403);
         }
 
-        MailSender mailSender = (MailSender) context.getServletContext().getAttribute(ApplicationAttributes.MAIL_SENDER);
+        MailSender mailSender = (MailSender) context.getServletContext().getAttribute(MailModule.MAIL_SENDER);
         if(mailSender == null) {
             return new ErrorResolution(500, "Mail Sender not active");
         }

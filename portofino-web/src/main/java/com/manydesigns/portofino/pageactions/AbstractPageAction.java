@@ -27,7 +27,6 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.Application;
@@ -39,6 +38,7 @@ import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Layout;
 import com.manydesigns.portofino.pages.NavigationRoot;
@@ -126,7 +126,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     /**
      * The global configuration object. Injected.
      */
-    @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
+    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
 
     //--------------------------------------------------------------------------

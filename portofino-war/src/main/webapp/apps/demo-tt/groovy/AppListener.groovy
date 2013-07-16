@@ -1,17 +1,18 @@
 import com.manydesigns.portofino.ApplicationAttributes
 import com.manydesigns.portofino.application.Application
 import com.manydesigns.portofino.di.Inject
+import com.manydesigns.portofino.menu.MenuBuilder
+import com.manydesigns.portofino.modules.BaseModule
 import com.manydesigns.portofino.starter.ApplicationListener
 import javax.servlet.ServletContext
 import org.apache.commons.configuration.Configuration
-import com.manydesigns.portofino.menu.*
 
 public class AppListener implements ApplicationListener {
 
     @Inject(ApplicationAttributes.USER_MENU)
     public MenuBuilder userMenu;
 
-    @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
+    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
     UserMenuAppender userMenuAppender;

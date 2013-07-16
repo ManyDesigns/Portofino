@@ -27,9 +27,9 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.servlet.ServletUtils;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.shiro.PasswordResetToken;
 import com.manydesigns.portofino.shiro.PortofinoRealm;
 import com.manydesigns.portofino.shiro.ShiroUtils;
@@ -77,7 +77,7 @@ public abstract class LoginAction extends AbstractActionBean {
     // Injections
     //**************************************************************************
 
-    @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
+    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
 
     //**************************************************************************

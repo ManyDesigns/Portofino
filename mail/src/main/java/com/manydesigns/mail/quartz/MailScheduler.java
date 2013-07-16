@@ -18,11 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.servlets;
+package com.manydesigns.mail.quartz;
 
 import com.manydesigns.mail.setup.MailProperties;
 import com.manydesigns.mail.setup.MailQueueSetup;
-import com.manydesigns.portofino.quartz.URLInvokeJob;
 import org.apache.commons.configuration.Configuration;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -42,6 +41,11 @@ public class MailScheduler {
     public static final Logger logger = LoggerFactory.getLogger(MailScheduler.class);
 
     public static void setupMailScheduler(MailQueueSetup mailQueueSetup) {
+        String group = "manydesigns-mail";
+        setupMailScheduler(mailQueueSetup, group);
+    }
+
+    public static void setupMailScheduler(MailQueueSetup mailQueueSetup, String group) {
         Configuration mailConfiguration = mailQueueSetup.getMailConfiguration();
         if(mailConfiguration != null) {
             if(mailConfiguration.getBoolean(MailProperties.MAIL_QUARTZ_ENABLED)) {
@@ -53,14 +57,14 @@ public class MailScheduler {
                     Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
                     JobDetail job = JobBuilder
                             .newJob(URLInvokeJob.class)
-                            .withIdentity("mail.sender", "portofino")
+                            .withIdentity("mail.sender", group)
                             .usingJobData(URLInvokeJob.URL_KEY, serverUrl)
                             .build();
 
                     int pollInterval = mailConfiguration.getInt(MailProperties.MAIL_SENDER_POLL_INTERVAL);
 
                     Trigger trigger = TriggerBuilder.newTrigger()
-                        .withIdentity("mail.sender.trigger", "portofino")
+                        .withIdentity("mail.sender.trigger", group)
                         .startNow()
                         .withSchedule(SimpleScheduleBuilder.simpleSchedule()
                                 .withIntervalInMilliseconds(pollInterval)

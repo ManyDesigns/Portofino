@@ -1,7 +1,6 @@
 package com.manydesigns.portofino.pageactions.login;
 
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
@@ -10,6 +9,7 @@ import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.Model;
+import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.shiro.PortofinoRealm;
@@ -93,7 +93,7 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
     /**
      * The global configuration object. Injected.
      */
-    @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
+    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
 
     public String openIdUrl;

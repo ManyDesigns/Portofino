@@ -22,11 +22,11 @@ package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.application.AppProperties;
 import com.manydesigns.portofino.application.Application;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.modules.BaseModule;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -57,7 +57,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     @Inject(RequestAttributes.APPLICATION)
     protected Application application;
 
-    @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
+    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     protected Configuration portofinoConfiguration;
 
     //--------------------------------------------------------------------------

@@ -22,8 +22,6 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.mail.queue.MailQueue;
-import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
@@ -43,7 +41,6 @@ import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.menu.*;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
-import com.manydesigns.portofino.servlets.MailScheduler;
 import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
 import com.manydesigns.portofino.starter.ApplicationStarter;
 import groovy.util.GroovyScriptEngine;
@@ -81,10 +78,10 @@ public class PortofinoWebModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(ApplicationAttributes.SERVLET_CONTEXT)
+    @Inject(BaseModule.SERVLET_CONTEXT)
     public ServletContext servletContext;
 
-    @Inject(ApplicationAttributes.PORTOFINO_CONFIGURATION)
+    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
     @Inject(ApplicationAttributes.ADMIN_MENU)
@@ -160,8 +157,6 @@ public class PortofinoWebModule implements Module {
             logger.error("Could not set up temp file service", e);
             throw new Error(e);
         }
-
-        setupMailQueue();
 
         //Disabilitazione security manager per funzionare su GAE. Il security manager permette di valutare
         //in sicurezza espressioni OGNL provenienti da fonti non sicure, configurando i necessari permessi
@@ -387,29 +382,6 @@ public class PortofinoWebModule implements Module {
         }
 
         protected abstract void append(MenuGroup pageMenu, PageAction pageAction);
-    }
-
-    protected void setupMailQueue() {
-        MailQueueSetup mailQueueSetup = new MailQueueSetup();
-        mailQueueSetup.setup();
-
-        MailQueue mailQueue = mailQueueSetup.getMailQueue();
-        if(mailQueue == null) {
-            logger.info("Mail queue not enabled");
-            return;
-        }
-
-        servletContext.setAttribute(ApplicationAttributes.MAIL_QUEUE, mailQueue);
-        servletContext.setAttribute(ApplicationAttributes.MAIL_SENDER, mailQueueSetup.getMailSender());
-        servletContext.setAttribute(ApplicationAttributes.MAIL_CONFIGURATION, mailQueueSetup.getMailConfiguration());
-
-        try {
-            //In classe separata per permettere al Listener di essere caricato anche in assenza di Quartz a runtime
-            MailScheduler.setupMailScheduler(mailQueueSetup);
-        } catch (NoClassDefFoundError e) {
-            logger.debug(e.getMessage(), e);
-            logger.info("Quartz is not available, mail scheduler not started");
-        }
     }
 
     @Override

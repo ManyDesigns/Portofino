@@ -30,9 +30,6 @@ public class MailProperties {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    public static final String PROPERTIES_RESOURCE = "mail.properties";
-    public static final String PROPERTIES_CUSTOM_RESOURCE = "mail-custom.properties";
-
     public static final String MAIL_ENABLED = "mail.enabled";
     public static final String MAIL_SMTP_HOST = "mail.smtp.host";
     public static final String MAIL_SMTP_PORT = "mail.smtp.port";

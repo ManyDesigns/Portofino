@@ -141,7 +141,9 @@ public class ModuleRegistry {
 
         @Override
         public int compare(Module m1, Module m2) {
-            return Double.compare(m1.getPriority(), m2.getPriority());
+            int cmp = Double.compare(m1.getPriority(), m2.getPriority());
+            //Establish a proper order even if priorities are equal
+            return cmp != 0 ? cmp : m1.getId().compareTo(m2.getId());
         }
     }
 
