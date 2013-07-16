@@ -1,7 +1,11 @@
-<web-fragment>
-    <name>portofino-web</name>
+<?xml version="1.0" encoding="UTF-8"?>
+<web-fragment xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd"
+        version="3.0">
+    <name>portofinoWeb</name>
     <ordering>
-        <after><name>portofino-base</name></after>
+        <after><name>portofinoBase</name></after>
     </ordering>
 
     <filter>

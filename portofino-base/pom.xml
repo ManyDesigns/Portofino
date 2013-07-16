@@ -61,7 +61,7 @@
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
+            <artifactId>guava-jdk5</artifactId> <!-- Used also by google OAuth client -->
             <version>${guava.version}</version>
             <scope>compile</scope>
         </dependency>

@@ -115,13 +115,13 @@ public class ApplicationStarter {
             throw new DestroyedApplicationException();
         }
         if (status == Status.UNINITIALIZED) {
-            logger.info("Trying to initilize application");
+            logger.info("Trying to initialize application");
             try {
                 status = Status.INITIALIZING;
                 initializeApplication();
             } catch (Throwable e) {
                 status = Status.UNINITIALIZED;
-                logger.error("Failed to initilize application", e);
+                logger.error("Failed to initialize application", e);
                 throw new UninitializedApplicationException();
             }
         }
