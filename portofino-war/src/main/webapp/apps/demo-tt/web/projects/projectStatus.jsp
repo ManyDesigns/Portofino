@@ -1,8 +1,8 @@
-<%@ page import="com.manydesigns.portofino.RequestAttributes" %>
-<%@ page import="com.manydesigns.portofino.application.Application" %>
+<%@ page import="com.manydesigns.portofino.modules.DatabaseModule" %>
+<%@ page import="com.manydesigns.portofino.persistence.Persistence" %>
+<%@ page import="com.manydesigns.portofino.persistence.QueryUtils" %>
 <%@ page import="org.hibernate.Session" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.manydesigns.portofino.application.QueryUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -14,8 +14,8 @@
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody"><%
-        Application appl = (Application) request.getAttribute(RequestAttributes.APPLICATION);
-        Session hSession = appl.getSession("redmine");
+        Persistence persistence = (Persistence) application.getAttribute(DatabaseModule.PERSISTENCE);
+        Session hSession = persistence.getSession("redmine");
         List<?> objects = QueryUtils.runSql
                 (hSession, "select count(*), \"project_id\", status.\"name\", \"projects\".\"name\" " +
                         "from \"issues\" join \"issue_statuses\" status on \"status_id\" = status.\"id\" " +

@@ -54,8 +54,8 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>portofino-web/target/apidocs</directory>
-      <outputDirectory>javadocs/portofino-web</outputDirectory>
+      <directory>portofino-pageactions/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-pageactions</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>

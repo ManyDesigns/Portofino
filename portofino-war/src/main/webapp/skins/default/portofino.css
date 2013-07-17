@@ -242,6 +242,9 @@ Forms
     position: relative; padding: 0;
 }
 
+td.selection-cell {
+    width: 13px;
+}
 
 .attachment {
     margin: 0.2em 2em 0.2em 0;

@@ -53,8 +53,13 @@ public class BaseModule implements Module {
     // Constants
     //**************************************************************************
 
-    public final static String SERVLET_CONTEXT = "servletContext";
+    public final static String SERVLET_CONTEXT = "com.manydesigns.portofino.servletContext";
     public final static String PORTOFINO_CONFIGURATION = "portofinoConfiguration";
+    public final static String APPLICATION_DIRECTORY = "com.manydesigns.portofino.application.directory";
+    public final static String RESOURCE_BUNDLE_MANAGER = "com.manydesigns.portofino.resourceBundleManager";
+    public final static String ELEMENTS_CONFIGURATION = "com.manydesigns.portofino.elementsConfiguration";
+    public final static String SERVER_INFO = "com.manydesigns.portofino.serverInfo";
+    public final static String APP_LISTENERS = "com.manydesigns.portofino.application.listeners";
 
     //**************************************************************************
     // Injected objects

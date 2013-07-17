@@ -131,6 +131,8 @@ public class MailModule implements Module {
             logger.debug(e.getMessage(), e);
             logger.info("Quartz is not available, mail scheduler not started");
         }
+
+        status = ModuleStatus.ACTIVE;
     }
 
     @Override

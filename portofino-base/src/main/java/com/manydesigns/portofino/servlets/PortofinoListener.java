@@ -25,10 +25,12 @@ import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.di.Injections;
+import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleRegistry;
+import com.manydesigns.portofino.starter.ApplicationListener;
 import net.sourceforge.stripes.util.ResolverUtil;
 import org.apache.commons.configuration.*;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
@@ -45,6 +47,8 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 
@@ -84,6 +88,8 @@ public class PortofinoListener
 
     protected ModuleRegistry moduleRegistry;
 
+    protected List<ApplicationListener> applicationListeners;
+
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -112,13 +118,13 @@ public class PortofinoListener
 
         serverInfo = new ServerInfo(servletContext);
         servletContext.setAttribute(BaseModule.SERVLET_CONTEXT, servletContext);
-        servletContext.setAttribute(ApplicationAttributes.SERVER_INFO, serverInfo);
+        servletContext.setAttribute(BaseModule.SERVER_INFO, serverInfo);
 
         setupCommonsConfiguration();
 
         elementsConfiguration = ElementsProperties.getConfiguration();
         servletContext.setAttribute(
-                ApplicationAttributes.ELEMENTS_CONFIGURATION, elementsConfiguration);
+                BaseModule.ELEMENTS_CONFIGURATION, elementsConfiguration);
 
         try {
             loadConfiguration();
@@ -126,8 +132,12 @@ public class PortofinoListener
             logger.error("Could not load configuration", e);
             throw new Error(e);
         }
-        servletContext.setAttribute(ApplicationAttributes.APPLICATION_DIRECTORY, applicationDirectory);
+        servletContext.setAttribute(BaseModule.APPLICATION_DIRECTORY, applicationDirectory);
         servletContext.setAttribute(BaseModule.PORTOFINO_CONFIGURATION, configuration);
+        ResourceBundleManager resourceBundleManager = new ResourceBundleManager(applicationDirectory);
+        servletContext.setAttribute(BaseModule.RESOURCE_BUNDLE_MANAGER, resourceBundleManager);
+        applicationListeners = new ArrayList<ApplicationListener>();
+        servletContext.setAttribute(BaseModule.APP_LISTENERS, applicationListeners);
 
         logger.info("Servlet API version is " + serverInfo.getServletApiVersion());
         if (serverInfo.getServletApiMajor() < 3) {
@@ -161,6 +171,11 @@ public class PortofinoListener
         }
         if(!"UTF-8".equals(encoding)) {
             logger.warn("URL encoding is not UTF-8, but the Stripes framework always generates UTF-8 encoded URLs. URLs with non-ASCII characters may not work.");
+        }
+
+        logger.info("Invoking application listeners...");
+        for(ApplicationListener listener : applicationListeners) {
+            listener.applicationStarting();
         }
 
         String lineSeparator = System.getProperty("line.separator", "\n");
@@ -198,6 +213,10 @@ public class PortofinoListener
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         MDC.clear();
         logger.info("ManyDesigns Portofino stopping...");
+        logger.info("Invoking application listeners...");
+        for(ApplicationListener listener : applicationListeners) {
+            listener.applicationDestroying();
+        }
         logger.info("Destroying modules...");
         moduleRegistry.destroy();
         logger.info("ManyDesigns Portofino stopped.");
@@ -254,7 +273,7 @@ public class PortofinoListener
         logger.debug("Setting up commons-configuration lookups...");
         BeanLookup serverInfoLookup = new BeanLookup(serverInfo);
         ConfigurationInterpolator.registerGlobalLookup(
-        ApplicationAttributes.SERVER_INFO,
-        serverInfoLookup);
+                "serverInfo",
+                serverInfoLookup);
     }
 }

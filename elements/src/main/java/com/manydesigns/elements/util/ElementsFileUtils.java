@@ -20,10 +20,12 @@
 
 package com.manydesigns.elements.util;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -150,6 +152,23 @@ public class ElementsFileUtils {
         } catch (SecurityException e) {
             logger.error("mkdir failed, security exception", e);
             return false;
+        }
+    }
+
+    public static void moveFileSafely(File tempFile, String fileName) throws IOException {
+        File destination = new File(fileName);
+        if(!destination.exists()) {
+            FileUtils.moveFile(tempFile, destination);
+        } else {
+            File backup = File.createTempFile(destination.getName(), ".backup", destination.getParentFile());
+            if (!backup.delete()) {
+                logger.warn("Cannot delete: {}", backup);
+            }
+            FileUtils.moveFile(destination, backup);
+            FileUtils.moveFile(tempFile, destination);
+            if (!backup.delete()) {
+                logger.warn("Cannot delete: {}", backup);
+            }
         }
     }
 }

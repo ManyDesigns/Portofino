@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId> 
-            <artifactId>portofino-web</artifactId>
+            <artifactId>portofino-database</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>

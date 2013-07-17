@@ -4,11 +4,15 @@
 <%@ page import="org.apache.shiro.subject.Subject" %>
 <%@ page import="com.manydesigns.portofino.stripes.AbstractActionBean" %>
 <%@ page import="com.manydesigns.portofino.pageactions.AbstractPageAction" %>
+<%@ page import="org.apache.commons.configuration.Configuration" %>
+<%@ page import="com.manydesigns.portofino.dispatcher.PageInstance" %>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%
     AbstractPageAction theActionBean = (AbstractPageAction) request.getAttribute("actionBean");
     Subject subject = SecurityUtils.getSubject();
-    if(SecurityLogic.hasPermissions(theActionBean.getPageInstance(), subject, AccessLevel.DEVELOP)) { %>
+    Configuration portofinoConfiguration = theActionBean.getPortofinoConfiguration();
+    PageInstance pageInstance = theActionBean.getPageInstance();
+    if(SecurityLogic.hasPermissions(portofinoConfiguration, pageInstance, subject, AccessLevel.DEVELOP)) { %>
 <script src="<stripes:url value="/ace-1.0.0/ace.js" />" type="text/javascript" charset="utf-8"></script>
 <script src="<stripes:url value="/ace-1.0.0/theme-twilight.js" />" type="text/javascript" charset="utf-8"></script>
 <script src="<stripes:url value="/ace-1.0.0/mode-groovy.js" />" type="text/javascript" charset="utf-8"></script>

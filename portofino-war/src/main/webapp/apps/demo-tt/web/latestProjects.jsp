@@ -1,14 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"%>
-<%@ page import="com.manydesigns.portofino.application.Application" %>
+<%@ page import="com.manydesigns.portofino.modules.DatabaseModule" %>
+<%@ page import="com.manydesigns.portofino.persistence.Persistence" %>
+<%@ page import="com.manydesigns.portofino.persistence.QueryUtils" %>
 <%@ page import="org.apache.commons.lang.time.FastDateFormat" %>
 <%@ page import="org.hibernate.Session" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="com.manydesigns.portofino.application.QueryUtils" %>
-<%@ page import="com.manydesigns.portofino.RequestAttributes" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
@@ -21,9 +21,9 @@
     <stripes:layout-component name="portletBody">
         <ul>
             <%
-                Application appl = (Application) request.getAttribute(RequestAttributes.APPLICATION);
+                Persistence persistence = (Persistence) application.getAttribute(DatabaseModule.PERSISTENCE);
                 String queryString = "FROM projects order by updated_on desc, created_on desc";
-                Session hSession = appl.getSession("redmine");
+                Session hSession = persistence.getSession("redmine");
                 List objects = QueryUtils.runHqlQuery(hSession, queryString, new Object[0], 0, 3);
                 for(Object obj : objects) {
                     Map map = (Map) obj;

@@ -1,0 +1,90 @@
+/*
+ * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+package com.manydesigns.portofino.actions.admin;
+
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.modules.BaseModule;
+import com.manydesigns.portofino.modules.DatabaseModule;
+import com.manydesigns.portofino.persistence.Persistence;
+import com.manydesigns.portofino.security.RequiresAdministrator;
+import com.manydesigns.portofino.servlets.ServerInfo;
+import com.manydesigns.portofino.stripes.AbstractActionBean;
+import net.sourceforge.stripes.action.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+/**
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+@RequiresAdministrator
+@UrlBinding(ReloadModelAction.URL_BINDING)
+public class ReloadModelAction extends AbstractActionBean {
+    public static final String copyright =
+            "Copyright (c) 2005-2013, ManyDesigns srl";
+
+    public static final String URL_BINDING = "/actions/admin/reload-model";
+
+    @Inject(DatabaseModule.PERSISTENCE)
+    Persistence persistence;
+
+    //--------------------------------------------------------------------------
+    // Logging
+    //--------------------------------------------------------------------------
+
+    public final static Logger logger =
+            LoggerFactory.getLogger(ReloadModelAction.class);
+
+    //--------------------------------------------------------------------------
+    // Action events
+    //--------------------------------------------------------------------------
+
+    @DefaultHandler
+    public Resolution execute() {
+        return new ForwardResolution("/layouts/admin/reload-model.jsp");
+    }
+
+    @Button(list = "reload-model", key = "model.reload", order = 1, type = Button.TYPE_PRIMARY)
+    @RequiresAdministrator
+    public Resolution reloadModel() {
+        synchronized (persistence) {
+            persistence.loadXmlModel();
+            DispatcherLogic.clearConfigurationCache();
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("model.reloaded"));
+            return new ForwardResolution("/layouts/admin/reload-model.jsp");
+        }
+    }
+
+    @Button(list = "reload-model-bar", key = "commons.returnToPages", order = 1)
+    public Resolution returnToPages() {
+        return new RedirectResolution("/");
+    }
+
+}

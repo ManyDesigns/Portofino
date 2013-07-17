@@ -96,8 +96,8 @@
         <module>elements-extras</module>
         <module>portofino-base</module>
         <module>portofino-stripes</module>
-        <module>portofino-core</module>
-        <module>portofino-web</module>
+        <module>portofino-database</module>
+        <module>portofino-pageactions</module>
         <module>portofino-war</module>
         <module>portofino-war-jee</module>
         <module>portofino-war-gae</module>

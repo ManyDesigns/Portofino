@@ -1,8 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"%>
-<%@ page import="com.manydesigns.portofino.RequestAttributes" %>
-<%@ page import="com.manydesigns.portofino.application.Application" %>
-<%@ page import="com.manydesigns.portofino.application.QueryUtils" %>
+<%@ page import="com.manydesigns.portofino.modules.DatabaseModule" %>
+<%@ page import="com.manydesigns.portofino.persistence.Persistence" %>
+<%@ page import="com.manydesigns.portofino.persistence.QueryUtils" %>
 <%@ page import="org.apache.commons.collections.MultiHashMap" %>
 <%@ page import="org.apache.commons.collections.MultiMap" %>
 <%@ page import="org.hibernate.Session" %>
@@ -19,8 +19,8 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <%
-            Application appl = (Application) request.getAttribute(RequestAttributes.APPLICATION);
-            Session hSession = appl.getSession("redmine");
+            Persistence persistence = (Persistence) application.getAttribute(DatabaseModule.PERSISTENCE);
+            Session hSession = persistence.getSession("redmine");
             List<?> objects = QueryUtils.getObjects(hSession,
                     "SELECT r.name, u.login " +
                             "FROM members m, users u, " +

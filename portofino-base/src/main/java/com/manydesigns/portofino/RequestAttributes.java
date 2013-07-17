@@ -34,8 +34,6 @@ public class RequestAttributes {
 
     public final static String DISPATCHER = "portofino.dispatcher";
     public final static String STOP_WATCH = "stopWatch";
-    public static final String MODEL = "model";
     public static final String PAGE_INSTANCE = "pageInstance";
-    public final static String APPLICATION = "app";
     public final static String SKIN = "skin";
 }

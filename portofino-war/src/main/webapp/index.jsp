@@ -1,11 +1,10 @@
-<%@ page import="com.manydesigns.portofino.RequestAttributes" %>
-<%@ page import="com.manydesigns.portofino.application.Application" %>
-<%@ page import="com.manydesigns.portofino.application.AppProperties" %>
-<%
-    Application app =
-            (Application) request.getAttribute(
-                    RequestAttributes.APPLICATION);
-    String landingPage = app.getConfiguration().getString(AppProperties.LANDING_PAGE);
+<%@   page import="com.manydesigns.portofino.AppProperties"
+%><%@ page import="com.manydesigns.portofino.modules.BaseModule"
+%><%@ page import="org.apache.commons.configuration.Configuration"
+%><%
+    Configuration configuration =
+            (Configuration) request.getServletContext().getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
+    String landingPage = configuration.getString(AppProperties.LANDING_PAGE);
     String redirectURL = request.getContextPath() + landingPage;
     response.sendRedirect(redirectURL);
 %>

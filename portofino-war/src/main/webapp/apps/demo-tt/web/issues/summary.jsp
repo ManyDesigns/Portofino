@@ -1,7 +1,7 @@
 <%@ page import="com.manydesigns.elements.ElementsThreadLocals" %>
-<%@ page import="com.manydesigns.portofino.RequestAttributes" %>
-<%@ page import="com.manydesigns.portofino.application.Application" %>
-<%@ page import="com.manydesigns.portofino.application.QueryUtils" %>
+<%@ page import="com.manydesigns.portofino.modules.DatabaseModule" %>
+<%@ page import="com.manydesigns.portofino.persistence.Persistence" %>
+<%@ page import="com.manydesigns.portofino.persistence.QueryUtils" %>
 <%@ page import="ognl.Ognl" %>
 <%@ page import="org.hibernate.Session" %>
 <%@ page import="java.util.List" %>
@@ -18,8 +18,8 @@
     <stripes:layout-component name="portletBody">
         <ul>
             <%
-                Application appl = (Application) request.getAttribute(RequestAttributes.APPLICATION);
-                Session hSession = appl.getSession("redmine");
+                Persistence persistence = (Persistence) application.getAttribute(DatabaseModule.PERSISTENCE);
+                Session hSession = persistence.getSession("redmine");
                 List<?> objects = QueryUtils.getObjects(hSession,
                         "SELECT t.name, sum(1 - st.is_closed) as sum, count(*) as count " +
                                 "FROM issues i, trackers t, issue_statuses st " +

@@ -1,10 +1,14 @@
 import com.manydesigns.elements.reflection.ClassAccessor
 import com.manydesigns.elements.reflection.JavaClassAccessor
 import com.manydesigns.elements.util.RandomUtil
-import com.manydesigns.portofino.application.AppProperties
+import com.manydesigns.portofino.AppProperties
+import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.model.database.Database
 import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.model.database.Table
+import com.manydesigns.portofino.modules.DatabaseModule
+import com.manydesigns.portofino.persistence.Persistence
+import com.manydesigns.portofino.reflection.TableAccessor
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import com.manydesigns.portofino.shiro.PasswordResetToken
 import com.manydesigns.portofino.shiro.SignUpToken
@@ -17,11 +21,13 @@ import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.apache.shiro.authc.*
-import com.manydesigns.portofino.reflection.TableAccessor
 
 class Security extends AbstractPortofinoRealm {
 
     private static final Logger logger = LoggerFactory.getLogger(Security.class);
+
+    @Inject(DatabaseModule.PERSISTENCE)
+    Persistence persistence;
 
     //--------------------------------------------------------------------------
     // Authentication
@@ -37,7 +43,7 @@ class Security extends AbstractPortofinoRealm {
         String password = new String(usernamePasswordToken.password);
         String hashedPassword = hashPassword(password);
 
-        Session session = application.getSession("redmine");
+        Session session = persistence.getSession("redmine");
         org.hibernate.Criteria criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq("login", userName));
         criteria.add(Restrictions.eq("hashed_password", hashedPassword));
@@ -55,7 +61,7 @@ class Security extends AbstractPortofinoRealm {
     }
 
     public AuthenticationInfo loadAuthenticationInfo(OpenIDToken openIDToken) {
-        Session session = application.getSession("redmine");
+        Session session = persistence.getSession("redmine");
         org.hibernate.Criteria criteria = session.createCriteria("users");
         if(openIDToken.firstLoginToken != null) {
             criteria.add(Restrictions.eq("token", openIDToken.firstLoginToken));
@@ -91,7 +97,7 @@ class Security extends AbstractPortofinoRealm {
     }
 
     protected SimpleAuthenticationInfo setNewPassword(token) {
-        Session session = application.getSession("redmine");
+        Session session = persistence.getSession("redmine");
         Criteria criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq("token", token.principal));
 
@@ -142,7 +148,7 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     Map<Serializable, String> getUsers() {
-        Session session = application.getSession("redmine");
+        Session session = persistence.getSession("redmine");
         SQLQuery query = session.createSQLQuery("select \"id\", \"login\" from \"users\" order by \"login\"");
         def users = new LinkedHashMap();
         for(Object[] user : query.list()) {
@@ -153,12 +159,12 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     Serializable getUserById(String encodedUserId) {
-        Session session = application.getSession("redmine");
+        Session session = persistence.getSession("redmine");
         return (Serializable) session.get("users", Integer.parseInt(encodedUserId));
     }
 
     Serializable getUserByEmail(String email) {
-        Session session = application.getSession("redmine");
+        Session session = persistence.getSession("redmine");
         def criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq("mail", email));
         return (Serializable) criteria.uniqueResult();
@@ -175,7 +181,7 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     Serializable saveUser(Serializable user) {
-        def session = application.getSession("redmine");
+        def session = persistence.getSession("redmine");
         session.save("users", (Object) user);
         session.transaction.commit();
         return user;
@@ -183,7 +189,7 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     Serializable updateUser(Serializable user) {
-        def session = application.getSession("redmine");
+        def session = persistence.getSession("redmine");
         session.update("users", (Object) user);
         session.transaction.commit();
         return user;
@@ -192,7 +198,7 @@ class Security extends AbstractPortofinoRealm {
     @Override
     ClassAccessor getUserClassAccessor() {
         Database database =
-            DatabaseLogic.findDatabaseByName(application.model, "redmine");
+            DatabaseLogic.findDatabaseByName(persistence.model, "redmine");
         Table table =
             DatabaseLogic.findTableByEntityName(database, "users");
         return new TableAccessor(table);
@@ -200,7 +206,7 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     void changePassword(Serializable user, String oldPassword, String newPassword) {
-        def session = application.getSession("redmine")
+        def session = persistence.getSession("redmine")
         def q = session.createQuery(
                 "update users set hashed_password = :newPwd where id = :id and hashed_password = :oldPwd");
         q.setParameter("newPwd", hashPassword(newPassword));
@@ -222,7 +228,7 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     String generateOneTimeToken(Serializable user) {
-        Session session = application.getSession("redmine");
+        Session session = persistence.getSession("redmine");
         user = (Serializable) session.get("users", user.id);
         String token = RandomUtil.createRandomId(20);
         user.token = token;
@@ -233,7 +239,7 @@ class Security extends AbstractPortofinoRealm {
 
     String saveSelfRegisteredUser(Object user) {
         DemoUser theUser = (DemoUser) user;
-        Session session = application.getSession("redmine");
+        Session session = persistence.getSession("redmine");
         Map persistentUser = new HashMap();
         persistentUser.login = theUser.username;
         persistentUser.mail = theUser.email;

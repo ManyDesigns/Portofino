@@ -157,7 +157,7 @@
                         String changelogFileName =
                             MessageFormat.format(
                                 changelogFileNameTemplate, table.getDatabaseName() + "-" + table.getSchemaName());
-                        File changelogFile = new File(actionBean.getApplication().getAppDbsDir(), changelogFileName);
+                        File changelogFile = new File(actionBean.getPersistence().getAppDbsDir(), changelogFileName);
                         String schemaDescr = table.getSchemaName();
                         if(changelogFile.isFile()) {
                             schemaDescr += " <img src='" + request.getContextPath() + "/layouts/admin/tables/liquibase_logo_small.gif' /> Liquibase";

@@ -30,11 +30,11 @@
                     $("label[for='connectionProviderName']").css("width", "auto").css("margin-right", "20px");
                 })
             </script>
-            <c:if test="${not empty actionBean.application.model.databases}">
+            <c:if test="${not empty actionBean.persistence.model.databases}">
                 <mde:write name="actionBean" property="connectionProviderField" />
                 <fmt:message key="appwizard.orNewConnectionProvider" />
             </c:if>
-            <c:if test="${empty actionBean.application.model.databases}">
+            <c:if test="${empty actionBean.persistence.model.databases}">
                 <fmt:message key="appwizard.newConnectionProvider" />
             </c:if>
             <div id="connectionProviderTypeForm">
@@ -65,7 +65,7 @@
                 $(function() {
                     $("#jdbcdriver").change(function() {
                         var connectionUrlDefaults = {
-                            <c:forEach var="db" items="${actionBean.application.databasePlatformsManager.databasePlatforms}"
+                            <c:forEach var="db" items="${actionBean.persistence.databasePlatformsManager.databasePlatforms}"
                                        varStatus="status">
                                 <c:out value="'${db.standardDriverClassName}': '${db.connectionStringTemplate}'" escapeXml="false"/>
                                 <c:if test="${!status.last}">,</c:if>
@@ -85,7 +85,7 @@
                     });
 
                     var toggleNewSPForm = function() {
-                        if(${empty actionBean.application.model.databases}) {
+                        if(${empty actionBean.persistence.model.databases}) {
                             return;
                         }
 

@@ -1,6 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ page import="com.manydesigns.portofino.ApplicationAttributes"
 %>
+<%@ page import="com.manydesigns.portofino.PortofinoProperties" %>
+<%@ page import="com.manydesigns.portofino.AppProperties" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
@@ -9,17 +11,15 @@
 %><stripes:url var="profileUrl" value="/actions/profile"/>
 <jsp:useBean id="portofinoConfiguration" scope="application"
              type="org.apache.commons.configuration.Configuration"/>
-<jsp:useBean id="model" scope="request"
-             type="com.manydesigns.portofino.model.Model"/>
-<jsp:useBean id="app" scope="request"
-             type="com.manydesigns.portofino.application.Application"/>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.stripes.AbstractActionBean"/>
 <fmt:setLocale value="${pageContext.request.locale}"/>
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
             <h4 id="app-title" class="pull-left">
-                <stripes:link href="/"><c:out value="${app.name}"/></stripes:link>
+                <stripes:link href="/">
+                    <c:out value="<%= portofinoConfiguration.getString(AppProperties.APPLICATION_NAME) %>"/>
+                </stripes:link>
             </h4>
             <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                 <span class="icon-bar"></span>

@@ -22,11 +22,10 @@ package com.manydesigns.portofino.actions;
 
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.application.Application;
-import com.manydesigns.portofino.stripes.AbstractActionBean;
 import com.manydesigns.portofino.shiro.ShiroUtils;
+import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
@@ -36,8 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpSession;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -78,10 +75,7 @@ public class GAELoginAction extends AbstractActionBean {
                 session.invalidate();
             }
 
-            Locale locale = context.getLocale();
-            Application application = (Application) context.getRequest().getAttribute(RequestAttributes.APPLICATION);
-            ResourceBundle bundle = application.getBundle(locale);
-            String msg = bundle.getString("user.logout");
+            String msg = ElementsThreadLocals.getText("user.logout");
             SessionMessages.addInfoMessage(msg);
             logger.info("User {} logout", userName);
             String logoutUrl = userService.createLogoutURL(context.getRequest().getContextPath() + "/");

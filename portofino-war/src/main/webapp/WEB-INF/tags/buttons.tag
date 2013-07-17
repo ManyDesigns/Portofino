@@ -6,9 +6,11 @@
 %><%@ tag import="com.manydesigns.portofino.dispatcher.PageAction"
 %><%@ tag import="com.manydesigns.portofino.dispatcher.PageInstance"
 %><%@ tag import="com.manydesigns.portofino.logic.SecurityLogic"
+%><%@ tag import="com.manydesigns.portofino.modules.BaseModule"
 %><%@ tag import="com.manydesigns.portofino.pages.Permissions"
 %><%@ tag import="com.manydesigns.portofino.security.RequiresPermissions"
 %><%@ tag import="net.sourceforge.stripes.action.ActionBean"
+%><%@ tag import="org.apache.commons.configuration.Configuration"
 %><%@ tag import="org.apache.commons.lang.StringUtils"
 %><%@ tag import="org.apache.shiro.SecurityUtils"
 %><%@ tag import="org.apache.shiro.subject.Subject"
@@ -16,8 +18,9 @@
 %><%@ tag import="javax.servlet.jsp.jstl.fmt.LocalizationContext"
 %><%@ tag import="java.lang.reflect.Method"
 %><%@ tag import="java.util.List"
-%><%@ tag import="java.util.MissingResourceException"
-%><%@ attribute name="list" required="true"
+%>
+<%@ tag import="java.util.MissingResourceException" %>
+<%@ attribute name="list" required="true"
 %><%@ attribute name="cssClass" required="false"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%
@@ -30,6 +33,8 @@
     }
     List<ButtonInfo> buttons =
             ButtonsLogic.getButtonsForClass(actionBean.getClass(), list);
+    Configuration configuration =
+            (Configuration) request.getServletContext().getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
     if(buttons != null) {
         String group = null;
         XhtmlBuffer buffer = new XhtmlBuffer(out);
@@ -37,7 +42,7 @@
             Method handler = button.getMethod();
             boolean isAdmin = SecurityLogic.isAdministrator(request);
             if(!isAdmin &&
-               ((currentPageInstance != null && !hasPermissions(button, currentPageInstance, subject)) ||
+               ((currentPageInstance != null && !hasPermissions(configuration, button, currentPageInstance, subject)) ||
                 !SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler))) {
                 continue;
             }
@@ -106,13 +111,13 @@
     }
 %><%!
     protected static boolean hasPermissions
-            (@NotNull ButtonInfo button, @NotNull PageInstance pageInstance, @NotNull Subject subject) {
+            (Configuration conf, @NotNull ButtonInfo button, @NotNull PageInstance pageInstance, @NotNull Subject subject) {
         RequiresPermissions requiresPermissions =
                     SecurityLogic.getRequiresPermissionsAnnotation(button.getMethod(), button.getFallbackClass());
         if(requiresPermissions != null) {
             Permissions permissions = SecurityLogic.calculateActualPermissions(pageInstance);
             return SecurityLogic.hasPermissions
-                    (pageInstance.getApplication(), permissions, subject, requiresPermissions);
+                    (conf, permissions, subject, requiresPermissions);
         } else {
             return true;
         }
