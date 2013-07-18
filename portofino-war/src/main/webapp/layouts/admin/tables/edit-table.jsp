@@ -92,6 +92,9 @@
             </ul>
             <div class="tab-content">
                 <div id="tab-table-columns" class="tab-pane fade in active">
+                    <div style="visibility: hidden;">
+                        <portofino:buttons list="table-edit" /><%-- So pressing Enter calls Save--%>
+                    </div>
                     <div class="controls-row">
                         <mde:write name="actionBean" property="tableForm" />
                     </div>
