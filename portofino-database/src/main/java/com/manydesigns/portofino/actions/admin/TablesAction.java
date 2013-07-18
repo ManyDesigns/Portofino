@@ -33,7 +33,6 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.admin.tables.forms.ColumnForm;
 import com.manydesigns.portofino.actions.admin.tables.forms.DatabaseSelectionProviderForm;
 import com.manydesigns.portofino.buttons.GuardType;
@@ -46,6 +45,7 @@ import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.ModelObjectNotFoundError;
 import com.manydesigns.portofino.persistence.Persistence;
@@ -63,7 +63,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -257,7 +256,7 @@ public class TablesAction extends AbstractActionBean {
             if(!StringUtils.isBlank(javaClass)) {
                 try {
                     ClassLoader classLoader =
-                            (ClassLoader) context.getServletContext().getAttribute(ApplicationAttributes.CLASS_LOADER);
+                            (ClassLoader) context.getServletContext().getAttribute(BaseModule.CLASS_LOADER);
                     Class.forName(javaClass, true, classLoader);
                 } catch (ClassNotFoundException e) {
                     javaClassField.getErrors().add(ElementsThreadLocals.getText("layouts.admin.tables.classNotFound"));

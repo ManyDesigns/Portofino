@@ -20,9 +20,9 @@
 
 package com.manydesigns.portofino.actions.admin;
 
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.menu.*;
+import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.RedirectResolution;
@@ -46,7 +46,7 @@ public class AdminAction extends AbstractActionBean {
 
     public static final String URL_BINDING = "/actions/admin";
 
-    @Inject(ApplicationAttributes.ADMIN_MENU)
+    @Inject(BaseModule.ADMIN_MENU)
     MenuBuilder adminMenu;
 
     //--------------------------------------------------------------------------

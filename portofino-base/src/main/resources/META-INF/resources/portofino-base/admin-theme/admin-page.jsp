@@ -66,7 +66,7 @@
                 </button>
                 <div id="header-menu" class="nav-collapse collapse">
                     <ul id="user-menu" class="nav">
-                        <% request.setAttribute("menu", ApplicationAttributes.USER_MENU); %>
+                        <% request.setAttribute("menu", BaseModule.USER_MENU); %>
                         <jsp:include page="../layouts/render-menu.jsp" />
                     </ul>
                 </div>
@@ -81,7 +81,7 @@
                         <%
                             //Admin menu
                             MenuBuilder adminMenuBuilder =
-                                    (MenuBuilder) application.getAttribute(ApplicationAttributes.ADMIN_MENU);
+                                    (MenuBuilder) application.getAttribute(BaseModule.ADMIN_MENU);
                             Menu adminMenu = adminMenuBuilder.build();
                             for(MenuItem item : adminMenu.items) {
                                 if(item instanceof MenuGroup) {

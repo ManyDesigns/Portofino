@@ -22,7 +22,6 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.SettingsAction;
 import com.manydesigns.portofino.actions.admin.page.PageAdminAction;
@@ -84,10 +83,10 @@ public class PageActionsModule implements Module {
     @Inject(BaseModule.APPLICATION_DIRECTORY)
     public File applicationDirectory;
 
-    @Inject(ApplicationAttributes.ADMIN_MENU)
+    @Inject(BaseModule.ADMIN_MENU)
     public MenuBuilder adminMenu;
 
-    @Inject(ApplicationAttributes.APP_MENU)
+    @Inject(BaseModule.APP_MENU)
     public MenuBuilder appMenu;
 
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
@@ -103,6 +102,7 @@ public class PageActionsModule implements Module {
     public static final String GROOVY_SCRIPT_ENGINE = "GROOVY_SCRIPT_ENGINE";
     public static final String GROOVY_CLASS_PATH = "GROOVY_CLASS_PATH";
     public static final String PAGES_DIRECTORY = "PAGES_DIRECTORY";
+    public final static String EHCACHE_MANAGER = "portofino.ehcache.manager";
 
     //**************************************************************************
     // Logging
@@ -164,7 +164,7 @@ public class PageActionsModule implements Module {
 
         logger.info("Initializing ehcache service");
         cacheManager = CacheManager.newInstance();
-        servletContext.setAttribute(ApplicationAttributes.EHCACHE_MANAGER, cacheManager);
+        servletContext.setAttribute(EHCACHE_MANAGER, cacheManager);
 
         logger.info("Initializing Shiro environment");
         WebEnvironment environment = environmentLoader.initEnvironment(servletContext);
@@ -206,7 +206,7 @@ public class PageActionsModule implements Module {
         servletContext.setAttribute(PAGES_DIRECTORY, pagesDirectory);
 
         ClassLoader classLoader = groovyScriptEngine.getGroovyClassLoader();
-        servletContext.setAttribute(ApplicationAttributes.CLASS_LOADER, classLoader);
+        servletContext.setAttribute(BaseModule.CLASS_LOADER, classLoader);
 
         File scriptFile = new File(groovyClasspath, "Security.groovy");
         SecurityGroovyRealm realm = new SecurityGroovyRealm(groovyScriptEngine, scriptFile.toURI().toString());
@@ -396,7 +396,7 @@ public class PageActionsModule implements Module {
         servletContext.removeAttribute(GROOVY_SCRIPT_ENGINE);
         servletContext.removeAttribute(GROOVY_CLASS_PATH);
         //TODO
-        servletContext.setAttribute(ApplicationAttributes.CLASS_LOADER, PageActionsModule.class.getClassLoader());
+        servletContext.setAttribute(BaseModule.CLASS_LOADER, PageActionsModule.class.getClassLoader());
         logger.info("ManyDesigns Portofino web module stopped.");
         status = ModuleStatus.DESTROYED;
     }

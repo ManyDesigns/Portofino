@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
 import com.manydesigns.portofino.actions.admin.ReloadModelAction;
@@ -61,7 +60,7 @@ public class DatabaseModule implements Module {
     @Inject(BaseModule.APPLICATION_DIRECTORY)
     public File applicationDirectory;
 
-    @Inject(ApplicationAttributes.ADMIN_MENU)
+    @Inject(BaseModule.ADMIN_MENU)
     public MenuBuilder adminMenu;
 
     protected ModuleStatus status = ModuleStatus.CREATED;

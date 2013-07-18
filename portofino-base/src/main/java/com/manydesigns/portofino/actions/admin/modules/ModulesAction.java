@@ -24,9 +24,9 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Status;
 import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleRegistry;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
@@ -51,7 +51,7 @@ public class ModulesAction extends AbstractActionBean {
 
     public static final String URL_BINDING = "/actions/admin/modules";
 
-    @Inject(ApplicationAttributes.MODULE_REGISTRY)
+    @Inject(BaseModule.MODULE_REGISTRY)
     ModuleRegistry moduleRegistry;
 
     TableForm form;

@@ -8,7 +8,7 @@ import org.apache.commons.configuration.Configuration
 
 public class AppListener implements ApplicationListener {
 
-    @Inject(ApplicationAttributes.USER_MENU)
+    @Inject(USER_MENU)
     public MenuBuilder userMenu;
 
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)

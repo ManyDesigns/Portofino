@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.modules.ModulesAction;
 import com.manydesigns.portofino.di.Inject;
@@ -60,6 +59,10 @@ public class BaseModule implements Module {
     public final static String ELEMENTS_CONFIGURATION = "com.manydesigns.portofino.elementsConfiguration";
     public final static String SERVER_INFO = "com.manydesigns.portofino.serverInfo";
     public final static String APP_LISTENERS = "com.manydesigns.portofino.application.listeners";
+    public final static String CLASS_LOADER = "com.manydesigns.portofino.application.classLoader";
+    public final static String MODULE_REGISTRY = "com.manydesigns.portofino.modules.ModuleRegistry";
+    public final static String USER_MENU = "com.manydesigns.portofino.menu.Menu.user";
+    public final static String APP_MENU = "com.manydesigns.portofino.menu.Menu.app";
 
     //**************************************************************************
     // Injected objects
@@ -68,7 +71,8 @@ public class BaseModule implements Module {
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
-    @Inject(ApplicationAttributes.ADMIN_MENU)
+    public final static String ADMIN_MENU = "com.manydesigns.portofino.menu.Menu.admin";
+    @Inject(BaseModule.ADMIN_MENU)
     public MenuBuilder adminMenu;
 
     @Override

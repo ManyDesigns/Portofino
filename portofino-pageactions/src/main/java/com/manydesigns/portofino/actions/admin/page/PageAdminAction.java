@@ -35,7 +35,6 @@ import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.portofino.AppProperties;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.actions.forms.CopyPage;
 import com.manydesigns.portofino.actions.forms.MovePage;
 import com.manydesigns.portofino.actions.forms.NewPage;
@@ -44,6 +43,7 @@ import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.logic.SecurityLogic;
+import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageActionsModule;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
@@ -144,7 +144,7 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     protected Class<?> getActionClass(String className) throws ClassNotFoundException {
-        ClassLoader classLoader = (ClassLoader) context.getServletContext().getAttribute(ApplicationAttributes.CLASS_LOADER);
+        ClassLoader classLoader = (ClassLoader) context.getServletContext().getAttribute(BaseModule.CLASS_LOADER);
         return Class.forName(className, true, classLoader);
     }
 

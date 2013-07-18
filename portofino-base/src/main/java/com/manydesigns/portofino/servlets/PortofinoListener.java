@@ -22,7 +22,6 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.configuration.BeanLookup;
-import com.manydesigns.portofino.ApplicationAttributes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
@@ -147,20 +146,20 @@ public class PortofinoListener
         }
 
         logger.debug("Registering application class loader");
-        servletContext.setAttribute(ApplicationAttributes.CLASS_LOADER, getClass().getClassLoader());
+        servletContext.setAttribute(BaseModule.CLASS_LOADER, getClass().getClassLoader());
 
         logger.debug("Installing standard menu builders");
         MenuBuilder adminMenuBuilder = new MenuBuilder();
-        servletContext.setAttribute(ApplicationAttributes.ADMIN_MENU, adminMenuBuilder);
+        servletContext.setAttribute(BaseModule.ADMIN_MENU, adminMenuBuilder);
         MenuBuilder userMenuBuilder = new MenuBuilder();
-        servletContext.setAttribute(ApplicationAttributes.USER_MENU, userMenuBuilder);
+        servletContext.setAttribute(BaseModule.USER_MENU, userMenuBuilder);
         MenuBuilder appMenuBuilder = new MenuBuilder();
-        servletContext.setAttribute(ApplicationAttributes.APP_MENU, appMenuBuilder);
+        servletContext.setAttribute(BaseModule.APP_MENU, appMenuBuilder);
 
         logger.info("Loading modules...");
         moduleRegistry = new ModuleRegistry(appConfiguration);
         discoverModules(moduleRegistry);
-        servletContext.setAttribute(ApplicationAttributes.MODULE_REGISTRY, moduleRegistry);
+        servletContext.setAttribute(BaseModule.MODULE_REGISTRY, moduleRegistry);
         moduleRegistry.migrateAndInit();
         logger.info("All modules loaded.");
 

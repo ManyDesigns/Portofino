@@ -3,6 +3,7 @@
 %>
 <%@ page import="com.manydesigns.portofino.PortofinoProperties" %>
 <%@ page import="com.manydesigns.portofino.AppProperties" %>
+<%@ page import="com.manydesigns.portofino.modules.BaseModule" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
@@ -33,11 +34,11 @@
                     </form>
                 </c:if>
                 <ul id="app-menu" class="nav">
-                    <% request.setAttribute("menu", ApplicationAttributes.APP_MENU); %>
+                    <% request.setAttribute("menu", BaseModule.APP_MENU); %>
                     <jsp:include page="/portofino-base/layouts/render-menu.jsp" />
                 </ul>
                 <ul id="user-menu" class="nav">
-                    <% request.setAttribute("menu", ApplicationAttributes.USER_MENU); %>
+                    <% request.setAttribute("menu", BaseModule.USER_MENU); %>
                     <jsp:include page="/portofino-base/layouts/render-menu.jsp" />
                 </ul>
             </div>
