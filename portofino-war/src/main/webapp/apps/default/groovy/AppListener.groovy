@@ -1,4 +1,3 @@
-import com.manydesigns.portofino.ApplicationAttributes
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.starter.ApplicationListener
 import org.apache.commons.configuration.Configuration
@@ -7,7 +6,7 @@ import com.manydesigns.portofino.modules.BaseModule
 
 public class AppListener implements ApplicationListener {
 
-    @Inject(USER_MENU)
+    @Inject(BaseModule.USER_MENU)
     public MenuBuilder userMenu;
 
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)

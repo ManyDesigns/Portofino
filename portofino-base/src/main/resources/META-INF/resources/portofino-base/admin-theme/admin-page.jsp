@@ -1,5 +1,4 @@
-<%@   page import="com.manydesigns.portofino.ApplicationAttributes"
-%><%@ page import="com.manydesigns.portofino.menu.*"
+<%@ page import="com.manydesigns.portofino.menu.*"
 %><%@ page import="net.sourceforge.stripes.controller.ActionResolver"
 %><%@ page import="org.apache.commons.lang.StringUtils"
 %><%@ page import="com.manydesigns.portofino.modules.BaseModule"
