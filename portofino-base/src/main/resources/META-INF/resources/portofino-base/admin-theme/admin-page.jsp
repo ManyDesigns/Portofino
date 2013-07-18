@@ -1,13 +1,15 @@
-<%@ page import="com.manydesigns.portofino.ApplicationAttributes" %>
-<%@ page import="com.manydesigns.portofino.menu.*" %>
-<%@ page import="net.sourceforge.stripes.controller.ActionResolver" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
+<%@   page import="com.manydesigns.portofino.ApplicationAttributes"
+%><%@ page import="com.manydesigns.portofino.menu.*"
+%><%@ page import="net.sourceforge.stripes.controller.ActionResolver"
+%><%@ page import="org.apache.commons.lang.StringUtils"
+%><%@ page import="com.manydesigns.portofino.modules.BaseModule"
+%><%@ page import="java.io.File"
+%><%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
-%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<stripes:layout-definition><%--
+%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><stripes:layout-definition><%--
 --%><!doctype html>
     <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
     <head>
@@ -53,7 +55,9 @@
         <div class="navbar-inner">
             <div class="container">
                 <h4 id="app-title" class="pull-left">
-                    <stripes:link href="/actions/admin">Administration</stripes:link>
+                    <stripes:link href="/">
+                        <%= ((File) application.getAttribute(BaseModule.APPLICATION_DIRECTORY)).getName() %>
+                    </stripes:link>
                 </h4>
                 <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                     <span class="icon-bar"></span>

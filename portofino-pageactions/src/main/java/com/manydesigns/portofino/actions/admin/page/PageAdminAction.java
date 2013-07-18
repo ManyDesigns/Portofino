@@ -173,7 +173,7 @@ public class PageAdminAction extends AbstractPageAction {
                     updateLayout(layoutContainer, portletWrapperIds);
                 } catch (Exception e) {
                     logger.error("Error updating layout", e);
-                    SessionMessages.addErrorMessage(getMessage("layout.update.failed"));
+                    SessionMessages.addErrorMessage(ElementsThreadLocals.getText("layout.update.failed"));
                 }
             }
         }
@@ -216,7 +216,7 @@ public class PageAdminAction extends AbstractPageAction {
             return doCreateNewPage();
         } catch (Exception e) {
             logger.error("Error creating page", e);
-            String msg = getMessage("page.create.failed", e.getMessage());
+            String msg = ElementsThreadLocals.getText("page.create.failed", e.getMessage());
             SessionMessages.addErrorMessage(msg);
             return new ForwardResolution("/layouts/page-crud/new-page.jsp");
         }
@@ -316,7 +316,7 @@ public class PageAdminAction extends AbstractPageAction {
 
             if(directory.exists()) {
                 logger.error("Can't create page - directory {} exists", directory.getAbsolutePath());
-                SessionMessages.addErrorMessage(getMessage("page.create.failed.directoryExists"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.create.failed.directoryExists"));
                 return new ForwardResolution("/layouts/page-crud/new-page.jsp");
             }
             if(ElementsFileUtils.safeMkdirs(directory)) {
@@ -354,16 +354,16 @@ public class PageAdminAction extends AbstractPageAction {
                     DispatcherLogic.savePage(parentDirectory, parentPage);
                 } catch (Exception e) {
                     logger.error("Exception saving page configuration");
-                    SessionMessages.addErrorMessage(getMessage("page.create.failed"));
+                    SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.create.failed"));
                     return new ForwardResolution("/layouts/page-crud/new-page.jsp");
                 }
             } else {
                 logger.error("Can't create directory {}", directory.getAbsolutePath());
-                SessionMessages.addErrorMessage(getMessage("page.create.failed.cantCreateDir"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.create.failed.cantCreateDir"));
                 return new ForwardResolution("/layouts/page-crud/new-page.jsp");
             }
             logger.info("Page " + pageId + " created. Path: " + directory.getAbsolutePath());
-            SessionMessages.addInfoMessage(getMessage("page.create.successful"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("page.create.successful"));
             String url = context.getRequest().getContextPath() + configurePath + "/" + fragment;
             return new RedirectResolution(url, false)
                             .addParameter("configure").addParameter("cancelReturnUrl", url);
@@ -376,7 +376,7 @@ public class PageAdminAction extends AbstractPageAction {
         PageInstance pageInstance = getPageInstance();
         PageInstance parentPageInstance = pageInstance.getParent();
         if(parentPageInstance == null) {
-            SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.root"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.delete.forbidden.root"));
         } else {
             Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
             String contextPath = context.getRequest().getContextPath();
@@ -384,7 +384,7 @@ public class PageAdminAction extends AbstractPageAction {
             Dispatch landingPageDispatch = dispatcher.getDispatch(contextPath, landingPagePath);
             if(landingPageDispatch != null &&
                landingPageDispatch.getLastPageInstance().getDirectory().equals(pageInstance.getDirectory())) {
-                SessionMessages.addErrorMessage(getMessage("page.delete.forbidden.landing"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.delete.forbidden.landing"));
                 return new RedirectResolution(dispatch.getOriginalPath());
             }
             try {
@@ -454,13 +454,13 @@ public class PageAdminAction extends AbstractPageAction {
 
     protected Resolution copyPage(String destinationPagePath, String newName, boolean deleteOriginal) {
         if(StringUtils.isEmpty(destinationPagePath)) {
-            SessionMessages.addErrorMessage(getMessage("page.copyOrMove.noDestination"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.copyOrMove.noDestination"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
         PageInstance pageInstance = getPageInstance();
         PageInstance oldParent = pageInstance.getParent();
         if(oldParent == null) {
-            SessionMessages.addErrorMessage(getMessage("page.copyOrMove.forbidden.root"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.copyOrMove.forbidden.root"));
             return new RedirectResolution(dispatch.getOriginalPath());
         }
         if(deleteOriginal) {
@@ -471,7 +471,7 @@ public class PageAdminAction extends AbstractPageAction {
             Dispatch landingPageDispatch = dispatcher.getDispatch(contextPath, landingPagePath);
             if(landingPageDispatch != null &&
                landingPageDispatch.getLastPageInstance().getDirectory().equals(pageInstance.getDirectory())) {
-                SessionMessages.addErrorMessage(getMessage("page.move.forbidden.landing"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.move.forbidden.landing"));
                 return new RedirectResolution(dispatch.getOriginalPath());
             }
         }
@@ -552,11 +552,11 @@ public class PageAdminAction extends AbstractPageAction {
                     DispatcherLogic.savePage(newParent.getDirectory(), newParent.getPage());
                 } catch (Exception e) {
                     logger.error("Couldn't copy/move page", e);
-                    String msg = getMessage("page.copyOrMove.failed", destinationPagePath);
+                    String msg = ElementsThreadLocals.getText("page.copyOrMove.failed", destinationPagePath);
                     SessionMessages.addErrorMessage(msg);
                 }
             } else {
-                String msg = getMessage("page.copyOrMove.destinationExists", newDirectory.getAbsolutePath());
+                String msg = ElementsThreadLocals.getText("page.copyOrMove.destinationExists", newDirectory.getAbsolutePath());
                 SessionMessages.addErrorMessage(msg);
                 return new RedirectResolution(dispatch.getOriginalPath());
             }
@@ -569,7 +569,7 @@ public class PageAdminAction extends AbstractPageAction {
                 return new RedirectResolution(newParent.getPath());
             }
         } else {
-            String msg = getMessage("page.copyOrMove.invalidDestination", destinationPagePath);
+            String msg = ElementsThreadLocals.getText("page.copyOrMove.invalidDestination", destinationPagePath);
             SessionMessages.addErrorMessage(msg);
             return new RedirectResolution(dispatch.getOriginalPath());
         }
@@ -738,7 +738,7 @@ public class PageAdminAction extends AbstractPageAction {
             detailChildPages.clear();
         }
         setupChildPages(); //Re-read sorted values
-        SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
+        SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.update.successful"));
         return forwardToPageChildren();
     }
 
@@ -777,7 +777,7 @@ public class PageAdminAction extends AbstractPageAction {
             }
             newChildren.add(childPage);
             if(!editChildPage.showInNavigation && !editChildPage.embedded) {
-                String msg = getMessage("page.warnNotShowInNavigationNotEmbedded", editChildPage.name);
+                String msg = ElementsThreadLocals.getText("page.warnNotShowInNavigationNotEmbedded", editChildPage.name);
                 SessionMessages.addWarningMessage(msg);
             }
         }
@@ -796,7 +796,7 @@ public class PageAdminAction extends AbstractPageAction {
             DispatcherLogic.savePage(getPageInstance());
         } catch (Exception e) {
             logger.error("Couldn't save page", e);
-            String msg = getMessage("page.update.failed", e.getMessage());
+            String msg = ElementsThreadLocals.getText("page.update.failed", e.getMessage());
             SessionMessages.addErrorMessage(msg);
             return false;
         }
@@ -924,12 +924,12 @@ public class PageAdminAction extends AbstractPageAction {
     public Resolution updatePagePermissions() {
         try {
             updatePagePermissions(getPageInstance());
-            SessionMessages.addInfoMessage(getMessage("permissions.page.updated"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("permissions.page.updated"));
             return new RedirectResolution(HttpUtil.getRequestedPath(context.getRequest()))
                     .addParameter("pagePermissions").addParameter("originalPath", dispatch.getOriginalPath());
         } catch (Exception e) {
             logger.error("Couldn't update page permissions", e);
-            SessionMessages.addInfoMessage(getMessage("permissions.page.notUpdated"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("permissions.page.notUpdated"));
             return new RedirectResolution(HttpUtil.getRequestedPath(context.getRequest()))
                     .addParameter("pagePermissions").addParameter("originalPath", dispatch.getOriginalPath());
         }
