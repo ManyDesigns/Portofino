@@ -65,24 +65,16 @@
     </dependencies>
     <build>
         <plugins>
-        <!--    <plugin>
-                <groupId>org.glassfish</groupId>
-                <artifactId>maven-embedded-glassfish-plugin</artifactId>
-                <version>3.1.1</version>
-                <configuration>
-                    <app>target/${project.artifactId}-${project.version}.${project.packaging}</app>
-                    <port>8080</port>
-                </configuration>
-            </plugin>-->
+            <!--
+            To run the application in an embedded JBoss AS 7:
+              export MAVEN_OPTS="-Xmx1024M -XX:MaxPermSize=512m"
+              mvn jboss-as:run
+            then browse to http://localhost:8080/${build.finalName}
+             -->
             <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>8.1.11.v20130520</version>
-                <configuration>
-                    <webAppConfig>
-                        <allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
-                    </webAppConfig>
-                </configuration>
+                <groupId>org.jboss.as.plugins</groupId>
+                <artifactId>jboss-as-maven-plugin</artifactId>
+                <version>7.4.Final</version>
             </plugin>
         </plugins>
         <resources>
