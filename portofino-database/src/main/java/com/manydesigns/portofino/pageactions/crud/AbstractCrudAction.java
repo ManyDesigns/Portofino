@@ -549,7 +549,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Edit/Update
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "commons.edit", order = 1, icon = Button.ICON_EDIT, group = "crud")
+    @Button(list = "crud-read", key = "commons.edit", order = 1, icon = Button.ICON_EDIT + Button.ICON_WHITE,
+            group = "crud", type = Button.TYPE_SUCCESS)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution edit() {
         setupForm(Mode.EDIT);

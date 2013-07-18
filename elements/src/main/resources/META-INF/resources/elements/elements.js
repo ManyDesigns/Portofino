@@ -114,7 +114,7 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, meth
 
 function setupDatePicker(dateFieldId, dateFormat) {
     var dateField = $(dateFieldId);
-    dateField.datepicker({ format: dateFormat });
+    dateField.datepicker({ format: dateFormat, autoclose: true });
 }
 
 function stripQueryString(url) {

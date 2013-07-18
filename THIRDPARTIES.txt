@@ -80,7 +80,7 @@ Files: elements/src/main/resources/META-INF/resources/elements/bootstrap/
 License: Apache License v2.0
 
 Bootstrap Datepicker
-Site: http://www.eyecon.ro/bootstrap-datepicker/
+Site: https://github.com/eternicode/bootstrap-datepicker
 Files: elements/src/main/resources/META-INF/resources/elements/datepicker/
 License: Apache License v2.0
 
@@ -154,11 +154,6 @@ Site: http://dom4j.sourceforge.net/
 File: dom4j-1.6.1.jar
 License: BSD
 
-Dumbster
-Site: http://quintanasoft.com/dumbster/
-File: dumbster-1.5.jar
-License: Apache License v2
-
 Ehcache
 Site: http://ehcache.org/
 File: ehcache-core-2.5.2.jar
@@ -171,7 +166,7 @@ License: Apache License v2
 
 Google Guava
 Site: http://code.google.com/p/guava-libraries/
-File: guava-11.0.2.jar
+File: guava-jdk5-13.0.jar
 License: Apache License v2
 
 Google Guice
@@ -196,11 +191,6 @@ Files: hibernate-core-3.6.9.Final.jar,
        hibernate-jpa-2.0-api-1.0.1.Final.jar,
        hibernate-c3p0-3.6.9.Final.jar
 License: LGPL v2.1
-
-HttpUnit
-Site: http://httpunit.sourceforge.net/
-File: httpunit-1.7.1.jar 
-License: MIT
 
 Intellij Annotations
 Site: http://www.jetbrains.com/idea
@@ -291,11 +281,6 @@ JSqlParser
 Site: http://jsqlparser.sourceforge.net/home.php
 File: jsqlparser-0.8.0.jar
 License: LGPL
-
-JUnit
-Site: http://junit.sourceforge.net
-File: junit-3.8.1.jar
-License: Common Public License - v 1.0
 
 Liquibase
 Site: http://www.liquibase.org/
