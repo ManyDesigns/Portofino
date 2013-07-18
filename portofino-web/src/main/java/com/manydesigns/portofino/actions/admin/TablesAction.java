@@ -243,11 +243,13 @@ public class TablesAction extends AbstractActionBean {
                 logger.error("Could not save model", e);
                 SessionMessages.addErrorMessage(e.toString());
             }
+            return new RedirectResolution(TablesAction.class, "editTable")
+                    .addParameter("databaseName", databaseName)
+                    .addParameter("schemaName", schemaName)
+                    .addParameter("tableName", tableName);
+        } else {
+            return new ForwardResolution("/layouts/admin/tables/edit-table.jsp");
         }
-        return new RedirectResolution(TablesAction.class, "editTable")
-                .addParameter("databaseName", databaseName)
-                .addParameter("schemaName", schemaName)
-                .addParameter("tableName", tableName);
     }
 
     protected boolean validateTableForm() {
