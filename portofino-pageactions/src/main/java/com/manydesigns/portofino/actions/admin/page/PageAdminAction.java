@@ -723,14 +723,14 @@ public class PageAdminAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updatePageChildren() {
         setupChildPages();
-        String[] order = context.getRequest().getParameterValues("childrenTable_0");
+        String[] order = context.getRequest().getParameterValues("directChildren");
         if(order == null) {
             order = new String[0];
         }
         boolean success = updatePageChildren(childPagesForm, childPages, getPage().getLayout(), order);
         childPages.clear();
         if(success && detailChildPagesForm != null) {
-            order = context.getRequest().getParameterValues("childrenTable_1");
+            order = context.getRequest().getParameterValues("detailChildren");
             if(order == null) {
                 order = new String[0];
             }
