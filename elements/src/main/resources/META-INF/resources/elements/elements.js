@@ -142,9 +142,17 @@ $(function() {
 });
 
 function configureBulkEditTextField(id, checkboxName) {
-    $("#" + id).focusin(function() {
-        $("input[name=" + checkboxName + "]").prop("checked", true);
-    })
+    $("#" + id).keypress(function(event) {
+        var keyCode = event.keyCode || event.which;
+        if(keyCode != 9) { //9 = Tab
+            $("input[name=" + checkboxName + "]").prop("checked", true);
+        }
+    });
+}
+
+function configureBulkEditDateField(id, checkboxName) {
+    configureBulkEditTextField(id, checkboxName);
+    configureBulkEditField(id, checkboxName);
 }
 
 function configureBulkEditField(id, checkboxName) {
@@ -152,6 +160,6 @@ function configureBulkEditField(id, checkboxName) {
         if($(this).val()) {
             $("input[name=" + checkboxName + "]").prop("checked", true);
         }
-    })
+    });
 }
 

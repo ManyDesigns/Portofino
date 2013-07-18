@@ -211,7 +211,7 @@ public class DateField extends AbstractTextField {
         if(mode.isBulk()) {
             xb.writeJavaScript(
                     "$(function() { " +
-                        "configureBulkEditTextField('" + id + "', '" + bulkCheckboxName + "'); " +
+                        "configureBulkEditDateField('" + id + "', '" + bulkCheckboxName + "'); " +
                     "});");
         }
     }
