@@ -25,11 +25,11 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
+import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
-import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -54,7 +54,7 @@ import java.util.List;
 @ConfigurationClass(CalendarConfiguration.class)
 @PageActionName("Calendar")
 @ScriptTemplate("script_template.groovy")
-public class CalendarAction extends CustomAction {
+public class CalendarAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -103,7 +103,6 @@ public class CalendarAction extends CustomAction {
         return null;
     }
 
-    @Override
     @Button(list = "portletHeaderButtons", titleKey = "commons.configure", order = 1, icon = Button.ICON_WRENCH)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
