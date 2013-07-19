@@ -526,7 +526,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     pk = pkHelper.generatePkStringArray(object);
                     String url = getDispatch().getOriginalPath() + "/" + getPkForUrl(pk);
                     XhtmlBuffer buffer = new XhtmlBuffer();
-                    buffer.write(getMessage("commons.save.successful") + ". ");
+                    buffer.write(ElementsThreadLocals.getText("commons.save.successful") + ". ");
                     String createUrl = getDispatch().getAbsoluteOriginalPath();
                     if(!createUrl.contains("?")) {
                         createUrl += "?";
@@ -535,7 +535,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     }
                     createUrl += "create=";
                     createUrl = appendSearchStringParamIfNecessary(createUrl);
-                    buffer.writeAnchor(createUrl, getMessage("commons.create.another"));
+                    buffer.writeAnchor(createUrl, ElementsThreadLocals.getText("commons.create.another"));
                     SessionMessages.addInfoMessage(buffer);
                     return new RedirectResolution(url);
                 }
@@ -579,7 +579,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     SessionMessages.addErrorMessage(rootCauseMessage);
                     return getEditView();
                 }
-                SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
+                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.update.successful"));
                 return new RedirectResolution(
                         appendSearchStringParamIfNecessary(getDispatch().getOriginalPath()));
             }
@@ -602,7 +602,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkEdit() {
         if (selection == null || selection.length == 0) {
-            SessionMessages.addWarningMessage(getMessage("commons.bulkUpdate.nothingSelected"));
+            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("commons.bulkUpdate.nothingSelected"));
             return new RedirectResolution(cancelReturnUrl, false);
         }
 
@@ -646,7 +646,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 return getBulkEditView();
             }
             SessionMessages.addInfoMessage(
-                    getMessage("commons.bulkUpdate.successful", updated));
+                    ElementsThreadLocals.getText("commons.bulkUpdate.successful", updated));
             return new RedirectResolution(
                     appendSearchStringParamIfNecessary(getDispatch().getOriginalPath()));
         } else {
@@ -667,8 +667,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             try {
                 deletePostProcess(object);
                 commitTransaction();
-                deleteBlobs(object);
-                SessionMessages.addInfoMessage(getMessage("commons.delete.successful"));
+                deleteFileBlobs(object);
+                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.delete.successful"));
 
                 // invalidate the pk on this crud
                 pk = null;
@@ -687,7 +687,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public Resolution bulkDelete() {
         int deleted = 0;
         if (selection == null) {
-            SessionMessages.addWarningMessage(getMessage("commons.bulkDelete.nothingSelected"));
+            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("commons.bulkDelete.nothingSelected"));
             return new RedirectResolution(appendSearchStringParamIfNecessary(getDispatch().getOriginalPath()));
         }
         List<T> objects = new ArrayList<T>(selection.length);
@@ -705,9 +705,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         try {
             commitTransaction();
             for(T obj : objects) {
-                deleteBlobs(obj);
+                deleteFileBlobs(obj);
             }
-            SessionMessages.addInfoMessage(getMessage("commons.bulkDelete.successful", deleted));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.bulkDelete.successful", deleted));
         } catch (Exception e) {
             logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
             SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
@@ -716,7 +716,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return new RedirectResolution(appendSearchStringParamIfNecessary(getDispatch().getOriginalPath()));
     }
 
-    protected void deleteBlobs(T object) {
+    protected void deleteFileBlobs(T object) {
         setupForm(Mode.VIEW);
         form.readFromObject(object);
         BlobManager blobManager = ElementsThreadLocals.getBlobManager();
@@ -1274,7 +1274,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             if(!StringUtils.isBlank(searchString)) {
                 returnToParentParams.put(SEARCH_STRING_PARAM, searchString);
             }
-            returnToParentTarget = getMessage("layouts.crud.search");
+            returnToParentTarget = ElementsThreadLocals.getText("layouts.crud.search");
         }/* else {
             PageInstance[] pageInstancePath =
                 dispatch.getPageInstancePath();
@@ -1437,7 +1437,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             return fileService.stream(tempFile);
         } catch (Exception e) {
             logger.error("Excel export failed", e);
-            SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.export.failed"));
             return new RedirectResolution(getDispatch().getOriginalPath());
         }
     }
@@ -1510,7 +1510,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             return fileService.stream(tempFile);
         } catch (Exception e) {
             logger.error("Excel export failed", e);
-            SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.export.failed"));
             return new RedirectResolution(getDispatch().getOriginalPath());
         }
     }
@@ -1675,7 +1675,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             return fileService.stream(tempFile);
         } catch (Exception e) {
             logger.error("PDF export failed", e);
-            SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.export.failed"));
             return new RedirectResolution(getDispatch().getOriginalPath());
         }
     }
@@ -1986,7 +1986,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }.setFilename(getReadTitle() + ".pdf");
         } catch (Exception e) {
             logger.error("PDF export failed", e);
-            SessionMessages.addErrorMessage(getMessage("commons.export.failed"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.export.failed"));
             return new RedirectResolution(getDispatch().getOriginalPath());
         }
     }
@@ -2161,10 +2161,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
             saveConfiguration(crudConfiguration);
 
-            SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.updated"));
             return cancel();
         } else {
-            SessionMessages.addErrorMessage(getMessage("commons.configuration.notUpdated"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.configuration.notUpdated"));
             return getConfigurationView();
         }
     }
