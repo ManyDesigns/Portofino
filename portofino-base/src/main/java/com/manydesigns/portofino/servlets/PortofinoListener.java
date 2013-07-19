@@ -24,6 +24,7 @@ import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.di.Injections;
+import com.manydesigns.portofino.head.HtmlHeadBuilder;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.modules.BaseModule;
@@ -155,6 +156,9 @@ public class PortofinoListener
         servletContext.setAttribute(BaseModule.USER_MENU, userMenuBuilder);
         MenuBuilder appMenuBuilder = new MenuBuilder();
         servletContext.setAttribute(BaseModule.APP_MENU, appMenuBuilder);
+
+        logger.debug("Installing HTML head builder");
+        servletContext.setAttribute(BaseModule.HTML_HEAD_BUILDER, new HtmlHeadBuilder());
 
         logger.info("Loading modules...");
         moduleRegistry = new ModuleRegistry(appConfiguration);

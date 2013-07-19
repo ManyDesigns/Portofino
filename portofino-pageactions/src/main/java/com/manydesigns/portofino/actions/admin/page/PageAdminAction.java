@@ -166,11 +166,11 @@ public class PageAdminAction extends AbstractPageAction {
         Enumeration parameters = request.getParameterNames();
         while(parameters.hasMoreElements()) {
             String parameter = (String) parameters.nextElement();
-            if(parameter.startsWith("portletWrapper_")) {
-                String layoutContainer = parameter.substring("portletWrapper_".length());
-                String[] portletWrapperIds = request.getParameterValues(parameter);
+            if(parameter.startsWith("embeddedPageActionWrapper_")) {
+                String layoutContainer = parameter.substring("embeddedPageActionWrapper_".length());
+                String[] embeddedPageActionWrapperIds = request.getParameterValues(parameter);
                 try {
-                    updateLayout(layoutContainer, portletWrapperIds);
+                    updateLayout(layoutContainer, embeddedPageActionWrapperIds);
                 } catch (Exception e) {
                     logger.error("Error updating layout", e);
                     SessionMessages.addErrorMessage(ElementsThreadLocals.getText("layout.update.failed"));
@@ -180,15 +180,15 @@ public class PageAdminAction extends AbstractPageAction {
         return new RedirectResolution(dispatch.getOriginalPath());
     }
 
-    protected void updateLayout(String layoutContainer, String[] portletWrapperIds) throws Exception {
+    protected void updateLayout(String layoutContainer, String[] embeddedPageActionWrapperIds) throws Exception {
         PageInstance instance = getPageInstance();
         Layout layout = instance.getLayout();
         if(layout == null) {
             layout = new Layout();
             instance.setLayout(layout);
         }
-        for(int i = 0; i < portletWrapperIds.length; i++) {
-            String current = portletWrapperIds[i];
+        for(int i = 0; i < embeddedPageActionWrapperIds.length; i++) {
+            String current = embeddedPageActionWrapperIds[i];
             if (current.startsWith("c")) { //Retaggio di quando avevamo self (non serve piu')
                 String pageFragment = current.substring(1); //current = c...
                 for(ChildPage p : layout.getChildPages()) {

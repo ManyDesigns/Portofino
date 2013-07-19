@@ -27,12 +27,7 @@
 *
 */
 
-package com.manydesigns.portofino.menu;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+package com.manydesigns.portofino.head;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -40,34 +35,34 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class MenuBuilder {
+public class Style {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    public final List<MenuAppender> menuAppenders = new ArrayList<MenuAppender>();
+    private String source;
 
-    public Menu build() {
-        Menu menu = new Menu();
-        for(MenuAppender appender : menuAppenders) {
-            appender.append(menu);
-        }
-        Collections.sort(menu.items, new MenuItemComparator());
-        for(MenuItem menuItem : menu.items) {
-            if(menuItem instanceof MenuGroup) {
-                Collections.sort(((MenuGroup) menuItem).menuLinks, new MenuItemComparator());
-            }
-        }
-        return menu;
+    public String getSource() {
+        return source;
     }
 
-    public List<MenuAppender> getMenuAppenders() {
-        return menuAppenders;
+    public void setSource(String source) {
+        this.source = source;
     }
 
-    public static class MenuItemComparator implements Comparator<MenuItem> {
-        @Override
-        public int compare(MenuItem mi1, MenuItem mi2) {
-            return Double.compare(mi1.order, mi2.order);
-        }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Style style = (Style) o;
+
+        if (source != null ? !source.equals(style.source) : style.source != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return source != null ? source.hashCode() : 0;
     }
 }

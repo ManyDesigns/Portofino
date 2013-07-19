@@ -29,9 +29,15 @@ import com.manydesigns.portofino.actions.admin.page.RootChildrenAction;
 import com.manydesigns.portofino.actions.admin.page.RootPermissionsAction;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.di.Injections;
+import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.dispatcher.DispatcherUtil;
 import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.files.TempFileService;
+import com.manydesigns.portofino.head.HtmlHead;
+import com.manydesigns.portofino.head.HtmlHeadAppender;
+import com.manydesigns.portofino.head.HtmlHeadBuilder;
+import com.manydesigns.portofino.head.Script;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.menu.*;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
@@ -40,6 +46,7 @@ import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
 import com.manydesigns.portofino.starter.ApplicationListener;
 import groovy.util.GroovyScriptEngine;
 import net.sf.ehcache.CacheManager;
+import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlRuntime;
 import org.apache.commons.configuration.Configuration;
@@ -56,6 +63,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
@@ -88,6 +96,9 @@ public class PageActionsModule implements Module {
 
     @Inject(BaseModule.APP_MENU)
     public MenuBuilder appMenu;
+
+    @Inject(BaseModule.HTML_HEAD_BUILDER)
+    public HtmlHeadBuilder headBuilder;
 
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
 
@@ -215,6 +226,8 @@ public class PageActionsModule implements Module {
 
         appendToAdminMenu();
         appendToAppMenu();
+
+        setupHead();
 
         status = ModuleStatus.ACTIVE;
     }
@@ -383,6 +396,41 @@ public class PageActionsModule implements Module {
         }
 
         protected abstract void append(MenuGroup pageMenu, PageAction pageAction);
+    }
+
+    protected void setupHead() {
+        headBuilder.appenders.add(new HtmlHeadAppender() {
+            @Override
+            public void append(HtmlHead head) {
+                //Add portofino.js.jsp
+                Script script = new Script();
+                script.setSource("/portofino.js.jsp");
+                head.scripts.add(script);
+
+                //Setup base href - uniform handling of .../resource and .../resource/
+                HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
+                ActionBean actionBean = (ActionBean) request.getAttribute("actionBean");
+                Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);
+                if(dispatch != null) {
+                    String baseHref = dispatch.getAbsoluteOriginalPath();
+                    //Remove all trailing slashes
+                    while (baseHref.length() > 1 && baseHref.endsWith("/")) {
+                        baseHref = baseHref.substring(0, baseHref.length() - 1);
+                    }
+                    //Add a single trailing slash so all relative URLs use this page as the root
+                    baseHref += "/";
+                    //Try to make the base HREF absolute
+                    try {
+                        URL url = new URL(request.getRequestURL().toString());
+                        String port = url.getPort() > 0 ? ":" + url.getPort() : "";
+                        baseHref = url.getProtocol() + "://" + url.getHost() + port + baseHref;
+                    } catch (MalformedURLException e) {
+                        //Ignore
+                    }
+                    head.html.add("<base href=\"" + baseHref  + "\" />");
+                }
+            }
+        });
     }
 
     @Override

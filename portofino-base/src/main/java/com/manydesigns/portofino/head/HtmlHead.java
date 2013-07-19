@@ -27,12 +27,10 @@
 *
 */
 
-package com.manydesigns.portofino.menu;
+package com.manydesigns.portofino.head;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -40,34 +38,23 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class MenuBuilder {
+public class HtmlHead {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    public final List<MenuAppender> menuAppenders = new ArrayList<MenuAppender>();
+    public final Set<Script> scripts = new LinkedHashSet<Script>();
+    public final Set<Style> styles = new LinkedHashSet<Style>();
+    public final Set<String> html = new LinkedHashSet<String>();
 
-    public Menu build() {
-        Menu menu = new Menu();
-        for(MenuAppender appender : menuAppenders) {
-            appender.append(menu);
-        }
-        Collections.sort(menu.items, new MenuItemComparator());
-        for(MenuItem menuItem : menu.items) {
-            if(menuItem instanceof MenuGroup) {
-                Collections.sort(((MenuGroup) menuItem).menuLinks, new MenuItemComparator());
-            }
-        }
-        return menu;
+    public Set<Script> getScripts() {
+        return scripts;
     }
 
-    public List<MenuAppender> getMenuAppenders() {
-        return menuAppenders;
+    public Set<Style> getStyles() {
+        return styles;
     }
 
-    public static class MenuItemComparator implements Comparator<MenuItem> {
-        @Override
-        public int compare(MenuItem mi1, MenuItem mi2) {
-            return Double.compare(mi1.order, mi2.order);
-        }
+    public Set<String> getHtml() {
+        return html;
     }
 }

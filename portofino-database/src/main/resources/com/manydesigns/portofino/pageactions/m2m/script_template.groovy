@@ -5,7 +5,6 @@ import javax.servlet.*
 import com.manydesigns.elements.messages.*
 import com.manydesigns.elements.reflection.*
 import com.manydesigns.portofino.*
-import com.manydesigns.portofino.application.*
 import com.manydesigns.portofino.buttons.*
 import com.manydesigns.portofino.buttons.annotations.*
 import com.manydesigns.portofino.dispatcher.*

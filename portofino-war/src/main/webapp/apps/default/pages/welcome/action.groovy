@@ -1,5 +1,4 @@
 import com.manydesigns.portofino.*
-import com.manydesigns.portofino.application.*
 import com.manydesigns.portofino.buttons.annotations.*
 import com.manydesigns.portofino.dispatcher.*
 import com.manydesigns.portofino.model.database.*

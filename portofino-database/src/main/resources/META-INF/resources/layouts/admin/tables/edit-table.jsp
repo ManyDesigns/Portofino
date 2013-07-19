@@ -13,7 +13,7 @@
               href="<stripes:url value="/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"/>"/>
 
         <script type="text/javascript"
-                src="<stripes:url value="/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"/>"></script>
+                src="<stripes:url value='/jquery-ui/js/jquery-ui-1.10.3.custom.min.js'/>"></script>
 
         <style type="text/css">
             .tableForm {

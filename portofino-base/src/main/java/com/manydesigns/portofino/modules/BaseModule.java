@@ -63,16 +63,17 @@ public class BaseModule implements Module {
     public final static String MODULE_REGISTRY = "com.manydesigns.portofino.modules.ModuleRegistry";
     public final static String USER_MENU = "com.manydesigns.portofino.menu.Menu.user";
     public final static String APP_MENU = "com.manydesigns.portofino.menu.Menu.app";
+    public final static String ADMIN_MENU = "com.manydesigns.portofino.menu.Menu.admin";
+    public final static String HTML_HEAD_BUILDER = "com.manydesigns.portofino.head.builder";
 
     //**************************************************************************
     // Injected objects
     //**************************************************************************
 
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    @Inject(PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
-    public final static String ADMIN_MENU = "com.manydesigns.portofino.menu.Menu.admin";
-    @Inject(BaseModule.ADMIN_MENU)
+    @Inject(ADMIN_MENU)
     public MenuBuilder adminMenu;
 
     @Override
@@ -97,7 +98,7 @@ public class BaseModule implements Module {
 
     @Override
     public String getName() {
-        return "Portofino base";
+        return "Portofino Base";
     }
 
     @Override

@@ -26,22 +26,22 @@ package com.manydesigns.portofino.pageactions;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class PortletInstance implements Comparable<PortletInstance> {
+public class EmbeddedPageAction implements Comparable<EmbeddedPageAction> {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    protected final String jsp;
+    protected final String path;
     protected final String id;
     protected final Integer index;
 
-    public PortletInstance(String id, Integer index, String jsp) {
+    public EmbeddedPageAction(String id, Integer index, String path) {
         this.id = id;
         this.index = index;
-        this.jsp = jsp;
+        this.path = path;
     }
 
-    public String getJsp() {
-        return jsp;
+    public String getPath() {
+        return path;
     }
 
     public String getId() {
@@ -52,7 +52,7 @@ public class PortletInstance implements Comparable<PortletInstance> {
         return index;
     }
 
-    public int compareTo(PortletInstance that) {
+    public int compareTo(EmbeddedPageAction that) {
         if (this.index == null) {
             if (that.index == null) {
                 return this.id.compareTo(that.id);

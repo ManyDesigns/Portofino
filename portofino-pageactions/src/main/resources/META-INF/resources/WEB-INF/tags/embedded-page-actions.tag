@@ -7,11 +7,12 @@
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
 <div class="${cssClass} pageActionContainer">
-    <input type="hidden" name="portletWrapperName_${list}" value="portletWrapper_${list}" />
-    <c:forEach var="portletInstance" items="${ actionBean.embeddedPageActions[list] }">
-        <div id="portletWrapper_<c:out value='${portletInstance.id}' />">
+    <input type="hidden" name="embeddedPageActionWrapperName_${list}" value="embeddedPageActionWrapper_${list}" />
+    <% actionBean.initEmbeddedPageActions(); %>
+    <c:forEach var="embeddedPageAction" items="${ actionBean.embeddedPageActions[list] }">
+        <div id="embeddedPageActionWrapper_<c:out value='${embeddedPageAction.id}' />">
             <% try {%>
-                <jsp:include page="${portletInstance.jsp}" flush="false" />
+                <jsp:include page="${embeddedPageAction.path}" flush="false" />
             <%} catch (Throwable t) {
                 LoggerFactory.getLogger(actionBean.getClass()).error("Error in included page", t);
             %>
@@ -20,7 +21,7 @@
                     <ul class="errorMessages">
                         <li>
                             <fmt:message key="portlet.view.error">
-                                <fmt:param value="${portletInstance.jsp}" />
+                                <fmt:param value="${embeddedPageAction.path}" />
                             </fmt:message>
                         </li>
                     </ul>

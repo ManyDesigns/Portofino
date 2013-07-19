@@ -89,7 +89,7 @@ var portofino = {
                     var hiddenField = document.createElement("input");
                     hiddenField.setAttribute("type", "hidden");
                     hiddenField.setAttribute("name", templateHiddenField.val());
-                    hiddenField.setAttribute("value", id.substring("portletWrapper_".length));
+                    hiddenField.setAttribute("value", id.substring("embeddedPageActionWrapper_".length));
                     theButton.before(hiddenField);
                 }
             });

@@ -29,7 +29,7 @@
         var sortables = $("div.childrenTable tbody").sortable({
                 cursor: "move", // cursor image
                 revert: true // moves the portlet to its new position with a smooth transition
-            }).disableSelection();
+            });
         function prepareChildrenTablesForm(sortables) {
             sortables.each(function(i, elem) {
                 var items = $($(elem).sortable( "option", "items" ), elem)

@@ -204,7 +204,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         this.dispatch = dispatch;
     }
 
-    public MultiMap getEmbeddedPageActions() {
+    public MultiMap initEmbeddedPageActions() {
         if(embeddedPageActions == null) {
             MultiMap mm = new MultiHashMap();
             Layout layout = pageInstance.getLayout();
@@ -212,13 +212,13 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
                 String layoutContainerInParent = page.getContainer();
                 if(layoutContainerInParent != null) {
                     String newPath = getDispatch().getOriginalPath() + "/" + page.getName();
-                    PortletInstance portletInstance =
-                            new PortletInstance(
-                                    "c" + page.getName(),
+                    EmbeddedPageAction embeddedPageAction =
+                            new EmbeddedPageAction(
+                                    page.getName(),
                                     page.getActualOrder(),
                                     newPath);
 
-                    mm.put(layoutContainerInParent, portletInstance);
+                    mm.put(layoutContainerInParent, embeddedPageAction);
                 }
             }
             for(Object entryObj : mm.entrySet()) {
@@ -228,6 +228,10 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             }
             embeddedPageActions = mm;
         }
+        return embeddedPageActions;
+    }
+
+    public MultiMap getEmbeddedPageActions() {
         return embeddedPageActions;
     }
 

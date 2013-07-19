@@ -27,11 +27,9 @@
 *
 */
 
-package com.manydesigns.portofino.menu;
+package com.manydesigns.portofino.head;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -40,34 +38,27 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class MenuBuilder {
+public class HtmlHeadBuilder {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    public final List<MenuAppender> menuAppenders = new ArrayList<MenuAppender>();
+    public final List<HtmlHeadAppender> appenders = new ArrayList<HtmlHeadAppender>();
 
-    public Menu build() {
-        Menu menu = new Menu();
-        for(MenuAppender appender : menuAppenders) {
-            appender.append(menu);
+    public HtmlHead build() {
+        HtmlHead head = new HtmlHead();
+        for(HtmlHeadAppender appender : appenders) {
+            appender.append(head);
         }
-        Collections.sort(menu.items, new MenuItemComparator());
-        for(MenuItem menuItem : menu.items) {
-            if(menuItem instanceof MenuGroup) {
-                Collections.sort(((MenuGroup) menuItem).menuLinks, new MenuItemComparator());
+        /*Collections.sort(head.items, new Comparator<MenuItem>() {
+            @Override
+            public int compare(MenuItem mi1, MenuItem mi2) {
+                return Double.compare(mi1.order, mi2.order);
             }
-        }
-        return menu;
+        });*/
+        return head;
     }
 
-    public List<MenuAppender> getMenuAppenders() {
-        return menuAppenders;
-    }
-
-    public static class MenuItemComparator implements Comparator<MenuItem> {
-        @Override
-        public int compare(MenuItem mi1, MenuItem mi2) {
-            return Double.compare(mi1.order, mi2.order);
-        }
+    public List<HtmlHeadAppender> getAppenders() {
+        return appenders;
     }
 }
