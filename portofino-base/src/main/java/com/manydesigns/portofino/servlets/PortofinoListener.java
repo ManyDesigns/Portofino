@@ -46,8 +46,11 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 
@@ -134,7 +137,15 @@ public class PortofinoListener
         }
         servletContext.setAttribute(BaseModule.APPLICATION_DIRECTORY, applicationDirectory);
         servletContext.setAttribute(BaseModule.PORTOFINO_CONFIGURATION, configuration);
-        ResourceBundleManager resourceBundleManager = new ResourceBundleManager(applicationDirectory);
+        ResourceBundleManager resourceBundleManager = new ResourceBundleManager();
+        try {
+            Enumeration<URL> messagesSearchPaths = getClass().getClassLoader().getResources("portofino-messages.properties");
+            while (messagesSearchPaths.hasMoreElements()) {
+                resourceBundleManager.addSearchPath(messagesSearchPaths.nextElement().toString());
+            }
+        } catch (IOException e) {
+            logger.warn("Could not initialize resource bundle manager", e);
+        }
         servletContext.setAttribute(BaseModule.RESOURCE_BUNDLE_MANAGER, resourceBundleManager);
         applicationListeners = new ArrayList<ApplicationListener>();
         servletContext.setAttribute(BaseModule.APP_LISTENERS, applicationListeners);

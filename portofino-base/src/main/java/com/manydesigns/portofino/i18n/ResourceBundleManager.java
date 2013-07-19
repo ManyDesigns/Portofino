@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.i18n;
 
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
@@ -27,7 +28,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,23 +44,12 @@ import java.util.concurrent.ConcurrentMap;
 public class ResourceBundleManager {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
-    public static final String DEFAULT_BUNDLE_NAME = "portofino-messages";
 
-    protected final File directory;
+    protected LinkedList<String> searchPaths = new LinkedList<String>();
     protected final ConcurrentMap<Locale, ConfigurationResourceBundle> resourceBundles =
             new ConcurrentHashMap<Locale, ConfigurationResourceBundle>();
 
     public static final Logger logger = LoggerFactory.getLogger(ResourceBundleManager.class);
-    protected final String resourceBundleName;
-
-    public ResourceBundleManager(File dir) {
-        this(dir, DEFAULT_BUNDLE_NAME);
-    }
-
-    public ResourceBundleManager(File dir, String resourceBundleName) {
-        this.directory = dir;
-        this.resourceBundleName = resourceBundleName;
-    }
 
     protected String getBundleFileName(String baseName, Locale locale) {
         return getBundleName(baseName, locale) + ".properties";
@@ -87,32 +78,50 @@ public class ResourceBundleManager {
     public ResourceBundle getBundle(Locale locale) {
         ConfigurationResourceBundle bundle = resourceBundles.get(locale);
         if(bundle == null) {
-            ResourceBundle parentBundle = ResourceBundle.getBundle(resourceBundleName, locale);
-            PropertiesConfiguration configuration;
-            try {
-                File bundleFile = getBundleFile(locale);
-                if(!bundleFile.exists() && !locale.equals(parentBundle.getLocale())) {
-                    bundleFile = getBundleFile(parentBundle.getLocale());
+            CompositeConfiguration configuration = new CompositeConfiguration();
+            Iterator<String> iterator = searchPaths.descendingIterator();
+            while(iterator.hasNext()) {
+                String path = iterator.next();
+                int index = path.lastIndexOf('/') + 1;
+                String basePath = path.substring(0, index);
+                int suffixIndex = path.length() - ".properties".length();
+                String resourceBundleBaseName = path.substring(index, suffixIndex);
+                String bundleName = getBundleFileName(resourceBundleBaseName, locale);
+                PropertiesConfiguration conf = null;
+                try {
+                    conf = new PropertiesConfiguration(basePath + bundleName);
+                } catch (ConfigurationException e) {
+                    logger.debug("Couldn't load resource bundle for locale " + locale + " from " + basePath, e);
+                    //Fall back to default .properties without _locale
+                    try {
+                        String defaultBundleName = basePath + resourceBundleBaseName + ".properties";
+                        conf = new PropertiesConfiguration(defaultBundleName);
+                    } catch (ConfigurationException e1) {
+                        logger.warn("Couldn't load default resource bundle from " + basePath, e1);
+                    }
                 }
-                if(!bundleFile.exists()) {
-                    return parentBundle;
+                if(conf != null) {
+                    FileChangedReloadingStrategy reloadingStrategy = new FileChangedReloadingStrategy();
+                    conf.setReloadingStrategy(reloadingStrategy);
+                    configuration.addConfiguration(conf);
                 }
-                configuration = new PropertiesConfiguration(bundleFile);
-                FileChangedReloadingStrategy reloadingStrategy = new FileChangedReloadingStrategy();
-                configuration.setReloadingStrategy(reloadingStrategy);
-                bundle = new ConfigurationResourceBundle(configuration, locale);
-                bundle.setParent(parentBundle);
-                resourceBundles.put(locale, bundle);
-            } catch (ConfigurationException e) {
-                logger.warn("Couldn't load app resource bundle for locale " + locale, e);
-                return parentBundle;
             }
+            bundle = new ConfigurationResourceBundle(configuration, locale);
+            resourceBundles.put(locale, bundle);
         }
         return bundle;
     }
 
-    protected File getBundleFile(Locale locale) {
-        String resourceName = getBundleFileName(resourceBundleName, locale);
-        return new File(directory, resourceName);
+    public void addSearchPath(String searchPath) {
+        if(searchPaths.contains(searchPath)) {
+            logger.debug("Not adding search path: {}", searchPath);
+            return;
+        }
+        logger.info("Adding search path: {}", searchPath);
+        LinkedList<String> newSearchPaths = new LinkedList<String>(searchPaths);
+        newSearchPaths.add(searchPath);
+        searchPaths = newSearchPaths;
+        resourceBundles.clear(); //Clear cache
     }
+
 }
