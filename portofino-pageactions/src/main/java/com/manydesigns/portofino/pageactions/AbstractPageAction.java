@@ -345,11 +345,11 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         formBuilder.configSelectionProvider(detailLayoutSelectionProvider, "detailTemplate");
 
         DefaultSelectionProvider navRootSelectionProvider = new DefaultSelectionProvider("navigationRoot");
-        String label = getMessage("com.manydesigns.portofino.pageactions.EditPage.navigationRoot.inherit");
+        String label = ElementsThreadLocals.getText("com.manydesigns.portofino.pageactions.EditPage.navigationRoot.inherit");
         navRootSelectionProvider.appendRow(NavigationRoot.INHERIT, label, true);
-        label = getMessage("com.manydesigns.portofino.pageactions.EditPage.navigationRoot.root");
+        label = ElementsThreadLocals.getText("com.manydesigns.portofino.pageactions.EditPage.navigationRoot.root");
         navRootSelectionProvider.appendRow(NavigationRoot.ROOT, label, true);
-        label = getMessage("com.manydesigns.portofino.pageactions.EditPage.navigationRoot.ghost_root");
+        label = ElementsThreadLocals.getText("com.manydesigns.portofino.pageactions.EditPage.navigationRoot.ghost_root");
         navRootSelectionProvider.appendRow(NavigationRoot.GHOST_ROOT, label, true);
         formBuilder.configSelectionProvider(navRootSelectionProvider, "navigationRoot");
 
@@ -495,7 +495,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             fw.close();
             Class<?> scriptClass = DispatcherLogic.getActionClass(portofinoConfiguration, directory, false);
             if(scriptClass == null) {
-                SessionMessages.addErrorMessage(getMessage("script.class.invalid"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("script.class.invalid"));
             }
             if(this instanceof GroovyObject) {
                 //Attempt to remove old instance of custom action bean
@@ -510,12 +510,12 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             }
         } catch (IOException e) {
             logger.error("Error writing script to " + groovyScriptFile, e);
-            String msg = getMessage("script.write.failed", groovyScriptFile.getAbsolutePath());
+            String msg = ElementsThreadLocals.getText("script.write.failed", groovyScriptFile.getAbsolutePath());
             SessionMessages.addErrorMessage(msg);
         } catch (Exception e) {
             String pageId = pageInstance.getPage().getId();
             logger.warn("Couldn't compile script for page " + pageId, e);
-            SessionMessages.addErrorMessage(getMessage("script.compile.failed"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("script.compile.failed"));
         } finally {
             IOUtils.closeQuietly(fw);
         }
@@ -557,7 +557,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     /**
      * Returns the path to a jsp file inside the current application's web directory.
      * @param jsp the relative path to the file, starting from the web directory. Must start with a slash.
-     * @return
+     * @return the path.
      */
     public String getAppJsp(String jsp) {
         return "/apps/" + appDir.getName() + "/web" + jsp;

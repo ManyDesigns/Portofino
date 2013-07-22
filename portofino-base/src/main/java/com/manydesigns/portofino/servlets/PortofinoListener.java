@@ -75,6 +75,7 @@ public class PortofinoListener
                     "----------------------------------------";
     
     public static final String APP_PROPERTIES = "app.properties";
+    public static final String PORTOFINO_MESSAGES_FILE_NAME = "portofino-messages.properties";
 
     //**************************************************************************
     // Fields
@@ -137,12 +138,20 @@ public class PortofinoListener
         }
         servletContext.setAttribute(BaseModule.APPLICATION_DIRECTORY, applicationDirectory);
         servletContext.setAttribute(BaseModule.PORTOFINO_CONFIGURATION, configuration);
+
+        ClassLoader classLoader = getClass().getClassLoader();
+        logger.debug("Registering application class loader");
+        servletContext.setAttribute(BaseModule.CLASS_LOADER, classLoader);
+
+        logger.debug("Installing I18n ResourceBundleManager");
         ResourceBundleManager resourceBundleManager = new ResourceBundleManager();
         try {
-            Enumeration<URL> messagesSearchPaths = getClass().getClassLoader().getResources("portofino-messages.properties");
+            Enumeration<URL> messagesSearchPaths = classLoader.getResources(PORTOFINO_MESSAGES_FILE_NAME);
             while (messagesSearchPaths.hasMoreElements()) {
                 resourceBundleManager.addSearchPath(messagesSearchPaths.nextElement().toString());
             }
+            File appMessages = new File(applicationDirectory, PORTOFINO_MESSAGES_FILE_NAME);
+            resourceBundleManager.addSearchPath(appMessages.getAbsolutePath());
         } catch (IOException e) {
             logger.warn("Could not initialize resource bundle manager", e);
         }
@@ -156,9 +165,6 @@ public class PortofinoListener
             logger.error(msg);
             throw new InternalError(msg);
         }
-
-        logger.debug("Registering application class loader");
-        servletContext.setAttribute(BaseModule.CLASS_LOADER, getClass().getClassLoader());
 
         logger.debug("Installing standard menu builders");
         MenuBuilder adminMenuBuilder = new MenuBuilder();
