@@ -22,11 +22,7 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.BlobManager;
-import com.manydesigns.elements.i18n.SimpleTextProvider;
-import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.i18n.MultipleTextProvider;
-import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.modules.BaseModule;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.web.util.WebUtils;
@@ -36,15 +32,11 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.jstl.core.Config;
-import javax.servlet.jsp.jstl.fmt.LocalizationContext;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -116,25 +108,6 @@ public class ApplicationFilter implements Filter {
 
     protected void setupApplication(Configuration configuration, ServletRequest request)
             throws ServletException {
-        //I18n
-        Locale locale = request.getLocale();
-        ResourceBundleManager resourceBundleManager =
-                (ResourceBundleManager) servletContext.getAttribute(BaseModule.RESOURCE_BUNDLE_MANAGER);
-        ResourceBundle portofinoResourceBundle = resourceBundleManager.getBundle(locale);
-
-        LocalizationContext localizationContext =
-                new LocalizationContext(portofinoResourceBundle, locale);
-        request.setAttribute(Config.FMT_LOCALIZATION_CONTEXT + ".request", localizationContext);
-
-        //Setup Elements I18n
-        ResourceBundle elementsResourceBundle =
-                ResourceBundle.getBundle(SimpleTextProvider.DEFAULT_MESSAGE_RESOURCE, locale);
-
-        TextProvider textProvider =
-                new MultipleTextProvider(
-                        portofinoResourceBundle, elementsResourceBundle);
-        ElementsThreadLocals.setTextProvider(textProvider);
-
         //Setup Elements blob manager
         File appBlobsDir;
         if(configuration.containsKey(PortofinoProperties.BLOBS_DIR_PATH)) {

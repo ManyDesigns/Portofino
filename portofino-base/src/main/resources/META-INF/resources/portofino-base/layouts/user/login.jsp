@@ -1,3 +1,4 @@
+<%@ page import="com.manydesigns.portofino.shiro.ShiroUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
@@ -18,25 +19,32 @@
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
         </stripes:form>
-        <div class="login-links spacingWithDividerTop">
-            <div class="login-link">
-                <stripes:link href="<%= actionBean.getOriginalPath() %>">
-                    <stripes:param name="forgotPassword" value=""/>
-                    <stripes:param name="returnUrl" value="${actionBean.returnUrl}"/>
-                    <stripes:param name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
-                    <fmt:message key='skins.default.login.forgot.your.password'/>
-                </stripes:link>
-            </div>
-            <div class="login-link">
-                Don't have an account?
-                <stripes:link href="<%= actionBean.getOriginalPath() %>">
-                    <stripes:param name="signUp" value=""/>
-                    <stripes:param name="returnUrl"/>
-                    <stripes:param name="cancelReturnUrl"/>
-                    Sign up now
-                </stripes:link>
-            </div>
-        </div>
+        <%
+        try {
+            ShiroUtils.getPortofinoRealm();
+        %>  <div class="login-links spacingWithDividerTop">
+                <div class="login-link">
+                    <stripes:link href="<%= actionBean.getOriginalPath() %>">
+                        <stripes:param name="forgotPassword" value=""/>
+                        <stripes:param name="returnUrl" value="${actionBean.returnUrl}"/>
+                        <stripes:param name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
+                        <fmt:message key='skins.default.login.forgot.your.password'/>
+                    </stripes:link>
+                </div>
+                <div class="login-link">
+                    Don't have an account?
+                    <stripes:link href="<%= actionBean.getOriginalPath() %>">
+                        <stripes:param name="signUp" value=""/>
+                        <stripes:param name="returnUrl"/>
+                        <stripes:param name="cancelReturnUrl"/>
+                        Sign up now
+                    </stripes:link>
+                </div>
+            </div><%
+        } catch (ClassCastException e) {
+            //Portofino realm not available; don't show sign up and change password links.
+        }
+        %>
         <script type="text/javascript">
             $('#userName').focus();
         </script>

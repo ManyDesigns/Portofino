@@ -32,6 +32,19 @@
             <version>${javaee-web-api.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -44,6 +57,7 @@
             <version>${logback.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Quartz -->
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
@@ -56,6 +70,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- mail -->
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>

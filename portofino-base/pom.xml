@@ -70,20 +70,6 @@
             <artifactId>cage</artifactId>
             <version>1.0</version>
         </dependency>
-
-        <!-- logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
     <build>
         <resources>

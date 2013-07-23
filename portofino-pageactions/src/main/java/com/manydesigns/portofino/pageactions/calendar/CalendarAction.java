@@ -24,7 +24,6 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.buttons.annotations.Button;
-import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
@@ -79,7 +78,6 @@ public class CalendarAction extends AbstractPageAction {
     //**************************************************************************
 
     protected Form configurationForm;
-    protected ResourceBundleManager resourceBundleManager;
 
     //**************************************************************************
     // Logging
