@@ -143,9 +143,7 @@ public abstract class LoginAction extends AbstractActionBean {
                     new UsernamePasswordToken(userName, pwd);
             usernamePasswordToken.setRememberMe(false);
             subject.login(usernamePasswordToken);
-            Serializable principal = (Serializable) ShiroUtils.getPrimaryPrincipal(subject);
-            Serializable userId = ShiroUtils.getPortofinoRealm().getUserId(principal);
-            logger.info("User {} login", userId);
+            logger.info("User {} login", ShiroUtils.getUserId(subject));
             String successMsg = ElementsThreadLocals.getText("user.login.success", userName);
             SessionMessages.addInfoMessage(successMsg);
             return redirectToReturnUrl();

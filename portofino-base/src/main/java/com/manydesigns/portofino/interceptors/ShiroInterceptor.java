@@ -61,8 +61,7 @@ public class ShiroInterceptor implements Interceptor {
         Serializable userId = null;
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
-            Serializable principal = (Serializable) ShiroUtils.getPrimaryPrincipal(subject);
-            userId = ShiroUtils.getPortofinoRealm().getUserId(principal);
+            userId = ShiroUtils.getUserId(subject);
             logger.debug("Retrieved userId={}", userId);
         } else {
             logger.debug("No user found");
