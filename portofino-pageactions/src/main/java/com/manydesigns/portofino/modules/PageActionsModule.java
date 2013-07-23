@@ -203,12 +203,13 @@ public class PageActionsModule implements Module {
             if(listener != null) {
                 if(listener instanceof ApplicationListener) {
                     ApplicationListener applicationListener = (ApplicationListener) listener;
-                    logger.info("Invoking application listener defined in {}", appListenerFile.getAbsolutePath());
+                    logger.info("Groovy application listener found at {}", appListenerFile.getAbsolutePath());
                     Injections.inject(applicationListener, servletContext, null);
                     applicationListeners.add((ApplicationListener) listener);
                 } else {
-                    logger.error("Candidate app listener " + listener +
-                                 " is not an instance of " + ApplicationListener.class);
+                    logger.error(
+                            "Candidate app listener " + listener + " found at " + appListenerFile.getAbsolutePath() +
+                            " is not an instance of " + ApplicationListener.class);
                 }
             } else {
                 logger.debug("No Groovy app listener present");
