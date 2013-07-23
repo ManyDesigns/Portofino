@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.PortofinoDatabaseProperties;
 import com.manydesigns.portofino.model.database.ConnectionProvider;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
@@ -61,7 +61,7 @@ public class DatabasePlatformsManager {
         this.portofinoConfiguration = portofinoConfiguration;
         databasePlatformList = new ArrayList<DatabasePlatform>();
         String[] platformNames = portofinoConfiguration.getStringArray(
-                PortofinoProperties.DATABASE_PLATFORMS_LIST);
+                PortofinoDatabaseProperties.DATABASE_PLATFORMS_LIST);
         if (platformNames == null) {
             logger.debug("Empty list");
             return;

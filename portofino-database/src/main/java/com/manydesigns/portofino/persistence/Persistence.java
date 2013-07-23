@@ -22,7 +22,7 @@ package com.manydesigns.portofino.persistence;
 
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.AppProperties;
-import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.PortofinoDatabaseProperties;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
@@ -133,7 +133,7 @@ public class Persistence {
             model = (Model) um.unmarshal(appModelFile);
             boolean syncOnStart = false;
             initModel();
-            if(configuration.getBoolean(PortofinoProperties.LIQUIBASE_ENABLED)) {
+            if(configuration.getBoolean(PortofinoDatabaseProperties.LIQUIBASE_ENABLED)) {
                 runLiquibaseScripts();
             }
             if (syncOnStart) {

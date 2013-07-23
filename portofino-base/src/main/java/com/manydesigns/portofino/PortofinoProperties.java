@@ -48,8 +48,6 @@ public final class PortofinoProperties {
 
     public static final String PORTOFINO_VERSION =
             "portofino.version";
-    public static final String DATABASE_PLATFORMS_LIST =
-            "database.platforms.list";
     public static final String WAR_REAL_PATH =
             "war.real.path";
     public static final String APPS_DIR_PATH =
@@ -59,18 +57,8 @@ public final class PortofinoProperties {
     public static final String APP_ID =
             "app.id";
     public static final String HOSTNAMES = "portofino.hostnames";
-    public static final String FALLBACK_ACTION_CLASS = "fallback.action.class";
     public static final String URL_ENCODING = "url.encoding";
     public static final String TEMP_FILE_SERVICE_CLASS = "temp.file.service.class";
-
-    //Liquibase properties
-    public static final String LIQUIBASE_ENABLED = "liquibase.enabled";
-
-    //Cache configuration properties
-    public static final String PAGE_CACHE_SIZE = "page.cache.size";
-    public static final String PAGE_CACHE_CHECK_FREQUENCY = "page.cache.check.frequency";
-    public static final String CONFIGURATION_CACHE_SIZE = "configuration.cache.size";
-    public static final String CONFIGURATION_CACHE_CHECK_FREQUENCY = "configuration.cache.check.frequency";
 
     //Login
     public static final String LOGIN_PAGE = "login.page";

@@ -30,6 +30,7 @@
 package com.manydesigns.portofino.menu;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,16 +62,18 @@ public class SimpleMenuAppender implements MenuAppender {
         this.order = order;
     }
 
-    public static SimpleMenuAppender group(String id, String icon, String labelKey, double order) {
+    public static SimpleMenuAppender group(
+            String id, @Nullable String icon, String labelKey, double order) {
         return new SimpleMenuAppender(null, id, icon, labelKey, null, order);
     }
 
-    public static SimpleMenuAppender link(String id, String icon, String labelKey, String link, double order) {
+    public static SimpleMenuAppender link(
+            String id, @Nullable String icon, String labelKey, String link, double order) {
         return new SimpleMenuAppender(null, id, icon, labelKey, link, order);
     }
 
-    public static SimpleMenuAppender link
-            (String targetMenuGroupId, String id, String icon, String labelKey, String link, double order) {
+    public static SimpleMenuAppender link(
+            String targetMenuGroupId, String id, @Nullable String icon, String labelKey, String link, double order) {
         return new SimpleMenuAppender(targetMenuGroupId, id, icon, labelKey, link, order);
     }
 

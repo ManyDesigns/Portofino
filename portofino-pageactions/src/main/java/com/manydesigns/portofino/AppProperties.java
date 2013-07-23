@@ -40,8 +40,6 @@ public class AppProperties {
             "skin";
     public static final String APPLICATION_NAME =
             "app.name";
-    public static final String INIT_AT_STARTUP =
-            "init-at-startup";
     public static final String OPENID_ENABLED =
             "openId.enabled";
 
@@ -53,4 +51,11 @@ public class AppProperties {
     //The mail address used as the from: field in email messages sent by the application (e.g. password change)
     public static final String MAIL_FROM = "mail.from";
 
+    public static final String FALLBACK_ACTION_CLASS = "fallback.action.class";
+
+    //Cache configuration properties
+    public static final String PAGE_CACHE_SIZE = "page.cache.size";
+    public static final String PAGE_CACHE_CHECK_FREQUENCY = "page.cache.check.frequency";
+    public static final String CONFIGURATION_CACHE_SIZE = "configuration.cache.size";
+    public static final String CONFIGURATION_CACHE_CHECK_FREQUENCY = "configuration.cache.check.frequency";
 }

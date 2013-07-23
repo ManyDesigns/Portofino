@@ -100,6 +100,12 @@ public class PageActionsModule implements Module {
     @Inject(BaseModule.HTML_HEAD_BUILDER)
     public HtmlHeadBuilder headBuilder;
 
+    @Inject(BaseModule.CLASS_LOADER)
+    public ClassLoader originalClassLoader;
+
+    @Inject(BaseModule.APP_LISTENERS)
+    public List<ApplicationListener> applicationListeners;
+
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
 
     protected CacheManager cacheManager;
@@ -193,16 +199,15 @@ public class PageActionsModule implements Module {
         File appListenerFile = new File(groovyClasspath, "AppListener.groovy");
         try {
             ElementsThreadLocals.setServletContext(servletContext); //Necessary for getGroovyObject
-            Object o = ScriptingUtil.getGroovyObject(appListenerFile);
-            if(o != null) {
-                if(o instanceof ApplicationListener) {
-                    ApplicationListener applicationListener = (ApplicationListener) o;
+            Object listener = ScriptingUtil.getGroovyObject(appListenerFile);
+            if(listener != null) {
+                if(listener instanceof ApplicationListener) {
+                    ApplicationListener applicationListener = (ApplicationListener) listener;
                     logger.info("Invoking application listener defined in {}", appListenerFile.getAbsolutePath());
                     Injections.inject(applicationListener, servletContext, null);
-                    List listeners = (List) servletContext.getAttribute(BaseModule.APP_LISTENERS);
-                    listeners.add(o);
+                    applicationListeners.add((ApplicationListener) listener);
                 } else {
-                    logger.error("Candidate app listener " + o +
+                    logger.error("Candidate app listener " + listener +
                                  " is not an instance of " + ApplicationListener.class);
                 }
             } else {
@@ -232,7 +237,7 @@ public class PageActionsModule implements Module {
         status = ModuleStatus.ACTIVE;
     }
 
-    protected static GroovyScriptEngine createScriptEngine(File classpathFile) {
+    protected GroovyScriptEngine createScriptEngine(File classpathFile) {
         CompilerConfiguration cc = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
         String classpath = classpathFile.getAbsolutePath();
         logger.info("Groovy classpath: " + classpath);
@@ -242,7 +247,7 @@ public class PageActionsModule implements Module {
         try {
             scriptEngine =
                     new GroovyScriptEngine(new URL[] { classpathFile.toURI().toURL() },
-                                           ScriptingUtil.class.getClassLoader());
+                                           originalClassLoader);
         } catch (IOException e) {
             throw new Error(e);
         }
@@ -443,8 +448,7 @@ public class PageActionsModule implements Module {
         logger.info("Removing Groovy classloader...");
         servletContext.removeAttribute(GROOVY_SCRIPT_ENGINE);
         servletContext.removeAttribute(GROOVY_CLASS_PATH);
-        //TODO
-        servletContext.setAttribute(BaseModule.CLASS_LOADER, PageActionsModule.class.getClassLoader());
+        servletContext.setAttribute(BaseModule.CLASS_LOADER, originalClassLoader);
         logger.info("ManyDesigns Portofino web module stopped.");
         status = ModuleStatus.DESTROYED;
     }

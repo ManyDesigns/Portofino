@@ -97,7 +97,7 @@ public class ResourceBundleManager {
                         String defaultBundleName = basePath + resourceBundleBaseName + ".properties";
                         conf = new PropertiesConfiguration(defaultBundleName);
                     } catch (ConfigurationException e1) {
-                        logger.warn("Couldn't load default resource bundle from " + basePath, e1);
+                        logger.debug("Couldn't load default resource bundle from " + basePath, e1);
                     }
                 }
                 if(conf != null) {
