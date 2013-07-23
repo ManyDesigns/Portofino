@@ -43,7 +43,6 @@ import com.manydesigns.portofino.menu.*;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
-import com.manydesigns.portofino.starter.ApplicationListener;
 import groovy.util.GroovyScriptEngine;
 import net.sf.ehcache.CacheManager;
 import net.sourceforge.stripes.action.ActionBean;

@@ -1,7 +1,7 @@
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.menu.MenuBuilder
 import com.manydesigns.portofino.modules.BaseModule
-import com.manydesigns.portofino.starter.ApplicationListener
+import com.manydesigns.portofino.modules.ApplicationListener
 import org.apache.commons.configuration.Configuration
 
 public class AppListener implements ApplicationListener {

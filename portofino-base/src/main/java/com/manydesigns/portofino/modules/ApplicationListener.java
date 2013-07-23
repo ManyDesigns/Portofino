@@ -18,9 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.starter;
-
-import javax.servlet.ServletContext;
+package com.manydesigns.portofino.modules;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com

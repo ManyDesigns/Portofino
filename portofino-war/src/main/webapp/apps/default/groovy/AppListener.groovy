@@ -1,5 +1,5 @@
 import com.manydesigns.portofino.di.Inject
-import com.manydesigns.portofino.starter.ApplicationListener
+import com.manydesigns.portofino.modules.ApplicationListener
 import org.apache.commons.configuration.Configuration
 import com.manydesigns.portofino.menu.*
 import com.manydesigns.portofino.modules.BaseModule
