@@ -56,6 +56,8 @@ public final class PortofinoProperties {
             "blobs.dir.path";
     public static final String APP_ID =
             "app.id";
+    public static final String APP_NAME =
+            "app.name";
     public static final String HOSTNAMES = "portofino.hostnames";
     public static final String URL_ENCODING = "url.encoding";
     public static final String TEMP_FILE_SERVICE_CLASS = "temp.file.service.class";

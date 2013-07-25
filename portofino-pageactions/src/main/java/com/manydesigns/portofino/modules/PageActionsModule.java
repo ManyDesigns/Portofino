@@ -372,7 +372,7 @@ public class PageActionsModule implements Module {
 
 
         link = SimpleMenuAppender.link(
-                "configuration", "settings", null, "Settings", SettingsAction.URL_BINDING, 2.0);
+                "configuration", "settings", null, "Settings", SettingsAction.URL_BINDING, 0.5);
         adminMenu.menuAppenders.add(link);
         link = SimpleMenuAppender.link(
                 "configuration", "topLevelPages", null, "Top-level pages", RootChildrenAction.URL_BINDING, 3.0);

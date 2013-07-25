@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.pageactions.calendar;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
@@ -120,10 +121,10 @@ public class CalendarAction extends AbstractPageAction {
             updatePageConfiguration();
             configurationForm.writeToObject(pageInstance.getConfiguration());
             saveConfiguration(pageInstance.getConfiguration());
-            SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.updated"));
             return cancel();
         } else {
-            SessionMessages.addErrorMessage(getMessage("commons.configuration.notUpdated"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.configuration.notUpdated"));
             return new ForwardResolution("/layouts/calendar/configure.jsp");
         }
     }

@@ -1,8 +1,8 @@
-<%@ page import="com.manydesigns.portofino.menu.*"
+<%@ page import="com.manydesigns.portofino.PortofinoProperties"
+%><%@ page import="com.manydesigns.portofino.menu.*"
+%><%@ page import="com.manydesigns.portofino.modules.BaseModule"
 %><%@ page import="net.sourceforge.stripes.controller.ActionResolver"
 %><%@ page import="org.apache.commons.lang.StringUtils"
-%><%@ page import="com.manydesigns.portofino.modules.BaseModule"
-%><%@ page import="java.io.File"
 %><%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
@@ -50,12 +50,13 @@
         </title>
     </head>
     <body>
+    <jsp:useBean id="portofinoConfiguration" scope="application" type="org.apache.commons.configuration.Configuration"/>
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
                 <h4 id="app-title" class="pull-left">
                     <stripes:link href="/">
-                        <%= ((File) application.getAttribute(BaseModule.APPLICATION_DIRECTORY)).getName() %>
+                        <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
                     </stripes:link>
                 </h4>
                 <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">

@@ -31,6 +31,7 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.modules.ModulesAction;
+import com.manydesigns.portofino.actions.admin.servletcontext.ServletContextAction;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.menu.SimpleMenuAppender;
@@ -113,6 +114,10 @@ public class BaseModule implements Module {
 
         SimpleMenuAppender link = SimpleMenuAppender.link(
                 "configuration", "modules", null, "Modules", ModulesAction.URL_BINDING, 1.0);
+        adminMenu.menuAppenders.add(link);
+
+        link = SimpleMenuAppender.link(
+                "configuration", "servlet-context", null, "Servlet Context", ServletContextAction.URL_BINDING, 2.0);
         adminMenu.menuAppenders.add(link);
 
         status = ModuleStatus.ACTIVE;

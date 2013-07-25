@@ -28,6 +28,7 @@ import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.CommonsConfigurationAccessor;
 import com.manydesigns.portofino.AppProperties;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
@@ -96,15 +97,15 @@ public class SettingsAction extends AbstractActionBean {
 
         CommonsConfigurationAccessor accessor = new CommonsConfigurationAccessor(configuration);
         form = new FormBuilder(accessor)
-                .configFields(AppProperties.APPLICATION_NAME, AppProperties.SKIN, AppProperties.LANDING_PAGE)
+                .configFields(PortofinoProperties.APP_NAME, AppProperties.SKIN, AppProperties.LANDING_PAGE)
                 .configSelectionProvider(skinSelectionProvider, AppProperties.SKIN)
                 .configSelectionProvider(pagesSelectionProvider, AppProperties.LANDING_PAGE)
                 .build();
         //TODO I18n
-        form.findFieldByPropertyName(AppProperties.APPLICATION_NAME).setLabel("Application name");
+        form.findFieldByPropertyName(PortofinoProperties.APP_NAME).setLabel("Application name");
         form.findFieldByPropertyName(AppProperties.LANDING_PAGE).setLabel("Landing page");
 
-        form.findFieldByPropertyName(AppProperties.APPLICATION_NAME).setRequired(true);
+        form.findFieldByPropertyName(PortofinoProperties.APP_NAME).setRequired(true);
         form.findFieldByPropertyName(AppProperties.LANDING_PAGE).setRequired(true);
         form.findFieldByPropertyName(AppProperties.SKIN).setRequired(true);
         form.readFromObject(configuration);
