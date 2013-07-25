@@ -24,7 +24,10 @@ import com.manydesigns.mail.quartz.MailScheduler;
 import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.setup.MailQueueSetup;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.actions.admin.mail.MailSettingsAction;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.menu.MenuBuilder;
+import com.manydesigns.portofino.menu.SimpleMenuAppender;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -53,6 +56,9 @@ public class MailModule implements Module {
 
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
+
+    @Inject(BaseModule.ADMIN_MENU)
+    public MenuBuilder adminMenu;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -131,6 +137,13 @@ public class MailModule implements Module {
             logger.debug(e.getMessage(), e);
             logger.info("Quartz is not available, mail scheduler not started");
         }
+
+        SimpleMenuAppender group = SimpleMenuAppender.group("mail", null, "Mail", 4.0);
+        adminMenu.menuAppenders.add(group);
+
+        SimpleMenuAppender link = SimpleMenuAppender.link(
+                "mail", "Mail", null, "Mail", MailSettingsAction.URL_BINDING, 1.0);
+        adminMenu.menuAppenders.add(link);
 
         status = ModuleStatus.ACTIVE;
     }

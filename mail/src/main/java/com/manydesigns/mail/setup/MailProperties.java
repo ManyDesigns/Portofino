@@ -39,8 +39,8 @@ public class MailProperties {
     public static final String MAIL_SMTP_PASSWORD = "mail.smtp.password";
     public static final String MAIL_KEEP_SENT = "mail.keep.sent";
     public static final String MAIL_QUEUE_LOCATION = "mail.queue.location";
-    public static final String MAIL_SENDER_POLL_INTERVAL = "mail.sender.poll.interval";
 
+    public static final String MAIL_SENDER_POLL_INTERVAL = "mail.sender.poll.interval";
     public static final String MAIL_SENDER_SERVER_URL = "mail.sender.server_url";
     public static final String MAIL_QUARTZ_ENABLED = "mail.quartz.enabled";
 
