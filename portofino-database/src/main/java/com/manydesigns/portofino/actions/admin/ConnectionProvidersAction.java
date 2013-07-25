@@ -52,11 +52,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -183,13 +180,13 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                             "status", "errorMessage", "lastTested"};
 
     public final static String[] jdbcEditFields = {"databaseName", "driver",
-                            "url", "username", "password"
+                            "url", "username", "password", "trueString", "falseString"
                             };
 
     public final static String[] jndiViewFields = {"databaseName", "jndiResource",
                             "status", "errorMessage", "lastTested"};
 
-    public final static String[] jndiEditFields = {"databaseName", "jndiResource"};
+    public final static String[] jndiEditFields = {"databaseName", "jndiResource", "trueString", "falseString"};
 
     private void buildConnectionProviderForm(Mode mode) {
         String [] fields;
@@ -357,9 +354,10 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                 SessionMessages.addErrorMessage(msg);
                 logger.error(msg, e);
             }
+            return new RedirectResolution(this.getClass()).addParameter("databaseName", databaseName);
+        } else {
+            return new ForwardResolution("/layouts/admin/connectionProviders/edit.jsp");
         }
-        return new RedirectResolution(this.getClass())
-                .addParameter("databaseName", databaseName);
     }
 
     @Buttons({

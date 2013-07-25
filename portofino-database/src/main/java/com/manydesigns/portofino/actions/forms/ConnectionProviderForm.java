@@ -24,6 +24,7 @@ import com.manydesigns.elements.annotations.*;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.model.database.JndiConnectionProvider;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
 
@@ -60,6 +61,22 @@ public class ConnectionProviderForm {
     @Required(true)
     public String getDatabaseName() {
         return database.getDatabaseName();
+    }
+
+    public void setTrueString(String trueString) {
+        database.setTrueString(StringUtils.defaultIfEmpty(trueString, null));
+    }
+
+    public String getTrueString() {
+        return database.getTrueString();
+    }
+
+    public void setFalseString(String falseString) {
+        database.setFalseString(StringUtils.defaultIfEmpty(falseString, null));
+    }
+
+    public String getFalseString() {
+        return database.getFalseString();
     }
 
     @FieldSize(50)
