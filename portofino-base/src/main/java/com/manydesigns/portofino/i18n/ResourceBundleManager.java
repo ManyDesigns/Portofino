@@ -124,4 +124,12 @@ public class ResourceBundleManager {
         resourceBundles.clear(); //Clear cache
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(super.toString() + " search paths: \n");
+        for(String s : searchPaths) {
+            sb.append(s + "\n");
+        }
+        return sb.toString();
+    }
 }
