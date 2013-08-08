@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsProperties;
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.di.Injections;
@@ -107,10 +108,13 @@ public class PortofinoListener
 
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         try {
+            ElementsThreadLocals.setupDefaultElementsContext();
             init(servletContextEvent);
         } catch (Throwable e) {
             logger.error("Could not start ManyDesigns Portofino", e);
             throw new Error(e);
+        } finally {
+            ElementsThreadLocals.removeElementsContext();
         }
     }
 
