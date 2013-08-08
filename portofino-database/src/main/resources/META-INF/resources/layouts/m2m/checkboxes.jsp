@@ -1,24 +1,24 @@
-<%@ page import="java.util.Map" %>
-<%@ page import="com.manydesigns.elements.reflection.ClassAccessor" %>
-<%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
-<%@ page import="com.manydesigns.portofino.util.ShortNameUtils" %>
-<%@ page import="com.manydesigns.portofino.util.PkHelper" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
-<%@ page import="org.apache.shiro.SecurityUtils" %>
-<%@ page import="com.manydesigns.portofino.security.AccessLevel" %>
-<%@ page import="com.manydesigns.portofino.pageactions.m2m.ManyToManyAction" %>
-<%@ page import="com.manydesigns.elements.util.RandomUtil" %>
-<%@ page import="com.manydesigns.portofino.pageactions.m2m.configuration.ViewType" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java"
-         pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@taglib prefix="mde" uri="/manydesigns-elements"%>
-<%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.m2m.ManyToManyAction"/>
-<stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/normal.jsp" formClass="form-inline">
+<%@   page import="java.util.Map"
+%><%@ page import="com.manydesigns.elements.reflection.ClassAccessor"
+%><%@ page import="com.manydesigns.elements.xml.XhtmlBuffer"
+%><%@ page import="com.manydesigns.portofino.util.ShortNameUtils"
+%><%@ page import="com.manydesigns.portofino.util.PkHelper"
+%><%@ page import="org.apache.commons.lang.StringUtils"
+%><%@ page import="com.manydesigns.portofino.logic.SecurityLogic"
+%><%@ page import="org.apache.shiro.SecurityUtils"
+%><%@ page import="com.manydesigns.portofino.security.AccessLevel"
+%><%@ page import="com.manydesigns.portofino.pageactions.m2m.ManyToManyAction"
+%><%@ page import="com.manydesigns.elements.util.RandomUtil"
+%><%@ page import="com.manydesigns.portofino.pageactions.m2m.configuration.ViewType"
+%><%@ page contentType="text/html;charset=UTF-8" language="java"
+           pageEncoding="UTF-8"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
+%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><%@taglib prefix="mde" uri="/manydesigns-elements"
+%><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
+%><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.m2m.ManyToManyAction"
+/><stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/normal.jsp" formClass="form-inline">
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
