@@ -349,7 +349,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             setupTableForm(Mode.VIEW);
 
             context.getRequest().setAttribute("actionBean", this);
-            return new ForwardResolution("/layouts/crud/datatable.jsp");
+            return getSearchResultsPageView();
         } catch(Exception e) {
             logger.warn("Crud not correctly configured", e);
             return new ErrorResolution(500, "Crud not correctly configured");
@@ -716,24 +716,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return new RedirectResolution(appendSearchStringParamIfNecessary(getDispatch().getOriginalPath()));
     }
 
-    protected void deleteFileBlobs(T object) {
-        setupForm(Mode.VIEW);
-        form.readFromObject(object);
-        BlobManager blobManager = ElementsThreadLocals.getBlobManager();
-        for(FieldSet fieldSet : form) {
-            for(FormElement field : fieldSet) {
-                if(field instanceof FileBlobField) {
-                    Blob blob = ((FileBlobField) field).getValue();
-                    if(blob != null) {
-                        if(!blobManager.deleteBlob(blob.getCode())) {
-                            logger.warn("Could not delete blob: " + blob.getCode());
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     //**************************************************************************
     // Hooks/scripting
     //**************************************************************************
@@ -859,6 +841,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     protected Resolution getEmbeddedSearchView() {
         return new ForwardResolution("/layouts/crud/search.jsp");
+    }
+
+    /**
+     * Returns the Resolution used to display the search results when paginating or sorting via AJAX.
+     */
+    protected Resolution getSearchResultsPageView() {
+        return new ForwardResolution("/layouts/crud/datatable.jsp");
     }
 
     //--------------------------------------------------------------------------
@@ -1420,6 +1409,24 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 .setLastModified(blob.getCreateTimestamp().getMillis());
     }
 
+    protected void deleteFileBlobs(T object) {
+        setupForm(Mode.VIEW);
+        form.readFromObject(object);
+        BlobManager blobManager = ElementsThreadLocals.getBlobManager();
+        for(FieldSet fieldSet : form) {
+            for(FormElement field : fieldSet) {
+                if(field instanceof FileBlobField) {
+                    Blob blob = ((FileBlobField) field).getValue();
+                    if(blob != null) {
+                        if(!blobManager.deleteBlob(blob.getCode())) {
+                            logger.warn("Could not delete blob: " + blob.getCode());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     //**************************************************************************
     // ExportSearch
     //**************************************************************************
@@ -1570,7 +1577,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-
     private WritableCellFormat headerExcel() {
         WritableFont fontCell = new WritableFont(WritableFont.ARIAL, 12,
              WritableFont.BOLD, true);
@@ -1585,7 +1591,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             j++;
         }
     }
-
 
     private void addHeaderToReadSheet(WritableSheet sheet) throws WriteException {
         WritableCellFormat formatCell = headerExcel();
@@ -1654,8 +1659,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             sheet.addCell(label);
         }
     }
-
-
 
     //**************************************************************************
     // exportSearchPdf
@@ -2310,7 +2313,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         try {
             return pkHelper.getPkStringForUrl(pk, encoding);
         } catch (UnsupportedEncodingException e) {
-            throw new Error(e); //TODO
+            throw new Error(e);
         }
     }
 

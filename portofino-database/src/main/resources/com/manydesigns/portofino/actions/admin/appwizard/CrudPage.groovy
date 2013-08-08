@@ -79,4 +79,8 @@ class CrudPage extends CrudAction {
         return super.getEmbeddedSearchView();
     }
 
+    protected Resolution getSearchResultsPage() {
+        return super.getSearchResultsPage()
+    }
+
 }
