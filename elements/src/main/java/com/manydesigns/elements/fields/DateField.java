@@ -87,14 +87,8 @@ public class DateField extends AbstractTextField {
                 || datePattern.contains("ss");
 
         String tmpPattern = datePattern;
-        if (tmpPattern.contains("yyyy")) {
-            tmpPattern = tmpPattern.replaceAll("yyyy", "yy");
-        }
         if (tmpPattern.contains("MM")) {
             tmpPattern = tmpPattern.replaceAll("MM", "mm");
-        }
-        if (tmpPattern.contains("dd")) {
-            tmpPattern = tmpPattern.replaceAll("dd", "dd");
         }
         jsDatePattern = tmpPattern;
     }
