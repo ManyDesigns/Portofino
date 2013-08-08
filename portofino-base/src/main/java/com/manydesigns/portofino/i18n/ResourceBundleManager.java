@@ -87,17 +87,24 @@ public class ResourceBundleManager {
                 int suffixIndex = path.length() - ".properties".length();
                 String resourceBundleBaseName = path.substring(index, suffixIndex);
                 String bundleName = getBundleFileName(resourceBundleBaseName, locale);
-                PropertiesConfiguration conf = null;
+                PropertiesConfiguration conf;
                 try {
-                    conf = new PropertiesConfiguration(basePath + bundleName);
+                    conf = new PropertiesConfiguration();
+                    conf.setFileName(basePath + bundleName);
+                    conf.setDelimiterParsingDisabled(true);
+                    conf.load();
                 } catch (ConfigurationException e) {
                     logger.debug("Couldn't load resource bundle for locale " + locale + " from " + basePath, e);
                     //Fall back to default .properties without _locale
                     try {
                         String defaultBundleName = basePath + resourceBundleBaseName + ".properties";
-                        conf = new PropertiesConfiguration(defaultBundleName);
+                        conf = new PropertiesConfiguration();
+                        conf.setFileName(defaultBundleName);
+                        conf.setDelimiterParsingDisabled(true);
+                        conf.load();
                     } catch (ConfigurationException e1) {
                         logger.debug("Couldn't load default resource bundle from " + basePath, e1);
+                        conf = null;
                     }
                 }
                 if(conf != null) {
