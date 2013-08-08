@@ -220,11 +220,12 @@ public abstract class AbstractField implements Field {
     public void labelToXhtml(XhtmlBuffer xb) {
         xb.openElement("label");
         xb.addAttribute("for", id);
-        xb.addAttribute("class", FORM_LABEL_CLASS);
+        boolean hasLabel = !StringUtils.isBlank(label);
+        xb.addAttribute("class", FORM_LABEL_CLASS + (hasLabel ? " mde-label" : ""));
         if (mode.isBulk() && mode.isEdit() && !mode.isView(insertable, updatable)) {
             xb.writeInputCheckbox(null, bulkCheckboxName, "checked", bulkChecked, false, "pull-left");
         }
-        if (hasRequiredFields()) {
+        if (hasRequiredFields() && hasLabel) {
             xb.openElement("span");
             xb.addAttribute("class", "required");
             xb.write("*");
@@ -235,9 +236,9 @@ public abstract class AbstractField implements Field {
         boolean capitalize = elementsConfiguration.getBoolean(
                 ElementsProperties.FIELDS_LABEL_CAPITALIZE);
         if (capitalize) {
-            actualLabel = StringUtils.capitalize(label + ":");
+            actualLabel = StringUtils.capitalize(label);
         } else {
-            actualLabel = label + ":";
+            actualLabel = label;
         }
         xb.write(actualLabel);
         xb.closeElement("label");
