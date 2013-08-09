@@ -63,21 +63,6 @@ public abstract class AbstractTextField extends AbstractField {
     }
 
     //**************************************************************************
-    // Field size
-    //**************************************************************************
-
-    public static enum RelativeSize {
-        MINI("input-mini"), SMALL("input-small"), MEDIUM("input-medium"),
-        LARGE("input-large"), XLARGE("input-xlarge"), XXLARGE("input-xxlarge");
-
-        public final String cssClass;
-
-        RelativeSize(String cssClass) {
-            this.cssClass = cssClass;
-        }
-    }
-
-    //**************************************************************************
     // Implementazione di Element
     //**************************************************************************
     public boolean validate() {
