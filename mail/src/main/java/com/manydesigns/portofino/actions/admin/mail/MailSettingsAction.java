@@ -56,6 +56,9 @@ public class MailSettingsAction extends AbstractActionBean {
     @Inject(MailModule.MAIL_CONFIGURATION)
     public Configuration configuration;
 
+    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    public Configuration portofinoConfiguration;
+
     Form form;
 
     //--------------------------------------------------------------------------
@@ -82,8 +85,9 @@ public class MailSettingsAction extends AbstractActionBean {
         if (form.validate()) {
             logger.debug("Applying settings to app configuration");
             try {
-                CompositeConfiguration appConfiguration = (CompositeConfiguration) configuration;
-                FileConfiguration fileConfiguration = (FileConfiguration) appConfiguration.getConfiguration(0);
+                //mail configuration = portofino configuration + mail.properties defaults
+                CompositeConfiguration compositeConfiguration = (CompositeConfiguration) portofinoConfiguration;
+                FileConfiguration fileConfiguration = (FileConfiguration) compositeConfiguration.getConfiguration(0);
                 MailSettingsForm bean = new MailSettingsForm();
                 form.writeToObject(bean);
                 fileConfiguration.setProperty(MailProperties.MAIL_ENABLED, bean.mailEnabled);
@@ -96,10 +100,11 @@ public class MailSettingsAction extends AbstractActionBean {
                 fileConfiguration.setProperty(MailProperties.MAIL_SMTP_LOGIN, bean.smtpLogin);
                 fileConfiguration.setProperty(MailProperties.MAIL_SMTP_PASSWORD, bean.smtpPassword);
                 fileConfiguration.save();
+                logger.info("Configuration saved to " + fileConfiguration.getFile().getAbsolutePath());
             } catch (Exception e) {
                 logger.error("Configuration not saved", e);
-                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.notUpdated"));
-                return new ForwardResolution("/layouts/admin/settings.jsp");
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.configuration.notUpdated"));
+                return new ForwardResolution("/layouts/admin/mail/settings.jsp");
             }
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.updated"));
             return new RedirectResolution(this.getClass());

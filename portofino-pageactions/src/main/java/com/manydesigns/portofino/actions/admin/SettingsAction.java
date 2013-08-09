@@ -122,9 +122,10 @@ public class SettingsAction extends AbstractActionBean {
                 FileConfiguration fileConfiguration = (FileConfiguration) appConfiguration.getConfiguration(0);
                 form.writeToObject(fileConfiguration);
                 fileConfiguration.save();
+                logger.info("Configuration saved to " + fileConfiguration.getFile().getAbsolutePath());
             } catch (Exception e) {
                 logger.error("Configuration not saved", e);
-                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.notUpdated"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.configuration.notUpdated"));
                 return new ForwardResolution("/layouts/admin/settings.jsp");
             }
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.updated"));

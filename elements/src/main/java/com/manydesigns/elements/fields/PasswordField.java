@@ -124,7 +124,7 @@ public class PasswordField extends TextField {
                 String confirmationHtmlId = id + "_confirm";
                 String confirmationInputName = inputName + "_confirm";
                 xb.writeNbsp();
-                String confirmLabel = ElementsThreadLocals.getText("elements.field.password.confirm") + ":";
+                String confirmLabel = ElementsThreadLocals.getText("elements.field.password.confirm");
                 xb.writeLabel(confirmLabel, confirmationHtmlId, FORM_LABEL_CLASS + " mde-password-confirm-label");
                 valueToXhtml(xb, confirmationHtmlId,
                         confirmationInputName, confirmationValue);
@@ -146,15 +146,8 @@ public class PasswordField extends TextField {
                              String actualLabel) {
         xb.openElement("label");
         xb.addAttribute("for", actualHtmlId);
-        xb.addAttribute("class", FORM_LABEL_CLASS);
-        if (required && (mode.isEdit())) {
-            xb.openElement("span");
-            xb.addAttribute("class", "required");
-            xb.write("*");
-            xb.closeElement("span");
-            xb.writeNbsp();
-        }
-        xb.write(StringUtils.capitalize(actualLabel + ":"));
+        xb.addAttribute("class", FORM_LABEL_CLASS + (required && (mode.isEdit()) ? " required" : ""));
+        xb.write(StringUtils.capitalize(actualLabel));
         xb.closeElement("label");
     }
 
