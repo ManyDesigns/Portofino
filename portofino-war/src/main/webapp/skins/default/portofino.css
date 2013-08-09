@@ -362,3 +362,12 @@ Wizard
 .wizard-header ul li.before .chevron:before {
   border-left: 14px solid #F3F4F5;
 }
+
+/*******************************************************************************
+CRUD
+*******************************************************************************/
+
+.crudReadButtons {
+    border-top: solid 1px #E5E5E5;
+    padding-top: 10px;
+}

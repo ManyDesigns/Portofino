@@ -2,19 +2,19 @@
     <div id="portlet_${actionBean.pageInstance.page.id}">
         <stripes:layout-component name="portletHeader">
             <div class="portletHeader">
-                <h4>
-                    <span class="pull-right">
-                        <stripes:form action="${actionBean.dispatch.originalPath}" method="post">
+                <stripes:form action="${actionBean.dispatch.originalPath}" method="post">
+                    <h4>
+                        <span class="pull-right">
                             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
                             <stripes:layout-component name="portletHeaderButtons">
-                                <div class="btn-group">
+                                <span class="btn-group">
                                     <portofino:buttons list="portletHeaderButtons" cssClass="btn-mini" />
-                                </div>
+                                </span>
                             </stripes:layout-component>
-                        </stripes:form>
-                    </span>
-                    <stripes:layout-component name="portletTitle" />
-                </h4>
+                        </span>
+                        <stripes:layout-component name="portletTitle" />
+                    </h4>
+                </stripes:form>
             </div>
         </stripes:layout-component>
         <div class="portletBody">

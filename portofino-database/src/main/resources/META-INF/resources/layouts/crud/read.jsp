@@ -25,12 +25,6 @@
             <c:if test="${not empty actionBean.searchString}">
                 <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
             </c:if>
-            <style type="text/css">
-                .crudReadButtons {
-                    border-top: solid 1px #E5E5E5;
-                    padding-top: 10px;
-                }
-            </style>
             <div class="crudReadButtons">
                 <portofino:buttons list="crud-read" />
             </div>

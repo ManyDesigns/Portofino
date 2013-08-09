@@ -35,17 +35,19 @@
                         <div id="portlet_${actionBean.pageInstance.page.id}">
                             <stripes:layout-component name="portletHeader">
                                 <div class="portletHeader" style="padding-bottom: 0;">
-                                    <h3>
-                                        <span class="pull-right btn-group">
-                                            <stripes:form action="${actionBean.dispatch.originalPath}" method="post">
+                                    <stripes:form action="${actionBean.dispatch.originalPath}" method="post">
+                                        <h3>
+                                            <span class="pull-right">
                                                 <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
                                                 <stripes:layout-component name="portletHeaderButtons">
-                                                    <portofino:buttons list="portletHeaderButtons" cssClass="btn-mini" />
+                                                    <span class="btn-group">
+                                                        <portofino:buttons list="portletHeaderButtons" cssClass="btn-mini" />
+                                                    </span>
                                                 </stripes:layout-component>
-                                            </stripes:form>
-                                        </span>
-                                        <stripes:layout-component name="portletTitle" />
-                                    </h3>
+                                            </span>
+                                            <stripes:layout-component name="portletTitle" />
+                                        </h3>
+                                    </stripes:form>
                                 </div>
                             </stripes:layout-component>
                             <div class="portletBody">

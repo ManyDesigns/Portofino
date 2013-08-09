@@ -229,7 +229,9 @@ public abstract class AbstractField implements Field {
         }
 
         xb.openElement("label");
-        xb.addAttribute("for", id);
+        if(!mode.isView(insertable, updatable)) {
+            xb.addAttribute("for", id); //HTML5 validation
+        }
         xb.addAttribute("class", FORM_LABEL_CLASS + (hasRequiredFields() ? " required" : ""));
         if (mode.isBulk() && mode.isEdit() && !mode.isView(insertable, updatable)) {
             xb.writeInputCheckbox(null, bulkCheckboxName, "checked", bulkChecked, false, "pull-left");
