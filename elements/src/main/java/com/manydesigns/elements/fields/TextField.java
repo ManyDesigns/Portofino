@@ -51,7 +51,6 @@ public class TextField extends AbstractTextField {
     public final static Pattern emailPattern =
             Pattern.compile("[a-z0-9\\-_]++(\\.[a-z0-9\\-_]++)*@[a-z0-9\\-_]++" +
                     "(\\.[a-z0-9\\-_]++)++", Pattern.CASE_INSENSITIVE);
-    public static final String DEFAULT_FIELD_CSS_CLASS = "";
 
     protected boolean highlightLinks = false;
     protected boolean multiline = false;
@@ -71,7 +70,6 @@ public class TextField extends AbstractTextField {
 
     public TextField(PropertyAccessor accessor, Mode mode, String prefix) {
         super(accessor, mode, prefix);
-        fieldCssClass = DEFAULT_FIELD_CSS_CLASS;
 
         HighlightLinks highlightLinksAnnotation =
                 accessor.getAnnotation(HighlightLinks.class);

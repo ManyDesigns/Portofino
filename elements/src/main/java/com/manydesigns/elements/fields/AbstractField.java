@@ -49,6 +49,7 @@ public abstract class AbstractField implements Field {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     public static final String FORM_LABEL_CLASS = "control-label";
+    public static final String DEFAULT_FIELD_CSS_CLASS = "";
 
     protected final Configuration elementsConfiguration;
 
@@ -159,6 +160,13 @@ public abstract class AbstractField implements Field {
         if (accessor.isAnnotationPresent(ColSpan.class)) {
             colSpan = accessor.getAnnotation(ColSpan.class).value();
             logger.debug("ColSpan annotation present with value: " + colSpan);
+        }
+
+        if (accessor.isAnnotationPresent(CssClass.class)) {
+            String[] cssClasses = accessor.getAnnotation(CssClass.class).value();
+            fieldCssClass = StringUtils.join(cssClasses, " ");
+        } else {
+            fieldCssClass = DEFAULT_FIELD_CSS_CLASS;
         }
     }
 
