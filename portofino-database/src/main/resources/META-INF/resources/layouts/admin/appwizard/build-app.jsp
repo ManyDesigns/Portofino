@@ -20,7 +20,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"
-                      method="post" enctype="multipart/form-data">
+                      method="post">
             <p>
                 <fmt:message key="appwizard.finish.text" />
             </p>

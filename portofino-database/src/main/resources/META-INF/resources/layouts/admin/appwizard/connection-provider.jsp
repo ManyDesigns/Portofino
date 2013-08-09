@@ -20,7 +20,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"
-                      method="post" enctype="multipart/form-data" class="form-horizontal">
+                      method="post" class="form-horizontal">
             <script type="text/javascript">
                 function changeNewSPForm() {
                     $("#jndiCPForm").toggle();

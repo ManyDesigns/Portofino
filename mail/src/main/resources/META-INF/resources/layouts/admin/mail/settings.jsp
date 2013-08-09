@@ -18,7 +18,7 @@
         <p>Be careful if you change the location of the mail queue while the system is enqueuing mails: you'll have to
         manually move unsent mails to the new location as you restart the application.</p>
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.mail.MailSettingsAction"
-                      method="post" enctype="multipart/form-data" class="form-horizontal">
+                      method="post" class="form-horizontal">
             <mde:write name="actionBean" property="form"/>
             <div class="form-actions">
                 <portofino:buttons list="settings" />

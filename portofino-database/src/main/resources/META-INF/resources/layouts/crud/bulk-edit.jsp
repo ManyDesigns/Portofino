@@ -12,7 +12,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <p><fmt:message key = "layouts.crud.bulk-edit.select_columns"/></p>
-        <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data"
+        <stripes:form action="${actionBean.dispatch.originalPath}" method="post"
                       class="form-horizontal">
             <mde:write name="actionBean" property="form"/>
             <stripes:hidden name="selection"/>

@@ -28,7 +28,8 @@
         <c:if test="${actionBean.requiredFieldsPresent}">
             <p><fmt:message key="commons.fields_required"/>.</p>
         </c:if>
-        <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data"
+        <stripes:form action="${actionBean.dispatch.originalPath}" method="post"
+                      <% if(actionBean.isMultipartRequest()) { out.print("enctype=\"multipart/form-data\""); } %>
                       class="form-horizontal">
             <mde:write name="actionBean" property="form"/>
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>

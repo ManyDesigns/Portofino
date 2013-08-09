@@ -15,7 +15,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.ConnectionProvidersAction"
-                      method="post" enctype="multipart/form-data">
+                      method="post">
             <mde:write name="actionBean" property="tableForm"/>
             <h4><fmt:message key="layouts.admin.connectionProviders.list.available_platforms"/></h4>
             <mde:write name="actionBean" property="databasePlatformsTableForm"/>

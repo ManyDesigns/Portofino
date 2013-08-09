@@ -15,7 +15,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.ConnectionProvidersAction"
-                      method="post" enctype="multipart/form-data" class="form-horizontal">
+                      method="post" class="form-horizontal">
             <mde:write name="actionBean" property="form"/>
             <c:if test="${not empty actionBean.connectionProvider.database.schemas}">
                 <div class="horizontalSeparator"></div>

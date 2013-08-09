@@ -80,8 +80,7 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <stripes:form action="${actionBean.actionPath}"
-                      method="post" enctype="multipart/form-data">
+        <stripes:form action="${actionBean.actionPath}" method="post">
             <ul id="tabs" class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#tab-table-columns">
                     <fmt:message key="layouts.admin.tables.tableAndColumns" />

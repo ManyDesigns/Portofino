@@ -188,7 +188,7 @@
                 } %>
         </table>
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.TablesAction"
-                      method="post" enctype="multipart/form-data">
+                      method="post">
             <div class="form-actions">
                 <portofino:buttons list="tables-list" />
             </div>

@@ -15,7 +15,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.ReloadModelAction"
-                      method="post" enctype="multipart/form-data">
+                      method="post">
             <p>
                 <fmt:message key="layouts.admin.reload-model.text"/>
                 <portofino:buttons list="reload-model" />

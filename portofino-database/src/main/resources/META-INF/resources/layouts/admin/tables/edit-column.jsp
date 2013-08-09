@@ -19,7 +19,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <stripes:form action="${actionBean.actionPath}"
-                      method="post" enctype="multipart/form-data" class="form-horizontal">
+                      method="post" class="form-horizontal">
             <mde:write name="actionBean" property="columnForm" />
             <mde:write name="actionBean" property="tableForm" />
             <div class="form-actions">

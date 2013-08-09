@@ -15,7 +15,7 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data"
+        <stripes:form action="${actionBean.dispatch.originalPath}" method="post"
                       class="form-horizontal">
             <mde:write name="actionBean" property="pageConfigurationForm"/>
             <mde:write name="actionBean" property="form" />
