@@ -130,7 +130,15 @@ function setupRichTextEditors() {
             toolbarCanCollapse: false
         };
         if(element.ckeditor) {
-            element.ckeditor(conf);
+            element.ckeditor(function() {
+                var elementId = element.attr("id");
+                var editor = this;
+                if(elementId) {
+                    $("label[for=" + elementId + "]").click(function() {
+                        editor.focus();
+                    })
+                }
+            }, conf);
         } else if(console && console.error) {
             console.error("CKEditor not loaded! Make sure that /elements/ckeditor/ckeditor.js and /elements/ckeditor/adapters/jquery.js are included in your page.");
         }
