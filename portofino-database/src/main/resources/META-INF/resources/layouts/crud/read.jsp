@@ -17,23 +17,28 @@
         <c:out value="${actionBean.readTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <mde:write name="actionBean" property="form"/>
-        <c:if test="${not empty actionBean.searchString}">
-            <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
-        </c:if>
-        <style type="text/css">
-            .crudReadButtons {
-                border-top: solid 1px #E5E5E5;
-                padding-top: 10px;
-            }
-        </style>
-        <div class="crudReadButtons">
-            <portofino:buttons list="crud-read" />
-        </div>
-        <script type="text/javascript">
-            $(".crudReadButtons button[name=delete]").click(function() {
-                return confirm ('<fmt:message key="commons.confirm" />');
-            });
-        </script>
+        <stripes:form action="${actionBean.dispatch.originalPath}" method="post" class="form-horizontal">
+            <%-- Hidden submit so that ENTER on a form executes the default action --%>
+            <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
+            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+            <mde:write name="actionBean" property="form"/>
+            <c:if test="${not empty actionBean.searchString}">
+                <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
+            </c:if>
+            <style type="text/css">
+                .crudReadButtons {
+                    border-top: solid 1px #E5E5E5;
+                    padding-top: 10px;
+                }
+            </style>
+            <div class="crudReadButtons">
+                <portofino:buttons list="crud-read" />
+            </div>
+            <script type="text/javascript">
+                $(".crudReadButtons button[name=delete]").click(function() {
+                    return confirm ('<fmt:message key="commons.confirm" />');
+                });
+            </script>
+        </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

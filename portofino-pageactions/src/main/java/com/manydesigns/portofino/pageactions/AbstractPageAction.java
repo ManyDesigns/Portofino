@@ -209,7 +209,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
                 String layoutContainerInParent = childPage.getContainer();
                 if(layoutContainerInParent != null) {
                     String newPath = getDispatch().getOriginalPath() + "/" + childPage.getName();
-                    File pageDir = new File(getDispatch().getLastPageInstance().getDirectory(), childPage.getName());
+                    File pageDir = new File(pageInstance.getChildrenDirectory(), childPage.getName());
                     try {
                         Page page = DispatcherLogic.getPage(pageDir);
                         EmbeddedPageAction embeddedPageAction =

@@ -15,26 +15,31 @@
             margin:  0;
         }
     </style>
-        <div class="row-fluid">
-            <div class="span2 calendar-calendars">
-                <strong><fmt:message key="calendar.calendars.legend" /></strong>
-                <ul class="calendars">
-                    <c:forEach var="calendar" items="${actionBean.calendars}">
-                        <li style="margin: 0.5em 0; list-style: none;">
-                            <div style="background-color: ${calendar.backgroundHtmlColor}; height: 1em;
-                                 width: 1em; display: inline-block;">&nbsp;</div>
-                            ${calendar.name}
-                        </li>
-                    </c:forEach>
-                </ul>
-            </div>
-            <div class="span10 calendar-view">
+    <div class="row-fluid">
+        <div class="span2 calendar-calendars">
+            <strong><fmt:message key="calendar.calendars.legend" /></strong>
+            <ul class="calendars">
+                <c:forEach var="calendar" items="${actionBean.calendars}">
+                    <li style="margin: 0.5em 0; list-style: none;">
+                        <div style="background-color: ${calendar.backgroundHtmlColor}; height: 1em;
+                             width: 1em; display: inline-block;">&nbsp;</div>
+                        ${calendar.name}
+                    </li>
+                </c:forEach>
+            </ul>
+        </div>
+        <div class="span10 calendar-view">
+            <stripes:form action="${actionBean.dispatch.originalPath}" method="post">
+                <%-- Hidden submit so that ENTER on a form executes the default action --%>
+                <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
+                <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
                 <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
                 <input type="hidden" name="calendarViewType" value="<c:out value="${actionBean.calendarViewType}"/>"/>
                 <a class="calendar-legend-hide-link" data-hide="false" href="#"><fmt:message key="calendar.hide.calendars" /></a>
                 <jsp:include page="${actionBean.calendarViewType}.jsp" />
-            </div>
+            </stripes:form>
         </div>
+    </div>
     <script type="text/javascript">
         $(function() {
             $(".calendar-legend-hide-link").click(function() {

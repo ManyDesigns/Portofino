@@ -58,6 +58,10 @@ PageActions
     margin-bottom: 0;
 }
 
+.portletHeader form {
+    margin: 0;
+}
+
 .portletBody {
     clear: left;
 }

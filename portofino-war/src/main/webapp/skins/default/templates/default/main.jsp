@@ -33,27 +33,24 @@
                     </stripes:layout-component>
                     <stripes:layout-component name="mainPageActionBody">
                         <div id="portlet_${actionBean.pageInstance.page.id}">
-                            <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data"
-                                          class="${formClass != null ? formClass : 'form-horizontal'}">
-                                <%-- Hidden submit so that ENTER on a form executes the default action --%>
-                                <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
-                                <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
-                                <stripes:layout-component name="portletHeader">
-                                    <div class="portletHeader" style="padding-bottom: 0;">
-                                        <h3>
-                                            <span class="pull-right btn-group">
+                            <stripes:layout-component name="portletHeader">
+                                <div class="portletHeader" style="padding-bottom: 0;">
+                                    <h3>
+                                        <span class="pull-right btn-group">
+                                            <stripes:form action="${actionBean.dispatch.originalPath}" method="post">
+                                                <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
                                                 <stripes:layout-component name="portletHeaderButtons">
                                                     <portofino:buttons list="portletHeaderButtons" cssClass="btn-mini" />
                                                 </stripes:layout-component>
-                                            </span>
-                                            <stripes:layout-component name="portletTitle" />
-                                        </h3>
-                                    </div>
-                                </stripes:layout-component>
-                                <div class="portletBody">
-                                    <stripes:layout-component name="portletBody" />
+                                            </stripes:form>
+                                        </span>
+                                        <stripes:layout-component name="portletTitle" />
+                                    </h3>
                                 </div>
-                            </stripes:form>
+                            </stripes:layout-component>
+                            <div class="portletBody">
+                                <stripes:layout-component name="portletBody" />
+                            </div>
                         </div>
                     </stripes:layout-component>
                     <stripes:layout-component name="mainPageActionFooter" />

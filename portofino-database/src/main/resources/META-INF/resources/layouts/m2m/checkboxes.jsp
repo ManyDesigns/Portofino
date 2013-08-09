@@ -18,56 +18,63 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.m2m.ManyToManyAction"
-/><stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/normal.jsp" formClass="form-inline">
+/><stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <c:if test="${not empty actionBean.oneSelectField}">
-            <span class="onePkContainer"><mde:write name="actionBean" property="oneSelectField" /></span>
-            <br />
-            <script type="text/javascript">
-                $(function() {
-                    $(".onePkContainer select").change(function() {
-                        $(this).prop("form").submit();
+        <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data"
+                      class="form-inline">
+            <%-- Hidden submit so that ENTER on a form executes the default action --%>
+            <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
+            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+            <c:if test="${not empty actionBean.oneSelectField}">
+                <span class="onePkContainer"><mde:write name="actionBean" property="oneSelectField" /></span>
+                <br />
+                <script type="text/javascript">
+                    $(function() {
+                        $(".onePkContainer select").change(function() {
+                            $(this).prop("form").submit();
+                        });
                     });
-                });
-            </script>
-        </c:if>
-        <%
-            ClassAccessor ca = actionBean.getManyTableAccessor();
-            XhtmlBuffer buffer = new XhtmlBuffer(out);
-            PkHelper pkHelper = new PkHelper(ca);
-            for(Map.Entry<Object, Boolean> entry : actionBean.getBooleanRelation().entrySet()) {
-                String id = RandomUtil.createRandomId();
-                buffer.openElement("label");
-                buffer.addAttribute("class", "checkbox");
-                buffer.addAttribute("for", id);
-                Object obj = entry.getKey();
-                buffer.write(ShortNameUtils.getName(ca, obj));
-                buffer.openElement("input");
-                buffer.addAttribute("id", id);
-                buffer.addAttribute("type", "checkbox");
-                buffer.addAttribute("name", "selectedPrimaryKeys");
-                buffer.addAttribute("value", StringUtils.join(pkHelper.generatePkStringArray(obj), "/"));
-                if(!SecurityLogic.hasPermissions(
-                        actionBean.getPageInstance(), SecurityUtils.getSubject(),
-                        AccessLevel.VIEW, ManyToManyAction.PERMISSION_UPDATE)) {
-                    buffer.addAttribute("disabled", "disabled");
+                </script>
+            </c:if>
+            <%
+                ClassAccessor ca = actionBean.getManyTableAccessor();
+                XhtmlBuffer buffer = new XhtmlBuffer(out);
+                PkHelper pkHelper = new PkHelper(ca);
+                for(Map.Entry<Object, Boolean> entry : actionBean.getBooleanRelation().entrySet()) {
+                    String id = RandomUtil.createRandomId();
+                    buffer.openElement("label");
+                    buffer.addAttribute("class", "checkbox");
+                    buffer.addAttribute("for", id);
+                    Object obj = entry.getKey();
+                    buffer.write(ShortNameUtils.getName(ca, obj));
+                    buffer.openElement("input");
+                    buffer.addAttribute("id", id);
+                    buffer.addAttribute("type", "checkbox");
+                    buffer.addAttribute("name", "selectedPrimaryKeys");
+                    buffer.addAttribute("value", StringUtils.join(pkHelper.generatePkStringArray(obj), "/"));
+                    if(!SecurityLogic.hasPermissions(
+                            actionBean.getPortofinoConfiguration(),
+                            actionBean.getPageInstance(), SecurityUtils.getSubject(),
+                            AccessLevel.VIEW, ManyToManyAction.PERMISSION_UPDATE)) {
+                        buffer.addAttribute("disabled", "disabled");
+                    }
+                    if(entry.getValue()) {
+                        buffer.addAttribute("checked", "t");
+                    }
+                    buffer.closeElement("input");
+                    buffer.closeElement("label");
+                    if(actionBean.getConfiguration().getActualViewType() == ViewType.CHECKBOXES_VERTICAL) {
+                        buffer.writeNoHtmlEscape("<br />");
+                    } else {
+                        buffer.write(" ");
+                    }
                 }
-                if(entry.getValue()) {
-                    buffer.addAttribute("checked", "t");
-                }
-                buffer.closeElement("input");
-                buffer.closeElement("label");
-                if(actionBean.getConfiguration().getActualViewType() == ViewType.CHECKBOXES_VERTICAL) {
-                    buffer.writeNoHtmlEscape("<br />");
-                } else {
-                    buffer.write(" ");
-                }
-            }
-        %>
-        <br /><br />
-        <portofino:buttons list="m2m-checkboxes-edit" />
+            %>
+            <br /><br />
+            <portofino:buttons list="m2m-checkboxes-edit" />
+        </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>
