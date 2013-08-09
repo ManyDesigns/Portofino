@@ -47,6 +47,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -337,17 +338,21 @@ public class DispatcherLogic {
         return (Page) unmarshaller.unmarshal(inputStream);
     }
 
-    public static Page getPage(File directory) throws Exception {
+    public static Page getPage(File directory) throws PageNotActiveException {
         File pageFile = getPageFile(directory);
         /*if(!pageFile.exists()) {
             pageCache.invalidate(pageFile);
             return null;
         }*/
-        FileCacheEntry<Page> entry = pageCache.get(pageFile);
-        if(!entry.error) {
-            return entry.object;
-        } else {
-            throw new PageNotActiveException(pageFile.getAbsolutePath());
+        try {
+            FileCacheEntry<Page> entry = pageCache.get(pageFile);
+            if(!entry.error) {
+                return entry.object;
+            } else {
+                throw new PageNotActiveException(pageFile.getAbsolutePath());
+            }
+        } catch (ExecutionException e) {
+            throw new PageNotActiveException(pageFile.getAbsolutePath(), e);
         }
     }
 

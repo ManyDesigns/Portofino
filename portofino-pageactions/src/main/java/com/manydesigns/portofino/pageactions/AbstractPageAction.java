@@ -31,10 +31,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.DispatcherLogic;
-import com.manydesigns.portofino.dispatcher.PageAction;
-import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pages.ChildPage;
@@ -208,17 +205,24 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         if(embeddedPageActions == null) {
             MultiMap mm = new MultiHashMap();
             Layout layout = pageInstance.getLayout();
-            for(ChildPage page : layout.getChildPages()) {
-                String layoutContainerInParent = page.getContainer();
+            for(ChildPage childPage : layout.getChildPages()) {
+                String layoutContainerInParent = childPage.getContainer();
                 if(layoutContainerInParent != null) {
-                    String newPath = getDispatch().getOriginalPath() + "/" + page.getName();
-                    EmbeddedPageAction embeddedPageAction =
+                    String newPath = getDispatch().getOriginalPath() + "/" + childPage.getName();
+                    File pageDir = new File(getDispatch().getLastPageInstance().getDirectory(), childPage.getName());
+                    try {
+                        Page page = DispatcherLogic.getPage(pageDir);
+                        EmbeddedPageAction embeddedPageAction =
                             new EmbeddedPageAction(
-                                    page.getName(),
-                                    page.getActualOrder(),
-                                    newPath);
+                                    childPage.getName(),
+                                    childPage.getActualOrder(),
+                                    newPath,
+                                    page);
 
-                    mm.put(layoutContainerInParent, embeddedPageAction);
+                        mm.put(layoutContainerInParent, embeddedPageAction);
+                    } catch (PageNotActiveException e) {
+                        logger.warn("Embedded page action is not active, skipping! " + pageDir, e);
+                    }
                 }
             }
             for(Object entryObj : mm.entrySet()) {
