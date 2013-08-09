@@ -48,7 +48,6 @@ public abstract class AbstractField implements Field {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    public final static String BULK_SUFFIX = "_bulk";
     public static final String FORM_LABEL_CLASS = "control-label";
 
     protected final Configuration elementsConfiguration;
