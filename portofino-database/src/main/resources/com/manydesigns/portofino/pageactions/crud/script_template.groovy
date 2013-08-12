@@ -80,8 +80,8 @@ class MyCrudAction extends CrudAction {
         return super.getEmbeddedSearchView();
     }
 
-    protected Resolution getSearchResultsPage() {
-        return super.getSearchResultsPage()
+    protected Resolution getSearchResultsPageView() {
+        return super.getSearchResultsPageView()
     }
 
 }

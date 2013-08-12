@@ -119,17 +119,16 @@ Search form
 .search_results {
     overflow-x: auto;
     overflow-y: hidden; /* Fixes a bug in Chrome */
-    padding-bottom: 1px;
+    margin-bottom: 20px;
     border-top: 1px solid #DDDDDD;
-}
-
-.search_results.withSearchForm {
-    padding-right: 1em;
-    border-right: 1px solid #AAAAAA;
 }
 
 .search_results th a {
     color: #000000;
+}
+
+.search_results table {
+    margin-bottom: 0;
 }
 
 .searchFormButtons {
