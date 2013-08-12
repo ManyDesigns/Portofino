@@ -31,8 +31,7 @@
             </c:if>
         </p>
         <stripes:form action="${actionBean.dispatch.originalPath}" method="post"
-                      <% if(actionBean.isMultipartRequest()) { out.print("enctype=\"multipart/form-data\""); } %>
-                      class="form-horizontal">
+                      enctype="multipart/form-data" class="form-horizontal">
             <mde:write name="actionBean" property="form"/>
             <c:if test="${not empty actionBean.searchString}">
                 <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
