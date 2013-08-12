@@ -112,8 +112,9 @@ public class SelectSearchField extends AbstractSearchField {
        } else if (values.length == 0) {
            logger.debug("Enpty values array. Not adding 'in' criteria.");
        } else {
-           logger.debug("Adding 'in' criteria for values: {}",
-                   ArrayUtils.toString(values));
+           if(logger.isDebugEnabled()) {
+               logger.debug("Adding 'in' criteria for values: {}", ArrayUtils.toString(values));
+           }
            criteria.in(accessor, values);
        }
     }

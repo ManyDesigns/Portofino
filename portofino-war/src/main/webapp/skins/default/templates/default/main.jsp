@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-    <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+    <html lang="en">
     <head>
         <jsp:include page="../../head.jsp"/>
         <stripes:layout-component name="customScripts"/>

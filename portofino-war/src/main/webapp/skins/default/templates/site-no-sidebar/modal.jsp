@@ -7,7 +7,7 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><stripes:layout-definition><%--
 --%><!DOCTYPE html>
-    <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+    <html lang="en">
     <head>
         <jsp:include page="../../head.jsp"/>
         <link rel="stylesheet" type="text/css"

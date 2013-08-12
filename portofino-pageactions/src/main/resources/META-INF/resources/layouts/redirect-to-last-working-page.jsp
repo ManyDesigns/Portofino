@@ -39,7 +39,7 @@
     response.setHeader("Refresh", "0; " + targetUrl);
     
     %><!doctype html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
     <head>
         <meta http-equiv="refresh" content='<%= "0; " + targetUrl %>' />
     </head>

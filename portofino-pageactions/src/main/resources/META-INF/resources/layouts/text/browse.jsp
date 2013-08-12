@@ -4,7 +4,7 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%--
 --%><!doctype html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.pageactions.text.TextAction"/>
 <head>

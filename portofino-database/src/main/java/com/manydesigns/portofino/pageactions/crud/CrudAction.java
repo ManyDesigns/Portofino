@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.pageactions.crud;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.SelectionProvider;
@@ -117,7 +118,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
                 QueryUtils.mergeQuery(crudConfiguration.getQuery(), criteria, this);
 
         String queryString = query.getQueryString();
-        String totalRecordsQueryString = null;
+        String totalRecordsQueryString;
         try {
             totalRecordsQueryString = generateCountQuery(queryString);
         } catch (JSQLParserException e) {
@@ -169,7 +170,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
             session.save(baseTable.getActualEntityName(), object);
         } catch(ConstraintViolationException e) {
             logger.warn("Constraint violation in save", e);
-            throw new RuntimeException(getMessage("crud.constraintViolation"));
+            throw new RuntimeException(ElementsThreadLocals.getText("crud.constraintViolation"));
         }
     }
 
@@ -179,7 +180,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
             session.update(baseTable.getActualEntityName(), object);
         } catch(ConstraintViolationException e) {
             logger.warn("Constraint violation in update", e);
-            throw new RuntimeException(getMessage("crud.constraintViolation"));
+            throw new RuntimeException(ElementsThreadLocals.getText("crud.constraintViolation"));
         }
     }
 
@@ -268,7 +269,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
             logger.warn("Incorrect Field Type", e);
-            SessionMessages.addWarningMessage(getMessage("crud.incorrectFieldType"));
+            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("crud.incorrectFieldType"));
         }
     }
 
@@ -278,7 +279,6 @@ public class CrudAction extends AbstractCrudAction<Object> {
                 persistence,
                 baseTable, pkObject,
                 crudConfiguration.getQuery(), this);
-        //return QueryUtils.getObjectByPk(application, baseTable, pkObject);
     }
 
     //**************************************************************************
