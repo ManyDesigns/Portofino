@@ -235,9 +235,7 @@ public class FileBlobField extends AbstractField
         Upload upload = null;
         try {
             upload = webFramework.getUpload(req, inputName);
-            if (upload == null) {
-                blob = null;
-            } else {
+            if (upload != null) {
                 String code = RandomUtil.createRandomId();
                 blob = blobManager.saveBlob(
                         code,
@@ -245,6 +243,10 @@ public class FileBlobField extends AbstractField
                         upload.getFilename(),
                         upload.getContentType(),
                         upload.getCharacterEncoding());
+            } else {
+                logger.debug("An update of a blob was requested, but nothing was uploaded. The previous value will be kept.");
+                String code = req.getParameter(codeInputName);
+                safeLoadBlob(code);
             }
         } catch (Throwable e) {
             logger.warn("Cannot save upload", e);
@@ -292,7 +294,7 @@ public class FileBlobField extends AbstractField
                 blob = blobManager.loadBlob(code);
             } catch (Throwable e) {
                 blob = null;
-                blobError = "Cannot load blob";
+                blobError = getText("elements.error.field.fileblob.cannotLoad");
                 logger.warn("Cannot load blob with code '{}'. Cause: {}",
                         code, e.getMessage());
             }
@@ -313,6 +315,10 @@ public class FileBlobField extends AbstractField
 
     public void setValue(Blob blob) {
         this.blob = blob;
+    }
+
+    public String getCodeInputName() {
+        return codeInputName;
     }
 
     public String getOperationInputName() {

@@ -1,8 +1,8 @@
-<%@   page import="com.manydesigns.portofino.AppProperties"
+<%@ page session="false"
+%><%@ page import="com.manydesigns.portofino.AppProperties"
 %><%@ page import="com.manydesigns.portofino.modules.BaseModule"
 %><%@ page import="org.apache.commons.configuration.Configuration"
-%>
-<%@ page import="org.slf4j.LoggerFactory" %><%
+%><%@ page import="org.slf4j.LoggerFactory" %><%
     Configuration configuration =
             (Configuration) request.getServletContext().getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
     String landingPage = configuration.getString(AppProperties.LANDING_PAGE);
