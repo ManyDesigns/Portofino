@@ -42,6 +42,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
+ * Session listener that deletes temporary blobs when a user's session ends. The application must record the blobs it
+ * wants to be deleted with the method recordBlob, and can at any time declare that a blob must not be deleted with
+ * the method forgetBlob.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -74,7 +78,7 @@ public class BlobCleanupListener implements HttpSessionListener {
         if(blob == null) {
             return;
         }
-        HttpSession session = ElementsThreadLocals.getHttpServletRequest().getSession(false);
+        HttpSession session = ElementsThreadLocals.getHttpServletRequest().getSession();
         Set<String> blobs = (Set<String>) session.getAttribute(SESSION_ATTRIBUTE);
         blobs.add(blob.getCode());
     }
@@ -83,7 +87,7 @@ public class BlobCleanupListener implements HttpSessionListener {
         if(blob == null) {
             return;
         }
-        HttpSession session = ElementsThreadLocals.getHttpServletRequest().getSession(false);
+        HttpSession session = ElementsThreadLocals.getHttpServletRequest().getSession();
         Set<String> blobs = (Set<String>) session.getAttribute(SESSION_ATTRIBUTE);
         blobs.remove(blob.getCode());
     }
