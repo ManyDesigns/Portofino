@@ -78,17 +78,20 @@ public class BlobCleanupListener implements HttpSessionListener {
 
         Set<String> blobs = (Set<String>) session.getAttribute(SESSION_ATTRIBUTE);
         BlobManager blobManager = ElementsThreadLocals.getBlobManager();
-        //Setup Elements blob manager
-        File appBlobsDir;
+        if(blobManager == null) { //Outside of a request
+            //Setup Elements blob manager
+            File appBlobsDir;
 
-        if(configuration.containsKey(PortofinoProperties.BLOBS_DIR_PATH)) {
-            appBlobsDir = new File(configuration.getString(PortofinoProperties.BLOBS_DIR_PATH));
-        } else {
-            File appDir = (File) servletContext.getAttribute(BaseModule.APPLICATION_DIRECTORY);
-            appBlobsDir = new File(appDir, "blobs");
+            if(configuration.containsKey(PortofinoProperties.BLOBS_DIR_PATH)) {
+                appBlobsDir = new File(configuration.getString(PortofinoProperties.BLOBS_DIR_PATH));
+            } else {
+                File appDir = (File) servletContext.getAttribute(BaseModule.APPLICATION_DIRECTORY);
+                appBlobsDir = new File(appDir, "blobs");
+            }
+            logger.debug("Setting blobs directory");
+            blobManager = BlobManager.createDefaultBlobManager();
+            blobManager.setBlobsDir(appBlobsDir);
         }
-        logger.debug("Setting blobs directory");
-        blobManager.setBlobsDir(appBlobsDir);
         for(String blobCode : blobs) {
             logger.info("Deleting unused blob: " + blobCode);
             if(!blobManager.deleteBlob(blobCode)) {
