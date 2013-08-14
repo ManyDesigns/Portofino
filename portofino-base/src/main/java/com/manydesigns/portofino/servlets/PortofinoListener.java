@@ -109,6 +109,7 @@ public class PortofinoListener
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         try {
             ElementsThreadLocals.setupDefaultElementsContext();
+            ElementsThreadLocals.setServletContext(servletContextEvent.getServletContext());
             init(servletContextEvent);
         } catch (Throwable e) {
             logger.error("Could not start ManyDesigns Portofino", e);
