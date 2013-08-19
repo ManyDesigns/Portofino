@@ -9,17 +9,16 @@ import com.manydesigns.portofino.model.database.Table
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.reflection.TableAccessor
-import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
-import com.manydesigns.portofino.shiro.PasswordResetToken
-import com.manydesigns.portofino.shiro.SignUpToken
 import com.manydesigns.portofino.shiro.openid.OpenIDToken
 import java.security.MessageDigest
 import org.hibernate.Criteria
 import org.hibernate.SQLQuery
 import org.hibernate.Session
 import org.hibernate.criterion.Restrictions
+import org.hibernate.exception.ConstraintViolationException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import com.manydesigns.portofino.shiro.*
 import org.apache.shiro.authc.*
 
 class Security extends AbstractPortofinoRealm {
@@ -237,7 +236,7 @@ class Security extends AbstractPortofinoRealm {
         return token;
     }
 
-    String saveSelfRegisteredUser(Object user) {
+    String saveSelfRegisteredUser(Object user) throws RegistrationException {
         DemoUser theUser = (DemoUser) user;
         Session session = persistence.getSession("redmine");
         Map persistentUser = new HashMap();
@@ -253,7 +252,12 @@ class Security extends AbstractPortofinoRealm {
         String token = RandomUtil.createRandomId(20);
         persistentUser.token = token;
 
-        session.save("users", (Object) persistentUser);
+        try {
+            session.save("users", (Object) persistentUser);
+            session.flush();
+        } catch (ConstraintViolationException e) {
+            throw new ExistingUserException(e);
+        }
         session.transaction.commit();
         return token;
     }

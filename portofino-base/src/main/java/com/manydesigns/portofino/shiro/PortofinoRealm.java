@@ -119,7 +119,7 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
      */
     ClassAccessor getSelfRegisteredUserClassAccessor();
 
-    String saveSelfRegisteredUser(Object user);
+    String saveSelfRegisteredUser(Object user) throws RegistrationException;
 
     String getUserPrettyName(Serializable user);
 

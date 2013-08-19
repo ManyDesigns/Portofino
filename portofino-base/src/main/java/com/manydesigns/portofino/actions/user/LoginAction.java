@@ -30,10 +30,7 @@ import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.modules.BaseModule;
-import com.manydesigns.portofino.shiro.PasswordResetToken;
-import com.manydesigns.portofino.shiro.PortofinoRealm;
-import com.manydesigns.portofino.shiro.ShiroUtils;
-import com.manydesigns.portofino.shiro.SignUpToken;
+import com.manydesigns.portofino.shiro.*;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
@@ -371,6 +368,8 @@ public abstract class LoginAction extends AbstractActionBean {
 
                 sendSignupConfirmationEmail(email, ElementsThreadLocals.getText("user.signUp.email.subject"), body);
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("user.signUp.email.sent"));
+            } catch (ExistingUserException e) {
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.signUp.failure.userExists"));
             } catch (Exception e) {
                 logger.error("Error during sign-up", e);
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.signUp.failure"));

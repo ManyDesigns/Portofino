@@ -7,10 +7,6 @@ import com.manydesigns.portofino.model.database.Table
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.reflection.TableAccessor
-import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
-import com.manydesigns.portofino.shiro.PasswordResetToken
-import com.manydesigns.portofino.shiro.SignUpToken
-import com.manydesigns.portofino.shiro.User
 import com.manydesigns.portofino.util.PkHelper
 import java.security.MessageDigest
 import org.apache.commons.lang.StringUtils
@@ -24,7 +20,9 @@ import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import com.manydesigns.portofino.shiro.*
 import org.apache.shiro.authc.*
+import org.hibernate.exception.ConstraintViolationException
 
 public class Security extends AbstractPortofinoRealm {
 
@@ -263,7 +261,7 @@ public class Security extends AbstractPortofinoRealm {
         return token;
     }
 
-    String saveSelfRegisteredUser(Object user) {
+    String saveSelfRegisteredUser(Object user) throws RegistrationException {
         if(StringUtils.isEmpty(userTokenProperty)) {
             throw new UnsupportedOperationException("Token property not configured.");
         }
@@ -278,7 +276,12 @@ public class Security extends AbstractPortofinoRealm {
         String token = RandomUtil.createRandomId(20);
         persistentUser[userTokenProperty] = token;
 
-        session.save(userTableEntityName, (Object) persistentUser);
+        try {
+            session.save(userTableEntityName, (Object) persistentUser);
+            session.flush();
+        } catch (ConstraintViolationException e) {
+            throw new ExistingUserException(e);
+        }
         session.transaction.commit();
         return token;
     }
