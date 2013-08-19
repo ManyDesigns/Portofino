@@ -122,7 +122,7 @@ public class FileBlobField extends AbstractField
         xb.addAttribute("class", "value");
         if (blobError != null) {
             xb.openElement("div");
-            xb.addAttribute("class", "error");
+            xb.addAttribute("class", "blob-error");
             xb.write(blobError);
             xb.closeElement("div");
         } else if (blob != null) {

@@ -207,6 +207,9 @@ public abstract class AbstractField implements Field {
         if(mode.isView(insertable, updatable)) {
             cssClass += " readonly";
         }
+        if(errors.size() > 0) {
+            cssClass += " error";
+        }
         xb.addAttribute("class", cssClass);
         labelToXhtml(xb);
         xb.openElement("div");
@@ -259,14 +262,13 @@ public abstract class AbstractField implements Field {
 
     public void errorsToXhtml(XhtmlBuffer xb) {
         if (errors.size() > 0) {
-            xb.openElement("ul");
-            xb.addAttribute("class", "errors");
+            xb.openElement("span");
+            xb.addAttribute("class", "help-inline");
             for (String error : errors) {
-                xb.openElement("li");
                 xb.write(error);
-                xb.closeElement("li");
+                xb.writeBr();
             }
-            xb.closeElement("ul");
+            xb.closeElement("span");
         }
     }
 

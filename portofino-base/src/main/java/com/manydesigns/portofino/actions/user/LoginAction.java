@@ -108,6 +108,7 @@ public abstract class LoginAction extends AbstractActionBean {
 
     private static final Cage cage = new CaptchaGenerator();
     public static final String CAPTCHA_SESSION_ATTRIBUTE = "LoginAction.captcha";
+    public boolean captchaValidationFailed;
 
     public static final Logger logger =
             LoggerFactory.getLogger(LoginAction.class);
@@ -374,11 +375,10 @@ public abstract class LoginAction extends AbstractActionBean {
                 logger.error("Error during sign-up", e);
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.signUp.failure"));
             }
-            return new RedirectResolution(getOriginalPath());
         } else {
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.signUp.failure.formErrors"));
-            return new ForwardResolution(getSignUpPage());
         }
+        return new ForwardResolution(getSignUpPage());
     }
 
     protected boolean validateCaptcha() {
@@ -388,6 +388,7 @@ public abstract class LoginAction extends AbstractActionBean {
                 request.getParameter("captchaText"),
                 (String) session.getAttribute(CAPTCHA_SESSION_ATTRIBUTE));
         session.removeAttribute(CAPTCHA_SESSION_ATTRIBUTE);
+        captchaValidationFailed = !valid;
         return valid;
     }
 
@@ -588,5 +589,9 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public boolean isCaptchaValidationFailed() {
+        return captchaValidationFailed;
     }
 }

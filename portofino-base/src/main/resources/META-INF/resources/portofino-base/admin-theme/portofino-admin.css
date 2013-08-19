@@ -147,26 +147,6 @@ label.control-label.required:before {
 }
 
 /*******************************************************************************
-Inline form errors (Elements)
-*******************************************************************************/
-
-ul.errors {
-    display: inline;
-    padding: 5px 0;
-    border: 0 none;
-    margin: 0;
-}
-
-ul.errors li {
-    display: inline;
-    margin: 0;
-    padding: 0 0 0 16px;
-    border: 0 none;
-    color: red;
-    font-weight: bold;
-}
-
-/*******************************************************************************
 General
 *******************************************************************************/
 
@@ -184,7 +164,7 @@ General
     font-weight: bold;
 }
 
-.error {
+.blob-error {
     color: gray;
     font-weight: bold;
 }
