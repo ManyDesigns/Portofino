@@ -87,15 +87,7 @@ class Security extends AbstractPortofinoRealm {
         }
     }
 
-    AuthenticationInfo loadAuthenticationInfo(PasswordResetToken passwordResetToken) {
-        return setNewPassword(passwordResetToken)
-    }
-
-    AuthenticationInfo loadAuthenticationInfo(SignUpToken signUpToken) {
-        return setNewPassword(signUpToken)
-    }
-
-    protected SimpleAuthenticationInfo setNewPassword(token) {
+    AuthenticationInfo loadAuthenticationInfo(PasswordResetToken token) {
         Session session = persistence.getSession("redmine");
         Criteria criteria = session.createCriteria("users");
         criteria.add(Restrictions.eq("token", token.principal));
@@ -106,6 +98,26 @@ class Security extends AbstractPortofinoRealm {
             def user = result.get(0);
             user.token = null; //Consume token
             user.hashed_password = hashPassword(token.newPassword);
+            session.update("users", (Object) user);
+            session.transaction.commit();
+            SimpleAuthenticationInfo info =
+                new SimpleAuthenticationInfo(user, token.credentials, getName());
+            return info;
+        } else {
+            throw new IncorrectCredentialsException("Invalid token");
+        }
+    }
+
+    AuthenticationInfo loadAuthenticationInfo(SignUpToken token) {
+        Session session = persistence.getSession("redmine");
+        Criteria criteria = session.createCriteria("users");
+        criteria.add(Restrictions.eq("token", token.principal));
+
+        List result = criteria.list();
+
+        if (result.size() == 1) {
+            def user = result.get(0);
+            user.token = null; //Consume token
             session.update("users", (Object) user);
             session.transaction.commit();
             SimpleAuthenticationInfo info =
@@ -237,14 +249,13 @@ class Security extends AbstractPortofinoRealm {
     }
 
     String saveSelfRegisteredUser(Object user) throws RegistrationException {
-        DemoUser theUser = (DemoUser) user;
         Session session = persistence.getSession("redmine");
         Map persistentUser = new HashMap();
-        persistentUser.login = theUser.username;
-        persistentUser.mail = theUser.email;
-        persistentUser.hashed_password = RandomUtil.createRandomId(32);
-        persistentUser.firstname = theUser.firstname;
-        persistentUser.lastname = theUser.lastname;
+        persistentUser.login = user.username;
+        persistentUser.mail = user.email;
+        persistentUser.hashed_password = hashPassword(user.password);
+        persistentUser.firstname = user.firstname;
+        persistentUser.lastname = user.lastname;
         persistentUser.admin = false;
         persistentUser.status = 0;
         persistentUser.mail_notification = "";

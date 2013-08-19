@@ -20,9 +20,8 @@
 
 package com.manydesigns.portofino.shiro;
 
+import com.manydesigns.elements.annotations.Password;
 import com.manydesigns.elements.annotations.Required;
-
-import java.util.Date;
 
 public class User {
     public static final String copyright =
@@ -33,5 +32,9 @@ public class User {
 
     @Required
     public String email;
+
+    @Required
+    @Password(confirmationRequired = true)
+    public String password;
 
 }

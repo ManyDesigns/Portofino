@@ -35,8 +35,8 @@
                     Don't have an account?
                     <stripes:link href="<%= actionBean.getOriginalPath() %>">
                         <stripes:param name="signUp" value=""/>
-                        <stripes:param name="returnUrl"/>
-                        <stripes:param name="cancelReturnUrl"/>
+                        <stripes:param name="returnUrl" value="/"/>
+                        <stripes:param name="cancelReturnUrl" value="/"/>
                         Sign up now
                     </stripes:link>
                 </div>

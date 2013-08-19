@@ -127,23 +127,11 @@ public class Security extends AbstractPortofinoRealm {
         }
     }
 
-    AuthenticationInfo loadAuthenticationInfo(PasswordResetToken passwordResetToken) {
+    AuthenticationInfo loadAuthenticationInfo(PasswordResetToken token) {
         if(StringUtils.isEmpty(userTokenProperty)) {
             throw new AuthenticationException("User token property is not configured; password reset is not supported by this application.");
         }
 
-        return setNewPassword(passwordResetToken)
-    }
-
-    AuthenticationInfo loadAuthenticationInfo(SignUpToken signUpToken) {
-        if(StringUtils.isEmpty(userTokenProperty)) {
-            throw new AuthenticationException("User token property is not configured; self registration is not supported by this application.");
-        }
-
-        return setNewPassword(signUpToken)
-    }
-
-    protected SimpleAuthenticationInfo setNewPassword(token) {
         Session session = persistence.getSession(databaseName);
         Criteria criteria = session.createCriteria(userTableEntityName);
         criteria.add(Restrictions.eq(userTokenProperty, token.principal));
@@ -157,7 +145,31 @@ public class Security extends AbstractPortofinoRealm {
             session.update(userTableEntityName, (Object) user);
             session.transaction.commit();
             SimpleAuthenticationInfo info =
-            new SimpleAuthenticationInfo(user, token.credentials, getName());
+                new SimpleAuthenticationInfo(user, token.credentials, getName());
+            return info;
+        } else {
+            throw new IncorrectCredentialsException("Invalid token");
+        }
+    }
+
+    AuthenticationInfo loadAuthenticationInfo(SignUpToken token) {
+        if(StringUtils.isEmpty(userTokenProperty)) {
+            throw new AuthenticationException("User token property is not configured; self registration is not supported by this application.");
+        }
+
+        Session session = persistence.getSession(databaseName);
+        Criteria criteria = session.createCriteria(userTableEntityName);
+        criteria.add(Restrictions.eq(userTokenProperty, token.principal));
+
+        List result = criteria.list();
+
+        if (result.size() == 1) {
+            def user = result.get(0);
+            user[userTokenProperty] = null; //Consume token
+            session.update(userTableEntityName, (Object) user);
+            session.transaction.commit();
+            SimpleAuthenticationInfo info =
+                new SimpleAuthenticationInfo(user, token.credentials, getName());
             return info;
         } else {
             throw new IncorrectCredentialsException("Invalid token");
@@ -269,6 +281,7 @@ public class Security extends AbstractPortofinoRealm {
         Session session = persistence.getSession(databaseName);
         Map persistentUser = new HashMap();
         persistentUser[userNameProperty] = theUser.username;
+        persistentUser[passwordProperty] = encryptPassword(theUser.password);
         if(!StringUtils.isEmpty(userEmailProperty)) {
             persistentUser[userEmailProperty] = theUser.email;
         }

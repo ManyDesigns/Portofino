@@ -368,7 +368,7 @@ public abstract class LoginAction extends AbstractActionBean {
 
                 sendSignupConfirmationEmail(email, ElementsThreadLocals.getText("user.signUp.email.subject"), body);
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("user.signUp.email.sent"));
-                return new RedirectResolution(getOriginalPath());
+                return new ForwardResolution(getLoginPage());
             } catch (ExistingUserException e) {
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.signUp.failure.userExists"));
             } catch (Exception e) {
@@ -413,31 +413,16 @@ public abstract class LoginAction extends AbstractActionBean {
             return redirectToReturnUrl();
         }
 
-        return new ForwardResolution("/portofino-base/layouts/user/confirmSignUp.jsp");
-    }
-
-    public Resolution confirmSignUp2() {
-        Subject subject = SecurityUtils.getSubject();
-        if (subject.isAuthenticated()) {
-            logger.debug("Already logged in");
+        SignUpToken token = new SignUpToken(this.token);
+        try {
+            subject.login(token);
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("user.signUp.success"));
             return redirectToReturnUrl();
-        }
-
-        if (ObjectUtils.equals(newPassword, confirmNewPassword)) {
-            SignUpToken token = new SignUpToken(this.token, newPassword);
-            try {
-                subject.login(token);
-                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("user.signUp.success"));
-                return redirectToReturnUrl();
-            } catch (AuthenticationException e) {
-                String errMsg = ElementsThreadLocals.getText("user.signUp.invalidToken");
-                SessionMessages.addErrorMessage(errMsg);
-                logger.warn(errMsg, e);
-                return new ForwardResolution(getLoginPage());
-            }
-        } else {
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.signUp.failure.passwordsDontMatch"));
-            return confirmSignUp();
+        } catch (AuthenticationException e) {
+            String errMsg = ElementsThreadLocals.getText("user.signUp.invalidToken");
+            SessionMessages.addErrorMessage(errMsg);
+            logger.warn(errMsg, e);
+            return signUp();
         }
     }
 

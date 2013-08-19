@@ -121,9 +121,8 @@ public class PasswordField extends TextField {
             openVisibleField(xb);
             valueToXhtml(xb, id, inputName, stringValue);
             helpToXhtml(xb);
-            errorsToXhtml(xb);
-            closeVisibleField(xb);
             if (confirmationRequired) {
+                closeVisibleField(xb);
                 //Open another input
                 xb.openElement("div");
                 String cssClass = "control-group";
@@ -142,14 +141,14 @@ public class PasswordField extends TextField {
                 } else {
                     actualLabel = confirmLabel;
                 }
-                xb.writeLabel(actualLabel, confirmationHtmlId, FORM_LABEL_CLASS);
+                xb.writeLabel(actualLabel, confirmationHtmlId, FORM_LABEL_CLASS + " required");
                 xb.openElement("div");
                 xb.addAttribute("class", "controls");
                 // print out confirmation input field
                 valueToXhtml(xb, confirmationHtmlId, confirmationInputName, confirmationValue);
-                xb.closeElement("div");
-                xb.closeElement("div");
             }
+            errorsToXhtml(xb);
+            closeVisibleField(xb);
         } else {
             super.toXhtml(xb);
         }

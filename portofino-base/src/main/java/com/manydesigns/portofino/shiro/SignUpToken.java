@@ -42,11 +42,9 @@ public class SignUpToken implements AuthenticationToken {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     protected final String token;
-    protected final String newPassword;
 
-    public SignUpToken(String token, String newPassword) {
+    public SignUpToken(String token) {
         this.token = token;
-        this.newPassword = newPassword;
     }
 
     @Override
@@ -63,7 +61,4 @@ public class SignUpToken implements AuthenticationToken {
         return token;
     }
 
-    public String getNewPassword() {
-        return newPassword;
-    }
 }
