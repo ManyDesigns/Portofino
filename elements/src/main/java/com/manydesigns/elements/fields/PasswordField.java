@@ -20,6 +20,7 @@
 
 package com.manydesigns.elements.fields;
 
+import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Password;
@@ -119,19 +120,36 @@ public class PasswordField extends TextField {
         if (mode.isEdit() && (mode.isCreate() || updatable)) { //was !immutable
             openVisibleField(xb);
             valueToXhtml(xb, id, inputName, stringValue);
-            if (confirmationRequired) {
-                // print out confirmation input field
-                String confirmationHtmlId = id + "_confirm";
-                String confirmationInputName = inputName + "_confirm";
-                xb.writeNbsp();
-                String confirmLabel = ElementsThreadLocals.getText("elements.field.password.confirm");
-                xb.writeLabel(confirmLabel, confirmationHtmlId, FORM_LABEL_CLASS + " mde-password-confirm-label");
-                valueToXhtml(xb, confirmationHtmlId,
-                        confirmationInputName, confirmationValue);
-            }
             helpToXhtml(xb);
             errorsToXhtml(xb);
             closeVisibleField(xb);
+            if (confirmationRequired) {
+                //Open another input
+                xb.openElement("div");
+                String cssClass = "control-group";
+                if(errors.size() > 0) {
+                    cssClass += " error";
+                }
+                xb.addAttribute("class", cssClass);
+                String confirmationHtmlId = id + "_confirm";
+                String confirmationInputName = inputName + "_confirm";
+                String confirmLabel = ElementsThreadLocals.getText("elements.field.password.confirm");
+                String actualLabel;
+                boolean capitalize = elementsConfiguration.getBoolean(
+                        ElementsProperties.FIELDS_LABEL_CAPITALIZE);
+                if (capitalize) {
+                    actualLabel = StringUtils.capitalize(confirmLabel);
+                } else {
+                    actualLabel = confirmLabel;
+                }
+                xb.writeLabel(actualLabel, confirmationHtmlId, FORM_LABEL_CLASS);
+                xb.openElement("div");
+                xb.addAttribute("class", "controls");
+                // print out confirmation input field
+                valueToXhtml(xb, confirmationHtmlId, confirmationInputName, confirmationValue);
+                xb.closeElement("div");
+                xb.closeElement("div");
+            }
         } else {
             super.toXhtml(xb);
         }
