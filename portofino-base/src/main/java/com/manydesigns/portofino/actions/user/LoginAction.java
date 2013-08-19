@@ -368,6 +368,7 @@ public abstract class LoginAction extends AbstractActionBean {
 
                 sendSignupConfirmationEmail(email, ElementsThreadLocals.getText("user.signUp.email.subject"), body);
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("user.signUp.email.sent"));
+                return new RedirectResolution(getOriginalPath());
             } catch (ExistingUserException e) {
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.signUp.failure.userExists"));
             } catch (Exception e) {
