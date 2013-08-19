@@ -20,13 +20,11 @@
 
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.DispatcherUtil;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pages.Permissions;
-import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.stripes.ForbiddenAccessResolution;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -85,24 +83,18 @@ public class
             String resource;
             boolean allowed;
             if(dispatch != null) {
+                logger.debug("The protected resource is a page action");
                 resource = dispatch.getLastPageInstance().getPath();
                 allowed = SecurityLogic.hasPermissions(configuration, dispatch, subject, handler);
             } else {
-                logger.debug("Retrieving Portofino application");
+                logger.debug("The protected resource is a plain Stripes ActionBean");
                 resource = request.getRequestURI();
                 permissions = new Permissions();
                 allowed = SecurityLogic.hasPermissions
                         (configuration, permissions, subject, handler, actionBean.getClass());
             }
             if(!allowed) {
-                String userId = null;
-                if (subject.isAuthenticated()) {
-                    userId = ShiroUtils.getPrimaryPrincipal(subject).toString();
-                    logger.debug("Retrieved userId={}", userId);
-                } else {
-                    logger.debug("No user found");
-                }
-                logger.info("User {} is not allowed for {}", userId, resource);
+                logger.info("Access to {} is forbidden", resource);
                 return new ForbiddenAccessResolution();
             }
         }
