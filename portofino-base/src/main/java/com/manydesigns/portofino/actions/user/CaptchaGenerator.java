@@ -101,10 +101,10 @@ public class CaptchaGenerator extends Cage {
     }
 
     protected CaptchaGenerator(Random rnd, @Nullable String format) {
-        super(new Painter(WIDTH, HEIGHT, null, null, new EffectConfig(true,
-                true, true, false, new ScaleConfig(1.0f, 1.0f)), rnd), null,
+        super(new Painter(WIDTH, HEIGHT, null, Painter.Quality.MAX, new EffectConfig(true,
+                true, false, false, new ScaleConfig(1.0f, 1.0f)), rnd), null,
                 new ConstantColorGenerator(Color.BLACK), format,
-                Cage.DEFAULT_COMPRESS_RATIO, new RandomTokenGenerator(rnd,
+                1.0f, new RandomTokenGenerator(rnd,
                         new RandomCharacterGeneratorFactory(
                                 TOKEN_DEFAULT_CHARACTER_SET, null, rnd),
                         TOKEN_LEN_MIN, TOKEN_LEN_DELTA), rnd);

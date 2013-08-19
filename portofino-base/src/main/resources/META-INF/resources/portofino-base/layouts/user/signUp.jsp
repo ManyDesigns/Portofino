@@ -15,12 +15,12 @@
             <label for="captcha">Please type the text shown in the image:</label>
             <div class="input-append" style="margin-top: 5px;">
                 <input id="captcha" name="captchaText" type="text" autocomplete="off" class="input-small" />
-                <a onclick="$('#captcha-image').attr('src', '${actionBean.originalPath}?captcha=' + Math.random());"
+                <a onclick="$('#captcha-image').attr('src', '${pageContext.request.contextPath}/${actionBean.originalPath}?captcha=' + Math.random());"
                    class="btn" >
                     <i class="icon-refresh"></i>
                 </a>
             </div>
-            <img alt="captcha image" id="captcha-image" src="${actionBean.originalPath}?captcha=" />
+            <img alt="captcha image" id="captcha-image" src="${pageContext.request.contextPath}/${actionBean.originalPath}?captcha=" />
             <div class="login-buttons" style="margin-top: 10px;">
                 <button type="submit" name="signUp2" class="btn btn-primary">Sign up</button>
                 <button type="submit" name="cancel" class="btn btn-link">Cancel</button>
