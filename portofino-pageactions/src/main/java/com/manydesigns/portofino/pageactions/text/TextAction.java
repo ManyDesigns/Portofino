@@ -20,8 +20,8 @@
 
 package com.manydesigns.portofino.pageactions.text;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.servlet.ServletConstants;
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
@@ -422,7 +422,7 @@ public class TextAction extends AbstractPageAction {
         boolean valid = validatePageConfiguration();
         if (valid) {
             updatePageConfiguration();
-            SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.updated"));
             return cancel();
         } else {
             return new ForwardResolution("/layouts/text/configure.jsp");
@@ -433,14 +433,14 @@ public class TextAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution uploadAttachment() {
         if (upload == null) {
-            SessionMessages.addWarningMessage(getMessage("text.attachment.noFileSelected"));
+            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("text.attachment.noFileSelected"));
         } else {
             try {
                 commonUploadAttachment();
-                SessionMessages.addInfoMessage(getMessage("text.attachment.uploadSuccessful"));
+                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("text.attachment.uploadSuccessful"));
             } catch (IOException e) {
                 logger.error("Upload failed", e);
-                SessionMessages.addErrorMessage(getMessage("text.attachment.uploadFailed"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("text.attachment.uploadFailed"));
             }
         }
         return new RedirectResolution(getDispatch().getOriginalPath())
@@ -574,7 +574,7 @@ public class TextAction extends AbstractPageAction {
         title = context.getRequest().getParameter("title");
         title = StringUtils.trimToNull(title);
         if (title == null) {
-            SessionMessages.addErrorMessage(getMessage("commons.configuration.titleEmpty"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.configuration.titleEmpty"));
             return new ForwardResolution("/layouts/text/edit-content.jsp");
         }
         Page page = pageInstance.getPage();
@@ -582,10 +582,10 @@ public class TextAction extends AbstractPageAction {
         try {
             DispatcherLogic.savePage(pageInstance.getDirectory(), page);
             saveContent();
-            SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.update.successful"));
         } catch (Exception e) {
             logger.error("Could not save content for page " + pageInstance.getPath(), e);
-            SessionMessages.addInfoMessage(getMessage("commons.update.failed"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.update.failed"));
         }
         return cancel();
     }
@@ -594,7 +594,7 @@ public class TextAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution deleteAttachments() {
         if (selection == null || selection.length == 0) {
-            SessionMessages.addWarningMessage(getMessage("text.attachment.noAttachmentSelected"));
+            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("text.attachment.noAttachmentSelected"));
         } else {
             int counter = 0;
             for (String code : selection) {
@@ -613,10 +613,10 @@ public class TextAction extends AbstractPageAction {
             }
             saveConfiguration(textConfiguration);
             if (counter == 1) {
-                SessionMessages.addInfoMessage(getMessage("text.attachment.oneDeleted"));
+                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("text.attachment.oneDeleted"));
             } else if (counter > 1) {
                 SessionMessages.addInfoMessage(
-                                getMessage("text.attachment.nDeleted", counter));
+                                ElementsThreadLocals.getText("text.attachment.nDeleted", counter));
             }
         }
         return new RedirectResolution(getDispatch().getOriginalPath())

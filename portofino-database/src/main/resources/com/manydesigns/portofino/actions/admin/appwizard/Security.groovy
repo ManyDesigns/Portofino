@@ -154,7 +154,8 @@ public class Security extends AbstractPortofinoRealm {
 
     AuthenticationInfo loadAuthenticationInfo(SignUpToken token) {
         if(StringUtils.isEmpty(userTokenProperty)) {
-            throw new AuthenticationException("User token property is not configured; self registration is not supported by this application.");
+            throw new AuthenticationException(
+                    "User token property is not configured; self registration is not supported by this application.");
         }
 
         Session session = persistence.getSession(databaseName);

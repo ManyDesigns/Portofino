@@ -85,7 +85,7 @@ class CalendarPage extends CalendarAction {
             Calendar calendar = new Calendar(cal[1], cal[0], cal[3])
             calendars.add(calendar)
             def qname = DatabaseLogic.splitQualifiedTableName(cal[1]);
-            Table table = DatabaseLogic.findTableByName(model, qname[0], qname[1], qname[2])
+            Table table = DatabaseLogic.findTableByName(persistence.model, qname[0], qname[1], qname[2])
             Session session = persistence.getSession(table.schema.databaseName)
             for(col in cal[2]) {
                 Criteria criteria = session.createCriteria(table.actualEntityName)
