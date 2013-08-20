@@ -22,6 +22,7 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.ElementsFileUtils;
+import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.SettingsAction;
 import com.manydesigns.portofino.actions.admin.page.PageAdminAction;
@@ -37,7 +38,6 @@ import com.manydesigns.portofino.files.TempFileService;
 import com.manydesigns.portofino.head.HtmlHead;
 import com.manydesigns.portofino.head.HtmlHeadAppender;
 import com.manydesigns.portofino.head.HtmlHeadBuilder;
-import com.manydesigns.portofino.head.Script;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.menu.*;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
@@ -408,9 +408,11 @@ public class PageActionsModule implements Module {
             @Override
             public void append(HtmlHead head) {
                 //Add portofino.js.jsp
-                Script script = new Script();
-                script.setSource("/portofino.js.jsp");
-                head.scripts.add(script);
+                XhtmlBuffer xb = new XhtmlBuffer();
+                xb.openElement("script");
+                xb.addAttribute("src", "/portofino.js.jsp");
+                xb.closeElement("script");
+                head.fragments.add(xb);
 
                 //Setup base href - uniform handling of .../resource and .../resource/
                 HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
@@ -432,7 +434,12 @@ public class PageActionsModule implements Module {
                     } catch (MalformedURLException e) {
                         //Ignore
                     }
-                    head.html.add("<base href=\"" + baseHref  + "\" />");
+
+                    xb = new XhtmlBuffer();
+                    xb.openElement("base");
+                    xb.addAttribute("href", baseHref);
+                    xb.closeElement("base");
+                    head.fragments.add(xb);
                 }
             }
         });
@@ -440,7 +447,6 @@ public class PageActionsModule implements Module {
 
     @Override
     public void destroy() {
-        logger.info("ManyDesigns Portofino web module stopping..."); //TODO
         logger.info("Destroying Shiro environment...");
         environmentLoader.destroyEnvironment(servletContext);
         logger.info("Shutting down cache...");
@@ -449,7 +455,6 @@ public class PageActionsModule implements Module {
         servletContext.removeAttribute(GROOVY_SCRIPT_ENGINE);
         servletContext.removeAttribute(GROOVY_CLASS_PATH);
         servletContext.setAttribute(BaseModule.CLASS_LOADER, originalClassLoader);
-        logger.info("ManyDesigns Portofino web module stopped.");
         status = ModuleStatus.DESTROYED;
     }
 

@@ -29,8 +29,10 @@
 
 package com.manydesigns.portofino.head;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import com.manydesigns.elements.xml.XhtmlFragment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,19 +44,9 @@ public class HtmlHead {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    public final Set<Script> scripts = new LinkedHashSet<Script>();
-    public final Set<Style> styles = new LinkedHashSet<Style>();
-    public final Set<String> html = new LinkedHashSet<String>();
+    public final List<XhtmlFragment> fragments = new ArrayList<XhtmlFragment>();
 
-    public Set<Script> getScripts() {
-        return scripts;
-    }
-
-    public Set<Style> getStyles() {
-        return styles;
-    }
-
-    public Set<String> getHtml() {
-        return html;
+    public List<XhtmlFragment> getFragments() {
+        return fragments;
     }
 }
