@@ -1,29 +1,31 @@
-import javax.servlet.*
-
-import com.manydesigns.elements.messages.*
-import com.manydesigns.elements.reflection.*
+import com.manydesigns.elements.reflection.ClassAccessor
 import com.manydesigns.elements.util.Util
-import com.manydesigns.portofino.*
-import com.manydesigns.portofino.buttons.*
-import com.manydesigns.portofino.buttons.annotations.*
-import com.manydesigns.portofino.dispatcher.*
-import com.manydesigns.portofino.model.database.*
-import com.manydesigns.portofino.pageactions.*
+import com.manydesigns.portofino.di.Inject
+import com.manydesigns.portofino.model.database.DatabaseLogic
+import com.manydesigns.portofino.model.database.Table
+import com.manydesigns.portofino.modules.DatabaseModule
+import com.manydesigns.portofino.pageactions.calendar.Calendar
+import com.manydesigns.portofino.pageactions.calendar.CalendarAction
+import com.manydesigns.portofino.pageactions.calendar.Event
+import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.reflection.TableAccessor
-import com.manydesigns.portofino.security.*
-import com.manydesigns.portofino.shiro.*
+import com.manydesigns.portofino.security.AccessLevel
+import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.util.ShortNameUtils
-
-import net.sourceforge.stripes.action.*
-import org.apache.shiro.*
-import org.hibernate.*
-import org.hibernate.criterion.*
-import org.joda.time.*
-
-import com.manydesigns.portofino.pageactions.calendar.*
+import org.hibernate.Criteria
+import org.hibernate.Session
+import org.hibernate.criterion.Order
+import org.hibernate.criterion.Restrictions
+import org.joda.time.DateMidnight
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
+import org.joda.time.Interval
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class CalendarPage extends CalendarAction {
+
+    @Inject(DatabaseModule.PERSISTENCE)
+    public Persistence persistence;
 
     def calDefs = $calendarDefinitions; //Es. [["Cal 1", "db1.schema1.table1", ["column1", "column2"], Color.RED], ["Cal 2", "db1.schema1.table2", ["column1", "column2"], Color.BLUE]]
 
@@ -31,8 +33,8 @@ class CalendarPage extends CalendarAction {
     void loadObjects(Interval interval) {
         for(cal in calDefs) {
             def qname = DatabaseLogic.splitQualifiedTableName((cal[1]))
-            Table table = DatabaseLogic.findTableByName(application.model, qname[0], qname[1], qname[2])
-            Session session = application.getSession(table.schema.databaseName)
+            Table table = DatabaseLogic.findTableByName(persistence.model, qname[0], qname[1], qname[2])
+            Session session = persistence.getSession(table.schema.databaseName)
             def objects = []
             for(col in cal[2]) {
                 Criteria criteria = session.createCriteria(table.actualEntityName)
@@ -84,7 +86,7 @@ class CalendarPage extends CalendarAction {
             calendars.add(calendar)
             def qname = DatabaseLogic.splitQualifiedTableName(cal[1]);
             Table table = DatabaseLogic.findTableByName(model, qname[0], qname[1], qname[2])
-            Session session = application.getSession(table.schema.databaseName)
+            Session session = persistence.getSession(table.schema.databaseName)
             for(col in cal[2]) {
                 Criteria criteria = session.createCriteria(table.actualEntityName)
                 criteria.add(Restrictions.ge(col, instant.toDate()))

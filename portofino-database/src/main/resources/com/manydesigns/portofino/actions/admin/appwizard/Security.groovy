@@ -252,10 +252,16 @@ public class Security extends AbstractPortofinoRealm {
 
     @Override
     String getUserPrettyName(Serializable user) {
+        if(user instanceof String) {
+            return user; //When you have just run the wizard, you are still logged in as "admin" (String)
+        }
         return user[userNameProperty];
     }
 
     Serializable getUserId(Serializable user) {
+        if(user instanceof String) {
+            return user; //When you have just run the wizard, you are still logged in as "admin" (String)
+        }
         return user[userIdProperty];
     }
 

@@ -1,3 +1,4 @@
+<%@ page import="com.manydesigns.elements.ElementsThreadLocals" %>
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="com.manydesigns.portofino.pageactions.calendar.Event" %>
 <%@ page import="com.manydesigns.portofino.pageactions.calendar.EventDay" %>
@@ -5,9 +6,8 @@
 <%@ page import="org.joda.time.DateTime" %>
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="org.joda.time.format.DateTimeFormatterBuilder" %>
-<%@ page import="java.util.Locale" %>
-<%@ page import="java.util.ResourceBundle" %>
 <%@ page import="java.text.MessageFormat" %>
+<%@ page import="java.util.Locale" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -36,7 +36,6 @@
                     .toFormatter()
                     .withLocale(request.getLocale());
     XhtmlBuffer xhtmlBuffer = new XhtmlBuffer(out);
-    ResourceBundle resourceBundle = actionBean.getApplication().getBundle(request.getLocale());
 %>
 <style type="text/css">
     .agenda-table {
@@ -112,8 +111,8 @@
                 DateTime start = event.getInterval().getStart();
                 DateTime end = event.getInterval().getEnd();
 
-                writeEventSpanCell(hhmmFormatter, xhtmlBuffer, day, start, end, resourceBundle);
-                writeEventCell(hhmmFormatter, xhtmlBuffer, day, event, start, end, resourceBundle);
+                writeEventSpanCell(hhmmFormatter, xhtmlBuffer, day, start, end);
+                writeEventCell(hhmmFormatter, xhtmlBuffer, day, event, start, end);
                 
                 if(!first) {
                     xhtmlBuffer.closeElement("tr");
@@ -127,13 +126,13 @@
 </div><%!
     private void writeEventCell
             (DateTimeFormatter hhmmFormatter, XhtmlBuffer xhtmlBuffer, EventDay day, Event event,
-             DateTime start, DateTime end, ResourceBundle resourceBundle) {
+             DateTime start, DateTime end) {
         xhtmlBuffer.openElement("td");
         xhtmlBuffer.openElement("span");
         xhtmlBuffer.addAttribute("class", "event");
 
         String dialogId =
-                writeEventDialog(hhmmFormatter, xhtmlBuffer, day, event, start, end, resourceBundle);
+                writeEventDialog(hhmmFormatter, xhtmlBuffer, day, event, start, end);
 
         xhtmlBuffer.openElement("a");
         xhtmlBuffer.addAttribute("style", "color: " + event.getCalendar().getForegroundHtmlColor() + ";");
@@ -147,7 +146,7 @@
 
     private String writeEventDialog
             (DateTimeFormatter hhmmFormatter, XhtmlBuffer xhtmlBuffer, EventDay day, Event event,
-             DateTime start, DateTime end, ResourceBundle resourceBundle) {
+             DateTime start, DateTime end) {
         String dialogId = "event-dialog-" + event.getId() + "-" + day.getDay().getMillis();
 
         // modal
@@ -203,7 +202,7 @@
         xhtmlBuffer.closeElement("p");
         if(event.getEditUrl() != null) {
             xhtmlBuffer.openElement("p");
-            String editText = resourceBundle.getString("calendar.event.edit");
+            String editText = ElementsThreadLocals.getText("calendar.event.edit");
             xhtmlBuffer.writeAnchor(event.getEditUrl(), editText);
             xhtmlBuffer.closeElement("p");
         }
@@ -216,7 +215,7 @@
         xhtmlBuffer.addAttribute("class", "btn btn-primary");
         xhtmlBuffer.addAttribute("data-dismiss", "modal");
         xhtmlBuffer.addAttribute("aria-hidden", "true");
-        xhtmlBuffer.write(resourceBundle.getString("commons.close"));
+        xhtmlBuffer.write(ElementsThreadLocals.getText("commons.close"));
         xhtmlBuffer.closeElement("button");
         xhtmlBuffer.closeElement("div"); // modal-footer
 
@@ -226,7 +225,7 @@
 
     private void writeEventSpanCell
             (DateTimeFormatter hhmmFormatter, XhtmlBuffer xhtmlBuffer,
-             EventDay day, DateTime start, DateTime end, ResourceBundle resourceBundle) {
+             EventDay day, DateTime start, DateTime end) {
         xhtmlBuffer.openElement("td");
         xhtmlBuffer.addAttribute("class", "hour-cell");
         boolean startPrinted = false;
@@ -240,13 +239,13 @@
                 xhtmlBuffer.write(" - " + hhmmFormatter.print(end));
             } else {
                 String msg = MessageFormat.format
-                        (resourceBundle.getString("calendar.agenda.until"), hhmmFormatter.print(end));
+                        (ElementsThreadLocals.getText("calendar.agenda.until"), hhmmFormatter.print(end));
                 xhtmlBuffer.write(msg);
             }
             endPrinted = true;
         }
         if(!startPrinted && !endPrinted) {
-            xhtmlBuffer.write(resourceBundle.getString("calendar.agenda.wholeday"));
+            xhtmlBuffer.write(ElementsThreadLocals.getText("calendar.agenda.wholeday"));
         }
         xhtmlBuffer.closeElement("td");
     }

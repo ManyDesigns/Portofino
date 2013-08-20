@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.actions.admin.appwizard;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.annotations.Multiline;
@@ -37,7 +38,6 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.AppProperties;
-import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderForm;
 import com.manydesigns.portofino.actions.forms.SelectableSchema;
 import com.manydesigns.portofino.buttons.annotations.Button;
@@ -162,6 +162,11 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     private final String databaseSessionKey = getClass().getName() + ".database";
 
+    public final static String[] JDBC_CP_FIELDS =
+            {"databaseName", "driver", "url", "username", "password" };
+
+    public final static String[] JNDI_CP_FIELDS = { "databaseName", "jndiResource" };
+
     //**************************************************************************
     // Injections
     //**************************************************************************
@@ -212,14 +217,14 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                             connectionProviderSP,
                             Mode.EDIT,
                             null);
-            connectionProviderField.setLabel(getMessage("appwizard.existingConnectionProvider"));
+            connectionProviderField.setLabel(ElementsThreadLocals.getText("appwizard.existingConnectionProvider"));
             connectionProviderField.setComboLabel("--");
         } catch (NoSuchFieldException e) {
             throw new Error(e);
         }
 
         jndiCPForm = new FormBuilder(ConnectionProviderForm.class)
-                            .configFields(ConnectionProvidersAction.jndiEditFields)
+                            .configFields(JNDI_CP_FIELDS)
                             .configPrefix("jndi")
                             .configMode(Mode.CREATE)
                             .build();
@@ -236,13 +241,13 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         }
 
         jdbcCPForm = new FormBuilder(ConnectionProviderForm.class)
-                            .configFields(ConnectionProvidersAction.jdbcEditFields)
+                            .configFields(JDBC_CP_FIELDS)
                             .configPrefix("jdbc")
                             .configMode(Mode.CREATE)
                             .configSelectionProvider(driverSelectionProvider, "driver")
                             .build();
 
-        jdbcCPForm.findFieldByPropertyName("driver").setHelp(getMessage("appwizard.jdbcDriver.help"));
+        jdbcCPForm.findFieldByPropertyName("driver").setHelp(ElementsThreadLocals.getText("appwizard.jdbcDriver.help"));
 
         //Handle back
         jndiCPForm.readFromRequest(context.getRequest());
