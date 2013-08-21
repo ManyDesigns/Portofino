@@ -24,6 +24,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.SettingsAction;
 import com.manydesigns.portofino.actions.admin.page.PageAdminAction;
 import com.manydesigns.portofino.actions.admin.page.RootChildrenAction;
@@ -407,15 +408,22 @@ public class PageActionsModule implements Module {
         headBuilder.appenders.add(new HtmlHeadAppender() {
             @Override
             public void append(HtmlHead head) {
-                //Add portofino.js.jsp
                 XhtmlBuffer xb = new XhtmlBuffer();
+
+                HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
+                String contextPath = request.getContextPath();
+
+                xb.writeLink("stylesheet", "text/css", contextPath + "/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css");
+                String skin = (String) request.getAttribute(RequestAttributes.SKIN);
+                if(skin != null) {
+                    xb.writeLink("stylesheet", "text/css", contextPath + "/skins/" + skin + "/portofino.css");
+                }
+
                 xb.openElement("script");
-                xb.addAttribute("src", "/portofino.js.jsp");
+                xb.addAttribute("src", contextPath + "/portofino.js.jsp");
                 xb.closeElement("script");
-                head.fragments.add(xb);
 
                 //Setup base href - uniform handling of .../resource and .../resource/
-                HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
                 ActionBean actionBean = (ActionBean) request.getAttribute("actionBean");
                 Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);
                 if(dispatch != null) {
@@ -435,12 +443,12 @@ public class PageActionsModule implements Module {
                         //Ignore
                     }
 
-                    xb = new XhtmlBuffer();
                     xb.openElement("base");
                     xb.addAttribute("href", baseHref);
                     xb.closeElement("base");
-                    head.fragments.add(xb);
                 }
+
+                head.fragments.add(xb);
             }
         });
     }

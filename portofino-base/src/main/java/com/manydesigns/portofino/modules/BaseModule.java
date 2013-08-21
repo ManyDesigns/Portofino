@@ -29,10 +29,15 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.modules.ModulesAction;
 import com.manydesigns.portofino.actions.admin.servletcontext.ServletContextAction;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.head.HtmlHead;
+import com.manydesigns.portofino.head.HtmlHeadAppender;
+import com.manydesigns.portofino.head.HtmlHeadBuilder;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.menu.SimpleMenuAppender;
 import org.apache.commons.configuration.Configuration;
@@ -77,6 +82,13 @@ public class BaseModule implements Module {
     @Inject(ADMIN_MENU)
     public MenuBuilder adminMenu;
 
+    @Inject(BaseModule.HTML_HEAD_BUILDER)
+    public HtmlHeadBuilder headBuilder;
+
+    //**************************************************************************
+    // Module implementation
+    //**************************************************************************
+
     @Override
     public String getModuleVersion() {
         return configuration.getString(PortofinoProperties.PORTOFINO_VERSION);
@@ -120,7 +132,54 @@ public class BaseModule implements Module {
                 "configuration", "servlet-context", null, "Servlet Context", ServletContextAction.URL_BINDING, 2.0);
         adminMenu.menuAppenders.add(link);
 
+        setupHead();
+
         status = ModuleStatus.ACTIVE;
+    }
+
+    protected void setupHead() {
+        headBuilder.appenders.add(new HtmlHeadAppender() {
+            @Override
+            public void append(HtmlHead head) {
+                XhtmlBuffer xb = new XhtmlBuffer();
+                xb.openElement("meta");
+                xb.addAttribute("http-equiv", "Content-Type");
+                xb.addAttribute("content", "text/html;charset=UTF-8");
+                xb.closeElement("meta");
+                xb.openElement("meta");
+                xb.addAttribute("name", "viewport");
+                xb.addAttribute("content", "width=device-width, initial-scale=1.0");
+                xb.closeElement("meta");
+
+                //HTML5 shim, for IE6-8 support of HTML5 elements
+                xb.writeNoHtmlEscape(
+                        "<!--[if lt IE 9]>\n" +
+                        "      <script src=\"http://html5shim.googlecode.com/svn/trunk/html5.js\"></script>\n" +
+                        "<![endif]-->");
+
+                String contextPath = ElementsThreadLocals.getHttpServletRequest().getContextPath();
+                xb.writeLink("stylesheet", "text/css", contextPath + "/elements/bootstrap/css/bootstrap.min.css");
+                xb.writeLink("stylesheet", "text/css", contextPath + "/elements/bootstrap/css/bootstrap-responsive.min.css");
+                xb.writeLink("stylesheet", "text/css", contextPath + "/elements/datepicker/css/datepicker.css");
+
+                xb.writeStyle("body { padding-top: 50px; }");
+
+                xb.openElement("script");
+                xb.addAttribute("src", contextPath + "/elements/jquery/jquery.min.js");
+                xb.closeElement("script");
+                xb.openElement("script");
+                xb.addAttribute("src", contextPath + "/elements/elements.js");
+                xb.closeElement("script");
+
+                xb.openElement("script");
+                xb.addAttribute("src", contextPath + "/elements/bootstrap/js/bootstrap.min.js");
+                xb.closeElement("script");
+                xb.openElement("script");
+                xb.addAttribute("src", contextPath + "/elements/datepicker/js/bootstrap-datepicker.js");
+                xb.closeElement("script");
+                head.fragments.add(xb);
+            }
+        });
     }
 
     @Override

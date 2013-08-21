@@ -328,6 +328,20 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
         closeElement("img");
     }
 
+    public void writeLink(String rel, String type, String href) {
+        openElement("link");
+        addAttribute("rel", rel);
+        addAttribute("type", type);
+        addAttribute("href", href);
+        closeElement("link");
+    }
+
+    public void writeStyle(String body) {
+        openElement("style");
+        write(body);
+        closeElement("style");
+    }
+
     public void openFormElement(String id, String method,
                                 String action, String htmlClass) {
         openElement("form");
