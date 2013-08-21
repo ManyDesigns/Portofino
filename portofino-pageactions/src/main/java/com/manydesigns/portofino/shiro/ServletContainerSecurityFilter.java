@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
 
 /**
  * Add this to web.xml to manage user authentication with the servlet container.
@@ -70,9 +71,9 @@ public class ServletContainerSecurityFilter extends PathMatchingFilter {
             }
         } else if(shiroAuthenticated && !containerAuthenticated) {
             logger.debug("User is authenticated to Shiro, but not to the servlet container; logging out of Shiro.");
-            String userName = ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) + "";
+            Serializable userId = ShiroUtils.getUserId(SecurityUtils.getSubject());
             subject.logout();
-            logger.info("User {} logout", userName);
+            logger.info("User {} logout", userId);
             //TODO valutare effetti del distruggere o meno la sessione
             /*HttpSession session = req.getSession(false);
             if(session != null) {

@@ -165,7 +165,7 @@ public class OAuthHelper {
         Subject subject = SecurityUtils.getSubject();
         String userId;
         if(subject.isAuthenticated()) {
-            userId = OgnlUtils.convertValueToString(ShiroUtils.getPrimaryPrincipal(subject));
+            userId = OgnlUtils.convertValueToString(ShiroUtils.getUserId(subject));
         } else {
             throw new IllegalStateException("User is not logged in, can not determine the user id");
         }
@@ -200,7 +200,7 @@ public class OAuthHelper {
         Subject subject = SecurityUtils.getSubject();
         String userId;
         if(subject.isAuthenticated()) {
-            userId = OgnlUtils.convertValueToString(ShiroUtils.getPrimaryPrincipal(subject));
+            userId = OgnlUtils.convertValueToString(ShiroUtils.getUserId(subject));
         } else {
             throw new IllegalStateException("User is not logged in, can not determine the user id");
         }

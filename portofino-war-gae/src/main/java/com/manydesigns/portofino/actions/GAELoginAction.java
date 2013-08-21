@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -68,7 +69,7 @@ public class GAELoginAction extends AbstractActionBean {
         if(subject.isAuthenticated()) {
             logger.debug("User not authenticated, redirecting to GAE logout URL");
             UserService userService = UserServiceFactory.getUserService();
-            String userName = ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject()) + "";
+            Serializable userId = ShiroUtils.getUserId(SecurityUtils.getSubject());
             SecurityUtils.getSubject().logout();
             HttpSession session = context.getRequest().getSession(false);
             if (session != null) {
@@ -77,7 +78,7 @@ public class GAELoginAction extends AbstractActionBean {
 
             String msg = ElementsThreadLocals.getText("user.logout");
             SessionMessages.addInfoMessage(msg);
-            logger.info("User {} logout", userName);
+            logger.info("User {} logout", userId);
             String logoutUrl = userService.createLogoutURL(context.getRequest().getContextPath() + "/");
             return new RedirectResolution(logoutUrl);
         } else {
