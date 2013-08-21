@@ -20,6 +20,8 @@
 
 package com.manydesigns.elements.servlet;
 
+import net.sourceforge.stripes.mock.MockHttpSession;
+import net.sourceforge.stripes.mock.MockServletContext;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -57,6 +59,9 @@ public class MutableHttpServletRequest implements MultipartRequest {
     private String servletPath;
     private String requestURI;
 
+    private MockServletContext servletContext;
+    private MockHttpSession session;
+
     //**************************************************************************
     // Constructor
     //**************************************************************************
@@ -65,6 +70,11 @@ public class MutableHttpServletRequest implements MultipartRequest {
         attributeMap= new HashMap<String, Object>();
         parameterMap = new HashMap<String, String[]>();
         fileItemMap = new HashMap<String, FileItem[]>();
+    }
+
+    public MutableHttpServletRequest(MockServletContext servletContext) {
+        this();
+        this.servletContext = servletContext;
     }
 
     //**************************************************************************
@@ -77,12 +87,7 @@ public class MutableHttpServletRequest implements MultipartRequest {
         parameterMap.put(name, newValues);
     }
 
-    public void setParameter(String key, String value) {
-        String[] values = {value};
-        parameterMap.put(key, values);
-    }
-
-    public void setParameter(String key, String[] values) {
+    public void setParameter(String key, String... values) {
         parameterMap.put(key, values);
     }
 
@@ -239,12 +244,19 @@ public class MutableHttpServletRequest implements MultipartRequest {
         throw new UnsupportedOperationException();
     }
 
-    public HttpSession getSession(boolean b) {
-        throw new UnsupportedOperationException();
+    public HttpSession getSession(boolean create) {
+        if(create) {
+            synchronized (this) {
+                if(session == null) {
+                    session = new MockHttpSession(servletContext);
+                }
+            }
+        }
+        return session;
     }
 
     public HttpSession getSession() {
-        throw new UnsupportedOperationException();
+        return getSession(true);
     }
 
     public boolean isRequestedSessionIdValid() {
@@ -361,12 +373,12 @@ public class MutableHttpServletRequest implements MultipartRequest {
 
     @Override
     public void login(String s, String s1) throws ServletException {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void logout() throws ServletException {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -381,7 +393,7 @@ public class MutableHttpServletRequest implements MultipartRequest {
 
     @Override
     public ServletContext getServletContext() {
-        return null;
+        return servletContext;
     }
 
     @Override
