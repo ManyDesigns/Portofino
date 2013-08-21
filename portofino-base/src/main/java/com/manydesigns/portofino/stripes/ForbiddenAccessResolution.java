@@ -65,10 +65,6 @@ public class ForbiddenAccessResolution implements Resolution {
 
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Subject subject = SecurityUtils.getSubject();
-        String userId = null;
-        if (subject.isAuthenticated()) {
-            userId = subject.getPrincipal().toString();
-        }
         String originalPath = ServletUtils.getOriginalPath(request);
         UrlBuilder urlBuilder =
                 new UrlBuilder(Locale.getDefault(), originalPath, false);
@@ -79,7 +75,7 @@ public class ForbiddenAccessResolution implements Resolution {
         ServletContext servletContext = request.getServletContext();
         Configuration configuration =
                 (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
-        if (userId == null && !ajax) {
+        if (!subject.isAuthenticated() && !ajax) {
             logger.info("Anonymous user not allowed. Redirecting to login.");
             String loginPage = configuration.getString(PortofinoProperties.LOGIN_PAGE);
             RedirectResolution redirectResolution =
@@ -96,7 +92,7 @@ public class ForbiddenAccessResolution implements Resolution {
                 response.setStatus(UNAUTHORIZED);
                 new StreamingResolution("text/plain", loginUrlBuilder.toString()).execute(request, response);
             } else {
-                logger.warn("User {} not authorized for url {}.", userId, returnUrl);
+                logger.warn("User not authorized for url {}.", returnUrl);
                 new ErrorResolution(UNAUTHORIZED, errorMessage).execute(request, response);
             }
         }
