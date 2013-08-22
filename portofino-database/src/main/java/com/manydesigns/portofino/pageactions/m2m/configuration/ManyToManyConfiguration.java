@@ -20,14 +20,16 @@
 
 package com.manydesigns.portofino.pageactions.m2m.configuration;
 
+import com.manydesigns.elements.annotations.CssClass;
 import com.manydesigns.elements.annotations.Multiline;
 import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.elements.util.BootstrapSizes;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
+import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
-import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
-import com.manydesigns.portofino.model.database.*;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -173,6 +175,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
 
     @Required
     @Multiline
+    @CssClass(BootstrapSizes.BLOCK_LEVEL)
     @XmlAttribute(required = true)
     public String getQuery() {
         return query;
@@ -192,6 +195,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
         this.viewType = viewType;
     }
 
+    @CssClass(BootstrapSizes.SPAN6)
     @XmlAttribute(required = false)
     public String getOneExpression() {
         return oneExpression;
@@ -202,6 +206,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     }
 
     @XmlAttribute(required = false)
+    @CssClass(BootstrapSizes.SPAN6)
     public String getOnePropertyName() {
         return onePropertyName;
     }

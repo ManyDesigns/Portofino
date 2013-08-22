@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.pageactions;
 
 import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.util.BootstrapSizes;
 import com.manydesigns.portofino.pages.NavigationRoot;
 
 /**
@@ -39,11 +40,12 @@ public class EditPage {
 
     @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.title")
     @Required
+    @CssClass(BootstrapSizes.BLOCK_LEVEL)
     public String title;
 
     @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.description")
     @Required
-    @Multiline
+    @CssClass(BootstrapSizes.BLOCK_LEVEL)
     public String description;
 
     @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.navigationRoot")

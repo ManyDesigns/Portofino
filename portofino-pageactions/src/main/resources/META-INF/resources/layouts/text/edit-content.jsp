@@ -32,7 +32,8 @@
             <!-- Content editor -->
             <fieldset style="margin-bottom: 2em;">
                 <legend><fmt:message key="layouts.text.configure.content"/></legend>
-                <input type="text" name="title" value="<c:out value="${actionBean.title}"/>"/>
+                <input type="text" name="title" value="<c:out value="${actionBean.title}"/>"
+                       class="input-block-level"/>
                 <stripes:textarea class="mde-form-rich-text" name="content" value="${actionBean.content}"/>
                 <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
             </fieldset>

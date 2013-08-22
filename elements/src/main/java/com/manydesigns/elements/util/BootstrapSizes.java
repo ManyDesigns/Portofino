@@ -42,6 +42,7 @@ public class BootstrapSizes {
     public static final String
         MINI = "input-mini", SMALL = "input-small", MEDIUM = "input-medium",
         LARGE = "input-large", XLARGE = "input-xlarge", XXLARGE = "input-xxlarge",
+        BLOCK_LEVEL = "input-block-level",
 
         SPAN1 = "span1", SPAN2 = "span2", SPAN3 = "span3", SPAN4 = "span4",
         SPAN5 = "span5", SPAN6 = "span6", SPAN7 = "span7", SPAN8 = "span8",

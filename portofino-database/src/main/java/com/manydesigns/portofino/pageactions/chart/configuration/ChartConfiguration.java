@@ -21,11 +21,12 @@
 package com.manydesigns.portofino.pageactions.chart.configuration;
 
 import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.util.BootstrapSizes;
+import com.manydesigns.portofino.chart.*;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
-import com.manydesigns.portofino.chart.*;
-import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.model.database.Database;
+import com.manydesigns.portofino.model.database.DatabaseLogic;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;
 import org.slf4j.Logger;
@@ -150,6 +151,7 @@ public class ChartConfiguration implements PageActionConfiguration, ChartDefinit
     //**************************************************************************
     @Required
     @XmlAttribute(required = true)
+    @CssClass(BootstrapSizes.BLOCK_LEVEL)
     public String getName() {
         return name;
     }
@@ -175,6 +177,7 @@ public class ChartConfiguration implements PageActionConfiguration, ChartDefinit
 
     @Required
     @XmlAttribute(required = true)
+    @CssClass(BootstrapSizes.BLOCK_LEVEL)
     public String getLegend() {
         return legend;
     }
@@ -196,6 +199,7 @@ public class ChartConfiguration implements PageActionConfiguration, ChartDefinit
     @Required
     @Label("SQL Query")
     @Multiline
+    @CssClass(BootstrapSizes.BLOCK_LEVEL)
     @XmlAttribute(required = true)
     public String getQuery() {
         return query;
@@ -207,7 +211,7 @@ public class ChartConfiguration implements PageActionConfiguration, ChartDefinit
 
     @Label("URL expression")
     @XmlAttribute(required = true)
-    @FieldSize(100)
+    @CssClass(BootstrapSizes.BLOCK_LEVEL)
     public String getUrlExpression() {
         return urlExpression;
     }

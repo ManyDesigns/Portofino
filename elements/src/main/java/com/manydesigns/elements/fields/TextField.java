@@ -144,16 +144,16 @@ public class TextField extends AbstractTextField {
             xb.openElement("textarea");
             xb.addAttribute("id", id);
             xb.addAttribute("name", inputName);
-            String htmlClass = "";
+            String htmlClass = fieldCssClass;
             if(textAreaWidth != null) {
                 xb.addAttribute("cols", Integer.toString(textAreaWidth));
                 xb.addAttribute("rows", Integer.toString(numRowTextArea(stringValue, textAreaWidth)));
-                htmlClass = "mde-text-field-with-explicit-size ";
+                htmlClass += " mde-text-field-with-explicit-size";
             } else {
                 xb.addAttribute("rows", Integer.toOctalString(textAreaMinRows));
             }
             if(richText) {
-                htmlClass += "mde-form-rich-text";
+                htmlClass += " mde-form-rich-text";
             }
             if(!StringUtils.isEmpty(htmlClass)) {
                 xb.addAttribute("class", htmlClass);

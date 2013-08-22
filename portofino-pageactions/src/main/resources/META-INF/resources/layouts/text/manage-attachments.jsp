@@ -15,7 +15,8 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data">
+        <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data"
+                      class="form-inline">
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
             <c:if test="${not empty actionBean.textConfiguration.attachments}">
                 <fmt:message key="commons.attachments"/>:
@@ -24,14 +25,18 @@
                     <c:forEach var="attachment" items="${actionBean.textConfiguration.attachments}">
                         <tr>
                             <td>
-                                <stripes:checkbox name="selection" value="${attachment.id}"/>
-                                <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?downloadAttachment=&id=${attachment.id}"/>"
-                                        ><c:out value="${attachment.filename}"/></a>
+                                <label class="checkbox">
+                                    <stripes:checkbox name="selection" value="${attachment.id}"/>
+                                    <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?downloadAttachment=&id=${attachment.id}"/>"
+                                            ><c:out value="${attachment.filename}"/></a>
+                                </label>
                             </td>
                             <td>
-                                <stripes:checkbox name="downloadable" value="${attachment.id}"
-                                                  checked="${attachment.downloadable ? attachment.id : null}"/>
-                                <fmt:message key="layouts.text.manage-attachments.downloadable" />
+                                <label class="checkbox">
+                                    <stripes:checkbox name="downloadable" value="${attachment.id}"
+                                                      checked="${attachment.downloadable ? attachment.id : null}"/>
+                                    <fmt:message key="layouts.text.manage-attachments.downloadable" />
+                                </label>
                             </td>
                         </tr>
                     </c:forEach>
@@ -51,8 +56,10 @@
             <div class="horizontalSeparator"></div>
             <fmt:message key="layouts.text.manage-attachments.upload_new_file"/>:
             <stripes:file name="upload"/>
-            <stripes:checkbox name="uploadDownloadable" checked="checked" />
-            <fmt:message key="layouts.text.manage-attachments.downloadable" />
+            <label class="checkbox">
+                <stripes:checkbox name="uploadDownloadable" checked="checked" />
+                <fmt:message key="layouts.text.manage-attachments.downloadable" />
+            </label>
             <br/>
             <br/>
             <portofino:buttons list="manage-attachments-upload" />
