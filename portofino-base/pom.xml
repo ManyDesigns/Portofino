@@ -70,6 +70,14 @@
             <artifactId>cage</artifactId>
             <version>1.0</version>
         </dependency>
+
+        <!-- Quartz integration (optional) -->
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>${quartz.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <build>
         <resources>
