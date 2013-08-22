@@ -25,10 +25,7 @@ import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
 
 import java.io.Serializable;
@@ -56,7 +53,7 @@ public class GAEPortofinoRealm extends AbstractPortofinoRealm {
         UserService userService = UserServiceFactory.getUserService();
         User user = userService.getCurrentUser();
         if(user == null) {
-            throw new AuthenticationException("User is authenticated to the container, but is not known to the UserService");
+            throw new UnknownAccountException("User is authenticated to the container, but is not known to the UserService");
         }
         //TODO verifica utilizzo User come principal direttamente
         return new SimpleAuthenticationInfo(user, token.getCredentials(), getName());

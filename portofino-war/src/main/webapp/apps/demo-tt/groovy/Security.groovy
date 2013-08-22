@@ -38,6 +38,9 @@ class Security extends AbstractPortofinoRealm {
     }
 
     public AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {
+        if(usernamePasswordToken.password == null) {
+            throw new IncorrectCredentialsException("Password not provided");
+        }
         String userName = usernamePasswordToken.username;
         String password = new String(usernamePasswordToken.password);
         String hashedPassword = hashPassword(password);
