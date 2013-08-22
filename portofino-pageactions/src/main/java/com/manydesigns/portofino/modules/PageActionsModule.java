@@ -22,6 +22,7 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.ElementsFileUtils;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
@@ -409,18 +410,18 @@ public class PageActionsModule implements Module {
             @Override
             public void append(HtmlHead head) {
                 XhtmlBuffer xb = new XhtmlBuffer();
-
                 HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-                String contextPath = request.getContextPath();
 
-                xb.writeLink("stylesheet", "text/css", contextPath + "/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css");
+                xb.writeLink("stylesheet", "text/css",
+                             Util.getAbsoluteUrl("/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"));
                 String skin = (String) request.getAttribute(RequestAttributes.SKIN);
                 if(skin != null) {
-                    xb.writeLink("stylesheet", "text/css", contextPath + "/skins/" + skin + "/portofino.css");
+                    xb.writeLink("stylesheet", "text/css",
+                                 Util.getAbsoluteUrl("/skins/" + skin + "/portofino.css"));
                 }
 
                 xb.openElement("script");
-                xb.addAttribute("src", contextPath + "/portofino.js.jsp");
+                xb.addAttribute("src", Util.getAbsoluteUrl("/portofino.js.jsp"));
                 xb.closeElement("script");
 
                 //Setup base href - uniform handling of .../resource and .../resource/

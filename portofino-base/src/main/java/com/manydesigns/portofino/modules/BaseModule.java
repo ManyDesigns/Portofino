@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.modules.ModulesAction;
@@ -157,25 +157,27 @@ public class BaseModule implements Module {
                         "      <script src=\"http://html5shim.googlecode.com/svn/trunk/html5.js\"></script>\n" +
                         "<![endif]-->");
 
-                String contextPath = ElementsThreadLocals.getHttpServletRequest().getContextPath();
-                xb.writeLink("stylesheet", "text/css", contextPath + "/elements/bootstrap/css/bootstrap.min.css");
-                xb.writeLink("stylesheet", "text/css", contextPath + "/elements/bootstrap/css/bootstrap-responsive.min.css");
-                xb.writeLink("stylesheet", "text/css", contextPath + "/elements/datepicker/css/datepicker.css");
-
+                xb.writeLink("stylesheet", "text/css",
+                             Util.getAbsoluteUrl("/elements/bootstrap/css/bootstrap.min.css"));
+                //Deve essere dopo bootstrap.min.css ma prima di bootstrap-responsive.min.css
                 xb.writeStyle("body { padding-top: 50px; }");
+                xb.writeLink("stylesheet", "text/css",
+                             Util.getAbsoluteUrl("/elements/bootstrap/css/bootstrap-responsive.min.css"));
+                xb.writeLink("stylesheet", "text/css",
+                             Util.getAbsoluteUrl("/elements/datepicker/css/datepicker.css"));
 
                 xb.openElement("script");
-                xb.addAttribute("src", contextPath + "/elements/jquery/jquery.min.js");
+                xb.addAttribute("src", Util.getAbsoluteUrl("/elements/jquery/jquery.min.js"));
                 xb.closeElement("script");
                 xb.openElement("script");
-                xb.addAttribute("src", contextPath + "/elements/elements.js");
+                xb.addAttribute("src", Util.getAbsoluteUrl("/elements/elements.js"));
                 xb.closeElement("script");
 
                 xb.openElement("script");
-                xb.addAttribute("src", contextPath + "/elements/bootstrap/js/bootstrap.min.js");
+                xb.addAttribute("src", Util.getAbsoluteUrl("/elements/bootstrap/js/bootstrap.min.js"));
                 xb.closeElement("script");
                 xb.openElement("script");
-                xb.addAttribute("src", contextPath + "/elements/datepicker/js/bootstrap-datepicker.js");
+                xb.addAttribute("src", Util.getAbsoluteUrl("/elements/datepicker/js/bootstrap-datepicker.js"));
                 xb.closeElement("script");
                 head.fragments.add(xb);
             }

@@ -59,6 +59,7 @@
         width: 15%; white-space: nowrap;
     }
 </style>
+<h3><%= StringUtils.capitalize(dateFormatter.print(referenceDateTime)) %></h3>
 <div>
     <div class="pull-right" >
         <button type="submit" name="monthView" class="btn btn-small">
@@ -84,9 +85,7 @@
         </button>
     </div>
 </div>
-<div>
-    <h3 style="margin: 0; text-align: center;"><%= StringUtils.capitalize(dateFormatter.print(referenceDateTime)) %></h3>
-</div>
+<div class="horizontalSeparator"></div>
 <div class="calendar-container">
     <table class="agenda-table">
     <%

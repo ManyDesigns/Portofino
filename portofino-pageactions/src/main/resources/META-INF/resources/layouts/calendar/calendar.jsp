@@ -9,7 +9,6 @@
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-    <input type="hidden" name="referenceDateTimeLong" value="${actionBean.referenceDateTimeLong}" />
     <style type="text/css">
         ul.calendars {
             margin:  0;
@@ -32,7 +31,7 @@
             <stripes:form action="${actionBean.dispatch.originalPath}" method="post">
                 <%-- Hidden submit so that ENTER on a form executes the default action --%>
                 <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
-                <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+                <input type="hidden" name="referenceDateTimeLong" value="${actionBean.referenceDateTimeLong}" />
                 <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
                 <input type="hidden" name="calendarViewType" value="<c:out value="${actionBean.calendarViewType}"/>"/>
                 <a class="calendar-legend-hide-link" data-hide="false" href="#"><fmt:message key="calendar.hide.calendars" /></a>
@@ -45,9 +44,8 @@
             $(".calendar-legend-hide-link").click(function() {
                 var link = $(this);
                 var hide = link.data("hide");
-                var containerDiv = link.parent().parent();
-                var calendarsDiv = containerDiv.find(".calendar-calendars")
-                var viewDiv = containerDiv.find(".calendar-view")
+                var calendarsDiv = $(".calendar-calendars");
+                var viewDiv = $(".calendar-view");
                 if (hide) {
                     calendarsDiv.insertBefore(viewDiv);
                     calendarsDiv.show();
