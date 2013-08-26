@@ -188,17 +188,12 @@ public class PageAdminAction extends AbstractPageAction {
             instance.setLayout(layout);
         }
         for(int i = 0; i < embeddedPageActionWrapperIds.length; i++) {
-            String current = embeddedPageActionWrapperIds[i];
-            if (current.startsWith("c")) { //Retaggio di quando avevamo self (non serve piu')
-                String pageFragment = current.substring(1); //current = c...
-                for(ChildPage p : layout.getChildPages()) {
-                    if(pageFragment.equals(p.getName())) {
-                        p.setContainer(layoutContainer);
-                        p.setOrder(i + "");
-                    }
+            String pageFragment = embeddedPageActionWrapperIds[i];
+            for(ChildPage p : layout.getChildPages()) {
+                if(pageFragment.equals(p.getName())) {
+                    p.setContainer(layoutContainer);
+                    p.setOrder(i + "");
                 }
-            } else {
-                logger.debug("Ignoring: {}", current);
             }
         }
         DispatcherLogic.savePage(instance);
@@ -724,16 +719,10 @@ public class PageAdminAction extends AbstractPageAction {
     public Resolution updatePageChildren() {
         setupChildPages();
         String[] order = context.getRequest().getParameterValues("directChildren");
-        if(order == null) {
-            order = new String[0];
-        }
         boolean success = updatePageChildren(childPagesForm, childPages, getPage().getLayout(), order);
         childPages.clear();
         if(success && detailChildPagesForm != null) {
             order = context.getRequest().getParameterValues("detailChildren");
-            if(order == null) {
-                order = new String[0];
-            }
             updatePageChildren(detailChildPagesForm, detailChildPages, getPage().getDetailLayout(), order);
             detailChildPages.clear();
         }
@@ -782,11 +771,15 @@ public class PageAdminAction extends AbstractPageAction {
             }
         }
         List<ChildPage> sortedChildren = new ArrayList<ChildPage>();
-        for(String name : order) {
-            for(ChildPage p : newChildren) {
-                if(name.equals(p.getName())) {
-                    sortedChildren.add(p);
-                    break;
+        if(order == null) {
+            sortedChildren.addAll(newChildren);
+        } else {
+            for(String name : order) {
+                for(ChildPage p : newChildren) {
+                    if(name.equals(p.getName())) {
+                        sortedChildren.add(p);
+                        break;
+                    }
                 }
             }
         }
