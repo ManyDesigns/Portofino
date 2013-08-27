@@ -371,7 +371,7 @@ public class ManyToManyAction extends AbstractPageAction {
             }
         }
         session.getTransaction().commit();
-        SessionMessages.addInfoMessage(getMessage("commons.update.successful"));
+        SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.update.successful"));
         if(oneSelectField != null) {
             session.beginTransaction();
             session.clear();
@@ -419,10 +419,10 @@ public class ManyToManyAction extends AbstractPageAction {
             configurationForm.writeToObject(conf);
             conf.writeTo(m2mConfiguration);
             saveConfiguration(m2mConfiguration);
-            SessionMessages.addInfoMessage(getMessage("commons.configuration.updated"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.updated"));
             return cancel();
         } else {
-            SessionMessages.addErrorMessage(getMessage("commons.configuration.notUpdated"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.configuration.notUpdated"));
             return new ForwardResolution("/layouts/m2m/configure.jsp");
         }
     }
@@ -461,9 +461,9 @@ public class ManyToManyAction extends AbstractPageAction {
         formBuilder.configFieldSetNames("Many to many");
 
         DefaultSelectionProvider viewTypeSelectionProvider = new DefaultSelectionProvider("viewType");
-        String label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.CHECKBOXES");
+        String label = ElementsThreadLocals.getText("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.CHECKBOXES");
         viewTypeSelectionProvider.appendRow(ViewType.CHECKBOXES.name(), label, true);
-        label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.CHECKBOXES_VERTICAL");
+        label = ElementsThreadLocals.getText("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.CHECKBOXES_VERTICAL");
         viewTypeSelectionProvider.appendRow(ViewType.CHECKBOXES_VERTICAL.name(), label, true);
         //label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.LISTS");
         //viewTypeSelectionProvider.appendRow(ViewType.LISTS.name(), label, true);

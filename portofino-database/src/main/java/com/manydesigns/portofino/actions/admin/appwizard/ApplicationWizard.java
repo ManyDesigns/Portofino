@@ -20,6 +20,8 @@
 
 package com.manydesigns.portofino.actions.admin.appwizard;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.LabelI18N;
@@ -70,8 +72,6 @@ import groovy.text.TemplateEngine;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import net.sourceforge.stripes.action.*;
-import org.apache.commons.collections.MultiHashMap;
-import org.apache.commons.collections.MultiMap;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -151,7 +151,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     protected String adminGroupName;
 
     protected List<Table> roots;
-    protected MultiMap children;
+    protected Multimap<Table, Reference> children;
     protected List<Table> allTables;
     protected Table userTable;
     protected Table groupTable;
@@ -296,7 +296,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             Database existingDatabase =
                     DatabaseLogic.findDatabaseByName(persistence.getModel(), edit.getDatabaseName());
             if(existingDatabase != null) {
-                SessionMessages.addErrorMessage(getMessage("appwizard.error.duplicateDatabase", edit.getDatabaseName()));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("appwizard.error.duplicateDatabase", edit.getDatabaseName()));
                 return createConnectionProviderForm();
             }
             return afterCreateConnectionProvider();
@@ -310,7 +310,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             configureEditSchemas();
         } catch (Exception e) {
             logger.error("Couldn't read schema names from db", e);
-            SessionMessages.addErrorMessage(getMessage("appwizard.error.schemas", e));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("appwizard.error.schemas", e));
             return createConnectionProviderForm();
         }
         return selectSchemasForm();
@@ -362,7 +362,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                 }
                 return afterSelectSchemas();
             } else {
-                SessionMessages.addErrorMessage(getMessage("appwizard.error.schemas.noneSelected"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("appwizard.error.schemas.noneSelected"));
                 return selectSchemasForm();
             }
         }
@@ -383,7 +383,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     protected void updateModelFailed(Exception e) {
         logger.error("Could not update model", e);
         SessionMessages.addErrorMessage(
-                getMessage("appwizard.error.updateModelFailed", ExceptionUtils.getRootCauseMessage(e)));
+                ElementsThreadLocals.getText("appwizard.error.updateModelFailed", ExceptionUtils.getRootCauseMessage(e)));
         if(isNewConnectionProvider()) {
             persistence.getModel().getDatabases().remove(connectionProvider.getDatabase());
         }
@@ -423,7 +423,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             targetDatabase = dbSyncer.syncDatabase(refModel);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            SessionMessages.addErrorMessage(getMessage("appwizard.error.sync", e));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("appwizard.error.sync", e));
             return null;
         } finally {
             database.getSchemas().removeAll(tempSchemas);
@@ -442,7 +442,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     }
 
     public Resolution afterSelectSchemas() {
-        children = new MultiHashMap();
+        children = HashMultimap.create();
         allTables = new ArrayList<Table>();
         roots = determineRoots(children, allTables);
         Collections.sort(allTables, new Comparator<Table>() {
@@ -493,7 +493,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             Field userGroupTableField = new SelectField(userGroupPropertyAccessor, selectionProvider, mode, "");
 
             userAndGroupTablesForm = new Form(mode);
-            FieldSet fieldSet = new FieldSet(getMessage("appwizard.userAndGroupTables"), 1, mode);
+            FieldSet fieldSet = new FieldSet(ElementsThreadLocals.getText("appwizard.userAndGroupTables"), 1, mode);
             fieldSet.add(userTableField);
             fieldSet.add(groupTableField);
             fieldSet.add(userGroupTableField);
@@ -553,23 +553,23 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         DefaultSelectionProvider algoSelectionProvider = new DefaultSelectionProvider("");
         algoSelectionProvider.appendRow(
                 "plaintext",
-                getMessage("appwizard.userTable.encryption.plaintext"),
+                ElementsThreadLocals.getText("appwizard.userTable.encryption.plaintext"),
                 true);
         algoSelectionProvider.appendRow(
                 "md5Base64",
-                getMessage("appwizard.userTable.encryption.md5Base64"),
+                ElementsThreadLocals.getText("appwizard.userTable.encryption.md5Base64"),
                 true);
         algoSelectionProvider.appendRow(
                 "md5Hex",
-                getMessage("appwizard.userTable.encryption.md5Hex"),
+                ElementsThreadLocals.getText("appwizard.userTable.encryption.md5Hex"),
                 true);
         algoSelectionProvider.appendRow(
                 "sha1Base64",
-                getMessage("appwizard.userTable.encryption.sha1Base64"),
+                ElementsThreadLocals.getText("appwizard.userTable.encryption.sha1Base64"),
                 true);
         algoSelectionProvider.appendRow(
                 "sha1Hex",
-                getMessage("appwizard.userTable.encryption.sha1Hex"),
+                ElementsThreadLocals.getText("appwizard.userTable.encryption.sha1Hex"),
                 true);
         try {
             ClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(getClass());
@@ -601,7 +601,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             Field userTokenPropertyField = new SelectField(propertyAccessor, userSelectionProvider, mode, "");
             userTokenPropertyField.setRequired(false);
 
-            FieldSet uFieldSet = new FieldSet(getMessage("appwizard.userTable"), 1, mode);
+            FieldSet uFieldSet = new FieldSet(ElementsThreadLocals.getText("appwizard.userTable"), 1, mode);
             uFieldSet.add(userIdPropertyField);
             uFieldSet.add(userNamePropertyField);
             uFieldSet.add(userPasswordPropertyField);
@@ -648,7 +648,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                 propertyAccessor = classAccessor.getProperty("adminGroupName");
                 Field adminGroupNameField = new TextField(propertyAccessor, mode);
 
-                FieldSet gFieldSet = new FieldSet(getMessage("appwizard.groupTable"), 1, mode);
+                FieldSet gFieldSet = new FieldSet(ElementsThreadLocals.getText("appwizard.groupTable"), 1, mode);
                 gFieldSet.add(groupIdPropertyField);
                 gFieldSet.add(groupNamePropertyField);
                 gFieldSet.add(groupLinkPropertyField);
@@ -707,14 +707,14 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         try {
             generateCalendarField =
                     new BooleanField(classAccessor.getProperty("generateCalendar"), Mode.EDIT);
-            generateCalendarField.setLabel(getMessage("appwizard.generateCalendar"));
+            generateCalendarField.setLabel(ElementsThreadLocals.getText("appwizard.generateCalendar"));
             generateCalendarField.readFromObject(this);
         } catch (NoSuchFieldException e) {
             throw new Error(e);
         }
     }
 
-    protected List<Table> determineRoots(MultiMap children, List<Table> allTables) {
+    protected List<Table> determineRoots(Multimap<Table, Reference> children, List<Table> allTables) {
         List<Table> roots = new ArrayList<Table>();
         for(SelectableSchema selectableSchema : selectableSchemas) {
             if(selectableSchema.selected) {
@@ -804,7 +804,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         afterSelectSchemas();
 
         if(roots.isEmpty()) {
-            SessionMessages.addWarningMessage(getMessage("appwizard.warning.noRoot"));
+            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("appwizard.warning.noRoot"));
         }
 
         return buildAppForm();
@@ -881,7 +881,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                 DispatcherLogic.savePage(pagesDir, rootPage);
             } catch (Exception e) {
                 logger.error("Error while creating pages", e);
-                SessionMessages.addErrorMessage(getMessage("appwizard.error.createPagesFailed", e));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("appwizard.error.createPagesFailed", e));
                 return buildAppForm();
             }
         }
@@ -895,9 +895,9 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             updateModelFailed(e);
             return buildAppForm();
         }
-        SessionMessages.addInfoMessage(getMessage("appwizard.finished"));
+        SessionMessages.addInfoMessage(ElementsThreadLocals.getText("appwizard.finished"));
         if(userTable != null) {
-            SessionMessages.addWarningMessage(getMessage("appwizard.warning.userTable.created"));
+            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("appwizard.warning.userTable.created"));
             //ShiroUtils.clearCache(SecurityUtils.getSubject().getPrincipals());
         }
         context.getRequest().getSession().removeAttribute(databaseSessionKey);
@@ -989,7 +989,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             } else {
                 logger.warn("Couldn't create directory {}", dir.getAbsolutePath());
                 SessionMessages.addWarningMessage(
-                        getMessage("appwizard.error.createDirectoryFailed", dir.getAbsolutePath()));
+                        ElementsThreadLocals.getText("appwizard.error.createDirectoryFailed", dir.getAbsolutePath()));
             }
         }
     }
@@ -1081,7 +1081,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             IOUtils.closeQuietly(fw);
         } catch (Exception e) {
             logger.warn("Couldn't configure users", e);
-            SessionMessages.addWarningMessage(getMessage("appwizard.error.userSetupFailed", e));
+            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("appwizard.error.userSetupFailed", e));
         }
     }
 
@@ -1113,7 +1113,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             throws Exception {
         if(dir.exists()) {
             SessionMessages.addWarningMessage(
-                        getMessage("appwizard.error.directoryExists", dir.getAbsolutePath()));
+                        ElementsThreadLocals.getText("appwizard.error.directoryExists", dir.getAbsolutePath()));
             return null;
         } else if(dir.mkdirs()) {
             logger.info("Creating CRUD page {}", dir.getAbsolutePath());
@@ -1171,7 +1171,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             if(!detailDir.isDirectory() && !detailDir.mkdir()) {
                 logger.warn("Could not create detail directory {}", detailDir.getAbsolutePath());
                 SessionMessages.addWarningMessage(
-                    getMessage("appwizard.error.createDirectoryFailed", detailDir.getAbsolutePath()));
+                    ElementsThreadLocals.getText("appwizard.error.createDirectoryFailed", detailDir.getAbsolutePath()));
             }
 
             ChildPage childPage = new ChildPage();
@@ -1183,7 +1183,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         } else {
             logger.warn("Couldn't create directory {}", dir.getAbsolutePath());
             SessionMessages.addWarningMessage(
-                    getMessage("appwizard.error.createDirectoryFailed", dir.getAbsolutePath()));
+                    ElementsThreadLocals.getText("appwizard.error.createDirectoryFailed", dir.getAbsolutePath()));
             return null;
         }
     }
@@ -1676,14 +1676,14 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     @Override
     public List<Step> getSteps() {
         List<Step> steps = new ArrayList<Step>();
-        steps.add(new Step("1", getMessage("appwizard.step1.title")));
-        steps.add(new Step("2", getMessage("appwizard.step2.title")));
-        steps.add(new Step("3", getMessage("appwizard.step3.title")));
+        steps.add(new Step("1", ElementsThreadLocals.getText("appwizard.step1.title")));
+        steps.add(new Step("2", ElementsThreadLocals.getText("appwizard.step2.title")));
+        steps.add(new Step("3", ElementsThreadLocals.getText("appwizard.step3.title")));
         if(userTable != null) {
-            steps.add(new Step("3a", getMessage("appwizard.step3a.title")));
+            steps.add(new Step("3a", ElementsThreadLocals.getText("appwizard.step3a.title")));
         }
-        steps.add(new Step("4", getMessage("appwizard.step4.title")));
-        steps.add(new Step("5", getMessage("appwizard.step5.title")));
+        steps.add(new Step("4", ElementsThreadLocals.getText("appwizard.step4.title")));
+        steps.add(new Step("5", ElementsThreadLocals.getText("appwizard.step5.title")));
         return steps;
     }
 

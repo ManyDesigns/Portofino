@@ -34,11 +34,11 @@ public class QueryStringWithParameters implements Serializable {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     protected final String queryString;
-    protected final Object[] paramaters;
+    protected final Object[] parameters;
 
-    public QueryStringWithParameters(String queryString, Object[] paramaters) {
+    public QueryStringWithParameters(String queryString, Object[] parameters) {
         this.queryString = queryString;
-        this.paramaters = paramaters;
+        this.parameters = parameters;
     }
 
     public String getQueryString() {
@@ -46,7 +46,7 @@ public class QueryStringWithParameters implements Serializable {
     }
 
     public Object[] getParameters() {
-        return paramaters;
+        return parameters;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class QueryStringWithParameters implements Serializable {
         QueryStringWithParameters that = (QueryStringWithParameters) o;
 
         // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        if (!Arrays.equals(paramaters, that.paramaters)) return false;
+        if (!Arrays.equals(parameters, that.parameters)) return false;
         if (queryString != null ? !queryString.equals(that.queryString) : that.queryString != null) return false;
 
         return true;
@@ -66,7 +66,7 @@ public class QueryStringWithParameters implements Serializable {
     @Override
     public int hashCode() {
         int result = queryString != null ? queryString.hashCode() : 0;
-        result = 31 * result + (paramaters != null ? Arrays.hashCode(paramaters) : 0);
+        result = 31 * result + (parameters != null ? Arrays.hashCode(parameters) : 0);
         return result;
     }
 }
