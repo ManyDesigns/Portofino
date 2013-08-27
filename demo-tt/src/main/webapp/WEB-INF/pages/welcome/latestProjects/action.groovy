@@ -11,8 +11,7 @@ class latestProjects extends CustomAction {
     @DefaultHandler
     @Override
     public Resolution execute() {
-        String fwd = getAppJsp("/latestProjects.jsp");
-        return forwardTo(fwd);
+        return forwardTo("/latestProjects.jsp");
     }
 
 }

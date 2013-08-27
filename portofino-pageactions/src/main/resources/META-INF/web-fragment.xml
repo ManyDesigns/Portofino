@@ -92,32 +92,6 @@
     </filter-mapping>
 
     <filter>
-        <filter-name>portofino-application-filter</filter-name>
-        <filter-class>
-            com.manydesigns.portofino.servlets.ApplicationFilter
-        </filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>portofino-application-filter</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-    </filter-mapping>
-
-    <filter>
-        <filter-name>portofino-application-url-filter</filter-name>
-        <filter-class>
-            com.manydesigns.portofino.servlets.AppUrlFilter
-        </filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>portofino-application-url-filter</filter-name>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
-    </filter-mapping>
-
-    <filter>
         <filter-name>portofino-dispatcher</filter-name>
         <filter-class>
             com.manydesigns.portofino.servlets.DispatcherFilter

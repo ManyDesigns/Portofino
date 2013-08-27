@@ -11,8 +11,7 @@ class prjstatus extends CustomAction {
     @DefaultHandler
     @Override
     public Resolution execute() {
-        String fwd = getAppJsp("/projects/projectStatus.jsp");
-        return forwardTo(fwd);
+        return forwardTo("/projects/projectStatus.jsp");
     }
 
 }

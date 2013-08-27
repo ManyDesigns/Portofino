@@ -144,6 +144,18 @@ public class PortofinoListener
         servletContext.setAttribute(BaseModule.APPLICATION_DIRECTORY, applicationDirectory);
         servletContext.setAttribute(BaseModule.PORTOFINO_CONFIGURATION, configuration);
 
+        logger.debug("Setting blobs directory");
+        File appBlobsDir;
+        if(configuration.containsKey(PortofinoProperties.BLOBS_DIR_PATH)) {
+            appBlobsDir = new File(configuration.getString(PortofinoProperties.BLOBS_DIR_PATH));
+        } else {
+            File appDir = (File) servletContext.getAttribute(BaseModule.APPLICATION_DIRECTORY);
+            appBlobsDir = new File(appDir, "blobs");
+        }
+        String blobsDirPath = appBlobsDir.getAbsolutePath();
+        elementsConfiguration.setProperty(ElementsProperties.BLOBS_DIR, blobsDirPath);
+        logger.info("Blobs directory: " + blobsDirPath);
+
         ClassLoader classLoader = getClass().getClassLoader();
         logger.debug("Registering application class loader");
         servletContext.setAttribute(BaseModule.CLASS_LOADER, classLoader);

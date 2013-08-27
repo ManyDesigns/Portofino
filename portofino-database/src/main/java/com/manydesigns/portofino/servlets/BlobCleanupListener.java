@@ -32,7 +32,6 @@ package com.manydesigns.portofino.servlets;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.modules.BaseModule;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
@@ -42,7 +41,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-import java.io.File;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -79,18 +77,8 @@ public class BlobCleanupListener implements HttpSessionListener {
         Set<String> blobs = (Set<String>) session.getAttribute(SESSION_ATTRIBUTE);
         BlobManager blobManager = ElementsThreadLocals.getBlobManager();
         if(blobManager == null) { //Outside of a request
-            //Setup Elements blob manager
-            File appBlobsDir;
-
-            if(configuration.containsKey(PortofinoProperties.BLOBS_DIR_PATH)) {
-                appBlobsDir = new File(configuration.getString(PortofinoProperties.BLOBS_DIR_PATH));
-            } else {
-                File appDir = (File) servletContext.getAttribute(BaseModule.APPLICATION_DIRECTORY);
-                appBlobsDir = new File(appDir, "blobs");
-            }
-            logger.debug("Setting blobs directory");
+            //The blobs directory is already globally set by PortofinoListener
             blobManager = BlobManager.createDefaultBlobManager();
-            blobManager.setBlobsDir(appBlobsDir);
         }
         for(String blobCode : blobs) {
             logger.info("Deleting unused blob: " + blobCode);

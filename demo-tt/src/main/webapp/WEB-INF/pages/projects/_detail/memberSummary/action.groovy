@@ -11,8 +11,7 @@ class memberSummary extends CustomAction {
     @DefaultHandler
     @Override
     public Resolution execute() {
-        String fwd = getAppJsp("/projects/memberSummary.jsp");
-        return forwardTo(fwd);
+        return forwardTo("/projects/memberSummary.jsp");
     }
 
 }

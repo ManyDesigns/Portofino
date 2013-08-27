@@ -240,6 +240,7 @@ public class PageActionsModule implements Module {
         pageActionRegistry.register(CustomAction.class);
         pageActionRegistry.register(TextAction.class);
         pageActionRegistry.register(DefaultLoginAction.class);
+        pageActionRegistry.register(OpenIdLoginAction.class);
         servletContext.setAttribute(PAGE_ACTIONS_REGISTRY, pageActionRegistry);
 
         File scriptFile = new File(groovyClasspath, "Security.groovy");
