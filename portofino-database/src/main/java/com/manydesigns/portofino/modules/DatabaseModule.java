@@ -67,9 +67,6 @@ public class DatabaseModule implements Module {
     @Inject(BaseModule.ADMIN_MENU)
     public MenuBuilder adminMenu;
 
-    @Inject(PageActionsModule.PAGE_ACTIONS_REGISTRY)
-    public PageActionRegistry pageActionsRegistry;
-
     protected ModuleStatus status = ModuleStatus.CREATED;
 
     //**************************************************************************
@@ -126,6 +123,8 @@ public class DatabaseModule implements Module {
         persistence.loadXmlModel();
         servletContext.setAttribute(PERSISTENCE, persistence);
 
+        PageActionRegistry pageActionsRegistry =
+                (PageActionRegistry) servletContext.getAttribute(PageActionsModule.PAGE_ACTIONS_REGISTRY);
         pageActionsRegistry.register(ChartAction.class);
         pageActionsRegistry.register(CrudAction.class);
         pageActionsRegistry.register(ManyToManyAction.class);

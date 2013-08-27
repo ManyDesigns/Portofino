@@ -52,6 +52,7 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.modules.PageActionsModule;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
@@ -176,6 +177,9 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     @Inject(PageActionsModule.PAGES_DIRECTORY)
     public File pagesDir;
+
+    @Inject(BaseModule.APPLICATION_DIRECTORY)
+    public File appDir;
 
     public static final Logger logger = LoggerFactory.getLogger(ApplicationWizard.class);
 
@@ -1085,7 +1089,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         }
     }
 
-    private boolean isMultipleRoles(Table fromTable, Reference ref, List<Reference> references) {
+    private boolean isMultipleRoles(Table fromTable, Reference ref, Collection<Reference> references) {
         boolean multipleRoles = false;
         for(Reference ref2 : references) {
             if(ref2 != ref && ref2.getActualFromColumn().getTable().equals(fromTable)) {
@@ -1144,7 +1148,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             page.setTitle(title);
             page.setDescription(title);
 
-            List<Reference> references = (List<Reference>) children.get(table);
+            Collection<Reference> references = children.get(table);
             if(references != null && depth < maxDepth) {
                 ArrayList<ChildPage> pages = page.getDetailLayout().getChildPages();
                 depth++;
@@ -1432,7 +1436,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     }
 
     protected void createChildCrudPage(
-            File dir, Template template, String parentName, List<Reference> references,
+            File dir, Template template, String parentName, Collection<Reference> references,
             Reference ref, ArrayList<ChildPage> pages)
             throws Exception {
         Column fromColumn = ref.getActualFromColumn();

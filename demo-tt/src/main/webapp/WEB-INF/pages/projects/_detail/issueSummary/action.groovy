@@ -11,8 +11,7 @@ class issueSummary extends CustomAction {
     @DefaultHandler
     @Override
     public Resolution execute() {
-        String fwd = getAppJsp("/issues/summary.jsp");
-        return forwardTo(fwd);
+        return forwardTo("/issues/summary.jsp");
     }
 
 }

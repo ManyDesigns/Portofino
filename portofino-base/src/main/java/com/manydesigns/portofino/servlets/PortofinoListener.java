@@ -269,12 +269,8 @@ public class PortofinoListener
         CompositeConfiguration portofinoConfiguration = new CompositeConfiguration();
         addConfiguration(portofinoConfiguration, PortofinoProperties.CUSTOM_PROPERTIES_RESOURCE);
         addConfiguration(portofinoConfiguration, PortofinoProperties.PROPERTIES_RESOURCE);
-        String appId = portofinoConfiguration.getString(PortofinoProperties.APP_ID);
-        String appsDirPath = portofinoConfiguration.getString(PortofinoProperties.APPS_DIR_PATH);
-        File appsDir = new File(appsDirPath);
-        logger.info("Apps dir: {}", appsDir.getAbsolutePath());
-        logger.info("App id: {}", appId);
-        applicationDirectory = new File(appsDir, appId);
+        applicationDirectory = new File(serverInfo.getRealPath(), "WEB-INF");
+        logger.info("Application directory: {}", applicationDirectory.getAbsolutePath());
         File appConfigurationFile = new File(applicationDirectory, APP_PROPERTIES);
         configuration = new CompositeConfiguration();
         appConfiguration = new PropertiesConfiguration(appConfigurationFile);

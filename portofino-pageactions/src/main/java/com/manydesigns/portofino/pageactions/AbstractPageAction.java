@@ -114,9 +114,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
 
-    @Inject(BaseModule.APPLICATION_DIRECTORY)
-    public File appDir;
-
     //--------------------------------------------------------------------------
     // UI
     //--------------------------------------------------------------------------
@@ -562,9 +559,11 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
      * Returns the path to a jsp file inside the current application's web directory.
      * @param jsp the relative path to the file, starting from the web directory. Must start with a slash.
      * @return the path.
+     * @deprecated use jsp directly.
      */
+    @Deprecated
     public String getAppJsp(String jsp) {
-        return "/apps/" + appDir.getName() + "/web" + jsp;
+        return jsp;
     }
 
     /**

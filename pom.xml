@@ -101,6 +101,7 @@
         <module>portofino-war-jee</module>
         <module>portofino-war-gae</module>
         <module>mail</module>
+        <module>demo-tt</module>
     </modules>
 
     <build>
