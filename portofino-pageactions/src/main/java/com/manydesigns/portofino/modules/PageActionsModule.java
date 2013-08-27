@@ -42,6 +42,12 @@ import com.manydesigns.portofino.head.HtmlHeadAppender;
 import com.manydesigns.portofino.head.HtmlHeadBuilder;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.menu.*;
+import com.manydesigns.portofino.pageactions.calendar.CalendarAction;
+import com.manydesigns.portofino.pageactions.custom.CustomAction;
+import com.manydesigns.portofino.pageactions.login.DefaultLoginAction;
+import com.manydesigns.portofino.pageactions.login.OpenIdLoginAction;
+import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
+import com.manydesigns.portofino.pageactions.text.TextAction;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
@@ -120,7 +126,9 @@ public class PageActionsModule implements Module {
     public static final String GROOVY_SCRIPT_ENGINE = "GROOVY_SCRIPT_ENGINE";
     public static final String GROOVY_CLASS_PATH = "GROOVY_CLASS_PATH";
     public static final String PAGES_DIRECTORY = "PAGES_DIRECTORY";
-    public final static String EHCACHE_MANAGER = "portofino.ehcache.manager";
+    public static final String EHCACHE_MANAGER = "portofino.ehcache.manager";
+    public static final String PAGE_ACTIONS_REGISTRY =
+            "com.manydesigns.portofino.pageactions.registry.PageActionRegistry";
 
     //**************************************************************************
     // Logging
@@ -225,6 +233,14 @@ public class PageActionsModule implements Module {
 
         ClassLoader classLoader = groovyScriptEngine.getGroovyClassLoader();
         servletContext.setAttribute(BaseModule.CLASS_LOADER, classLoader);
+
+        logger.debug("Creating pageactions registry");
+        PageActionRegistry pageActionRegistry = new PageActionRegistry();
+        pageActionRegistry.register(CalendarAction.class);
+        pageActionRegistry.register(CustomAction.class);
+        pageActionRegistry.register(TextAction.class);
+        pageActionRegistry.register(DefaultLoginAction.class);
+        servletContext.setAttribute(PAGE_ACTIONS_REGISTRY, pageActionRegistry);
 
         File scriptFile = new File(groovyClasspath, "Security.groovy");
         SecurityGroovyRealm realm = new SecurityGroovyRealm(groovyScriptEngine, scriptFile.toURI().toString());

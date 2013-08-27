@@ -29,6 +29,10 @@ import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
 import com.manydesigns.portofino.menu.*;
+import com.manydesigns.portofino.pageactions.chart.ChartAction;
+import com.manydesigns.portofino.pageactions.crud.CrudAction;
+import com.manydesigns.portofino.pageactions.m2m.ManyToManyAction;
+import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import com.manydesigns.portofino.persistence.Persistence;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
@@ -62,6 +66,9 @@ public class DatabaseModule implements Module {
 
     @Inject(BaseModule.ADMIN_MENU)
     public MenuBuilder adminMenu;
+
+    @Inject(PageActionsModule.PAGE_ACTIONS_REGISTRY)
+    public PageActionRegistry pageActionsRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -118,6 +125,10 @@ public class DatabaseModule implements Module {
                 new Persistence(applicationDirectory, configuration, new DatabasePlatformsManager(configuration));
         persistence.loadXmlModel();
         servletContext.setAttribute(PERSISTENCE, persistence);
+
+        pageActionsRegistry.register(ChartAction.class);
+        pageActionsRegistry.register(CrudAction.class);
+        pageActionsRegistry.register(ManyToManyAction.class);
 
         appendToAdminMenu();
 

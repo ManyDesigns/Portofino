@@ -98,6 +98,9 @@ public class PageAdminAction extends AbstractPageAction {
     @Inject(PageActionsModule.PAGES_DIRECTORY)
     public File pagesDir;
 
+    @Inject(PageActionsModule.PAGE_ACTIONS_REGISTRY)
+    public PageActionRegistry registry;
+
     //--------------------------------------------------------------------------
     // Page crud fields
     //--------------------------------------------------------------------------
@@ -107,8 +110,6 @@ public class PageAdminAction extends AbstractPageAction {
     protected Form newPageForm;
     protected String title;
 
-    protected final PageActionRegistry registry = new PageActionRegistry();
-
     @Before
     public Resolution prepare() {
         Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
@@ -116,36 +117,12 @@ public class PageAdminAction extends AbstractPageAction {
         dispatch = dispatcher.getDispatch(contextPath, originalPath);
         pageInstance = dispatch.getLastPageInstance();
 
-        List<String> knownPageActions = portofinoConfiguration.getList("pageactions");
-        for(String pageAction : knownPageActions) {
-            tryToRegisterPageAction(pageAction);
-        }
-        knownPageActions = portofinoConfiguration.getList("pageactions");
-        if(knownPageActions != null) {
-            for(String pageAction : knownPageActions) {
-                tryToRegisterPageAction(pageAction);
-            }
-        }
-
         if(!SecurityLogic.hasPermissions(
                 portofinoConfiguration, pageInstance, SecurityUtils.getSubject(), AccessLevel.EDIT)) {
             return new ForbiddenAccessResolution();
         } else {
             return null;
         }
-    }
-
-    protected void tryToRegisterPageAction(String className) {
-        try {
-            registry.register(getActionClass(className));
-        } catch (Exception e) {
-            logger.warn("{} class not found, page not available", className);
-        }
-    }
-
-    protected Class<?> getActionClass(String className) throws ClassNotFoundException {
-        ClassLoader classLoader = (ClassLoader) context.getServletContext().getAttribute(BaseModule.CLASS_LOADER);
-        return Class.forName(className, true, classLoader);
     }
 
     //--------------------------------------------------------------------------
@@ -237,7 +214,8 @@ public class PageAdminAction extends AbstractPageAction {
             InsertPosition insertPosition =
                     InsertPosition.valueOf(newPage.getInsertPositionName());
             String pageClassName = newPage.getActionClassName();
-            Class actionClass = getActionClass(pageClassName);
+            ClassLoader classLoader = (ClassLoader) context.getServletContext().getAttribute(BaseModule.CLASS_LOADER);
+            Class actionClass = Class.forName(pageClassName, true, classLoader);
             PageActionInfo info = registry.getInfo(actionClass);
             String scriptTemplate = info.scriptTemplate;
             Class<?> configurationClass = info.configurationClass;
