@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.manydesigns</groupId>
+    <artifactId>portofino-war-archetype</artifactId>
+    <version>4.1.beta5-SNAPSHOT</version>
+    <packaging>maven-archetype</packaging>
+
+    <name>portofino-war-archetype</name>
+
+    <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.archetype</groupId>
+                <artifactId>archetype-packaging</artifactId>
+                <version>2.2</version>
+            </extension>
+        </extensions>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-archetype-plugin</artifactId>
+                    <version>2.2</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources/META-INF/maven</directory>
+                <targetPath>META-INF/maven</targetPath>
+                <filtering>true</filtering>
+            </resource>
+
+        </resources>
+    </build>
+
+    <description>Portofino is a web application framework written in Java and
+        extensible using Groovy, distributed under the LGPL open source license.
+        The framework can be used to create interactive database-driven web
+        applications. The creation process includes automatic generation through
+        a "wizard" tool, manual configuration through a web-based
+        administration interface, and customization through scripting languages.
+        The framework combines features that are typical of Content Management
+        Systems and of Rapid application development tools. Portofino is mainly
+        intended for Java developers of enterprise applications and of dynamic
+        web sites. It can connect to an existing database and generate a working
+        web application based on an automatic analysis of the database's
+        structure.
+    </description>
+
+    <url>http://www.manydesigns.com/</url>
+
+    <licenses>
+        <license>
+            <name>GNU LESSER GENERAL PUBLIC LICENSE, Version 3</name>
+            <url>http://www.gnu.org/licenses/lgpl.html</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:hg:http://hg.code.sf.net/p/portofino/mercurial</connection>
+        <developerConnection>scm:hg:https://hg.code.sf.net/p/portofino/mercurial</developerConnection>
+        <url>http://sourceforge.net/p/portofino/mercurial</url>
+    </scm>
+
+</project>

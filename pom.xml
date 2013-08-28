@@ -102,6 +102,7 @@
         <module>portofino-war-gae</module>
         <module>mail</module>
         <module>demo-tt</module>
+        <module>portofino-war-archetype</module>
     </modules>
 
     <build>

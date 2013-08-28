@@ -29,7 +29,7 @@
             <groupId>com.manydesigns</groupId>
             <artifactId>manydesigns-mail</artifactId>
             <version>${project.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
            <groupId>net.sf.ehcache</groupId>
