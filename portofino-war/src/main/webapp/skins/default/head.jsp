@@ -4,7 +4,6 @@
 %><%@ page import="com.manydesigns.elements.xml.XhtmlFragment"
 %><%@ page import="com.manydesigns.elements.xml.XhtmlBuffer"
 %><%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
-%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%
     HtmlHeadBuilder htmlHeadBuilder = (HtmlHeadBuilder) application.getAttribute(BaseModule.HTML_HEAD_BUILDER);
     HtmlHead head = htmlHeadBuilder.build();
