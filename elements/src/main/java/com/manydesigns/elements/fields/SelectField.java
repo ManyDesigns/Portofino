@@ -308,6 +308,7 @@ public class SelectField extends AbstractField {
         xb.openElement("select");
         xb.addAttribute("id", id);
         xb.addAttribute("name", inputName);
+        xb.addAttribute("class", fieldCssClass);
 
         boolean checked = (value == null);
         if (comboLabel != null && !options.isEmpty()) {
@@ -439,8 +440,7 @@ public class SelectField extends AbstractField {
         xb.addAttribute("name", autocompleteInputName);
         xb.addAttribute("autocomplete", "off");
         xb.addAttribute("value", getStringValue());
-        xb.addAttribute("class", null);
-        xb.addAttribute("size", null);
+        xb.addAttribute("class", fieldCssClass);
         xb.closeElement("input");
 
         String js = composeAutocompleteJs();
