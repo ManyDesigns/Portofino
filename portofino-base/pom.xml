@@ -43,18 +43,6 @@
             <version>${jstl.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.sourceforge.stripes</groupId>
-            <artifactId>stripes</artifactId>
-            <version>${stripes.version}</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
             <version>${shiro.version}</version>

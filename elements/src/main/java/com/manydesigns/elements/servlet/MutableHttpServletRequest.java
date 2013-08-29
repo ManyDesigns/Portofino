@@ -20,19 +20,14 @@
 
 package com.manydesigns.elements.servlet;
 
-import net.sourceforge.stripes.action.FileBean;
-import net.sourceforge.stripes.controller.FileUploadLimitExceededException;
-import net.sourceforge.stripes.controller.multipart.MultipartWrapper;
 import net.sourceforge.stripes.mock.MockHttpSession;
 import net.sourceforge.stripes.mock.MockServletContext;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
@@ -44,7 +39,7 @@ import java.util.*;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class MutableHttpServletRequest implements HttpServletRequest, MultipartWrapper {
+public class MutableHttpServletRequest implements HttpServletRequest {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -52,9 +47,9 @@ public class MutableHttpServletRequest implements HttpServletRequest, MultipartW
     // Fields
     //**************************************************************************
 
-    protected final Map<String, Object> attributeMap;
-    protected final Map<String, String[]> parameterMap;
-    protected final Map<String, FileItem[]> fileItemMap;
+    public final Map<String, Object> attributeMap;
+    public final Map<String, String[]> parameterMap;
+    public final Map<String, FileItem[]> fileItemMap;
 
     private String method;
     private String contextPath;
@@ -145,38 +140,12 @@ public class MutableHttpServletRequest implements HttpServletRequest, MultipartW
         }
     }
 
-    @Override
-    public void build(HttpServletRequest request, File tempDir, long maxPostSize) throws IOException, FileUploadLimitExceededException {
-
-    }
-
     public Enumeration getParameterNames() {
         return Collections.enumeration(parameterMap.keySet());
     }
 
     public String[] getParameterValues(String name) {
         return parameterMap.get(name);
-    }
-
-    @Override
-    public Enumeration<String> getFileParameterNames() {
-        return new Vector<String>(fileItemMap.keySet()).elements();
-    }
-
-    @Override
-    public FileBean getFileParameterValue(String name) {
-        FileItem item = getFileItem(name);
-        if(item == null) {
-            return null;
-        }
-        try {
-            File file = File.createTempFile("blob", name);
-            FileUtils.copyInputStreamToFile(item.getInputStream(), file);
-            FileBean fileBean = new FileBean(file, item.getContentType(), item.getName(), null);
-            return fileBean;
-        } catch (IOException e) {
-            throw new Error(e);
-        }
     }
 
     public Map getParameterMap() {

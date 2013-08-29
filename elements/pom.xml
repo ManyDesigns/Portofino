@@ -19,6 +19,7 @@
             <version>${javaee-web-api.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Apache Commons -->
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
@@ -59,12 +60,14 @@
             <version>${commons.collections.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- OGNL -->
         <dependency>
             <groupId>ognl</groupId>
             <artifactId>ognl</artifactId>
             <version>${ognl.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Javassist is necessary for OGNL to work -->
         <dependency>
             <groupId>javassist</groupId>
             <artifactId>javassist</artifactId>
@@ -93,12 +96,18 @@
             <artifactId>json</artifactId>
             <version>${json.version}</version>
         </dependency>
-        <!-- Stripes dependencies (provided) -->
+        <!-- Stripes -->
         <dependency>
             <groupId>net.sourceforge.stripes</groupId>
             <artifactId>stripes</artifactId>
             <version>${stripes.version}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 </project>
