@@ -27,14 +27,14 @@
         <link rel="stylesheet" type="text/css"
               href="<stripes:url value="/elements/datepicker/css/datepicker.css"/>"/>
         <link rel="stylesheet" type="text/css"
-              href="<stripes:url value="/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"/>"/>
+              href="<stripes:url value="/m/portofino-base/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"/>"/>
 
         <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
               <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
         <link rel="stylesheet" type="text/css"
-              href="<stripes:url value="/portofino-base/admin-theme/portofino-admin.css"/>"/>
+              href="<stripes:url value="/m/portofino-base/admin-theme/portofino-admin.css"/>"/>
         <%-- jQuery & jQuery UI (for draggable/droppable) --%>
         <script type="text/javascript"
                 src="<stripes:url value="/elements/jquery/jquery.min.js"/>"></script>
@@ -44,7 +44,7 @@
         <script type="text/javascript"
                 src="<stripes:url value="/elements/datepicker/js/bootstrap-datepicker.js"/>"></script>
         <script type="text/javascript"
-                src="<stripes:url value="/jquery-ui/js/jquery-ui-1.10.3.custom.min.js" />"></script>
+                src="<stripes:url value="/m/portofino-base/jquery-ui/js/jquery-ui-1.10.3.custom.min.js" />"></script>
 
         <script type="text/javascript"
                 src="<stripes:url value="/elements/elements.js"/>"></script>
@@ -71,7 +71,7 @@
                 <div id="header-menu" class="nav-collapse collapse">
                     <ul id="user-menu" class="nav">
                         <% request.setAttribute("menu", BaseModule.USER_MENU); %>
-                        <jsp:include page="../layouts/render-menu.jsp" />
+                        <jsp:include page="render-menu.jsp" />
                     </ul>
                 </div>
             </div>

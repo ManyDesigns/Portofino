@@ -32,11 +32,11 @@
                 </c:if>
                 <ul id="app-menu" class="nav">
                     <% request.setAttribute("menu", BaseModule.APP_MENU); %>
-                    <jsp:include page="/portofino-base/layouts/render-menu.jsp" />
+                    <jsp:include page="/m/portofino-base/admin-theme/render-menu.jsp" />
                 </ul>
                 <ul id="user-menu" class="nav">
                     <% request.setAttribute("menu", BaseModule.USER_MENU); %>
-                    <jsp:include page="/portofino-base/layouts/render-menu.jsp" />
+                    <jsp:include page="/m/portofino-base/admin-theme/render-menu.jsp" />
                 </ul>
             </div>
         </div>

@@ -6,7 +6,7 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.ConnectionProvidersAction"/>
-<stripes:layout-render name="/portofino-base/admin-theme/admin-page.jsp">
+<stripes:layout-render name="/m/portofino-base/admin-theme/admin-page.jsp">
     <stripes:layout-component name="pageTitle">
         Connection provider: <c:out value="${actionBean.databaseName}"/>
     </stripes:layout-component>

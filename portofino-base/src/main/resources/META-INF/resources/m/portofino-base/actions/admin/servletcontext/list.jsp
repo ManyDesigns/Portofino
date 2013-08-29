@@ -5,7 +5,7 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.servletcontext.ServletContextAction"/>
-<stripes:layout-render name="/portofino-base/admin-theme/admin-page.jsp">
+<stripes:layout-render name="/m/portofino-base/admin-theme/admin-page.jsp">
     <stripes:layout-component name="pageTitle">
         <fmt:message key="layouts.admin.modules.title"/>
     </stripes:layout-component>

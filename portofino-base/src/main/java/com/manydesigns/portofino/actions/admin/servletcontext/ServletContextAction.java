@@ -67,7 +67,7 @@ public class ServletContextAction extends AbstractActionBean {
     @RequiresPermissions("com.manydesigns.portofino.servletcontext:list")
     public Resolution execute() {
         setupForm();
-        return new ForwardResolution("/portofino-base/actions/admin/servletcontext/list.jsp");
+        return new ForwardResolution("/m/portofino-base/actions/admin/servletcontext/list.jsp");
     }
 
     protected void setupForm() {
