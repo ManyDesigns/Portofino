@@ -412,8 +412,6 @@ public class PageActionsModule implements Module {
                 XhtmlBuffer xb = new XhtmlBuffer();
                 HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
 
-                xb.writeLink("stylesheet", "text/css",
-                             Util.getAbsoluteUrl("/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"));
                 String skin = (String) request.getAttribute(RequestAttributes.SKIN);
                 if(skin != null) {
                     xb.writeLink("stylesheet", "text/css",

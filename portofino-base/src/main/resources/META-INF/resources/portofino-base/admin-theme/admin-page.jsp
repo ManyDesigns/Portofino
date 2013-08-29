@@ -26,6 +26,8 @@
               href="<stripes:url value="/elements/bootstrap/css/bootstrap-responsive.min.css"/>"/>
         <link rel="stylesheet" type="text/css"
               href="<stripes:url value="/elements/datepicker/css/datepicker.css"/>"/>
+        <link rel="stylesheet" type="text/css"
+              href="<stripes:url value="/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"/>"/>
 
         <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
@@ -41,6 +43,8 @@
                 src="<stripes:url value="/elements/bootstrap/js/bootstrap.min.js"/>"></script>
         <script type="text/javascript"
                 src="<stripes:url value="/elements/datepicker/js/bootstrap-datepicker.js"/>"></script>
+        <script type="text/javascript"
+                src="<stripes:url value="/jquery-ui/js/jquery-ui-1.10.3.custom.min.js" />"></script>
 
         <script type="text/javascript"
                 src="<stripes:url value="/elements/elements.js"/>"></script>
