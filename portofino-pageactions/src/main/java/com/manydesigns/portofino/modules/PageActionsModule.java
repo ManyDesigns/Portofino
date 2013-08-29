@@ -27,9 +27,6 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.SettingsAction;
-import com.manydesigns.portofino.actions.admin.page.PageAdminAction;
-import com.manydesigns.portofino.actions.admin.page.RootChildrenAction;
-import com.manydesigns.portofino.actions.admin.page.RootPermissionsAction;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.dispatcher.Dispatch;
@@ -54,7 +51,6 @@ import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
 import groovy.util.GroovyScriptEngine;
 import net.sf.ehcache.CacheManager;
 import net.sourceforge.stripes.action.ActionBean;
-import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlRuntime;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.SecurityUtils;
@@ -73,7 +69,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -100,9 +95,6 @@ public class PageActionsModule implements Module {
 
     @Inject(BaseModule.ADMIN_MENU)
     public MenuBuilder adminMenu;
-
-    @Inject(BaseModule.APP_MENU)
-    public MenuBuilder appMenu;
 
     @Inject(BaseModule.HTML_HEAD_BUILDER)
     public HtmlHeadBuilder headBuilder;
@@ -248,8 +240,9 @@ public class PageActionsModule implements Module {
         LifecycleUtils.init(realm);
         rsm.setRealm(realm);
 
-        appendToAdminMenu();
-        appendToAppMenu();
+        SimpleMenuAppender link = SimpleMenuAppender.link(
+                "configuration", "settings", null, "Settings", SettingsAction.URL_BINDING, 0.5);
+        adminMenu.menuAppenders.add(link);
 
         setupHead();
 
@@ -272,130 +265,6 @@ public class PageActionsModule implements Module {
         }
         scriptEngine.setConfig(cc);
         return scriptEngine;
-    }
-
-
-    protected void appendToAppMenu() {
-        appMenu.menuAppenders.add(new MenuAppender() {
-            @Override
-            public void append(Menu menu) {
-                HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-                if(!(request.getAttribute("actionBean") instanceof PageAction)) {
-                    return;
-                }
-                PageAction pageAction = (PageAction) request.getAttribute("actionBean");
-                if(pageAction.getDispatch() != null &&
-                   SecurityLogic.hasPermissions(
-                           configuration, pageAction.getPageInstance(),
-                           SecurityUtils.getSubject(), AccessLevel.EDIT)) {
-                    MenuGroup pageGroup = new MenuGroup("page", "icon-file icon-white", "Page", 1.0);
-                    menu.items.add(pageGroup);
-                }
-            }
-        });
-
-        appMenu.menuAppenders.add(new PageMenuAppender() {
-            @Override
-            public void append(MenuGroup pageMenu, PageAction pageAction) {
-                HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-
-                MenuLink link = new MenuLink(
-                        "editLayout",
-                        "icon-file icon-white",
-                        "Edit layout",
-                        "javascript:portofino.enablePortletDragAndDrop($(this), '" +
-                                pageAction.getDispatch().getOriginalPath() +
-                                "');",
-                        1.0);
-                pageMenu.menuLinks.add(link);
-
-                UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, false);
-                urlBuilder.addParameter("originalPath", pageAction.getDispatch().getOriginalPath());
-                urlBuilder.setEvent("pageChildren");
-                link = new MenuLink(
-                        "pageChildren",
-                        "icon-folder-open icon-white",
-                        "Page children",
-                        request.getContextPath() + urlBuilder.toString(),
-                        2.0);
-                pageMenu.menuLinks.add(link);
-
-                urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, false);
-                urlBuilder.addParameter("originalPath", pageAction.getDispatch().getOriginalPath());
-                urlBuilder.setEvent("newPage");
-                link = new MenuLink(
-                        "newPage",
-                        "icon-plus icon-white",
-                        "Add new page",
-                        request.getContextPath() + urlBuilder.toString(),
-                        3.0);
-                pageMenu.menuLinks.add(link);
-
-                String jsArgs = "('" +
-                        pageAction.getDispatch().getOriginalPath() + "', '" +
-                        request.getContextPath() + "');";
-
-                link = new MenuLink(
-                        "deletePage",
-                        "icon-minus icon-white",
-                        "Delete page",
-                        "javascript:portofino.confirmDeletePage" + jsArgs,
-                        4.0);
-                pageMenu.menuLinks.add(link);
-
-                link = new MenuLink(
-                        "copyPage",
-                        "icon-file icon-white",
-                        "Copy page",
-                        "javascript:portofino.showCopyPageDialog" + jsArgs,
-                        5.0);
-                pageMenu.menuLinks.add(link);
-
-                link = new MenuLink(
-                        "movePage",
-                        "icon-share icon-white",
-                        "Move page",
-                        "javascript:portofino.showMovePageDialog" + jsArgs,
-                        6.0);
-                pageMenu.menuLinks.add(link);
-
-                if(SecurityLogic.hasPermissions(
-                        configuration, pageAction.getPageInstance(),
-                        SecurityUtils.getSubject(), AccessLevel.DEVELOP)) {
-                    urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, false);
-                    urlBuilder.addParameter("originalPath", pageAction.getDispatch().getOriginalPath());
-                    urlBuilder.setEvent("pagePermissions");
-                    link = new MenuLink(
-                            "pagePermissions",
-                            "icon-user icon-white",
-                            "Page permissions",
-                            request.getContextPath() + urlBuilder.toString(),
-                        7.0);
-                    pageMenu.menuLinks.add(link);
-                }
-            }
-        });
-
-    }
-
-    protected void appendToAdminMenu() {
-        SimpleMenuAppender group;
-        SimpleMenuAppender link;
-
-        group = SimpleMenuAppender.group("security", null, "Security", 2.0);
-        adminMenu.menuAppenders.add(group);
-
-        link = SimpleMenuAppender.link(
-                "security", "rootPermissions", null, "Root permissions", RootPermissionsAction.URL_BINDING, 1.0);
-        adminMenu.menuAppenders.add(link);
-
-
-        link = SimpleMenuAppender.link(
-                "configuration", "settings", null, "Settings", SettingsAction.URL_BINDING, 0.5);
-        adminMenu.menuAppenders.add(link);
-        link = SimpleMenuAppender.link(
-                "configuration", "topLevelPages", null, "Top-level pages", RootChildrenAction.URL_BINDING, 3.0);
-        adminMenu.menuAppenders.add(link);
     }
 
     public abstract class PageMenuAppender implements MenuAppender {

@@ -18,10 +18,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.actions.forms;
+package com.manydesigns.portofino.actions.admin.forms;
 
-import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.annotations.RegExp;
+import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.annotations.Required;
 
 /**
@@ -30,17 +29,12 @@ import com.manydesigns.elements.annotations.Required;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class CopyPage {
+public class MovePage {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    @RegExp(value = "[a-zA-Z0-9][a-zA-Z0-9_\\-]*", errorMessage = "page.invalid.fragment")
     @Required
-    @Label("Fragment")
-    public String fragment;
-
-    @Required
-    @Label("Copy to")
+    @LabelI18N("layouts.admin.movePageDialog.choose_where_move")
     public String destinationPagePath;
 
 }

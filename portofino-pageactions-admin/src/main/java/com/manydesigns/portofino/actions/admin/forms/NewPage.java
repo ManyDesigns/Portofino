@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.actions.forms;
+package com.manydesigns.portofino.actions.admin.forms;
 
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.RegExp;
