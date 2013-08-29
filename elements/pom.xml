@@ -93,39 +93,7 @@
             <artifactId>json</artifactId>
             <version>${json.version}</version>
         </dependency>
-        <!-- Struts 1 dependencies (provided) -->
-        <dependency>
-            <groupId>org.apache.struts</groupId>
-            <artifactId>struts-core</artifactId>
-            <version>${struts1.version}</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion><!-- Exclude incompatible version (2.7.2) and, below, include the right one -->
-                    <groupId>antlr</groupId>
-                    <artifactId>antlr</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>antlr</groupId>
-            <artifactId>antlr</artifactId>
-            <version>${antlr.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>commons-chain</groupId>
-            <artifactId>commons-chain</artifactId>
-            <version>${commons.chain.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- Struts 2 dependencies (provided) -->
-        <dependency>
-            <groupId>org.apache.struts</groupId>
-            <artifactId>struts2-core</artifactId>
-            <version>${struts2.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- Struts 2 dependencies (provided) -->
+        <!-- Stripes dependencies (provided) -->
         <dependency>
             <groupId>net.sourceforge.stripes</groupId>
             <artifactId>stripes</artifactId>

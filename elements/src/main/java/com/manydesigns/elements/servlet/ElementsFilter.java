@@ -107,10 +107,6 @@ public class ElementsFilter implements Filter {
             ElementsThreadLocals.setupDefaultElementsContext();
             OgnlContext ognlContext = ElementsThreadLocals.getOgnlContext();
 
-            logger.debug("Wrapping request");
-            WebFramework webFramework = ElementsThreadLocals.getWebFramework();
-            req = webFramework.wrapRequest(req);
-
             logger.debug("Creating request attribute mapper");
             AttributeMap requestAttributeMap =
                     AttributeMap.createAttributeMap(req);

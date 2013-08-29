@@ -24,7 +24,6 @@ import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.i18n.SimpleTextProvider;
 import com.manydesigns.elements.i18n.TextProvider;
 import com.manydesigns.elements.ognl.CustomTypeConverter;
-import com.manydesigns.elements.servlet.WebFramework;
 import ognl.Ognl;
 import ognl.OgnlContext;
 import ognl.TypeConverter;
@@ -124,15 +123,6 @@ public final class ElementsThreadLocals {
         getElementsContext().setBlobManager(blobManager);
     }
 
-    public static WebFramework getWebFramework() {
-        return getElementsContext().getWebFramework();
-    }
-
-    public static void setWebFramework(WebFramework webFramework) {
-        getElementsContext().setWebFramework(webFramework);
-    }
-
-
     //**************************************************************************
     // Utility methods
     //**************************************************************************
@@ -150,7 +140,6 @@ public final class ElementsThreadLocals {
         elementsContext.setHttpServletRequest(null);
         elementsContext.setHttpServletResponse(null);
         elementsContext.setServletContext(null);
-        elementsContext.setWebFramework(WebFramework.getDefaultWebFramework());
 
         BlobManager blobManager = BlobManager.createDefaultBlobManager();
         elementsContext.setBlobManager(blobManager);

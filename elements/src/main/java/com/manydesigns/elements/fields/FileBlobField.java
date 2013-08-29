@@ -25,16 +25,17 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import com.manydesigns.elements.servlet.Upload;
-import com.manydesigns.elements.servlet.WebFramework;
 import com.manydesigns.elements.util.MemoryUtil;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
+import net.sourceforge.stripes.action.FileBean;
+import net.sourceforge.stripes.controller.StripesRequestWrapper;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -224,25 +225,26 @@ public class FileBlobField extends AbstractField
     }
 
     private void saveUpload(HttpServletRequest req) {
-        WebFramework webFramework = ElementsThreadLocals.getWebFramework();
-
         BlobManager blobManager = ElementsThreadLocals.getBlobManager();
         if (blobManager == null) {
             logger.warn("No blob manager found. Cannot save upload.");
             throw new Error("No blob manager found. Cannot save upload.");
         }
 
-        Upload upload = null;
+        FileBean fileBean = null;
         try {
-            upload = webFramework.getUpload(req, inputName);
-            if (upload != null) {
+            StripesRequestWrapper stripesRequest =
+                StripesRequestWrapper.findStripesWrapper(req);
+            fileBean = stripesRequest.getFileParameterValue(inputName);
+
+            if (fileBean != null) {
                 String code = RandomUtil.createRandomId();
                 blob = blobManager.saveBlob(
                         code,
-                        upload.getInputStream(), 
-                        upload.getFilename(),
-                        upload.getContentType(),
-                        upload.getCharacterEncoding());
+                        fileBean.getInputStream(),
+                        fileBean.getFileName(),
+                        fileBean.getContentType(),
+                        null);
             } else {
                 logger.debug("An update of a blob was requested, but nothing was uploaded. The previous value will be kept.");
                 String code = req.getParameter(codeInputName);
@@ -252,8 +254,12 @@ public class FileBlobField extends AbstractField
             logger.warn("Cannot save upload", e);
             throw new Error("Cannot save upload", e);
         } finally {
-            if(upload != null) {
-                upload.dispose();
+            if(fileBean != null) {
+                try {
+                    fileBean.delete();
+                } catch (IOException e) {
+                    logger.warn("Could not delete file bean", e);
+                }
             }
         }
     }

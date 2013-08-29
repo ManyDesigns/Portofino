@@ -22,7 +22,6 @@ package com.manydesigns.elements;
 
 import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.i18n.TextProvider;
-import com.manydesigns.elements.servlet.WebFramework;
 import ognl.OgnlContext;
 
 import javax.servlet.ServletContext;
@@ -45,7 +44,6 @@ public class ElementsContext {
     protected ServletContext servletContext;
     protected OgnlContext ognlContext;
     protected BlobManager blobManager;
-    protected WebFramework webFramework;
 
     //**************************************************************************
     // Constructors
@@ -104,11 +102,4 @@ public class ElementsContext {
         this.blobManager = blobManager;
     }
 
-    public WebFramework getWebFramework() {
-        return webFramework;
-    }
-
-    public void setWebFramework(WebFramework webFramework) {
-        this.webFramework = webFramework;
-    }
 }

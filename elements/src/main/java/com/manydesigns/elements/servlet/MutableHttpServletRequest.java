@@ -20,17 +20,19 @@
 
 package com.manydesigns.elements.servlet;
 
+import net.sourceforge.stripes.action.FileBean;
+import net.sourceforge.stripes.controller.FileUploadLimitExceededException;
+import net.sourceforge.stripes.controller.multipart.MultipartWrapper;
 import net.sourceforge.stripes.mock.MockHttpSession;
 import net.sourceforge.stripes.mock.MockServletContext;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 
 import javax.servlet.*;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
+import javax.servlet.http.*;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
@@ -42,7 +44,7 @@ import java.util.*;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class MutableHttpServletRequest implements MultipartRequest {
+public class MutableHttpServletRequest implements HttpServletRequest, MultipartWrapper {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -58,6 +60,8 @@ public class MutableHttpServletRequest implements MultipartRequest {
     private String contextPath;
     private String servletPath;
     private String requestURI;
+
+    private String contentType;
 
     private MockServletContext servletContext;
     private MockHttpSession session;
@@ -123,6 +127,11 @@ public class MutableHttpServletRequest implements MultipartRequest {
         this.servletPath = servletPath;
     }
 
+    public void makeMultipart() {
+        setMethod("POST");
+        setContentType("multipart/form-data");
+    }
+
     //**************************************************************************
     // HttpServletRequest implementation
     //**************************************************************************
@@ -136,12 +145,38 @@ public class MutableHttpServletRequest implements MultipartRequest {
         }
     }
 
+    @Override
+    public void build(HttpServletRequest request, File tempDir, long maxPostSize) throws IOException, FileUploadLimitExceededException {
+
+    }
+
     public Enumeration getParameterNames() {
         return Collections.enumeration(parameterMap.keySet());
     }
 
     public String[] getParameterValues(String name) {
         return parameterMap.get(name);
+    }
+
+    @Override
+    public Enumeration<String> getFileParameterNames() {
+        return new Vector<String>(fileItemMap.keySet()).elements();
+    }
+
+    @Override
+    public FileBean getFileParameterValue(String name) {
+        FileItem item = getFileItem(name);
+        if(item == null) {
+            return null;
+        }
+        try {
+            File file = File.createTempFile("blob", name);
+            FileUtils.copyInputStreamToFile(item.getInputStream(), file);
+            FileBean fileBean = new FileBean(file, item.getContentType(), item.getName(), null);
+            return fileBean;
+        } catch (IOException e) {
+            throw new Error(e);
+        }
     }
 
     public Map getParameterMap() {
@@ -205,7 +240,7 @@ public class MutableHttpServletRequest implements MultipartRequest {
     }
 
     public String getPathInfo() {
-        throw new UnsupportedOperationException();
+        return null; //TODO
     }
 
     public String getPathTranslated() {
@@ -293,7 +328,11 @@ public class MutableHttpServletRequest implements MultipartRequest {
     }
 
     public String getContentType() {
-        throw new UnsupportedOperationException();
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
     public ServletInputStream getInputStream() throws IOException {

@@ -73,14 +73,15 @@ public class SelectSearchField extends AbstractSearchField {
                 }
                 selectionModel = sp.createSelectionModel();
                 displayMode = annotation.searchDisplayMode();
-            } else {
-                displayMode = SearchDisplayMode.DROPDOWN;
             }
         } else {
             displayMode = selectionProvider.getSearchDisplayMode();
             if(displayMode == null && annotation != null) {
                 displayMode = annotation.searchDisplayMode();
             }
+        }
+        if(displayMode == null) {
+            displayMode = SearchDisplayMode.DROPDOWN;
         }
         selectionModelIndex = 0;
         comboLabel = getText("elements.field.select.select", label);
