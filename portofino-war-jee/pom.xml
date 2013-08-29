@@ -16,25 +16,25 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-database</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>manydesigns-mail</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-stripes</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-war</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
             <type>war</type>
         </dependency>
