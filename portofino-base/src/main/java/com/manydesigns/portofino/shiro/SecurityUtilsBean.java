@@ -23,6 +23,8 @@ package com.manydesigns.portofino.shiro;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 
+import java.io.Serializable;
+
 /**
  * A bean meant to facilitate access to certain static methods in OGNL. Wraps static methods in the SecurityUtils
  * and ShiroUtils classes and exposed them as JavaBean properties or ordinary instance methods.
@@ -41,6 +43,10 @@ public class SecurityUtilsBean {
      */
     public Subject getSubject() {
         return SecurityUtils.getSubject();
+    }
+
+    public Serializable getUserId() {
+        return ShiroUtils.getUserId(getSubject());
     }
 
     /**
