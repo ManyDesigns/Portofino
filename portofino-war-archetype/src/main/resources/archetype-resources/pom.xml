@@ -9,7 +9,6 @@
     <artifactId>${artifactId}</artifactId>
     <groupId>${groupId}</groupId>
     <packaging>war</packaging>
-    <name>${name}</name>
     <version>${version}</version>
     <dependencies>
         <dependency>
