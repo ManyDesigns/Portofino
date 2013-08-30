@@ -57,7 +57,7 @@
             }
         %>
         </table>
-        <script type="text/javascript" src="<%= request.getContextPath() %>/jquery-treetable-3.0.1/jquery.treetable.js" >
+        <script type="text/javascript" src="<%= request.getContextPath() %>/m/portofino-database/jquery-treetable-3.0.1/jquery.treetable.js" >
         </script>
         <script type="text/javascript">
             $("#projectTree").treetable({"clickableNodeNames": true, "expandable":true, "treeColumn":0, "indent":20 });

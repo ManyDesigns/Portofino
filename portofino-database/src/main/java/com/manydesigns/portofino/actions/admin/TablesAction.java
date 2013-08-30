@@ -154,7 +154,7 @@ public class TablesAction extends AbstractActionBean {
     }
 
     public Resolution search() {
-        return new ForwardResolution("/layouts/admin/tables/list.jsp");
+        return new ForwardResolution("/m/portofino-database/actions/admin/tables/list.jsp");
     }
 
     public Resolution editTable() {
@@ -165,7 +165,7 @@ public class TablesAction extends AbstractActionBean {
             fkOnePropertyNames.put(fk.getName(), fk.getOnePropertyName());
             fkManyPropertyNames.put(fk.getName(), fk.getManyPropertyName());
         }
-        return new ForwardResolution("/layouts/admin/tables/edit-table.jsp");
+        return new ForwardResolution("/m/portofino-database/actions/admin/tables/edit-table.jsp");
     }
 
     public Resolution editColumn() {
@@ -173,7 +173,7 @@ public class TablesAction extends AbstractActionBean {
         tableForm.readFromRequest(context.getRequest());
 
         setupColumnForm();
-        return new ForwardResolution("/layouts/admin/tables/edit-column.jsp");
+        return new ForwardResolution("/m/portofino-database/actions/admin/tables/edit-column.jsp");
     }
 
     @Button(key = "commons.save", list = "table-edit", order = 1, type = Button.TYPE_PRIMARY)
@@ -245,7 +245,7 @@ public class TablesAction extends AbstractActionBean {
                     .addParameter("schemaName", schemaName)
                     .addParameter("tableName", tableName);
         } else {
-            return new ForwardResolution("/layouts/admin/tables/edit-table.jsp");
+            return new ForwardResolution("/m/portofino-database/actions/admin/tables/edit-table.jsp");
         }
     }
 
@@ -370,7 +370,7 @@ public class TablesAction extends AbstractActionBean {
     protected Resolution doEditSelectionProvider(DatabaseSelectionProviderForm databaseSelectionProviderForm) {
         setupTableForm(Mode.HIDDEN);
         tableForm.readFromRequest(context.getRequest());
-        return new ForwardResolution("/layouts/admin/tables/edit-db-selection-provider.jsp");
+        return new ForwardResolution("/m/portofino-database/actions/admin/tables/edit-db-selection-provider.jsp");
     }
 
     protected DatabaseSelectionProviderForm setupDbSelectionProviderForm(Mode mode) {

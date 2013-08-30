@@ -156,7 +156,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                         .build();
         databasePlatformsTableForm.readFromObject(databasePlatforms);
 
-        return new ForwardResolution("/layouts/admin/connectionProviders/list.jsp");
+        return new ForwardResolution("/m/portofino-database/actions/admin/connectionProviders/list.jsp");
     }
 
     public Resolution read() {
@@ -172,7 +172,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
             configureDetected();
         }
 
-        return new ForwardResolution("/layouts/admin/connectionProviders/read.jsp");
+        return new ForwardResolution("/m/portofino-database/actions/admin/connectionProviders/read.jsp");
     }
 
     public final static String[] jdbcViewFields = {"databaseName", "driver",
@@ -293,7 +293,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
 
         configureEditSchemas();
 
-        return new ForwardResolution("/layouts/admin/connectionProviders/edit.jsp");
+        return new ForwardResolution("/m/portofino-database/actions/admin/connectionProviders/edit.jsp");
     }
 
     @Button(list = "connectionProviders-edit", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
@@ -356,7 +356,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
             }
             return new RedirectResolution(this.getClass()).addParameter("databaseName", databaseName);
         } else {
-            return new ForwardResolution("/layouts/admin/connectionProviders/edit.jsp");
+            return new ForwardResolution("/m/portofino-database/actions/admin/connectionProviders/edit.jsp");
         }
     }
 

@@ -152,7 +152,7 @@ public class ChartAction extends AbstractPageAction {
             return forwardToPortletError(e);
         }
 
-        return forwardTo("/layouts/chart/chart.jsp");
+        return forwardTo("/m/portofino-database/pageactions/chart/chart.jsp");
     }
 
     public void generateChart() {
@@ -257,7 +257,7 @@ public class ChartAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();
-        return new ForwardResolution("/layouts/chart/configure.jsp");
+        return new ForwardResolution("/m/portofino-database/pageactions/chart/configure.jsp");
     }
 
     @Override
@@ -321,7 +321,7 @@ public class ChartAction extends AbstractPageAction {
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.updated"));
             return cancel();
         } else {
-            return new ForwardResolution("/layouts/chart/configure.jsp");
+            return new ForwardResolution("/m/portofino-database/pageactions/chart/configure.jsp");
         }
     }
 

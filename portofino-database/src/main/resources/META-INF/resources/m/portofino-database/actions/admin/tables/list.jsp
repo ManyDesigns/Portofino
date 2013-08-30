@@ -5,14 +5,17 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
+%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/m/portofino-base/admin-theme/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.TablesAction"/>
     <stripes:layout-component name="customScripts">
-        <script type="text/javascript" src="<%= request.getContextPath() %>/jquery-treetable-3.0.1/jquery.treetable.js" >
+        <stripes:url var="treetablePath"
+                     value="/m/portofino-database/jquery-treetable-3.0.1" />
+
+        <script type="text/javascript" src="${treetablePath}/jquery.treetable.js" >
         </script>
 
         <script type="text/javascript">
@@ -59,7 +62,7 @@
             }
 
             table.treetable thead {
-              background: #aaa url(../../jquery-treetable-3.0.1/images/bg-table-thead.png) repeat-x top left;
+              background: #aaa url(${treetablePath}/images/bg-table-thead.png) repeat-x top left;
             }
 
             table.treetable thead tr th {
@@ -81,19 +84,19 @@
             }
 
             table.treetable span.file {
-              background-image: url(../../jquery-treetable-3.0.1/images/file.png);
+              background-image: url(${treetablePath}/images/file.png);
             }
 
             table.treetable span.folder {
-              background-image: url(../../jquery-treetable-3.0.1/images/folder.png);
+              background-image: url(${treetablePath}/images/folder.png);
             }
 
             table.treetable tr.collapsed span.indenter a {
-              background-image: url(../../jquery-treetable-3.0.1/images/expand.png);
+              background-image: url(${treetablePath}/images/expand.png);
             }
 
             table.treetable tr.expanded span.indenter a {
-              background-image: url(../../jquery-treetable-3.0.1/images/collapse.png);
+              background-image: url(${treetablePath}/images/collapse.png);
             }
 
             table.treetable tr.selected {
@@ -102,11 +105,11 @@
             }
 
             table.treetable tr.collapsed.selected span.indenter a {
-              background-image: url(../../jquery-treetable-3.0.1/images/expand-light.png);
+              background-image: url(${treetablePath}/images/expand-light.png);
             }
 
             table.treetable tr.expanded.selected span.indenter a {
-              background-image: url(../../jquery-treetable-3.0.1/images/collapse-light.png);
+              background-image: url(${treetablePath}/images/collapse-light.png);
             }
 
             table.treetable tr.accept {
@@ -115,11 +118,11 @@
             }
 
             table.treetable tr.collapsed.accept td span.indenter a {
-              background-image: url(../../jquery-treetable-3.0.1/images/expand-light.png);
+              background-image: url(${treetablePath}/images/expand-light.png);
             }
 
             table.treetable tr.expanded.accept td span.indenter a {
-              background-image: url(../../jquery-treetable-3.0.1/images/collapse-light.png);
+              background-image: url(${treetablePath}/images/collapse-light.png);
             }
         </style>
     </stripes:layout-component>
@@ -160,7 +163,7 @@
                         File changelogFile = new File(actionBean.getPersistence().getAppDbsDir(), changelogFileName);
                         String schemaDescr = table.getSchemaName();
                         if(changelogFile.isFile()) {
-                            schemaDescr += " <img src='" + request.getContextPath() + "/layouts/admin/tables/liquibase_logo_small.gif' /> Liquibase";
+                            schemaDescr += " <img src='" + request.getContextPath() + "/m/portofino-database/actions/admin/tables/liquibase_logo_small.gif' /> Liquibase";
                         }
 
                         lastDatabase = table.getDatabaseName();
