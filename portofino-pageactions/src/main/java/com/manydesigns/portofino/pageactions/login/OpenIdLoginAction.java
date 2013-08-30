@@ -181,13 +181,13 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
                 session.setAttribute(OPENID_IDENTIFIER, identifier);
                 return signUp();
             } catch (AuthenticationException e) {
-                String errMsg = MessageFormat.format(ElementsThreadLocals.getText("user.login.failed"), userName);
+                String errMsg = MessageFormat.format(ElementsThreadLocals.getText("user.login.failed"), identifier.getIdentifier());
                 SessionMessages.addErrorMessage(errMsg);
                 logger.warn(errMsg, e);
                 return new ForwardResolution(getLoginPage());
             }
         } else {
-            String errMsg = MessageFormat.format(ElementsThreadLocals.getText("user.login.failed"), userName);
+            String errMsg = MessageFormat.format(ElementsThreadLocals.getText("user.login.failed"), "(failed OpenId authentication)");
             SessionMessages.addErrorMessage(errMsg);
             return new ForwardResolution(getLoginPage());
         }
