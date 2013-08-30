@@ -38,8 +38,6 @@ public class AppProperties {
             "landing.page";
     public static final String SKIN =
             "skin";
-    public static final String OPENID_ENABLED =
-            "openId.enabled";
 
     public static final String GROUP_ALL = "group.all";
     public static final String GROUP_ANONYMOUS = "group.anonymous";

@@ -2,7 +2,6 @@ package com.manydesigns.portofino.pageactions.login;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.AppProperties;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageAction;
@@ -13,7 +12,6 @@ import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.shiro.PortofinoRealm;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.shiro.openid.OpenIDToken;
-import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
@@ -91,9 +89,6 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
 
     public Resolution showOpenIDForm()
             throws ConsumerException, MessageException, DiscoveryException, MalformedURLException {
-        if(!isOpenIdEnabled()) {
-            return new ErrorResolution(403);
-        }
         ConsumerManager manager = new ConsumerManager();
 
         // perform discovery on the user-supplied identifier
@@ -138,9 +133,6 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
     }
 
     public Resolution handleOpenIDLogin() throws DiscoveryException, AssociationException, MessageException {
-        if(!isOpenIdEnabled()) {
-            return new ErrorResolution(403);
-        }
         // extract the parameters from the authentication response
         // (which comes in as a HTTP request from the OpenID provider)
         HttpServletRequest request = context.getRequest();
@@ -232,10 +224,6 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
             SessionMessages.addErrorMessage("Correct the errors before proceding");
             return new ForwardResolution(getSignUpPage());
         }
-    }
-
-    public boolean isOpenIdEnabled() {
-        return portofinoConfiguration.getBoolean(AppProperties.OPENID_ENABLED, false);
     }
 
     public String getOpenIdUrl() {
