@@ -89,7 +89,7 @@
                             Menu adminMenu = adminMenuBuilder.build();
                             for(MenuItem item : adminMenu.items) {
                                 if(item instanceof MenuGroup) {
-                                    %><li class="nav-header"><%= item.label %></li><%
+                                    %><li class="nav-header"><c:out value="<%= item.label %>"/></li><%
                                     for(MenuLink link : ((MenuGroup) item).menuLinks) {
                                         String adminLinkClass = getLinkClass(link, request);
                                         %>
