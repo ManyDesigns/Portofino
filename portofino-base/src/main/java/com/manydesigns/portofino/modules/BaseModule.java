@@ -159,8 +159,6 @@ public class BaseModule implements Module {
 
                 xb.writeLink("stylesheet", "text/css",
                              Util.getAbsoluteUrl("/elements/bootstrap/css/bootstrap.min.css"));
-                //Deve essere dopo bootstrap.min.css ma prima di bootstrap-responsive.min.css
-                xb.writeStyle("body { padding-top: 50px; }");
                 xb.writeLink("stylesheet", "text/css",
                              Util.getAbsoluteUrl("/elements/bootstrap/css/bootstrap-responsive.min.css"));
                 xb.writeLink("stylesheet", "text/css",

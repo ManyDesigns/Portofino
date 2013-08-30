@@ -22,7 +22,6 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.admin.SettingsAction;
 import com.manydesigns.portofino.actions.admin.page.PageAdminAction;
 import com.manydesigns.portofino.actions.admin.page.RootChildrenAction;
 import com.manydesigns.portofino.actions.admin.page.RootPermissionsAction;
@@ -148,7 +147,7 @@ public class PageActionsAdminModule implements Module {
                    SecurityLogic.hasPermissions(
                            configuration, pageAction.getPageInstance(),
                            SecurityUtils.getSubject(), AccessLevel.EDIT)) {
-                    MenuGroup pageGroup = new MenuGroup("page", "icon-file icon-white", "Page", 1.0);
+                    MenuGroup pageGroup = new MenuGroup("page", "icon-file", "Page", 1.0);
                     menu.items.add(pageGroup);
                 }
             }
@@ -161,7 +160,7 @@ public class PageActionsAdminModule implements Module {
 
                 MenuLink link = new MenuLink(
                         "editLayout",
-                        "icon-file icon-white",
+                        "icon-file",
                         "Edit layout",
                         "javascript:portofino.enablePortletDragAndDrop($(this), '" +
                                 pageAction.getDispatch().getOriginalPath() +
@@ -174,7 +173,7 @@ public class PageActionsAdminModule implements Module {
                 urlBuilder.setEvent("pageChildren");
                 link = new MenuLink(
                         "pageChildren",
-                        "icon-folder-open icon-white",
+                        "icon-folder-open",
                         "Page children",
                         request.getContextPath() + urlBuilder.toString(),
                         2.0);
@@ -185,7 +184,7 @@ public class PageActionsAdminModule implements Module {
                 urlBuilder.setEvent("newPage");
                 link = new MenuLink(
                         "newPage",
-                        "icon-plus icon-white",
+                        "icon-plus",
                         "Add new page",
                         request.getContextPath() + urlBuilder.toString(),
                         3.0);
@@ -197,7 +196,7 @@ public class PageActionsAdminModule implements Module {
 
                 link = new MenuLink(
                         "deletePage",
-                        "icon-minus icon-white",
+                        "icon-minus",
                         "Delete page",
                         "javascript:portofino.confirmDeletePage" + jsArgs,
                         4.0);
@@ -205,7 +204,7 @@ public class PageActionsAdminModule implements Module {
 
                 link = new MenuLink(
                         "copyPage",
-                        "icon-file icon-white",
+                        "icon-file",
                         "Copy page",
                         "javascript:portofino.showCopyPageDialog" + jsArgs,
                         5.0);
@@ -213,7 +212,7 @@ public class PageActionsAdminModule implements Module {
 
                 link = new MenuLink(
                         "movePage",
-                        "icon-share icon-white",
+                        "icon-share",
                         "Move page",
                         "javascript:portofino.showMovePageDialog" + jsArgs,
                         6.0);
@@ -227,7 +226,7 @@ public class PageActionsAdminModule implements Module {
                     urlBuilder.setEvent("pagePermissions");
                     link = new MenuLink(
                             "pagePermissions",
-                            "icon-user icon-white",
+                            "icon-user",
                             "Page permissions",
                             request.getContextPath() + urlBuilder.toString(),
                         7.0);

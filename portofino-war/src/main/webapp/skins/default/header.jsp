@@ -11,6 +11,13 @@
              type="org.apache.commons.configuration.Configuration"/>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.stripes.AbstractActionBean"/>
 <fmt:setLocale value="${pageContext.request.locale}"/>
+<style type="text/css">
+@media (min-width: 980px) {
+    body {
+        padding-top: 50px;
+    }
+}
+</style>
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">

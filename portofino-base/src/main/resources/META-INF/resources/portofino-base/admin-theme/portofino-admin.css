@@ -8,21 +8,21 @@ footer {
     padding-bottom: 10px;
 }
 
-.navbar-fixed-top a {
+.navbar-inverse, .navbar-inverse a, .navbar-inverse #header-menu li > a {
     color: #ffffff;
 }
 
-.navbar-fixed-top {
-    color: #ffffff;
-}
-
-#header-menu li > a {
-    color: #ffffff;
-}
-
-#header-menu li.dropdown > .dropdown-toggle .caret {
+.navbar-inverse #header-menu li.dropdown > .dropdown-toggle .caret {
     border-bottom-color: #ffffff;
     border-top-color: #ffffff;
+}
+
+.navbar-inverse [class^="icon-"], .navbar-inverse [class*=" icon-"] {
+    background-image: url("../../elements/bootstrap/img/glyphicons-halflings-white.png")
+}
+
+.dropdown-menu li > a {
+    color: #ffffff;
 }
 
 @media (min-width: 980px) {
@@ -37,11 +37,23 @@ footer {
     #header-menu .dropdown-menu {
         background-color: #555555;
     }
+
+    .dropdown-menu li > a [class^="icon-"], .dropdown-menu li > a [class*="icon-"] {
+        background-image: url("../../elements/bootstrap/img/glyphicons-halflings-white.png")
+    }
 }
 
 @media (max-width: 979px) {
     #header-menu {
         float: none;
+    }
+
+    .dropdown-menu li > a [class^="icon-"], .dropdown-menu li > a [class*="icon-"] {
+        background-image: url("../../elements/bootstrap/img/glyphicons-halflings.png")
+    }
+
+    .navbar-inverse .dropdown-menu li > a [class^="icon-"], .navbar-inverse .dropdown-menu li > a [class*="icon-"] {
+        background-image: url("../../elements/bootstrap/img/glyphicons-halflings-white.png")
     }
 }
 
