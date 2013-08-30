@@ -1023,7 +1023,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                 String childQuery =
                         "from " + entityName +
                         " where " + linkToUserProperty +
-                        " = %{#securityUtils.getPrincipal(1).getDatabaseId()}" +
+                        " = %{#securityUtils.primaryPrincipal.id}" +
                         " order by id desc";
                 String dirName = "my-" + entityName;
                 boolean multipleRoles = isMultipleRoles(fromTable, ref, references);
@@ -1035,7 +1035,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
                 Map<String, String> bindings = new HashMap<String, String>();
                 bindings.put("parentName", "securityUtils");
-                bindings.put("parentProperty", "getPrincipal(1).getDatabaseId()");
+                bindings.put("parentProperty", "primaryPrincipal.id");
                 bindings.put("linkToParentProperty", linkToUserProperty);
 
                 Page page = createCrudPage(
