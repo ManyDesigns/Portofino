@@ -69,16 +69,11 @@ public class ElementsCommand implements Command {
             textProvider = new Struts1TextProvider(messageResources);
         }
 
-        OgnlContext ognlContext = (OgnlContext) Ognl.createDefaultContext(null);
-
-        ElementsContext elementsContext =
-                ElementsThreadLocals.getElementsContext();
-
-        elementsContext.setHttpServletRequest(request);
-        elementsContext.setHttpServletResponse(response);
-        elementsContext.setServletContext(servletContext);
-        elementsContext.setTextProvider(textProvider);
-        elementsContext.setOgnlContext(ognlContext);
+        ElementsThreadLocals.setupDefaultElementsContext();
+        ElementsThreadLocals.setHttpServletRequest(request);
+        ElementsThreadLocals.setHttpServletResponse(response);
+        ElementsThreadLocals.setServletContext(servletContext);
+        ElementsThreadLocals.setTextProvider(textProvider);
 
         return CONTINUE_PROCESSING;
     }
