@@ -22,12 +22,12 @@
                 <div class="controls">
                     <div class="input-append" style="margin-top: 5px;">
                         <input id="captcha" name="captchaText" type="text" autocomplete="off" class="input-small" />
-                        <a onclick="$('#captcha-image').attr('src', '${pageContext.request.contextPath}/${actionBean.originalPath}?captcha=' + Math.random());"
+                        <a onclick="$('#captcha-image').attr('src', '${pageContext.request.contextPath}${actionBean.originalPath}?captcha=' + Math.random());"
                            class="btn" >
                             <i class="icon-refresh"></i>
                         </a>
                     </div>
-                    <img alt="captcha image" id="captcha-image" src="${pageContext.request.contextPath}/${actionBean.originalPath}?captcha=" />
+                    <img alt="captcha image" id="captcha-image" src="${pageContext.request.contextPath}${actionBean.originalPath}?captcha=" />
                     <c:if test="${actionBean.captchaValidationFailed}">
                         <span class="help-inline"><fmt:message key="skins.default.login.captcha.error" /></span>
                     </c:if>
