@@ -125,14 +125,14 @@ public class PasswordField extends TextField {
                 closeVisibleField(xb);
                 //Open another input
                 xb.openElement("div");
-                String cssClass = "control-group";
+                String cssClass = "control-group readwrite required";
                 if(errors.size() > 0) {
                     cssClass += " error";
                 }
                 xb.addAttribute("class", cssClass);
                 String confirmationHtmlId = id + "_confirm";
                 String confirmationInputName = inputName + "_confirm";
-                String confirmLabel = ElementsThreadLocals.getText("elements.field.password.confirm");
+                String confirmLabel = ElementsThreadLocals.getText("elements.field.password.confirm") + " " + label;
                 String actualLabel;
                 boolean capitalize = elementsConfiguration.getBoolean(
                         ElementsProperties.FIELDS_LABEL_CAPITALIZE);

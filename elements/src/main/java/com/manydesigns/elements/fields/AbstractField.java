@@ -206,6 +206,8 @@ public abstract class AbstractField implements Field {
         String cssClass = "control-group";
         if(mode.isView(insertable, updatable)) {
             cssClass += " readonly";
+        } else {
+            cssClass += " readwrite";
         }
         if(errors.size() > 0) {
             cssClass += " error";
