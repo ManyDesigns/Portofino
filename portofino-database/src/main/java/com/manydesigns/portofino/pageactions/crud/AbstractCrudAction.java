@@ -1489,7 +1489,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // ExportSearch
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.exportExcel", order = 5, group = "export")
+    @Button(list = "crud-search", key = "commons.exportExcel", order = 5, group = "export", preventDoubleSubmit = false)
     public Resolution exportSearchExcel() {
         try {
             TempFileService fileService = TempFileService.getInstance();
@@ -1562,7 +1562,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // ExportRead
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "commons.exportExcel", order = 4, group = "export")
+    @Button(list = "crud-read", key = "commons.exportExcel", order = 4, group = "export", preventDoubleSubmit = false)
     public Resolution exportReadExcel() {
         try {
             TempFileService fileService = TempFileService.getInstance();
@@ -1722,7 +1722,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // exportSearchPdf
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.exportPdf", order = 4, group = "export")
+    @Button(list = "crud-search", key = "commons.exportPdf", order = 4, group = "export", preventDoubleSubmit = false)
     public Resolution exportSearchPdf() {
         try {
             //final File tmpFile = File.createTempFile(crudConfiguration.getName() + ".search", ".pdf");
@@ -2030,7 +2030,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    @Button(list = "crud-read", key = "commons.exportPdf", order = 3, group = "export")
+    @Button(list = "crud-read", key = "commons.exportPdf", order = 3, group = "export", preventDoubleSubmit = false)
     public Resolution exportReadPdf() {
         try {
             final File tmpFile = File.createTempFile("export." + crudConfiguration.getName(), ".read.pdf");

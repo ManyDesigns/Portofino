@@ -201,4 +201,20 @@ $(function() {
     $(".portofino-datatable").each(function(index, elem) {
         portofino.dataTable(elem);
     });
+
+    //Prevent double submit
+    $('button.dont-prevent-double-submit').cli
+    $('form').on('submit', function() {
+        var form = $(this);
+        var buttons = form.find(":submit");
+        buttons.each(function(index, current) {
+            var button = $(current);
+            var clone = button.clone();
+            clone.removeAttr("name");
+            clone.attr("disabled", "disabled");
+            button.css("display", "none");
+            button.after(clone);
+            button.appendTo(form);
+        });
+    });
 });

@@ -93,4 +93,11 @@ public @interface Button {
      * from other groups.
      */
     String group() default "";
+
+    /**
+     * Whether to automatically prevent the user from submitting the form twice using this button. Note that this is
+     * a client-side facility to help legitimate users avoid making a common mistake; it won't stop determined
+     * malicious users from submitting forms multiple times.
+     */
+    boolean preventDoubleSubmit() default true;
 }
