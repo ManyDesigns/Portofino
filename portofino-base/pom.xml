@@ -20,12 +20,6 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>elements-extras</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>
             <version>${javaee-web-api.version}</version>

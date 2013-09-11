@@ -54,12 +54,6 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>elements-extras/pom.xml</source>
-      <outputDirectory>elements-extras</outputDirectory>
-      <destName>pom.xml</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
       <source>portofino-base/pom.xml</source>
       <outputDirectory>portofino-base</outputDirectory>
       <destName>pom.xml</destName>
@@ -112,13 +106,6 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>elements-extras/src/main</directory>
-      <outputDirectory>elements-extras/src/main</outputDirectory>
-      <useDefaultExcludes>true</useDefaultExcludes>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
       <directory>portofino-core/src/main</directory>
       <outputDirectory>portofino-core/src/main</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
@@ -164,13 +151,6 @@
     <fileSet>
       <directory>elements/target/apidocs</directory>
       <outputDirectory>javadocs/elements</outputDirectory>
-      <useDefaultExcludes>true</useDefaultExcludes>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>elements-extras/target/apidocs</directory>
-      <outputDirectory>javadocs/elements-extras</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>

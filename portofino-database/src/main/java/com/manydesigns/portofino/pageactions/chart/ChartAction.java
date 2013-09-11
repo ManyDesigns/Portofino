@@ -24,7 +24,6 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
-import com.manydesigns.elements.jfreechart.JFreeChartInstance;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
