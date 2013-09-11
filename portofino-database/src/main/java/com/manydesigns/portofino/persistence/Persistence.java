@@ -241,7 +241,7 @@ public class Persistence {
         model.init();
         for (Database database : model.getDatabases()) {
             ConnectionProvider connectionProvider = database.getConnectionProvider();
-            connectionProvider.init(databasePlatformsManager, appDir);
+            connectionProvider.init(databasePlatformsManager);
             if (connectionProvider.getStatus()
                     .equals(ConnectionProvider.STATUS_CONNECTED)) {
                 HibernateConfig builder =

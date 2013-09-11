@@ -3,7 +3,8 @@
     <databases>
         <database databaseName="redmine">
             <!--<jdbcConnection driver="org.postgresql.Driver" password="manydesigns" url="jdbc:postgresql://localhost/portofino4" username="manydesigns"/>-->
-            <jdbcConnection driver="org.h2.Driver" password="" url="jdbc:h2:${app}/dbs/redmine" username="sa"/>
+            <!-- TODO esporre app dir e war dir come oggetti OGNL -->
+            <jdbcConnection driver="org.h2.Driver" password="" url="jdbc:h2:%{#servletContext['com.manydesigns.portofino.application.directory'].absolutePath}/dbs/redmine" username="sa"/>
             <!--<jdbcConnection driver="com.google.appengine.api.rdbms.AppEngineDriver" url="jdbc:google:rdbms://manydesigns.com:prova1:dbprova1/PUBLIC" />-->
             <!--<jdbcConnection driver="com.mysql.jdbc.Driver" password="" url="jdbc:mysql://localhost/public" username="root"/>-->
             <schemas>

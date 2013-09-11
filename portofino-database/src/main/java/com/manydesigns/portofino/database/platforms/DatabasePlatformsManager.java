@@ -20,14 +20,13 @@
 
 package com.manydesigns.portofino.database.platforms;
 
-import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.PortofinoDatabaseProperties;
 import com.manydesigns.portofino.model.database.ConnectionProvider;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -44,7 +43,7 @@ public class DatabasePlatformsManager {
     //**************************************************************************
 
     protected final Configuration portofinoConfiguration;
-    protected ArrayList<DatabasePlatform> databasePlatformList;
+    protected final List<DatabasePlatform> databasePlatformList = new ArrayList<DatabasePlatform>();
 
     //**************************************************************************
     // Logging
@@ -59,38 +58,17 @@ public class DatabasePlatformsManager {
 
     public DatabasePlatformsManager(Configuration portofinoConfiguration) {
         this.portofinoConfiguration = portofinoConfiguration;
-        databasePlatformList = new ArrayList<DatabasePlatform>();
-        String[] platformNames = portofinoConfiguration.getStringArray(
-                PortofinoDatabaseProperties.DATABASE_PLATFORMS_LIST);
-        if (platformNames == null) {
-            logger.debug("Empty list");
-            return;
-        }
-
-        for (String current : platformNames) {
-            addDatabasePlatform(current);
-        }
     }
 
-    protected void addDatabasePlatform(String databasePlatformClassName) {
-        databasePlatformClassName = databasePlatformClassName.trim();
-        logger.debug("Adding database platform: {}", databasePlatformClassName);
-        DatabasePlatform databasePlatform =
-                (DatabasePlatform)ReflectionUtil
-                        .newInstance(databasePlatformClassName);
-        if (databasePlatform == null) {
-            logger.warn("Cannot load or instanciate: {}",
-                    databasePlatformClassName);
-        } else {
-            databasePlatform.test();
-            databasePlatformList.add(databasePlatform);
-        }
+    public void addDatabasePlatform(DatabasePlatform databasePlatform) {
+        logger.debug("Adding database platform: {}", databasePlatform);
+        databasePlatform.test();
+        databasePlatformList.add(databasePlatform);
     }
 
     //**************************************************************************
     // Methods
     //**************************************************************************
-
     public DatabasePlatform findApplicableAbstraction(
             ConnectionProvider connectionProvider) {
         for (DatabasePlatform current : databasePlatformList) {

@@ -25,10 +25,11 @@ import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
 import com.manydesigns.portofino.actions.admin.ReloadModelAction;
 import com.manydesigns.portofino.actions.admin.TablesAction;
 import com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard;
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.database.platforms.*;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.liquibase.LiquibaseUtils;
-import com.manydesigns.portofino.menu.*;
+import com.manydesigns.portofino.menu.MenuBuilder;
+import com.manydesigns.portofino.menu.SimpleMenuAppender;
 import com.manydesigns.portofino.pageactions.chart.ChartAction;
 import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.pageactions.m2m.ManyToManyAction;
@@ -73,7 +74,10 @@ public class DatabaseModule implements Module {
     // Constants
     //**************************************************************************
 
-    public static final String PERSISTENCE = "com.manydesigns.portofino.modules.DatabaseModule.persistence";
+    public static final String PERSISTENCE =
+            "com.manydesigns.portofino.modules.DatabaseModule.persistence";
+    public static final String DATABASE_PLATFORMS_MANAGER =
+            "com.manydesigns.portofino.modules.DatabaseModule.databasePlatformsManager";
 
     //**************************************************************************
     // Logging
@@ -118,9 +122,23 @@ public class DatabaseModule implements Module {
         LiquibaseUtils.setup();
 
         logger.info("Initializing persistence");
+        DatabasePlatformsManager databasePlatformsManager = new DatabasePlatformsManager(configuration);
+
+        //TODO spostare nei singoli moduli
+        databasePlatformsManager.addDatabasePlatform(new ApacheDerbyDatabasePlatform());
+        databasePlatformsManager.addDatabasePlatform(new MSSqlServerDatabasePlatform());
+        databasePlatformsManager.addDatabasePlatform(new JTDSDatabasePlatform());
+        databasePlatformsManager.addDatabasePlatform(new MySql5DatabasePlatform());
+        databasePlatformsManager.addDatabasePlatform(new OracleDatabasePlatform());
+        databasePlatformsManager.addDatabasePlatform(new PostgreSQLDatabasePlatform());
+        databasePlatformsManager.addDatabasePlatform(new H2DatabasePlatform());
+        databasePlatformsManager.addDatabasePlatform(new GoogleCloudSQLDatabasePlatform());
+        databasePlatformsManager.addDatabasePlatform(new IbmDb2DatabasePlatform());
+
         Persistence persistence =
-                new Persistence(applicationDirectory, configuration, new DatabasePlatformsManager(configuration));
+                new Persistence(applicationDirectory, configuration, databasePlatformsManager);
         persistence.loadXmlModel();
+        servletContext.setAttribute(DATABASE_PLATFORMS_MANAGER, databasePlatformsManager);
         servletContext.setAttribute(PERSISTENCE, persistence);
 
         PageActionRegistry pageActionsRegistry =

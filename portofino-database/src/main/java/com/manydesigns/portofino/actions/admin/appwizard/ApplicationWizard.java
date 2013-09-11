@@ -326,7 +326,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     }
 
     protected void configureEditSchemas() throws Exception {
-        connectionProvider.init(persistence.getDatabasePlatformsManager(), appDir);
+        connectionProvider.init(persistence.getDatabasePlatformsManager());
         Connection conn = connectionProvider.acquireConnection();
         logger.debug("Reading database metadata");
         DatabaseMetaData metadata = conn.getMetaData();

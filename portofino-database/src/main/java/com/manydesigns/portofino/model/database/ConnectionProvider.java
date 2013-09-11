@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import java.io.File;
 import java.sql.*;
 import java.text.MessageFormat;
 import java.util.*;
@@ -126,7 +125,7 @@ public abstract class ConnectionProvider {
         lastTested = null;
     }
 
-    public void init(DatabasePlatformsManager databasePlatformsManager, File appDir) {
+    public void init(DatabasePlatformsManager databasePlatformsManager) {
         Connection conn = null;
         ResultSet typeRs = null;
         String databaseName = getDatabase().getDatabaseName();

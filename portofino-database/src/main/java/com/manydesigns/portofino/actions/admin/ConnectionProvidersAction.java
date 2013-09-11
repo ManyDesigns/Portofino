@@ -263,7 +263,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
     @Button(list = "connectionProviders-read", key = "layouts.admin.connectionProviders.list.test", order = 3)
     public Resolution test() {
         connectionProvider = persistence.getConnectionProvider(databaseName);
-        connectionProvider.init(persistence.getDatabasePlatformsManager(), appDir);
+        connectionProvider.init(persistence.getDatabasePlatformsManager());
         String status = connectionProvider.getStatus();
         if (ConnectionProvider.STATUS_CONNECTED.equals(status)) {
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("connectionProviders.test.successful"));
@@ -344,7 +344,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
             }
             form.writeToObject(connectionProviderForm);
             try {
-                connectionProvider.init(persistence.getDatabasePlatformsManager(), appDir);
+                connectionProvider.init(persistence.getDatabasePlatformsManager());
                 persistence.initModel();
                 persistence.saveXmlModel();
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("connectionProviders.update.successful"));
