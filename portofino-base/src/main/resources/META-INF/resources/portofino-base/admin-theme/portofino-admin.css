@@ -150,7 +150,7 @@ label.control-label:after {
     content: ": ";
 }
 
-label.control-label.required:before {
+.control-group.required label.control-label:before {
     content: "* ";
 }
 

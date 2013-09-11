@@ -210,6 +210,9 @@ public abstract class AbstractField implements Field {
         if(errors.size() > 0) {
             cssClass += " error";
         }
+        if(hasRequiredFields()) {
+            cssClass += " required";
+        }
         xb.addAttribute("class", cssClass);
         labelToXhtml(xb);
         xb.openElement("div");
@@ -235,7 +238,7 @@ public abstract class AbstractField implements Field {
         if(!mode.isView(insertable, updatable)) {
             xb.addAttribute("for", id); //HTML5 validation
         }
-        xb.addAttribute("class", FORM_LABEL_CLASS + (hasRequiredFields() ? " required" : ""));
+        xb.addAttribute("class", FORM_LABEL_CLASS);
         if (mode.isBulk() && mode.isEdit() && !mode.isView(insertable, updatable)) {
             xb.writeInputCheckbox(null, bulkCheckboxName, "checked", bulkChecked, false, "pull-left");
         }

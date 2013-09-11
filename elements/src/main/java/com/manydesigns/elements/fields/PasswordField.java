@@ -141,7 +141,7 @@ public class PasswordField extends TextField {
                 } else {
                     actualLabel = confirmLabel;
                 }
-                xb.writeLabel(actualLabel, confirmationHtmlId, FORM_LABEL_CLASS + " required");
+                xb.writeLabel(actualLabel, confirmationHtmlId, FORM_LABEL_CLASS);
                 xb.openElement("div");
                 xb.addAttribute("class", "controls");
                 // print out confirmation input field
@@ -163,7 +163,7 @@ public class PasswordField extends TextField {
                              String actualLabel) {
         xb.openElement("label");
         xb.addAttribute("for", actualHtmlId);
-        xb.addAttribute("class", FORM_LABEL_CLASS + (required && (mode.isEdit()) ? " required" : ""));
+        xb.addAttribute("class", FORM_LABEL_CLASS);
         xb.write(StringUtils.capitalize(actualLabel));
         xb.closeElement("label");
     }
