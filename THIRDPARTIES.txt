@@ -337,11 +337,6 @@ Site: http://sublink.ca/icons/sweetieplus/
 Files: SweetiePlus-v2-SublinkInteractive directory
 License: Creative Commons Attribution-ShareAlike 3.0 Unported
 
-Tuckey UrlRewriteFilter
-Site: http://tuckey.org/urlrewrite/
-File: urlrewritefilter-3.1.0.jar
-License: BSD
-
 Xalan-Java
 Site: http://xml.apache.org/xalan-j/
 File: xalan-2.6.0.jar

@@ -68,11 +68,6 @@
             <version>1.7.5</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.tuckey</groupId>
-            <artifactId>urlrewritefilter</artifactId>
-            <version>${tuckey.version}</version>
-        </dependency>
         <!-- OpenID -->
         <dependency>
             <groupId>org.openid4java</groupId>
