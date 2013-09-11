@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.stripes;
 
+import com.manydesigns.elements.ElementsActionBeanContext;
 import com.manydesigns.elements.servlet.ServletUtils;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -36,15 +37,15 @@ public abstract class AbstractActionBean implements ActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    protected ActionBeanContext context;
+    protected ElementsActionBeanContext context;
     protected String originalPath;
 
     public void setContext(ActionBeanContext context) {
-        this.context = context;
+        this.context = (ElementsActionBeanContext) context;
         this.originalPath = ServletUtils.getOriginalPath(context.getRequest());
     }
 
-    public ActionBeanContext getContext() {
+    public ElementsActionBeanContext getContext() {
         return context;
     }
 
