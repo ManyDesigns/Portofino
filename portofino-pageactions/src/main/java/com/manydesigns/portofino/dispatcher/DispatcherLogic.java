@@ -30,6 +30,7 @@ import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.AppProperties;
+import com.manydesigns.portofino.actions.safemode.SafeModeAction;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
@@ -437,27 +438,13 @@ public class DispatcherLogic {
             actionClass = (Class<? extends PageAction>) ScriptingUtil.getGroovyClass(scriptFile);
         } catch (Exception e) {
             logger.error("Couldn't load action class for " + directory + ", returning safe-mode action", e);
-            return fallback ? getFallbackActionClass(configuration) : null;
+            return fallback ? SafeModeAction.class : null;
         }
         if (isValidActionClass(actionClass)) {
             return actionClass;
         } else {
             logger.error("Invalid action class for " + directory + ": " + actionClass);
-            return fallback ? getFallbackActionClass(configuration) : null;
-        }
-    }
-
-    public static Class<? extends PageAction> getFallbackActionClass(Configuration configuration) {
-        String className = configuration.getString(AppProperties.FALLBACK_ACTION_CLASS);
-        try {
-            Class<?> aClass = Class.forName(className);
-            if (isValidActionClass(aClass)) {
-                return (Class<? extends PageAction>) aClass;
-            } else {
-                throw new Error("Configuration error, invalid fallback action class: " + className);
-            }
-        } catch (Throwable e) {
-            throw new Error("Configuration error, fallback action class not found: " + className, e);
+            return fallback ? SafeModeAction.class : null;
         }
     }
 

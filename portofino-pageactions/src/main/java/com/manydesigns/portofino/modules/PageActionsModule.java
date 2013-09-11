@@ -166,11 +166,13 @@ public class PageActionsModule implements Module {
 
         logger.debug("Setting up temporary file service");
         String tempFileServiceClass = configuration.getString(PortofinoProperties.TEMP_FILE_SERVICE_CLASS);
-        try {
-            TempFileService.setInstance((TempFileService) Class.forName(tempFileServiceClass).newInstance());
-        } catch (Exception e) {
-            logger.error("Could not set up temp file service", e);
-            throw new Error(e);
+        if(tempFileServiceClass != null) {
+            try {
+                TempFileService.setInstance((TempFileService) Class.forName(tempFileServiceClass).newInstance());
+            } catch (Exception e) {
+                logger.error("Could not set up temp file service", e);
+                throw new Error(e);
+            }
         }
 
         //Disabilitazione security manager per funzionare su GAE. Il security manager permette di valutare
