@@ -85,8 +85,7 @@
             buffer.addAttribute("type", "submit");
             String actualCssClass =
                     "btn " +
-                    theButton.type() +
-                    (theButton.preventDoubleSubmit() ? "" : " dont-prevent-double-submit");
+                    theButton.type();
             if(cssClass != null) {
                 actualCssClass += cssClass;
             }
