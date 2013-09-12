@@ -31,6 +31,7 @@ import java.util.Properties;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@SuppressWarnings({"UnusedDeclaration"})
 public class PropertiesAccessor implements ClassAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
