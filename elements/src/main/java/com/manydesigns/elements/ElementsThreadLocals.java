@@ -45,11 +45,11 @@ public final class ElementsThreadLocals {
     //**************************************************************************
     // Static
     //**************************************************************************
-    private static ThreadLocal<ElementsActionBeanContext> threadLocalElementsContext =
-            new ThreadLocal<ElementsActionBeanContext>() {
+    private static ThreadLocal<ElementsContext> threadLocalElementsContext =
+            new ThreadLocal<ElementsContext>() {
                 @Override
-                protected ElementsActionBeanContext initialValue() {
-                    return new ElementsActionBeanContext();
+                protected ElementsContext initialValue() {
+                    return new ElementsContext();
                 }
             };
 
@@ -71,7 +71,7 @@ public final class ElementsThreadLocals {
     // Static getters/setters
     //**************************************************************************
 
-    public static ElementsActionBeanContext getElementsContext() {
+    public static ElementsContext getElementsContext() {
         return threadLocalElementsContext.get();
     }
 
@@ -84,19 +84,19 @@ public final class ElementsThreadLocals {
     }
 
     public static HttpServletRequest getHttpServletRequest() {
-        return getElementsContext().getRequest();
+        return getElementsContext().getHttpServletRequest();
     }
 
     public static void setHttpServletRequest(HttpServletRequest httpServletRequest) {
-        getElementsContext().setRequest(httpServletRequest);
+        getElementsContext().setHttpServletRequest(httpServletRequest);
     }
 
     public static HttpServletResponse getHttpServletResponse() {
-        return getElementsContext().getResponse();
+        return getElementsContext().getHttpServletResponse();
     }
 
     public static void setHttpServletResponse(HttpServletResponse httpServletResponse) {
-        getElementsContext().setResponse(httpServletResponse);
+        getElementsContext().setHttpServletResponse(httpServletResponse);
     }
 
     public static ServletContext getServletContext() {
@@ -133,12 +133,12 @@ public final class ElementsThreadLocals {
         ognlContext.setTypeConverter(new CustomTypeConverter(conv));
         TextProvider textProvider = SimpleTextProvider.create();
 
-        ElementsActionBeanContext elementsContext = getElementsContext();
+        ElementsContext elementsContext = getElementsContext();
 
         elementsContext.setOgnlContext(ognlContext);
         elementsContext.setTextProvider(textProvider);
-        elementsContext.setRequest(null);
-        elementsContext.setResponse(null);
+        elementsContext.setHttpServletRequest(null);
+        elementsContext.setHttpServletResponse(null);
         elementsContext.setServletContext(null);
 
         BlobManager blobManager = BlobManager.createDefaultBlobManager();

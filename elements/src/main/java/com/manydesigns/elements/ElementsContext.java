@@ -22,8 +22,11 @@ package com.manydesigns.elements;
 
 import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.i18n.TextProvider;
-import net.sourceforge.stripes.action.ActionBeanContext;
 import ognl.OgnlContext;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -31,18 +34,21 @@ import ognl.OgnlContext;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class ElementsActionBeanContext extends ActionBeanContext {
+public class ElementsContext {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     protected TextProvider textProvider;
+    protected HttpServletRequest httpServletRequest;
+    protected HttpServletResponse httpServletResponse;
+    protected ServletContext servletContext;
     protected OgnlContext ognlContext;
     protected BlobManager blobManager;
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
-    public ElementsActionBeanContext() {}
+    public ElementsContext() {}
 
     //**************************************************************************
     // Getters/setters
@@ -54,6 +60,30 @@ public class ElementsActionBeanContext extends ActionBeanContext {
 
     public void setTextProvider(TextProvider textProvider) {
         this.textProvider = textProvider;
+    }
+
+    public HttpServletRequest getHttpServletRequest() {
+        return httpServletRequest;
+    }
+
+    public void setHttpServletRequest(HttpServletRequest httpServletRequest) {
+        this.httpServletRequest = httpServletRequest;
+    }
+
+    public HttpServletResponse getHttpServletResponse() {
+        return httpServletResponse;
+    }
+
+    public void setHttpServletResponse(HttpServletResponse httpServletResponse) {
+        this.httpServletResponse = httpServletResponse;
+    }
+
+    public ServletContext getServletContext() {
+        return servletContext;
+    }
+
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
     }
 
     public OgnlContext getOgnlContext() {
@@ -70,10 +100,6 @@ public class ElementsActionBeanContext extends ActionBeanContext {
 
     public void setBlobManager(BlobManager blobManager) {
         this.blobManager = blobManager;
-    }
-
-    public String getText(String key, Object... args) {
-        return textProvider.getText(key, args);
     }
 
 }

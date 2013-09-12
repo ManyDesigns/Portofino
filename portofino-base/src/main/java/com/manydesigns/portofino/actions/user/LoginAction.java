@@ -139,23 +139,23 @@ public abstract class LoginAction extends AbstractActionBean {
             usernamePasswordToken.setRememberMe(false);
             subject.login(usernamePasswordToken);
             logger.info("User {} login", ShiroUtils.getUserId(subject));
-            String successMsg = context.getText("user.login.success", userName);
+            String successMsg = ElementsThreadLocals.getText("user.login.success", userName);
             SessionMessages.addInfoMessage(successMsg);
             return redirectToReturnUrl();
         } catch (DisabledAccountException e) {
-            String errMsg = context.getText("user.not.active", userName);
+            String errMsg = ElementsThreadLocals.getText("user.not.active", userName);
             SessionMessages.addErrorMessage(errMsg);
             logger.warn("Login failed for '" + userName + "': " + e.getMessage());
         } catch (IncorrectCredentialsException e) {
-            String errMsg = context.getText("user.login.failed", userName);
+            String errMsg = ElementsThreadLocals.getText("user.login.failed", userName);
             SessionMessages.addErrorMessage(errMsg);
             logger.warn("Login failed for '" + userName + "': " + e.getMessage());
         } catch (UnknownAccountException e) {
-            String errMsg = context.getText("user.login.failed", userName);
+            String errMsg = ElementsThreadLocals.getText("user.login.failed", userName);
             SessionMessages.addErrorMessage(errMsg);
             logger.warn("Login failed for '" + userName + "': " + e.getMessage());
         } catch (AuthenticationException e) {
-            String errMsg = context.getText("user.login.failed", userName);
+            String errMsg = ElementsThreadLocals.getText("user.login.failed", userName);
             SessionMessages.addErrorMessage(errMsg);
             logger.warn("Login failed for '" + userName + "': " + e.getMessage(), e);
         }
@@ -193,7 +193,7 @@ public abstract class LoginAction extends AbstractActionBean {
             session.invalidate();
         }
 
-        String msg = context.getText("user.logout");
+        String msg = ElementsThreadLocals.getText("user.logout");
         SessionMessages.addInfoMessage(msg);
         logger.info("User logout");
 
@@ -237,13 +237,13 @@ public abstract class LoginAction extends AbstractActionBean {
 
                 String body = getResetPasswordEmailBody(siteUrl, changePasswordLink);
 
-                sendForgotPasswordEmail(email, context.getText("user.passwordReset.emailSubject"), body);
+                sendForgotPasswordEmail(email, ElementsThreadLocals.getText("user.passwordReset.emailSubject"), body);
             }
 
-            SessionMessages.addInfoMessage(context.getText("user.passwordReset.email.sent"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("user.passwordReset.email.sent"));
         } catch (Exception e) {
             logger.error("Error during password reset", e);
-            SessionMessages.addErrorMessage(context.getText("user.passwordReset.failure"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.passwordReset.failure"));
         }
         return new RedirectResolution(getOriginalPath());
     }
@@ -281,16 +281,16 @@ public abstract class LoginAction extends AbstractActionBean {
             PasswordResetToken token = new PasswordResetToken(this.token, newPassword);
             try {
                 subject.login(token);
-                SessionMessages.addInfoMessage(context.getText("user.passwordReset.success"));
+                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("user.passwordReset.success"));
                 return redirectToReturnUrl();
             } catch (AuthenticationException e) {
-                String errMsg = context.getText("user.passwordReset.invalidToken");
+                String errMsg = ElementsThreadLocals.getText("user.passwordReset.invalidToken");
                 SessionMessages.addErrorMessage(errMsg);
                 logger.warn(errMsg, e);
                 return new ForwardResolution(getLoginPage());
             }
         } else {
-            SessionMessages.addErrorMessage(context.getText("user.passwordReset.failure.passwordsDontMatch"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.passwordReset.failure.passwordsDontMatch"));
             return resetPassword();
         }
     }
@@ -370,17 +370,17 @@ public abstract class LoginAction extends AbstractActionBean {
 
                 String body = getConfirmSignUpEmailBody(siteUrl, changePasswordLink);
 
-                sendSignupConfirmationEmail(email, context.getText("user.signUp.email.subject"), body);
-                SessionMessages.addInfoMessage(context.getText("user.signUp.email.sent"));
+                sendSignupConfirmationEmail(email, ElementsThreadLocals.getText("user.signUp.email.subject"), body);
+                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("user.signUp.email.sent"));
                 return new ForwardResolution(getLoginPage());
             } catch (ExistingUserException e) {
-                SessionMessages.addErrorMessage(context.getText("user.signUp.failure.userExists"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.signUp.failure.userExists"));
             } catch (Exception e) {
                 logger.error("Error during sign-up", e);
-                SessionMessages.addErrorMessage(context.getText("user.signUp.failure"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.signUp.failure"));
             }
         } else {
-            SessionMessages.addErrorMessage(context.getText("user.signUp.failure.formErrors"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.signUp.failure.formErrors"));
         }
         return new ForwardResolution(getSignUpPage());
     }
@@ -420,10 +420,10 @@ public abstract class LoginAction extends AbstractActionBean {
         SignUpToken token = new SignUpToken(this.token);
         try {
             subject.login(token);
-            SessionMessages.addInfoMessage(context.getText("user.signUp.success"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("user.signUp.success"));
             return redirectToReturnUrl();
         } catch (AuthenticationException e) {
-            String errMsg = context.getText("user.signUp.invalidToken");
+            String errMsg = ElementsThreadLocals.getText("user.signUp.invalidToken");
             SessionMessages.addErrorMessage(errMsg);
             logger.warn(errMsg, e);
             return signUp();
@@ -461,19 +461,19 @@ public abstract class LoginAction extends AbstractActionBean {
                     ShiroUtils.getPortofinoRealm();
             try {
                 portofinoRealm.changePassword(principal, pwd, newPassword);
-                SessionMessages.addInfoMessage(context.getText("user.passwordChange.success"));
+                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("user.passwordChange.success"));
             } catch (IncorrectCredentialsException e) {
                 logger.error("Password update failed", e);
-                SessionMessages.addErrorMessage(context.getText("user.passwordChange.failure.passwordDoesntMatch"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.passwordChange.failure.passwordDoesntMatch"));
                 return new ForwardResolution("/portofino-base/layouts/user/changePassword.jsp");
             } catch (Exception e) {
                 logger.error("Password update failed", e);
-                SessionMessages.addErrorMessage(context.getText("user.passwordChange.failure"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.passwordChange.failure"));
                 return new ForwardResolution("/portofino-base/layouts/user/changePassword.jsp");
             }
             return redirectToReturnUrl();
         } else {
-            SessionMessages.addErrorMessage(context.getText("user.passwordChange.failure.passwordsDontMatch"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.passwordChange.failure.passwordsDontMatch"));
             return new ForwardResolution("/portofino-base/layouts/user/changePassword.jsp");
         }
     }

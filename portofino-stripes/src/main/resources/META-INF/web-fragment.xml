@@ -22,7 +22,7 @@
         </init-param>
         <init-param>
             <param-name>Extension.Packages</param-name>
-            <param-value>com.manydesigns.elements.stripes,com.manydesigns.portofino.stripes,com.manydesigns.portofino.interceptors</param-value>
+            <param-value>com.manydesigns.portofino.stripes,com.manydesigns.portofino.interceptors</param-value>
         </init-param>
         <init-param>
             <param-name>LocalePicker.Locales</param-name>

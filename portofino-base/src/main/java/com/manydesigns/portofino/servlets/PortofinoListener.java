@@ -23,8 +23,6 @@ package com.manydesigns.portofino.servlets;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.configuration.BeanLookup;
-import com.manydesigns.elements.servlet.AttributeMap;
-import com.manydesigns.elements.servlet.ElementsFilter;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.head.HtmlHeadBuilder;
@@ -111,12 +109,7 @@ public class PortofinoListener
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         try {
             ElementsThreadLocals.setupDefaultElementsContext();
-            ServletContext servletContext = servletContextEvent.getServletContext();
-            ElementsThreadLocals.setServletContext(servletContext);
-            AttributeMap servletContextAttributeMap = AttributeMap.createAttributeMap(servletContext);
-            ElementsThreadLocals.getOgnlContext().put(
-                    ElementsFilter.SERVLET_CONTEXT_OGNL_ATTRIBUTE,
-                    servletContextAttributeMap);
+            ElementsThreadLocals.setServletContext(servletContextEvent.getServletContext());
             init(servletContextEvent);
         } catch (Throwable e) {
             logger.error("Could not start ManyDesigns Portofino", e);
