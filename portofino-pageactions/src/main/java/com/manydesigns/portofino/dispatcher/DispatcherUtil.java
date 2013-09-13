@@ -41,6 +41,9 @@ public class DispatcherUtil {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     public static Dispatcher get(HttpServletRequest request) {
+        if(request == null) {
+            return null;
+        }
         return (Dispatcher) request.getAttribute(RequestAttributes.DISPATCHER);
     }
 
@@ -56,7 +59,7 @@ public class DispatcherUtil {
     }
 
     public static Dispatch getDispatch(HttpServletRequest request) {
-        Dispatcher dispatcher = DispatcherUtil.get(request);
+        Dispatcher dispatcher = get(request);
         return getDispatch(dispatcher, request);
     }
 
@@ -64,7 +67,7 @@ public class DispatcherUtil {
         if(actionBean instanceof PageAction) {
             return ((PageAction) actionBean).getDispatch();
         } else {
-            return DispatcherUtil.getDispatch(request);
+            return getDispatch(request);
         }
     }
 
