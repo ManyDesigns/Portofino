@@ -14,7 +14,7 @@
             div#openid_highlight { padding: 0; }
         </style>
         <script type="text/javascript" src="<stripes:url value="/m/pageactions/openid-selector/js/openid-jquery.js" />"></script>
-        <script type="text/javascript" src="<stripes:url value="/layouts/login/openid-custom.js"/>"></script>
+        <script type="text/javascript" src="<stripes:url value="/m/pageactions/openid-custom.js"/>"></script>
         <script type="text/javascript">
             $(document).ready(function() {
                 openid.img_path = '${pageContext.request.contextPath}/m/pageactions/openid-selector/images/';

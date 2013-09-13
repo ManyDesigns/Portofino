@@ -84,7 +84,7 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
     public Map openIdParameterMap;
 
     protected String getLoginPage() {
-        return "/layouts/login/openIdLogin.jsp";
+        return "/m/pageactions/pageactions/login/openIdLogin.jsp";
     }
 
     public Resolution showOpenIDForm()
@@ -122,7 +122,7 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
             if(authReq.isVersion2()) {
                 openIdDestinationUrl = authReq.getDestinationUrl(false);
                 openIdParameterMap = authReq.getParameterMap();
-                return new ForwardResolution("/layouts/login/openIDFormRedirect.jsp");
+                return new ForwardResolution("/m/pageactions/pageactions/login/openIDFormRedirect.jsp");
             } else {
                 SessionMessages.addErrorMessage("Cannot login, payload too big and OpenID version 2 not supported.");
                 return new ForwardResolution(getLoginPage());
