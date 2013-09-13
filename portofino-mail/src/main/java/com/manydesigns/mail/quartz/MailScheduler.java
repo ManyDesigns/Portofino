@@ -41,7 +41,7 @@ public class MailScheduler {
     public static final Logger logger = LoggerFactory.getLogger(MailScheduler.class);
 
     public static void setupMailScheduler(MailQueueSetup mailQueueSetup) {
-        String group = "manydesigns-mail";
+        String group = "portofino-mail";
         setupMailScheduler(mailQueueSetup, group);
     }
 

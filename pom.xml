@@ -96,7 +96,7 @@
         <module>portofino-war</module>
         <module>portofino-war-jee</module>
         <module>portofino-war-gae</module>
-        <module>mail</module>
+        <module>portofino-mail</module>
         <module>demo-tt</module>
         <module>portofino-war-archetype</module>
     </modules>

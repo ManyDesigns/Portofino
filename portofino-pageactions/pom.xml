@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>manydesigns-mail</artifactId>
+            <artifactId>portofino-mail</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

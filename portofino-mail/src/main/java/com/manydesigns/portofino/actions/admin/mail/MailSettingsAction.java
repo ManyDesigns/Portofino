@@ -75,7 +75,7 @@ public class MailSettingsAction extends AbstractActionBean {
     @DefaultHandler
     public Resolution execute() {
         setupFormAndBean();
-        return new ForwardResolution("/layouts/admin/mail/settings.jsp");
+        return new ForwardResolution("/m/mail/admin/settings.jsp");
     }
 
     @Button(list = "settings", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
@@ -104,12 +104,12 @@ public class MailSettingsAction extends AbstractActionBean {
             } catch (Exception e) {
                 logger.error("Configuration not saved", e);
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.configuration.notUpdated"));
-                return new ForwardResolution("/layouts/admin/mail/settings.jsp");
+                return new ForwardResolution("/m/mail/admin/settings.jsp");
             }
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.updated"));
             return new RedirectResolution(this.getClass());
         } else {
-            return new ForwardResolution("/layouts/admin/mail/settings.jsp");
+            return new ForwardResolution("/m/mail/admin/settings.jsp");
         }
     }
 

@@ -8,9 +8,9 @@
         <artifactId>portofino</artifactId>
         <version>4.1.beta5-SNAPSHOT</version>
     </parent>
-    <artifactId>manydesigns-mail</artifactId>
+    <artifactId>portofino-mail</artifactId>
     <packaging>jar</packaging>
-    <name>manydesigns-mail</name>
+    <name>portofino-mail</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>

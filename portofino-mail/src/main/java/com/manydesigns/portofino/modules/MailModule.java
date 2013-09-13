@@ -94,12 +94,12 @@ public class MailModule implements Module {
 
     @Override
     public String getId() {
-        return "manydesigns-mail";
+        return "mail";
     }
 
     @Override
     public String getName() {
-        return "ManyDesigns Mail";
+        return "Mail";
     }
 
     @Override
