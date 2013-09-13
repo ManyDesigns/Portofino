@@ -12,6 +12,6 @@ import org.hibernate.criterion.*
 import com.manydesigns.portofino.pageactions.text.*
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class Welcome extends TextAction {
+class Welcome extends com.manydesigns.portofino.pageactions.text.TextAction {
 
 }

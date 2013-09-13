@@ -20,7 +20,8 @@
 
 package com.manydesigns.portofino.actions.admin.appwizard;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
@@ -77,6 +78,7 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,7 +154,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     protected String adminGroupName;
 
     protected List<Table> roots;
-    protected Multimap<Table, Reference> children;
+    protected ListMultimap<Table, Reference> children;
     protected List<Table> allTables;
     protected Table userTable;
     protected Table groupTable;
@@ -446,7 +448,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     }
 
     public Resolution afterSelectSchemas() {
-        children = HashMultimap.create();
+        children = ArrayListMultimap.create();
         allTables = new ArrayList<Table>();
         roots = determineRoots(children, allTables);
         Collections.sort(allTables, new Comparator<Table>() {
@@ -899,11 +901,13 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             updateModelFailed(e);
             return buildAppForm();
         }
-        SessionMessages.addInfoMessage(ElementsThreadLocals.getText("appwizard.finished"));
         if(userTable != null) {
+            SecurityUtils.getSubject().logout();
+            context.getRequest().getSession().invalidate();
             SessionMessages.addWarningMessage(ElementsThreadLocals.getText("appwizard.warning.userTable.created"));
             //ShiroUtils.clearCache(SecurityUtils.getSubject().getPrincipals());
         }
+        SessionMessages.addInfoMessage(ElementsThreadLocals.getText("appwizard.finished"));
         context.getRequest().getSession().removeAttribute(databaseSessionKey);
         return new RedirectResolution("/");
     }

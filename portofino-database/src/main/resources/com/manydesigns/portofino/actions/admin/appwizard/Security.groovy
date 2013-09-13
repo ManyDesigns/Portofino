@@ -6,6 +6,7 @@ import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.model.database.Table
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.persistence.Persistence
+import com.manydesigns.portofino.persistence.QueryUtils
 import com.manydesigns.portofino.reflection.TableAccessor
 import com.manydesigns.portofino.util.PkHelper
 import java.security.MessageDigest
@@ -18,11 +19,11 @@ import org.hibernate.Session
 import org.hibernate.criterion.Order
 import org.hibernate.criterion.Projections
 import org.hibernate.criterion.Restrictions
+import org.hibernate.exception.ConstraintViolationException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import com.manydesigns.portofino.shiro.*
 import org.apache.shiro.authc.*
-import org.hibernate.exception.ConstraintViolationException
 
 public class Security extends AbstractPortofinoRealm {
 
@@ -227,9 +228,8 @@ public class Security extends AbstractPortofinoRealm {
         TableAccessor accessor = getUserClassAccessor();
         PkHelper pkHelper = new PkHelper(accessor);
         Serializable id = pkHelper.getPrimaryKey(encodedId);
-
         Session session = persistence.getSession(databaseName);
-        return (Serializable) session.get(userTableEntityName, id);
+        return (Serializable) QueryUtils.getObjectByPk(session, accessor, id);
     }
 
     TableAccessor getUserClassAccessor() {
@@ -253,17 +253,11 @@ public class Security extends AbstractPortofinoRealm {
 
     @Override
     String getUserPrettyName(Serializable user) {
-        if(user instanceof String) {
-            return user; //When you have just run the wizard, you are still logged in as "admin" (String)
-        }
         return user[userNameProperty];
     }
 
     Serializable getUserId(Serializable user) {
-        if(user instanceof String) {
-            return user; //When you have just run the wizard, you are still logged in as "admin" (String)
-        }
-        return user[userIdProperty];
+        return (Serializable) user[userIdProperty];
     }
 
     @Override

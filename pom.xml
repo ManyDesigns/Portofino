@@ -92,7 +92,8 @@
         <module>portofino-stripes</module>
         <module>portofino-database</module>
         <module>portofino-pageactions</module>
-        <module>portofino-pageactions-admin</module>
+        <module>portofino-pageactionsadmin</module>
+        <module>portofino-text</module>
         <module>portofino-war</module>
         <module>portofino-war-jee</module>
         <module>portofino-war-gae</module>

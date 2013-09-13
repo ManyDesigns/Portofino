@@ -122,7 +122,7 @@ public class TextAction extends AbstractPageAction {
                !isEmbedded() &&
                SecurityLogic.hasPermissions(
                        portofinoConfiguration, pageInstance, SecurityUtils.getSubject(), AccessLevel.EDIT)) {
-                return new ForwardResolution("/layouts/text/create-page.jsp");
+                return new ForwardResolution("/META-INF/resources/m/text/create-page.jsp");
             } else {
                 return portletPageNotFound();
             }
@@ -141,7 +141,7 @@ public class TextAction extends AbstractPageAction {
         if (StringUtils.isEmpty(content)) {
             content = "<em>Empty content. To add content, configure this page.</em>";
         }
-        return forwardTo("/layouts/text/read.jsp");
+        return forwardTo("/m/text/read.jsp");
     }
 
     /**
@@ -404,14 +404,14 @@ public class TextAction extends AbstractPageAction {
             logger.error("Could not load content", e);
             SessionMessages.addErrorMessage("Could not load content: " + e);
         }
-        return new ForwardResolution("/layouts/text/edit-content.jsp");
+        return new ForwardResolution("/META-INF/resources/m/text/edit-content.jsp");
     }
 
     @Button(list = "portletHeaderButtons", titleKey = "commons.configure", order = 1, icon = Button.ICON_WRENCH)
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configurePage() {
         prepareConfigurationForms();
-        return new ForwardResolution("/layouts/text/configure.jsp");
+        return new ForwardResolution("/META-INF/resources/m/text/configure.jsp");
     }
 
     @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, type = Button.TYPE_PRIMARY)
@@ -425,7 +425,7 @@ public class TextAction extends AbstractPageAction {
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.updated"));
             return cancel();
         } else {
-            return new ForwardResolution("/layouts/text/configure.jsp");
+            return new ForwardResolution("/META-INF/resources/m/text/configure.jsp");
         }
     }
 
@@ -459,7 +459,7 @@ public class TextAction extends AbstractPageAction {
             logger.error("Upload failed", e);
         }
         return new ForwardResolution(
-                "/layouts/text/upload-attachment.jsp");
+                "/META-INF/resources/m/text/upload-attachment.jsp");
     }
 
     protected void commonUploadAttachment() throws IOException {
@@ -551,13 +551,13 @@ public class TextAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution browse() {
         logger.debug("Browse");
-        return new ForwardResolution("/layouts/text/browse.jsp");
+        return new ForwardResolution("/META-INF/resources/m/text/browse.jsp");
     }
 
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution browsePages() {
         logger.debug("Browse Pages");
-        return new ForwardResolution("/layouts/text/browsePages.jsp");
+        return new ForwardResolution("/META-INF/resources/m/text/browsePages.jsp");
     }
 
     @Button(list = "portletHeaderButtons", titleKey = "layouts.text.manage-attachments.manage_attachments", order = 3,
@@ -565,7 +565,7 @@ public class TextAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution manageAttachments() {
         logger.debug("Manage attachments");
-        return new ForwardResolution("/layouts/text/manage-attachments.jsp");
+        return new ForwardResolution("/META-INF/resources/m/text/manage-attachments.jsp");
     }
 
     @Button(list = "edit-content", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
@@ -575,7 +575,7 @@ public class TextAction extends AbstractPageAction {
         title = StringUtils.trimToNull(title);
         if (title == null) {
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.configuration.titleEmpty"));
-            return new ForwardResolution("/layouts/text/edit-content.jsp");
+            return new ForwardResolution("/META-INF/resources/m/text/edit-content.jsp");
         }
         Page page = pageInstance.getPage();
         page.setTitle(title);

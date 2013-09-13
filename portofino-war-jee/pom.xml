@@ -21,8 +21,14 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-pageactions-admin</artifactId>
+            <artifactId>portofino-pageactionsadmin</artifactId>
             <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-text</artifactId>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

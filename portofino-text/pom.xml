@@ -8,9 +8,9 @@
         <artifactId>portofino</artifactId>
         <version>4.1.beta5-SNAPSHOT</version>
     </parent>
-    <artifactId>portofino-pageactions-admin</artifactId>
+    <artifactId>portofino-text</artifactId>
     <packaging>jar</packaging>
-    <name>manydesigns-portofino-pageactions-admin</name>
+    <name>manydesigns-portofino-pageactionsadmin</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>

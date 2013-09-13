@@ -605,6 +605,18 @@ public class QueryUtils {
             Persistence persistence, String database, String entityName, Serializable pk) {
         Session session = persistence.getSession(database);
         TableAccessor table = persistence.getTableAccessor(database, entityName);
+        return getObjectByPk(session, table, pk);
+    }
+
+    /**
+     * Loads an object by primary key.
+     * @param session the Hibernate session
+     * @param table the table where to load the object from
+     * @param pk the primary key object. Might be an atomic value (String, Integer, etc.) for single-column primary
+     * keys, or a composite object for multi-column primary keys.
+     * @return the loaded object, or null if an object with that key does not exist.
+     */
+    public static Object getObjectByPk(Session session, TableAccessor table, Serializable pk) {
         String actualEntityName = table.getTable().getActualEntityName();
         Object result;
         PropertyAccessor[] keyProperties = table.getKeyProperties();

@@ -17,12 +17,21 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Page administration (CMS). Remove to disable this feature. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-pageactions-admin</artifactId>
+            <artifactId>portofino-pageactionsadmin</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Text pages. Remove to disable this feature. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-text</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Reliable mail sender. Remove to disable this feature. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-mail</artifactId>
@@ -35,6 +44,7 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Default theme -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-war</artifactId>
