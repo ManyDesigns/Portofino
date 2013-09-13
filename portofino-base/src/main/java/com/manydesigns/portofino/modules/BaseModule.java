@@ -111,7 +111,7 @@ public class BaseModule implements Module {
 
     @Override
     public String getName() {
-        return "Portofino Base";
+        return "Base";
     }
 
     @Override
