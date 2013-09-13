@@ -15,7 +15,7 @@
             (PageInstance) request.getAttribute(ApplicationInterceptor.INVALID_PAGE_INSTANCE);
 
     if(invalidPage.getActionBean().isEmbedded()) {
-        request.getRequestDispatcher("/layouts/safemode/safemode.jsp").include(request, response);
+        request.getRequestDispatcher("/m/pageactions/safemode/safemode.jsp").include(request, response);
         return;
     }
 

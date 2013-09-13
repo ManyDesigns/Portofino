@@ -23,7 +23,7 @@ package com.manydesigns.portofino.dispatcher;
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.modules.BaseModule;
-import com.manydesigns.portofino.modules.PageActionsModule;
+import com.manydesigns.portofino.modules.PageactionsModule;
 import org.apache.commons.configuration.Configuration;
 
 import javax.servlet.ServletContext;
@@ -48,7 +48,7 @@ public class DispatcherUtil {
         ServletContext servletContext = request.getServletContext();
         Configuration configuration =
                 (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
-        File pagesDir = (File) servletContext.getAttribute(PageActionsModule.PAGES_DIRECTORY);
+        File pagesDir = (File) servletContext.getAttribute(PageactionsModule.PAGES_DIRECTORY);
 
         Dispatcher dispatcher = new Dispatcher(configuration, pagesDir);
         request.setAttribute(RequestAttributes.DISPATCHER, dispatcher);

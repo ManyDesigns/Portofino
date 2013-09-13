@@ -18,7 +18,7 @@ footer {
 }
 
 .navbar-inverse [class^="icon-"], .navbar-inverse [class*=" icon-"] {
-    background-image: url("../../elements/bootstrap/img/glyphicons-halflings-white.png")
+    background-image: url("../../../elements/bootstrap/img/glyphicons-halflings-white.png")
 }
 
 .dropdown-menu li > a {
@@ -39,7 +39,7 @@ footer {
     }
 
     .dropdown-menu li > a [class^="icon-"], .dropdown-menu li > a [class*="icon-"] {
-        background-image: url("../../elements/bootstrap/img/glyphicons-halflings-white.png")
+        background-image: url("../../../elements/bootstrap/img/glyphicons-halflings-white.png")
     }
 }
 
@@ -49,11 +49,11 @@ footer {
     }
 
     .dropdown-menu li > a [class^="icon-"], .dropdown-menu li > a [class*="icon-"] {
-        background-image: url("../../elements/bootstrap/img/glyphicons-halflings.png")
+        background-image: url("../../../elements/bootstrap/img/glyphicons-halflings.png")
     }
 
     .navbar-inverse .dropdown-menu li > a [class^="icon-"], .navbar-inverse .dropdown-menu li > a [class*="icon-"] {
-        background-image: url("../../elements/bootstrap/img/glyphicons-halflings-white.png")
+        background-image: url("../../../elements/bootstrap/img/glyphicons-halflings-white.png")
     }
 }
 

@@ -36,7 +36,7 @@ import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.modules.BaseModule;
-import com.manydesigns.portofino.modules.PageActionsModule;
+import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.servlets.ServerInfo;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
@@ -70,7 +70,7 @@ public class SettingsAction extends AbstractActionBean {
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
-    @Inject(PageActionsModule.PAGES_DIRECTORY)
+    @Inject(PageactionsModule.PAGES_DIRECTORY)
     public File pagesDir;
 
     Form form;
@@ -89,7 +89,7 @@ public class SettingsAction extends AbstractActionBean {
     @DefaultHandler
     public Resolution execute() {
         setupFormAndBean();
-        return new ForwardResolution("/layouts/admin/settings.jsp");
+        return new ForwardResolution("/m/pageactions/actions/admin/settings.jsp");
     }
 
     private void setupFormAndBean() {
@@ -133,12 +133,12 @@ public class SettingsAction extends AbstractActionBean {
             } catch (Exception e) {
                 logger.error("Configuration not saved", e);
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.configuration.notUpdated"));
-                return new ForwardResolution("/layouts/admin/settings.jsp");
+                return new ForwardResolution("/m/pageactions/actions/admin/settings.jsp");
             }
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.updated"));
             return new RedirectResolution(this.getClass());
         } else {
-            return new ForwardResolution("/layouts/admin/settings.jsp");
+            return new ForwardResolution("/m/pageactions/actions/admin/settings.jsp");
         }
     }
 

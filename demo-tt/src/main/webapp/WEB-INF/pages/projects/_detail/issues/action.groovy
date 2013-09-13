@@ -6,7 +6,7 @@ import com.manydesigns.portofino.pageactions.crud.ModelSelectionProviderSupport
 import com.manydesigns.portofino.model.database.DatabaseSelectionProvider
 import com.manydesigns.elements.text.QueryStringWithParameters
 import com.manydesigns.portofino.di.Inject
-import com.manydesigns.portofino.modules.PageActionsModule
+import com.manydesigns.portofino.modules.PageactionsModule
 import net.sf.ehcache.CacheManager
 import net.sf.ehcache.Element
 
@@ -34,7 +34,7 @@ class issues extends CrudAction {
     }
 
     //Cacheable queries
-    @Inject(PageActionsModule.EHCACHE_MANAGER)
+    @Inject(PageactionsModule.EHCACHE_MANAGER)
     public CacheManager cacheManager;
 
     @Override

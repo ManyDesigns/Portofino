@@ -39,7 +39,7 @@ var portofino = {
         }
 
         config = $.extend(baseConfig, {
-            customConfig : '<c:out value="${pageContext.request.contextPath}"/>/ckeditor-custom/config.js',
+            customConfig : '<c:out value="${pageContext.request.contextPath}"/>/m/pageactions/ckeditor-custom/config.js',
             toolbar: 'PortofinoDefault',
             toolbarCanCollapse: false,
             filebrowserWindowWidth : windowWidth,

@@ -44,7 +44,7 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
-import com.manydesigns.portofino.modules.PageActionsModule;
+import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
 import com.manydesigns.portofino.pageactions.registry.PageActionInfo;
@@ -95,10 +95,10 @@ public class PageAdminAction extends AbstractPageAction {
 
     private static final Logger logger = LoggerFactory.getLogger(PageAdminAction.class);
 
-    @Inject(PageActionsModule.PAGES_DIRECTORY)
+    @Inject(PageactionsModule.PAGES_DIRECTORY)
     public File pagesDir;
 
-    @Inject(PageActionsModule.PAGE_ACTIONS_REGISTRY)
+    @Inject(PageactionsModule.PAGE_ACTIONS_REGISTRY)
     public PageActionRegistry registry;
 
     //--------------------------------------------------------------------------
@@ -178,7 +178,7 @@ public class PageAdminAction extends AbstractPageAction {
 
     public Resolution newPage() throws Exception {
         prepareNewPageForm();
-        return new ForwardResolution("/layouts/page-crud/new-page.jsp");
+        return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/new-page.jsp");
     }
 
     @Button(list = "page-create", key = "commons.create", order = 1, type = Button.TYPE_PRIMARY)
@@ -190,7 +190,7 @@ public class PageAdminAction extends AbstractPageAction {
             logger.error("Error creating page", e);
             String msg = ElementsThreadLocals.getText("page.create.failed", e.getMessage());
             SessionMessages.addErrorMessage(msg);
-            return new ForwardResolution("/layouts/page-crud/new-page.jsp");
+            return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/new-page.jsp");
         }
     }
 
@@ -290,7 +290,7 @@ public class PageAdminAction extends AbstractPageAction {
             if(directory.exists()) {
                 logger.error("Can't create page - directory {} exists", directory.getAbsolutePath());
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.create.failed.directoryExists"));
-                return new ForwardResolution("/layouts/page-crud/new-page.jsp");
+                return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/new-page.jsp");
             }
             if(ElementsFileUtils.safeMkdirs(directory)) {
                 try {
@@ -328,12 +328,12 @@ public class PageAdminAction extends AbstractPageAction {
                 } catch (Exception e) {
                     logger.error("Exception saving page configuration");
                     SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.create.failed"));
-                    return new ForwardResolution("/layouts/page-crud/new-page.jsp");
+                    return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/new-page.jsp");
                 }
             } else {
                 logger.error("Can't create directory {}", directory.getAbsolutePath());
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.create.failed.cantCreateDir"));
-                return new ForwardResolution("/layouts/page-crud/new-page.jsp");
+                return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/new-page.jsp");
             }
             logger.info("Page " + pageId + " created. Path: " + directory.getAbsolutePath());
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("page.create.successful"));
@@ -341,7 +341,7 @@ public class PageAdminAction extends AbstractPageAction {
             return new RedirectResolution(url, false)
                             .addParameter("configure").addParameter("cancelReturnUrl", url);
         } else {
-            return new ForwardResolution("/layouts/page-crud/new-page.jsp");
+            return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/new-page.jsp");
         }
     }
 
@@ -795,7 +795,7 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     protected Resolution forwardToPageChildren() {
-        return new ForwardResolution("/layouts/page/children.jsp");
+        return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/children.jsp");
     }
 
     //--------------------------------------------------------------------------
@@ -882,7 +882,7 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     protected Resolution forwardToPagePermissions() {
-        return new ForwardResolution("/layouts/page/permissions.jsp");
+        return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/permissions.jsp");
     }
 
     protected void setupGroups() {
@@ -956,17 +956,17 @@ public class PageAdminAction extends AbstractPageAction {
     protected Form copyForm;
 
     public Resolution confirmDelete() {
-        return new ForwardResolution("/layouts/page-crud/deletePageDialog.jsp");
+        return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/deletePageDialog.jsp");
     }
 
     public Resolution chooseNewLocation() {
         buildMovePageForm();
-        return new ForwardResolution("/layouts/page-crud/movePageDialog.jsp");
+        return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/movePageDialog.jsp");
     }
 
     public Resolution copyPageDialog() {
         buildCopyPageForm();
-        return new ForwardResolution("/layouts/page-crud/copyPageDialog.jsp");
+        return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/copyPageDialog.jsp");
     }
 
     protected void buildMovePageForm() {

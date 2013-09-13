@@ -54,7 +54,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.DatabaseModule;
-import com.manydesigns.portofino.modules.PageActionsModule;
+import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
@@ -175,7 +175,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     @Inject(DatabaseModule.PERSISTENCE)
     public Persistence persistence;
 
-    @Inject(PageActionsModule.PAGES_DIRECTORY)
+    @Inject(PageactionsModule.PAGES_DIRECTORY)
     public File pagesDir;
 
     @Inject(BaseModule.APPLICATION_DIRECTORY)
@@ -1079,7 +1079,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
             bindings.put("adminGroupName", StringUtils.defaultString(adminGroupName));
 
             bindings.put("encryptionAlgorithm", encryptionAlgorithm);
-            File gcp = (File) context.getServletContext().getAttribute(PageActionsModule.GROOVY_CLASS_PATH);
+            File gcp = (File) context.getServletContext().getAttribute(PageactionsModule.GROOVY_CLASS_PATH);
             FileWriter fw = new FileWriter(new File(gcp, "Security.groovy"));
             secTemplate.make(bindings).writeTo(fw);
             IOUtils.closeQuietly(fw);

@@ -17,7 +17,7 @@
     <stripes:layout-component name="portletBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.page.RootChildrenAction"
                       method="post" enctype="multipart/form-data">
-            <%@include file="/layouts/page/children-tables.jsp"%>
+            <%@include file="children-tables.jsp"%>
             <div class="form-actions">
                 <portofino:buttons list="root-children" />
             </div>

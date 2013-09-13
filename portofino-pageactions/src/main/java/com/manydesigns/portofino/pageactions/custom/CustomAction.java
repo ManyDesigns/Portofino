@@ -53,7 +53,7 @@ public class CustomAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();
-        return new ForwardResolution("/layouts/custom/configure.jsp");
+        return new ForwardResolution("/m/pageactions/pageactions/custom/configure.jsp");
     }
 
     @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, type = Button.TYPE_PRIMARY)

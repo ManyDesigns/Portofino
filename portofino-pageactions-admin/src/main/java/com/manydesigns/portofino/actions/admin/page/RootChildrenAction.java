@@ -22,7 +22,7 @@ package com.manydesigns.portofino.actions.admin.page;
 
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.modules.PageActionsModule;
+import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -44,7 +44,7 @@ public class RootChildrenAction extends RootConfigurationAction {
 
     public static final String URL_BINDING = "/actions/admin/root-page/children";
 
-    @Inject(PageActionsModule.PAGES_DIRECTORY)
+    @Inject(PageactionsModule.PAGES_DIRECTORY)
     public File pagesDir;
 
     @Override
@@ -56,7 +56,7 @@ public class RootChildrenAction extends RootConfigurationAction {
 
     @Override
     protected Resolution forwardToPageChildren() {
-        return new ForwardResolution("/layouts/admin/rootChildren.jsp");
+        return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/rootChildren.jsp");
     }
 
     @Override

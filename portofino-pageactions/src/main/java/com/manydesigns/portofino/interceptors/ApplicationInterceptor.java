@@ -120,7 +120,7 @@ public class ApplicationInterceptor implements Interceptor {
                                 (ElementsThreadLocals.getText("portlet.exception"), ExceptionUtils.getRootCause(t));
                         SessionMessages.addErrorMessage(msg);
                     }
-                    return new ForwardResolution("/layouts/redirect-to-last-working-page.jsp");
+                    return new ForwardResolution("/m/pageactions/redirect-to-last-working-page.jsp");
                 }
             }
             PageInstance pageInstance = dispatch.getLastPageInstance();

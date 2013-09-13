@@ -306,7 +306,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected Resolution doSearch() {
         if(!isConfigured()) {
             logger.debug("Crud not correctly configured");
-            return forwardTo(PAGE_PORTLET_NOT_CONFIGURED);
+            return forwardToPortletNotConfigured();
         }
 
         try {
@@ -330,7 +330,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }
         } catch(Exception e) {
             logger.warn("Crud not correctly configured", e);
-            return forwardTo(PAGE_PORTLET_NOT_CONFIGURED);
+            return forwardToPortletNotConfigured();
         }
     }
 
@@ -942,7 +942,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         logger.info("Not in use case: " + crudConfiguration.getName());
         String msg = ElementsThreadLocals.getText("crud.notInUseCase", StringUtils.join(parameters, "/"));
         SessionMessages.addWarningMessage(msg);
-        return new ForwardResolution("/m/database/pageactions/redirect-to-last-working-page.jsp");
+        return new ForwardResolution("/m/pageactions/redirect-to-last-working-page.jsp");
     }
 
     /**

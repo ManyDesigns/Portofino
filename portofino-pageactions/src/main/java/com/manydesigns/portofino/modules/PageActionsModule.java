@@ -76,7 +76,7 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class PageActionsModule implements Module {
+public class PageactionsModule implements Module {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -127,7 +127,7 @@ public class PageActionsModule implements Module {
     //**************************************************************************
 
     public static final Logger logger =
-            LoggerFactory.getLogger(PageActionsModule.class);
+            LoggerFactory.getLogger(PageactionsModule.class);
 
     @Override
     public String getModuleVersion() {
@@ -146,12 +146,12 @@ public class PageActionsModule implements Module {
 
     @Override
     public String getId() {
-        return "portofino-pageactions";
+        return "pageactions";
     }
 
     @Override
     public String getName() {
-        return "Portofino PageActions";
+        return "Pageactions";
     }
 
     @Override
@@ -307,7 +307,7 @@ public class PageActionsModule implements Module {
                 }
 
                 xb.openElement("script");
-                xb.addAttribute("src", Util.getAbsoluteUrl("/portofino.js.jsp"));
+                xb.addAttribute("src", Util.getAbsoluteUrl("/m/pageactions/portofino.js.jsp"));
                 xb.closeElement("script");
 
                 //Setup base href - uniform handling of .../resource and .../resource/

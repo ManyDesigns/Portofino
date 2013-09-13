@@ -26,7 +26,7 @@ class MyCustomAction extends CustomAction {
 
     @DefaultHandler
     public Resolution execute() {
-        String fwd = "/layouts/custom/example.jsp";
+        String fwd = "/m/pageactions/pageactions/custom/example.jsp";
         return forwardTo(fwd);
     }
 

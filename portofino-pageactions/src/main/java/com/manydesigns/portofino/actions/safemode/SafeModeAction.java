@@ -38,7 +38,7 @@ public class SafeModeAction extends CustomAction {
 
     @DefaultHandler
     public Resolution execute() {
-        String fwd = "/layouts/safemode/safemode.jsp";
+        String fwd = "/m/pageactions/safemode/safemode.jsp";
         return forwardTo(fwd);
     }
 

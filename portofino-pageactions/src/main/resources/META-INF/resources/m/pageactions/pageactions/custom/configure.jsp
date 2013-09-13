@@ -18,7 +18,7 @@
         <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data"
                       class="form-horizontal">
             <mde:write name="actionBean" property="pageConfigurationForm"/>
-            <%@include file="../script-configuration.jsp" %>
+            <%@include file="/m/pageactions/script-configuration.jsp" %>
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
             <div class="form-actions">
                 <portofino:buttons list="configuration" />

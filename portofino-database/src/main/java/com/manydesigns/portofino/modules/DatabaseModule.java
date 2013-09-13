@@ -142,7 +142,7 @@ public class DatabaseModule implements Module {
         servletContext.setAttribute(PERSISTENCE, persistence);
 
         PageActionRegistry pageActionsRegistry =
-                (PageActionRegistry) servletContext.getAttribute(PageActionsModule.PAGE_ACTIONS_REGISTRY);
+                (PageActionRegistry) servletContext.getAttribute(PageactionsModule.PAGE_ACTIONS_REGISTRY);
         pageActionsRegistry.register(ChartAction.class);
         pageActionsRegistry.register(CrudAction.class);
         pageActionsRegistry.register(ManyToManyAction.class);

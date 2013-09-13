@@ -28,7 +28,7 @@ import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.actions.safemode.SafeModeAction;
-import com.manydesigns.portofino.modules.PageActionsModule;
+import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import net.sourceforge.stripes.action.Before;
@@ -61,7 +61,7 @@ public abstract class RootConfigurationAction extends PageAdminAction {
     // Action events
     //--------------------------------------------------------------------------
 
-    @Inject(PageActionsModule.PAGES_DIRECTORY)
+    @Inject(PageactionsModule.PAGES_DIRECTORY)
     public File pagesDir;
 
     @Override

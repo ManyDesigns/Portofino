@@ -1,0 +1,1 @@
+<%@include file="/m/pageactions/redirect-to-landing-page.jsp"%>

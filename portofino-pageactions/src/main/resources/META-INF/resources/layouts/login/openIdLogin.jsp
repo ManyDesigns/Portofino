@@ -7,17 +7,17 @@
 <stripes:layout-render name="/skins/${skin}/login.jsp">
     <stripes:layout-component name="customScripts">
         <!-- Simple OpenID Selector -->
-        <link type="text/css" rel="stylesheet" href="<stripes:url value="/openid-selector/css/openid.css" />" />
+        <link type="text/css" rel="stylesheet" href="<stripes:url value="/m/pageactions/openid-selector/css/openid.css" />" />
         <style type="text/css">
             #openid_form { width: auto; }
             #openid_username { margin-right: .5em; }
             div#openid_highlight { padding: 0; }
         </style>
-        <script type="text/javascript" src="<stripes:url value="/openid-selector/js/openid-jquery.js" />"></script>
+        <script type="text/javascript" src="<stripes:url value="/m/pageactions/openid-selector/js/openid-jquery.js" />"></script>
         <script type="text/javascript" src="<stripes:url value="/layouts/login/openid-custom.js"/>"></script>
         <script type="text/javascript">
             $(document).ready(function() {
-                openid.img_path = '${pageContext.request.contextPath}/openid-selector/images/';
+                openid.img_path = '${pageContext.request.contextPath}/m/pageactions/openid-selector/images/';
                 openid.useInputBox = function(provider) {
                     var input_area = $('#openid_input_area');
                     var html = '';

@@ -27,22 +27,16 @@ import com.manydesigns.portofino.actions.admin.page.RootChildrenAction;
 import com.manydesigns.portofino.actions.admin.page.RootPermissionsAction;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.PageAction;
-import com.manydesigns.portofino.head.HtmlHeadBuilder;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.menu.*;
 import com.manydesigns.portofino.security.AccessLevel;
-import net.sf.ehcache.CacheManager;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.web.env.EnvironmentLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.util.List;
 import java.util.Locale;
 
 /*
@@ -51,7 +45,7 @@ import java.util.Locale;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class PageActionsAdminModule implements Module {
+public class PageactionsadminModule implements Module {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -59,33 +53,14 @@ public class PageActionsAdminModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(BaseModule.SERVLET_CONTEXT)
-    public ServletContext servletContext;
-
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
-
-    @Inject(BaseModule.APPLICATION_DIRECTORY)
-    public File applicationDirectory;
 
     @Inject(BaseModule.ADMIN_MENU)
     public MenuBuilder adminMenu;
 
     @Inject(BaseModule.APP_MENU)
     public MenuBuilder appMenu;
-
-    @Inject(BaseModule.HTML_HEAD_BUILDER)
-    public HtmlHeadBuilder headBuilder;
-
-    @Inject(BaseModule.CLASS_LOADER)
-    public ClassLoader originalClassLoader;
-
-    @Inject(BaseModule.APP_LISTENERS)
-    public List<ApplicationListener> applicationListeners;
-
-    protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
-
-    protected CacheManager cacheManager;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -94,7 +69,7 @@ public class PageActionsAdminModule implements Module {
     //**************************************************************************
 
     public static final Logger logger =
-            LoggerFactory.getLogger(PageActionsAdminModule.class);
+            LoggerFactory.getLogger(PageactionsadminModule.class);
 
     @Override
     public String getModuleVersion() {
@@ -113,12 +88,12 @@ public class PageActionsAdminModule implements Module {
 
     @Override
     public String getId() {
-        return "portofino-pageactions-admin";
+        return "pageactionsadmin";
     }
 
     @Override
     public String getName() {
-        return "Portofino PageActions Admin";
+        return "Pageactions Administration";
     }
 
     @Override

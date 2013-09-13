@@ -89,7 +89,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             {{"id", "title", "description", "navigationRoot", "template", "detailTemplate", "applyTemplateRecursively"}};
     public static final String[][] PAGE_CONFIGURATION_FIELDS_NO_DETAIL =
             {{"id", "title", "description", "navigationRoot", "template", "applyTemplateRecursively"}};
-    public static final String PAGE_PORTLET_NOT_CONFIGURED = "/layouts/portlet-not-configured.jsp";
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
     public static final String CONF_FORM_PREFIX = "config";
@@ -579,26 +578,26 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     }
 
     /**
-     * Returns a ForwardResolution to a standard page with an error message saying that the portlet is not properly
+     * Returns a ForwardResolution to a standard page with an error message saying that the pageaction is not properly
      * configured.
      */
     public Resolution forwardToPortletNotConfigured() {
-        return new ForwardResolution(PAGE_PORTLET_NOT_CONFIGURED);
+        return new ForwardResolution("/m/pageactions/portlet-not-configured.jsp");
     }
 
     /**
-      * Returns a ForwardResolution to a standard page that reports an exception with an error message saying that the portlet is not properly
-      * configured.
-      */
+     * Returns a ForwardResolution to a standard page that reports an exception with an error message saying that
+     * the pageaction is not properly configured.
+     */
     public Resolution forwardToPortletError(Throwable e) {
         context.getRequest().setAttribute(PORTOFINO_PORTLET_EXCEPTION, e);
-        return forwardTo("/layouts/portlet-error.jsp");
+        return forwardTo("/m/pageactions/portlet-error.jsp");
     }
 
     protected Resolution portletPageNotFound() {
         if(isEmbedded()) {
             context.getRequest().setAttribute(PORTOFINO_PORTLET_EXCEPTION, new Exception());
-            return new ForwardResolution("/layouts/portlet-error-404.jsp");
+            return new ForwardResolution("/m/pageactions/portlet-error-404.jsp");
         } else {
             return new ErrorResolution(404);
         }

@@ -173,7 +173,7 @@ table.treetable caption {
 }
 
 table.treetable thead {
-  background: #aaa url(../../jquery-treetable-3.0.1/images/bg-table-thead.png) repeat-x top left;
+  background: #aaa url(../../m/database/jquery-treetable-3.0.1/images/bg-table-thead.png) repeat-x top left;
 }
 
 table.treetable thead tr th {
@@ -195,19 +195,19 @@ table.treetable span {
 }
 
 table.treetable span.file {
-  background-image: url(../../jquery-treetable-3.0.1/images/file.png);
+  background-image: url(../../m/database/jquery-treetable-3.0.1/images/file.png);
 }
 
 table.treetable span.folder {
-  background-image: url(../../jquery-treetable-3.0.1/images/folder.png);
+  background-image: url(../../m/database/jquery-treetable-3.0.1/images/folder.png);
 }
 
 table.treetable tr.collapsed span.indenter a {
-  background-image: url(../../jquery-treetable-3.0.1/images/expand.png);
+  background-image: url(../../m/database/jquery-treetable-3.0.1/images/expand.png);
 }
 
 table.treetable tr.expanded span.indenter a {
-  background-image: url(../../jquery-treetable-3.0.1/images/collapse.png);
+  background-image: url(../../m/database/jquery-treetable-3.0.1/images/collapse.png);
 }
 
 table.treetable tr.selected {
@@ -216,11 +216,11 @@ table.treetable tr.selected {
 }
 
 table.treetable tr.collapsed.selected span.indenter a {
-  background-image: url(../../jquery-treetable-3.0.1/images/expand-light.png);
+  background-image: url(../../m/database/jquery-treetable-3.0.1/images/expand-light.png);
 }
 
 table.treetable tr.expanded.selected span.indenter a {
-  background-image: url(../../jquery-treetable-3.0.1/images/collapse-light.png);
+  background-image: url(../../m/database/jquery-treetable-3.0.1/images/collapse-light.png);
 }
 
 table.treetable tr.accept {
@@ -229,11 +229,11 @@ table.treetable tr.accept {
 }
 
 table.treetable tr.collapsed.accept td span.indenter a {
-  background-image: url(../../jquery-treetable-3.0.1/images/expand-light.png);
+  background-image: url(../../m/database/jquery-treetable-3.0.1/images/expand-light.png);
 }
 
 table.treetable tr.expanded.accept td span.indenter a {
-  background-image: url(../../jquery-treetable-3.0.1/images/collapse-light.png);
+  background-image: url(../../m/database/jquery-treetable-3.0.1/images/collapse-light.png);
 }
 
 /*******************************************************************************
