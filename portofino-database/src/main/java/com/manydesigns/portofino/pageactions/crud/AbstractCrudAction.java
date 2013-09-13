@@ -526,7 +526,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 }
                 if(isPopup()) {
                     popupCloseCallback += "(true)";
-                    return new ForwardResolution("/layouts/crud/popup/close.jsp");
+                    return new ForwardResolution("/m/database/pageactions/crud/popup/close.jsp");
                 } else {
                     pk = pkHelper.generatePkStringArray(object);
                     String url = getDispatch().getOriginalPath() + "/" + getPkForUrl(pk);
@@ -827,7 +827,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * Returns the Resolution used to show the Bulk Edit page.
      */
     protected Resolution getBulkEditView() {
-        return new ForwardResolution("/layouts/crud/bulk-edit.jsp");
+        return new ForwardResolution("/m/database/pageactions/crud/bulk-edit.jsp");
     }
 
     /**
@@ -835,9 +835,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     protected Resolution getCreateView() { //TODO spezzare in popup/non-popup?
         if(isPopup()) {
-            return new ForwardResolution("/layouts/crud/popup/create.jsp");
+            return new ForwardResolution("/m/database/pageactions/crud/popup/create.jsp");
         } else {
-            return new ForwardResolution("/layouts/crud/create.jsp");
+            return new ForwardResolution("/m/database/pageactions/crud/create.jsp");
         }
     }
 
@@ -845,42 +845,42 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * Returns the Resolution used to show the Edit page.
      */
     protected Resolution getEditView() {
-        return new ForwardResolution("/layouts/crud/edit.jsp");
+        return new ForwardResolution("/m/database/pageactions/crud/edit.jsp");
     }
 
     /**
      * Returns the Resolution used to show the Read page.
      */
     protected Resolution getReadView() {
-        return forwardTo("/layouts/crud/read.jsp");
+        return forwardTo("/m/database/pageactions/crud/read.jsp");
     }
 
     /**
      * Returns the Resolution used to show the Search page when this page is embedded in its parent.
      */
     protected Resolution getEmbeddedReadView() {
-        return new ForwardResolution("/layouts/crud/read.jsp");
+        return new ForwardResolution("/m/database/pageactions/crud/read.jsp");
     }
 
     /**
      * Returns the Resolution used to show the Search page.
      */
     protected Resolution getSearchView() {
-        return forwardTo("/layouts/crud/search.jsp");
+        return forwardTo("/m/database/pageactions/crud/search.jsp");
     }
 
     /**
      * Returns the Resolution used to show the Search page when this page is embedded in its parent.
      */
     protected Resolution getEmbeddedSearchView() {
-        return new ForwardResolution("/layouts/crud/search.jsp");
+        return new ForwardResolution("/m/database/pageactions/crud/search.jsp");
     }
 
     /**
      * Returns the Resolution used to display the search results when paginating or sorting via AJAX.
      */
     protected Resolution getSearchResultsPageView() {
-        return new ForwardResolution("/layouts/crud/datatable.jsp");
+        return new ForwardResolution("/m/database/pageactions/crud/datatable.jsp");
     }
 
     //--------------------------------------------------------------------------
@@ -942,7 +942,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         logger.info("Not in use case: " + crudConfiguration.getName());
         String msg = ElementsThreadLocals.getText("crud.notInUseCase", StringUtils.join(parameters, "/"));
         SessionMessages.addWarningMessage(msg);
-        return new ForwardResolution("/layouts/redirect-to-last-working-page.jsp");
+        return new ForwardResolution("/m/database/pageactions/redirect-to-last-working-page.jsp");
     }
 
     /**
@@ -1356,7 +1356,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public Resolution cancel() {
         if(isPopup()) {
             popupCloseCallback += "(false)";
-            return new ForwardResolution("/layouts/crud/popup/close.jsp");
+            return new ForwardResolution("/m/database/pageactions/crud/popup/close.jsp");
         } else {
             return super.cancel();
         }

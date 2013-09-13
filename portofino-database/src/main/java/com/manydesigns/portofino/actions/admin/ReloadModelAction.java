@@ -63,7 +63,7 @@ public class ReloadModelAction extends AbstractActionBean {
 
     @DefaultHandler
     public Resolution execute() {
-        return new ForwardResolution("/layouts/admin/reload-model.jsp");
+        return new ForwardResolution("/m/database/actions/admin/reload-model.jsp");
     }
 
     @Button(list = "reload-model", key = "model.reload", order = 1, type = Button.TYPE_PRIMARY)
@@ -73,7 +73,7 @@ public class ReloadModelAction extends AbstractActionBean {
             persistence.loadXmlModel();
             DispatcherLogic.clearConfigurationCache();
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("model.reloaded"));
-            return new ForwardResolution("/layouts/admin/reload-model.jsp");
+            return new ForwardResolution("/m/database/actions/admin/reload-model.jsp");
         }
     }
 

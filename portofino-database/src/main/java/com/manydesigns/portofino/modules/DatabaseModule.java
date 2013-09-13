@@ -103,12 +103,12 @@ public class DatabaseModule implements Module {
 
     @Override
     public String getId() {
-        return "portofino-database";
+        return "database";
     }
 
     @Override
     public String getName() {
-        return "Portofino Database";
+        return "Database";
     }
 
     @Override

@@ -286,7 +286,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
     //**************************************************************************
 
     protected Resolution getConfigurationView() {
-        return new ForwardResolution("/layouts/crud/configure.jsp");
+        return new ForwardResolution("/m/database/pageactions/crud/configure.jsp");
     }
 
     //--------------------------------------------------------------------------
