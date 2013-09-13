@@ -164,7 +164,7 @@ public class BaseModule implements Module {
                 xb.writeLink("stylesheet", "text/css",
                              Util.getAbsoluteUrl("/elements/datepicker/css/datepicker.css"));
                 xb.writeLink("stylesheet", "text/css",
-                             Util.getAbsoluteUrl("/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"));
+                             Util.getAbsoluteUrl("/m/base/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"));
 
                 xb.openElement("script");
                 xb.addAttribute("src", Util.getAbsoluteUrl("/elements/jquery/jquery.min.js"));
@@ -180,7 +180,7 @@ public class BaseModule implements Module {
                 xb.addAttribute("src", Util.getAbsoluteUrl("/elements/datepicker/js/bootstrap-datepicker.js"));
                 xb.closeElement("script");
                 xb.openElement("script");
-                xb.addAttribute("src", Util.getAbsoluteUrl("/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"));
+                xb.addAttribute("src", Util.getAbsoluteUrl("/m/base/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"));
                 xb.closeElement("script");
                 head.fragments.add(xb);
             }

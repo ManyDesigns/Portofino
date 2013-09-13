@@ -71,7 +71,7 @@ public class ModulesAction extends AbstractActionBean {
     @RequiresPermissions("com.manydesigns.portofino.modules:list")
     public Resolution execute() {
         setupForm();
-        return new ForwardResolution("/portofino-base/actions/admin/modules/list.jsp");
+        return new ForwardResolution("/m/base/actions/admin/modules/list.jsp");
     }
 
     protected void setupForm() {

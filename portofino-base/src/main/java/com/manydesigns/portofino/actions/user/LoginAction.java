@@ -163,7 +163,7 @@ public abstract class LoginAction extends AbstractActionBean {
     }
 
     protected String getLoginPage() {
-        return "/portofino-base/layouts/user/login.jsp";
+        return "/m/base/actions/user/login.jsp";
     }
 
     //**************************************************************************
@@ -267,7 +267,7 @@ public abstract class LoginAction extends AbstractActionBean {
             return redirectToReturnUrl();
         }
 
-        return new ForwardResolution("/portofino-base/layouts/user/resetPassword.jsp");
+        return new ForwardResolution("/m/base/actions/user/resetPassword.jsp");
     }
 
     public Resolution resetPassword2() {
@@ -298,7 +298,7 @@ public abstract class LoginAction extends AbstractActionBean {
     protected abstract void sendForgotPasswordEmail(String email, String subject, String body);
 
     protected String getForgotPasswordPage() {
-        return "/portofino-base/layouts/user/forgotPassword.jsp";
+        return "/m/base/actions/user/forgotPassword.jsp";
     }
 
     //**************************************************************************
@@ -431,7 +431,7 @@ public abstract class LoginAction extends AbstractActionBean {
     }
 
     protected String getSignUpPage() {
-        return "/portofino-base/layouts/user/signUp.jsp";
+        return "/m/base/actions/user/signUp.jsp";
     }
 
     protected void setupSignUpForm(PortofinoRealm realm) {
@@ -447,7 +447,7 @@ public abstract class LoginAction extends AbstractActionBean {
 
     @RequiresAuthentication
     public Resolution changePassword() throws Exception {
-        return new ForwardResolution("/portofino-base/layouts/user/changePassword.jsp");
+        return new ForwardResolution("/m/base/actions/user/changePassword.jsp");
     }
 
     @Button(list = "changepassword", key = "commons.ok", order = 1, type = Button.TYPE_PRIMARY)
@@ -465,16 +465,16 @@ public abstract class LoginAction extends AbstractActionBean {
             } catch (IncorrectCredentialsException e) {
                 logger.error("Password update failed", e);
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.passwordChange.failure.passwordDoesntMatch"));
-                return new ForwardResolution("/portofino-base/layouts/user/changePassword.jsp");
+                return new ForwardResolution("/m/base/actions/user/changePassword.jsp");
             } catch (Exception e) {
                 logger.error("Password update failed", e);
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.passwordChange.failure"));
-                return new ForwardResolution("/portofino-base/layouts/user/changePassword.jsp");
+                return new ForwardResolution("/m/base/actions/user/changePassword.jsp");
             }
             return redirectToReturnUrl();
         } else {
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("user.passwordChange.failure.passwordsDontMatch"));
-            return new ForwardResolution("/portofino-base/layouts/user/changePassword.jsp");
+            return new ForwardResolution("/m/base/actions/user/changePassword.jsp");
         }
     }
 
