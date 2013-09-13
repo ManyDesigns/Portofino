@@ -29,10 +29,12 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.portofino.di.Injections;
 import org.apache.commons.configuration.FileConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
 import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.NavigableSet;
@@ -61,13 +63,14 @@ public class ModuleRegistry {
         return modules;
     }
 
-    public void migrateAndInit() {
+    public void migrateAndInit(ServletContext servletContext) {
         for(Module module : modules) {
             int migrationVersion = module.getMigrationVersion();
             String key = "module." + module.getId() + ".migration.version";
             int installedVersion = configuration.getInt(key, -1);
 
             boolean migrationOk = true;
+            Injections.inject(module, servletContext, null);
 
             if(installedVersion == -1) try { //Install
                 logger.info("Installing module " + printModule(module) + "...");

@@ -8,9 +8,9 @@
         <artifactId>portofino</artifactId>
         <version>4.1.beta5-SNAPSHOT</version>
     </parent>
-    <artifactId>portofino-text</artifactId>
+    <artifactId>portofino-calendar</artifactId>
     <packaging>jar</packaging>
-    <name>manydesigns-portofino-text</name>
+    <name>manydesigns-portofino-calendar</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>

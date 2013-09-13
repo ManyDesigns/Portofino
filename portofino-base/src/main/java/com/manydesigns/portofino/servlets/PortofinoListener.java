@@ -26,7 +26,6 @@ import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.elements.servlet.AttributeMap;
 import com.manydesigns.elements.servlet.ElementsFilter;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.head.HtmlHeadBuilder;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.menu.MenuBuilder;
@@ -205,7 +204,7 @@ public class PortofinoListener
         moduleRegistry = new ModuleRegistry(appConfiguration);
         discoverModules(moduleRegistry);
         servletContext.setAttribute(BaseModule.MODULE_REGISTRY, moduleRegistry);
-        moduleRegistry.migrateAndInit();
+        moduleRegistry.migrateAndInit(servletContext);
         logger.info("All modules loaded.");
 
         String encoding = configuration.getString(PortofinoProperties.URL_ENCODING);
@@ -246,7 +245,6 @@ public class PortofinoListener
             try {
                 logger.debug("Adding discovered module " + moduleClass);
                 Module module = moduleClass.newInstance();
-                Injections.inject(module, servletContext, null);
                 moduleRegistry.getModules().add(module);
             } catch (Throwable e) {
                 logger.error("Could not register module " + moduleClass, e);

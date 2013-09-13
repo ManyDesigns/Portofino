@@ -19,6 +19,13 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- For the wizard -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-calendar</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>

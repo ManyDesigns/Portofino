@@ -39,7 +39,6 @@ import com.manydesigns.portofino.head.HtmlHeadAppender;
 import com.manydesigns.portofino.head.HtmlHeadBuilder;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.menu.*;
-import com.manydesigns.portofino.pageactions.calendar.CalendarAction;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.pageactions.login.DefaultLoginAction;
 import com.manydesigns.portofino.pageactions.login.OpenIdLoginAction;
@@ -229,7 +228,6 @@ public class PageactionsModule implements Module {
 
         logger.debug("Creating pageactions registry");
         PageActionRegistry pageActionRegistry = new PageActionRegistry();
-        pageActionRegistry.register(CalendarAction.class);
         pageActionRegistry.register(CustomAction.class);
         pageActionRegistry.register(DefaultLoginAction.class);
         pageActionRegistry.register(OpenIdLoginAction.class);

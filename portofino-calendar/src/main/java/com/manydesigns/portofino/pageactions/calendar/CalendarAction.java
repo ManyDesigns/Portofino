@@ -106,7 +106,7 @@ public class CalendarAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();
-        return new ForwardResolution("/layouts/calendar/configure.jsp");
+        return new ForwardResolution("/m/calendar/configure.jsp");
     }
 
     @Button(list = "configuration", key = "commons.updateConfiguration", type = Button.TYPE_PRIMARY)
@@ -125,7 +125,7 @@ public class CalendarAction extends AbstractPageAction {
             return cancel();
         } else {
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.configuration.notUpdated"));
-            return new ForwardResolution("/layouts/calendar/configure.jsp");
+            return new ForwardResolution("/m/calendar/configure.jsp");
         }
     }
 
@@ -158,7 +158,7 @@ public class CalendarAction extends AbstractPageAction {
             monthView.addEvent(event);
         }
         monthView.sortEvents();
-        return forwardTo("/layouts/calendar/calendar.jsp");
+        return forwardTo("/m/calendar/calendar.jsp");
     }
 
     public Resolution agendaView() {
@@ -174,7 +174,7 @@ public class CalendarAction extends AbstractPageAction {
             }
         }
         agendaView.sortEvents();
-        return forwardTo("/layouts/calendar/calendar.jsp");
+        return forwardTo("/m/calendar/calendar.jsp");
     }
 
     public Resolution nextMonth() {

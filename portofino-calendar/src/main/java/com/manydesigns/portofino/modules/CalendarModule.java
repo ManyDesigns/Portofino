@@ -22,8 +22,8 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.pageactions.calendar.CalendarAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
-import com.manydesigns.portofino.pageactions.text.TextAction;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class TextModule implements Module {
+public class CalendarModule implements Module {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -55,7 +55,7 @@ public class TextModule implements Module {
     //**************************************************************************
 
     public static final Logger logger =
-            LoggerFactory.getLogger(TextModule.class);
+            LoggerFactory.getLogger(CalendarModule.class);
 
     @Override
     public String getModuleVersion() {
@@ -74,12 +74,12 @@ public class TextModule implements Module {
 
     @Override
     public String getId() {
-        return "text";
+        return "calendar";
     }
 
     @Override
     public String getName() {
-        return "Text";
+        return "Calendar";
     }
 
     @Override
@@ -89,7 +89,7 @@ public class TextModule implements Module {
 
     @Override
     public void init() {
-        pageActionRegistry.register(TextAction.class);
+        pageActionRegistry.register(CalendarAction.class);
         status = ModuleStatus.ACTIVE;
     }
 @Override
