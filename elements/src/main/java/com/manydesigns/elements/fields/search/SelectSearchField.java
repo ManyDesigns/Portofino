@@ -218,9 +218,7 @@ public class SelectSearchField extends AbstractSearchField {
 
         for (Map.Entry<Object,SelectionModel.Option> option :
                 options.entrySet()) {
-            if(!option.getValue().active) {
-                continue;
-            }
+            //#1318 include inactive options, because they must be searchable.
             Object optionValue = option.getKey();
             String optionStringValue =
                     OgnlUtils.convertValueToString(optionValue);
