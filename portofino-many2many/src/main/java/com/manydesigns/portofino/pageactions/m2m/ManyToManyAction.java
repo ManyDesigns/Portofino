@@ -264,7 +264,7 @@ public class ManyToManyAction extends AbstractPageAction {
                         booleanRelation.put(o, !availableAssociations.contains(o));
                     }
                 }
-                return forwardTo("/m/database/pageactions/m2m/checkboxes.jsp");
+                return forwardTo("/m/many2many/checkboxes.jsp");
             default:
                 return forwardToPortletNotConfigured();
         }
@@ -401,7 +401,7 @@ public class ManyToManyAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();
-        return new ForwardResolution("/m/database/pageactions/m2m/configure.jsp");
+        return new ForwardResolution("/m/many2many/configure.jsp");
     }
 
     @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, type = Button.TYPE_PRIMARY)
@@ -423,7 +423,7 @@ public class ManyToManyAction extends AbstractPageAction {
             return cancel();
         } else {
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.configuration.notUpdated"));
-            return new ForwardResolution("/m/database/pageactions/m2m/configure.jsp");
+            return new ForwardResolution("/m/many2many/configure.jsp");
         }
     }
 

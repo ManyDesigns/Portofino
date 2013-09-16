@@ -267,6 +267,8 @@ public class Persistence {
                 setups.put(databaseName, setup);
             }
         }
+
+        //DispatcherLogic.clearConfigurationCache(); TODO ripristinare
     }
 
     //**************************************************************************

@@ -24,7 +24,6 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
@@ -71,7 +70,6 @@ public class ReloadModelAction extends AbstractActionBean {
     public Resolution reloadModel() {
         synchronized (persistence) {
             persistence.loadXmlModel();
-            DispatcherLogic.clearConfigurationCache();
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("model.reloaded"));
             return new ForwardResolution("/m/database/actions/admin/reload-model.jsp");
         }

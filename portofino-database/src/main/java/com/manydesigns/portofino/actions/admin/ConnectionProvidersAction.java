@@ -37,7 +37,6 @@ import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.DatabaseModule;
@@ -427,7 +426,6 @@ public class ConnectionProvidersAction extends AbstractActionBean {
             persistence.syncDataModel(databaseName);
             persistence.initModel();
             persistence.saveXmlModel();
-            DispatcherLogic.clearConfigurationCache();
             SessionMessages.addInfoMessage(
                     "Connection provider synchronized correctly");
         } catch (Exception e) {
