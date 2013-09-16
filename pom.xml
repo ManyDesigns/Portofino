@@ -95,6 +95,8 @@
         <module>portofino-pageactionsadmin</module>
         <module>portofino-text</module>
         <module>portofino-calendar</module>
+        <module>portofino-crud</module>
+        <module>portofino-wizard</module>
         <module>portofino-war</module>
         <module>portofino-war-jee</module>
         <module>portofino-war-gae</module>

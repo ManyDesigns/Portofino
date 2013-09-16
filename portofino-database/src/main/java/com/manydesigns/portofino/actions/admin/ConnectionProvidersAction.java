@@ -28,7 +28,7 @@ import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.text.OgnlTextFormat;
-import com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard;
+//import com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderForm;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderTableForm;
 import com.manydesigns.portofino.actions.forms.SelectableSchema;
@@ -279,7 +279,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
 
     @Button(list = "connectionProviders-search", key = "commons.create", order = 1)
     public Resolution create() {
-        return new RedirectResolution(ApplicationWizard.class);
+        return null; //TODO new RedirectResolution(ApplicationWizard.class);
     }
 
     @Button(list = "connectionProviders-read", key = "commons.edit", order = 2)
@@ -440,6 +440,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                 .addParameter("databaseName", databaseName);
     }
 
+    /* TODO
     @Button(list = "connectionProviders-read", key = "layouts.admin.connectionProviders.list.runWizard", order = 5)
     public Resolution runWizard() {
         ConnectionProvider connectionProvider = persistence.getConnectionProvider(databaseName);
@@ -447,7 +448,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                 .addParameter("connectionProviderName", databaseName)
                 .addParameter("configureConnectionProvider")
                 .addParameter("connectionProviderType", connectionProvider instanceof JdbcConnectionProvider ? "JDBC" : "JNDI");
-    }
+    }*/
 
     @Buttons({
         @Button(list = "connectionProviders-read", key = "commons.returnToList", order = 1),

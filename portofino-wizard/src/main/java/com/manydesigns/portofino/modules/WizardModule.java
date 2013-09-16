@@ -21,15 +21,10 @@
 package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
-import com.manydesigns.portofino.actions.admin.ReloadModelAction;
-import com.manydesigns.portofino.actions.admin.TablesAction;
-import com.manydesigns.portofino.database.platforms.*;
+import com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.liquibase.LiquibaseUtils;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.menu.SimpleMenuAppender;
-import com.manydesigns.portofino.persistence.Persistence;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +38,7 @@ import java.io.File;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class DatabaseModule implements Module {
+public class WizardModule implements Module {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -79,7 +74,7 @@ public class DatabaseModule implements Module {
     //**************************************************************************
 
     public static final Logger logger =
-            LoggerFactory.getLogger(DatabaseModule.class);
+            LoggerFactory.getLogger(WizardModule.class);
 
     @Override
     public String getModuleVersion() {
@@ -93,17 +88,17 @@ public class DatabaseModule implements Module {
 
     @Override
     public double getPriority() {
-        return 2;
+        return 3;
     }
 
     @Override
     public String getId() {
-        return "database";
+        return "wizard";
     }
 
     @Override
     public String getName() {
-        return "Database";
+        return "Wizard";
     }
 
     @Override
@@ -113,56 +108,15 @@ public class DatabaseModule implements Module {
 
     @Override
     public void init() {
-        logger.info("Setting up Liquibase");
-        LiquibaseUtils.setup();
-
-        logger.info("Initializing persistence");
-        DatabasePlatformsManager databasePlatformsManager = new DatabasePlatformsManager(configuration);
-
-        //TODO spostare nei singoli moduli
-        databasePlatformsManager.addDatabasePlatform(new ApacheDerbyDatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new MSSqlServerDatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new JTDSDatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new MySql5DatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new OracleDatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new PostgreSQLDatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new H2DatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new GoogleCloudSQLDatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new IbmDb2DatabasePlatform());
-
-        Persistence persistence =
-                new Persistence(applicationDirectory, configuration, databasePlatformsManager);
-        persistence.loadXmlModel();
-        servletContext.setAttribute(DATABASE_PLATFORMS_MANAGER, databasePlatformsManager);
-        servletContext.setAttribute(PERSISTENCE, persistence);
-
-        appendToAdminMenu();
+        SimpleMenuAppender link = SimpleMenuAppender.link(
+                "dataModeling", "wizard", null, "Wizard", ApplicationWizard.URL_BINDING, 0.5);
+        adminMenu.menuAppenders.add(link);
 
         status = ModuleStatus.ACTIVE;
     }
 
-    protected void appendToAdminMenu() {
-        SimpleMenuAppender group;
-        SimpleMenuAppender link;
-
-        group = SimpleMenuAppender.group("dataModeling", null, "Data modeling", 3.0);
-        adminMenu.menuAppenders.add(group);
-
-        link = SimpleMenuAppender.link(
-                "dataModeling", "connectionProviders", null, "Connection providers", ConnectionProvidersAction.URL_BINDING, 1.0);
-        adminMenu.menuAppenders.add(link);
-        link = SimpleMenuAppender.link(
-                "dataModeling", "tables", null, "Tables", TablesAction.BASE_ACTION_PATH, 2.0);
-        adminMenu.menuAppenders.add(link);
-        link = SimpleMenuAppender.link(
-                "dataModeling", "reloadModel", null, "Reload model", ReloadModelAction.URL_BINDING, 3.0);
-        adminMenu.menuAppenders.add(link);
-    }
-
     @Override
     public void destroy() {
-        logger.info("ManyDesigns Portofino database module stopping...");
-        logger.info("ManyDesigns Portofino database module stopped.");
         status = ModuleStatus.DESTROYED;
     }
 

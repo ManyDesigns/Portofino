@@ -33,6 +33,12 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-wizard</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
             <artifactId>portofino-mail</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>

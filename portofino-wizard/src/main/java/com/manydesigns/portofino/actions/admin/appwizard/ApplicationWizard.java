@@ -195,7 +195,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     protected Resolution createConnectionProviderForm() {
         step = 0;
-        return new ForwardResolution("/m/database/actions/admin/appwizard/connection-provider.jsp");
+        return new ForwardResolution("/m/wizard/connection-provider.jsp");
     }
 
     @Before
@@ -324,7 +324,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     protected Resolution selectSchemasForm() {
         step = 1;
-        return new ForwardResolution("/m/database/actions/admin/appwizard/select-schemas.jsp");
+        return new ForwardResolution("/m/wizard/select-schemas.jsp");
     }
 
     protected void configureEditSchemas() throws Exception {
@@ -515,7 +515,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     protected Resolution userManagementForm() {
         step = 2;
-        return new ForwardResolution("/m/database/actions/admin/appwizard/user-management.jsp");
+        return new ForwardResolution("/m/wizard/user-management.jsp");
     }
 
     @Button(list = "user-management", key="wizard.next", order = 2, type = Button.TYPE_PRIMARY)
@@ -699,13 +699,13 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     protected Resolution selectUserFieldsForm() {
         step = 3;
-        return new ForwardResolution("/m/database/actions/admin/appwizard/select-user-fields.jsp");
+        return new ForwardResolution("/m/wizard/select-user-fields.jsp");
     }
 
     protected Resolution selectTablesForm() {
         step = (userTable == null) ? 3 : 4;
         setupCalendarField();
-        return new ForwardResolution("/m/database/actions/admin/appwizard/select-tables.jsp");
+        return new ForwardResolution("/m/wizard/select-tables.jsp");
     }
 
     protected void setupCalendarField() {
@@ -831,7 +831,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         setupCalendarField();
         generateCalendarField.readFromRequest(context.getRequest());
         generateCalendarField.writeToObject(this);
-        return new ForwardResolution("/m/database/actions/admin/appwizard/build-app.jsp");
+        return new ForwardResolution("/m/wizard/build-app.jsp");
     }
 
     @Button(list = "build-app", key="wizard.prev", order = 1)
