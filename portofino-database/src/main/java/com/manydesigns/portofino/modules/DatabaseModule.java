@@ -24,18 +24,23 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
 import com.manydesigns.portofino.actions.admin.ReloadModelAction;
 import com.manydesigns.portofino.actions.admin.TablesAction;
-import com.manydesigns.portofino.database.platforms.*;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.liquibase.LiquibaseUtils;
+import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoSelectFromDatabaseChangeLogLockGenerator;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.menu.SimpleMenuAppender;
 import com.manydesigns.portofino.persistence.Persistence;
+import liquibase.database.DatabaseFactory;
+import liquibase.snapshot.DatabaseSnapshotGenerator;
+import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
+import liquibase.sqlgenerator.SqlGeneratorFactory;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import java.io.File;
+import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -114,25 +119,19 @@ public class DatabaseModule implements Module {
     @Override
     public void init() {
         logger.info("Setting up Liquibase");
-        LiquibaseUtils.setup();
+        DatabaseFactory databaseFactory = DatabaseFactory.getInstance();
+        logger.debug("Clearing Liquibase database factory registry");
+        databaseFactory.clearRegistry();
+        logger.debug("Clearing Liquibase database snapshot generator factory registry");
+        List<DatabaseSnapshotGenerator> registry = DatabaseSnapshotGeneratorFactory.getInstance().getRegistry();
+        registry.clear();
+        SqlGeneratorFactory.getInstance().register(new PortofinoSelectFromDatabaseChangeLogLockGenerator());
 
         logger.info("Initializing persistence");
         DatabasePlatformsManager databasePlatformsManager = new DatabasePlatformsManager(configuration);
 
-        //TODO spostare nei singoli moduli
-        databasePlatformsManager.addDatabasePlatform(new ApacheDerbyDatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new MSSqlServerDatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new JTDSDatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new MySql5DatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new OracleDatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new PostgreSQLDatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new H2DatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new GoogleCloudSQLDatabasePlatform());
-        databasePlatformsManager.addDatabasePlatform(new IbmDb2DatabasePlatform());
-
         Persistence persistence =
                 new Persistence(applicationDirectory, configuration, databasePlatformsManager);
-        persistence.loadXmlModel();
         servletContext.setAttribute(DATABASE_PLATFORMS_MANAGER, databasePlatformsManager);
         servletContext.setAttribute(PERSISTENCE, persistence);
 

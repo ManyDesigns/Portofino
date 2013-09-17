@@ -32,12 +32,9 @@ package com.manydesigns.portofino.servlets;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
-import com.manydesigns.portofino.modules.BaseModule;
-import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
@@ -70,9 +67,6 @@ public class BlobCleanupListener implements HttpSessionListener {
     @Override
     public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
         HttpSession session = httpSessionEvent.getSession();
-        ServletContext servletContext = session.getServletContext();
-        Configuration configuration =
-                (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
 
         Set<String> blobs = (Set<String>) session.getAttribute(SESSION_ATTRIBUTE);
         BlobManager blobManager = ElementsThreadLocals.getBlobManager();

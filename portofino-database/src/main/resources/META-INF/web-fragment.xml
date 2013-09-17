@@ -13,6 +13,11 @@
         <listener-class>com.manydesigns.portofino.servlets.BlobCleanupListener</listener-class>
     </listener>
 
+    <listener>
+        <description>Persistence Manager Listener</description>
+        <listener-class>com.manydesigns.portofino.servlets.PersistenceManagerListener</listener-class>
+    </listener>
+
     <filter>
         <filter-name>cleanup-filter</filter-name>
         <filter-class>
