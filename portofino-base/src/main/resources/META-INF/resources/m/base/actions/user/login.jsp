@@ -5,7 +5,7 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"
-%><stripes:layout-render name="/skins/${skin}/login.jsp">
+%><stripes:layout-render name="/m/theme/login.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
     <stripes:layout-component name="loginBody">
         <stripes:form action="<%= actionBean.getOriginalPath() %>" method="post">

@@ -29,15 +29,10 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.elements.util.Util;
-import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.modules.ModulesAction;
 import com.manydesigns.portofino.actions.admin.servletcontext.ServletContextAction;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.head.HtmlHead;
-import com.manydesigns.portofino.head.HtmlHeadAppender;
-import com.manydesigns.portofino.head.HtmlHeadBuilder;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.menu.SimpleMenuAppender;
 import org.apache.commons.configuration.Configuration;
@@ -67,10 +62,7 @@ public class BaseModule implements Module {
     public final static String APP_LISTENERS = "com.manydesigns.portofino.application.listeners";
     public final static String CLASS_LOADER = "com.manydesigns.portofino.application.classLoader";
     public final static String MODULE_REGISTRY = "com.manydesigns.portofino.modules.ModuleRegistry";
-    public final static String USER_MENU = "com.manydesigns.portofino.menu.Menu.user";
-    public final static String APP_MENU = "com.manydesigns.portofino.menu.Menu.app";
     public final static String ADMIN_MENU = "com.manydesigns.portofino.menu.Menu.admin";
-    public final static String HTML_HEAD_BUILDER = "com.manydesigns.portofino.head.builder";
 
     //**************************************************************************
     // Injected objects
@@ -81,9 +73,6 @@ public class BaseModule implements Module {
 
     @Inject(ADMIN_MENU)
     public MenuBuilder adminMenu;
-
-    @Inject(BaseModule.HTML_HEAD_BUILDER)
-    public HtmlHeadBuilder headBuilder;
 
     //**************************************************************************
     // Module implementation
@@ -132,59 +121,7 @@ public class BaseModule implements Module {
                 "configuration", "servlet-context", null, "Servlet Context", ServletContextAction.URL_BINDING, 2.0);
         adminMenu.menuAppenders.add(link);
 
-        setupHead();
-
         status = ModuleStatus.ACTIVE;
-    }
-
-    protected void setupHead() {
-        headBuilder.appenders.add(new HtmlHeadAppender() {
-            @Override
-            public void append(HtmlHead head) {
-                XhtmlBuffer xb = new XhtmlBuffer();
-                xb.openElement("meta");
-                xb.addAttribute("http-equiv", "Content-Type");
-                xb.addAttribute("content", "text/html;charset=UTF-8");
-                xb.closeElement("meta");
-                xb.openElement("meta");
-                xb.addAttribute("name", "viewport");
-                xb.addAttribute("content", "width=device-width, initial-scale=1.0");
-                xb.closeElement("meta");
-
-                //HTML5 shim, for IE6-8 support of HTML5 elements
-                xb.writeNoHtmlEscape(
-                        "<!--[if lt IE 9]>\n" +
-                        "      <script src=\"http://html5shim.googlecode.com/svn/trunk/html5.js\"></script>\n" +
-                        "<![endif]-->");
-
-                xb.writeLink("stylesheet", "text/css",
-                             Util.getAbsoluteUrl("/elements/bootstrap/css/bootstrap.min.css"));
-                xb.writeLink("stylesheet", "text/css",
-                             Util.getAbsoluteUrl("/elements/bootstrap/css/bootstrap-responsive.min.css"));
-                xb.writeLink("stylesheet", "text/css",
-                             Util.getAbsoluteUrl("/elements/datepicker/css/datepicker.css"));
-                xb.writeLink("stylesheet", "text/css",
-                             Util.getAbsoluteUrl("/m/base/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css"));
-
-                xb.openElement("script");
-                xb.addAttribute("src", Util.getAbsoluteUrl("/elements/jquery/jquery.min.js"));
-                xb.closeElement("script");
-                xb.openElement("script");
-                xb.addAttribute("src", Util.getAbsoluteUrl("/elements/elements.js"));
-                xb.closeElement("script");
-
-                xb.openElement("script");
-                xb.addAttribute("src", Util.getAbsoluteUrl("/elements/bootstrap/js/bootstrap.min.js"));
-                xb.closeElement("script");
-                xb.openElement("script");
-                xb.addAttribute("src", Util.getAbsoluteUrl("/elements/datepicker/js/bootstrap-datepicker.js"));
-                xb.closeElement("script");
-                xb.openElement("script");
-                xb.addAttribute("src", Util.getAbsoluteUrl("/m/base/jquery-ui/js/jquery-ui-1.10.3.custom.min.js"));
-                xb.closeElement("script");
-                head.fragments.add(xb);
-            }
-        });
     }
 
     @Override

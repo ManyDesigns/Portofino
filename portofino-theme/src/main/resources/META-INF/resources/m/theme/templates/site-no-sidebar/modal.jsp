@@ -11,7 +11,7 @@
     <head>
         <jsp:include page="../../head.jsp"/>
         <link rel="stylesheet" type="text/css"
-              href="<stripes:url value="/skins/${skin}/templates/site-no-sidebar/site.css"/>"/>
+              href="<stripes:url value="/m/theme/templates/site-no-sidebar/site.css"/>"/>
         <stripes:layout-component name="customScripts"/>
         <jsp:useBean id="actionBean" scope="request"
                      type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
@@ -22,7 +22,7 @@
         <div id="hd">
             <jsp:include page="../../header.jsp"/>
             <div class="tabs">
-                <jsp:include page="tabs.jsp">
+                <jsp:include page="../site/tabs.jsp">
                     <jsp:param name="" value="1" />
                 </jsp:include>
             </div>

@@ -6,7 +6,7 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"
-/><stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/modal.jsp">
+/><stripes:layout-render name="/m/theme${actionBean.pageTemplate}/modal.jsp">
     <stripes:layout-component name="customScripts">
         <c:if test="${actionBean.formWithRichTextFields}">
             <script type="text/javascript" src="<stripes:url value="/elements/ckeditor/ckeditor.js"/>"></script>

@@ -10,7 +10,7 @@
     taglib prefix="mde" uri="/manydesigns-elements"%><%@
     taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%@
     taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/modal.jsp">
+<stripes:layout-render name="/m/theme${actionBean.pageTemplate}/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
     <stripes:layout-component name="portletTitle">
         <fmt:message key="layouts.page-crud.new-page.add_new_page"/>

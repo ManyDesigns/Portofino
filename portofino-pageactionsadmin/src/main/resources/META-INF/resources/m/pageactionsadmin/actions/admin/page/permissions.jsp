@@ -16,7 +16,7 @@
 %><%@ page import="java.util.Collections"
 %><jsp:useBean id="actionBean" scope="request"
                type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"
-/><stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/modal.jsp">
+/><stripes:layout-render name="/m/theme${actionBean.pageTemplate}/modal.jsp">
     <stripes:layout-component name="portletTitle">
         <fmt:message key="layouts.page.permissions.page-permissions-for">
             <fmt:param value="<%= StringEscapeUtils.escapeHtml(actionBean.getPage().getTitle()) %>" />

@@ -8,7 +8,7 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><jsp:useBean id="actionBean" scope="request"
                type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"
-/><stripes:layout-render name="/skins/${skin}${actionBean.pageTemplate}/modal.jsp">
+/><stripes:layout-render name="/m/theme${actionBean.pageTemplate}/modal.jsp">
     <stripes:layout-component name="portletTitle">
         <fmt:message key="com.manydesigns.portofino.pageactions.configure">
             <fmt:param value="<%= StringEscapeUtils.escapeHtml(actionBean.getPage().getTitle()) %>" />

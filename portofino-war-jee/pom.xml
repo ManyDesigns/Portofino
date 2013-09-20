@@ -123,10 +123,9 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-war</artifactId>
+            <artifactId>portofino-theme</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>
-            <type>war</type>
         </dependency>
         <dependency>
             <groupId>javax</groupId>

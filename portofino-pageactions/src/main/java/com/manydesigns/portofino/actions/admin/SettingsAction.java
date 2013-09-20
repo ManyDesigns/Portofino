@@ -26,7 +26,6 @@ import com.manydesigns.elements.fields.TextField;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.CommonsConfigurationAccessor;
 import com.manydesigns.elements.util.BootstrapSizes;
@@ -48,7 +47,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileFilter;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -93,15 +91,12 @@ public class SettingsAction extends AbstractActionBean {
     }
 
     private void setupFormAndBean() {
-        SelectionProvider skinSelectionProvider =
-                createSkinSelectionProvider();
         SelectionProvider pagesSelectionProvider =
                 DispatcherLogic.createPagesSelectionProvider(pagesDir);
 
         CommonsConfigurationAccessor accessor = new CommonsConfigurationAccessor(configuration);
         form = new FormBuilder(accessor)
-                .configFields(PortofinoProperties.APP_NAME, AppProperties.SKIN, AppProperties.LANDING_PAGE)
-                .configSelectionProvider(skinSelectionProvider, AppProperties.SKIN)
+                .configFields(PortofinoProperties.APP_NAME, AppProperties.LANDING_PAGE)
                 .configSelectionProvider(pagesSelectionProvider, AppProperties.LANDING_PAGE)
                 .build();
         //TODO I18n
@@ -114,7 +109,6 @@ public class SettingsAction extends AbstractActionBean {
         landingPageField.setLabel("Landing page");
         landingPageField.setRequired(true);
         
-        form.findFieldByPropertyName(AppProperties.SKIN).setRequired(true);
         form.readFromObject(configuration);
     }
 
@@ -145,36 +139,6 @@ public class SettingsAction extends AbstractActionBean {
     @Button(list = "settings", key = "commons.returnToPages", order = 2)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
-    }
-
-    //--------------------------------------------------------------------------
-    // Utility methods
-    //--------------------------------------------------------------------------
-
-    public SelectionProvider createSkinSelectionProvider() {
-                logger.debug("Looking for available skins");
-        File webAppDirFile = new File(serverInfo.getRealPath());
-        File skinDirFile = new File(webAppDirFile, "skins");
-        File[] skinFiles = skinDirFile.listFiles(new FileFilter() {
-            public boolean accept(File file) {
-                return file.isDirectory();
-            }
-        });
-
-        String[] skins = new String[skinFiles.length];
-        for (int i = 0; i < skinFiles.length; i++) {
-            File current = skinFiles[i];
-            String skinName = current.getName();
-            skins[i] = skinName;
-            logger.debug("Found skin: {}", skinName);
-        }
-
-        DefaultSelectionProvider skinSelectionProvider = new DefaultSelectionProvider("skins");
-        for(String s : skins) {
-            skinSelectionProvider.appendRow(s, s, true);
-        }
-
-        return skinSelectionProvider;
     }
 
     //--------------------------------------------------------------------------

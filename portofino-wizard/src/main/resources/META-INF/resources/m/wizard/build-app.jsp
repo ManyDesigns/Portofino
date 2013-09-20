@@ -10,13 +10,13 @@
                  type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="customScripts">
         <link rel="stylesheet" type="text/css"
-              href="<stripes:url value="/skins/default/portofino.css"/>"/>
+              href="<stripes:url value="/m/theme/portofino.css"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
         <fmt:message key="appwizard.step4.title" />
     </stripes:layout-component>
     <stripes:layout-component name="portletHeader">
-        <jsp:include page="/skins/default/wizard-content-header.jsp" />
+        <jsp:include page="wizard-content-header.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"

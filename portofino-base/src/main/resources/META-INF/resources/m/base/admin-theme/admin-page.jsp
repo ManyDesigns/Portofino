@@ -63,17 +63,6 @@
                         <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
                     </stripes:link>
                 </h4>
-                <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <div id="header-menu" class="nav-collapse collapse">
-                    <ul id="user-menu" class="nav">
-                        <% request.setAttribute("menu", BaseModule.USER_MENU); %>
-                        <jsp:include page="render-menu.jsp" />
-                    </ul>
-                </div>
             </div>
         </div>
     </div>

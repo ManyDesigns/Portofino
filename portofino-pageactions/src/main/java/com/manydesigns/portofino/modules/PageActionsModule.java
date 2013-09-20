@@ -22,21 +22,13 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.elements.util.Util;
-import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.admin.SettingsAction;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.di.Injections;
-import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
-import com.manydesigns.portofino.dispatcher.DispatcherUtil;
 import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.files.TempFileService;
-import com.manydesigns.portofino.head.HtmlHead;
-import com.manydesigns.portofino.head.HtmlHeadAppender;
-import com.manydesigns.portofino.head.HtmlHeadBuilder;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.menu.*;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
@@ -48,7 +40,6 @@ import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
 import groovy.util.GroovyScriptEngine;
 import net.sf.ehcache.CacheManager;
-import net.sourceforge.stripes.action.ActionBean;
 import ognl.OgnlRuntime;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.SecurityUtils;
@@ -64,7 +55,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
@@ -93,9 +83,6 @@ public class PageactionsModule implements Module {
 
     @Inject(BaseModule.ADMIN_MENU)
     public MenuBuilder adminMenu;
-
-    @Inject(BaseModule.HTML_HEAD_BUILDER)
-    public HtmlHeadBuilder headBuilder;
 
     @Inject(BaseModule.CLASS_LOADER)
     public ClassLoader originalClassLoader;
@@ -242,8 +229,6 @@ public class PageactionsModule implements Module {
                 "configuration", "settings", null, "Settings", SettingsAction.URL_BINDING, 0.5);
         adminMenu.menuAppenders.add(link);
 
-        setupHead();
-
         status = ModuleStatus.ACTIVE;
     }
 
@@ -287,53 +272,6 @@ public class PageactionsModule implements Module {
         }
 
         protected abstract void append(MenuGroup pageMenu, PageAction pageAction);
-    }
-
-    protected void setupHead() {
-        headBuilder.appenders.add(new HtmlHeadAppender() {
-            @Override
-            public void append(HtmlHead head) {
-                XhtmlBuffer xb = new XhtmlBuffer();
-                HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-
-                String skin = (String) request.getAttribute(RequestAttributes.SKIN);
-                if(skin != null) {
-                    xb.writeLink("stylesheet", "text/css",
-                                 Util.getAbsoluteUrl("/skins/" + skin + "/portofino.css"));
-                }
-
-                xb.openElement("script");
-                xb.addAttribute("src", Util.getAbsoluteUrl("/m/pageactions/portofino.js.jsp"));
-                xb.closeElement("script");
-
-                //Setup base href - uniform handling of .../resource and .../resource/
-                ActionBean actionBean = (ActionBean) request.getAttribute("actionBean");
-                Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);
-                if(dispatch != null) {
-                    String baseHref = dispatch.getAbsoluteOriginalPath();
-                    //Remove all trailing slashes
-                    while (baseHref.length() > 1 && baseHref.endsWith("/")) {
-                        baseHref = baseHref.substring(0, baseHref.length() - 1);
-                    }
-                    //Add a single trailing slash so all relative URLs use this page as the root
-                    baseHref += "/";
-                    //Try to make the base HREF absolute
-                    try {
-                        URL url = new URL(request.getRequestURL().toString());
-                        String port = url.getPort() > 0 ? ":" + url.getPort() : "";
-                        baseHref = url.getProtocol() + "://" + url.getHost() + port + baseHref;
-                    } catch (MalformedURLException e) {
-                        //Ignore
-                    }
-
-                    xb.openElement("base");
-                    xb.addAttribute("href", baseHref);
-                    xb.closeElement("base");
-                }
-
-                head.fragments.add(xb);
-            }
-        });
     }
 
     @Override

@@ -8,9 +8,9 @@
         <artifactId>portofino</artifactId>
         <version>4.1.beta5-SNAPSHOT</version>
     </parent>
-    <artifactId>portofino-war</artifactId>
-    <packaging>war</packaging>
-    <name>manydesigns-portofino-war</name>
+    <artifactId>portofino-theme</artifactId>
+    <packaging>jar</packaging>
+    <name>manydesigns-portofino-theme</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>
@@ -41,14 +41,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                </configuration>
             </plugin>
         </plugins>
     </build>

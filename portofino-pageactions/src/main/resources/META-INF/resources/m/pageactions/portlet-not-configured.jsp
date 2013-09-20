@@ -4,7 +4,7 @@
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-%><stripes:layout-render name="/skins/${skin}/templates/default/normal.jsp">
+%><stripes:layout-render name="/m/theme/templates/default/normal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.pageInstance.page.title}"/>

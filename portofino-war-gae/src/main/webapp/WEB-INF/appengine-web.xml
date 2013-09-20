@@ -20,7 +20,7 @@
         <include path="/openid-selector/**" />
         <include path="/SweetiePlus-v2-SublinkInteractive/**" />-->
 
-        <include path="/skins/default/images/**" />
+        <include path="/m/theme/images/**" />
    </static-files>
 
     <system-properties>

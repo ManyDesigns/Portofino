@@ -4,7 +4,7 @@
 ^out/
 ^[.]idea/
 ^[.]iml/
-^.*/overlays/[^/]+[.]info$
+^.*/overlays/.*$
 ^oneclick/local.py$
 ^oneclick/local.pyc$
 ^oneclick/build/
