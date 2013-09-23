@@ -201,4 +201,35 @@ $(function() {
     $(".portofino-datatable").each(function(index, elem) {
         portofino.dataTable(elem);
     });
+
+    //Prevent double submit
+    $('form').on('submit', function() {
+        var form = $(this);
+        var buttons = form.find(":submit");
+        var undo = new Array();
+        buttons.each(function(index, current) {
+            var button = $(current);
+            var clone = button.clone();
+            var display = button.css("display");
+            clone.removeAttr("name");
+            clone.attr("disabled", "disabled");
+            button.css("display", "none");
+            button.after(clone);
+            button.appendTo(form);
+            undo.push({ button: button, clone: clone, display: display });
+        });
+        //Restore the buttons after 10s...
+        var timeout = setTimeout(function() {
+            undo.forEach(function(obj) {
+                obj.clone.before(obj.button);
+                obj.clone.remove();
+                obj.button.css("display", obj.display);
+            });
+        }, 10000);
+        //...unless we have requested another page (note: beforeunload is triggered even if the page doesn't change,
+        //e.g. when downloading a pdf export)
+        $(window).unload(function() {
+            clearTimeout(timeout);
+        });
+    });
 });
