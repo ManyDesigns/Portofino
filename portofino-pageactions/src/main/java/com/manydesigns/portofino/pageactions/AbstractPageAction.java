@@ -26,14 +26,14 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
+import com.manydesigns.portofino.modules.PageactionsModule;
+import com.manydesigns.portofino.pageactions.registry.TemplateInfo;
+import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Layout;
 import com.manydesigns.portofino.pages.NavigationRoot;
@@ -112,6 +112,9 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
      */
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
+
+    @Inject(PageactionsModule.TEMPLATES_REGISTRY)
+    public TemplateRegistry templates;
 
     //--------------------------------------------------------------------------
     // UI
@@ -264,10 +267,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
 
         try {
-            Object skin = context.getRequest().getAttribute(RequestAttributes.SKIN);
-            String templateRealPath = "/skins/" + skin + template;
-            if(context.getServletContext().getResource(templateRealPath) == null) {
-                logger.warn("Template file {} does not exist, using default", templateRealPath);
+            if(context.getServletContext().getResource(template) == null) {
+                logger.warn("Template file {} does not exist, using default", template);
                 return getDefaultPageTemplate();
             }
         } catch (MalformedURLException e) {
@@ -278,7 +279,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     }
 
     protected String getDefaultPageTemplate() {
-        return "/templates/default";
+        return templates.iterator().next().path; //Assumes at least a template has been registered
     }
 
     @Button(list = "configuration", key = "commons.cancel", order = 99)
@@ -369,23 +370,9 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     }
 
     protected SelectionProvider createTemplateSelectionProvider() {
-        String warRealPath =
-                portofinoConfiguration.getString(
-                        PortofinoProperties.WAR_REAL_PATH);
-        File skinsDir = new File(warRealPath, "skins");
-        String skin = context.getRequest().getAttribute(RequestAttributes.SKIN) + "";
-        File skinDir = new File(skinsDir, skin);
-        File layoutsDir = new File(skinDir, "templates");
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("template");
-        if(layoutsDir.isDirectory()) {
-            File[] files = layoutsDir.listFiles();
-            for(File file : files) {
-                if(file.isDirectory()) {
-                    String path = "/" + ElementsFileUtils.getRelativePath(skinDir, file, "/");
-                    String name = file.getName();
-                    selectionProvider.appendRow(path, name, true);
-                }
-            }
+        for(TemplateInfo template : templates) {
+            selectionProvider.appendRow(template.path, template.name, true);
         }
         return selectionProvider;
     }

@@ -253,15 +253,6 @@ td.selection-cell {
     margin: 0.2em 2em 0.2em 0;
     float:left;
     padding-left: 20px;
-    background: url("../../famfamfam_mini_icons/page_attachment.gif") no-repeat left center;
-}
-
-.attachment.mime-image-png {
-    background-image: url("../../famfamfam_mini_icons/page_colors.gif") ;
-}
-
-.attachment.mime-application-binary {
-    background-image: url("../../famfamfam_mini_icons/file_acrobat.gif") ;
 }
 
 .attachmentName {

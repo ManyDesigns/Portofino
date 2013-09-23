@@ -5,9 +5,12 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"
-%><stripes:layout-render name="/m/theme/login.jsp">
+%><stripes:layout-render name="/m/theme/templates/dialog/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
-    <stripes:layout-component name="loginBody">
+    <stripes:layout-component name="dialogTitle">
+        <fmt:message key="skins.default.login.login_to"/>
+    </stripes:layout-component>
+    <stripes:layout-component name="dialogBody">
         <stripes:form action="<%= actionBean.getOriginalPath() %>" method="post" class="dont-prompt-on-page-abandon">
             <input type="text" name="userName" id="userName" class="input-block-level"
                    placeholder="<fmt:message key='skins.default.login.username'/>" />

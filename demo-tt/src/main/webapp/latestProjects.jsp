@@ -14,7 +14,7 @@
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"/>
-<stripes:layout-render name="/m/theme${actionBean.pageTemplate}/normal.jsp">
+<stripes:layout-render name="${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>

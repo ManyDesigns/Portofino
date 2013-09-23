@@ -22,7 +22,6 @@ package com.manydesigns.portofino.interceptors;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.portofino.AppProperties;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.dispatcher.*;
@@ -80,12 +79,6 @@ public class ApplicationInterceptor implements Interceptor {
         // There is no need to stop this timer.
         stopWatch.start();
         request.setAttribute(RequestAttributes.STOP_WATCH, stopWatch);
-
-        logger.debug("Setting skin");
-        if(request.getAttribute(RequestAttributes.SKIN) == null) {
-            String skin = configuration.getString(AppProperties.SKIN);
-            request.setAttribute(RequestAttributes.SKIN, skin);
-        }
 
         Dispatch dispatch = DispatcherUtil.getDispatch(request);
         if (dispatch != null) {

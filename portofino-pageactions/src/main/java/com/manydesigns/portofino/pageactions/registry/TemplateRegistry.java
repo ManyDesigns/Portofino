@@ -18,7 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino;
+package com.manydesigns.portofino.pageactions.registry;
+
+import com.manydesigns.portofino.dispatcher.PageAction;
+import com.manydesigns.portofino.pageactions.PageActionLogic;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -26,28 +33,20 @@ package com.manydesigns.portofino;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class AppProperties {
+public class TemplateRegistry implements Iterable<TemplateInfo> {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    //**************************************************************************
-    // Property names
-    //**************************************************************************
+    protected final List<TemplateInfo> registry = new CopyOnWriteArrayList<TemplateInfo>();
 
-    public static final String LANDING_PAGE =
-            "landing.page";
+    public TemplateInfo register(String name, String path) {
+        TemplateInfo info = new TemplateInfo(name, path);
+        registry.add(info);
+        return info;
+    }
 
-    public static final String GROUP_ALL = "group.all";
-    public static final String GROUP_ANONYMOUS = "group.anonymous";
-    public static final String GROUP_REGISTERED = "group.registered";
-    public static final String GROUP_ADMINISTRATORS = "group.administrators";
+    public Iterator<TemplateInfo> iterator() {
+        return registry.iterator();
+    }
 
-    //The mail address used as the from: field in email messages sent by the application (e.g. password change)
-    public static final String MAIL_FROM = "mail.from";
-
-    //Cache configuration properties
-    public static final String PAGE_CACHE_SIZE = "page.cache.size";
-    public static final String PAGE_CACHE_CHECK_FREQUENCY = "page.cache.check.frequency";
-    public static final String CONFIGURATION_CACHE_SIZE = "configuration.cache.size";
-    public static final String CONFIGURATION_CACHE_CHECK_FREQUENCY = "configuration.cache.check.frequency";
 }

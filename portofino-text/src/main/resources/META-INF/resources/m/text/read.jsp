@@ -5,7 +5,7 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-%><stripes:layout-render name="/m/theme${actionBean.pageTemplate}/normal.jsp">
+%><stripes:layout-render name="${actionBean.pageTemplate}/normal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.text.TextAction"/>
     <stripes:layout-component name="portletTitle">
         <c:out value="${actionBean.pageInstance.page.title}"/>
@@ -17,8 +17,11 @@
             <fmt:message key="commons.attachments"/>:
             <div class="attachmentBox">
                 <c:forEach var="attachment" items="${actionBean.downloadableAttachments}">
-                    <div class="attachment <c:out value="mime-${fn:replace(attachment.contentType,'/','-')}"/>">
-                        <div class="attachmentName"><c:out value="${attachment.filename}"/></div>
+                    <div class="attachment">
+                        <div class="attachmentName">
+                            <i class="icon-file"></i>
+                            <c:out value="${attachment.filename}"/>
+                        </div>
                         <c:out value="${mde:bytesToHumanString(attachment.size)}"/>
                         <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?viewAttachment=&id=${attachment.id}"/>">view</a>
                         <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?downloadAttachment=&id=${attachment.id}"/>">download</a>

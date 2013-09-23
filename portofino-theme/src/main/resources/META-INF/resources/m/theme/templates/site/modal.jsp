@@ -1,1 +1,0 @@
-<%@include file="../site-no-sidebar/modal.jsp" %>

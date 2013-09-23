@@ -4,15 +4,15 @@
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<stripes:layout-render name="/m/theme/login.jsp">
+<stripes:layout-render name="/m/theme/templates/dialog/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
     <stripes:layout-component name="pageTitle">
         Forgot your password?
     </stripes:layout-component>
-    <stripes:layout-component name="loginTitle">
+    <stripes:layout-component name="dialogTitle">
         Forgot your password?
     </stripes:layout-component>
-    <stripes:layout-component name="loginBody">
+    <stripes:layout-component name="dialogBody">
         Enter your email address below and we'll send you password reset instructions.
         <stripes:form action="<%= actionBean.getOriginalPath() %>" method="post" class="spacingTop">
             <input type="text" name="email" id="email" class="input-block-level"

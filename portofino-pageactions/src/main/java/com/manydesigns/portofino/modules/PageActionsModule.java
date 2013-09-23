@@ -35,6 +35,7 @@ import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.pageactions.login.DefaultLoginAction;
 import com.manydesigns.portofino.pageactions.login.OpenIdLoginAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
+import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
@@ -106,6 +107,8 @@ public class PageactionsModule implements Module {
     public static final String EHCACHE_MANAGER = "portofino.ehcache.manager";
     public static final String PAGE_ACTIONS_REGISTRY =
             "com.manydesigns.portofino.pageactions.registry.PageActionRegistry";
+    public static final String TEMPLATES_REGISTRY =
+            "com.manydesigns.portofino.pageactions.templates.registry";
 
     //**************************************************************************
     // Logging
@@ -224,6 +227,8 @@ public class PageactionsModule implements Module {
         SecurityGroovyRealm realm = new SecurityGroovyRealm(groovyScriptEngine, scriptFile.toURI().toString());
         LifecycleUtils.init(realm);
         rsm.setRealm(realm);
+
+        servletContext.setAttribute(TEMPLATES_REGISTRY, new TemplateRegistry());
 
         SimpleMenuAppender link = SimpleMenuAppender.link(
                 "configuration", "settings", null, "Settings", SettingsAction.URL_BINDING, 0.5);

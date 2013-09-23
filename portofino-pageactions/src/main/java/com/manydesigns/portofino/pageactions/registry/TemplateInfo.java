@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino;
+package com.manydesigns.portofino.pageactions.registry;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -26,28 +26,15 @@ package com.manydesigns.portofino;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class AppProperties {
+public class TemplateInfo {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    //**************************************************************************
-    // Property names
-    //**************************************************************************
+    public final String name;
+    public final String path;
 
-    public static final String LANDING_PAGE =
-            "landing.page";
-
-    public static final String GROUP_ALL = "group.all";
-    public static final String GROUP_ANONYMOUS = "group.anonymous";
-    public static final String GROUP_REGISTERED = "group.registered";
-    public static final String GROUP_ADMINISTRATORS = "group.administrators";
-
-    //The mail address used as the from: field in email messages sent by the application (e.g. password change)
-    public static final String MAIL_FROM = "mail.from";
-
-    //Cache configuration properties
-    public static final String PAGE_CACHE_SIZE = "page.cache.size";
-    public static final String PAGE_CACHE_CHECK_FREQUENCY = "page.cache.check.frequency";
-    public static final String CONFIGURATION_CACHE_SIZE = "configuration.cache.size";
-    public static final String CONFIGURATION_CACHE_CHECK_FREQUENCY = "configuration.cache.check.frequency";
+    public TemplateInfo(String name, String path) {
+        this.name = name;
+        this.path = path;
+    }
 }
