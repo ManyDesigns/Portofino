@@ -27,10 +27,6 @@ import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
-import java.util.ArrayList;
-import java.util.List;
-
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -93,6 +89,7 @@ public class ThemeModule implements Module {
     @Override
     public void init() {
         templates.register("Default", "/m/theme/templates/default");
+        templates.register("Dialog", "/m/theme/templates/dialog");
         status = ModuleStatus.ACTIVE;
     }
 

@@ -9,10 +9,10 @@
     <stripes:layout-component name="pageTitle">
         Password reset
     </stripes:layout-component>
-    <stripes:layout-component name="dialogTitle">
+    <stripes:layout-component name="portletTitle">
         Password reset
     </stripes:layout-component>
-    <stripes:layout-component name="dialogBody">
+    <stripes:layout-component name="portletBody">
         <stripes:form action="<%= actionBean.getOriginalPath() %>" method="post">
             <input type="hidden" name="token" id="token" value="${actionBean.token}" />
             <input type="password" name="newPassword" id="newPassword" class="input-block-level"

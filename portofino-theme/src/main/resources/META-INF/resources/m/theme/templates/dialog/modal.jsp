@@ -15,29 +15,31 @@
         </title>
     </head>
     <body class="dialog">
-    <stripes:layout-component name="dialogContainer" >
         <div class="dialog-container">
-            <mde:sessionMessages/>
-            <div class="dialogHeader">
-                <stripes:layout-component name="dialogHeader" >
-                    <h2>
-                        <stripes:layout-component name="dialogTitle" />
-                    </h2>
+            <stripes:layout-component name="mainPageAction">
+                <mde:sessionMessages />
+                <stripes:layout-component name="mainPageActionBody">
+                    <div id="portlet_${actionBean.pageInstance.page.id}">
+                        <stripes:layout-component name="portletHeader">
+                            <h2>
+                                <stripes:layout-component name="portletTitle" />
+                            </h2>
+                        </stripes:layout-component>
+                        <div class="dialogBody spacingTop">
+                            <stripes:layout-component name="portletBody" />
+                        </div>
+                    </div>
                 </stripes:layout-component>
-            </div>
-            <div class="dialogBody spacingTop">
-                <stripes:layout-component name="dialogBody" />
-            </div>
-            <div class="dialogFooter spacingWithDividerTop">
-                <stripes:layout-component name="dialogFooter" >
-                    <jsp:useBean id="portofinoConfiguration" scope="application"
-                                 type="org.apache.commons.configuration.Configuration"/>
-                    Powered by <a href="http://www.manydesigns.com/">Portofino</a>
-                    <c:out value="${mde:getString(portofinoConfiguration, 'portofino.version')}"/>
-                </stripes:layout-component>
-            </div>
+                <div class="dialogFooter spacingWithDividerTop">
+                    <stripes:layout-component name="mainPageActionFooter">
+                        <jsp:useBean id="portofinoConfiguration" scope="application"
+                                     type="org.apache.commons.configuration.Configuration"/>
+                        Powered by <a href="http://www.manydesigns.com/">Portofino</a>
+                        <c:out value="${mde:getString(portofinoConfiguration, 'portofino.version')}"/>
+                    </stripes:layout-component>
+                </div>
+            </stripes:layout-component>
         </div>
-    </stripes:layout-component>
     </body>
 </html>
 </stripes:layout-definition>

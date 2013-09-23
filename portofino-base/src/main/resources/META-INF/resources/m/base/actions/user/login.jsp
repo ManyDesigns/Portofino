@@ -7,10 +7,17 @@
 %><%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"
 %><stripes:layout-render name="/m/theme/templates/dialog/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
-    <stripes:layout-component name="dialogTitle">
-        <fmt:message key="skins.default.login.login_to"/>
+    <stripes:layout-component name="pageTitle">
+        <fmt:message key="skins.default.login.login_to">
+            <fmt:param value="${actionBean.applicationName}" />
+        </fmt:message>
     </stripes:layout-component>
-    <stripes:layout-component name="dialogBody">
+    <stripes:layout-component name="portletTitle">
+        <fmt:message key="skins.default.login.login_to">
+            <fmt:param value="${actionBean.applicationName}" />
+        </fmt:message>
+    </stripes:layout-component>
+    <stripes:layout-component name="portletBody">
         <stripes:form action="<%= actionBean.getOriginalPath() %>" method="post" class="dont-prompt-on-page-abandon">
             <input type="text" name="userName" id="userName" class="input-block-level"
                    placeholder="<fmt:message key='skins.default.login.username'/>" />

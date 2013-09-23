@@ -45,8 +45,13 @@
         </script>
         <!-- /Simple OpenID Selector -->
     </stripes:layout-component>
-    <stripes:layout-component name="dialogBody">
-        <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.login.OpenIdLoginAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.login.OpenIdLoginAction"/>
+    <stripes:layout-component name="portletTitle">
+        <fmt:message key="skins.default.login.login_to">
+            <fmt:param value="${actionBean.applicationName}" />
+        </fmt:message>
+    </stripes:layout-component>
+    <stripes:layout-component name="portletBody">
         <stripes:form action="${actionBean.dispatch.absoluteOriginalPath}" method="post"
                       id="openid_form">
             <stripes:hidden name="returnUrl"/>

@@ -5,10 +5,10 @@
 %><stripes:layout-definition><%--
 --%><!DOCTYPE html>
     <html lang="en">
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.dispatcher.PageAction" />
     <head>
         <jsp:include page="../../head.jsp"/>
         <stripes:layout-component name="customScripts"/>
-        <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.dispatcher.PageAction" />
         <title>
             <stripes:layout-component name="pageTitle">
                 <c:out value="${actionBean.dispatch.lastPageInstance.page.description}"/>
@@ -32,7 +32,7 @@
                         <stripes:layout-component name="beforeSessionMessages" />
                         <mde:sessionMessages />
                         <stripes:layout-component name="beforeBreadcrumbs" />
-                        <jsp:include page="/m/theme/breadcrumbs.jsp" />
+                        <jsp:include page="../../breadcrumbs.jsp" />
                         <stripes:layout-component name="afterBreadcrumbs" />
                     </stripes:layout-component>
                     <stripes:layout-component name="mainPageActionBody">

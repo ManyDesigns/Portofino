@@ -9,10 +9,10 @@
     <stripes:layout-component name="pageTitle">
         Forgot your password?
     </stripes:layout-component>
-    <stripes:layout-component name="dialogTitle">
+    <stripes:layout-component name="portletTitle">
         Forgot your password?
     </stripes:layout-component>
-    <stripes:layout-component name="dialogBody">
+    <stripes:layout-component name="portletBody">
         Enter your email address below and we'll send you password reset instructions.
         <stripes:form action="<%= actionBean.getOriginalPath() %>" method="post" class="spacingTop">
             <input type="text" name="email" id="email" class="input-block-level"
