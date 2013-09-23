@@ -8,7 +8,7 @@
 %><stripes:layout-render name="/m/theme/login.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
     <stripes:layout-component name="loginBody">
-        <stripes:form action="<%= actionBean.getOriginalPath() %>" method="post">
+        <stripes:form action="<%= actionBean.getOriginalPath() %>" method="post" class="dont-prompt-on-page-abandon">
             <input type="text" name="userName" id="userName" class="input-block-level"
                    placeholder="<fmt:message key='skins.default.login.username'/>" />
             <input type="password" name="pwd" id="pwd" class="input-block-level"

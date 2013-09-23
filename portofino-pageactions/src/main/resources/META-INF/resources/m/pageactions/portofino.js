@@ -1,16 +1,7 @@
-<%@ page import="com.manydesigns.elements.servlet.ServletConstants"%><%@page contentType="text/javascript; UTF-8"
-%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><%
-    // Avoid caching of dynamic pages
-    response.setHeader(ServletConstants.HTTP_PRAGMA, ServletConstants.HTTP_PRAGMA_NO_CACHE);
-    response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_MUST_REVALIDATE);
-    response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_NO_CACHE);
-    response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_NO_STORE);
-    response.setDateHeader(ServletConstants.HTTP_EXPIRES, 0);
-%>
 var portofino = {
     _setupRichTextEditors: setupRichTextEditors,
+
+    contextPath: '',
 
     setupRichTextEditors: function(config) {
         config = config || {};
@@ -39,7 +30,7 @@ var portofino = {
         }
 
         config = $.extend(baseConfig, {
-            customConfig : '<c:out value="${pageContext.request.contextPath}"/>/m/pageactions/ckeditor-custom/config.js',
+            customConfig : portofino.contextPath + '/m/pageactions/ckeditor-custom/config.js',
             toolbar: 'PortofinoDefault',
             toolbarCanCollapse: false,
             filebrowserWindowWidth : windowWidth,
@@ -202,8 +193,8 @@ $(function() {
         portofino.dataTable(elem);
     });
 
-    //Prevent double submit
     $('form').on('submit', function() {
+        //Prevent double submit
         var form = $(this);
         var buttons = form.find(":submit");
         var undo = new Array();
@@ -231,5 +222,23 @@ $(function() {
         $(window).unload(function() {
             clearTimeout(timeout);
         });
+
+        //Page abandon
+        $(this).data("dirty", false);
     });
+
+    //Page abandon
+    $('input').on("change", function() {
+        $(this).closest("form").data("dirty", true);
+    });
+
+    window.onbeforeunload = function() {
+        var dirty = false;
+        $("form:not(.dont-prompt-on-page-abandon)").each(function(index, form) {
+            if($(form).data("dirty")) {
+                dirty = true;
+            }
+        });
+        return dirty ? "Are you sure you want to leave the page? Unsaved data will be lost." : null; //TODO I18n
+    };
 });

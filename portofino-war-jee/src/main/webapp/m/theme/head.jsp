@@ -25,7 +25,10 @@
 
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/m/theme/portofino.css' />">
 
-<script type="text/javascript" src="<stripes:url value='/m/pageactions/portofino.js.jsp' />" ></script>
+<script type="text/javascript" src="<stripes:url value='/m/pageactions/portofino.js' />" ></script>
+<script type="text/javascript">
+    portofino.contextPath = '${pageContext.request.contextPath}';
+</script>
 <%
     BaseHrefFix.fix(request, new XhtmlBuffer(out));
 %>
