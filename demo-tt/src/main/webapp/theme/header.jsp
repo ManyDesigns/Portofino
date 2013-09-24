@@ -45,7 +45,7 @@
                 <ul id="app-menu" class="nav">
                     <%
                         Subject subject = SecurityUtils.getSubject();
-                        String actionPath = actionBean.getOriginalPath();
+                        String actionPath = actionBean.getContext().getActualServletPath();
                         String loginPage = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PAGE);
                         if(subject.isAuthenticated()) {
                             Object principal = subject.getPrincipal();

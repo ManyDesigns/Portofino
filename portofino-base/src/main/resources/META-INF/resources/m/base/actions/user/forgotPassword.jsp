@@ -14,7 +14,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         Enter your email address below and we'll send you password reset instructions.
-        <stripes:form action="<%= actionBean.getOriginalPath() %>" method="post" class="spacingTop">
+        <stripes:form action="${actionBean.context.actualServletPath}" method="post" class="spacingTop">
             <input type="text" name="email" id="email" class="input-block-level"
                    placeholder="<fmt:message key='skins.default.login.email'/>" />
             <div class="login-buttons marginTop20px">

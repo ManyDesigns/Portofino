@@ -13,7 +13,7 @@
         Password reset
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <stripes:form action="<%= actionBean.getOriginalPath() %>" method="post">
+        <stripes:form action="${actionBean.context.actualServletPath}" method="post">
             <input type="hidden" name="token" id="token" value="${actionBean.token}" />
             <input type="password" name="newPassword" id="newPassword" class="input-block-level"
                    placeholder="<fmt:message key='skins.default.login.new.password'/>" />

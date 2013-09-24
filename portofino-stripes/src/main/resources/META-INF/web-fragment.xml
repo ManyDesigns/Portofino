@@ -32,6 +32,10 @@
             <param-name>MultipartWrapper.Class</param-name>
             <param-value>com.manydesigns.portofino.stripes.StreamingCommonsMultipartWrapper</param-value>
         </init-param>
+        <init-param>
+            <param-name>ActionBeanContext.Class</param-name>
+            <param-value>com.manydesigns.elements.stripes.ElementsActionBeanContext</param-value>
+        </init-param>
     </filter>
 
     <filter-mapping>

@@ -23,7 +23,6 @@ package com.manydesigns.elements.servlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
@@ -40,25 +39,6 @@ public class ServletUtils {
 
     public final static Logger logger =
             LoggerFactory.getLogger(ServletUtils.class);
-
-    public static String getOriginalPath(HttpServletRequest request) {
-        String originalPath =
-                (String) request.getAttribute(
-                        RequestDispatcher.INCLUDE_SERVLET_PATH);
-        if (originalPath == null) {
-            originalPath = (String) request.getAttribute(
-                RequestDispatcher.FORWARD_SERVLET_PATH);
-        }
-        if (originalPath == null) {
-            originalPath = request.getRequestURI();
-            String contextPath = request.getContextPath();
-            if(!"".equals(contextPath) &&
-               originalPath.startsWith(contextPath)) {
-                originalPath = originalPath.substring(contextPath.length());
-            }
-        }
-        return originalPath;
-    }
 
     public static void dumpRequestAttributes(HttpServletRequest request) {
         Enumeration attNames = request.getAttributeNames();

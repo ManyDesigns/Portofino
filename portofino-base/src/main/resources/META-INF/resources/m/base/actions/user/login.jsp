@@ -18,7 +18,7 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <stripes:form action="<%= actionBean.getOriginalPath() %>" method="post" class="dont-prompt-on-page-abandon">
+        <stripes:form action="${actionBean.context.actualServletPath}" method="post" class="dont-prompt-on-page-abandon">
             <input type="text" name="userName" id="userName" class="input-block-level"
                    placeholder="<fmt:message key='skins.default.login.username'/>" />
             <input type="password" name="pwd" id="pwd" class="input-block-level"
@@ -34,7 +34,7 @@
             ShiroUtils.getPortofinoRealm();
         %>  <div class="login-links spacingWithDividerTop">
                 <div class="login-link">
-                    <stripes:link href="<%= actionBean.getOriginalPath() %>">
+                    <stripes:link href="${actionBean.context.actualServletPath}">
                         <stripes:param name="forgotPassword" value=""/>
                         <stripes:param name="returnUrl" value="${actionBean.returnUrl}"/>
                         <stripes:param name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
@@ -43,7 +43,7 @@
                 </div>
                 <div class="login-link">
                     Don't have an account?
-                    <stripes:link href="<%= actionBean.getOriginalPath() %>">
+                    <stripes:link href="${actionBean.context.actualServletPath}">
                         <stripes:param name="signUp" value=""/>
                         <stripes:param name="returnUrl" value="/"/>
                         <stripes:param name="cancelReturnUrl" value="/"/>

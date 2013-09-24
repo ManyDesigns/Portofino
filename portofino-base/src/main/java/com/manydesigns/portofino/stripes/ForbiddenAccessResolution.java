@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.stripes;
 
-import com.manydesigns.elements.servlet.ServletUtils;
+import com.manydesigns.elements.stripes.ElementsActionBeanContext;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.modules.BaseModule;
 import net.sourceforge.stripes.action.ErrorResolution;
@@ -65,7 +65,10 @@ public class ForbiddenAccessResolution implements Resolution {
 
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Subject subject = SecurityUtils.getSubject();
-        String originalPath = ServletUtils.getOriginalPath(request);
+        //TODO ElementsActionBeanContext
+        ElementsActionBeanContext context = new ElementsActionBeanContext();
+        context.setRequest(request);
+        String originalPath = context.getActualServletPath();
         UrlBuilder urlBuilder =
                 new UrlBuilder(Locale.getDefault(), originalPath, false);
         Map<?, ?> parameters = request.getParameterMap();

@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.dispatcher;
 
-import com.manydesigns.elements.servlet.ServletUtils;
+import com.manydesigns.elements.stripes.ElementsActionBeanContext;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
@@ -72,7 +72,10 @@ public class DispatcherUtil {
     }
 
     public static Dispatch getDispatch(Dispatcher dispatcher, HttpServletRequest request) {
-        String originalPath = ServletUtils.getOriginalPath(request);
+        //TODO ElementsActionBeanContext
+        ElementsActionBeanContext context = new ElementsActionBeanContext();
+        context.setRequest(request);
+        String originalPath = context.getActualServletPath();
         return dispatcher.getDispatch(request.getContextPath(), originalPath);
     }
 

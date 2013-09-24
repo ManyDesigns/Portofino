@@ -13,7 +13,7 @@
         Password change
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <stripes:form action="<%= actionBean.getOriginalPath() %>" method="post">
+        <stripes:form action="${actionBean.context.actualServletPath}" method="post">
             <input type="password" name="pwd" id="pwd" class="input-block-level"
                    placeholder="<fmt:message key='skins.default.login.current.password'/>" />
             <input type="password" name="newPassword" id="newPassword" class="input-block-level"
