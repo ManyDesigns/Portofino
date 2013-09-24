@@ -23,6 +23,7 @@ package com.manydesigns.elements.servlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
@@ -43,10 +44,10 @@ public class ServletUtils {
     public static String getOriginalPath(HttpServletRequest request) {
         String originalPath =
                 (String) request.getAttribute(
-                        "javax.servlet.include.servlet_path");
+                        RequestDispatcher.INCLUDE_SERVLET_PATH);
         if (originalPath == null) {
             originalPath = (String) request.getAttribute(
-                "javax.servlet.forward.servlet_path");
+                RequestDispatcher.FORWARD_SERVLET_PATH);
         }
         if (originalPath == null) {
             originalPath = request.getRequestURI();
