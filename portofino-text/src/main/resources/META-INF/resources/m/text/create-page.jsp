@@ -15,7 +15,7 @@
     path = path.substring(0, path.length() - fragment.length());
 %><stripes:layout-render name="${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="mainPageAction">
-        <jsp:include page="/m/theme/breadcrumbs.jsp" />
+        <jsp:include page="/theme/breadcrumbs.jsp" />
         <stripes:form action="/actions/admin/page" method="post">
             <input type="hidden" name="originalPath" value="<%= path %>" />
             <input type="hidden" name="fragment" value="<%= fragment%>" />

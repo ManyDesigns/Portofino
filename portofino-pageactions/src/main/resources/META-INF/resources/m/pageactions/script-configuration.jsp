@@ -13,9 +13,9 @@
     Configuration portofinoConfiguration = theActionBean.getPortofinoConfiguration();
     PageInstance pageInstance = theActionBean.getPageInstance();
     if(SecurityLogic.hasPermissions(portofinoConfiguration, pageInstance, subject, AccessLevel.DEVELOP)) { %>
-<script src="<stripes:url value="/m/pageactions/ace-1.0.0/ace.js" />" type="text/javascript" charset="utf-8"></script>
-<script src="<stripes:url value="/m/pageactions/ace-1.0.0/theme-twilight.js" />" type="text/javascript" charset="utf-8"></script>
-<script src="<stripes:url value="/m/pageactions/ace-1.0.0/mode-groovy.js" />" type="text/javascript" charset="utf-8"></script>
+<script src="<stripes:url value="/m/pageactions/ace/ace.js" />" type="text/javascript" charset="utf-8"></script>
+<script src="<stripes:url value="/m/pageactions/ace/theme-twilight.js" />" type="text/javascript" charset="utf-8"></script>
+<script src="<stripes:url value="/m/pageactions/ace/mode-groovy.js" />" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
     $(function() {
         $("#scriptEditor").css('display', 'block');

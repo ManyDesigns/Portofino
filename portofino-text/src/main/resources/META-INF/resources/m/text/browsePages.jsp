@@ -9,7 +9,7 @@
              type="com.manydesigns.portofino.pageactions.text.TextAction"/>
 <head>
     <title><fmt:message key="layouts.text.browse.browse_server"/></title>
-    <jsp:include page="/m/theme/head.jsp" />
+    <jsp:include page="/theme/head.jsp" />
     <style type="text/css">
         body {
             padding-top: 0;

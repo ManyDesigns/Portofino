@@ -87,8 +87,8 @@ public class ThemeModule implements Module {
 
     @Override
     public void init() {
-        templates.register("Default", "/m/theme/templates/default");
-        templates.register("Dialog", "/m/theme/templates/dialog");
+        templates.register("default");
+        templates.register("dialog");
         status = ModuleStatus.ACTIVE;
     }
 

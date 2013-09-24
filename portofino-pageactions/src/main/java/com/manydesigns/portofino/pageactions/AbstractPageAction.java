@@ -32,7 +32,6 @@ import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
-import com.manydesigns.portofino.pageactions.registry.TemplateInfo;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Layout;
@@ -275,11 +274,11 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             logger.error("Malformed template path", e);
             return getDefaultPageTemplate();
         }
-        return template;
+        return "/theme/templates/" + template;
     }
 
     protected String getDefaultPageTemplate() {
-        return templates.iterator().next().path; //Assumes at least a template has been registered
+        return "/theme/templates/" + templates.iterator().next(); //Assumes at least a template has been registered
     }
 
     @Button(list = "configuration", key = "commons.cancel", order = 99)
@@ -371,8 +370,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     protected SelectionProvider createTemplateSelectionProvider() {
         DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("template");
-        for(TemplateInfo template : templates) {
-            selectionProvider.appendRow(template.path, template.name, true);
+        for(String template : templates) {
+            selectionProvider.appendRow(template, template, true);
         }
         return selectionProvider;
     }

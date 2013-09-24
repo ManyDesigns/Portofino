@@ -20,9 +20,6 @@
 
 package com.manydesigns.portofino.pageactions.registry;
 
-import com.manydesigns.portofino.dispatcher.PageAction;
-import com.manydesigns.portofino.pageactions.PageActionLogic;
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -33,19 +30,18 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class TemplateRegistry implements Iterable<TemplateInfo> {
+public class TemplateRegistry implements Iterable<String> {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    protected final List<TemplateInfo> registry = new CopyOnWriteArrayList<TemplateInfo>();
+    protected final List<String> registry = new CopyOnWriteArrayList<String>();
 
-    public TemplateInfo register(String name, String path) {
-        TemplateInfo info = new TemplateInfo(name, path);
-        registry.add(info);
-        return info;
+    public String register(String name) {
+        registry.add(name);
+        return name;
     }
 
-    public Iterator<TemplateInfo> iterator() {
+    public Iterator<String> iterator() {
         return registry.iterator();
     }
 

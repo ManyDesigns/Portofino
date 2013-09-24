@@ -10,7 +10,6 @@
     </parent>
     <artifactId>portofino-postgresql</artifactId>
     <packaging>jar</packaging>
-    <name>manydesigns-portofino-postgresql</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>

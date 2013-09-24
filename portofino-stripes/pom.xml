@@ -10,7 +10,6 @@
     </parent>
     <artifactId>portofino-stripes</artifactId>
     <packaging>jar</packaging>
-    <name>manydesigns-portofino-stripes</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>

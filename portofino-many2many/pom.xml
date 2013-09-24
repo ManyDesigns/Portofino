@@ -10,7 +10,6 @@
     </parent>
     <artifactId>portofino-many2many</artifactId>
     <packaging>jar</packaging>
-    <name>manydesigns-portofino-many2many</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>

@@ -13,7 +13,7 @@
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.TablesAction"/>
     <stripes:layout-component name="customScripts">
         <stripes:url var="treetablePath"
-                     value="/m/database/jquery-treetable-3.0.1" />
+                     value="/theme/jquery-treetable" />
 
         <script type="text/javascript" src="${treetablePath}/jquery.treetable.js" >
         </script>

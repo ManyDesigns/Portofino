@@ -28,7 +28,7 @@
                         <stripes:layout-component name="beforeSessionMessages" />
                         <mde:sessionMessages />
                         <stripes:layout-component name="beforeBreadcrumbs" />
-                        <jsp:include page="/m/theme/breadcrumbs.jsp" />
+                        <jsp:include page="/theme/breadcrumbs.jsp" />
                         <stripes:layout-component name="afterBreadcrumbs" />
                     </stripes:layout-component>
                     <stripes:layout-component name="mainPageActionBody">

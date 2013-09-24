@@ -10,7 +10,6 @@
     </parent>
     <artifactId>portofino-war-gae</artifactId>
     <packaging>war</packaging>
-    <name>manydesigns-portofino-war-gae</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>

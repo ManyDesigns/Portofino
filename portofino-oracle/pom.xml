@@ -10,7 +10,6 @@
     </parent>
     <artifactId>portofino-oracle</artifactId>
     <packaging>jar</packaging>
-    <name>manydesigns-portofino-oracle</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>

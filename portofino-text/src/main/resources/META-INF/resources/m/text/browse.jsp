@@ -8,7 +8,7 @@
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.pageactions.text.TextAction"/>
 <head>
-    <jsp:include page="/m/theme/head.jsp" />
+    <jsp:include page="/theme/head.jsp" />
     <title><fmt:message key="layouts.text.browse.browse_server"/></title>
 </head>
 <body

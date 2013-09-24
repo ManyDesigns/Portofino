@@ -11,16 +11,16 @@
         <include path="/favicon.ico" />
         <include path="/robots.txt" />
         <!--<include path="/elements.js" /> TODO Servlet 3.0
-        <include path="/ace-1.0.0/**" />
+        <include path="/ace/**" />
         <include path="/ckeditor/**" />
         <include path="/ckeditor-custom/**" />
         <include path="/famfamfam_mini_icons/**" />
-        <include path="/jquery-treetable-3.0.1/**" />
+        <include path="/jquery-treetable/**" />
         <include path="/jquery-ui/**" />
         <include path="/openid-selector/**" />
         <include path="/SweetiePlus-v2-SublinkInteractive/**" />-->
 
-        <include path="/m/theme/images/**" />
+        <include path="/theme/images/**" />
    </static-files>
 
     <system-properties>

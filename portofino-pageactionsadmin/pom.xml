@@ -10,7 +10,6 @@
     </parent>
     <artifactId>portofino-pageactionsadmin</artifactId>
     <packaging>jar</packaging>
-    <name>manydesigns-portofino-pageactionsadmin</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>

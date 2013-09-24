@@ -18,7 +18,7 @@ All trademarks belong to their respective owners.
 
 Ace (Ajax.org Cloud9 Editor)
 Site: https://github.com/ajaxorg/ace/
-Files: ace-1.0.0 directory
+Files: ace directory
 License: Mozilla Public License
 
 ANTLR Parser Generator
@@ -264,7 +264,7 @@ License: MIT
 
 JQuery Treetable
 Site: http://ludo.cubicphuse.nl/jquery-treetable/
-Files: jquery-treetable-3.0.1 directory
+Files: jquery-treetable directory
 License: MIT
 
 JSON

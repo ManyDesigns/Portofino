@@ -10,7 +10,6 @@
     </parent>
     <artifactId>portofino-chart</artifactId>
     <packaging>jar</packaging>
-    <name>manydesigns-portofino-chart</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>

@@ -10,7 +10,6 @@
     </parent>
     <artifactId>elements</artifactId>
     <packaging>jar</packaging>
-    <name>manydesigns-elements</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>

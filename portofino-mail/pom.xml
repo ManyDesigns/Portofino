@@ -10,7 +10,6 @@
     </parent>
     <artifactId>portofino-mail</artifactId>
     <packaging>jar</packaging>
-    <name>portofino-mail</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>

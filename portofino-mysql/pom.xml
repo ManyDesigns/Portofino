@@ -10,7 +10,6 @@
     </parent>
     <artifactId>portofino-mysql</artifactId>
     <packaging>jar</packaging>
-    <name>manydesigns-portofino-mysql</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>

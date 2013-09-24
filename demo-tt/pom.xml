@@ -10,7 +10,6 @@
     </parent>
     <artifactId>demo-tt</artifactId>
     <packaging>war</packaging>
-    <name>manydesigns-demo-tt</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>

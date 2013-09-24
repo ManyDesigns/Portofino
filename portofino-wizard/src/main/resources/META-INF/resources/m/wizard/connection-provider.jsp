@@ -10,7 +10,7 @@
                  type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="customScripts">
         <link rel="stylesheet" type="text/css"
-              href="<stripes:url value="/m/theme/portofino.css"/>"/>
+              href="<stripes:url value="/theme/portofino.css"/>"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
         <fmt:message key="appwizard.step1.title" />

@@ -5,7 +5,7 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"
-%><stripes:layout-render name="/m/theme/templates/dialog/modal.jsp">
+%><stripes:layout-render name="/theme/templates/dialog/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
     <stripes:layout-component name="pageTitle">
         <fmt:message key="skins.default.login.login_to">

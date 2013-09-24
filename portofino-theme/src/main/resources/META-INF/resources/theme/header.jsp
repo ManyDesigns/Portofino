@@ -19,7 +19,7 @@
                     <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
                 </stripes:link>
             </h4>
-            This is the default header. You should customize it including a /m/theme/header.jsp page in your application.
+            This is the default header. You should customize it including a /theme/header.jsp page in your application.
         </div>
     </div>
 </div>

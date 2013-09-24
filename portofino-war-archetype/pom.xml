@@ -7,9 +7,6 @@
     <artifactId>portofino-war-archetype</artifactId>
     <version>4.1.beta5-SNAPSHOT</version>
     <packaging>maven-archetype</packaging>
-
-    <name>portofino-war-archetype</name>
-
     <build>
         <extensions>
             <extension>

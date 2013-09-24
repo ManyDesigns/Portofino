@@ -9,8 +9,8 @@
 /><stripes:layout-render name="${actionBean.pageTemplate}/modal.jsp">
     <stripes:layout-component name="customScripts">
         <c:if test="${actionBean.formWithRichTextFields}">
-            <script type="text/javascript" src="<stripes:url value="/elements/ckeditor/ckeditor.js"/>"></script>
-            <script type="text/javascript" src="<stripes:url value="/elements/ckeditor/adapters/jquery.js"/>"></script>
+            <script type="text/javascript" src="<stripes:url value="/theme/ckeditor/ckeditor.js"/>"></script>
+            <script type="text/javascript" src="<stripes:url value="/theme/ckeditor/adapters/jquery.js"/>"></script>
             <script type="text/javascript">
                 $(function() {
                     portofino.setupRichTextEditors({

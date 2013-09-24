@@ -10,7 +10,6 @@
     </parent>
     <artifactId>portofino-calendar</artifactId>
     <packaging>jar</packaging>
-    <name>manydesigns-portofino-calendar</name>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>
