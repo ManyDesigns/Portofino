@@ -33,23 +33,9 @@ public final class PortofinoProperties {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     //**************************************************************************
-    // Default and custom properties location
-    //**************************************************************************
-
-    public final static String PROPERTIES_RESOURCE =
-            "portofino.properties";
-    public final static String CUSTOM_PROPERTIES_RESOURCE =
-            "portofino-custom.properties";
-
-
-    //**************************************************************************
     // Property names
     //**************************************************************************
 
-    public static final String PORTOFINO_VERSION =
-            "portofino.version";
-    public static final String WAR_REAL_PATH =
-            "war.real.path";
     public static final String BLOBS_DIR_PATH =
             "blobs.dir.path";
     public static final String APP_NAME =
@@ -60,6 +46,19 @@ public final class PortofinoProperties {
 
     //Login
     public static final String LOGIN_PAGE = "login.page";
+    public static final String LANDING_PAGE = "landing.page";
+
+    public static final String GROUP_ALL = "group.all";
+    public static final String GROUP_ANONYMOUS = "group.anonymous";
+    public static final String GROUP_REGISTERED = "group.registered";
+    public static final String GROUP_ADMINISTRATORS = "group.administrators";
+    //The mail address used as the from: field in email messages sent by the application (e.g. password change)
+    public static final String MAIL_FROM = "mail.from";
+    //Cache configuration properties
+    public static final String PAGE_CACHE_SIZE = "page.cache.size";
+    public static final String PAGE_CACHE_CHECK_FREQUENCY = "page.cache.check.frequency";
+    public static final String CONFIGURATION_CACHE_SIZE = "configuration.cache.size";
+    public static final String CONFIGURATION_CACHE_CHECK_FREQUENCY = "configuration.cache.check.frequency";
 
     private PortofinoProperties() {}
 }

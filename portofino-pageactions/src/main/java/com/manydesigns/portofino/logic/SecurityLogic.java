@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.logic;
 
-import com.manydesigns.portofino.AppProperties;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.modules.BaseModule;
@@ -156,7 +156,7 @@ public class SecurityLogic {
     public static boolean hasPermissions
             (Configuration conf, Permissions configuration, Subject subject, AccessLevel level, String... permissions) {
         if(subject.isAuthenticated()) {
-            String administratorsGroup = conf.getString(AppProperties.GROUP_ADMINISTRATORS);
+            String administratorsGroup = conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
             if(isUserInGroup(administratorsGroup)) {
                 return true;
             }
@@ -184,8 +184,8 @@ public class SecurityLogic {
             (Configuration conf, Permissions configuration, AccessLevel level, String... permissions) {
         PagePermission pagePermission = new PagePermission(configuration, level, permissions);
         List<String> groups = new ArrayList<String>();
-        groups.add(conf.getString(AppProperties.GROUP_ALL));
-        groups.add(conf.getString(AppProperties.GROUP_ANONYMOUS));
+        groups.add(conf.getString(PortofinoProperties.GROUP_ALL));
+        groups.add(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
         return new GroupPermission(groups).implies(pagePermission);
     }
 
@@ -201,7 +201,7 @@ public class SecurityLogic {
     }
 
     public static boolean isAdministrator(Configuration conf) {
-        String administratorsGroup = conf.getString(AppProperties.GROUP_ADMINISTRATORS);
+        String administratorsGroup = conf.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
         return isUserInGroup(administratorsGroup);
     }
 

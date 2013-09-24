@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.menu.MenuBuilder;
@@ -78,7 +77,7 @@ public class WizardModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return configuration.getString(PortofinoProperties.PORTOFINO_VERSION);
+        return ModuleRegistry.getPortofinoVersion();
     }
 
     @Override

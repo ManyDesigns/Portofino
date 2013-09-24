@@ -1,4 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
+<%@ page import="com.manydesigns.portofino.modules.ModuleRegistry"
+%><%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
@@ -35,7 +36,7 @@
                         <jsp:useBean id="portofinoConfiguration" scope="application"
                                      type="org.apache.commons.configuration.Configuration"/>
                         Powered by <a href="http://www.manydesigns.com/">Portofino</a>
-                        <c:out value="${mde:getString(portofinoConfiguration, 'portofino.version')}"/>
+                        <c:out value="<%= ModuleRegistry.getPortofinoVersion() %>"/>
                     </stripes:layout-component>
                 </div>
             </stripes:layout-component>

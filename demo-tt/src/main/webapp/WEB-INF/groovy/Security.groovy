@@ -1,7 +1,6 @@
 import com.manydesigns.elements.reflection.ClassAccessor
 import com.manydesigns.elements.reflection.JavaClassAccessor
 import com.manydesigns.elements.util.RandomUtil
-import com.manydesigns.portofino.AppProperties
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.model.database.Database
 import com.manydesigns.portofino.model.database.DatabaseLogic
@@ -20,6 +19,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import com.manydesigns.portofino.shiro.*
 import org.apache.shiro.authc.*
+import com.manydesigns.portofino.PortofinoProperties
 
 class Security extends AbstractPortofinoRealm {
 
@@ -150,7 +150,7 @@ class Security extends AbstractPortofinoRealm {
     @Override
     protected Collection<String> loadAuthorizationInfo(Serializable principal) {
         if("admin".equals(principal.login)) {
-            return [portofinoConfiguration.getString(AppProperties.GROUP_ADMINISTRATORS)]
+            return [portofinoConfiguration.getString(PortofinoProperties.GROUP_ADMINISTRATORS)]
         } else {
             return []
         }

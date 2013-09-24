@@ -29,7 +29,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.portofino.AppProperties;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.safemode.SafeModeAction;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.pages.Page;
@@ -177,13 +177,13 @@ public class DispatcherLogic {
 
     public static void init(Configuration portofinoConfiguration) {
         int maxSize, refreshCheckFrequency;
-        maxSize = portofinoConfiguration.getInt(AppProperties.PAGE_CACHE_SIZE, 1000);
+        maxSize = portofinoConfiguration.getInt(PortofinoProperties.PAGE_CACHE_SIZE, 1000);
         refreshCheckFrequency =
-                portofinoConfiguration.getInt(AppProperties.PAGE_CACHE_CHECK_FREQUENCY, 5);
+                portofinoConfiguration.getInt(PortofinoProperties.PAGE_CACHE_CHECK_FREQUENCY, 5);
         initPageCache(maxSize, refreshCheckFrequency);
-        maxSize = portofinoConfiguration.getInt(AppProperties.CONFIGURATION_CACHE_SIZE, 1000);
+        maxSize = portofinoConfiguration.getInt(PortofinoProperties.CONFIGURATION_CACHE_SIZE, 1000);
         refreshCheckFrequency =
-                portofinoConfiguration.getInt(AppProperties.CONFIGURATION_CACHE_CHECK_FREQUENCY, 5);
+                portofinoConfiguration.getInt(PortofinoProperties.CONFIGURATION_CACHE_CHECK_FREQUENCY, 5);
         initConfigurationCache(maxSize, refreshCheckFrequency);
     }
 

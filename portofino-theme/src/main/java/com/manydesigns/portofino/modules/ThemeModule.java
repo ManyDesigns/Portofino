@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
 import org.apache.commons.configuration.Configuration;
@@ -58,7 +57,7 @@ public class ThemeModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return configuration.getString(PortofinoProperties.PORTOFINO_VERSION);
+        return ModuleRegistry.getPortofinoVersion();
     }
 
     @Override

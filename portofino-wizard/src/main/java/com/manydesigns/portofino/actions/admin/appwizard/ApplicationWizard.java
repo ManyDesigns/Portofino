@@ -40,7 +40,7 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.AppProperties;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderForm;
 import com.manydesigns.portofino.actions.forms.SelectableSchema;
 import com.manydesigns.portofino.buttons.annotations.Button;
@@ -1047,7 +1047,7 @@ public class ApplicationWizard extends AbstractWizardPageAction {
                         childPages, template, bindings, title);
                 if(page != null) {
                     Group group = new Group();
-                    group.setName(conf.getString(AppProperties.GROUP_ANONYMOUS));
+                    group.setName(conf.getString(PortofinoProperties.GROUP_ANONYMOUS));
                     group.setAccessLevel(AccessLevel.DENY.name());
                     Permissions permissions = new Permissions();
                     permissions.getGroups().add(group);

@@ -73,7 +73,6 @@ public class PortofinoListener
             "----------------------------------------" +
                     "----------------------------------------";
     
-    public static final String APP_PROPERTIES = "app.properties";
     public static final String PORTOFINO_MESSAGES_FILE_NAME = "portofino-messages.properties";
 
     //**************************************************************************
@@ -81,8 +80,7 @@ public class PortofinoListener
     //**************************************************************************
 
     protected Configuration elementsConfiguration;
-    protected CompositeConfiguration configuration;
-    protected FileConfiguration appConfiguration;
+    protected FileConfiguration configuration;
 
     protected File applicationDirectory;
 
@@ -187,7 +185,7 @@ public class PortofinoListener
         servletContext.setAttribute(BaseModule.ADMIN_MENU, adminMenuBuilder);
 
         logger.info("Loading modules...");
-        moduleRegistry = new ModuleRegistry(appConfiguration);
+        moduleRegistry = new ModuleRegistry(configuration);
         discoverModules(moduleRegistry);
         servletContext.setAttribute(BaseModule.MODULE_REGISTRY, moduleRegistry);
         moduleRegistry.migrateAndInit(servletContext);
@@ -209,13 +207,11 @@ public class PortofinoListener
 
         String lineSeparator = System.getProperty("line.separator", "\n");
         logger.info(lineSeparator + SEPARATOR +
-                lineSeparator + "--- ManyDesigns Portofino {} started successfully" +
+                lineSeparator + "--- ManyDesigns Portofino started successfully" +
                 lineSeparator + "--- Context path: {}" +
                 lineSeparator + "--- Real path: {}" +
                 lineSeparator + SEPARATOR,
                 new String[]{
-                        configuration.getString(
-                                PortofinoProperties.PORTOFINO_VERSION),
                         serverInfo.getContextPath(),
                         serverInfo.getRealPath()
                 }
@@ -269,16 +265,10 @@ public class PortofinoListener
     //**************************************************************************
 
     protected void loadConfiguration() throws ConfigurationException {
-        CompositeConfiguration portofinoConfiguration = new CompositeConfiguration();
-        addConfiguration(portofinoConfiguration, PortofinoProperties.CUSTOM_PROPERTIES_RESOURCE);
-        addConfiguration(portofinoConfiguration, PortofinoProperties.PROPERTIES_RESOURCE);
         applicationDirectory = new File(serverInfo.getRealPath(), "WEB-INF");
         logger.info("Application directory: {}", applicationDirectory.getAbsolutePath());
-        File appConfigurationFile = new File(applicationDirectory, APP_PROPERTIES);
-        configuration = new CompositeConfiguration();
-        appConfiguration = new PropertiesConfiguration(appConfigurationFile);
-        configuration.addConfiguration(appConfiguration);
-        configuration.addConfiguration(portofinoConfiguration);
+        File appConfigurationFile = new File(applicationDirectory, "portofino.properties");
+        configuration = new PropertiesConfiguration(appConfigurationFile);
     }
 
     public void addConfiguration(CompositeConfiguration configuration, String resource) {

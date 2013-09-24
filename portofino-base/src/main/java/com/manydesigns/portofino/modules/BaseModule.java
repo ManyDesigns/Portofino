@@ -29,7 +29,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.modules.ModulesAction;
 import com.manydesigns.portofino.actions.admin.servletcontext.ServletContextAction;
 import com.manydesigns.portofino.di.Inject;
@@ -80,7 +79,7 @@ public class BaseModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return configuration.getString(PortofinoProperties.PORTOFINO_VERSION);
+        return ModuleRegistry.getPortofinoVersion();
     }
 
     @Override
@@ -133,4 +132,5 @@ public class BaseModule implements Module {
     public ModuleStatus getStatus() {
         return status;
     }
+
 }

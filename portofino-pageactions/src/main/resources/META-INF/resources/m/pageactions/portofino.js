@@ -63,7 +63,7 @@ var portofino = {
 
         var container = $("#content");
         container.prepend('\
-            <form action="${pageContext.request.contextPath}/actions/admin/page" method="post">\
+            <form action="' + portofino.contextPath + '/actions/admin/page" method="post">\
                 Edit page layout: \
                 <input type="hidden" name="originalPath" value="' + originalPath + '" />\
                 <button name="updateLayout" type="submit" class="btn btn-primary">Save</button>\

@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.pageactions.crud.CrudAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
@@ -59,7 +58,7 @@ public class CrudModule implements Module {
 
     @Override
     public String getModuleVersion() {
-        return configuration.getString(PortofinoProperties.PORTOFINO_VERSION);
+        return ModuleRegistry.getPortofinoVersion();
     }
 
     @Override

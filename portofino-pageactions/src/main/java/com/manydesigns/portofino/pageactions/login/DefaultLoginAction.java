@@ -33,7 +33,6 @@ import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.queue.QueueException;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
-import com.manydesigns.portofino.AppProperties;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.di.Inject;
@@ -95,7 +94,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
 
         Email email = new Email();
         email.getRecipients().add(new Recipient(Recipient.Type.TO, emailAddress));
-        email.setFrom(portofinoConfiguration.getString(AppProperties.MAIL_FROM, "example@example.com"));
+        email.setFrom(portofinoConfiguration.getString(PortofinoProperties.MAIL_FROM, "example@example.com"));
         email.setSubject(subject);
         email.setHtmlBody(body);
         try {

@@ -29,7 +29,6 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.CommonsConfigurationAccessor;
 import com.manydesigns.elements.util.BootstrapSizes;
-import com.manydesigns.portofino.AppProperties;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
@@ -37,10 +36,8 @@ import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.servlets.ServerInfo;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.FileConfiguration;
 import org.slf4j.Logger;
@@ -61,9 +58,6 @@ public class SettingsAction extends AbstractActionBean {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     public static final String URL_BINDING = "/actions/admin/settings";
-
-    @Inject(BaseModule.SERVER_INFO)
-    public ServerInfo serverInfo;
 
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
@@ -96,8 +90,8 @@ public class SettingsAction extends AbstractActionBean {
 
         CommonsConfigurationAccessor accessor = new CommonsConfigurationAccessor(configuration);
         form = new FormBuilder(accessor)
-                .configFields(PortofinoProperties.APP_NAME, AppProperties.LANDING_PAGE)
-                .configSelectionProvider(pagesSelectionProvider, AppProperties.LANDING_PAGE)
+                .configFields(PortofinoProperties.APP_NAME, PortofinoProperties.LANDING_PAGE)
+                .configSelectionProvider(pagesSelectionProvider, PortofinoProperties.LANDING_PAGE)
                 .build();
         //TODO I18n
         TextField appNameField = (TextField) form.findFieldByPropertyName(PortofinoProperties.APP_NAME);
@@ -105,7 +99,7 @@ public class SettingsAction extends AbstractActionBean {
         appNameField.setRequired(true);
         appNameField.setFieldCssClass(BootstrapSizes.BLOCK_LEVEL);
 
-        Field landingPageField = form.findFieldByPropertyName(AppProperties.LANDING_PAGE);
+        Field landingPageField = form.findFieldByPropertyName(PortofinoProperties.LANDING_PAGE);
         landingPageField.setLabel("Landing page");
         landingPageField.setRequired(true);
         
@@ -119,8 +113,7 @@ public class SettingsAction extends AbstractActionBean {
         if (form.validate()) {
             logger.debug("Applying settings to model");
             try {
-                CompositeConfiguration appConfiguration = (CompositeConfiguration) configuration;
-                FileConfiguration fileConfiguration = (FileConfiguration) appConfiguration.getConfiguration(0);
+                FileConfiguration fileConfiguration = (FileConfiguration) configuration;
                 form.writeToObject(fileConfiguration);
                 fileConfiguration.save();
                 logger.info("Configuration saved to " + fileConfiguration.getFile().getAbsolutePath());

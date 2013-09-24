@@ -3,6 +3,7 @@
 %><%@ page import="com.manydesigns.portofino.modules.BaseModule"
 %><%@ page import="net.sourceforge.stripes.controller.ActionResolver"
 %><%@ page import="org.apache.commons.lang.StringUtils"
+%><%@ page import="com.manydesigns.portofino.modules.ModuleRegistry"
 %><%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
@@ -121,7 +122,7 @@
     <footer>
         <div class="container">
             Powered by <a href="http://www.manydesigns.com/">Portofino</a>
-            <c:out value="${mde:getString(portofinoConfiguration, 'portofino.version')}"/>
+            <c:out value="<%= ModuleRegistry.getPortofinoVersion() %>"/>
         </div>
     </footer>
     </body>

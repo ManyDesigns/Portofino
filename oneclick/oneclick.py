@@ -7,9 +7,9 @@ Template del contenuto di local.py:
 #! /usr/bin/env python
 
 portofino_version = "4.1"
-tomcat_dir = "apache-tomcat-7.0.41"
+tomcat_dir = "apache-tomcat-7.0.42"
 portofino_path = "~/projects/portofino4"
-tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-7/v7.0.41/bin/apache-tomcat-7.0.41.zip"
+tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-7/v7.0.42/bin/apache-tomcat-7.0.42.zip"
 drivers = [["postgresql/postgresql/9.2-1003-jdbc4/", "postgresql-9.2-1003-jdbc4.jar"],
            ["mysql/mysql-connector-java/5.1.25/", "mysql-connector-java-5.1.25.jar"],
            ["net/sourceforge/jtds/jtds/1.2.8/", "jtds-1.2.8.jar"]]

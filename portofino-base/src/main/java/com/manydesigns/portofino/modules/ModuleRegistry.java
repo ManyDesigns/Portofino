@@ -31,10 +31,12 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.di.Injections;
 import org.apache.commons.configuration.FileConfiguration;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.NavigableSet;
@@ -147,6 +149,15 @@ public class ModuleRegistry {
             int cmp = Double.compare(m1.getPriority(), m2.getPriority());
             //Establish a proper order even if priorities are equal
             return cmp != 0 ? cmp : m1.getId().compareTo(m2.getId());
+        }
+    }
+
+    //Utilities
+    public static String getPortofinoVersion() {
+        try {
+            return IOUtils.toString(ModuleRegistry.class.getResourceAsStream("/portofino.version"));
+        } catch (IOException e) {
+            return null;
         }
     }
 
