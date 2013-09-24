@@ -4,8 +4,8 @@
         <childPages />
     </layout>
     <detailLayout>
-        <detailChildPages>
+        <childPages>
             <childPage name="tickets" container="contentLayoutBottom" order="0" showInNavigation="false"/>
-        </detailChildPages>
+        </childPages>
     </detailLayout>
 </page>

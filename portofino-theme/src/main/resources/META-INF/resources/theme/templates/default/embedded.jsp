@@ -2,7 +2,7 @@
     <div id="portlet_${actionBean.pageInstance.page.id}">
         <stripes:layout-component name="portletHeader">
             <div class="portletHeader">
-                <stripes:form action="${actionBean.dispatch.originalPath}" method="post">
+                <stripes:form action="${actionBean.context.actualServletPath}" method="post">
                     <h4>
                         <span class="pull-right">
                             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>

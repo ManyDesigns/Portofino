@@ -11,7 +11,7 @@
         <c:out value="${actionBean.createTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data"
+        <stripes:form action="${actionBean.context.actualServletPath}" method="post" enctype="multipart/form-data"
                       class="form-horizontal">
             <c:if test="${actionBean.requiredFieldsPresent}">
                 <p><fmt:message key="commons.fields_required"/>.</p>

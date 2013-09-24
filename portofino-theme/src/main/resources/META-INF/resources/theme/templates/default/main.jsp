@@ -5,7 +5,7 @@
         <stripes:layout-component name="customScripts"/>
         <title>
             <stripes:layout-component name="pageTitle">
-                <c:out value="${actionBean.dispatch.lastPageInstance.page.description}"/>
+                <c:out value="${actionBean.pageInstance.actualDescription}"/>
             </stripes:layout-component>
         </title>
     </head>
@@ -28,14 +28,14 @@
                         <stripes:layout-component name="beforeSessionMessages" />
                         <mde:sessionMessages />
                         <stripes:layout-component name="beforeBreadcrumbs" />
-                        <jsp:include page="/theme/breadcrumbs.jsp" />
+                        <jsp:include page="../../breadcrumbs.jsp" />
                         <stripes:layout-component name="afterBreadcrumbs" />
                     </stripes:layout-component>
                     <stripes:layout-component name="mainPageActionBody">
                         <div id="portlet_${actionBean.pageInstance.page.id}">
                             <stripes:layout-component name="portletHeader">
                                 <div class="portletHeader" style="padding-bottom: 0;">
-                                    <stripes:form action="${actionBean.dispatch.originalPath}" method="post">
+                                    <stripes:form action="${actionBean.context.actualServletPath}" method="post">
                                         <h3>
                                             <span class="pull-right">
                                                 <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>

@@ -23,8 +23,8 @@
                             <c:out value="${attachment.filename}"/>
                         </div>
                         <c:out value="${mde:bytesToHumanString(attachment.size)}"/>
-                        <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?viewAttachment=&id=${attachment.id}"/>">view</a>
-                        <a href="<c:out value="${actionBean.dispatch.absoluteOriginalPath}?downloadAttachment=&id=${attachment.id}"/>">download</a>
+                        <a href="<c:out value="${pageContext.request.contextPath}${actionBean.context.actualServletPath}?viewAttachment=&id=${attachment.id}"/>">view</a>
+                        <a href="<c:out value="${pageContext.request.contextPath}${actionBean.context.actualServletPath}?downloadAttachment=&id=${attachment.id}"/>">download</a>
                     </div>
                 </c:forEach>
                 <div style="clear:both"></div>

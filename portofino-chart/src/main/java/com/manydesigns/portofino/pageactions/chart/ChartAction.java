@@ -134,12 +134,12 @@ public class ChartAction extends AbstractPageAction {
 
             chartId = RandomUtil.createRandomId();
 
-            String actionurl = getDispatch().getAbsoluteOriginalPath();
+            String actionurl = context.getActualServletPath();
             UrlBuilder chartResolution =
                     new UrlBuilder(context.getLocale(), actionurl, false)
                             .addParameter("chartId", chartId)
                             .addParameter("chart", "");
-            String portletUrl = chartResolution.toString();
+            String portletUrl = context.getRequest().getContextPath() + chartResolution.toString();
 
             file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
 

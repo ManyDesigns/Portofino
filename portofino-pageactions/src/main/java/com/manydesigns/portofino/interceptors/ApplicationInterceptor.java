@@ -96,7 +96,6 @@ public class ApplicationInterceptor implements Interceptor {
                 configureActionBean(actionBean, page, request);
                 try {
                     actionBean.setContext(actionContext);
-                    actionBean.setDispatch(dispatch);
                     actionBean.setPageInstance(page);
                     Resolution resolution = actionBean.preparePage();
                     if(resolution != null) {

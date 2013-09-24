@@ -25,7 +25,7 @@
             <div id="content" class="span10">
                 <jsp:useBean id="actionBean" scope="request"
                              type="com.manydesigns.portofino.pageactions.wizard.AbstractWizardPageAction"/>
-                <stripes:form action="${actionBean.dispatch.originalPath}"
+                <stripes:form action="${actionBean.context.actualServletPath}"
                               method="post" enctype="multipart/form-data" class="form-horizontal">
                     <jsp:include page="wizard-content-header.jsp" />
                     <div class="row-fluid">

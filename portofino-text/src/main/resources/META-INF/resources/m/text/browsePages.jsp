@@ -17,7 +17,7 @@
     </style>
 </head>
 <body style="margin: 0 10px 0 10px; height: 100%;">
-<form action="${actionBean.dispatch.absoluteOriginalPath}" method="post" style="padding-top: 10px;">
+<form action="${pageContext.request.contextPath}${actionBean.context.actualServletPath}" method="post" style="padding-top: 10px;">
     Choose a page:
     <button onclick="window.opener.CKEDITOR.tools.callFunction(
                         <c:out value='${actionBean.CKEditorFuncNum}'/>,
@@ -31,10 +31,10 @@
         Cancel
     </button>
 </form>
-<iframe src="${actionBean.dispatch.absoluteOriginalPath}" id="iframe"
+<iframe src="${pageContext.request.contextPath}${actionBean.context.actualServletPath}" id="iframe"
         style="width: 100%; height: 85%; border: 1px dashed black; margin: 10px 0 10px 0;">
 </iframe>
-<form action="${actionBean.dispatch.absoluteOriginalPath}" method="post">
+<form action="${pageContext.request.contextPath}${actionBean.context.actualServletPath}" method="post">
     Choose a page:
     <button onclick="window.opener.CKEDITOR.tools.callFunction(
                         <c:out value='${actionBean.CKEditorFuncNum}'/>,

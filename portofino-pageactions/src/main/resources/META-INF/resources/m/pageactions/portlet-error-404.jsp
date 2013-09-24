@@ -6,7 +6,7 @@
 --%><stripes:layout-render name="/theme/templates/default/normal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
     <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.dispatch.originalPath}"/>
+        <c:out value="${actionBean.context.actualServletPath}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <div class="alert alert-error">
@@ -14,7 +14,7 @@
             <ul class="errorMessages">
                 <li>
                     <fmt:message key="portlet.404">
-                        <fmt:param value="${actionBean.dispatch.absoluteOriginalPath}" />
+                        <fmt:param value="${pageContext.request.contextPath}${actionBean.context.actualServletPath}" />
                     </fmt:message>
                 </li>
             </ul>

@@ -14,9 +14,9 @@
 <body
     <div class="container">
     <% if(request.getParameter("images-only") == null) { %>
-        <form action="${actionBean.dispatch.absoluteOriginalPath}">
+        <form action="${pageContext.request.contextPath}${actionBean.context.actualServletPath}">
             <input type="hidden" name="cancelReturnUrl"
-                   value='<%= actionBean.getDispatch().getAbsoluteOriginalPath() + "?" + request.getQueryString() %>' />
+                   value='<%= request.getContextPath() + actionBean.getContext().getActualServletPath() + "?" + request.getQueryString() %>' />
             <input type="hidden" name="CKEditorFuncNum" value='${actionBean.CKEditorFuncNum}' />
             <fmt:message key="layouts.text.browse.pages"/>:
             <button class="btn" type="submit" name="browsePages" role="button" aria-disabled="false">
@@ -30,7 +30,7 @@
                 <li><a href="#"
                         onclick="window.opener.CKEDITOR.tools.callFunction(
                         <c:out value='${actionBean.CKEditorFuncNum}'/>,
-                        '<c:out value="${actionBean.dispatch.absoluteOriginalPath}?viewAttachment=&id=${attachment.id}"/>'
+                        '<c:out value="${pageContext.request.contextPath}${actionBean.context.actualServletPath}?viewAttachment=&id=${attachment.id}"/>'
                     ); window.close();">
                     <c:out value="${attachment.filename}"/>
                 </a></li>

@@ -11,18 +11,18 @@
         <c:out value="${actionBean.searchTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <stripes:form action="${actionBean.dispatch.originalPath}" method="post" class="form-inline">
+        <stripes:form action="${actionBean.context.actualServletPath}" method="post" class="form-inline">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
             <c:if test="${not empty actionBean.searchForm}">
                 <c:if test="${actionBean.searchVisible}">
-                    <a class="search_form_toggle_link" href="${actionBean.dispatch.absoluteOriginalPath}">
+                    <a class="search_form_toggle_link" href="${pageContext.request.contextPath}${actionBean.context.actualServletPath}">
                         <fmt:message key="layouts.crud.search.hideSearch" />
                     </a>
                 </c:if>
                 <c:if test="${!actionBean.searchVisible}">
-                    <a class="search_form_toggle_link" href="${actionBean.dispatch.absoluteOriginalPath}?search=">
+                    <a class="search_form_toggle_link" href="${pageContext.request.contextPath}${actionBean.context.actualServletPath}?search=">
                         <fmt:message key="layouts.crud.search.showSearch" />
                     </a>
                 </c:if>

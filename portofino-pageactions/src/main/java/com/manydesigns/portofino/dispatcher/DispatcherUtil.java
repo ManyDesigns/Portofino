@@ -24,6 +24,7 @@ import com.manydesigns.elements.stripes.ElementsActionBeanContext;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
+import com.manydesigns.portofino.stripes.AbstractActionBean;
 import org.apache.commons.configuration.Configuration;
 
 import javax.servlet.ServletContext;
@@ -64,8 +65,10 @@ public class DispatcherUtil {
     }
 
     public static Dispatch getDispatch(HttpServletRequest request, Object actionBean) {
-        if(actionBean instanceof PageAction) {
-            return ((PageAction) actionBean).getDispatch();
+        Dispatcher dispatcher = get(request);
+        if(actionBean instanceof AbstractActionBean) {
+            String actualServletPath = ((AbstractActionBean) actionBean).getContext().getActualServletPath();
+            return dispatcher.getDispatch(request.getContextPath(), actualServletPath);
         } else {
             return getDispatch(request);
         }

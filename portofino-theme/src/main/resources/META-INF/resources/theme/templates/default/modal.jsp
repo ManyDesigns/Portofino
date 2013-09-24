@@ -11,7 +11,7 @@
         <stripes:layout-component name="customScripts"/>
         <title>
             <stripes:layout-component name="pageTitle">
-                <c:out value="${actionBean.dispatch.lastPageInstance.page.description}"/>
+                <c:out value="${actionBean.pageInstance.actualDescription}"/>
             </stripes:layout-component>
         </title>
     </head>

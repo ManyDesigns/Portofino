@@ -258,16 +258,6 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
     }
 
     @Override
-    public void setDispatch(Dispatch dispatch) {
-        this.dispatch = dispatch;
-    }
-
-    @Override
-    public Dispatch getDispatch() {
-        return dispatch;
-    }
-
-    @Override
     public boolean isEmbedded() {
         return false;
     }

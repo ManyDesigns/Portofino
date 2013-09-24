@@ -30,7 +30,7 @@
                 <fmt:message key="commons.fields_required"/>.
             </c:if>
         </p>
-        <stripes:form action="${actionBean.dispatch.originalPath}" method="post"
+        <stripes:form action="${actionBean.context.actualServletPath}" method="post"
                       enctype="multipart/form-data" class="form-horizontal">
             <mde:write name="actionBean" property="form"/>
             <c:if test="${not empty actionBean.searchString}">

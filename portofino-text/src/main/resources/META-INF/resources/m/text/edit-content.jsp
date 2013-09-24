@@ -15,9 +15,9 @@
         <script type="text/javascript">
             $(function() {
                 portofino.setupRichTextEditors({
-                    filebrowserBrowseUrl : '<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>?browse=',
-                    filebrowserImageBrowseUrl : '<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>?browse=&images-only=',
-                    filebrowserUploadUrl : '<c:out value="${actionBean.dispatch.absoluteOriginalPath}"/>?uploadAttachmentFromCKEditor='
+                    filebrowserBrowseUrl : '<c:out value="${pageContext.request.contextPath}${actionBean.context.actualServletPath}"/>?browse=',
+                    filebrowserImageBrowseUrl : '<c:out value="${pageContext.request.contextPath}${actionBean.context.actualServletPath}"/>?browse=&images-only=',
+                    filebrowserUploadUrl : '<c:out value="${pageContext.request.contextPath}${actionBean.context.actualServletPath}"/>?uploadAttachmentFromCKEditor='
                 });
             });
         </script>
@@ -28,7 +28,7 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <stripes:form action="${actionBean.dispatch.originalPath}" method="post" enctype="multipart/form-data">
+        <stripes:form action="${actionBean.context.actualServletPath}" method="post" enctype="multipart/form-data">
             <!-- Content editor -->
             <fieldset style="margin-bottom: 2em;">
                 <legend><fmt:message key="layouts.text.configure.content"/></legend>

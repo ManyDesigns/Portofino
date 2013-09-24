@@ -26,9 +26,13 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.*;
+import com.manydesigns.portofino.dispatcher.DispatcherLogic;
+import com.manydesigns.portofino.dispatcher.PageAction;
+import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.dispatcher.PageNotActiveException;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
@@ -95,11 +99,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     //--------------------------------------------------------------------------
     // Properties
     //--------------------------------------------------------------------------
-
-    /**
-     * The dispatch property. Injected.
-     */
-    public Dispatch dispatch;
 
     /**
      * The PageInstance property. Injected.
@@ -187,14 +186,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Getters/Setters
     //--------------------------------------------------------------------------
 
-    public Dispatch getDispatch() {
-        return dispatch;
-    }
-
-    public void setDispatch(Dispatch dispatch) {
-        this.dispatch = dispatch;
-    }
-
     public MultiMap initEmbeddedPageActions() {
         if(embeddedPageActions == null) {
             MultiMap mm = new MultiHashMap();
@@ -202,7 +193,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             for(ChildPage childPage : layout.getChildPages()) {
                 String layoutContainerInParent = childPage.getContainer();
                 if(layoutContainerInParent != null) {
-                    String newPath = getDispatch().getOriginalPath() + "/" + childPage.getName();
+                    String newPath = context.getActualServletPath() + "/" + childPage.getName();
                     File pageDir = new File(pageInstance.getChildrenDirectory(), childPage.getName());
                     try {
                         Page page = DispatcherLogic.getPage(pageDir);
@@ -308,7 +299,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     }
 
     protected String getDefaultCancelReturnUrl() {
-        return getDispatch().getAbsoluteOriginalPath();
+        return Util.getAbsoluteUrl(context.getActualServletPath());
     }
 
     public void setCancelReturnUrl(String cancelReturnUrl) {

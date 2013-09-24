@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.elements.stripes.ElementsActionBeanContext;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.Resolution;
 
@@ -57,20 +58,11 @@ public interface PageAction extends ActionBean {
     void setPageInstance(PageInstance pageInstance);
 
     /**
-     * Sets the Dispatch which this action belongs to. The action is not necessarily the last one in the dispatch.<br />
-     * This method is invoked automatically by the framework before calling preparePage().
-     */
-    void setDispatch(Dispatch dispatch);
-
-    /**
-     * Returns the Dispatch this action belongs to.
-     */
-    Dispatch getDispatch();
-
-    /**
      * Returns whether this page is embedded in its parent.
      * @return true if the page is embedded, false otherwise.
      */
     boolean isEmbedded();
 
+    @Override
+    ElementsActionBeanContext getContext();
 }

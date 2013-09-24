@@ -37,9 +37,9 @@
                 <span class="icon-bar"></span>
             </button>
             <div id="header-menu" class="nav-collapse collapse">
-                <c:if test="${not empty actionBean.dispatch}">
+                <c:if test="${not empty actionBean.pageInstance}">
                     <form id="pageAdminForm" action="${pageContext.request.contextPath}/actions/admin/page">
-                        <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
+                        <input type="hidden" name="originalPath" value="${actionBean.context.actualServletPath}" />
                     </form>
                 </c:if>
                 <ul id="app-menu" class="nav">
@@ -98,20 +98,20 @@
                             <%
                                 if(request.getAttribute("actionBean") instanceof PageAction) {
                                     PageAction pageAction = (PageAction) request.getAttribute("actionBean");
-                                    if(pageAction.getDispatch() != null &&
+                                    if(pageAction.getPageInstance() != null &&
                                        SecurityLogic.hasPermissions(
                                                portofinoConfiguration, pageAction.getPageInstance(),
                                                subject, AccessLevel.EDIT)) {%>
                             <li class="divider"></li>
                             <li>
-                                <a href="javascript:portofino.enablePortletDragAndDrop($(this), '${actionBean.dispatch.originalPath}');">
+                                <a href="javascript:portofino.enablePortletDragAndDrop($(this), '${actionBean.context.actualServletPath}');">
                                     <i class="icon-file"></i> Edit layout
                                 </a>
                             </li>
                             <li>
                                 <%
                                     UrlBuilder urlBuilder = new UrlBuilder(request.getLocale(), PageAdminAction.class, true);
-                                    urlBuilder.addParameter("originalPath", pageAction.getDispatch().getOriginalPath());
+                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getActualServletPath());
                                     urlBuilder.setEvent("pageChildren");
                                 %>
                                 <a href="<%= request.getContextPath() + urlBuilder %>">
@@ -121,7 +121,7 @@
                             <li>
                                 <%
                                     urlBuilder = new UrlBuilder(request.getLocale(), PageAdminAction.class, true);
-                                    urlBuilder.addParameter("originalPath", pageAction.getDispatch().getOriginalPath());
+                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getActualServletPath());
                                     urlBuilder.setEvent("newPage");
                                 %>
                                 <a href="<%= request.getContextPath() + urlBuilder %>">
@@ -130,7 +130,7 @@
                             </li>
                             <%
                                 String jsArgs = "('" +
-                                        pageAction.getDispatch().getOriginalPath() + "', '" +
+                                        pageAction.getContext().getActualServletPath() + "', '" +
                                         request.getContextPath() + "');";
 
                             %>
@@ -154,7 +154,7 @@
                                         portofinoConfiguration, pageAction.getPageInstance(),
                                         subject, AccessLevel.DEVELOP)) {
                                     urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, true);
-                                    urlBuilder.addParameter("originalPath", pageAction.getDispatch().getOriginalPath());
+                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getActualServletPath());
                                     urlBuilder.setEvent("pagePermissions");
                             %>
                             <li>

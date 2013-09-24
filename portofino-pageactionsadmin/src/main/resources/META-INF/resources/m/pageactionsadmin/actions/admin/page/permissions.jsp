@@ -17,6 +17,8 @@
 %><jsp:useBean id="actionBean" scope="request"
                type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"
 /><stripes:layout-render name="${actionBean.pageTemplate}/modal.jsp">
+    <stripes:layout-component name="sidebar" />
+    <stripes:layout-component name="mainPageActionHeader" />
     <stripes:layout-component name="portletTitle">
         <fmt:message key="layouts.page.permissions.page-permissions-for">
             <fmt:param value="<%= StringEscapeUtils.escapeHtml(actionBean.getPage().getTitle()) %>" />
@@ -25,7 +27,7 @@
     <stripes:layout-component name="portletBody">
         <stripes:form action="/actions/admin/page" method="post" enctype="multipart/form-data">
             <div class="row-fluid">
-                <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
+                <input type="hidden" name="originalPath" value="${actionBean.originalPath}" />
                 <div class="span9" style="margin-left: 0;">
                     <table class="table table-condensed">
                     <%
@@ -166,7 +168,7 @@
                     <c:if test="${actionBean.users == null}">
                         <input name="testUserId" id="testUserIdSelect" type="text" value="${actionBean.testUserId}" />
                     </c:if>
-                    <input type="hidden" name="originalPath" value="${actionBean.dispatch.originalPath}" />
+                    <input type="hidden" name="originalPath" value="${actionBean.originalPath}" />
                     <portofino:buttons list="testUserPermissions" cssClass="btn-block"/>
                     <br /><br />
                     <table id="userPermissionTestResults">

@@ -52,7 +52,7 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <stripes:form action="${actionBean.dispatch.absoluteOriginalPath}" method="post"
+        <stripes:form action="${pageContext.request.contextPath}${actionBean.context.actualServletPath}" method="post"
                       id="openid_form">
             <stripes:hidden name="returnUrl"/>
             <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />

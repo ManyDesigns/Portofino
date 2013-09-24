@@ -17,7 +17,7 @@
         <c:out value="${actionBean.readTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <stripes:form action="${actionBean.dispatch.originalPath}" method="post" class="form-horizontal">
+        <stripes:form action="${actionBean.context.actualServletPath}" method="post" class="form-horizontal">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>

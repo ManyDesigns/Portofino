@@ -28,7 +28,7 @@
             </ul>
         </div>
         <div class="span10 calendar-view">
-            <stripes:form action="${actionBean.dispatch.originalPath}" method="post">
+            <stripes:form action="${actionBean.context.actualServletPath}" method="post">
                 <%-- Hidden submit so that ENTER on a form executes the default action --%>
                 <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
                 <input type="hidden" name="referenceDateTimeLong" value="${actionBean.referenceDateTimeLong}" />

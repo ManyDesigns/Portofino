@@ -265,7 +265,7 @@ public class PageactionsModule implements Module {
                         return;
                     }
                     PageAction pageAction = (PageAction) request.getAttribute("actionBean");
-                    if(pageAction.getDispatch() != null &&
+                    if(pageAction.getPageInstance() != null &&
                        SecurityLogic.hasPermissions(
                                configuration, pageAction.getPageInstance(),
                                SecurityUtils.getSubject(), AccessLevel.EDIT)) {

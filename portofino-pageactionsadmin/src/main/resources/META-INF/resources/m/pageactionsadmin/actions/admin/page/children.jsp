@@ -9,6 +9,8 @@
 %><jsp:useBean id="actionBean" scope="request"
                type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"
 /><stripes:layout-render name="${actionBean.pageTemplate}/modal.jsp">
+    <stripes:layout-component name="sidebar" />
+    <stripes:layout-component name="mainPageActionHeader" />
     <stripes:layout-component name="portletTitle">
         <fmt:message key="page.children.title">
             <fmt:param value="<%= StringEscapeUtils.escapeHtml(actionBean.getPage().getTitle()) %>" />
