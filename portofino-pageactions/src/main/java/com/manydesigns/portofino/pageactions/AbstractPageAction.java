@@ -162,10 +162,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return null;
     }
 
-    public String getDescription() {
-        return pageInstance.getName();
-    }
-
     //--------------------------------------------------------------------------
     // Admin methods
     //--------------------------------------------------------------------------

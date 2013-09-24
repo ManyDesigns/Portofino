@@ -115,11 +115,6 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     }
 
     @Override
-    public String getDescription() {
-        return pageInstance.getName();
-    }
-
-    @Override
     public PageInstance getPageInstance() {
         return pageInstance;
     }

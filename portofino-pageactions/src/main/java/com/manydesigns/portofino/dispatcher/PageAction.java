@@ -47,11 +47,6 @@ public interface PageAction extends ActionBean {
     Resolution preparePage();
 
     /**
-     * Returns a textual description of the page, for use e.g. in links, breadcrumbs, and the like.
-     */
-    String getDescription();
-
-    /**
      * Returns the PageInstance of this action.
      */
     PageInstance getPageInstance();

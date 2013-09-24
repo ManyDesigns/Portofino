@@ -908,6 +908,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         List<String> parameters = pageInstance.getParameters();
         if(!parameters.isEmpty()) {
+            pageInstance.setDescription(ShortNameUtils.getName(classAccessor, object));
             String encoding = portofinoConfiguration.getString(PortofinoProperties.URL_ENCODING);
             pk = parameters.toArray(new String[parameters.size()]);
             try {
@@ -934,6 +935,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             } else {
                 return notInUseCase(context, parameters);
             }
+        } else {
+            pageInstance.setDescription(crudConfiguration.getSearchTitle());
         }
         return null;
     }
@@ -1276,15 +1279,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
     // Return to parent
     //**************************************************************************
-
-    @Override
-    public String getDescription() {
-        if(pageInstance.getParameters().isEmpty()) {
-            return crudConfiguration.getSearchTitle();
-        } else {
-            return ShortNameUtils.getName(classAccessor, object);
-        }
-    }
 
     /**
      * <p>Detects the parent page to return to (using the return to... button). This can be another PageAction,

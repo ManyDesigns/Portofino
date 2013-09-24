@@ -75,7 +75,7 @@ public class Breadcrumbs {
                     sb.append("/").append(param);
                 }
                 if(page.getActualNavigationRoot() != NavigationRoot.GHOST_ROOT) {
-                    String description = current.getDescription();
+                    String description = current.getActualDescription();
                     String title = String.format("%s (%s)", description, page.getTitle());
                     BreadcrumbItem item2 = new BreadcrumbItem(sb.toString(), description, title);
                     items.add(item2);

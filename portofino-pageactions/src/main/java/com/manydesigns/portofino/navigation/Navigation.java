@@ -90,7 +90,7 @@ public class Navigation {
         Page rootPage = rootPageInstance.getPage();
         boolean rootGhost = rootPage.getActualNavigationRoot() == NavigationRoot.GHOST_ROOT;
         rootNavigationItem = new NavigationItem(
-                rootPage.getTitle(), rootPageInstance.getDescription(), prefix, true, rootSelected, rootGhost);
+                rootPage.getTitle(), rootPageInstance.getActualDescription(), prefix, true, rootSelected, rootGhost);
         LinkedList<Page> pages = new LinkedList<Page>();
         PageInstance[] allInstances = dispatch.getPageInstancePath();
         for(int i = 0; i <= rootPageIndex; i++) {
@@ -140,7 +140,7 @@ public class Navigation {
                     if (next.getName().equals(childPage.getName())) {
                         inPath = true;
                         selected = (i == pageInstancesLength - 2);
-                        description = next.getDescription();
+                        description = next.getActualDescription();
                     }
                 }
                 pages.add(page);
@@ -167,7 +167,7 @@ public class Navigation {
                 String path = prefix + next.getName();
                 currentNavigationItem =
                         new NavigationItem(
-                                next.getPage().getTitle(), next.getDescription(), path, true, selected, false);
+                                next.getPage().getTitle(), next.getActualDescription(), path, true, selected, false);
                 currentChildNavigationItems.add(currentNavigationItem);
             }
 

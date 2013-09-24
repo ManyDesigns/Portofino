@@ -210,11 +210,15 @@ public class PageInstance {
     }
 
     public String getDescription() {
-        return description != null ? description : page.getTitle();
+        return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getActualDescription() {
+        return description != null ? description : page.getTitle();
     }
 
     public boolean isPrepared() {

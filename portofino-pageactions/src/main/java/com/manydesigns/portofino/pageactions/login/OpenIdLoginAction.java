@@ -248,16 +248,6 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
     }
 
     @Override
-    public Resolution preparePage() {
-        return null;
-    }
-
-    @Override
-    public String getDescription() {
-        return pageInstance.getName();
-    }
-
-    @Override
     public PageInstance getPageInstance() {
         return pageInstance;
     }
