@@ -27,7 +27,7 @@
     <stripes:layout-component name="portletBody">
         <stripes:form action="/actions/admin/page" method="post" enctype="multipart/form-data">
             <div class="row-fluid">
-                <input type="hidden" name="originalPath" value="${actionBean.originalPath}" />
+                <input type="hidden" name="originalPath" value="${actionBean.context.actualServletPath}" />
                 <div class="span9" style="margin-left: 0;">
                     <table class="table table-condensed">
                     <%
@@ -168,7 +168,7 @@
                     <c:if test="${actionBean.users == null}">
                         <input name="testUserId" id="testUserIdSelect" type="text" value="${actionBean.testUserId}" />
                     </c:if>
-                    <input type="hidden" name="originalPath" value="${actionBean.originalPath}" />
+                    <input type="hidden" name="originalPath" value="${actionBean.context.actualServletPath}" />
                     <portofino:buttons list="testUserPermissions" cssClass="btn-block"/>
                     <br /><br />
                     <table id="userPermissionTestResults">

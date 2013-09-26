@@ -28,7 +28,7 @@ public class UserMenuAppender implements MenuAppender {
         String originalPath = "/";
         if(request.getAttribute("actionBean") instanceof AbstractActionBean) {
             AbstractActionBean actionBean = (AbstractActionBean) request.getAttribute("actionBean");
-            originalPath = actionBean.getOriginalPath();
+            originalPath = actionBean.context.actualServletPath;
         }
         String loginPage = configuration.getString(PortofinoProperties.LOGIN_PAGE);
 

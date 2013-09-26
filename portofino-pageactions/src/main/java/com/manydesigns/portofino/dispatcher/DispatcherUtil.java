@@ -68,7 +68,7 @@ public class DispatcherUtil {
         Dispatcher dispatcher = get(request);
         if(actionBean instanceof AbstractActionBean) {
             String actualServletPath = ((AbstractActionBean) actionBean).getContext().getActualServletPath();
-            return dispatcher.getDispatch(request.getContextPath(), actualServletPath);
+            return dispatcher.getDispatch(actualServletPath);
         } else {
             return getDispatch(request);
         }
@@ -79,7 +79,7 @@ public class DispatcherUtil {
         ElementsActionBeanContext context = new ElementsActionBeanContext();
         context.setRequest(request);
         String originalPath = context.getActualServletPath();
-        return dispatcher.getDispatch(request.getContextPath(), originalPath);
+        return dispatcher.getDispatch(originalPath);
     }
 
 }

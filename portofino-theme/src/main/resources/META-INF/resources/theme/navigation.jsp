@@ -62,7 +62,7 @@
                     xb.addAttribute("class", "active");
                     nextNavigationItem = current;
                 }
-                xb.writeAnchor(current.getPath(), current.getTitle());
+                xb.writeAnchor(request.getContextPath() + current.getPath(), current.getTitle());
                 xb.closeElement("li");
             } else if (current.isInPath()) {
                 nextNavigationItem = current;

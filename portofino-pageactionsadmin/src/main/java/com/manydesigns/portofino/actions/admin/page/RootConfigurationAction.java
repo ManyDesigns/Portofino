@@ -76,7 +76,7 @@ public abstract class RootConfigurationAction extends PageAdminAction {
             throw new Error("Couldn't load root page", e);
         }
         pageInstance = new PageInstance(null, rootDir, rootPage, SafeModeAction.class);
-        dispatch = new Dispatch(context.getRequest().getContextPath(), originalPath, pageInstance);
+        dispatch = new Dispatch(pageInstance);
         return null;
     }
 

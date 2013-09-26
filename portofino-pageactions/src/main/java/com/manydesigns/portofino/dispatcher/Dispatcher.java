@@ -57,11 +57,10 @@ public class Dispatcher {
 
     /**
      * Returns a dispatch for the provided path.
-     * @param contextPath context path of the web application (as returned by request.getContextPath()).
      * @param path the path to resolve, not including the context path.
      * @return the dispatch. If no dispatch can be constructed, this method returns null.
      */
-    public Dispatch getDispatch(String contextPath, String path) {
+    public Dispatch getDispatch(String path) {
         if(path.endsWith(".jsp")) {
             logger.debug("Path is a JSP page ({}), not dispatching.", path);
             return null;
@@ -102,7 +101,7 @@ public class Dispatcher {
             PageInstance rootPageInstance = new PageInstance(null, rootDir, rootPage, null);
             pagePath.add(rootPageInstance);
 
-            dispatch = getDispatch(contextPath, path, pagePath, fragmentsIterator);
+            dispatch = getDispatch(pagePath, fragmentsIterator);
             if(dispatch != null) {
                 cache.put(path, dispatch);
             }
@@ -115,7 +114,7 @@ public class Dispatcher {
             List<String> fragmentsAsList = Arrays.asList(fragments);
             ListIterator<String> fragmentsIterator = fragmentsAsList.listIterator();
 
-            dispatch = getDispatch(contextPath, path, pagePath, fragmentsIterator);
+            dispatch = getDispatch(pagePath, fragmentsIterator);
             if(dispatch != null) {
                 cache.put(path, dispatch);
             }
@@ -124,7 +123,7 @@ public class Dispatcher {
     }
 
     protected Dispatch getDispatch(
-            String contextPath, String path, List<PageInstance> initialPath,
+            List<PageInstance> initialPath,
             ListIterator<String> fragmentsIterator) {
         try {
             makePageInstancePath(initialPath, fragmentsIterator);
@@ -150,7 +149,7 @@ public class Dispatcher {
                 new PageInstance[initialPath.size()];
         initialPath.toArray(pageArray);
 
-        Dispatch dispatch = new Dispatch(contextPath, path, pageArray);
+        Dispatch dispatch = new Dispatch(pageArray);
         return dispatch;
         //return checkDispatch(dispatch);
     }
@@ -194,12 +193,6 @@ public class Dispatcher {
                 pagePath.set(pagePath.size() - 1, parentPageInstance);
             }
         }
-    }
-
-    protected Dispatch checkDispatch(Dispatch dispatch) {
-        String pathUrl = dispatch.getLastPageInstance().getPath();
-        assert pathUrl.equals(normalizePath(dispatch.getOriginalPath()));
-        return dispatch;
     }
 
     protected static String normalizePath(String originalPath) {

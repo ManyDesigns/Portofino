@@ -39,24 +39,10 @@ public class Dispatch {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    protected final String contextPath;
-    protected final String originalPath;
     protected final PageInstance[] pageInstancePath;
 
-    public Dispatch(String contextPath,
-                    String originalPath,
-                    PageInstance... pageInstancePath) {
-        this.contextPath = contextPath;
-        this.originalPath = originalPath;
+    public Dispatch(PageInstance... pageInstancePath) {
         this.pageInstancePath = pageInstancePath;
-    }
-
-    /**
-     * Returns the context path.
-     * @see javax.servlet.http.HttpServletRequest#getContextPath()
-     */
-    public String getContextPath() {
-        return contextPath;
     }
 
     /**
@@ -88,25 +74,6 @@ public class Dispatch {
         return pageInstancePath[pageInstancePath.length - 1];
     }
 
-    /**
-     * Returns the path that was requested to the web server to generate this dispatch. The path is internal to
-     * the web application, it does not include the context path.
-     */
-    public String getOriginalPath() {
-        return originalPath;
-    }
-
-    /**
-     * Returns the path that was requested to the web server to generate this dispatch, including the context path.
-     */
-    public String getAbsoluteOriginalPath() {
-        if ("/".equals(contextPath)) {
-            return getOriginalPath();
-        } else {
-            return contextPath + getOriginalPath();
-        }
-    }
-
     public PageInstance getPageInstance(int index) {
         if(index >= 0) {
             return getPageInstancePath()[index];
@@ -129,9 +96,4 @@ public class Dispatch {
         return getLastPageInstance().getActionClass();
     }
 
-    @Override
-    public String toString() {
-        return "#<Dispatch contextPath='" + contextPath + "', originalPath='" + originalPath +
-               "', parameters=" + getLastPageInstance().getParameters() + ">";
-    }
 }

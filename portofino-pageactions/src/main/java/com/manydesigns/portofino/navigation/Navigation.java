@@ -75,14 +75,13 @@ public class Navigation {
     }
 
     private void buildTree() {
-        String contextPath = dispatch.getContextPath();
         int rootPageIndex = dispatch.getClosestSubtreeRootIndex();
         PageInstance[] pageInstances = dispatch.getPageInstancePath(rootPageIndex);
         if (pageInstances == null || pageInstances.length == 0) {
             return;
         }
         PageInstance rootPageInstance = pageInstances[0];
-        String prefix = contextPath;
+        String prefix = "";
         if(rootPageIndex > 0) {
             prefix += rootPageInstance.getParent().getPath() + "/" + rootPageInstance.getName();
         }

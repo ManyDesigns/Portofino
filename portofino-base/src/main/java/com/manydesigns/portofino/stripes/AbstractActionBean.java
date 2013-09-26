@@ -46,8 +46,4 @@ public abstract class AbstractActionBean implements ActionBean {
         return context;
     }
 
-    @Deprecated
-    public String getOriginalPath() {
-        return context.getActualServletPath();
-    }
 }

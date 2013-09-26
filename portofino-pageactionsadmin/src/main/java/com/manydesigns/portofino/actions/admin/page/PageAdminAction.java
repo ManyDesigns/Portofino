@@ -113,8 +113,7 @@ public class PageAdminAction extends AbstractPageAction {
     @Before
     public Resolution prepare() {
         Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
-        String contextPath = context.getRequest().getContextPath();
-        dispatch = dispatcher.getDispatch(contextPath, originalPath);
+        dispatch = dispatcher.getDispatch(originalPath);
         pageInstance = dispatch.getLastPageInstance();
 
         if(!SecurityLogic.hasPermissions(
@@ -135,7 +134,7 @@ public class PageAdminAction extends AbstractPageAction {
         @Button(list = "page-create", key = "commons.cancel", order = 99)
     })
     public Resolution cancel() {
-        return new RedirectResolution(dispatch.getOriginalPath());
+        return new RedirectResolution(originalPath);
     }
 
     public Resolution updateLayout() {
@@ -154,7 +153,7 @@ public class PageAdminAction extends AbstractPageAction {
                 }
             }
         }
-        return new RedirectResolution(dispatch.getOriginalPath());
+        return new RedirectResolution(originalPath);
     }
 
     protected void updateLayout(String layoutContainer, String[] embeddedPageActionWrapperIds) throws Exception {
@@ -266,7 +265,7 @@ public class PageAdminAction extends AbstractPageAction {
                     parentLayout = parentPageInstance.getLayout();
                     parentDirectory = parentPageInstance.getDirectory();
                     directory = parentPageInstance.getChildPageDirectory(fragment);
-                    configurePath = dispatch.getOriginalPath();
+                    configurePath = originalPath;
                     break;
                 case SIBLING:
                     parentPageInstance = dispatch.getPageInstance(-2);
@@ -354,11 +353,11 @@ public class PageAdminAction extends AbstractPageAction {
             Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
             String contextPath = context.getRequest().getContextPath();
             String landingPagePath = portofinoConfiguration.getString(PortofinoProperties.LANDING_PAGE);
-            Dispatch landingPageDispatch = dispatcher.getDispatch(contextPath, landingPagePath);
+            Dispatch landingPageDispatch = dispatcher.getDispatch(landingPagePath);
             if(landingPageDispatch != null &&
                landingPageDispatch.getLastPageInstance().getDirectory().equals(pageInstance.getDirectory())) {
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.delete.forbidden.landing"));
-                return new RedirectResolution(dispatch.getOriginalPath());
+                return new RedirectResolution(originalPath);
             }
             try {
                 String pageName = pageInstance.getName();
@@ -378,7 +377,7 @@ public class PageAdminAction extends AbstractPageAction {
             }
             return new RedirectResolution(StringUtils.defaultIfEmpty(parentPageInstance.getPath(), "/"));
         }
-        return new RedirectResolution(dispatch.getOriginalPath());
+        return new RedirectResolution(originalPath);
     }
 
     public Page getPage() {
@@ -401,7 +400,7 @@ public class PageAdminAction extends AbstractPageAction {
             if(!field.getErrors().isEmpty()) {
                 SessionMessages.addErrorMessage(field.getLabel() + ": " + field.getErrors().get(0));
             }
-            return new RedirectResolution(dispatch.getOriginalPath());
+            return new RedirectResolution(originalPath);
         }
     }
 
@@ -421,31 +420,31 @@ public class PageAdminAction extends AbstractPageAction {
             if(!field.getErrors().isEmpty()) {
                 SessionMessages.addErrorMessage(field.getLabel() + ": " + field.getErrors().get(0));
             }
-            return new RedirectResolution(dispatch.getOriginalPath());
+            return new RedirectResolution(originalPath);
         }
     }
 
     protected Resolution copyPage(String destinationPagePath, String newName, boolean deleteOriginal) {
         if(StringUtils.isEmpty(destinationPagePath)) {
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.copyOrMove.noDestination"));
-            return new RedirectResolution(dispatch.getOriginalPath());
+            return new RedirectResolution(originalPath);
         }
         PageInstance pageInstance = getPageInstance();
         PageInstance oldParent = pageInstance.getParent();
         if(oldParent == null) {
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.copyOrMove.forbidden.root"));
-            return new RedirectResolution(dispatch.getOriginalPath());
+            return new RedirectResolution(originalPath);
         }
         if(deleteOriginal) {
             logger.debug("Checking if we've been asked to move the landing page...");
             Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
             String contextPath = context.getRequest().getContextPath();
             String landingPagePath = portofinoConfiguration.getString(PortofinoProperties.LANDING_PAGE);
-            Dispatch landingPageDispatch = dispatcher.getDispatch(contextPath, landingPagePath);
+            Dispatch landingPageDispatch = dispatcher.getDispatch(landingPagePath);
             if(landingPageDispatch != null &&
                landingPageDispatch.getLastPageInstance().getDirectory().equals(pageInstance.getDirectory())) {
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.move.forbidden.landing"));
-                return new RedirectResolution(dispatch.getOriginalPath());
+                return new RedirectResolution(originalPath);
             }
         }
 
@@ -459,8 +458,7 @@ public class PageAdminAction extends AbstractPageAction {
             }
         } else {
             Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
-            Dispatch destinationDispatch =
-                    dispatcher.getDispatch(context.getRequest().getContextPath(), destinationPagePath);
+            Dispatch destinationDispatch = dispatcher.getDispatch(destinationPagePath);
             //TODO gestione eccezioni
             newParent = destinationDispatch.getLastPageInstance();
         }
@@ -474,7 +472,7 @@ public class PageAdminAction extends AbstractPageAction {
         Subject subject = SecurityUtils.getSubject();
         if(!SecurityLogic.hasPermissions(portofinoConfiguration, newParent, subject, AccessLevel.EDIT)) {
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.copyOrMove.forbidden.accessLevel"));
-            return new RedirectResolution(dispatch.getOriginalPath());
+            return new RedirectResolution(originalPath);
         }
 
         if(newParent != null) { //TODO vedi sopra
@@ -531,7 +529,7 @@ public class PageAdminAction extends AbstractPageAction {
             } else {
                 String msg = ElementsThreadLocals.getText("page.copyOrMove.destinationExists", newDirectory.getAbsolutePath());
                 SessionMessages.addErrorMessage(msg);
-                return new RedirectResolution(dispatch.getOriginalPath());
+                return new RedirectResolution(originalPath);
             }
             if(newParent.getParameters().isEmpty()) {
                 return new RedirectResolution(
@@ -544,7 +542,7 @@ public class PageAdminAction extends AbstractPageAction {
         } else {
             String msg = ElementsThreadLocals.getText("page.copyOrMove.invalidDestination", destinationPagePath);
             SessionMessages.addErrorMessage(msg);
-            return new RedirectResolution(dispatch.getOriginalPath());
+            return new RedirectResolution(originalPath);
         }
     }
 
@@ -897,12 +895,12 @@ public class PageAdminAction extends AbstractPageAction {
             updatePagePermissions(getPageInstance());
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("permissions.page.updated"));
             return new RedirectResolution(HttpUtil.getRequestedPath(context.getRequest()))
-                    .addParameter("pagePermissions").addParameter("originalPath", dispatch.getOriginalPath());
+                    .addParameter("pagePermissions").addParameter("originalPath", originalPath);
         } catch (Exception e) {
             logger.error("Couldn't update page permissions", e);
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("permissions.page.notUpdated"));
             return new RedirectResolution(HttpUtil.getRequestedPath(context.getRequest()))
-                    .addParameter("pagePermissions").addParameter("originalPath", dispatch.getOriginalPath());
+                    .addParameter("pagePermissions").addParameter("originalPath", originalPath);
         }
     }
 
@@ -1060,7 +1058,7 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     public String getCancelReturnUrl() {
-        return dispatch.getAbsoluteOriginalPath();
+        return context.getRequest().getContextPath() + originalPath;
     }
 
 }

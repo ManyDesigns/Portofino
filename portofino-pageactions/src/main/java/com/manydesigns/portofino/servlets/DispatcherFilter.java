@@ -56,36 +56,8 @@ public class DispatcherFilter implements Filter {
     ) throws IOException, ServletException {
         // cast to http type
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        //Application application = (Application) request.getAttribute(RequestAttributes.APPLICATION);
-
         logger.debug("Installing the dispatcher in the http current request");
-        //String oldPath = (String) request.getAttribute(Dispatcher.DISPATCH_PATH);
-        //request.removeAttribute(Dispatcher.DISPATCH_PATH);
         DispatcherUtil.install(httpRequest);
-        //Dispatch dispatch = DispatcherUtil.getDispatch(dispatcher, httpRequest);
-
-        /*if (dispatch == null) {
-            if(oldPath != null) {
-                dispatch = dispatcher.getDispatch(httpRequest.getContextPath(), oldPath);
-            } else {
-                logger.debug("We can't handle this path ({})." +
-                    " Let's do the normal filter chain",
-                    httpRequest.getServletPath());
-                chain.doFilter(request, response);
-                return;
-            }
-        }
-
-        //Map<String, Object> savedAttributes =
-        //        saveAndResetRequestAttributes(request);
-        request.setAttribute(Dispatcher.DISPATCH_PATH, dispatch.getOriginalPath());
-        try {
-            //Handle through the ModelActionResolver
-            chain.doFilter(request, response);
-        } finally {
-            //restoreRequestAttributes(request, savedAttributes);
-            request.setAttribute(Dispatcher.DISPATCH_PATH, oldPath);
-        }*/
         chain.doFilter(request, response);
     }
 

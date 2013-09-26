@@ -29,7 +29,7 @@
             } else {
                 %>
                     <a class="breadcrumb-item"
-                       href="<c:out value='${current.href}' />"
+                       href="<c:out value='${pageContext.request.contextPath}${current.href}' />"
                        title="<c:out value='${current.title}' />"
                     ><c:out value='${current.text}' /></a>
                 <%

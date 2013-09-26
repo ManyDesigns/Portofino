@@ -6,7 +6,7 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <p><fmt:message key="page.children.help" /></p>
-<input type="hidden" name="originalPath" value="${actionBean.originalPath}" />
+<input type="hidden" name="originalPath" value="${actionBean.context.actualServletPath}" />
 <div id="directChildren" class="childrenTable">
     <mde:write name="actionBean" property="childPagesForm" />
 </div>

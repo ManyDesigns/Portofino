@@ -30,8 +30,9 @@
 package com.manydesigns.portofino.navigation;
 
 import com.manydesigns.elements.xml.XhtmlBuffer;
-import com.manydesigns.portofino.dispatcher.Dispatch;
-import com.manydesigns.portofino.dispatcher.DispatcherUtil;
+import com.manydesigns.portofino.stripes.AbstractActionBean;
+import net.sourceforge.stripes.action.ActionBean;
+import net.sourceforge.stripes.controller.StripesConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
@@ -49,9 +50,11 @@ public class BaseHrefFix {
 
     public static void fix(HttpServletRequest request, XhtmlBuffer xb) {
         //Setup base href - uniform handling of .../resource and .../resource/
-        Dispatch dispatch = DispatcherUtil.getDispatch(request);
-        if(dispatch != null) {
-            String baseHref = dispatch.getAbsoluteOriginalPath();
+        ActionBean actionBean = (ActionBean) request.getAttribute(StripesConstants.REQ_ATTR_ACTION_BEAN);
+        if(actionBean instanceof AbstractActionBean) {
+            String baseHref =
+                    request.getContextPath() +
+                    ((AbstractActionBean) actionBean).getContext().getActualServletPath();
             //Remove all trailing slashes
             while (baseHref.length() > 1 && baseHref.endsWith("/")) {
                 baseHref = baseHref.substring(0, baseHref.length() - 1);
