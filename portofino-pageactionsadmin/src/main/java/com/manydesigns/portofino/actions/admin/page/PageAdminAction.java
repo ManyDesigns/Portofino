@@ -110,6 +110,11 @@ public class PageAdminAction extends AbstractPageAction {
     protected Form newPageForm;
     protected String title;
 
+    @Override
+    public Resolution preparePage() {
+        return null;
+    }
+
     @Before
     public Resolution prepare() {
         Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());

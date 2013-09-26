@@ -1682,6 +1682,11 @@ public class ApplicationWizard extends AbstractWizardPageAction {
     //Wizard implementation
 
     @Override
+    public Resolution preparePage() {
+        return null;
+    }
+
+    @Override
     public List<Step> getSteps() {
         List<Step> steps = new ArrayList<Step>();
         steps.add(new Step("1", ElementsThreadLocals.getText("appwizard.step1.title")));

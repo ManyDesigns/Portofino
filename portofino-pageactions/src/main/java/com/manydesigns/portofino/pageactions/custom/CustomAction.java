@@ -28,6 +28,7 @@ import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
+import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import org.slf4j.Logger;
@@ -70,12 +71,8 @@ public class CustomAction extends AbstractPageAction {
     }
 
     public Resolution preparePage() {
-        Resolution resolution = super.preparePage();
-        if(resolution != null) {
-            return resolution;
-        }
         if(!pageInstance.getParameters().isEmpty()) {
-            return portletPageNotFound();
+            return new ErrorResolution(404);
         }
         return null;
     }

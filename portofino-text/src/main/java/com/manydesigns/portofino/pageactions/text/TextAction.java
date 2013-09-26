@@ -112,19 +112,14 @@ public class TextAction extends AbstractPageAction {
     //**************************************************************************
 
     public Resolution preparePage() {
-        Resolution resolution = super.preparePage();
-        if(resolution != null) {
-            return resolution;
-        }
         textConfiguration = (TextConfiguration) pageInstance.getConfiguration();
         if(!pageInstance.getParameters().isEmpty()) {
             if(pageInstance.getParameters().size() == 1 &&
-               !isEmbedded() &&
                SecurityLogic.hasPermissions(
                        portofinoConfiguration, pageInstance, SecurityUtils.getSubject(), AccessLevel.EDIT)) {
                 return new ForwardResolution("/m/text/create-page.jsp");
             } else {
-                return portletPageNotFound();
+                return new ErrorResolution(404);
             }
         }
         return null;

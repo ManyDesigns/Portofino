@@ -185,12 +185,12 @@
               export MAVEN_OPTS="-Xmx1024M -XX:MaxPermSize=512m"
               mvn jboss-as:run
             then browse to http://localhost:8080/${build.finalName}
-             -->
             <plugin>
                 <groupId>org.jboss.as.plugins</groupId>
                 <artifactId>jboss-as-maven-plugin</artifactId>
                 <version>7.4.Final</version>
             </plugin>
+            -->
         </plugins>
         <resources>
             <resource>

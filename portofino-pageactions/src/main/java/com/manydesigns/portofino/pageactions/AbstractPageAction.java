@@ -47,11 +47,9 @@ import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import com.manydesigns.portofino.stripes.ModelActionResolver;
 import groovy.lang.GroovyObject;
-import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.controller.StripesConstants;
 import net.sourceforge.stripes.controller.StripesFilter;
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.commons.collections.MultiMap;
@@ -119,7 +117,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     //--------------------------------------------------------------------------
 
     private MultiMap embeddedPageActions;
-    protected boolean embedded;
 
     //--------------------------------------------------------------------------
     // Navigation
@@ -145,21 +142,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     public static final Logger logger =
             LoggerFactory.getLogger(AbstractPageAction.class);
-
-    public boolean isEmbedded() {
-        return embedded;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p><b>The AbstractPageAction specific implementation</b>
-     * detects whether the page is embedded. Subclasses are expected to override and extend
-     * this method.</p>
-     */
-    public Resolution preparePage() {
-        embedded = context.getRequest().getAttribute(StripesConstants.REQ_ATTR_INCLUDE_PATH) != null;
-        return null;
-    }
 
     //--------------------------------------------------------------------------
     // Admin methods
@@ -567,12 +549,4 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return forwardTo("/m/pageactions/portlet-error.jsp");
     }
 
-    protected Resolution portletPageNotFound() {
-        if(isEmbedded()) {
-            context.getRequest().setAttribute(PORTOFINO_PORTLET_EXCEPTION, new Exception());
-            return new ForwardResolution("/m/pageactions/portlet-error-404.jsp");
-        } else {
-            return new ErrorResolution(404);
-        }
-    }
 }

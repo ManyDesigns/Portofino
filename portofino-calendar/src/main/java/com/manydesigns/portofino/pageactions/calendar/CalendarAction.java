@@ -92,10 +92,6 @@ public class CalendarAction extends AbstractPageAction {
     //**************************************************************************
 
     public Resolution preparePage() {
-        Resolution resolution = super.preparePage();
-        if(resolution != null) {
-            return resolution;
-        }
         if(pageInstance.getConfiguration() == null) {
             pageInstance.setConfiguration(new CalendarConfiguration());
         }

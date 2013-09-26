@@ -29,6 +29,7 @@
 
 package com.manydesigns.elements.stripes;
 
+import com.manydesigns.elements.servlet.ServletUtils;
 import net.sourceforge.stripes.action.ActionBeanContext;
 
 import javax.servlet.RequestDispatcher;
@@ -50,14 +51,10 @@ public class ElementsActionBeanContext extends ActionBeanContext {
     public void setRequest(HttpServletRequest request) {
         super.setRequest(request);
         String actualServletPath =
-                (String) getRequest().getAttribute(
+                (String) request.getAttribute(
                         RequestDispatcher.INCLUDE_SERVLET_PATH);
         if (actualServletPath == null) {
-            actualServletPath = getRequest().getRequestURI();
-            String contextPath = getRequest().getContextPath();
-            if(actualServletPath.startsWith(contextPath)) {
-                actualServletPath = actualServletPath.substring(contextPath.length());
-            }
+            actualServletPath = ServletUtils.getPath(request);
         }
         this.actualServletPath = actualServletPath;
     }

@@ -20,7 +20,7 @@
     <stripes:layout-component name="portletBody">
         <stripes:form action="/actions/admin/page" method="post" enctype="multipart/form-data"
                       class="form-horizontal">
-            <input type="hidden" name="originalPath" value="${actionBean.context.actualServletPath}" />
+            <input type="hidden" name="originalPath" value="${actionBean.originalPath}" />
             <mde:write name="actionBean" property="newPageForm"/>
             <fieldset>
                 <legend><fmt:message key="layouts.page-crud.new-page.preview"/></legend>

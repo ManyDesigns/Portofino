@@ -25,7 +25,7 @@
         </style>
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.page.RootPermissionsAction"
                       method="post" enctype="multipart/form-data">
-            <input type="hidden" name="originalPath" value="${actionBean.context.actualServletPath}" />
+            <input type="hidden" name="originalPath" value="${actionBean.originalPath}" />
             <table class="table table-striped">
                 <%
                     PageInstance currentPageInstance = actionBean.getPageInstance();

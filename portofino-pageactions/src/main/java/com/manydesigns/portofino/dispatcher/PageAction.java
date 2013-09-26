@@ -57,12 +57,6 @@ public interface PageAction extends ActionBean {
      */
     void setPageInstance(PageInstance pageInstance);
 
-    /**
-     * Returns whether this page is embedded in its parent.
-     * @return true if the page is embedded, false otherwise.
-     */
-    boolean isEmbedded();
-
     @Override
     ElementsActionBeanContext getContext();
 }

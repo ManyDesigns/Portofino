@@ -52,6 +52,7 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.files.TempFile;
 import com.manydesigns.portofino.files.TempFileService;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
+import com.manydesigns.portofino.pageactions.PageActionLogic;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
@@ -319,7 +320,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             loadObjects();
             setupTableForm(Mode.VIEW);
 
-            if(isEmbedded()) {
+            if(PageActionLogic.isEmbedded(this)) {
                 return getEmbeddedSearchView();
             } else {
                 cancelReturnUrl = new UrlBuilder(
@@ -423,7 +424,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         setupReturnToParentTarget();
 
-        if(isEmbedded()) {
+        if(PageActionLogic.isEmbedded(this)) {
             return getEmbeddedReadView();
         } else {
             return getReadView();
@@ -889,10 +890,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //--------------------------------------------------------------------------
 
     public Resolution preparePage() {
-        Resolution resolution = super.preparePage();
-        if(resolution != null) {
-            return resolution;
-        }
         this.crudConfiguration = (CrudConfiguration) pageInstance.getConfiguration();
 
         if (crudConfiguration == null) {
@@ -909,7 +906,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         List<String> parameters = pageInstance.getParameters();
         if(!parameters.isEmpty()) {
-            pageInstance.setDescription(ShortNameUtils.getName(classAccessor, object));
             String encoding = portofinoConfiguration.getString(PortofinoProperties.URL_ENCODING);
             pk = parameters.toArray(new String[parameters.size()]);
             try {
@@ -1025,7 +1021,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 .configPrefix(searchPrefix)
                 .build();
 
-        if(!isEmbedded()) {
+        if(!PageActionLogic.isEmbedded(this)) {
             logger.debug("Search form not embedded, no risk of clashes - reading parameters from request");
             readSearchFormFromRequest();
         }
@@ -1140,7 +1136,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put("sortProperty", propName);
             parameters.put("sortDirection", sortDirection);
-            if(!isEmbedded()) {
+            if(!PageActionLogic.isEmbedded(this)) {
                 parameters.put(SEARCH_STRING_PARAM, searchString);
             }
             parameters.put(context.getEventName(), "");
@@ -1174,7 +1170,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         parameters.put("sortDirection", getSortDirection());
         parameters.put("firstResult", page * rowsPerPage);
         parameters.put("maxResults", rowsPerPage);
-        if(!isEmbedded()) {
+        if(!PageActionLogic.isEmbedded(this)) {
             parameters.put(AbstractCrudAction.SEARCH_STRING_PARAM, getSearchString());
         }
 
@@ -2701,7 +2697,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public boolean isSearchVisible() {
         //If embedded, search is always closed by default
-        return searchVisible && !isEmbedded();
+        return searchVisible && !PageActionLogic.isEmbedded(this);
     }
 
     public void setSearchVisible(boolean searchVisible) {

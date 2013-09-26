@@ -120,12 +120,8 @@ public class ManyToManyAction extends AbstractPageAction {
     public Persistence persistence;
 
     public Resolution preparePage() {
-        Resolution resolution = super.preparePage();
-        if(resolution != null) {
-            return resolution;
-        }
         if(!pageInstance.getParameters().isEmpty()) {
-            return portletPageNotFound();
+            return new ErrorResolution(404);
         }
         m2mConfiguration = (ManyToManyConfiguration) pageInstance.getConfiguration();
         if(m2mConfiguration != null && m2mConfiguration.getActualRelationDatabase() != null) {

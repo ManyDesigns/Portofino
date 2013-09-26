@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.pageactions;
 
 import com.manydesigns.portofino.dispatcher.PageAction;
+import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
@@ -98,5 +99,19 @@ public class PageActionLogic {
         } else {
             return actionClass.getName();
         }
+    }
+
+    public static boolean isEmbedded(PageAction pageAction) {
+        PageInstance parent = pageAction.getPageInstance().getParent();
+        if(parent == null) {
+            return false; //Root page
+        }
+        PageAction parentActionBean = parent.getActionBean();
+        if(parentActionBean == null) {
+            return false;
+        }
+        String parentPath = parentActionBean.getContext().getActualServletPath();
+        String myPath = pageAction.getContext().getActualServletPath();
+        return !parentPath.equals(myPath);
     }
 }

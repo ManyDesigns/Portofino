@@ -7,14 +7,16 @@
 %><%@ page import="com.manydesigns.portofino.dispatcher.PageInstance"
 %><%@ page import="com.manydesigns.portofino.interceptors.ApplicationInterceptor"
 %><%@ page import="org.slf4j.Logger"
-%><%@ page import="org.slf4j.LoggerFactory" %><%!
+%><%@ page import="org.slf4j.LoggerFactory"
+%><%@ page import="com.manydesigns.portofino.pageactions.PageActionLogic"
+%><%!
     private static Logger logger = LoggerFactory.getLogger("redirect-to-last-working-page.jsp");
 %><%
 
     PageInstance invalidPage =
             (PageInstance) request.getAttribute(ApplicationInterceptor.INVALID_PAGE_INSTANCE);
 
-    if(invalidPage.getActionBean().isEmbedded()) {
+    if(PageActionLogic.isEmbedded(invalidPage.getActionBean())) {
         request.getRequestDispatcher("/m/pageactions/safemode/safemode.jsp").include(request, response);
         return;
     }

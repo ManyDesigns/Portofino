@@ -185,7 +185,7 @@
                     <tr data-tt-id="<%= lastDatabase + "---" + lastSchema + "---" + table.getTableName() %>"
                         data-tt-parent-id="<%= lastDatabase + "---" + lastSchema %>">
                         <td></td>
-                        <td><a href="tables/<%= lastDatabase %>/<%= lastSchema %>/<%= table.getTableName() %>"
+                        <td><a href="<%= lastDatabase %>/<%= lastSchema %>/<%= table.getTableName() %>"
                                 ><%= tableDescr %></a></td>
                     </tr><%
                 } %>

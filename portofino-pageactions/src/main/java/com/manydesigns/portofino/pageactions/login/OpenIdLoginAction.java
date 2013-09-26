@@ -257,8 +257,4 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
         this.pageInstance = pageInstance;
     }
 
-    @Override
-    public boolean isEmbedded() {
-        return false;
-    }
 }

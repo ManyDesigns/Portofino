@@ -107,7 +107,7 @@ public class ApplicationInterceptor implements Interceptor {
                 } catch (Throwable t) {
                     request.setAttribute(INVALID_PAGE_INSTANCE, page);
                     logger.error("PageAction prepare failed for " + page, t);
-                    if(!actionBean.isEmbedded()) {
+                    if(!PageActionLogic.isEmbedded(actionBean)) {
                         String msg = MessageFormat.format
                                 (ElementsThreadLocals.getText("portlet.exception"), ExceptionUtils.getRootCause(t));
                         SessionMessages.addErrorMessage(msg);
