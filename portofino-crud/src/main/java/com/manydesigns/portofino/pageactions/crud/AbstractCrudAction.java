@@ -2231,7 +2231,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             } else {
                 selectionProviderSupport.configureSelectionProvider(
                         key, sp.selectionProvider, sp.displayMode, sp.searchDisplayMode,
-                        sp.createNewHref, sp.createNewText);
+                        StringUtils.trimToNull(sp.createNewHref), sp.createNewText);
             }
         }
     }

@@ -93,6 +93,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
 
     public static final String CONF_FORM_PREFIX = "config";
+    public static final String THEME_TEMPLATES = "/theme/templates/";
 
     //--------------------------------------------------------------------------
     // Properties
@@ -234,16 +235,17 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             return getDefaultPageTemplate();
         }
 
+        template = THEME_TEMPLATES + template;
         try {
             if(context.getServletContext().getResource(template) == null) {
-                logger.warn("Template file {} does not exist, using default", template);
+                logger.warn("Template directory {} does not exist in /theme/templates, using default", template);
                 return getDefaultPageTemplate();
             }
         } catch (MalformedURLException e) {
             logger.error("Malformed template path", e);
             return getDefaultPageTemplate();
         }
-        return "/theme/templates/" + template;
+        return template;
     }
 
     protected String getDefaultPageTemplate() {
@@ -328,8 +330,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         edit.title = page.getTitle();
         edit.description = page.getDescription();
         edit.navigationRoot = page.getActualNavigationRoot();
-        edit.template = getPageTemplate(page.getLayout());
-        edit.detailTemplate = getPageTemplate(page.getDetailLayout());
+        edit.template = getPageTemplate(page.getLayout()).substring(THEME_TEMPLATES.length());
+        edit.detailTemplate = getPageTemplate(page.getDetailLayout()).substring(THEME_TEMPLATES.length());
         pageConfigurationForm.readFromObject(edit);
 
         if(script == null) {
