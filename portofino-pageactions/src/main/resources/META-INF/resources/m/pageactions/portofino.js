@@ -10,7 +10,7 @@ function updateSelectOptions(relName, selectionProviderIndex, methodName) {
     for (var i = 3; i < arguments.length; i++ ) {
         var currentId = arguments[i];
         var current = $(currentId);
-        data[current.attr('name')] = current.attr('value');
+        data[current.attr('name')] = current.val();
     }
 
     var postUrl = stripQueryString(location.href);
@@ -25,7 +25,7 @@ function updateSelectOptions(relName, selectionProviderIndex, methodName) {
             }
 
             var selectField = $(selectFieldId);
-            selectField.empty()
+            selectField.empty();
 
             for (var i = 0; i < options.length; i++) {
                 var option = options[i];
