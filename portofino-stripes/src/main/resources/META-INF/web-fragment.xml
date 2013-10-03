@@ -25,8 +25,8 @@
             <param-value>com.manydesigns.portofino.stripes,com.manydesigns.portofino.interceptors</param-value>
         </init-param>
         <init-param>
-            <param-name>LocalePicker.Locales</param-name>
-            <param-value>en,it</param-value>
+            <param-name>LocalePicker.Class</param-name>
+            <param-value>com.manydesigns.portofino.stripes.LocalePicker</param-value>
         </init-param>
         <init-param>
             <param-name>MultipartWrapper.Class</param-name>
@@ -44,6 +44,17 @@
         <dispatcher>REQUEST</dispatcher>
         <dispatcher>FORWARD</dispatcher>
         <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+
+    <!-- Must be mapped after StripesFilter so it can pick the correct request locale -->
+    <filter>
+        <filter-name>I18nFilter</filter-name>
+        <filter-class>com.manydesigns.portofino.servlets.I18nFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>I18nFilter</filter-name>
+        <url-pattern>/*</url-pattern>
     </filter-mapping>
 
     <filter>

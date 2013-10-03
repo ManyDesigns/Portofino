@@ -9,35 +9,11 @@
     <display-name>ManyDesigns Portofino</display-name>
     <description>ManyDesigns Portofino</description>
 
-    <!-- Quartz configuration -->
-    <!--    <context-param>
-        <param-name>quartz:config-file</param-name>
-        <param-value>/some/path/my_quartz.properties</param-value>
-    </context-param>-->
-    <context-param>
-        <param-name>quartz:shutdown-on-unload</param-name>
-        <param-value>true</param-value>
-    </context-param>
-    <context-param>
-        <param-name>quartz:wait-on-shutdown</param-name>
-        <param-value>true</param-value>
-    </context-param>
-    <context-param>
-        <param-name>quartz:start-scheduler-on-load</param-name>
-        <param-value>true</param-value>
-    </context-param>
-
     <context-param>
         <param-name>LocalePicker.Locales</param-name>
         <param-value>en,it</param-value>
     </context-param>
     
-    <listener>
-        <listener-class>
-            org.quartz.ee.servlet.QuartzInitializerListener
-        </listener-class>
-    </listener>
-
     <session-config>
         <session-timeout>60</session-timeout>
     </session-config>
