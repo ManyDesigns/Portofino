@@ -73,30 +73,6 @@ public class ShiroUtils {
         }
     }
 
-    /**
-     * Clears the cache for a list of principals identifying a user. The cache typically contains authentication and
-     * authorization information.
-     * @param principals the principals associated with a user.
-     */
-    /*public static void clearCache(PrincipalCollection principals) {
-        SecurityManager securityManager = SecurityUtils.getSecurityManager();
-        if(securityManager instanceof RealmSecurityManager) {
-            RealmSecurityManager rsm = (RealmSecurityManager) securityManager;
-            for(Realm realm : rsm.getRealms()) {
-                if(realm instanceof ApplicationRealm) {
-                    ((ApplicationRealm) realm).clearCache(principals);
-                }
-            }
-        }
-    }*/
-
-    /**
-     * Clears the Shiro cache for the current Subject.
-     */
-    /*public static void clearCacheForCurrentSubject() {
-        clearCache(SecurityUtils.getSubject().getPrincipals());
-    }*/
-
     public static PortofinoRealm getPortofinoRealm() {
         RealmSecurityManager realmSecurityManager =
                 (RealmSecurityManager)SecurityUtils.getSecurityManager();

@@ -13,7 +13,9 @@
 <stripes:layout-render name="${actionBean.pageTemplate}/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
     <stripes:layout-component name="sidebar" />
-    <stripes:layout-component name="mainPageActionHeader" />
+    <stripes:layout-component name="mainPageActionHeader">
+        <mde:sessionMessages />
+    </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
         <fmt:message key="layouts.page-crud.new-page.add_new_page"/>
     </stripes:layout-component>

@@ -55,6 +55,8 @@ public class Security extends AbstractPortofinoRealm {
     protected Collection<String> loadAuthorizationInfo(Serializable principal) {
         def groups = []
         if(StringUtils.isEmpty(userGroupTableEntityName) || StringUtils.isEmpty(groupTableEntityName)) {
+            //Groups were not configured with the wizard. Please place here your own authorization logic.
+
             /////////////////////////////////////////////////////////////////
             //NB admin is hardcoded for the wizard to work - remove it in production!
             /////////////////////////////////////////////////////////////////
@@ -66,23 +68,25 @@ public class Security extends AbstractPortofinoRealm {
             }
             /////////////////////////////////////////////////////////////////
         } else {
-            Session session = persistence.getSession(databaseName)
+            //Load groups from the database
+            assert principal instanceof Map;
+            Session session = persistence.getSession(databaseName);
             def queryString = """
                 select distinct g.${groupNameProperty}
                 from ${groupTableEntityName} g, ${userGroupTableEntityName} ug, ${userTableEntityName} u
                 where g.${groupIdProperty} = ug.${groupLinkProperty}
                 and ug.${userLinkProperty} = u.${userIdProperty}
                 and u.${userIdProperty} = :userId
-            """
-            def query = session.createQuery(queryString)
-            query.setParameter("userId", principal[userIdProperty])
-            groups.addAll(query.list())
+            """;
+            def query = session.createQuery(queryString);
+            query.setParameter("userId", principal[userIdProperty]);
+            groups.addAll(query.list());
 
             if(!StringUtils.isEmpty(adminGroupName) && groups.contains(adminGroupName)) {
                 groups.add(getAdministratorsGroup());
             }
         }
-        return groups
+        return groups;
     }
 
     @Override
@@ -95,6 +99,8 @@ public class Security extends AbstractPortofinoRealm {
         String password = new String(usernamePasswordToken.password);
 
         if(StringUtils.isEmpty(userTableEntityName)) {
+            //Users were not configured with the wizard. Please place here your own authentication logic.
+
             /////////////////////////////////////////////////////////////////
             //NB admin is hardcoded for the wizard to work - remove it in production!
             /////////////////////////////////////////////////////////////////
@@ -189,7 +195,7 @@ public class Security extends AbstractPortofinoRealm {
     @Override
     void changePassword(Serializable user, String oldPassword, String newPassword) {
         if(StringUtils.isEmpty(userTableEntityName)) {
-            throw new UnsupportedOperationException("User table is not configured");
+            throw new UnsupportedOperationException("Users table is not configured");
         }
         Session session = persistence.getSession(databaseName);
         def q = session.createQuery("""
@@ -210,10 +216,15 @@ public class Security extends AbstractPortofinoRealm {
     }
 
     String encryptPassword(String password) {
-        return this.$encryptionAlgorithm(password)
+        return this.$encryptionAlgorithm(password);
     }
 
     Map<Serializable, String> getUsers() {
+        if(StringUtils.isEmpty(userTableEntityName)) {
+            //Users were not configured with the wizard.
+            return Collections.emptyMap();
+        }
+
         def users = new LinkedHashMap();
         Session session = persistence.getSession(databaseName);
         Query query = session.createQuery(
@@ -225,6 +236,11 @@ public class Security extends AbstractPortofinoRealm {
     }
 
     Serializable getUserById(String encodedId) {
+        if(StringUtils.isEmpty(userTableEntityName)) {
+            //Users were not configured with the wizard.
+            return encodedId;
+        }
+
         TableAccessor accessor = getUserClassAccessor();
         PkHelper pkHelper = new PkHelper(accessor);
         Serializable id = pkHelper.getPrimaryKey(encodedId);
@@ -234,11 +250,11 @@ public class Security extends AbstractPortofinoRealm {
 
     TableAccessor getUserClassAccessor() {
         Database database =
-        DatabaseLogic.findDatabaseByName(persistence.model, databaseName);
+            DatabaseLogic.findDatabaseByName(persistence.model, databaseName);
         Table table =
-        DatabaseLogic.findTableByEntityName(database, userTableEntityName);
-        def accessor = new TableAccessor(table)
-        return accessor
+            DatabaseLogic.findTableByEntityName(database, userTableEntityName);
+        def accessor = new TableAccessor(table);
+        return accessor;
     }
 
     Serializable getUserByEmail(String email) {
@@ -253,10 +269,16 @@ public class Security extends AbstractPortofinoRealm {
 
     @Override
     String getUserPrettyName(Serializable user) {
+        if(StringUtils.isEmpty(userNameProperty)) {
+            return user.toString();
+        }
         return user[userNameProperty];
     }
 
     Serializable getUserId(Serializable user) {
+        if(StringUtils.isEmpty(userIdProperty)) {
+            return user.toString();
+        }
         return (Serializable) user[userIdProperty];
     }
 
