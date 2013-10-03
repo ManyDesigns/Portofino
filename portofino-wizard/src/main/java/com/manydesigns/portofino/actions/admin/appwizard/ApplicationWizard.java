@@ -56,10 +56,10 @@ import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
+import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
-import com.manydesigns.portofino.pageactions.wizard.AbstractWizardPageAction;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Group;
 import com.manydesigns.portofino.pages.Page;
@@ -98,7 +98,7 @@ import java.util.List;
  */
 @RequiresAdministrator
 @UrlBinding(ApplicationWizard.URL_BINDING)
-public class ApplicationWizard extends AbstractWizardPageAction {
+public class ApplicationWizard extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -1681,12 +1681,29 @@ public class ApplicationWizard extends AbstractWizardPageAction {
 
     //Wizard implementation
 
+    public static class Step {
+        public final String number;
+        public final String title;
+
+        public Step(String number, String title) {
+            this.number = number;
+            this.title = title;
+        }
+
+        public String getNumber() {
+            return number;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+    }
+
     @Override
     public Resolution preparePage() {
         return null;
     }
 
-    @Override
     public List<Step> getSteps() {
         List<Step> steps = new ArrayList<Step>();
         steps.add(new Step("1", ElementsThreadLocals.getText("appwizard.step1.title")));
@@ -1700,7 +1717,6 @@ public class ApplicationWizard extends AbstractWizardPageAction {
         return steps;
     }
 
-    @Override
     public int getCurrentStepIndex() {
         return step;
     }

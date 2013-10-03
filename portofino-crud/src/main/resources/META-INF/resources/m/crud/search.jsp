@@ -36,7 +36,7 @@
             <c:if test="${not empty actionBean.searchString}">
                 <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
             </c:if>
-            <jsp:include page="datatable.jsp" />
+            <jsp:include page="/m/crud/datatable.jsp" />
             <script type="text/javascript">
                 <c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
                 $(function() {

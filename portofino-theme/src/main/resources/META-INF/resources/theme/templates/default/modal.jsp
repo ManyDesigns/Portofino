@@ -7,7 +7,7 @@
     <html lang="en">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.dispatcher.PageAction" />
     <head>
-        <jsp:include page="../../head.jsp"/>
+        <jsp:include page="/m/theme/head.jsp"/>
         <stripes:layout-component name="customScripts"/>
         <title>
             <stripes:layout-component name="pageTitle">
@@ -16,13 +16,13 @@
         </title>
     </head>
     <body>
-    <jsp:include page="../../header.jsp"/>
+    <jsp:include page="/m/theme/header.jsp"/>
     <div class="container">
         <div class="row">
             <div class="span2">
                 <stripes:layout-component name="sidebar">
                     <div id="navigation">
-                        <jsp:include page="../../navigation.jsp" />
+                        <jsp:include page="/m/theme/navigation.jsp" />
                     </div>
                 </stripes:layout-component>
             </div>
@@ -32,7 +32,7 @@
                         <stripes:layout-component name="beforeSessionMessages" />
                         <mde:sessionMessages />
                         <stripes:layout-component name="beforeBreadcrumbs" />
-                        <jsp:include page="../../breadcrumbs.jsp" />
+                        <jsp:include page="/m/theme/breadcrumbs.jsp" />
                         <stripes:layout-component name="afterBreadcrumbs" />
                     </stripes:layout-component>
                     <stripes:layout-component name="mainPageActionBody">
@@ -54,7 +54,7 @@
             </div>
         </div>
     </div>
-    <jsp:include page="../../footer.jsp"/>
+    <jsp:include page="/m/theme/footer.jsp"/>
     </body>
     </html>
 </stripes:layout-definition>

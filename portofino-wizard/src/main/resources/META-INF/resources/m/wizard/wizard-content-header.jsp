@@ -5,7 +5,7 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.wizard.AbstractWizardPageAction "/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
 <div class="wizard-header">
     <ul>
     <c:forEach items="${actionBean.steps}" var="step" varStatus="status">

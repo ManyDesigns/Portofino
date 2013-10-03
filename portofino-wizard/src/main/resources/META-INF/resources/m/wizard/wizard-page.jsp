@@ -24,7 +24,7 @@
             </div>
             <div id="content" class="span10">
                 <jsp:useBean id="actionBean" scope="request"
-                             type="com.manydesigns.portofino.pageactions.wizard.AbstractWizardPageAction"/>
+                             type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
                 <stripes:form action="${actionBean.context.actualServletPath}"
                               method="post" enctype="multipart/form-data" class="form-horizontal">
                     <jsp:include page="wizard-content-header.jsp" />

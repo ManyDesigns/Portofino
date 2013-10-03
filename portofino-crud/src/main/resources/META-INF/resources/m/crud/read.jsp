@@ -9,8 +9,8 @@
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"/>
     <stripes:layout-component name="beforeBreadcrumbs">
         <div class="pull-right">
-            <jsp:include page="result-set-navigation.jsp" />
-            <jsp:include page="return-to-parent.jsp" />
+            <jsp:include page="/m/crud/result-set-navigation.jsp" />
+            <jsp:include page="/m/crud/return-to-parent.jsp" />
         </div>
     </stripes:layout-component>
     <stripes:layout-component name="portletTitle">
