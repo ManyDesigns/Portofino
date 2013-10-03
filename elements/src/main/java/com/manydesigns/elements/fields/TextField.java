@@ -47,7 +47,7 @@ public class TextField extends AbstractTextField {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     public final static Pattern linkPattern =
-            Pattern.compile("(http://|www\\.)\\S+", Pattern.CASE_INSENSITIVE);
+            Pattern.compile("(http://|https://|ftp://|www\\.)\\S+", Pattern.CASE_INSENSITIVE);
     public final static Pattern emailPattern =
             Pattern.compile("[a-z0-9\\-_]++(\\.[a-z0-9\\-_]++)*@[a-z0-9\\-_]++" +
                     "(\\.[a-z0-9\\-_]++)++", Pattern.CASE_INSENSITIVE);
@@ -252,12 +252,12 @@ public class TextField extends AbstractTextField {
         StringBuffer sb = new StringBuffer();
         while (linkMatcher.find()) {
             String text = shortenEscaped(linkMatcher.group(0), 22);
-            if (linkMatcher.group(1).equals("http://")) {
-                linkMatcher.appendReplacement(sb, "<a href=\"" + linkMatcher.group(0) +
-                        "\">" + text + "</a>");
-            } else { // vuol dire che inizia con www e nn e' presente http://
+            if (linkMatcher.group(1).equalsIgnoreCase("www.")) {
                 linkMatcher.appendReplacement(sb, "<a href=\"http://" +
                         linkMatcher.group(0) + "\">" + text + "</a>");
+            } else {
+                linkMatcher.appendReplacement(sb, "<a href=\"" + linkMatcher.group(0) +
+                        "\">" + text + "</a>");
             }
             linkTrovato = true;
         }
