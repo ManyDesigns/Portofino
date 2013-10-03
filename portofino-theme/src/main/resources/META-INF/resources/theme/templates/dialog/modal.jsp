@@ -9,7 +9,7 @@
 --%><!doctype html>
     <html lang="en">
     <head>
-        <jsp:include page="/m/theme/head.jsp"/>
+        <jsp:include page="/theme/head.jsp"/>
         <stripes:layout-component name="customScripts"/>
         <title>
             <stripes:layout-component name="pageTitle" />

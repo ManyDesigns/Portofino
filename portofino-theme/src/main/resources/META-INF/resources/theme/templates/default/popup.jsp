@@ -6,7 +6,7 @@
 --%><!DOCTYPE html>
     <html lang="en">
     <head>
-        <jsp:include page="/m/theme/head.jsp"/>
+        <jsp:include page="/theme/head.jsp"/>
         <stripes:layout-component name="customScripts"/>
         <style type="text/css">
             body {
