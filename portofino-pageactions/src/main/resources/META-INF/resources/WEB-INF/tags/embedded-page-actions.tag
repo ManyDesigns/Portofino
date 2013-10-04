@@ -20,7 +20,7 @@
                     <button data-dismiss="alert" class="close" type="button">&times;</button>
                     <ul class="errorMessages">
                         <li>
-                            <fmt:message key="portlet.view.error">
+                            <fmt:message key="pageaction.view.error">
                                 <fmt:param value="${embeddedPageAction.path}" />
                             </fmt:message>
                         </li>

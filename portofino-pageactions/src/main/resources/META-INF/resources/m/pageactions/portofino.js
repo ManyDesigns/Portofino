@@ -226,7 +226,7 @@ var portofino = {
         });
     },
 
-    enablePortletDragAndDrop: function(button, originalPath) {
+    enablePageActionDragAndDrop: function(button, originalPath) {
         $("div.pageActionContainer").sortable({
             connectWith: "div.pageActionContainer",
             placeholder: "pageActionPlaceholder",

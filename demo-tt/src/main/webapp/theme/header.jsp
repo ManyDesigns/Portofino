@@ -104,7 +104,7 @@
                                                subject, AccessLevel.EDIT)) {%>
                             <li class="divider"></li>
                             <li>
-                                <a href="javascript:portofino.enablePortletDragAndDrop($(this), '${actionBean.context.actualServletPath}');">
+                                <a href="javascript:portofino.enablePageActionDragAndDrop($(this), '${actionBean.context.actualServletPath}');">
                                     <i class="icon-file"></i> Edit layout
                                 </a>
                             </li>

@@ -11,7 +11,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <div>
-            <fmt:message key="layouts.portletNotConfigured" />
+            <fmt:message key="layouts.pageactionNotConfigured" />
         </div>
     </stripes:layout-component>
 </stripes:layout-render>
