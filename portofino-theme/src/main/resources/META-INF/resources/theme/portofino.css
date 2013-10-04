@@ -151,7 +151,7 @@ fieldset.radio {
 }
 
 label.control-label:after {
-    content: ": ";
+    content: ":";
 }
 
 .control-group.readwrite.required label.control-label:before {
