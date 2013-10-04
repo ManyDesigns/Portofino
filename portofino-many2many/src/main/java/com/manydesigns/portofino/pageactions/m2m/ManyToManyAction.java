@@ -235,16 +235,16 @@ public class ManyToManyAction extends AbstractPageAction {
     @DefaultHandler
     public Resolution execute() {
         if(!correctlyConfigured) {
-            return forwardToPortletNotConfigured();
+            return forwardToPageActionNotConfigured();
         }
         if(onePk != null) {
             try {
                 loadAssociations();
                 if(potentiallyAvailableAssociations == null && onePk != null) {
-                    return forwardToPortletNotConfigured(); //TODO
+                    return forwardToPageActionNotConfigured(); //TODO
                 }
             } catch (NoSuchFieldException e) {
-                return forwardToPortletNotConfigured();
+                return forwardToPageActionNotConfigured();
             }
         }
         return view();
@@ -262,7 +262,7 @@ public class ManyToManyAction extends AbstractPageAction {
                 }
                 return forwardTo("/m/many2many/checkboxes.jsp");
             default:
-                return forwardToPortletNotConfigured();
+                return forwardToPageActionNotConfigured();
         }
     }
 
@@ -325,7 +325,7 @@ public class ManyToManyAction extends AbstractPageAction {
     @RequiresPermissions(permissions = ManyToManyAction.PERMISSION_UPDATE)
     public Resolution saveCheckboxes() throws Exception {
         if(!correctlyConfigured) {
-            return forwardToPortletNotConfigured();
+            return forwardToPageActionNotConfigured();
         }
         try {
             loadAssociations();

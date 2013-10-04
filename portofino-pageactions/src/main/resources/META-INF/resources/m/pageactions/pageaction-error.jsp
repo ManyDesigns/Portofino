@@ -12,7 +12,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
         <%
-            Object exception = request.getAttribute(AbstractPageAction.PORTOFINO_PORTLET_EXCEPTION);
+            Object exception = request.getAttribute(AbstractPageAction.PORTOFINO_PAGEACTION_EXCEPTION);
             if(exception instanceof Throwable) {
                 Throwable rootCause = ExceptionUtils.getRootCause((Throwable) exception);
                 if(rootCause == null) {
@@ -27,7 +27,7 @@
             <button data-dismiss="alert" class="close" type="button">&times;</button>
             <ul class="errorMessages">
                 <li>
-                    <fmt:message key="portlet.exception">
+                    <fmt:message key="pageaction.exception">
                         <fmt:param value="${exceptionString}" />
                     </fmt:message>
                 </li>

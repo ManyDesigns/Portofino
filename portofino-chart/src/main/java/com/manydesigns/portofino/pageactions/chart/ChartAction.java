@@ -120,7 +120,7 @@ public class ChartAction extends AbstractPageAction {
     @DefaultHandler
     public Resolution execute() {
         if(chartConfiguration == null) {
-            return forwardToPortletNotConfigured();
+            return forwardToPageActionNotConfigured();
         }
 
         try {
@@ -139,16 +139,16 @@ public class ChartAction extends AbstractPageAction {
                     new UrlBuilder(context.getLocale(), actionurl, false)
                             .addParameter("chartId", chartId)
                             .addParameter("chart", "");
-            String portletUrl = context.getRequest().getContextPath() + chartResolution.toString();
+            String url = context.getRequest().getContextPath() + chartResolution.toString();
 
             file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
 
             jfreeChartInstance =
                     new JFreeChartInstance(chart, file, chartId, "alt", //TODO
-                                           width, height, portletUrl);
+                                           width, height, url);
         } catch (Throwable e) {
-            logger.error("Portlet exception", e);
-            return forwardToPortletError(e);
+            logger.error("Chart exception", e);
+            return forwardToPageActionError(e);
         }
 
         return forwardTo("/m/chart/chart.jsp");

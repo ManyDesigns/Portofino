@@ -308,7 +308,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected Resolution doSearch() {
         if(!isConfigured()) {
             logger.debug("Crud not correctly configured");
-            return forwardToPortletNotConfigured();
+            return forwardToPageActionNotConfigured();
         }
 
         try {
@@ -332,7 +332,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }
         } catch(Exception e) {
             logger.warn("Crud not correctly configured", e);
-            return forwardToPortletNotConfigured();
+            return forwardToPageActionNotConfigured();
         }
     }
 

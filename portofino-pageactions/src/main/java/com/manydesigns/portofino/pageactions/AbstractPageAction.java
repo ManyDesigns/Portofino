@@ -90,7 +90,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             {{"id", "title", "description", "navigationRoot", "template", "detailTemplate", "applyTemplateRecursively"}};
     public static final String[][] PAGE_CONFIGURATION_FIELDS_NO_DETAIL =
             {{"id", "title", "description", "navigationRoot", "template", "applyTemplateRecursively"}};
-    public static final String PORTOFINO_PORTLET_EXCEPTION = "portofino.portlet.exception";
+    public static final String PORTOFINO_PAGEACTION_EXCEPTION = "portofino.pageaction.exception";
 
     public static final String CONF_FORM_PREFIX = "config";
     public static final String THEME_TEMPLATES = "/theme/templates/";
@@ -538,17 +538,27 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
      * Returns a ForwardResolution to a standard page with an error message saying that the pageaction is not properly
      * configured.
      */
+    public Resolution forwardToPageActionNotConfigured() {
+        return new ForwardResolution("/m/pageactions/pageaction-not-configured.jsp");
+    }
+
+    @Deprecated
     public Resolution forwardToPortletNotConfigured() {
-        return new ForwardResolution("/m/pageactions/portlet-not-configured.jsp");
+        return forwardToPageActionNotConfigured();
     }
 
     /**
      * Returns a ForwardResolution to a standard page that reports an exception with an error message saying that
      * the pageaction is not properly configured.
      */
+    public Resolution forwardToPageActionError(Throwable e) {
+        context.getRequest().setAttribute(PORTOFINO_PAGEACTION_EXCEPTION, e);
+        return forwardTo("/m/pageactions/pageaction-error.jsp");
+    }
+
+    @Deprecated
     public Resolution forwardToPortletError(Throwable e) {
-        context.getRequest().setAttribute(PORTOFINO_PORTLET_EXCEPTION, e);
-        return forwardTo("/m/pageactions/portlet-error.jsp");
+        return forwardToPageActionError(e);
     }
 
 }
