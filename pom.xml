@@ -3,6 +3,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
     <groupId>com.manydesigns</groupId>
     <artifactId>portofino</artifactId>
     <packaging>pom</packaging>
@@ -50,6 +55,24 @@
         <developerConnection>scm:hg:https://hg.code.sf.net/p/portofino/mercurial</developerConnection>
         <url>http://sourceforge.net/p/portofino/mercurial/</url>
     </scm>
+    <developers>
+        <developer>
+            <name>Paolo Predonzani</name>
+            <email>paolo.predonzani@manydesigns.com</email>
+        </developer>
+        <developer>
+            <name>Angelo Lupo</name>
+            <email>angelo.lupo@manydesigns.com</email>
+        </developer>
+        <developer>
+            <name>Giampiero Granatella</name>
+            <email>giampiero.granatella@manydesigns.com</email>
+        </developer>
+        <developer>
+            <name>Alessio Stalla</name>
+            <email>alessio.stalla@manydesigns.com</email>
+        </developer>
+    </developers>
     <properties>
         <javaee-web-api.version>6.0</javaee-web-api.version>
         <jstl.version>1.1.2</jstl.version>
