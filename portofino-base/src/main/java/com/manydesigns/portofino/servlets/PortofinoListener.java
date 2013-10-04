@@ -24,6 +24,7 @@ import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.modules.ApplicationListener;
@@ -202,6 +203,7 @@ public class PortofinoListener
 
         logger.info("Invoking application listeners...");
         for(ApplicationListener listener : applicationListeners) {
+            Injections.inject(listener, servletContext, null);
             listener.applicationStarting();
         }
 

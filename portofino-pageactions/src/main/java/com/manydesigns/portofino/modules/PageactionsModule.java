@@ -25,25 +25,21 @@ import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.SettingsAction;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
-import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.files.TempFileService;
-import com.manydesigns.portofino.logic.SecurityLogic;
-import com.manydesigns.portofino.menu.*;
+import com.manydesigns.portofino.menu.MenuBuilder;
+import com.manydesigns.portofino.menu.SimpleMenuAppender;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.pageactions.login.DefaultLoginAction;
 import com.manydesigns.portofino.pageactions.login.OpenIdLoginAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
-import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
 import groovy.util.GroovyScriptEngine;
 import net.sf.ehcache.CacheManager;
 import ognl.OgnlRuntime;
 import org.apache.commons.configuration.Configuration;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.web.env.EnvironmentLoader;
@@ -53,7 +49,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -195,8 +190,7 @@ public class PageactionsModule implements Module {
                 if(listener instanceof ApplicationListener) {
                     ApplicationListener applicationListener = (ApplicationListener) listener;
                     logger.info("Groovy application listener found at {}", appListenerFile.getAbsolutePath());
-                    Injections.inject(applicationListener, servletContext, null);
-                    applicationListeners.add((ApplicationListener) listener);
+                    applicationListeners.add(applicationListener);
                 } else {
                     logger.error(
                             "Candidate app listener " + listener + " found at " + appListenerFile.getAbsolutePath() +
@@ -253,30 +247,6 @@ public class PageactionsModule implements Module {
         }
         scriptEngine.setConfig(cc);
         return scriptEngine;
-    }
-
-    public abstract class PageMenuAppender implements MenuAppender {
-        @Override
-        public void append(Menu menu) {
-            for(MenuItem item : menu.items) {
-                if("page".equals(item.id) && item instanceof MenuGroup) {
-                    HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
-                    if(!(request.getAttribute("actionBean") instanceof PageAction)) {
-                        return;
-                    }
-                    PageAction pageAction = (PageAction) request.getAttribute("actionBean");
-                    if(pageAction.getPageInstance() != null &&
-                       SecurityLogic.hasPermissions(
-                               configuration, pageAction.getPageInstance(),
-                               SecurityUtils.getSubject(), AccessLevel.EDIT)) {
-                        append((MenuGroup) item, pageAction);
-                    }
-                    break;
-                }
-            }
-        }
-
-        protected abstract void append(MenuGroup pageMenu, PageAction pageAction);
     }
 
     @Override
