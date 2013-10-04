@@ -406,7 +406,7 @@ $(function() {
         $(this).closest("form").data("dirty", true);
     });
 
-    $(window).on("beforeunload", function() {
+    window.onbeforeunload = function() {
         var dirty = false;
         $("form:not(.dont-prompt-on-page-abandon)").each(function(index, form) {
             if($(form).data("dirty")) {
@@ -414,5 +414,5 @@ $(function() {
             }
         });
         return dirty ? "Are you sure you want to leave the page? Unsaved data will be lost." : null; //TODO I18n
-    });
+    };
 });
