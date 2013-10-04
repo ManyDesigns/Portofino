@@ -40,7 +40,7 @@
             <script type="text/javascript">
                 <c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
                 $(function() {
-                    $("#portlet_${pageId} .search_form_toggle_link").click(makeToggleFunction());
+                    $("#pageaction_${pageId} .search_form_toggle_link").click(makeToggleFunction());
                     function makeToggleFunction() {
                         var visible = ${actionBean.searchVisible};
                         return function(event) {

@@ -1,5 +1,5 @@
 <stripes:layout-component name="mainPageActionBody">
-    <div id="portlet_${actionBean.pageInstance.page.id}">
+    <div id="pageaction_${actionBean.pageInstance.page.id}">
         <stripes:layout-component name="portletHeader">
             <div class="portletHeader">
                 <stripes:form action="${actionBean.context.actualServletPath}" method="post">

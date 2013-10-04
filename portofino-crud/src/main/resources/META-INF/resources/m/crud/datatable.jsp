@@ -30,7 +30,7 @@
     <input type="hidden" name="eventName" value="${actionBean.context.eventName}" />
     <script type="text/javascript">
         $(function() {
-            $("#portlet_${pageId} button[name=bulkDelete]").click(function() {
+            $("#pageaction_${pageId} button[name=bulkDelete]").click(function() {
                 return confirm ('<fmt:message key="commons.confirm" />');
             });
         });

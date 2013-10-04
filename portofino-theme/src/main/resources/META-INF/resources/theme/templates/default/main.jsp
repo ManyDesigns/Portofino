@@ -27,12 +27,13 @@
                     <stripes:layout-component name="mainPageActionHeader">
                         <stripes:layout-component name="beforeSessionMessages" />
                         <mde:sessionMessages />
+                        <stripes:layout-component name="afterSessionMessages" />
                         <stripes:layout-component name="beforeBreadcrumbs" />
                         <jsp:include page="/theme/breadcrumbs.jsp" />
                         <stripes:layout-component name="afterBreadcrumbs" />
                     </stripes:layout-component>
                     <stripes:layout-component name="mainPageActionBody">
-                        <div id="portlet_${actionBean.pageInstance.page.id}">
+                        <div id="pageaction_${actionBean.pageInstance.page.id}">
                             <stripes:layout-component name="portletHeader">
                                 <div class="portletHeader" style="padding-bottom: 0;">
                                     <stripes:form action="${actionBean.context.actualServletPath}" method="post">
