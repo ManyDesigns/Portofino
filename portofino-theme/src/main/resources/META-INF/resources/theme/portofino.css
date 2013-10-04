@@ -273,7 +273,7 @@ PageActions
     clear: left;
 }
 
-.pageActionPlaceholder {
+.embeddedPageActionPlaceholder {
     border: 1px solid #fcefa1;
     background: #fbf9ee;
     color: #363636;

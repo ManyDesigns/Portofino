@@ -6,7 +6,7 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
-<div class="${cssClass} pageActionContainer">
+<div class="${cssClass} embeddedPageAction">
     <input type="hidden" name="embeddedPageActionWrapperName_${list}" value="embeddedPageActionWrapper_${list}" />
     <% actionBean.initEmbeddedPageActions(); %>
     <c:forEach var="embeddedPageAction" items="${ actionBean.embeddedPageActions[list] }">
