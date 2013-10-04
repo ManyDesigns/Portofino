@@ -27,11 +27,6 @@
         <param-value>true</param-value>
     </context-param>
 
-    <context-param>
-        <param-name>LocalePicker.Locales</param-name>
-        <param-value>en,it</param-value>
-    </context-param>
-
     <listener>
         <listener-class>
             org.quartz.ee.servlet.QuartzInitializerListener

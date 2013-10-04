@@ -8,6 +8,31 @@
         <after><others /></after>
     </ordering>
 
+    <context-param>
+        <param-name>ActionResolver.Packages</param-name>
+        <param-value>com.manydesigns.portofino.actions</param-value>
+    </context-param>
+    <context-param>
+        <param-name>Extension.Packages</param-name>
+        <param-value>com.manydesigns.portofino.stripes,com.manydesigns.portofino.interceptors</param-value>
+    </context-param>
+    <context-param>
+        <param-name>LocalePicker.Class</param-name>
+        <param-value>com.manydesigns.portofino.stripes.LocalePicker</param-value>
+    </context-param>
+    <context-param>
+        <param-name>LocalePicker.Locales</param-name>
+        <param-value>en,it</param-value>
+    </context-param>
+    <context-param>
+        <param-name>MultipartWrapper.Class</param-name>
+        <param-value>com.manydesigns.portofino.stripes.StreamingCommonsMultipartWrapper</param-value>
+    </context-param>
+    <context-param>
+        <param-name>ActionBeanContext.Class</param-name>
+        <param-value>com.manydesigns.elements.stripes.ElementsActionBeanContext</param-value>
+    </context-param>
+
     <!-- Stripes -->
     <filter>
         <description>Stripes Filter</description>
@@ -16,26 +41,6 @@
         <filter-class>
             net.sourceforge.stripes.controller.StripesFilter
         </filter-class>
-        <init-param>
-            <param-name>ActionResolver.Packages</param-name>
-            <param-value>com.manydesigns.portofino.actions</param-value>
-        </init-param>
-        <init-param>
-            <param-name>Extension.Packages</param-name>
-            <param-value>com.manydesigns.portofino.stripes,com.manydesigns.portofino.interceptors</param-value>
-        </init-param>
-        <init-param>
-            <param-name>LocalePicker.Class</param-name>
-            <param-value>com.manydesigns.portofino.stripes.LocalePicker</param-value>
-        </init-param>
-        <init-param>
-            <param-name>MultipartWrapper.Class</param-name>
-            <param-value>com.manydesigns.portofino.stripes.StreamingCommonsMultipartWrapper</param-value>
-        </init-param>
-        <init-param>
-            <param-name>ActionBeanContext.Class</param-name>
-            <param-value>com.manydesigns.elements.stripes.ElementsActionBeanContext</param-value>
-        </init-param>
     </filter>
 
     <filter-mapping>
