@@ -32,8 +32,8 @@
                     </div>
                 </stripes:layout-component>
                 <div class="dialogFooter">
-                    <hr />
                     <stripes:layout-component name="mainPageActionFooter">
+                        <hr />
                         <jsp:useBean id="portofinoConfiguration" scope="application"
                                      type="org.apache.commons.configuration.Configuration"/>
                         Powered by <a href="http://www.manydesigns.com/">Portofino</a>
