@@ -212,7 +212,7 @@
                         <link>http://shiro.apache.org/static/1.2.2/apidocs/</link>
                         <link>http://stripes.sourceforge.net/docs/current/javadoc/</link>
                         <link>http://commons.apache.org/configuration/apidocs/</link>
-                        <link>http://docs.jboss.org/hibernate/orm/3.5/api/</link>
+                        <link>http://docs.jboss.org/hibernate/core/3.6/javadocs/</link>
                     </links>
                 </configuration>
                 <executions>
