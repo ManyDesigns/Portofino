@@ -237,21 +237,16 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
+                    <artifactId>maven-release-plugin</artifactId>
                     <version>2.4</version>
                     <configuration>
-                        <archive>
-                            <index>true</index>
-                            <manifest>
-                                <addClasspath>true</addClasspath>
-                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            </manifest>
-                            <manifestEntries>
-                                <mode>development</mode>
-                                <url>${project.url}</url>
-                                <key>value</key>
-                            </manifestEntries>
-                        </archive>
+                        <mavenExecutorId>forked-path</mavenExecutorId>
+                        <useReleaseProfile>false</useReleaseProfile>
+                        <arguments>-Psonatype-oss-release</arguments>
+                        <localCheckout>true</localCheckout>
+                        <pushChanges>false</pushChanges>
+                        <tagNameFormat>@{project.version}</tagNameFormat>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
                     </configuration>
                 </plugin>
             </plugins>
