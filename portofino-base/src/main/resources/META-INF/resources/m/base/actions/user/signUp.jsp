@@ -47,7 +47,8 @@
         <script type="text/javascript">
             $('#signUpForm input:first').focus()
         </script>
-        <div class="spacingWithDividerTop">
+        <div>
+            <hr />
             If you don't receive an email from us within a few minutes,
             please check your spam filter.
             We send you emails from the following address:

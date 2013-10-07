@@ -209,12 +209,6 @@ body.dialog {
     margin-top: 20px;
 }
 
-.spacingWithDividerTop {
-    margin-top: 20px;
-    border-top: 1px solid #ddd;
-    padding-top: 20px;
-}
-
 /*******************************************************************************
 Breadcrumbs
 *******************************************************************************/

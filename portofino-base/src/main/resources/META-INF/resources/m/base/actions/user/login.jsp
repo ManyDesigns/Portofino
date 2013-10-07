@@ -32,7 +32,8 @@
         <%
         try {
             ShiroUtils.getPortofinoRealm();
-        %>  <div class="login-links spacingWithDividerTop">
+        %>  <div class="login-links">
+                <hr />
                 <div class="login-link">
                     <stripes:link href="${actionBean.context.actualServletPath}">
                         <stripes:param name="forgotPassword" value=""/>

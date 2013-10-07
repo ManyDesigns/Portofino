@@ -131,11 +131,11 @@
         <module>portofino-many2many</module>
         <module>portofino-wizard</module>
         <module>portofino-theme</module>
+        <module>portofino-war-archetype</module>
+        <module>portofino-mail</module>
         <module>portofino-war-jee</module>
         <module>portofino-war-gae</module>
-        <module>portofino-mail</module>
         <module>demo-tt</module>
-        <module>portofino-war-archetype</module>
     </modules>
 
     <build>

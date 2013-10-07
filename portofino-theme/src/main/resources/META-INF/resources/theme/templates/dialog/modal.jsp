@@ -31,7 +31,8 @@
                         </div>
                     </div>
                 </stripes:layout-component>
-                <div class="dialogFooter spacingWithDividerTop">
+                <div class="dialogFooter">
+                    <hr />
                     <stripes:layout-component name="mainPageActionFooter">
                         <jsp:useBean id="portofinoConfiguration" scope="application"
                                      type="org.apache.commons.configuration.Configuration"/>
