@@ -1,2 +1,2 @@
 User-agent: *
-Disallow: /actions/user/login
+Disallow: /login
