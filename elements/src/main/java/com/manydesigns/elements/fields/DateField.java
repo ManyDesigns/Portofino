@@ -50,7 +50,7 @@ public class DateField extends AbstractTextField {
     //**************************************************************************
 
     protected final String datePattern;
-    protected final DateTimeFormatter dateTimeFormatter;
+    protected DateTimeFormatter dateTimeFormatter;
     protected final boolean containsTime;
     protected final String jsDatePattern;
 
@@ -226,4 +226,11 @@ public class DateField extends AbstractTextField {
         return datePattern;
     }
 
+    public DateTimeFormatter getDateTimeFormatter() {
+        return dateTimeFormatter;
+    }
+
+    public void setDateTimeFormatter(DateTimeFormatter dateTimeFormatter) {
+        this.dateTimeFormatter = dateTimeFormatter;
+    }
 }
