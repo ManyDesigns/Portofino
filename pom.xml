@@ -54,13 +54,6 @@
         <url>http://sourceforge.net/p/portofino/mercurial/</url>
         <tag>HEAD</tag>
     </scm>
-    <distributionManagement>
-		<repository>
-			<id>sonatype-nexus-staging</id>
-			<name>Nexus Release Repository</name>
-			<url>file:///Users/alessio/prova_repo/</url>
-		</repository>
-	</distributionManagement>
     <developers>
         <developer>
             <name>Paolo Predonzani</name>
