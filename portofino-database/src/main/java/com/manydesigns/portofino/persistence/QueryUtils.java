@@ -633,7 +633,7 @@ public class QueryUtils {
 
     /**
      * Loads an object by primary key.
-     * @param application the application
+     * @param persistence the persistence object
      * @param baseTable the table to query
      * @param pkObject the primary key object.
      * @return the loaded object, or null if an object with that key does not exist.
@@ -645,7 +645,7 @@ public class QueryUtils {
 
     /**
      * Loads an object by primary key. It also verifies that the object falls within the results of a given query.
-     * @param application the application
+     * @param persistence the persistence object
      * @param baseTable the table to load from
      * @param pkObject the primary key object
      * @param query the query (where condition) that the object must fulfill
@@ -660,7 +660,7 @@ public class QueryUtils {
 
     /**
      * Loads an object by primary key. It also verifies that the object falls within the results of a given query.
-     * @param application the application
+     * @param persistence the persistence object
      * @param database the database (connection provider)
      * @param entityName the name of the entity to load
      * @param pk the primary key object
@@ -748,7 +748,7 @@ public class QueryUtils {
 
     /**
      * Cleanly commits the current (for this thread) transaction of the given database.
-     * @param application the application
+     * @param persistence the persistence object
      * @param databaseName the name of the database (connection provider)
      */
     public static void commit(Persistence persistence, String databaseName) {
@@ -763,7 +763,7 @@ public class QueryUtils {
 
     /**
      * Navigates a ...-to-many relationship returning the list of objects associated with a given entity.
-     * @param application the application
+     * @param persistence the persistence object
      * @param databaseName the name of the database (connection provider)
      * @param entityName the type (entity name) of the master object
      * @param obj the master object
