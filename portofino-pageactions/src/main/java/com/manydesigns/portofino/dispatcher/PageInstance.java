@@ -218,7 +218,7 @@ public class PageInstance {
     }
 
     public String getActualDescription() {
-        return description != null ? description : page.getTitle();
+        return description != null ? description : page.getDescription();
     }
 
     public boolean isPrepared() {
