@@ -413,6 +413,8 @@ $(function() {
                 dirty = true;
             }
         });
-        return dirty ? "Are you sure you want to leave the page? Unsaved data will be lost." : null; //TODO I18n
+        if (dirty) {
+            return "Are you sure you want to leave the page? Unsaved data will be lost."; //TODO I18n
+        }
     };
 });
