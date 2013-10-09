@@ -48,6 +48,10 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -317,6 +321,21 @@ public class DispatcherLogic {
 
     public static void clearConfigurationCache() {
         configurationCache.invalidateAll();
+    }
+
+    /**
+     * Clears the cache from entries whose class matches exactly with the one passed as a parameter.
+     * @param configurationClass the class of the entries to remove.
+     */
+    public static void clearConfigurationCache(Class configurationClass) {
+        Set<Map.Entry<File,ConfigurationCacheEntry>> entries = configurationCache.asMap().entrySet();
+        List<File> keysToInvalidate = new ArrayList<File>();
+        for(Map.Entry<File,ConfigurationCacheEntry> entry : entries) {
+            if(entry.getValue().configurationClass == configurationClass) {
+                keysToInvalidate.add(entry.getKey());
+            }
+        }
+        configurationCache.invalidateAll(keysToInvalidate);
     }
 
     protected static File getPageFile(File directory) {
