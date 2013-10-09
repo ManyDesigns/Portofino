@@ -278,7 +278,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
 
     @Button(list = "connectionProviders-search", key = "commons.create", order = 1)
     public Resolution create() {
-        return null; //TODO new RedirectResolution(ApplicationWizard.class);
+        return new RedirectResolution("/actions/admin/wizard");
     }
 
     @Button(list = "connectionProviders-read", key = "commons.edit", order = 2)
