@@ -107,7 +107,7 @@ public class HibernateConfig {
                 .setProperty("hibernate.globally_quoted_identifiers", "false");
         /*configuration.setProperty("hibernate.show_sql",
                 portofinoConfiguration.getString(
-                        PortofinoProperties.HIBERNATE_SHOW_SQL));*/
+                        PortofinoBaseProperties.HIBERNATE_SHOW_SQL));*/
         // mettendo la modalità dynamic map, non funzionano le entità mappate su bean.
         // configuration.setProperty("hibernate.default_entity_mode", "dynamic-map");
     }
@@ -132,19 +132,19 @@ public class HibernateConfig {
 
             /*configuration.setProperty("hibernate.connection.provider_class",
                     portofinoConfiguration.getString(
-                            PortofinoProperties.HIBERNATE_CONNECTION_PROVIDER_CLASS));
+                            PortofinoBaseProperties.HIBERNATE_CONNECTION_PROVIDER_CLASS));
             configuration.setProperty("hibernate.c3p0.min_size",
                     portofinoConfiguration.getString(
-                            PortofinoProperties.HIBERNATE_C3P0_MIN_SIZE));
+                            PortofinoBaseProperties.HIBERNATE_C3P0_MIN_SIZE));
             configuration.setProperty("hibernate.c3p0.max_size",
                     portofinoConfiguration.getString(
-                            PortofinoProperties.HIBERNATE_C3P0_MAX_SIZE));
+                            PortofinoBaseProperties.HIBERNATE_C3P0_MAX_SIZE));
             configuration.setProperty("hibernate.c3p0.timeout",
                     portofinoConfiguration.getString(
-                            PortofinoProperties.HIBERNATE_C3P0_TIMEOUT));
+                            PortofinoBaseProperties.HIBERNATE_C3P0_TIMEOUT));
             configuration.setProperty("hibernate.c3p0.idle_test_period",
                     portofinoConfiguration.getString(
-                            PortofinoProperties.HIBERNATE_C3P0_IDLE_TEST_PERIOD));*/
+                            PortofinoBaseProperties.HIBERNATE_C3P0_IDLE_TEST_PERIOD));*/
         } else if(connectionProvider instanceof JndiConnectionProvider) {
             JndiConnectionProvider jndiConnectionProvider =
                     (JndiConnectionProvider) connectionProvider;

@@ -1,4 +1,4 @@
-<%@ page import="com.manydesigns.portofino.PortofinoProperties"
+<%@ page import="com.manydesigns.portofino.PortofinoBaseProperties"
 %><%@ page import="com.manydesigns.portofino.menu.*"
 %><%@ page import="com.manydesigns.portofino.modules.BaseModule"
 %><%@ page import="net.sourceforge.stripes.controller.ActionResolver"
@@ -27,7 +27,7 @@
             <div class="container">
                 <h4 id="app-title" class="pull-left">
                     <stripes:link href="/">
-                        <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
+                        <c:out value="<%= portofinoConfiguration.getString(PortofinoBaseProperties.APP_NAME) %>"/>
                     </stripes:link>
                 </h4>
             </div>

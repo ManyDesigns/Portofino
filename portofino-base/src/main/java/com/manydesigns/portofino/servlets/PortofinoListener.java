@@ -23,7 +23,7 @@ package com.manydesigns.portofino.servlets;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.configuration.BeanLookup;
-import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.PortofinoBaseProperties;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.menu.MenuBuilder;
@@ -144,8 +144,8 @@ public class PortofinoListener
 
         logger.debug("Setting blobs directory");
         File appBlobsDir;
-        if(configuration.containsKey(PortofinoProperties.BLOBS_DIR_PATH)) {
-            appBlobsDir = new File(configuration.getString(PortofinoProperties.BLOBS_DIR_PATH));
+        if(configuration.containsKey(PortofinoBaseProperties.BLOBS_DIR_PATH)) {
+            appBlobsDir = new File(configuration.getString(PortofinoBaseProperties.BLOBS_DIR_PATH));
         } else {
             File appDir = (File) servletContext.getAttribute(BaseModule.APPLICATION_DIRECTORY);
             appBlobsDir = new File(appDir, "blobs");
@@ -192,7 +192,8 @@ public class PortofinoListener
         moduleRegistry.migrateAndInit(servletContext);
         logger.info("All modules loaded.");
 
-        String encoding = configuration.getString(PortofinoProperties.URL_ENCODING);
+        String encoding = configuration.getString(
+                PortofinoBaseProperties.URL_ENCODING, PortofinoBaseProperties.URL_ENCODING_DEFAULT);
         logger.info("URL character encoding is set to " + encoding + ". Make sure the web server uses the same encoding to parse URLs.");
         if(!Charset.isSupported(encoding)) {
             logger.error("The encoding is not supported by the JVM!");

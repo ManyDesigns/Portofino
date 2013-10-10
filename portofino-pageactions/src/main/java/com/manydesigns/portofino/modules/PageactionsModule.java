@@ -22,7 +22,7 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.PortofinoBaseProperties;
 import com.manydesigns.portofino.actions.admin.SettingsAction;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
@@ -148,7 +148,7 @@ public class PageactionsModule implements Module {
         DispatcherLogic.init(configuration);
 
         logger.debug("Setting up temporary file service");
-        String tempFileServiceClass = configuration.getString(PortofinoProperties.TEMP_FILE_SERVICE_CLASS);
+        String tempFileServiceClass = configuration.getString(PortofinoBaseProperties.TEMP_FILE_SERVICE_CLASS);
         if(tempFileServiceClass != null) {
             try {
                 TempFileService.setInstance((TempFileService) Class.forName(tempFileServiceClass).newInstance());

@@ -28,7 +28,7 @@ package com.manydesigns.portofino;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public final class PortofinoProperties {
+public final class PortofinoBaseProperties {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -42,6 +42,7 @@ public final class PortofinoProperties {
             "app.name";
     public static final String HOSTNAMES = "portofino.hostnames";
     public static final String URL_ENCODING = "url.encoding";
+    public static final String URL_ENCODING_DEFAULT = "UTF-8";
     public static final String TEMP_FILE_SERVICE_CLASS = "temp.file.service.class";
 
     //Login
@@ -60,5 +61,5 @@ public final class PortofinoProperties {
     public static final String CONFIGURATION_CACHE_SIZE = "configuration.cache.size";
     public static final String CONFIGURATION_CACHE_CHECK_FREQUENCY = "configuration.cache.check.frequency";
 
-    private PortofinoProperties() {}
+    private PortofinoBaseProperties() {}
 }

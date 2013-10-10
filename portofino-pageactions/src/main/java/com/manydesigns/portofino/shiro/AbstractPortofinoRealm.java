@@ -22,7 +22,7 @@ package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
-import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.PortofinoBaseProperties;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.modules.BaseModule;
 import org.apache.commons.configuration.Configuration;
@@ -107,7 +107,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
      */
     @Override
     public String getAllGroup() {
-        return portofinoConfiguration.getString(PortofinoProperties.GROUP_ALL);
+        return portofinoConfiguration.getString(PortofinoBaseProperties.GROUP_ALL);
     }
 
     /**
@@ -116,7 +116,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
      */
     @Override
     public String getAnonymousGroup() {
-        return portofinoConfiguration.getString(PortofinoProperties.GROUP_ANONYMOUS);
+        return portofinoConfiguration.getString(PortofinoBaseProperties.GROUP_ANONYMOUS);
     }
 
     /**
@@ -125,7 +125,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
      */
     @Override
     public String getRegisteredGroup() {
-        return portofinoConfiguration.getString(PortofinoProperties.GROUP_REGISTERED);
+        return portofinoConfiguration.getString(PortofinoBaseProperties.GROUP_REGISTERED);
     }
 
     /**
@@ -134,7 +134,7 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
      */
     @Override
     public String getAdministratorsGroup() {
-        return portofinoConfiguration.getString(PortofinoProperties.GROUP_ADMINISTRATORS);
+        return portofinoConfiguration.getString(PortofinoBaseProperties.GROUP_ADMINISTRATORS);
     }
 
     /**

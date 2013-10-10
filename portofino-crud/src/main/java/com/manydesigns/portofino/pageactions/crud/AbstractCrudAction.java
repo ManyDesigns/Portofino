@@ -43,7 +43,7 @@ import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XmlBuffer;
-import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.PortofinoBaseProperties;
 import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
@@ -906,7 +906,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         List<String> parameters = pageInstance.getParameters();
         if(!parameters.isEmpty()) {
-            String encoding = portofinoConfiguration.getString(PortofinoProperties.URL_ENCODING);
+            String encoding = getUrlEncoding();
             pk = parameters.toArray(new String[parameters.size()]);
             try {
                 for(int i = 0; i < pk.length; i++) {
@@ -1102,7 +1102,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         OgnlTextFormat hrefFormat =
                 OgnlTextFormat.create(readLinkExpression);
         hrefFormat.setUrl(true);
-        String encoding = portofinoConfiguration.getString(PortofinoProperties.URL_ENCODING);
+        String encoding = getUrlEncoding();
         hrefFormat.setEncoding(encoding);
 
         if(isShowingKey) {
@@ -1157,7 +1157,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }
             xb.closeElement("a");
             OgnlTextFormat hrefFormat = OgnlTextFormat.create(xb.toString());
-            String encoding = portofinoConfiguration.getString(PortofinoProperties.URL_ENCODING);
+            String encoding = getUrlEncoding();
             hrefFormat.setEncoding(encoding);
             tableFormBuilder.configHeaderTextFormat(propName, hrefFormat);
         }
@@ -1383,7 +1383,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 if (field instanceof FileBlobField) {
                     if(baseUrl == null) {
                         String readLinkExpression = getReadLinkExpression();
-                        String encoding = portofinoConfiguration.getString(PortofinoProperties.URL_ENCODING);
+                        String encoding = getUrlEncoding();
                         OgnlTextFormat hrefFormat =
                                 OgnlTextFormat.create(readLinkExpression);
                         hrefFormat.setUrl(true);
@@ -2337,6 +2337,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Utilities
     //--------------------------------------------------------------------------
 
+    protected String getUrlEncoding() {
+        return portofinoConfiguration.getString(
+                PortofinoBaseProperties.URL_ENCODING, PortofinoBaseProperties.URL_ENCODING_DEFAULT);
+    }
+
     /**
      * Searches in a list of properties for a property with a given name.
      * @param name the name of the properties.
@@ -2358,7 +2363,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @return the string to append to the URL.
      */
     protected String getPkForUrl(String[] pk) {
-        String encoding = portofinoConfiguration.getString(PortofinoProperties.URL_ENCODING);
+        String encoding = getUrlEncoding();
         try {
             return pkHelper.getPkStringForUrl(pk, encoding);
         } catch (UnsupportedEncodingException e) {
@@ -2430,7 +2435,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
         String encodedSearchString = "searchString=";
         try {
-            String encoding = portofinoConfiguration.getString(PortofinoProperties.URL_ENCODING);
+            String encoding = getUrlEncoding();
             String encoded = URLEncoder.encode(searchString, encoding);
             if(searchString.equals(URLDecoder.decode(encoded, encoding))) {
                 encodedSearchString += encoded;

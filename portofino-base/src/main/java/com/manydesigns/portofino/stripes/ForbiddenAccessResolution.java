@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.stripes;
 
 import com.manydesigns.elements.stripes.ElementsActionBeanContext;
-import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.PortofinoBaseProperties;
 import com.manydesigns.portofino.modules.BaseModule;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
@@ -80,7 +80,7 @@ public class ForbiddenAccessResolution implements Resolution {
                 (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
         if (!subject.isAuthenticated() && !ajax) {
             logger.info("Anonymous user not allowed. Redirecting to login.");
-            String loginPage = configuration.getString(PortofinoProperties.LOGIN_PAGE);
+            String loginPage = configuration.getString(PortofinoBaseProperties.LOGIN_PAGE);
             RedirectResolution redirectResolution =
                     new RedirectResolution(loginPage, true);
             redirectResolution.addParameter("returnUrl", returnUrl);
@@ -89,7 +89,7 @@ public class ForbiddenAccessResolution implements Resolution {
             if(ajax) {
                 logger.debug("AJAX call while user disconnected");
                 //TODO where to redirect?
-                String loginPage = configuration.getString(PortofinoProperties.LOGIN_PAGE);
+                String loginPage = configuration.getString(PortofinoBaseProperties.LOGIN_PAGE);
                 UrlBuilder loginUrlBuilder =
                         new UrlBuilder(Locale.getDefault(), loginPage, false);
                 response.setStatus(UNAUTHORIZED);

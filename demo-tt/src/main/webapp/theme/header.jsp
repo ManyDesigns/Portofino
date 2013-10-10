@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ page import="com.manydesigns.elements.util.Util"
-%><%@ page import="com.manydesigns.portofino.PortofinoProperties"
+%><%@ page import="com.manydesigns.portofino.PortofinoBaseProperties"
 %><%@ page import="com.manydesigns.portofino.actions.admin.AdminAction"
 %><%@ page import="com.manydesigns.portofino.actions.admin.page.PageAdminAction"
 %><%@ page import="com.manydesigns.portofino.dispatcher.PageAction"
@@ -28,7 +28,7 @@
         <div class="container">
             <h4 id="app-title" class="pull-left">
                 <stripes:link href="/">
-                    <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
+                    <c:out value="<%= portofinoConfiguration.getString(PortofinoBaseProperties.APP_NAME) %>"/>
                 </stripes:link>
             </h4>
             <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -46,7 +46,7 @@
                     <%
                         Subject subject = SecurityUtils.getSubject();
                         String actionPath = actionBean.getContext().getActualServletPath();
-                        String loginPage = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PAGE);
+                        String loginPage = portofinoConfiguration.getString(PortofinoBaseProperties.LOGIN_PAGE);
                         if(subject.isAuthenticated()) {
                             Object principal = subject.getPrincipal();
                             String prettyName = ShiroUtils.getPortofinoRealm().getUserPrettyName((Serializable) principal);
