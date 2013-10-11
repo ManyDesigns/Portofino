@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory
 import com.manydesigns.portofino.shiro.*
 import org.apache.shiro.authc.*
 import com.manydesigns.portofino.PortofinoBaseProperties
+import com.manydesigns.portofino.logic.SecurityLogic
 
 class Security extends AbstractPortofinoRealm {
 
@@ -150,7 +151,7 @@ class Security extends AbstractPortofinoRealm {
     @Override
     protected Collection<String> loadAuthorizationInfo(Serializable principal) {
         if("admin".equals(principal.login)) {
-            return [portofinoConfiguration.getString(PortofinoBaseProperties.GROUP_ADMINISTRATORS)]
+            return [ SecurityLogic.getAdministratorsGroup(portofinoConfiguration) ]
         } else {
             return []
         }

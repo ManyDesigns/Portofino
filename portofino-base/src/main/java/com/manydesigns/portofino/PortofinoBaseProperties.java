@@ -36,10 +36,12 @@ public final class PortofinoBaseProperties {
     // Property names
     //**************************************************************************
 
-    public static final String BLOBS_DIR_PATH =
-            "blobs.dir.path";
-    public static final String APP_NAME =
-            "app.name";
+    //App properties
+    public static final String BLOBS_DIR_PATH = "blobs.dir.path";
+    public static final String APP_NAME = "app.name";
+    public static final String LANDING_PAGE = "landing.page";
+
+    //Server config
     public static final String HOSTNAMES = "portofino.hostnames";
     public static final String URL_ENCODING = "url.encoding";
     public static final String URL_ENCODING_DEFAULT = "UTF-8";
@@ -47,12 +49,7 @@ public final class PortofinoBaseProperties {
 
     //Login
     public static final String LOGIN_PAGE = "login.page";
-    public static final String LANDING_PAGE = "landing.page";
 
-    public static final String GROUP_ALL = "group.all";
-    public static final String GROUP_ANONYMOUS = "group.anonymous";
-    public static final String GROUP_REGISTERED = "group.registered";
-    public static final String GROUP_ADMINISTRATORS = "group.administrators";
     //The mail address used as the from: field in email messages sent by the application (e.g. password change)
     public static final String MAIL_FROM = "mail.from";
     //Cache configuration properties

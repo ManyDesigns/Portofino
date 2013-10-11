@@ -22,8 +22,8 @@ package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.JavaClassAccessor;
-import com.manydesigns.portofino.PortofinoBaseProperties;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.authz.AuthorizationException;
@@ -69,18 +69,18 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     public AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         Object principal = principals.getPrimaryPrincipal();
         Set<String> groups = new HashSet<String>();
-        groups.add(getAllGroup());
+        groups.add(SecurityLogic.getAllGroup(portofinoConfiguration));
         if (principal == null) {
-            groups.add(getAnonymousGroup());
+            groups.add(SecurityLogic.getAnonymousGroup(portofinoConfiguration));
         } else if (principal instanceof Serializable) {
-            groups.add(getRegisteredGroup());
+            groups.add(SecurityLogic.getRegisteredGroup(portofinoConfiguration));
             groups.addAll(loadAuthorizationInfo((Serializable) principal));
         } else {
             throw new AuthorizationException("Invalid principal: " + principal);
         }
 
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo(groups);
-        if(groups.contains(getAdministratorsGroup())) {
+        if(groups.contains(SecurityLogic.getAdministratorsGroup(portofinoConfiguration))) {
             info.addStringPermission("*");
         }
         Permission permission = new GroupPermission(groups);
@@ -102,42 +102,6 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     //--------------------------------------------------------------------------
 
     /**
-     * Returns the name of the All group as defined in app.properties.
-     * @return the name of the All group
-     */
-    @Override
-    public String getAllGroup() {
-        return portofinoConfiguration.getString(PortofinoBaseProperties.GROUP_ALL);
-    }
-
-    /**
-     * Returns the name of the Anonymous group as defined in app.properties.
-     * @return the name of the Anonymous
-     */
-    @Override
-    public String getAnonymousGroup() {
-        return portofinoConfiguration.getString(PortofinoBaseProperties.GROUP_ANONYMOUS);
-    }
-
-    /**
-     * Returns the name of the Registered group as defined in app.properties.
-     * @return the name of the Registered group
-     */
-    @Override
-    public String getRegisteredGroup() {
-        return portofinoConfiguration.getString(PortofinoBaseProperties.GROUP_REGISTERED);
-    }
-
-    /**
-     * Returns the name of the Administrators group as defined in app.properties.
-     * @return the name of the Administrators group
-     */
-    @Override
-    public String getAdministratorsGroup() {
-        return portofinoConfiguration.getString(PortofinoBaseProperties.GROUP_ADMINISTRATORS);
-    }
-
-    /**
      * {@inheritDoc}
      * <p>This default implementation returns the built-in groups
      * (all, anonymous, registered, administrators).
@@ -146,10 +110,10 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
      */
     public Set<String> getGroups() {
         Set<String> groups = new LinkedHashSet<String>();
-        groups.add(getAllGroup());
-        groups.add(getAnonymousGroup());
-        groups.add(getRegisteredGroup());
-        groups.add(getAdministratorsGroup());
+        groups.add(SecurityLogic.getAllGroup(portofinoConfiguration));
+        groups.add(SecurityLogic.getAnonymousGroup(portofinoConfiguration));
+        groups.add(SecurityLogic.getRegisteredGroup(portofinoConfiguration));
+        groups.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
         return groups;
     }
 

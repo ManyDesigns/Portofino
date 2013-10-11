@@ -24,6 +24,7 @@ import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
@@ -67,7 +68,7 @@ public class GAEPortofinoRealm extends AbstractPortofinoRealm {
         if(user != null &&
            userService.isUserAdmin() && 
            StringUtils.equals(userService.getCurrentUser().getUserId(), user.getUserId())) {
-            authz.add(getAdministratorsGroup());
+            authz.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
         }
         return authz;
     }

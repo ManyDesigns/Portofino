@@ -136,11 +136,4 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
      */
     Set<String> getGroups();
 
-    String getAllGroup();
-
-    String getAnonymousGroup();
-
-    String getRegisteredGroup();
-
-    String getAdministratorsGroup();
 }

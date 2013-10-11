@@ -22,11 +22,9 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.portofino.PortofinoBaseProperties;
 import com.manydesigns.portofino.actions.admin.SettingsAction;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
-import com.manydesigns.portofino.files.TempFileService;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.menu.SimpleMenuAppender;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
@@ -38,7 +36,6 @@ import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
 import groovy.util.GroovyScriptEngine;
 import net.sf.ehcache.CacheManager;
-import ognl.OgnlRuntime;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.util.LifecycleUtils;
@@ -146,24 +143,6 @@ public class PageactionsModule implements Module {
     public void init() {
         logger.debug("Initializing dispatcher");
         DispatcherLogic.init(configuration);
-
-        logger.debug("Setting up temporary file service");
-        String tempFileServiceClass = configuration.getString(PortofinoBaseProperties.TEMP_FILE_SERVICE_CLASS);
-        if(tempFileServiceClass != null) {
-            try {
-                TempFileService.setInstance((TempFileService) Class.forName(tempFileServiceClass).newInstance());
-            } catch (Exception e) {
-                logger.error("Could not set up temp file service", e);
-                throw new Error(e);
-            }
-        }
-
-        //Disabilitazione security manager per funzionare su GAE. Il security manager permette di valutare
-        //in sicurezza espressioni OGNL provenienti da fonti non sicure, configurando i necessari permessi
-        //(invoke.<declaring-class>.<method-name>). In Portofino non permettiamo agli utenti finali di valutare
-        //espressioni OGNL arbitrarie, pertanto il security manager può essere disabilitato in sicurezza.
-        logger.info("Disabling OGNL security manager");
-        OgnlRuntime.setSecurityManager(null);
 
         logger.info("Initializing ehcache service");
         cacheManager = CacheManager.newInstance();

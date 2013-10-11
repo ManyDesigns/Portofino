@@ -193,26 +193,6 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
         return ensureDelegate().getGroups();
     }
 
-    @Override
-    public String getAllGroup() {
-        return ensureDelegate().getAllGroup();
-    }
-
-    @Override
-    public String getAnonymousGroup() {
-        return ensureDelegate().getAnonymousGroup();
-    }
-
-    @Override
-    public String getRegisteredGroup() {
-        return ensureDelegate().getRegisteredGroup();
-    }
-
-    @Override
-    public String getAdministratorsGroup() {
-        return ensureDelegate().getAdministratorsGroup();
-    }
-
     //--------------------------------------------------------------------------
     // Realm implementation
     //--------------------------------------------------------------------------

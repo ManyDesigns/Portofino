@@ -24,6 +24,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import com.manydesigns.portofino.shiro.*
 import org.apache.shiro.authc.*
+import com.manydesigns.portofino.logic.SecurityLogic
 
 public class Security extends AbstractPortofinoRealm {
 
@@ -64,7 +65,7 @@ public class Security extends AbstractPortofinoRealm {
                (principal instanceof Map && "admin".equals(principal[userNameProperty]))) {
                 logger.warn("Generated Security.groovy is using the hardcoded 'admin' user; " +
                             "remember to disable it in production!")
-                groups.add(getAdministratorsGroup());
+                groups.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
             }
             /////////////////////////////////////////////////////////////////
         } else {
@@ -83,7 +84,7 @@ public class Security extends AbstractPortofinoRealm {
             groups.addAll(query.list());
 
             if(!StringUtils.isEmpty(adminGroupName) && groups.contains(adminGroupName)) {
-                groups.add(getAdministratorsGroup());
+                groups.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
             }
         }
         return groups;

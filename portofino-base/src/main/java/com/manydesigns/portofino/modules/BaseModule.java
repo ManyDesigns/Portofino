@@ -29,12 +29,17 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.portofino.PortofinoBaseProperties;
 import com.manydesigns.portofino.actions.admin.modules.ModulesAction;
 import com.manydesigns.portofino.actions.admin.servletcontext.ServletContextAction;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.files.TempFileService;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.menu.SimpleMenuAppender;
+import ognl.OgnlRuntime;
 import org.apache.commons.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,6 +50,8 @@ import org.apache.commons.configuration.Configuration;
 public class BaseModule implements Module {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
+
+    public static final Logger logger = LoggerFactory.getLogger(BaseModule.class);
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -109,6 +116,24 @@ public class BaseModule implements Module {
 
     @Override
     public void init() {
+        logger.debug("Setting up temporary file service");
+        String tempFileServiceClass = configuration.getString(PortofinoBaseProperties.TEMP_FILE_SERVICE_CLASS);
+        if(tempFileServiceClass != null) {
+            try {
+                TempFileService.setInstance((TempFileService) Class.forName(tempFileServiceClass).newInstance());
+            } catch (Exception e) {
+                logger.error("Could not set up temp file service", e);
+                throw new Error(e);
+            }
+        }
+
+        //Disabilitazione security manager per funzionare su GAE. Il security manager permette di valutare
+        //in sicurezza espressioni OGNL provenienti da fonti non sicure, configurando i necessari permessi
+        //(invoke.<declaring-class>.<method-name>). In Portofino non permettiamo agli utenti finali di valutare
+        //espressioni OGNL arbitrarie, pertanto il security manager può essere disabilitato in sicurezza.
+        logger.info("Disabling OGNL security manager");
+        OgnlRuntime.setSecurityManager(null);
+
         SimpleMenuAppender group = SimpleMenuAppender.group("configuration", null, "Configuration", 1.0);
         adminMenu.menuAppenders.add(group);
 

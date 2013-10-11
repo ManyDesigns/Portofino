@@ -50,6 +50,7 @@ import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
@@ -1047,7 +1048,7 @@ public class ApplicationWizard extends AbstractPageAction {
                         childPages, template, bindings, title);
                 if(page != null) {
                     Group group = new Group();
-                    group.setName(conf.getString(PortofinoBaseProperties.GROUP_ANONYMOUS));
+                    group.setName(SecurityLogic.getAnonymousGroup(conf));
                     group.setAccessLevel(AccessLevel.DENY.name());
                     Permissions permissions = new Permissions();
                     permissions.getGroups().add(group);

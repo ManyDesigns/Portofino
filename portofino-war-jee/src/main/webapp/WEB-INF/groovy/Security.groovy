@@ -2,6 +2,7 @@ import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.apache.shiro.authc.*
+import com.manydesigns.portofino.logic.SecurityLogic
 
 class Security extends AbstractPortofinoRealm {
 
@@ -42,7 +43,7 @@ class Security extends AbstractPortofinoRealm {
     @Override
     protected Collection<String> loadAuthorizationInfo(Serializable principal) {
         if (ADMIN_LOGIN.equals(principal)) {
-            return [ getAdministratorsGroup() ]
+            return [ SecurityLogic.getAdministratorsGroup(portofinoConfiguration) ]
         } else {
             return []
         }
