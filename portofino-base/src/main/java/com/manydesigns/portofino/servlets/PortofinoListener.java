@@ -26,7 +26,6 @@ import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.portofino.BaseProperties;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
-import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.modules.ApplicationListener;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.Module;
@@ -180,10 +179,6 @@ public class PortofinoListener
             logger.error(msg);
             throw new InternalError(msg);
         }
-
-        logger.debug("Installing standard menu builders");
-        MenuBuilder adminMenuBuilder = new MenuBuilder();
-        servletContext.setAttribute(BaseModule.ADMIN_MENU, adminMenuBuilder);
 
         logger.info("Loading modules...");
         moduleRegistry = new ModuleRegistry(configuration);

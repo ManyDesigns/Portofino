@@ -25,6 +25,7 @@ import com.manydesigns.portofino.actions.admin.ReloadModelAction;
 import com.manydesigns.portofino.actions.admin.TablesAction;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoSelectFromDatabaseChangeLogLockGenerator;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.menu.SimpleMenuAppender;
@@ -131,6 +132,7 @@ public class DatabaseModule implements Module {
 
         Persistence persistence =
                 new Persistence(applicationDirectory, configuration, databasePlatformsManager);
+        Injections.inject(persistence, servletContext, null);
         servletContext.setAttribute(DATABASE_PLATFORMS_MANAGER, databasePlatformsManager);
         servletContext.setAttribute(PERSISTENCE, persistence);
 

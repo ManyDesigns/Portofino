@@ -23,6 +23,9 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.actions.admin.SettingsAction;
+import com.manydesigns.portofino.cache.CacheResetEvent;
+import com.manydesigns.portofino.cache.CacheResetListener;
+import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.menu.MenuBuilder;
@@ -82,6 +85,9 @@ public class PageactionsModule implements Module {
 
     @Inject(BaseModule.APP_LISTENERS)
     public List<ApplicationListener> applicationListeners;
+
+    @Inject(BaseModule.CACHE_RESET_LISTENER_REGISTRY)
+    public CacheResetListenerRegistry cacheResetListenerRegistry;
 
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
 
@@ -203,6 +209,8 @@ public class PageactionsModule implements Module {
 
         servletContext.setAttribute(TEMPLATES_REGISTRY, new TemplateRegistry());
 
+        cacheResetListenerRegistry.getCacheResetListeners().add(new ConfigurationCacheResetListener());
+
         SimpleMenuAppender link = SimpleMenuAppender.link(
                 "configuration", "settings", null, "Settings", SettingsAction.URL_BINDING, 0.5);
         adminMenu.menuAppenders.add(link);
@@ -244,5 +252,12 @@ public class PageactionsModule implements Module {
     @Override
     public ModuleStatus getStatus() {
         return status;
+    }
+
+    private static class ConfigurationCacheResetListener implements CacheResetListener {
+        @Override
+        public void handleReset(CacheResetEvent e) {
+            DispatcherLogic.clearConfigurationCache();
+        }
     }
 }

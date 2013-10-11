@@ -22,9 +22,13 @@ package com.manydesigns.portofino.persistence;
 
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.BaseProperties;
+import com.manydesigns.portofino.cache.CacheResetEvent;
+import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
+import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.persistence.hibernate.HibernateConfig;
 import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -84,6 +88,9 @@ public class Persistence {
     protected final File appDbsDir;
     protected final File appModelFile;
     protected final org.apache.commons.configuration.Configuration configuration;
+
+    @Inject(BaseModule.CACHE_RESET_LISTENER_REGISTRY)
+    public CacheResetListenerRegistry cacheResetListenerRegistry;
 
     //**************************************************************************
     // Logging
@@ -270,7 +277,7 @@ public class Persistence {
             }
         }
 
-        //DispatcherLogic.clearConfigurationCache(); TODO ripristinare
+        cacheResetListenerRegistry.fireReset(new CacheResetEvent(this));
     }
 
     //**************************************************************************
@@ -383,7 +390,6 @@ public class Persistence {
     //**************************************************************************
     // App directories and files
     //**************************************************************************
-
 
     public String getName() {
         return getPortofinoProperties().getString(BaseProperties.APP_NAME);
