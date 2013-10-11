@@ -105,9 +105,6 @@ public class HibernateConfig {
                         "org.hibernate.context.ThreadLocalSessionContext") //hb4: "org.hibernate.context.internal.ThreadLocalSessionContext"
                 .setProperty("org.hibernate.hql.ast.AST", "true")
                 .setProperty("hibernate.globally_quoted_identifiers", "false");
-        /*configuration.setProperty("hibernate.show_sql",
-                portofinoConfiguration.getString(
-                        BaseProperties.HIBERNATE_SHOW_SQL));*/
         // mettendo la modalità dynamic map, non funzionano le entità mappate su bean.
         // configuration.setProperty("hibernate.default_entity_mode", "dynamic-map");
     }
@@ -129,22 +126,6 @@ public class HibernateConfig {
             if(jdbcConnectionProvider.getPassword() != null) {
                     configuration.setProperty("hibernate.connection.password", jdbcConnectionProvider.getPassword());
             }
-
-            /*configuration.setProperty("hibernate.connection.provider_class",
-                    portofinoConfiguration.getString(
-                            BaseProperties.HIBERNATE_CONNECTION_PROVIDER_CLASS));
-            configuration.setProperty("hibernate.c3p0.min_size",
-                    portofinoConfiguration.getString(
-                            BaseProperties.HIBERNATE_C3P0_MIN_SIZE));
-            configuration.setProperty("hibernate.c3p0.max_size",
-                    portofinoConfiguration.getString(
-                            BaseProperties.HIBERNATE_C3P0_MAX_SIZE));
-            configuration.setProperty("hibernate.c3p0.timeout",
-                    portofinoConfiguration.getString(
-                            BaseProperties.HIBERNATE_C3P0_TIMEOUT));
-            configuration.setProperty("hibernate.c3p0.idle_test_period",
-                    portofinoConfiguration.getString(
-                            BaseProperties.HIBERNATE_C3P0_IDLE_TEST_PERIOD));*/
         } else if(connectionProvider instanceof JndiConnectionProvider) {
             JndiConnectionProvider jndiConnectionProvider =
                     (JndiConnectionProvider) connectionProvider;

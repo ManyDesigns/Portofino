@@ -83,7 +83,8 @@ public class MailSenderJob implements Job {
                 .withIdentity("mail.sender", group)
                 .build();
 
-        int pollInterval = mailConfiguration.getInt(MailProperties.MAIL_SENDER_POLL_INTERVAL);
+        int pollInterval = mailConfiguration.getInt(
+                MailProperties.MAIL_SENDER_POLL_INTERVAL, MailScheduler.DEFAULT_POLL_INTERVAL);
 
         Trigger trigger = TriggerBuilder.newTrigger()
             .withIdentity("mail.sender.trigger", group)

@@ -39,6 +39,7 @@ public class MailScheduler {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(MailScheduler.class);
+    public static final int DEFAULT_POLL_INTERVAL = 1000;
 
     public static void setupMailScheduler(MailQueueSetup mailQueueSetup) {
         String group = "portofino-mail";
@@ -48,7 +49,7 @@ public class MailScheduler {
     public static void setupMailScheduler(MailQueueSetup mailQueueSetup, String group) {
         Configuration mailConfiguration = mailQueueSetup.getMailConfiguration();
         if(mailConfiguration != null) {
-            if(mailConfiguration.getBoolean(MailProperties.MAIL_QUARTZ_ENABLED)) {
+            if(mailConfiguration.getBoolean(MailProperties.MAIL_QUARTZ_ENABLED, false)) {
                 logger.info("Scheduling mail sends with Quartz job");
                 try {
                     String serverUrl = mailConfiguration.getString(MailProperties.MAIL_SENDER_SERVER_URL);
@@ -61,7 +62,8 @@ public class MailScheduler {
                             .usingJobData(URLInvokeJob.URL_KEY, serverUrl)
                             .build();
 
-                    int pollInterval = mailConfiguration.getInt(MailProperties.MAIL_SENDER_POLL_INTERVAL);
+                    int pollInterval = mailConfiguration.getInt(
+                            MailProperties.MAIL_SENDER_POLL_INTERVAL, DEFAULT_POLL_INTERVAL);
 
                     Trigger trigger = TriggerBuilder.newTrigger()
                         .withIdentity("mail.sender.trigger", group)
