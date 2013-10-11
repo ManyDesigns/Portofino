@@ -40,7 +40,6 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.PortofinoBaseProperties;
 import com.manydesigns.portofino.actions.forms.ConnectionProviderForm;
 import com.manydesigns.portofino.actions.forms.SelectableSchema;
 import com.manydesigns.portofino.buttons.annotations.Button;

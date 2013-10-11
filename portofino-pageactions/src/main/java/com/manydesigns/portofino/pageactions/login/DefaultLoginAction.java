@@ -33,7 +33,7 @@ import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.queue.QueueException;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
-import com.manydesigns.portofino.PortofinoBaseProperties;
+import com.manydesigns.portofino.BaseProperties;
 import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
@@ -78,23 +78,23 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     //--------------------------------------------------------------------------
 
     @Override
-    protected void sendForgotPasswordEmail(String email, String subject, String body) {
-        sendMail(email, subject, body);
+    protected void sendForgotPasswordEmail(String from, String to, String subject, String body) {
+        sendMail(from, to, subject, body);
     }
 
     @Override
-    protected void sendSignupConfirmationEmail(String email, String subject, String body) {
-        sendMail(email, subject, body);
+    protected void sendSignupConfirmationEmail(String from, String to, String subject, String body) {
+        sendMail(from, to, subject, body);
     }
 
-    protected void sendMail(String emailAddress, String subject, String body) {
+    protected void sendMail(String from, String to, String subject, String body) {
         if(mailQueue == null) {
             throw new UnsupportedOperationException("Mail queue is not enabled");
         }
 
         Email email = new Email();
-        email.getRecipients().add(new Recipient(Recipient.Type.TO, emailAddress));
-        email.setFrom(portofinoConfiguration.getString(PortofinoBaseProperties.MAIL_FROM, "example@example.com"));
+        email.getRecipients().add(new Recipient(Recipient.Type.TO, to));
+        email.setFrom(from);
         email.setSubject(subject);
         email.setHtmlBody(body);
         try {
@@ -106,7 +106,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
 
     @Override
     public String getApplicationName() {
-        return portofinoConfiguration.getString(PortofinoBaseProperties.APP_NAME);
+        return portofinoConfiguration.getString(BaseProperties.APP_NAME);
     }
 
     @Override

@@ -21,8 +21,7 @@
 package com.manydesigns.portofino.persistence;
 
 import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.portofino.PortofinoBaseProperties;
-import com.manydesigns.portofino.PortofinoDatabaseProperties;
+import com.manydesigns.portofino.BaseProperties;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
@@ -124,6 +123,9 @@ public class Persistence {
     // Model loading
     //**************************************************************************
 
+    //Liquibase properties
+    public static final String LIQUIBASE_ENABLED = "liquibase.enabled";
+
     public synchronized void loadXmlModel() {
         logger.info("Loading xml model from file: {}", appModelFile.getAbsolutePath());
 
@@ -133,7 +135,7 @@ public class Persistence {
             model = (Model) um.unmarshal(appModelFile);
             boolean syncOnStart = false;
             initModel();
-            if(configuration.getBoolean(PortofinoDatabaseProperties.LIQUIBASE_ENABLED)) {
+            if(configuration.getBoolean(LIQUIBASE_ENABLED, true)) {
                 runLiquibaseScripts();
             }
             if (syncOnStart) {
@@ -384,7 +386,7 @@ public class Persistence {
 
 
     public String getName() {
-        return getPortofinoProperties().getString(PortofinoBaseProperties.APP_NAME);
+        return getPortofinoProperties().getString(BaseProperties.APP_NAME);
     }
 
     public File getAppDbsDir() {

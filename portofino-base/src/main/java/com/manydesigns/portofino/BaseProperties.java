@@ -28,7 +28,7 @@ package com.manydesigns.portofino;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public final class PortofinoBaseProperties {
+public final class BaseProperties {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -52,11 +52,6 @@ public final class PortofinoBaseProperties {
 
     //The mail address used as the from: field in email messages sent by the application (e.g. password change)
     public static final String MAIL_FROM = "mail.from";
-    //Cache configuration properties
-    public static final String PAGE_CACHE_SIZE = "page.cache.size";
-    public static final String PAGE_CACHE_CHECK_FREQUENCY = "page.cache.check.frequency";
-    public static final String CONFIGURATION_CACHE_SIZE = "configuration.cache.size";
-    public static final String CONFIGURATION_CACHE_CHECK_FREQUENCY = "configuration.cache.check.frequency";
 
-    private PortofinoBaseProperties() {}
+    private BaseProperties() {}
 }

@@ -19,7 +19,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import com.manydesigns.portofino.shiro.*
 import org.apache.shiro.authc.*
-import com.manydesigns.portofino.PortofinoBaseProperties
+import com.manydesigns.portofino.BaseProperties
 import com.manydesigns.portofino.logic.SecurityLogic
 
 class Security extends AbstractPortofinoRealm {

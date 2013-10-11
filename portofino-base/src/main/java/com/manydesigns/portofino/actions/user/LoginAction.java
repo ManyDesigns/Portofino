@@ -27,6 +27,7 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.servlet.ServletUtils;
+import com.manydesigns.portofino.BaseProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.modules.BaseModule;
@@ -237,7 +238,10 @@ public abstract class LoginAction extends AbstractActionBean {
 
                 String body = getResetPasswordEmailBody(siteUrl, changePasswordLink);
 
-                sendForgotPasswordEmail(email, ElementsThreadLocals.getText("user.passwordReset.emailSubject"), body);
+                String from = portofinoConfiguration.getString(
+                        BaseProperties.MAIL_FROM, "example@example.com");
+                sendForgotPasswordEmail(
+                        from, email, ElementsThreadLocals.getText("user.passwordReset.emailSubject"), body);
             }
 
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("user.passwordReset.email.sent"));
@@ -295,7 +299,7 @@ public abstract class LoginAction extends AbstractActionBean {
         }
     }
 
-    protected abstract void sendForgotPasswordEmail(String email, String subject, String body);
+    protected abstract void sendForgotPasswordEmail(String from, String to, String subject, String body);
 
     protected String getForgotPasswordPage() {
         return "/m/base/actions/user/forgotPassword.jsp";
@@ -370,7 +374,10 @@ public abstract class LoginAction extends AbstractActionBean {
 
                 String body = getConfirmSignUpEmailBody(siteUrl, changePasswordLink);
 
-                sendSignupConfirmationEmail(email, ElementsThreadLocals.getText("user.signUp.email.subject"), body);
+                String from = portofinoConfiguration.getString(
+                        BaseProperties.MAIL_FROM, "example@example.com");
+                sendSignupConfirmationEmail(
+                        from, email, ElementsThreadLocals.getText("user.signUp.email.subject"), body);
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("user.signUp.email.sent"));
                 return new ForwardResolution(getLoginPage());
             } catch (ExistingUserException e) {
@@ -408,7 +415,7 @@ public abstract class LoginAction extends AbstractActionBean {
         return body;
     }
 
-    protected abstract void sendSignupConfirmationEmail(String email, String subject, String body);
+    protected abstract void sendSignupConfirmationEmail(String from, String to, String subject, String body);
 
     public Resolution confirmSignUp() {
         Subject subject = SecurityUtils.getSubject();

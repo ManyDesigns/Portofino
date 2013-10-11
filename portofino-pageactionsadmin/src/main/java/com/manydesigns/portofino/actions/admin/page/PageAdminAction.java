@@ -34,7 +34,7 @@ import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.ReflectionUtil;
-import com.manydesigns.portofino.PortofinoBaseProperties;
+import com.manydesigns.portofino.BaseProperties;
 import com.manydesigns.portofino.actions.admin.forms.CopyPage;
 import com.manydesigns.portofino.actions.admin.forms.MovePage;
 import com.manydesigns.portofino.actions.admin.forms.NewPage;
@@ -357,7 +357,7 @@ public class PageAdminAction extends AbstractPageAction {
         } else {
             Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
             String contextPath = context.getRequest().getContextPath();
-            String landingPagePath = portofinoConfiguration.getString(PortofinoBaseProperties.LANDING_PAGE);
+            String landingPagePath = portofinoConfiguration.getString(BaseProperties.LANDING_PAGE);
             Dispatch landingPageDispatch = dispatcher.getDispatch(landingPagePath);
             if(landingPageDispatch != null &&
                landingPageDispatch.getLastPageInstance().getDirectory().equals(pageInstance.getDirectory())) {
@@ -444,7 +444,7 @@ public class PageAdminAction extends AbstractPageAction {
             logger.debug("Checking if we've been asked to move the landing page...");
             Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
             String contextPath = context.getRequest().getContextPath();
-            String landingPagePath = portofinoConfiguration.getString(PortofinoBaseProperties.LANDING_PAGE);
+            String landingPagePath = portofinoConfiguration.getString(BaseProperties.LANDING_PAGE);
             Dispatch landingPageDispatch = dispatcher.getDispatch(landingPagePath);
             if(landingPageDispatch != null &&
                landingPageDispatch.getLastPageInstance().getDirectory().equals(pageInstance.getDirectory())) {
