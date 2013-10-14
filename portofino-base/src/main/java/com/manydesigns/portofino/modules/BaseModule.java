@@ -29,7 +29,7 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.BaseProperties;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.modules.ModulesAction;
 import com.manydesigns.portofino.actions.admin.servletcontext.ServletContextAction;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
@@ -121,7 +121,7 @@ public class BaseModule implements Module {
     @Override
     public void init() {
         logger.debug("Setting up temporary file service");
-        String tempFileServiceClass = configuration.getString(BaseProperties.TEMP_FILE_SERVICE_CLASS);
+        String tempFileServiceClass = configuration.getString(PortofinoProperties.TEMP_FILE_SERVICE_CLASS);
         if(tempFileServiceClass != null) {
             try {
                 TempFileService.setInstance((TempFileService) Class.forName(tempFileServiceClass).newInstance());

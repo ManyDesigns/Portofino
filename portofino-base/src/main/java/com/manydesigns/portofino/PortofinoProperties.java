@@ -28,7 +28,7 @@ package com.manydesigns.portofino;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public final class BaseProperties {
+public final class PortofinoProperties {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -53,5 +53,5 @@ public final class BaseProperties {
     //The mail address used as the from: field in email messages sent by the application (e.g. password change)
     public static final String MAIL_FROM = "mail.from";
 
-    private BaseProperties() {}
+    private PortofinoProperties() {}
 }

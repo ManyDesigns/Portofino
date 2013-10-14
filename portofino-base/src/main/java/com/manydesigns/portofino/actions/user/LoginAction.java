@@ -27,7 +27,7 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.servlet.ServletUtils;
-import com.manydesigns.portofino.BaseProperties;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.modules.BaseModule;
@@ -239,7 +239,7 @@ public abstract class LoginAction extends AbstractActionBean {
                 String body = getResetPasswordEmailBody(siteUrl, changePasswordLink);
 
                 String from = portofinoConfiguration.getString(
-                        BaseProperties.MAIL_FROM, "example@example.com");
+                        PortofinoProperties.MAIL_FROM, "example@example.com");
                 sendForgotPasswordEmail(
                         from, email, ElementsThreadLocals.getText("user.passwordReset.emailSubject"), body);
             }
@@ -375,7 +375,7 @@ public abstract class LoginAction extends AbstractActionBean {
                 String body = getConfirmSignUpEmailBody(siteUrl, changePasswordLink);
 
                 String from = portofinoConfiguration.getString(
-                        BaseProperties.MAIL_FROM, "example@example.com");
+                        PortofinoProperties.MAIL_FROM, "example@example.com");
                 sendSignupConfirmationEmail(
                         from, email, ElementsThreadLocals.getText("user.signUp.email.subject"), body);
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("user.signUp.email.sent"));

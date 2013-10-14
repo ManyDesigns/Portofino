@@ -33,7 +33,7 @@ import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.queue.QueueException;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
-import com.manydesigns.portofino.BaseProperties;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
@@ -106,7 +106,7 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
 
     @Override
     public String getApplicationName() {
-        return portofinoConfiguration.getString(BaseProperties.APP_NAME);
+        return portofinoConfiguration.getString(PortofinoProperties.APP_NAME);
     }
 
     @Override

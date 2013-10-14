@@ -43,7 +43,7 @@ import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XmlBuffer;
-import com.manydesigns.portofino.BaseProperties;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
@@ -2339,7 +2339,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     protected String getUrlEncoding() {
         return portofinoConfiguration.getString(
-                BaseProperties.URL_ENCODING, BaseProperties.URL_ENCODING_DEFAULT);
+                PortofinoProperties.URL_ENCODING, PortofinoProperties.URL_ENCODING_DEFAULT);
     }
 
     /**

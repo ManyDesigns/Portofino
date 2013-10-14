@@ -29,7 +29,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.CommonsConfigurationAccessor;
 import com.manydesigns.elements.util.BootstrapSizes;
-import com.manydesigns.portofino.BaseProperties;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
@@ -90,16 +90,16 @@ public class SettingsAction extends AbstractActionBean {
 
         CommonsConfigurationAccessor accessor = new CommonsConfigurationAccessor(configuration);
         form = new FormBuilder(accessor)
-                .configFields(BaseProperties.APP_NAME, BaseProperties.LANDING_PAGE)
-                .configSelectionProvider(pagesSelectionProvider, BaseProperties.LANDING_PAGE)
+                .configFields(PortofinoProperties.APP_NAME, PortofinoProperties.LANDING_PAGE)
+                .configSelectionProvider(pagesSelectionProvider, PortofinoProperties.LANDING_PAGE)
                 .build();
         //TODO I18n
-        TextField appNameField = (TextField) form.findFieldByPropertyName(BaseProperties.APP_NAME);
+        TextField appNameField = (TextField) form.findFieldByPropertyName(PortofinoProperties.APP_NAME);
         appNameField.setLabel("Application name");
         appNameField.setRequired(true);
         appNameField.setFieldCssClass(BootstrapSizes.BLOCK_LEVEL);
 
-        Field landingPageField = form.findFieldByPropertyName(BaseProperties.LANDING_PAGE);
+        Field landingPageField = form.findFieldByPropertyName(PortofinoProperties.LANDING_PAGE);
         landingPageField.setLabel("Landing page");
         landingPageField.setRequired(true);
         

@@ -25,7 +25,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.portofino.BaseProperties;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
@@ -241,7 +241,7 @@ public class TextAction extends AbstractPageAction {
         List<String> hosts = new ArrayList<String>();
         hosts.add(context.getRequest().getLocalAddr());
         hosts.add(context.getRequest().getLocalName());
-        hosts.addAll(portofinoConfiguration.getList(BaseProperties.HOSTNAMES));
+        hosts.addAll(portofinoConfiguration.getList(PortofinoProperties.HOSTNAMES));
         String patternString = BASE_USER_URL_PATTERN.replace("HOSTS", "(" + StringUtils.join(hosts, ")|(") + ")");
         Pattern pattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(content);

@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.persistence;
 
 import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.portofino.BaseProperties;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
@@ -392,7 +392,7 @@ public class Persistence {
     //**************************************************************************
 
     public String getName() {
-        return getPortofinoProperties().getString(BaseProperties.APP_NAME);
+        return getPortofinoProperties().getString(PortofinoProperties.APP_NAME);
     }
 
     public File getAppDbsDir() {
