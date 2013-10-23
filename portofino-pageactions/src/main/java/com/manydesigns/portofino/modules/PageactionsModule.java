@@ -35,8 +35,8 @@ import com.manydesigns.portofino.pageactions.login.DefaultLoginAction;
 import com.manydesigns.portofino.pageactions.login.OpenIdLoginAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
-import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
+import groovy.lang.GroovyClassLoader;
 import groovy.util.GroovyScriptEngine;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.configuration.Configuration;
@@ -92,6 +92,8 @@ public class PageactionsModule implements Module {
     protected EnvironmentLoader environmentLoader = new EnvironmentLoader();
 
     protected CacheManager cacheManager;
+
+    protected GroovyClassLoader groovyClassLoader;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -159,41 +161,47 @@ public class PageactionsModule implements Module {
         logger.debug("Publishing the Application Realm in the servlet context");
         RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
 
-        logger.info("Initializing Groovy script engine");
         File groovyClasspath = new File(applicationDirectory, "groovy");
+        logger.info("Initializing Groovy script engine with classpath: " + groovyClasspath.getAbsolutePath());
         ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(groovyClasspath);
 
         servletContext.setAttribute(GROOVY_CLASS_PATH, groovyClasspath);
         GroovyScriptEngine groovyScriptEngine = createScriptEngine(groovyClasspath);
+        groovyClassLoader = groovyScriptEngine.getGroovyClassLoader();
+        logger.info("Preloading Groovy classes");
+        preloadGroovyClasses(groovyClasspath);
+        servletContext.setAttribute(BaseModule.CLASS_LOADER, groovyClassLoader);
         servletContext.setAttribute(GROOVY_SCRIPT_ENGINE, groovyScriptEngine);
 
-        File appListenerFile = new File(groovyClasspath, "AppListener.groovy");
         try {
-            ElementsThreadLocals.setServletContext(servletContext); //Necessary for getGroovyObject
-            Object listener = ScriptingUtil.getGroovyObject(appListenerFile);
+            Object listener = groovyClassLoader.loadClass("AppListener").newInstance();
             if(listener != null) {
                 if(listener instanceof ApplicationListener) {
                     ApplicationListener applicationListener = (ApplicationListener) listener;
-                    logger.info("Groovy application listener found at {}", appListenerFile.getAbsolutePath());
+                    logger.info("Groovy application listener found: {}", listener);
                     applicationListeners.add(applicationListener);
                 } else {
                     logger.error(
-                            "Candidate app listener " + listener + " found at " + appListenerFile.getAbsolutePath() +
+                            "Candidate Groovy application listener " + listener +
                             " is not an instance of " + ApplicationListener.class);
                 }
             } else {
                 logger.debug("No Groovy app listener present");
             }
+        } catch (ClassNotFoundException e) {
+            logger.debug("Groovy AppListener not present", e);
         } catch (Throwable e) {
             logger.error("Could not invoke app listener", e);
         }
 
         File pagesDirectory = new File(applicationDirectory, "pages");
+        logger.info("Pages directory: " + pagesDirectory);
         ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(pagesDirectory);
-        servletContext.setAttribute(PAGES_DIRECTORY, pagesDirectory);
 
-        ClassLoader classLoader = groovyScriptEngine.getGroovyClassLoader();
-        servletContext.setAttribute(BaseModule.CLASS_LOADER, classLoader);
+        ElementsThreadLocals.setServletContext(servletContext); //Necessary for getGroovyObject
+        logger.info("Preloading pages");
+        preloadPageActions(pagesDirectory);
+        servletContext.setAttribute(PAGES_DIRECTORY, pagesDirectory);
 
         logger.debug("Creating pageactions registry");
         PageActionRegistry pageActionRegistry = new PageActionRegistry();
@@ -201,11 +209,6 @@ public class PageactionsModule implements Module {
         pageActionRegistry.register(DefaultLoginAction.class);
         pageActionRegistry.register(OpenIdLoginAction.class);
         servletContext.setAttribute(PAGE_ACTIONS_REGISTRY, pageActionRegistry);
-
-        File scriptFile = new File(groovyClasspath, "Security.groovy");
-        SecurityGroovyRealm realm = new SecurityGroovyRealm(groovyScriptEngine, scriptFile.toURI().toString());
-        LifecycleUtils.init(realm);
-        rsm.setRealm(realm);
 
         servletContext.setAttribute(TEMPLATES_REGISTRY, new TemplateRegistry());
 
@@ -215,7 +218,16 @@ public class PageactionsModule implements Module {
                 "configuration", "settings", null, "Settings", SettingsAction.URL_BINDING, 0.5);
         adminMenu.menuAppenders.add(link);
 
-        status = ModuleStatus.ACTIVE;
+        logger.debug("Creating SecurityGroovyRealm");
+        try {
+            SecurityGroovyRealm realm = new SecurityGroovyRealm(groovyClassLoader);
+            LifecycleUtils.init(realm);
+            rsm.setRealm(realm);
+            status = ModuleStatus.ACTIVE;
+        } catch (ClassNotFoundException e) {
+            logger.error("Security.groovy not found or invalid", e);
+            status = ModuleStatus.FAILED;
+        }
     }
 
     protected GroovyScriptEngine createScriptEngine(File classpathFile) {
@@ -234,6 +246,49 @@ public class PageactionsModule implements Module {
         }
         scriptEngine.setConfig(cc);
         return scriptEngine;
+    }
+
+    protected void preloadPageActions(File directory) {
+        for(File file : directory.listFiles()) {
+            logger.debug("visit {}", file);
+            if(file.isDirectory()) {
+                if(!file.equals(directory) && !file.equals(directory.getParentFile())) {
+                    preloadPageActions(file);
+                }
+            } else if("action.groovy".equals(file.getName())) {
+                logger.debug("Preloading page: {}", file);
+                try {
+                    Class<?> clazz = DispatcherLogic.getActionClass(configuration, directory);
+                    clazz.newInstance();
+                } catch(Throwable t) {
+                    logger.warn("PageAction preload failed for page " + file.getAbsolutePath(), t);
+                }
+            }
+        }
+    }
+
+    protected void preloadGroovyClasses(File directory) {
+        preloadGroovyClasses(directory, "");
+    }
+
+    protected void preloadGroovyClasses(File directory, String pkg) {
+        for(File file : directory.listFiles()) {
+            logger.debug("visit {}", file);
+            if(file.isDirectory()) {
+                if(!file.equals(directory) && !file.equals(directory.getParentFile())) {
+                    preloadGroovyClasses(file, pkg + file.getName() + ".");
+                }
+            } else {
+                String name = file.getName();
+                String className = pkg + name.substring(0, name.length() - ".groovy".length());
+                logger.debug("Preloading " + className);
+                try {
+                    Class.forName(className, true, groovyClassLoader);
+                } catch(Throwable t) {
+                    logger.warn("Groovy class preload failed for class " + className, t);
+                }
+            }
+        }
     }
 
     @Override

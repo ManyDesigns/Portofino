@@ -23,7 +23,6 @@ package com.manydesigns.portofino.shiro;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.di.Injections;
-import groovy.util.GroovyScriptEngine;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -59,8 +58,7 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     // Properties
     //--------------------------------------------------------------------------
 
-    protected final String securityGroovyPath;
-    protected final GroovyScriptEngine scriptEngine;
+    protected final ClassLoader classLoader;
     protected volatile PortofinoRealm security;
     protected volatile boolean destroyed = false;
 
@@ -70,39 +68,40 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     // Constructors
     //--------------------------------------------------------------------------
 
-    public SecurityGroovyRealm(GroovyScriptEngine scriptEngine, String securityGroovyPath) {
-        this.scriptEngine = scriptEngine;
-        this.securityGroovyPath = securityGroovyPath;
+    public SecurityGroovyRealm(ClassLoader classLoader) throws ClassNotFoundException {
+        this.classLoader = classLoader;
     }
 
     //--------------------------------------------------------------------------
     // Delegation support
     //--------------------------------------------------------------------------
 
-    private PortofinoRealm ensureDelegate() {
+    private synchronized PortofinoRealm ensureDelegate() {
         if(destroyed) {
             throw new IllegalStateException("This realm has been destroyed.");
         }
         try {
-            Class<?> scriptClass = scriptEngine.loadScriptByName(securityGroovyPath);
-            Object security = this.security;
+            Class<?> scriptClass = Class.forName("Security", true, classLoader);
             if(scriptClass.isInstance(security)) { //Class did not change
-                return this.security;
+                return security;
             } else {
                 logger.info("Refreshing Portofino Realm Delegate instance (Security.groovy)");
-                security = scriptClass.newInstance();
-                if(security instanceof PortofinoRealm) {
-                    PortofinoRealm realm = (PortofinoRealm) security;
+                if(security != null) {
+                    logger.info("Script class changed: from " + security.getClass() + " to " + scriptClass);
+                }
+                Object securityTemp = scriptClass.newInstance();
+                if(securityTemp instanceof PortofinoRealm) {
+                    PortofinoRealm realm = (PortofinoRealm) securityTemp;
                     configureDelegate(realm);
-                    PortofinoRealm oldSecurity = this.security;
-                    this.security = realm;
+                    PortofinoRealm oldSecurity = security;
+                    security = realm;
                     LifecycleUtils.destroy(oldSecurity);
                     return realm;
                 } else {
                      throw new Error(
-                             "Security object is not an instance of " + PortofinoRealm.class + ": " + security +
-                             " (" + security.getClass().getSuperclass() + " " +
-                             Arrays.asList(security.getClass().getInterfaces()) + ")");
+                             "Security object is not an instance of " + PortofinoRealm.class + ": " + securityTemp +
+                             " (" + securityTemp.getClass().getSuperclass() + " " +
+                             Arrays.asList(securityTemp.getClass().getInterfaces()) + ")");
                 }
             }
         } catch (Exception e) {
