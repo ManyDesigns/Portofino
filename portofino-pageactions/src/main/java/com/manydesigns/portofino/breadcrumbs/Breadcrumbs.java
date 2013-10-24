@@ -64,8 +64,8 @@ public class Breadcrumbs {
             Page page = current.getPage();
             sb.append(current.getName());
             BreadcrumbItem item = new BreadcrumbItem(
-                    sb.toString(), current.getTitle(),
-                    current.getDescription());
+                    sb.toString(), current.getPage().getTitle(),
+                    current.getPage().getDescription());
             if(page.getActualNavigationRoot() != NavigationRoot.GHOST_ROOT) {
                 items.add(item);
             }

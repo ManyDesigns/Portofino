@@ -134,13 +134,11 @@ public class Navigation {
                 String path = prefix + childPage.getName();
                 boolean inPath = false;
                 boolean selected = false;
-                String title = page.getTitle();
                 String description = page.getDescription();
                 if (next != null) {
                     if (next.getName().equals(childPage.getName())) {
                         inPath = true;
                         selected = (i == pageInstancesLength - 2);
-                        title = next.getTitle();
                         description = next.getDescription();
                     }
                 }
@@ -157,7 +155,7 @@ public class Navigation {
                     continue;
                 }
                 NavigationItem childNavigationItem =
-                        new NavigationItem(title, description, path, inPath, selected, false);
+                        new NavigationItem(page.getTitle(), description, path, inPath, selected, false);
                 currentChildNavigationItems.add(childNavigationItem);
                 if (inPath) {
                     currentNavigationItem = childNavigationItem;
