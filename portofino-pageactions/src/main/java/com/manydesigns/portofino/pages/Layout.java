@@ -41,7 +41,7 @@ public class Layout {
     // Fields
     //**************************************************************************
 
-    protected String template;
+    protected String template = "default";
     protected final ArrayList<ChildPage> childPages;
 
     //**************************************************************************

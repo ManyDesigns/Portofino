@@ -793,10 +793,6 @@ public class PageAdminAction extends AbstractPageAction {
         return detailChildPagesForm;
     }
 
-    public String getPageTemplate() {
-        return getDefaultPageTemplate();
-    }
-
     protected Resolution forwardToPageChildren() {
         return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/children.jsp");
     }

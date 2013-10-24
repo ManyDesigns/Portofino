@@ -13,7 +13,7 @@
     String fragment = parameters.get(0);
     String path = actionBean.getContext().getActualServletPath();
     path = path.substring(0, path.length() - fragment.length());
-%><stripes:layout-render name="${actionBean.pageTemplate}/normal.jsp">
+%><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
     <stripes:layout-component name="mainPageAction">
         <jsp:include page="/theme/breadcrumbs.jsp" />
         <stripes:form action="/actions/admin/page" method="post">

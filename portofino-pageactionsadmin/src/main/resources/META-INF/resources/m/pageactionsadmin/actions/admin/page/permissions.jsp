@@ -16,7 +16,7 @@
 %><%@ page import="java.util.Collections"
 %><jsp:useBean id="actionBean" scope="request"
                type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"
-/><stripes:layout-render name="${actionBean.pageTemplate}/modal.jsp">
+/><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
     <stripes:layout-component name="sidebar" />
     <stripes:layout-component name="mainPageActionHeader">
         <mde:sessionMessages />

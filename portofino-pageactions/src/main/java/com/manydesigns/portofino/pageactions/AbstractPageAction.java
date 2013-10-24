@@ -63,7 +63,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
@@ -93,7 +92,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     public static final String PORTOFINO_PAGEACTION_EXCEPTION = "portofino.pageaction.exception";
 
     public static final String CONF_FORM_PREFIX = "config";
-    public static final String THEME_TEMPLATES = "/theme/templates/";
 
     //--------------------------------------------------------------------------
     // Properties
@@ -224,34 +222,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return forwardTo(pageJsp);
     }
 
-    public String getPageTemplate() {
-        Layout layout = getPageInstance().getLayout();
-        return getPageTemplate(layout);
-    }
-
-    public String getPageTemplate(Layout layout) {
-        String template = layout.getTemplate();
-        if(StringUtils.isBlank(template)) {
-            return getDefaultPageTemplate();
-        }
-
-        template = THEME_TEMPLATES + template;
-        try {
-            if(context.getServletContext().getResource(template) == null) {
-                logger.warn("Template directory {} does not exist in /theme/templates, using default", template);
-                return getDefaultPageTemplate();
-            }
-        } catch (MalformedURLException e) {
-            logger.error("Malformed template path", e);
-            return getDefaultPageTemplate();
-        }
-        return template;
-    }
-
-    protected String getDefaultPageTemplate() {
-        return "/theme/templates/" + templates.iterator().next(); //Assumes at least a template has been registered
-    }
-
     @Button(list = "configuration", key = "commons.cancel", order = 99)
     public Resolution cancel() {
         return new RedirectResolution(getCancelReturnUrl(), false);
@@ -330,8 +300,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         edit.title = page.getTitle();
         edit.description = page.getDescription();
         edit.navigationRoot = page.getActualNavigationRoot();
-        edit.template = getPageTemplate(page.getLayout()).substring(THEME_TEMPLATES.length());
-        edit.detailTemplate = getPageTemplate(page.getDetailLayout()).substring(THEME_TEMPLATES.length());
+        edit.template = page.getLayout().getTemplate();
+        edit.detailTemplate = page.getDetailLayout().getTemplate();
         pageConfigurationForm.readFromObject(edit);
 
         if(script == null) {

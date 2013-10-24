@@ -10,7 +10,7 @@
     taglib prefix="mde" uri="/manydesigns-elements"%><%@
     taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%@
     taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<stripes:layout-render name="${actionBean.pageTemplate}/modal.jsp">
+<stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
     <stripes:layout-component name="sidebar" />
     <stripes:layout-component name="mainPageActionHeader">
