@@ -168,8 +168,6 @@ public class PageactionsModule implements Module {
         servletContext.setAttribute(GROOVY_CLASS_PATH, groovyClasspath);
         GroovyScriptEngine groovyScriptEngine = createScriptEngine(groovyClasspath);
         groovyClassLoader = groovyScriptEngine.getGroovyClassLoader();
-        logger.info("Preloading Groovy classes");
-        preloadGroovyClasses(groovyClasspath);
         servletContext.setAttribute(BaseModule.CLASS_LOADER, groovyClassLoader);
         servletContext.setAttribute(GROOVY_SCRIPT_ENGINE, groovyScriptEngine);
 
@@ -201,6 +199,8 @@ public class PageactionsModule implements Module {
         ElementsThreadLocals.setServletContext(servletContext); //Necessary for getGroovyObject
         logger.info("Preloading pages");
         preloadPageActions(pagesDirectory);
+        logger.info("Preloading Groovy classes");
+        preloadGroovyClasses(groovyClasspath);
         servletContext.setAttribute(PAGES_DIRECTORY, pagesDirectory);
 
         logger.debug("Creating pageactions registry");
