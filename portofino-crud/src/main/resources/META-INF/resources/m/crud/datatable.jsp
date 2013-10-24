@@ -28,13 +28,6 @@
     <input type="hidden" name="sortProperty" value="${actionBean.sortProperty}" />
     <input type="hidden" name="sortDirection" value="${actionBean.sortDirection}" />
     <input type="hidden" name="eventName" value="${actionBean.context.eventName}" />
-    <script type="text/javascript">
-        $(function() {
-            $("#pageaction_${pageId} button[name=bulkDelete]").click(function() {
-                return confirm ('<fmt:message key="commons.confirm" />');
-            });
-        });
-    </script>
     <div style="clear: both;"></div>
 </div>
 <%!

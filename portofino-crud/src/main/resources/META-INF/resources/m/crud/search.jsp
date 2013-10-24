@@ -11,7 +11,9 @@
         <c:out value="${actionBean.searchTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
-        <stripes:form action="${actionBean.context.actualServletPath}" method="post" class="form-inline">
+        <stripes:form
+                action="${actionBean.context.actualServletPath}" method="post" class="form-inline crud-search-form"
+                data-search-visible="${actionBean.searchVisible}">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
@@ -37,25 +39,6 @@
                 <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
             </c:if>
             <jsp:include page="/m/crud/datatable.jsp" />
-            <script type="text/javascript">
-                <c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
-                $(function() {
-                    $("#pageaction_${pageId} .search_form_toggle_link").click(makeToggleFunction());
-                    function makeToggleFunction() {
-                        var visible = ${actionBean.searchVisible};
-                        return function(event) {
-                            $(this).next().slideToggle(300);
-                            visible = !visible;
-                            if(visible) {
-                                $(event.target).html('<fmt:message key="layouts.crud.search.hideSearch" />');
-                            } else {
-                                $(event.target).html('<fmt:message key="layouts.crud.search.showSearch" />');
-                            }
-                            return false;
-                        };
-                    }
-                });
-            </script>
         </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

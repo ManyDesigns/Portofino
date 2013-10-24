@@ -44,11 +44,11 @@ import java.net.URL;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class BaseHrefFix {
+public class BaseHref {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    public static void fix(HttpServletRequest request, XhtmlBuffer xb) {
+    public static void emit(HttpServletRequest request, XhtmlBuffer xb) {
         //Setup base href - uniform handling of .../resource and .../resource/
         ActionBean actionBean = (ActionBean) request.getAttribute(StripesConstants.REQ_ATTR_ACTION_BEAN);
         if(actionBean instanceof AbstractActionBean) {

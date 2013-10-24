@@ -1,5 +1,5 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer"
-%><%@ page import="com.manydesigns.portofino.navigation.BaseHrefFix"
+%><%@ page import="com.manydesigns.portofino.navigation.BaseHref"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%--
@@ -29,7 +29,7 @@
     portofino.contextPath = '${pageContext.request.contextPath}';
 </script>
 <%
-    BaseHrefFix.fix(request, new XhtmlBuffer(out));
+    BaseHref.emit(request, new XhtmlBuffer(out));
 %>
 <style type="text/css">
 @media (min-width: 980px) {
