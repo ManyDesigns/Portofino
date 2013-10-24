@@ -37,7 +37,7 @@
                         <stripes:layout-component name="afterBreadcrumbs" />
                     </stripes:layout-component>
                     <stripes:layout-component name="mainPageActionBody">
-                        <div id="pageaction_${actionBean.pageInstance.page.id}">
+                        <div>
                             <stripes:layout-component name="portletHeader">
                                 <div class="portletHeader" style="padding-bottom: 0;">
                                     <h3>

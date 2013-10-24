@@ -20,7 +20,7 @@
             <stripes:layout-component name="mainPageAction">
                 <mde:sessionMessages />
                 <stripes:layout-component name="mainPageActionBody">
-                    <div id="pageaction_${actionBean.pageInstance.page.id}">
+                    <div>
                         <stripes:layout-component name="portletHeader">
                             <h2>
                                 <stripes:layout-component name="portletTitle" />
