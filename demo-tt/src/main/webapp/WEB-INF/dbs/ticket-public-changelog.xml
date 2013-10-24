@@ -158,8 +158,8 @@
             <column name="n" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="component_id" autoIncrement="true" type="int">
-                <constraints nullable="false" primaryKey="true"/>
+            <column name="component_id" type="int">
+                <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
@@ -194,7 +194,7 @@
             <column name="id" autoIncrement="true" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="file" type="varchar(255)">
+             <column name="file" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="title" type="varchar(255)">
@@ -222,7 +222,7 @@
             <column name="n" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="message" type="varchar(4000)">
+             <column name="message" type="varchar(4000)">
                 <constraints nullable="false"/>
             </column>
             <column name="user_id" type="int">
@@ -400,6 +400,8 @@
     </changeSet>
 
 
+
+
     <changeSet id="tt-023" author="Giampiero Granatella">
         <addPrimaryKey
                 columnNames="project_id, n"
@@ -407,161 +409,119 @@
                 tableName="tickets"/>
     </changeSet>
     <changeSet id="tt-024" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="tickets"
-                                 baseColumnNames="project_id"
-                                 constraintName="fk_ticket_project"
-                                 referencedTableName="projects"
-                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="tickets" baseColumnNames="project_id"
+                             constraintName="fk_ticket_project" referencedTableName="projects"
+                             referencedColumnNames="id"/>
     </changeSet>
     <changeSet id="tt-025" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="tickets"
-                                 baseColumnNames="state_id"
-                                 constraintName="fk_ticket_state"
-                                 referencedTableName="ticket_states"
-                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="tickets" baseColumnNames="state_id"
+                             constraintName="fk_ticket_state" referencedTableName="ticket_states"
+                             referencedColumnNames="id"/>
     </changeSet>
     <changeSet id="tt-026" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="tickets"
-                                 baseColumnNames="priority_id"
-                                 constraintName="fk_ticket_priority"
-                                 referencedTableName="ticket_priorities"
-                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="tickets" baseColumnNames="priority_id"
+                             constraintName="fk_ticket_priority" referencedTableName="ticket_priorities"
+                             referencedColumnNames="id"/>
     </changeSet>
     <changeSet id="tt-027" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="tickets"
-                                 baseColumnNames="assignee"
-                                 constraintName="fk_ticket_assignee"
-                                 referencedTableName="users"
-                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="tickets" baseColumnNames="assignee"
+                             constraintName="fk_ticket_assignee" referencedTableName="users"
+                             referencedColumnNames="id"/>
     </changeSet>
     <changeSet id="tt-028" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="tickets"
-                                 baseColumnNames="created_by"
-                                 constraintName="fk_ticket_creator"
-                                 referencedTableName="users"
-                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="tickets" baseColumnNames="created_by"
+                             constraintName="fk_ticket_creator" referencedTableName="users"
+                             referencedColumnNames="id"/>
     </changeSet>
     <changeSet id="tt-029" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="tickets"
-                                 baseColumnNames="type_id"
-                                 constraintName="fk_ticket_type"
-                                 referencedTableName="ticket_types"
-                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="tickets" baseColumnNames="type_id"
+                             constraintName="fk_ticket_type" referencedTableName="ticket_types"
+                             referencedColumnNames="id"/>
     </changeSet>
     <changeSet id="tt-030" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="tickets"
-                                 baseColumnNames="affected_version"
-                                 constraintName="fk_ticket_affected_version"
-                                 referencedTableName="versions"
-                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="tickets" baseColumnNames="affected_version"
+                             constraintName="fk_ticket_affected_version" referencedTableName="versions"
+                             referencedColumnNames="id"/>
     </changeSet>
     <changeSet id="tt-031" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="tickets"
-                                 baseColumnNames="fix_version"
-                                 constraintName="fk_ticket_fix_version"
-                                 referencedTableName="versions"
-                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="tickets" baseColumnNames="fix_version"
+                             constraintName="fk_ticket_fix_version" referencedTableName="versions"
+                             referencedColumnNames="id"/>
     </changeSet>
     <changeSet id="tt-032" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="activity"
-                                 baseColumnNames="project_id, n"
-                                 constraintName="fk_activity_ticket"
-                                 referencedTableName="tickets"
+        <addForeignKeyConstraint baseTableName="activity" baseColumnNames="project_id, n"
+                                 constraintName="fk_activity_ticket" referencedTableName="tickets"
                                  referencedColumnNames="project_id, n"/>
     </changeSet>
     <changeSet id="tt-033" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="activity"
-                                 baseColumnNames="user_id"
-                                 constraintName="fk_activity_user"
-                                 referencedTableName="users"
+        <addForeignKeyConstraint baseTableName="activity" baseColumnNames="user_id"
+                                 constraintName="fk_activity_user" referencedTableName="users"
                                  referencedColumnNames="id"/>
     </changeSet>
     <changeSet id="tt-034" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="versions"
-                                 baseColumnNames="state_id"
-                                 constraintName="fk_version_state"
-                                 referencedTableName="version_states"
+        <addForeignKeyConstraint baseTableName="versions" baseColumnNames="state_id"
+                                 constraintName="fk_version_state" referencedTableName="version_states"
                                  referencedColumnNames="id"/>
     </changeSet>
     <changeSet id="tt-035" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="affected_components"
-                                 baseColumnNames="component_id"
-                                 constraintName="fk_affected_component_component"
-                                 referencedTableName="components"
+        <addForeignKeyConstraint baseTableName="affected_components" baseColumnNames="component_id"
+                                 constraintName="fk_affected_component_component" referencedTableName="components"
                                  referencedColumnNames="id"/>
     </changeSet>
     <changeSet id="tt-036" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="affected_components"
-                                 baseColumnNames="project_id, n"
-                                 constraintName="fk_affected_component_ticket"
-                                 referencedTableName="tickets"
+        <addForeignKeyConstraint baseTableName="affected_components" baseColumnNames="project_id, n"
+                                 constraintName="fk_affected_component_ticket" referencedTableName="tickets"
                                  referencedColumnNames="project_id, n"/>
     </changeSet>
     <changeSet id="tt-037" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="comments"
-                                 baseColumnNames="user_id"
-                                 constraintName="fk_comment_user"
-                                 referencedTableName="users"
+        <addForeignKeyConstraint baseTableName="comments" baseColumnNames="user_id"
+                                 constraintName="fk_comment_user" referencedTableName="users"
                                  referencedColumnNames="id"/>
     </changeSet>
     <changeSet id="tt-038" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="members"
-                                 baseColumnNames="user_id"
-                                 constraintName="fk_member_user"
-                                 referencedTableName="users"
+        <addForeignKeyConstraint baseTableName="members" baseColumnNames="user_id"
+                                 constraintName="fk_member_user" referencedTableName="users"
                                  referencedColumnNames="id"/>
     </changeSet>
 
     <changeSet id="tt-039" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="members"
-                                 baseColumnNames="project_id"
-                                 constraintName="fk_member_project"
-                                 referencedTableName="projects"
+        <addForeignKeyConstraint baseTableName="members" baseColumnNames="project_id"
+                                 constraintName="fk_member_project" referencedTableName="projects"
                                  referencedColumnNames="id"/>
     </changeSet>
 
     <changeSet id="tt-040" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="components"
-                                 baseColumnNames="project_id"
-                                 constraintName="fk_component_project"
-                                 referencedTableName="projects"
+        <addForeignKeyConstraint baseTableName="components" baseColumnNames="project_id"
+                                 constraintName="fk_component_project" referencedTableName="projects"
                                  referencedColumnNames="id"/>
     </changeSet>
 
     <changeSet id="tt-041" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="members"
-                                 baseColumnNames="role_id"
-                                 constraintName="fk_member_role"
-                                 referencedTableName="roles"
+        <addForeignKeyConstraint baseTableName="members" baseColumnNames="role_id"
+                                 constraintName="fk_member_role" referencedTableName="roles"
                                  referencedColumnNames="id"/>
     </changeSet>
 
     <changeSet id="tt-042" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="tickets"
-                                 baseColumnNames="resolution_id"
-                                 constraintName="fk_ticket_resolution"
-                                 referencedTableName="ticket_resolutions"
+        <addForeignKeyConstraint baseTableName="tickets" baseColumnNames="resolution_id"
+                                 constraintName="fk_ticket_resolution" referencedTableName="ticket_resolutions"
                                  referencedColumnNames="id"/>
     </changeSet>
     <changeSet id="tt-043" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="attachments"
-                                 baseColumnNames="project_id, n"
-                                 constraintName="fk_attachment_ticket"
-                                 referencedTableName="tickets"
+        <addForeignKeyConstraint baseTableName="attachments" baseColumnNames="project_id, n"
+                                 constraintName="fk_attachment_ticket" referencedTableName="tickets"
                                  referencedColumnNames="project_id, n"/>
     </changeSet>
     <changeSet id="tt-044" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="versions"
-                                 baseColumnNames="project_id"
-                                 constraintName="fk_version_project"
-                                 referencedTableName="projects"
+        <addForeignKeyConstraint baseTableName="versions" baseColumnNames="project_id"
+                                 constraintName="fk_version_project" referencedTableName="projects"
                                  referencedColumnNames="id"/>
     </changeSet>
     <changeSet id="tt-045" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="comments"
-                                 baseColumnNames="project_id, n"
-                                 constraintName="fk_comment_ticket"
-                                 referencedTableName="tickets"
-                                 referencedColumnNames="project_id, n"/>
-    </changeSet>
+            <addForeignKeyConstraint baseTableName="comments" baseColumnNames="project_id, n"
+                                     constraintName="fk_comment_ticket" referencedTableName="tickets"
+                                     referencedColumnNames="project_id, n"/>
+        </changeSet>
+
+
 </databaseChangeLog>
