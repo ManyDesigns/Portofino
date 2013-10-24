@@ -64,8 +64,8 @@ public class Breadcrumbs {
             Page page = current.getPage();
             sb.append(current.getName());
             BreadcrumbItem item = new BreadcrumbItem(
-                    sb.toString(), page.getTitle(),
-                    page.getDescription());
+                    sb.toString(), current.getTitle(),
+                    current.getDescription());
             if(page.getActualNavigationRoot() != NavigationRoot.GHOST_ROOT) {
                 items.add(item);
             }
@@ -74,9 +74,9 @@ public class Breadcrumbs {
                     sb.append("/").append(param);
                 }
                 if(page.getActualNavigationRoot() != NavigationRoot.GHOST_ROOT) {
-                    String description = current.getActualDescription();
-                    String title = String.format("%s (%s)", description, page.getTitle());
-                    BreadcrumbItem item2 = new BreadcrumbItem(sb.toString(), description, title);
+                    String title = current.getTitle();
+                    String description = current.getDescription();
+                    BreadcrumbItem item2 = new BreadcrumbItem(sb.toString(), title, description);
                     items.add(item2);
                 }
             }

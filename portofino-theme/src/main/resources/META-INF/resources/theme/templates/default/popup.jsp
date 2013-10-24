@@ -16,7 +16,7 @@
         <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.dispatcher.PageAction" />
         <title>
             <stripes:layout-component name="pageTitle">
-                <c:out value="${actionBean.pageInstance.actualDescription}"/>
+                <c:out value="${actionBean.pageInstance.description}"/>
             </stripes:layout-component>
         </title>
     </head>

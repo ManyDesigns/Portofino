@@ -49,6 +49,7 @@ public class PageInstance {
     protected final Class<? extends PageAction> actionClass;
     protected Object configuration;
     protected PageAction actionBean;
+    protected String title;
     protected String description;
     protected boolean prepared;
 
@@ -67,6 +68,8 @@ public class PageInstance {
         this.page = page;
         this.actionClass = actionClass;
         parameters = new ArrayList<String>();
+        this.title = page.getTitle();
+        this.description = page.getDescription();
     }
 
     public PageInstance copy() {
@@ -75,6 +78,7 @@ public class PageInstance {
         pageInstance.parameters.addAll(parameters);
         pageInstance.configuration = configuration;
         pageInstance.actionBean = actionBean;
+        pageInstance.title = title;
         pageInstance.description = description;
         return pageInstance;
     }
@@ -209,16 +213,20 @@ public class PageInstance {
         return directory.getName();
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getActualDescription() {
-        return description != null ? description : page.getDescription();
     }
 
     public boolean isPrepared() {

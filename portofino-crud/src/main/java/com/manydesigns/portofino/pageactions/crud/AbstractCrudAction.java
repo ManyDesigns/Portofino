@@ -927,13 +927,16 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             object = loadObjectByPrimaryKey(pkObject);
             if(object != null) {
                 ognlContext.put(crudConfiguration.getActualVariable(), object);
-                String description = ShortNameUtils.getName(classAccessor, object);
-                pageInstance.setDescription(description);
+                String title = getReadTitle();
+                pageInstance.setTitle(title);
+                pageInstance.setDescription(title);
             } else {
                 return notInUseCase(context, parameters);
             }
         } else {
-            pageInstance.setDescription(crudConfiguration.getSearchTitle());
+            String title = crudConfiguration.getSearchTitle();
+            pageInstance.setTitle(title);
+            pageInstance.setDescription(title);
         }
         return null;
     }

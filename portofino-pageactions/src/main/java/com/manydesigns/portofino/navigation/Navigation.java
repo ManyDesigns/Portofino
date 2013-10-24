@@ -89,7 +89,7 @@ public class Navigation {
         Page rootPage = rootPageInstance.getPage();
         boolean rootGhost = rootPage.getActualNavigationRoot() == NavigationRoot.GHOST_ROOT;
         rootNavigationItem = new NavigationItem(
-                rootPage.getTitle(), rootPageInstance.getActualDescription(), prefix, true, rootSelected, rootGhost);
+                rootPageInstance.getTitle(), rootPageInstance.getDescription(), prefix, true, rootSelected, rootGhost);
         LinkedList<Page> pages = new LinkedList<Page>();
         PageInstance[] allInstances = dispatch.getPageInstancePath();
         for(int i = 0; i <= rootPageIndex; i++) {
@@ -134,12 +134,14 @@ public class Navigation {
                 String path = prefix + childPage.getName();
                 boolean inPath = false;
                 boolean selected = false;
+                String title = page.getTitle();
                 String description = page.getDescription();
                 if (next != null) {
                     if (next.getName().equals(childPage.getName())) {
                         inPath = true;
                         selected = (i == pageInstancesLength - 2);
-                        description = next.getActualDescription();
+                        title = next.getTitle();
+                        description = next.getDescription();
                     }
                 }
                 pages.add(page);
@@ -155,7 +157,7 @@ public class Navigation {
                     continue;
                 }
                 NavigationItem childNavigationItem =
-                        new NavigationItem(page.getTitle(), description, path, inPath, selected, false);
+                        new NavigationItem(title, description, path, inPath, selected, false);
                 currentChildNavigationItems.add(childNavigationItem);
                 if (inPath) {
                     currentNavigationItem = childNavigationItem;
@@ -166,7 +168,7 @@ public class Navigation {
                 String path = prefix + next.getName();
                 currentNavigationItem =
                         new NavigationItem(
-                                next.getPage().getTitle(), next.getActualDescription(), path, true, selected, false);
+                                next.getTitle(), next.getDescription(), path, true, selected, false);
                 currentChildNavigationItems.add(currentNavigationItem);
             }
 
