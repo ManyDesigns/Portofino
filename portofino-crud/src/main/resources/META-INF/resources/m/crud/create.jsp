@@ -7,7 +7,10 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"
 /><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
-    <stripes:layout-component name="customScripts">
+    <stripes:layout-component name="portletTitle">
+        <c:out value="${actionBean.createTitle}"/>
+    </stripes:layout-component>
+    <stripes:layout-component name="portletBody">
         <c:if test="${actionBean.formWithRichTextFields}">
             <script type="text/javascript" src="<stripes:url value="/theme/ckeditor/ckeditor.js"/>"></script>
             <script type="text/javascript" src="<stripes:url value="/theme/ckeditor/adapters/jquery.js"/>"></script>
@@ -20,11 +23,6 @@
                 });
             </script>
         </c:if>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <c:out value="${actionBean.createTitle}"/>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
         <c:if test="${actionBean.requiredFieldsPresent}">
             <p><fmt:message key="commons.fields_required"/>.</p>
         </c:if>

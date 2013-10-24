@@ -5,14 +5,14 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/theme/templates/dialog/modal.jsp">
-    <stripes:layout-component name="customScripts">
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.login.OpenIdLoginAction"/>
+    <stripes:layout-component name="portletTitle">
+        <fmt:message key="skins.default.login.login_to">
+            <fmt:param value="${actionBean.applicationName}" />
+        </fmt:message>
+    </stripes:layout-component>
+    <stripes:layout-component name="portletBody">
         <!-- Simple OpenID Selector -->
-        <link type="text/css" rel="stylesheet" href="<stripes:url value="/m/pageactions/openid-selector/css/openid.css" />" />
-        <style type="text/css">
-            #openid_form { width: auto; }
-            #openid_username { margin-right: .5em; }
-            div#openid_highlight { padding: 0; }
-        </style>
         <script type="text/javascript" src="<stripes:url value="/m/pageactions/openid-selector/js/openid-jquery.js" />"></script>
         <script type="text/javascript" src="<stripes:url value="/m/pageactions/openid-custom.js"/>"></script>
         <script type="text/javascript">
@@ -44,14 +44,6 @@
             });
         </script>
         <!-- /Simple OpenID Selector -->
-    </stripes:layout-component>
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.login.OpenIdLoginAction"/>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="skins.default.login.login_to">
-            <fmt:param value="${actionBean.applicationName}" />
-        </fmt:message>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
         <stripes:form action="${pageContext.request.contextPath}${actionBean.context.actualServletPath}" method="post"
                       id="openid_form">
             <stripes:hidden name="returnUrl"/>

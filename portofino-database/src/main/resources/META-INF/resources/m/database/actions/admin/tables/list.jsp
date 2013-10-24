@@ -11,7 +11,13 @@
 %><%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/m/base/admin-theme/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.TablesAction"/>
-    <stripes:layout-component name="customScripts">
+    <stripes:layout-component name="pageTitle">
+        Tables
+    </stripes:layout-component>
+    <stripes:layout-component name="portletTitle">
+        Tables
+    </stripes:layout-component>
+    <stripes:layout-component name="portletBody">
         <stripes:url var="treetablePath"
                      value="/theme/jquery-treetable" />
 
@@ -125,14 +131,6 @@
               background-image: url(${treetablePath}/images/collapse-light.png);
             }
         </style>
-    </stripes:layout-component>
-    <stripes:layout-component name="pageTitle">
-        Tables
-    </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        Tables
-    </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
         <table id="tables" style="width: auto;">
             <tr>
                 <th width="20%"><fmt:message key="layouts.admin.tables.databaseSlashSchema" /></th>

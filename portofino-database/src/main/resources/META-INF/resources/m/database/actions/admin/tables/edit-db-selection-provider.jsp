@@ -7,16 +7,6 @@
 %><%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/m/base/admin-theme/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.TablesAction"/>
-    <stripes:layout-component name="customScripts">
-        <script type="text/javascript">
-            $(function() {
-                $("button[name=removeSelectionProvider]").click(
-                        function() {
-                            return confirm('<fmt:message key="commons.confirm" />');
-                        });
-            });
-        </script>
-    </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
         <c:if test="${empty actionBean.selectionProviderName}">
             <fmt:message key="layouts.admin.tables.addSelectionProvider.title">
@@ -42,6 +32,14 @@
         </c:if>
     </stripes:layout-component>
     <stripes:layout-component name="portletBody">
+        <script type="text/javascript">
+            $(function() {
+                $("button[name=removeSelectionProvider]").click(
+                        function() {
+                            return confirm('<fmt:message key="commons.confirm" />');
+                        });
+            });
+        </script>
         <stripes:form action="${actionBean.actionPath}"
                       method="post" class="form-horizontal">
             <mde:write name="actionBean" property="dbSelectionProviderForm" />

@@ -8,7 +8,17 @@
 %><%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/m/base/admin-theme/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.TablesAction"/>
-    <stripes:layout-component name="customScripts">
+    <stripes:layout-component name="pageTitle">
+        <fmt:message key="layouts.admin.tables.title">
+            <fmt:param value="${actionBean.table.qualifiedName}" />
+        </fmt:message>
+    </stripes:layout-component>
+    <stripes:layout-component name="portletTitle">
+        <fmt:message key="layouts.admin.tables.title">
+            <fmt:param value="${actionBean.table.qualifiedName}" />
+        </fmt:message>
+    </stripes:layout-component>
+    <stripes:layout-component name="portletBody">
         <style type="text/css">
             .tableForm {
                 overflow-x: auto;
@@ -62,18 +72,6 @@
                 });
             });
         </script>
-    </stripes:layout-component>
-    <stripes:layout-component name="pageTitle">
-        <fmt:message key="layouts.admin.tables.title">
-            <fmt:param value="${actionBean.table.qualifiedName}" />
-        </fmt:message>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.admin.tables.title">
-            <fmt:param value="${actionBean.table.qualifiedName}" />
-        </fmt:message>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
         <stripes:form action="${actionBean.actionPath}" method="post">
             <ul id="tabs" class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#tab-table-columns">
