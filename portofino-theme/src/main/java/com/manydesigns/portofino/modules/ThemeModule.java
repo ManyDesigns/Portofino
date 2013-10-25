@@ -89,7 +89,7 @@ public class ThemeModule implements Module {
     public void init() {
         templates.register("default");
         templates.register("dialog");
-        templates.register("naked");
+        templates.register("main-with-tabs");
         templates.register("well-with-tabs");
         status = ModuleStatus.ACTIVE;
     }

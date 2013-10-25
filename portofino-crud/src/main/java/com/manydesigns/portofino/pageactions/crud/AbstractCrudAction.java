@@ -2377,11 +2377,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     /**
      * Returns an OGNL expression that, when evaluated against a persistent object, produces a
      * URL path suitable to be used as a link to that object.
+     * @return the read link expression.
      */
     protected String getReadLinkExpression() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(context.getActualServletPath());
-        sb.append("/");
+        String actualServletPath = context.getActualServletPath();
+        StringBuilder sb = new StringBuilder(actualServletPath);
+        if(!actualServletPath.endsWith("/")) {
+            sb.append("/");
+        }
         boolean first = true;
 
         for (PropertyAccessor property : classAccessor.getKeyProperties()) {
