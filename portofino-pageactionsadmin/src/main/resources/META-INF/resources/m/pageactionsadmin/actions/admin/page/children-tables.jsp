@@ -44,8 +44,8 @@
             });
         }
         $("button[name=updatePageChildren]").click(
-                function() {
-                    prepareChildrenTablesForm(sortables);
-                });
+            function() {
+                prepareChildrenTablesForm(sortables);
+            });
         });
 </script>

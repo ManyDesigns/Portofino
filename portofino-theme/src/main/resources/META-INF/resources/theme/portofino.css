@@ -112,10 +112,12 @@ General
     color: red;
     font-weight: bold;
 }
+
 .status_amber {
     color: #880;
     font-weight: bold;
 }
+
 .status_green {
     color: green;
     font-weight: bold;
@@ -143,11 +145,11 @@ body.dialog {
     background-color: #ffffff;
     border: 1px solid #e5e5e5;
     -webkit-border-radius: 5px;
-       -moz-border-radius: 5px;
-            border-radius: 5px;
-    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
-       -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
-            box-shadow: 0 1px 2px rgba(0,0,0,.05);
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+    -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
 }
 
 .spacingTop {
@@ -194,14 +196,16 @@ PageActions
 
 .pageHeader {
     margin-bottom: 12px;
+    margin-top: 10px;
     float: left;
     width: 100%;
     padding-bottom: 8px;
-    border-bottom: 1px solid #E5E5E5
+    border-bottom: 1px solid #E5E5E5;
 }
 
 .pageHeader h3, .pageHeader h4 {
     margin-bottom: 0;
+    margin-top: 0;
 }
 
 .pageHeader form {
@@ -235,7 +239,8 @@ Search form
 }
 
 .searchform .control-group {
-    display: inline-block; margin-right: 1em;
+    display: inline-block;
+    margin-right: 1em;
 }
 
 .searchform label.match_mode {
@@ -253,7 +258,9 @@ Search form
 }
 
 .searchform .controls label.checkbox input {
-    margin-top: 0; margin-left: 10px; margin-right: 10px;
+    margin-top: 0;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .searchform fieldset {
@@ -286,100 +293,99 @@ Treetable
 *******************************************************************************/
 
 table.treetable span.indenter {
-  display: inline-block;
-  margin: 0;
-  padding: 0;
-  text-align: right;
-  user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -o-user-select: none;
-  -webkit-user-select: none;
-  width: 19px;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    text-align: right;
+    user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    -webkit-user-select: none;
+    width: 19px;
 }
 
 table.treetable span.indenter a {
-  background-position: left center;
-  background-repeat: no-repeat;
-  display: inline-block;
-  text-decoration: none;
-  width: 19px;
+    background: no-repeat left center;
+    display: inline-block;
+    text-decoration: none;
+    width: 19px;
 }
 
 table.treetable {
-  border: 1px solid #888;
-  border-collapse: collapse;
-  margin: .6em 0 1.8em 0;
-  width: 100%;
+    border: 1px solid #888;
+    border-collapse: collapse;
+    margin: .6em 0 1.8em 0;
+    width: 100%;
 }
 
 table.treetable caption {
-  font-weight: bold;
-  margin-bottom: .2em;
+    font-weight: bold;
+    margin-bottom: .2em;
 }
 
 table.treetable thead {
-  background: #aaa url(jquery-treetable/images/bg-table-thead.png) repeat-x top left;
+    background: #aaa url(jquery-treetable/images/bg-table-thead.png) repeat-x top left;
 }
 
 table.treetable thead tr th {
-  border: 1px solid #888;
-  font-weight: normal;
-  padding: .3em 1em .1em 1em;
-  text-align: left;
+    border: 1px solid #888;
+    font-weight: normal;
+    padding: .3em 1em .1em 1em;
+    text-align: left;
 }
 
 table.treetable tbody tr td {
-  cursor: default;
-  padding: .3em 1em;
+    cursor: default;
+    padding: .3em 1em;
 }
 
 table.treetable span {
-  background-position: center left;
-  background-repeat: no-repeat;
-  padding: .2em 0 .2em 1.5em;
+    background-position: center left;
+    background-repeat: no-repeat;
+    padding: .2em 0 .2em 1.5em;
 }
 
 table.treetable span.file {
-  background-image: url(jquery-treetable/images/file.png);
+    background-image: url(jquery-treetable/images/file.png);
 }
 
 table.treetable span.folder {
-  background-image: url(jquery-treetable/images/folder.png);
+    background-image: url(jquery-treetable/images/folder.png);
 }
 
 table.treetable tr.collapsed span.indenter a {
-  background-image: url(jquery-treetable/images/expand.png);
+    background-image: url(jquery-treetable/images/expand.png);
 }
 
 table.treetable tr.expanded span.indenter a {
-  background-image: url(jquery-treetable/images/collapse.png);
+    background-image: url(jquery-treetable/images/collapse.png);
 }
 
 table.treetable tr.selected {
-  background-color: #3875d7;
-  color: #fff;
+    background-color: #3875d7;
+    color: #fff;
 }
 
 table.treetable tr.collapsed.selected span.indenter a {
-  background-image: url(jquery-treetable/images/expand-light.png);
+    background-image: url(jquery-treetable/images/expand-light.png);
 }
 
 table.treetable tr.expanded.selected span.indenter a {
-  background-image: url(jquery-treetable/images/collapse-light.png);
+    background-image: url(jquery-treetable/images/collapse-light.png);
 }
 
 table.treetable tr.accept {
-  background-color: #a3bce4;
-  color: #fff
+    background-color: #a3bce4;
+    color: #fff
 }
 
 table.treetable tr.collapsed.accept td span.indenter a {
-  background-image: url(jquery-treetable/images/expand-light.png);
+    background-image: url(jquery-treetable/images/expand-light.png);
 }
 
 table.treetable tr.expanded.accept td span.indenter a {
-  background-image: url(jquery-treetable/images/collapse-light.png);
+    background-image: url(jquery-treetable/images/collapse-light.png);
 }
 
 /*******************************************************************************
@@ -387,8 +393,11 @@ Forms
 *******************************************************************************/
 
 #scriptEditor {
-    min-height: 20em; width: 100%; display: none;
-    position: relative; padding: 0;
+    min-height: 20em;
+    width: 100%;
+    display: none;
+    position: relative;
+    padding: 0;
 }
 
 td.selection-cell {
@@ -397,7 +406,7 @@ td.selection-cell {
 
 .attachment {
     margin: 0.2em 2em 0.2em 0;
-    float:left;
+    float: left;
     padding-left: 20px;
 }
 
@@ -456,24 +465,24 @@ Wizard
 }
 
 .wizard-header ul li .chevron {
-  position: absolute;
-  top: 0;
-  right: -14px;
-  display: block;
-  border: 24px solid transparent;
-  border-right: 0;
-  border-left: 14px solid #d4d4d4;
+    position: absolute;
+    top: 0;
+    right: -14px;
+    display: block;
+    border: 24px solid transparent;
+    border-right: 0;
+    border-left: 14px solid #d4d4d4;
 }
 
 .wizard-header ul li .chevron:before {
-  position: absolute;
-  top: -24px;
-  right: 1px;
-  display: block;
-  border: 24px solid transparent;
-  border-right: 0;
-  border-left: 14px solid #F8F8FF;
-  content: "";
+    position: absolute;
+    top: -24px;
+    right: 1px;
+    display: block;
+    border: 24px solid transparent;
+    border-right: 0;
+    border-left: 14px solid #F8F8FF;
+    content: "";
 }
 
 .wizard-header ul li.active {
@@ -483,7 +492,7 @@ Wizard
 }
 
 .wizard-header ul li.active .chevron:before {
-  border-left: 14px solid #F1F6FC;
+    border-left: 14px solid #F1F6FC;
 }
 
 .wizard-header ul li.first {
@@ -496,7 +505,7 @@ Wizard
 }
 
 .wizard-header ul li.before .chevron:before {
-  border-left: 14px solid #F3F4F5;
+    border-left: 14px solid #F3F4F5;
 }
 
 /* ============================================== */
