@@ -388,7 +388,8 @@ public class TextAction extends AbstractPageAction {
         return pathDispatch.getPathUrl();
     }*/
 
-    @Button(list = "pageHeaderButtons", titleKey = "layouts.text.edit", order = 2, icon = Button.ICON_EDIT)
+    @Button(list = "pageHeaderButtons", titleKey = "layouts.text.edit", order = 2, icon = Button.ICON_EDIT,
+            group = "pageHeaderButtons")
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution configure() {
         title = pageInstance.getPage().getTitle();
@@ -402,7 +403,8 @@ public class TextAction extends AbstractPageAction {
         return new ForwardResolution("/m/text/edit-content.jsp");
     }
 
-    @Button(list = "pageHeaderButtons", titleKey = "commons.configure", order = 1, icon = Button.ICON_WRENCH)
+    @Button(list = "pageHeaderButtons", titleKey = "commons.configure", order = 1, icon = Button.ICON_WRENCH,
+            group = "pageHeaderButtons")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configurePage() {
         prepareConfigurationForms();
@@ -556,7 +558,7 @@ public class TextAction extends AbstractPageAction {
     }
 
     @Button(list = "pageHeaderButtons", titleKey = "layouts.text.manage-attachments.manage_attachments", order = 3,
-            icon = Button.ICON_PICTURE)
+            icon = Button.ICON_PICTURE, group = "pageHeaderButtons")
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution manageAttachments() {
         logger.debug("Manage attachments");

@@ -13,9 +13,10 @@
     String fragment = parameters.get(0);
     String path = actionBean.getContext().getActualServletPath();
     path = path.substring(0, path.length() - fragment.length());
-%><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
-    <stripes:layout-component name="mainPageAction">
-        <jsp:include page="/theme/breadcrumbs.jsp" />
+%><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
+    <stripes:layout-component name="contentHeader" />
+    <stripes:layout-component name="pageHeader" />
+    <stripes:layout-component name="pageBody">
         <stripes:form action="/actions/admin/page" method="post">
             <input type="hidden" name="originalPath" value="<%= path %>" />
             <input type="hidden" name="fragment" value="<%= fragment%>" />

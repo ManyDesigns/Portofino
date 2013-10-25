@@ -6,37 +6,42 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><stripes:layout-definition><%--
---%><!doctype html>
+--%><!DOCTYPE html>
     <html lang="en">
     <jsp:include page="/theme/head.jsp">
-        <jsp:param name="pageTitle" value="${(empty pageTitle) ? actionBean.pageInstance.description : pageTitle}" />
+        <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>
     <body class="dialog">
         <div class="dialog-container">
-            <stripes:layout-component name="mainPageAction">
-                <mde:sessionMessages />
-                <stripes:layout-component name="mainPageActionBody">
-                    <div>
-                        <stripes:layout-component name="pageHeader">
-                            <h2>
-                                <stripes:layout-component name="pageTitle" />
-                            </h2>
-                        </stripes:layout-component>
-                        <div class="dialogBody spacingTop">
-                            <stripes:layout-component name="pageBody" />
-                        </div>
-                    </div>
+            <div class="contentHeader">
+                <stripes:layout-component name="contentHeader">
+                    <mde:sessionMessages />
                 </stripes:layout-component>
-                <div class="dialogFooter">
-                    <stripes:layout-component name="contentFooter">
-                        <hr />
-                        <jsp:useBean id="portofinoConfiguration" scope="application"
-                                     type="org.apache.commons.configuration.Configuration"/>
-                        Powered by <a href="http://www.manydesigns.com/">Portofino</a>
-                        <c:out value="<%= ModuleRegistry.getPortofinoVersion() %>"/>
-                    </stripes:layout-component>
-                </div>
-            </stripes:layout-component>
+            </div>
+            <div class="pageHeader">
+                <stripes:layout-component name="pageHeader">
+                    <h2 class="pageTitle">
+                        <stripes:layout-component name="pageTitle">
+                            <c:out value="${actionBean.pageInstance.description}"/>
+                        </stripes:layout-component>
+                    </h2>
+                </stripes:layout-component>
+            </div>
+            <div class="pageBody spacingTop">
+                <stripes:layout-component name="pageBody" />
+            </div>
+            <div class="pageFooter">
+                <stripes:layout-component name="pageFooter" />
+            </div>
+            <div class="contentFooter">
+                <stripes:layout-component name="contentFooter">
+                    <hr />
+                    <jsp:useBean id="portofinoConfiguration" scope="application"
+                                 type="org.apache.commons.configuration.Configuration"/>
+                    Powered by <a href="http://www.manydesigns.com/">Portofino</a>
+                    <c:out value="<%= ModuleRegistry.getPortofinoVersion() %>"/>
+                </stripes:layout-component>
+            </div>
         </div>
     </body>
 </html>

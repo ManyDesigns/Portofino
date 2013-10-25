@@ -4,57 +4,56 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><stripes:layout-definition><%--
 --%><!DOCTYPE html>
-    <html lang="en">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.dispatcher.PageAction" />
-    <head>
-        <jsp:include page="/theme/head.jsp"/>
-        <title>
-            <stripes:layout-component name="pageTitle">
-                <c:out value="${actionBean.pageInstance.description}"/>
-            </stripes:layout-component>
-        </title>
-    </head>
+<html lang="en">
+    <jsp:useBean id="actionBean" scope="request"
+                 type="com.manydesigns.portofino.pageactions.AbstractPageAction" />
+    <jsp:include page="/theme/head.jsp">
+        <jsp:param name="pageTitle" value="${pageTitle}" />
+    </jsp:include>
     <body>
     <jsp:include page="/theme/header.jsp"/>
     <div class="container">
         <div class="row">
             <div class="span2">
-                <stripes:layout-component name="sidebar">
-                    <div class="navigation">
-                        <jsp:include page="/theme/navigation.jsp" />
-                    </div>
-                </stripes:layout-component>
+                <jsp:include page="/theme/navigation.jsp" />
             </div>
-            <div class="content span10">
-                <stripes:layout-component name="mainPageAction">
+            <div class="span10">
+                <div class="contentHeader">
                     <stripes:layout-component name="contentHeader">
-                        <stripes:layout-component name="beforeSessionMessages" />
                         <mde:sessionMessages />
-                        <stripes:layout-component name="afterSessionMessages" />
-                        <stripes:layout-component name="beforeBreadcrumbs" />
                         <jsp:include page="/theme/breadcrumbs.jsp" />
-                        <stripes:layout-component name="afterBreadcrumbs" />
                     </stripes:layout-component>
-                    <stripes:layout-component name="mainPageActionBody">
-                        <div>
-                            <stripes:layout-component name="pageHeader">
-                                <div class="pageHeader" style="padding-bottom: 0;">
-                                    <h3>
-                                        <stripes:layout-component name="pageTitle" />
-                                    </h3>
-                                </div>
-                            </stripes:layout-component>
-                            <div class="pageBody">
-                                <stripes:layout-component name="pageBody" />
-                            </div>
+                </div>
+                <div class="pageHeader">
+                    <stripes:layout-component name="pageHeader">
+                        <div class="pull-right">
+                            <stripes:form action="${actionBean.context.actualServletPath}"
+                                          method="post">
+                                <input type="hidden" name="cancelReturnUrl"
+                                       value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+                                <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
+                            </stripes:form>
                         </div>
+                        <h3 class="pageTitle">
+                            <stripes:layout-component name="pageTitle">
+                                <c:out value="${actionBean.pageInstance.description}"/>
+                            </stripes:layout-component>
+                        </h3>
                     </stripes:layout-component>
+                </div>
+                <div class="pageBody">
+                    <stripes:layout-component name="pageBody" />
+                </div>
+                <div class="pageFooter">
+                    <stripes:layout-component name="pageFooter" />
+                </div>
+                <div class="contentFooter">
                     <stripes:layout-component name="contentFooter" />
-                </stripes:layout-component>
+                </div>
             </div>
         </div>
     </div>
     <jsp:include page="/theme/footer.jsp"/>
     </body>
-    </html>
+</html>
 </stripes:layout-definition>

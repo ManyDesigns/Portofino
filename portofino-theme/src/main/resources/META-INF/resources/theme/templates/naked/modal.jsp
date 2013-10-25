@@ -10,18 +10,13 @@
     <jsp:include page="/theme/head.jsp">
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>
-    <body>
-    <jsp:include page="/theme/header.jsp"/>
+    <body style="padding-top: 0;">
     <div class="container">
         <div class="row">
-            <div class="span2">
-                <jsp:include page="/theme/navigation.jsp" />
-            </div>
-            <div class="span10">
+            <div class="span12">
                 <div class="contentHeader">
                     <stripes:layout-component name="contentHeader">
                         <mde:sessionMessages />
-                        <jsp:include page="/theme/breadcrumbs.jsp" />
                     </stripes:layout-component>
                 </div>
                 <div class="pageHeader">
@@ -53,7 +48,6 @@
             </div>
         </div>
     </div>
-    <jsp:include page="/theme/footer.jsp"/>
     </body>
-    </html>
+</html>
 </stripes:layout-definition>

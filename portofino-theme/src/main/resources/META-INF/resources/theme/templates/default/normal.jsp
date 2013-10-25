@@ -47,7 +47,7 @@
                 <jsp:include page="/theme/navigation.jsp" />
                 <portofino:embedded-page-actions list="belowNavigation" />
             </div>
-            <div class="span10">
+            <div class="content span10">
                 <div class="contentHeader">
                     <stripes:layout-component name="contentHeader">
                         <mde:sessionMessages />
@@ -93,6 +93,6 @@
     </div>
     <jsp:include page="/theme/footer.jsp"/>
     </body>
-    </html><%--
---%></c:if>
+</html>
+</c:if>
 </stripes:layout-definition>
