@@ -10,10 +10,7 @@
     <stripes:layout-component name="pageTitle">
         <fmt:message key="layouts.admin.connectionProviders" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.admin.connectionProviders" />
-    </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.ConnectionProvidersAction"
                       method="post">
             <mde:write name="actionBean" property="tableForm"/>

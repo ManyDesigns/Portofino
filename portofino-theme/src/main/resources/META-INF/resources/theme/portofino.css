@@ -192,7 +192,7 @@ Content
 PageActions
 *******************************************************************************/
 
-.portletHeader {
+.pageHeader {
     margin-bottom: 12px;
     float: left;
     width: 100%;
@@ -200,15 +200,15 @@ PageActions
     border-bottom: 1px solid #E5E5E5
 }
 
-.portletHeader h3, .portletHeader h4 {
+.pageHeader h3, .pageHeader h4 {
     margin-bottom: 0;
 }
 
-.portletHeader form {
+.pageHeader form {
     margin: 0;
 }
 
-.portletBody {
+.pageBody {
     clear: left;
 }
 
@@ -405,7 +405,7 @@ td.selection-cell {
     font-weight: bold;
 }
 
-.portletBox {
+.pageActionBox {
     padding: 1em 0;
     border: 1px dashed gray;
     margin-bottom: 1em;
@@ -503,7 +503,7 @@ Wizard
 /* theme/templates/well-with-tabs/main.jsp        */
 /* ============================================== */
 
-.tab-content .portletHeader {
+.tab-content .pageHeader {
     display: none;
 }
 

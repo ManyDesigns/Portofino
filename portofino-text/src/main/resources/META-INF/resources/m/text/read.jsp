@@ -7,10 +7,10 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.text.TextAction"/>
-    <stripes:layout-component name="portletTitle">
+    <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.pageInstance.page.title}"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <c:out value="${actionBean.content}" escapeXml="false"/>
         <c:if test="${not empty actionBean.downloadableAttachments}">
             <div class="horizontalSeparator"></div>

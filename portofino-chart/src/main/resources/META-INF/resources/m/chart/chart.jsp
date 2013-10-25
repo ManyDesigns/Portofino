@@ -6,10 +6,10 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.chart.ChartAction"/>
-    <stripes:layout-component name="portletTitle">
+    <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.pageInstance.page.title}"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <div style="text-align: center;">
             <mde:write name="actionBean" property="jfreeChartInstance"/>
         </div>

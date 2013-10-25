@@ -1,12 +1,13 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer"
 %><%@ page import="com.manydesigns.portofino.navigation.BaseHref"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%--
 
     This is only an example. You should customize your head.jsp depending on the installed modules.
 
---%>
+--%><head>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -45,3 +46,5 @@
     }
 }
 </style>
+<title><c:out value='<%= request.getParameter("pageTitle") %>' /></title>
+</head>

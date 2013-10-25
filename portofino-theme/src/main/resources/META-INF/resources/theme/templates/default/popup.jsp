@@ -24,26 +24,26 @@
         <div class="row">
             <div class="content span12">
                 <stripes:layout-component name="mainPageAction">
-                    <stripes:layout-component name="mainPageActionHeader">
+                    <stripes:layout-component name="contentHeader">
                         <stripes:layout-component name="beforeSessionMessages" />
                         <mde:sessionMessages />
                         <stripes:layout-component name="afterSessionMessages" />
                     </stripes:layout-component>
                     <stripes:layout-component name="mainPageActionBody">
                         <div>
-                            <stripes:layout-component name="portletHeader">
-                                <div class="portletHeader" style="padding-bottom: 0;">
+                            <stripes:layout-component name="pageHeader">
+                                <div class="pageHeader" style="padding-bottom: 0;">
                                     <h3>
-                                        <stripes:layout-component name="portletTitle" />
+                                        <stripes:layout-component name="pageTitle" />
                                     </h3>
                                 </div>
                             </stripes:layout-component>
-                            <div class="portletBody">
-                                <stripes:layout-component name="portletBody" />
+                            <div class="pageBody">
+                                <stripes:layout-component name="pageBody" />
                             </div>
                         </div>
                     </stripes:layout-component>
-                    <stripes:layout-component name="mainPageActionFooter" />
+                    <stripes:layout-component name="contentFooter" />
                 </stripes:layout-component>
             </div>
         </div>

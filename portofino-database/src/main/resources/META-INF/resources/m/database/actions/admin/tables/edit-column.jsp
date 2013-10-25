@@ -12,12 +12,7 @@
             <fmt:param value="${actionBean.column.qualifiedName}" />
         </fmt:message>
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.admin.tables.editColumn.title">
-            <fmt:param value="${actionBean.column.qualifiedName}" />
-        </fmt:message>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.actionPath}"
                       method="post" class="form-horizontal">
             <mde:write name="actionBean" property="columnForm" />

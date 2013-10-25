@@ -28,7 +28,7 @@
         });
         var sortables = $("div.childrenTable tbody").sortable({
                 cursor: "move", // cursor image
-                revert: true // moves the portlet to its new position with a smooth transition
+                revert: true // moves the pageAction to its new position with a smooth transition
             });
         function prepareChildrenTablesForm(sortables) {
             sortables.each(function(i, elem) {

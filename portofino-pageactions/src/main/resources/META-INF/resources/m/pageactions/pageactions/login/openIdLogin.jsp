@@ -6,12 +6,12 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/theme/templates/dialog/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.login.OpenIdLoginAction"/>
-    <stripes:layout-component name="portletTitle">
+    <stripes:layout-component name="pageTitle">
         <fmt:message key="skins.default.login.login_to">
             <fmt:param value="${actionBean.applicationName}" />
         </fmt:message>
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <!-- Simple OpenID Selector -->
         <script type="text/javascript" src="<stripes:url value="/m/pageactions/openid-selector/js/openid-jquery.js" />"></script>
         <script type="text/javascript" src="<stripes:url value="/m/pageactions/openid-custom.js"/>"></script>

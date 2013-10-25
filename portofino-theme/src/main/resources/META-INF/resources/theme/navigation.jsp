@@ -14,6 +14,9 @@
 <jsp:useBean id="actionBean" scope="request" type="net.sourceforge.stripes.action.ActionBean" />
 <%
     Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);
+    if(dispatch == null) {
+        return;
+    }
     boolean admin = SecurityLogic.isAdministrator(request);
     int startingLevel;
     int maxLevel;
@@ -45,6 +48,7 @@
     boolean first = true;
     int level = 0;
     String title = "";
+    %><div class="navigation"><%
     while (!navigationItems.isEmpty()) {
         NavigationItem nextNavigationItem = null;
         if(level >= startingLevel) {
@@ -79,4 +83,4 @@
     if(!first) {
         %></ul><%
     }
-%>
+%></div>

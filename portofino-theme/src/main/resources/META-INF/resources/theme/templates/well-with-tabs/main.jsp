@@ -24,26 +24,26 @@
             </div>
             <div class="content span10">
                 <stripes:layout-component name="mainPageAction">
-                    <stripes:layout-component name="mainPageActionHeader">
+                    <stripes:layout-component name="contentHeader">
                         <stripes:layout-component name="beforeSessionMessages" />
                         <mde:sessionMessages />
                         <stripes:layout-component name="afterSessionMessages" />
                         <stripes:layout-component name="beforeBreadcrumbs" />
                         <jsp:include page="/theme/breadcrumbs.jsp" />
                         <stripes:layout-component name="afterBreadcrumbs" />
-                        <stripes:layout-component name="portletHeader">
-                            <div class="portletHeader" style="padding-bottom: 0;">
+                        <stripes:layout-component name="pageHeader">
+                            <div class="pageHeader" style="padding-bottom: 0;">
                                 <stripes:form action="${actionBean.context.actualServletPath}" method="post">
                                     <h3>
                                         <span class="pull-right">
                                             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
-                                            <stripes:layout-component name="portletHeaderButtons">
+                                            <stripes:layout-component name="pageHeaderButtons">
                                                 <span class="btn-group">
-                                                    <portofino:buttons list="portletHeaderButtons" cssClass="btn-mini" />
+                                                    <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
                                                 </span>
                                             </stripes:layout-component>
                                         </span>
-                                        <stripes:layout-component name="portletTitle" />
+                                        <stripes:layout-component name="pageTitle" />
                                     </h3>
                                 </stripes:form>
                             </div>
@@ -52,7 +52,7 @@
                     <div class="row-fluid">
                         <div class="span8">
                             <% actionBean.initEmbeddedPageActions(); %>
-                            <ul class="nav nav-tabs" id="myTab">
+                            <ul class="nav nav-tabs tabs-header">
                                 <c:forEach var="embeddedPageAction" items="${ actionBean.embeddedPageActions['default'] }">
                                     <li>
                                         <a href="#embeddedPageActionWrapper_<c:out value='${embeddedPageAction.id}' />" data-toggle="tab"><c:out value='${embeddedPageAction.id}' /></a>
@@ -71,7 +71,7 @@
                                             <button data-dismiss="alert" class="close" type="button">&times;</button>
                                             <ul class="errorMessages">
                                                 <li>
-                                                    <fmt:message key="portlet.view.error">
+                                                    <fmt:message key="pageaction.view.error">
                                                         <fmt:param value="${embeddedPageAction.path}" />
                                                     </fmt:message>
                                                 </li>
@@ -82,22 +82,22 @@
                                 </c:forEach>
                             </div>
                             <script>
-                                $('#myTab a:first').tab('show');
+                                $('.tabs-header a:first').tab('show');
                             </script>
                         </div>
                         <div class="span4">
                             <stripes:layout-component name="mainPageActionBody">
                                 <div class="well">
                                     <div>
-                                        <div class="portletBody">
-                                            <stripes:layout-component name="portletBody" />
+                                        <div class="pageBody">
+                                            <stripes:layout-component name="pageBody" />
                                         </div>
                                     </div>
                                 </div>
                             </stripes:layout-component>
                         </div>
                     </div>
-                    <stripes:layout-component name="mainPageActionFooter" />
+                    <stripes:layout-component name="contentFooter" />
                 </stripes:layout-component>
             </div>
         </div>

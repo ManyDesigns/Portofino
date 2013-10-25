@@ -9,10 +9,10 @@
     <stripes:layout-component name="pageTitle">
         <fmt:message key="skins.default.login.signUp"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
+    <stripes:layout-component name="pageTitle">
         <fmt:message key="skins.default.login.signUp" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form id="signUpForm" action="${actionBean.context.actualServletPath}" method="post">
             <mde:write name="actionBean" property="signUpForm"/>
             <div class="control-group ${actionBean.captchaValidationFailed ? 'error' : ''}">

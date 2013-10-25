@@ -12,12 +12,12 @@
             <fmt:param value="${actionBean.applicationName}" />
         </fmt:message>
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
+    <stripes:layout-component name="pageTitle">
         <fmt:message key="skins.default.login.login_to">
             <fmt:param value="${actionBean.applicationName}" />
         </fmt:message>
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actualServletPath}" method="post" class="dont-prompt-on-page-abandon">
             <input type="text" name="userName" id="userName" class="input-block-level"
                    placeholder="<fmt:message key='skins.default.login.username'/>" />

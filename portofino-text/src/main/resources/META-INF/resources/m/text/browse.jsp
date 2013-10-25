@@ -7,11 +7,11 @@
 <html lang="en">
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.pageactions.text.TextAction"/>
-<head>
-    <jsp:include page="/theme/head.jsp" />
-    <title><fmt:message key="layouts.text.browse.browse_server"/></title>
-</head>
-<body
+<fmt:message key="layouts.text.browse.browse_server" var="pageTitle"/>
+<jsp:include page="/theme/head.jsp">
+    <jsp:param name="pageTitle" value="${pageTitle}" />
+</jsp:include>
+<body>
     <div class="container">
     <% if(request.getParameter("images-only") == null) { %>
         <form action="${pageContext.request.contextPath}${actionBean.context.actualServletPath}">

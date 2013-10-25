@@ -7,10 +7,10 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"
 /><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
-    <stripes:layout-component name="portletTitle">
+    <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.searchTitle}"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form
                 action="${actionBean.context.actualServletPath}" method="post" class="form-inline crud-search-form"
                 data-search-visible="${actionBean.searchVisible}">

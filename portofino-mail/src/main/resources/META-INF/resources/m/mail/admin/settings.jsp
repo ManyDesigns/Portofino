@@ -10,10 +10,7 @@
     <stripes:layout-component name="pageTitle">
         <fmt:message key="layouts.admin.settings.settings"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.admin.settings.settings"/>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <p>Note: you have to restart the application for these properties to have effect.</p>
         <p>Be careful if you change the location of the mail queue while the system is enqueuing mails: you'll have to
         manually move unsent mails to the new location as you restart the application.</p>

@@ -14,10 +14,7 @@
     <stripes:layout-component name="pageTitle">
         Tables
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        Tables
-    </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:url var="treetablePath"
                      value="/theme/jquery-treetable" />
 

@@ -13,12 +13,7 @@
             <fmt:param value="${actionBean.table.qualifiedName}" />
         </fmt:message>
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.admin.tables.title">
-            <fmt:param value="${actionBean.table.qualifiedName}" />
-        </fmt:message>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <style type="text/css">
             .tableForm {
                 overflow-x: auto;

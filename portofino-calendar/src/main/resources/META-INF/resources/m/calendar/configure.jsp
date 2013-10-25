@@ -9,12 +9,12 @@
 %><jsp:useBean id="actionBean" scope="request"
                type="com.manydesigns.portofino.pageactions.calendar.CalendarAction"
 /><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
-    <stripes:layout-component name="portletTitle">
+    <stripes:layout-component name="pageTitle">
         <fmt:message key="com.manydesigns.portofino.pageactions.configure">
             <fmt:param value="<%= StringEscapeUtils.escapeHtml(actionBean.getPage().getTitle()) %>" />
         </fmt:message>
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actualServletPath}" method="post" enctype="multipart/form-data"
                       class="form-horizontal">
             <mde:write name="actionBean" property="pageConfigurationForm"/>

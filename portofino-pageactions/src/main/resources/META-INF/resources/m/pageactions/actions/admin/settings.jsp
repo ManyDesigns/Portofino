@@ -10,10 +10,7 @@
     <stripes:layout-component name="pageTitle">
         <fmt:message key="layouts.admin.settings.settings"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.admin.settings.settings"/>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.SettingsAction"
                       method="post" enctype="multipart/form-data" class="form-horizontal">
             <mde:write name="actionBean" property="form"/>

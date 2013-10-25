@@ -10,10 +10,7 @@
     <stripes:layout-component name="pageTitle">
         Connection provider: <c:out value="${actionBean.databaseName}"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        Connection provider: <c:out value="${actionBean.databaseName}"/>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.ConnectionProvidersAction"
                       method="post" class="form-horizontal">
             <mde:write name="actionBean" property="form"/>

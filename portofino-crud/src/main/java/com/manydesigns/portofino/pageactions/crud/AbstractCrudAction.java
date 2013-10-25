@@ -2050,7 +2050,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Configuration
     //**************************************************************************
 
-    @Button(list = "portletHeaderButtons", titleKey = "commons.configure", order = 1, icon = Button.ICON_WRENCH)
+    @Button(list = "pageHeaderButtons", titleKey = "commons.configure", order = 1, icon = Button.ICON_WRENCH)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();

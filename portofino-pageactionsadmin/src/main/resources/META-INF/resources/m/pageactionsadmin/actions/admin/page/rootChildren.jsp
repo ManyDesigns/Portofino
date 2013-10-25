@@ -11,10 +11,7 @@
     <stripes:layout-component name="pageTitle">
         <fmt:message key="layouts.admin.rootChildren" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.admin.rootChildren" />
-    </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.page.RootChildrenAction"
                       method="post" enctype="multipart/form-data">
             <%@include file="children-tables.jsp"%>

@@ -13,10 +13,10 @@
             <jsp:include page="/m/crud/return-to-parent.jsp" />
         </div>
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
+    <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.readTitle}"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actualServletPath}" method="post" class="form-horizontal">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>

@@ -14,10 +14,7 @@
     <stripes:layout-component name="pageTitle">
         <fmt:message key="layouts.admin.rootPermissions" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.admin.rootPermissions" />
-    </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <style type="text/css">
             select {
                 margin-bottom: 0 !important;

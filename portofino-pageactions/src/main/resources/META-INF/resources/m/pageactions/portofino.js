@@ -232,7 +232,7 @@ var portofino = {
             cursor: "move", // cursor image
             revert: true, // moves the portlet to its new position with a smooth transition
             tolerance: "pointer" // mouse pointer overlaps the droppable
-        }).disableSelection().addClass("portletBox");
+        }).disableSelection().addClass("pageActionBox");
 
         var container = $(".content");
         container.prepend('\

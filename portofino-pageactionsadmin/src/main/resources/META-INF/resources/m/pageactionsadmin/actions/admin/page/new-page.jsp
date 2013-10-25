@@ -12,14 +12,13 @@
     taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
 <stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
-    <stripes:layout-component name="sidebar" />
-    <stripes:layout-component name="mainPageActionHeader">
+    <stripes:layout-component name="contentHeader">
         <mde:sessionMessages />
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
+    <stripes:layout-component name="pageTitle">
         <fmt:message key="layouts.page-crud.new-page.add_new_page"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form action="/actions/admin/page" method="post" enctype="multipart/form-data"
                       class="form-horizontal">
             <input type="hidden" name="originalPath" value="${actionBean.originalPath}" />

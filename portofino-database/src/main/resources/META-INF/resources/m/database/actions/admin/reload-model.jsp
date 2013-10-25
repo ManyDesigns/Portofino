@@ -10,10 +10,7 @@
     <stripes:layout-component name="pageTitle">
         <fmt:message key="layouts.admin.reload-model.title"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <fmt:message key="layouts.admin.reload-model.title"/>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.ReloadModelAction"
                       method="post">
             <p>

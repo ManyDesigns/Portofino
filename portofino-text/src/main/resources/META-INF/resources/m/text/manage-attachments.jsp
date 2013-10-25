@@ -9,12 +9,12 @@
 %><jsp:useBean id="actionBean" scope="request"
                type="com.manydesigns.portofino.pageactions.text.TextAction"
 /><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
-    <stripes:layout-component name="portletTitle">
+    <stripes:layout-component name="pageTitle">
         <fmt:message key="layouts.text.manage-attachments.manage_attachments_for_page">
             <fmt:param value="<%= StringEscapeUtils.escapeHtml(actionBean.getPage().getTitle()) %>" />
         </fmt:message>
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actualServletPath}" method="post" enctype="multipart/form-data"
                       class="form-inline">
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>

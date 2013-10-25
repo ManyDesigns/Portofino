@@ -7,10 +7,10 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"
 /><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
-    <stripes:layout-component name="portletTitle">
+    <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.editTitle}"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <p><fmt:message key = "layouts.crud.bulk-edit.select_columns"/></p>
         <stripes:form action="${actionBean.context.actualServletPath}" method="post"
                       class="form-horizontal">

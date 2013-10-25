@@ -8,30 +8,27 @@
 %><stripes:layout-definition><%--
 --%><!doctype html>
     <html lang="en">
-    <head>
-        <jsp:include page="/theme/head.jsp"/>
-        <title>
-            <stripes:layout-component name="pageTitle" />
-        </title>
-    </head>
+    <jsp:include page="/theme/head.jsp">
+        <jsp:param name="pageTitle" value="${(empty pageTitle) ? actionBean.pageInstance.description : pageTitle}" />
+    </jsp:include>
     <body class="dialog">
         <div class="dialog-container">
             <stripes:layout-component name="mainPageAction">
                 <mde:sessionMessages />
                 <stripes:layout-component name="mainPageActionBody">
                     <div>
-                        <stripes:layout-component name="portletHeader">
+                        <stripes:layout-component name="pageHeader">
                             <h2>
-                                <stripes:layout-component name="portletTitle" />
+                                <stripes:layout-component name="pageTitle" />
                             </h2>
                         </stripes:layout-component>
                         <div class="dialogBody spacingTop">
-                            <stripes:layout-component name="portletBody" />
+                            <stripes:layout-component name="pageBody" />
                         </div>
                     </div>
                 </stripes:layout-component>
                 <div class="dialogFooter">
-                    <stripes:layout-component name="mainPageActionFooter">
+                    <stripes:layout-component name="contentFooter">
                         <hr />
                         <jsp:useBean id="portofinoConfiguration" scope="application"
                                      type="org.apache.commons.configuration.Configuration"/>

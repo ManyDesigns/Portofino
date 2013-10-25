@@ -7,10 +7,10 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"/>
 <stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/popup.jsp">
-    <stripes:layout-component name="portletTitle">
+    <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.createTitle}"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actualServletPath}" method="post" enctype="multipart/form-data"
                       class="form-horizontal">
             <c:if test="${actionBean.requiredFieldsPresent}">

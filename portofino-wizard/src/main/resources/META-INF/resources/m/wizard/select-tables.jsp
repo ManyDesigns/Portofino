@@ -11,10 +11,10 @@
     <stripes:layout-component name="pageTitle">
         <fmt:message key="appwizard.step4.title" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletHeader">
+    <stripes:layout-component name="pageHeader">
         <jsp:include page="wizard-content-header.jsp" />
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"
                       method="post" class="form-horizontal">
             <style type="text/css">

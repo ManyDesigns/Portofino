@@ -10,10 +10,10 @@
 <%@taglib prefix="mde" uri="/manydesigns-elements"%>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"/>
 <stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
-    <stripes:layout-component name="portletTitle">
+    <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody"><%
+    <stripes:layout-component name="pageBody"><%
         Persistence persistence = (Persistence) application.getAttribute(DatabaseModule.PERSISTENCE);
         Session hSession = persistence.getSession("redmine");
         List<?> objects = QueryUtils.runSql

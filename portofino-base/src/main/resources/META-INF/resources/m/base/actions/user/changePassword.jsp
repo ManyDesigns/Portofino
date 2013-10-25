@@ -9,10 +9,10 @@
     <stripes:layout-component name="pageTitle">
         Password change
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
+    <stripes:layout-component name="pageTitle">
         Password change
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actualServletPath}" method="post">
             <input type="password" name="pwd" id="pwd" class="input-block-level"
                    placeholder="<fmt:message key='skins.default.login.current.password'/>" />

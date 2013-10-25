@@ -19,19 +19,7 @@
             </fmt:message>
         </c:if>
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
-        <c:if test="${empty actionBean.selectionProviderName}">
-            <fmt:message key="layouts.admin.tables.addSelectionProvider.title">
-                <fmt:param value="${actionBean.table.qualifiedName}" />
-            </fmt:message>
-        </c:if>
-        <c:if test="${not empty actionBean.selectionProviderName}">
-            <fmt:message key="layouts.admin.tables.editSelectionProvider.title">
-                <fmt:param value="${actionBean.selectionProviderName}" />
-            </fmt:message>
-        </c:if>
-    </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <script type="text/javascript">
             $(function() {
                 $("button[name=removeSelectionProvider]").click(

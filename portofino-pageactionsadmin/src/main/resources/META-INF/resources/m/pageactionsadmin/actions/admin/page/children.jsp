@@ -9,16 +9,15 @@
 %><jsp:useBean id="actionBean" scope="request"
                type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"
 /><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
-    <stripes:layout-component name="sidebar" />
-    <stripes:layout-component name="mainPageActionHeader">
+    <stripes:layout-component name="contentHeader">
         <mde:sessionMessages />
     </stripes:layout-component>
-    <stripes:layout-component name="portletTitle">
+    <stripes:layout-component name="pageTitle">
         <fmt:message key="page.children.title">
             <fmt:param value="<%= StringEscapeUtils.escapeHtml(actionBean.getPage().getTitle()) %>" />
         </fmt:message>
     </stripes:layout-component>
-    <stripes:layout-component name="portletBody">
+    <stripes:layout-component name="pageBody">
         <stripes:form action="/actions/admin/page" method="post" enctype="multipart/form-data">
             <%@include file="children-tables.jsp"%>
             <div class="form-actions">

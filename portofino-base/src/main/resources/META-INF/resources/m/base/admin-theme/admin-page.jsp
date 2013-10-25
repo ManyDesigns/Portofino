@@ -13,12 +13,9 @@
 %><stripes:layout-definition><%--
 --%><!doctype html>
     <html lang="en">
-    <head>
-        <jsp:include page="/theme/head.jsp" />
-        <title>
-            <stripes:layout-component name="pageTitle" />
-        </title>
-    </head>
+    <jsp:include page="/theme/head.jsp">
+        <jsp:param name="pageTitle" value="${pageTitle}" />
+    </jsp:include>
     <body>
     <jsp:useBean id="portofinoConfiguration" scope="application" type="org.apache.commons.configuration.Configuration"/>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -74,12 +71,12 @@
             <div class="content span10">
                 <div class="row-fluid">
                     <mde:sessionMessages/>
-                    <stripes:layout-component name="portletHeader">
+                    <stripes:layout-component name="pageHeader">
                         <h3 style="border-bottom: 1px solid #E5E5E5">
-                            <stripes:layout-component name="portletTitle" />
+                            <stripes:layout-component name="pageTitle" />
                         </h3>
                     </stripes:layout-component>
-                    <stripes:layout-component name="portletBody" />
+                    <stripes:layout-component name="pageBody" />
                 </div>
             </div>
         </div>
