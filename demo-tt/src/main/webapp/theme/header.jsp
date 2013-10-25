@@ -25,7 +25,7 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
-            <h4 id="app-title" class="pull-left">
+            <h4 class="pull-left">
                 <stripes:link href="/">
                     <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
                 </stripes:link>
@@ -35,13 +35,13 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <div id="header-menu" class="nav-collapse collapse">
+            <div class="header-menu nav-collapse collapse">
                 <c:if test="${not empty actionBean.pageInstance}">
                     <form id="pageAdminForm" action="${pageContext.request.contextPath}/actions/admin/page">
                         <input type="hidden" name="originalPath" value="${actionBean.context.actualServletPath}" />
                     </form>
                 </c:if>
-                <ul id="app-menu" class="nav">
+                <ul class="nav">
                     <%
                         Subject subject = SecurityUtils.getSubject();
                         String actionPath = actionBean.getContext().getActualServletPath();

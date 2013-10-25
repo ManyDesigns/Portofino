@@ -22,7 +22,7 @@
     <body>
     <div class="container">
         <div class="row">
-            <div id="content" class="span12">
+            <div class="content span12">
                 <stripes:layout-component name="mainPageAction">
                     <stripes:layout-component name="mainPageActionHeader">
                         <stripes:layout-component name="beforeSessionMessages" />

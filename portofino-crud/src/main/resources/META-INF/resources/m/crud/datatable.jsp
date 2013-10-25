@@ -8,7 +8,7 @@
 <%@ page language="java" %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"/>
 <c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
-<div id="datatable-${pageId}" class="portofino-datatable">
+<div class="portofino-datatable">
     <div class="search_results">
         <mde:write name="actionBean" property="tableForm" />
     </div>

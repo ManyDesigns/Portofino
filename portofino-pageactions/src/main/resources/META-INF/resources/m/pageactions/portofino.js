@@ -198,8 +198,7 @@ var portofino = {
             baseConfig.height =
                     windowHeight -
                     $("textarea.mde-form-rich-text").offset().top -
-                    $("#ft").height() -
-                    $(".contentFooter").height() -
+                    $("footer").height() -
                     350; //350 ~= toolbar 3 righe + footer + margine tolleranza
         }
 
@@ -235,7 +234,7 @@ var portofino = {
             tolerance: "pointer" // mouse pointer overlaps the droppable
         }).disableSelection().addClass("portletBox");
 
-        var container = $("#content");
+        var container = $(".content");
         container.prepend('\
             <form action="' + portofino.contextPath + '/actions/admin/page" method="post">\
                 Edit page layout: \
@@ -243,7 +242,7 @@ var portofino = {
                 <button name="updateLayout" type="submit" class="btn btn-primary">Save</button>\
                 <button name="cancel" type="submit" class="btn btn-default">Cancel</button>\
             </form>');
-        $("button[name=updateLayout]").click(function() {
+        container.find("button[name=updateLayout]").click(function() {
             var theButton = $(this);
             $('div.embeddedPageAction').each(function(index, element) {
                 var wrapper = $(element);
@@ -308,10 +307,9 @@ var portofino = {
                 $.ajax(href + additionalParameters, {
                     dataType: "text",
                     success: function(data, status, xhr) {
-                        var targetId = "#" + elem.attr("id");
-                        elem.replaceWith(data);
-                        var target = $(targetId);
-                        setupDataTable(target);
+                        var newElem = $(data);
+                        elem.replaceWith(newElem);
+                        setupDataTable(newElem);
                     },
                     error: function(xhr, status, errorThrown) {
                         if(xhr.status == 403) {

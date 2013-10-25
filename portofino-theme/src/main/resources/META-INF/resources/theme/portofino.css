@@ -8,26 +8,14 @@ footer {
     padding-bottom: 10px;
 }
 
-#header-menu {
+.header-menu {
     float: right;
 }
 
 @media (max-width: 979px) {
-    #header-menu {
+    .header-menu {
         float: none;
     }
-}
-
-#responseTime {
-    float: right;
-}
-
-/*******************************************************************************
-Content
-*******************************************************************************/
-
-#navigation {
-    margin-bottom: 1em;
 }
 
 /*******************************************************************************
@@ -196,7 +184,7 @@ Content
     display: inline;
 }
 
-#navigation {
+.navigation {
     margin-bottom: 1em;
 }
 

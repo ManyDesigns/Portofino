@@ -24,7 +24,7 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
-                <h4 id="app-title" class="pull-left">
+                <h4 class="pull-left">
                     <stripes:link href="/">
                         <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
                     </stripes:link>
@@ -35,7 +35,7 @@
     <div class="container">
         <div class="row">
             <div class="span2">
-                <div id="navigation">
+                <div class="navigation">
                     <ul class="nav nav-list portofino-sidenav">
                         <%
                             //Admin menu
@@ -71,7 +71,7 @@
                     </ul>
                 </div>
             </div>
-            <div id="content" class="span10">
+            <div class="content span10">
                 <div class="row-fluid">
                     <mde:sessionMessages/>
                     <stripes:layout-component name="portletHeader">

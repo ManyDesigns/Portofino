@@ -9,7 +9,7 @@
              type="org.apache.commons.lang.time.StopWatch"/>
 <footer>
     <div class="container">
-        <div id="responseTime">
+        <div class="pull-right">
             <fmt:message key="skins.default.footer.response_time"/>: <c:out value="${stopWatch.time}"/> ms.
         </div>
         Powered by <a href="http://www.manydesigns.com/">Portofino</a>

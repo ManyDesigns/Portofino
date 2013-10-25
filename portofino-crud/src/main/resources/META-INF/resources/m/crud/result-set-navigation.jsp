@@ -10,14 +10,14 @@
             <c:if test="${not empty resultSetNavigation.firstUrl}">
                 <li>
                     <fmt:message key="commons.first" var="pg_title" />
-                    <stripes:link id="first" href="${resultSetNavigation.firstUrl}" title="${pg_title}"
+                    <stripes:link href="${resultSetNavigation.firstUrl}" title="${pg_title}"
                                   class="paginator-link">
                         &lt;&lt;
                     </stripes:link>
                 </li>
                 <li>
                     <fmt:message key="commons.first" var="pg_title" />
-                    <stripes:link id="previous" href="${resultSetNavigation.previousUrl}" title="${pg_title}"
+                    <stripes:link href="${resultSetNavigation.previousUrl}" title="${pg_title}"
                                   class="paginator-link">
                         &lt;
                     </stripes:link>
@@ -37,14 +37,14 @@
             <c:if test="${not empty resultSetNavigation.lastUrl}">
                 <li>
                     <fmt:message key="commons.next" var="pg_title" />
-                    <stripes:link id="next" href="${resultSetNavigation.nextUrl}" title="${pg_title}"
+                    <stripes:link href="${resultSetNavigation.nextUrl}" title="${pg_title}"
                                   class="paginator-link">
                         &gt;
                     </stripes:link>
                 </li>
                 <li>
                     <fmt:message key="commons.last" var="pg_title" />
-                    <stripes:link id="last" href="${resultSetNavigation.lastUrl}" title="${pg_title}"
+                    <stripes:link href="${resultSetNavigation.lastUrl}" title="${pg_title}"
                                   class="paginator-link">
                         &gt;&gt;
                     </stripes:link>

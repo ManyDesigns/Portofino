@@ -16,13 +16,13 @@
             <div class="span2">
                 <stripes:layout-component name="sidebar">
                     <portofino:embedded-page-actions list="aboveNavigation" />
-                    <div id="navigation">
+                    <div class="navigation">
                         <jsp:include page="/theme/navigation.jsp" />
                     </div>
                     <portofino:embedded-page-actions list="belowNavigation" />
                 </stripes:layout-component>
             </div>
-            <div id="content" class="span10">
+            <div class="content span10">
                 <stripes:layout-component name="mainPageAction">
                     <stripes:layout-component name="mainPageActionHeader">
                         <stripes:layout-component name="beforeSessionMessages" />
@@ -88,7 +88,7 @@
                         <div class="span4">
                             <stripes:layout-component name="mainPageActionBody">
                                 <div class="well">
-                                    <div id="portlet_${actionBean.pageInstance.page.id}">
+                                    <div>
                                         <div class="portletBody">
                                             <stripes:layout-component name="portletBody" />
                                         </div>
