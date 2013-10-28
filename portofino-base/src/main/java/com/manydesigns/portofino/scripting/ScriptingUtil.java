@@ -23,7 +23,7 @@ package com.manydesigns.portofino.scripting;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.elements.util.RandomUtil;
-import com.manydesigns.portofino.modules.PageactionsModule;
+import com.manydesigns.portofino.modules.BaseModule;
 import groovy.lang.Binding;
 import groovy.lang.GroovyObject;
 import groovy.lang.GroovyShell;
@@ -95,7 +95,7 @@ public class ScriptingUtil {
         }
         GroovyScriptEngine scriptEngine =
                 (GroovyScriptEngine) ElementsThreadLocals.getServletContext().getAttribute(
-                        PageactionsModule.GROOVY_SCRIPT_ENGINE);
+                        BaseModule.GROOVY_SCRIPT_ENGINE);
         return scriptEngine.loadScriptByName(scriptFile.toURI().toString());
     }
 

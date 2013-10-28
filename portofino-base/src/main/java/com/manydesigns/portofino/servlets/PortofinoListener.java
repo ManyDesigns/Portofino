@@ -23,17 +23,20 @@ package com.manydesigns.portofino.servlets;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.configuration.BeanLookup;
+import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
-import com.manydesigns.portofino.modules.ApplicationListener;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleRegistry;
-import net.sourceforge.stripes.util.ResolverUtil;
-import org.apache.commons.configuration.*;
+import com.manydesigns.portofino.stripes.ResolverUtil;
+import groovy.util.GroovyScriptEngine;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.FileConfiguration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.codehaus.groovy.control.CompilerConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -48,9 +51,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Set;
 
 
@@ -88,8 +89,6 @@ public class PortofinoListener
     protected ServerInfo serverInfo;
 
     protected ModuleRegistry moduleRegistry;
-
-    protected List<ApplicationListener> applicationListeners;
 
     //**************************************************************************
     // Logging
@@ -153,9 +152,16 @@ public class PortofinoListener
         elementsConfiguration.setProperty(ElementsProperties.BLOBS_DIR, blobsDirPath);
         logger.info("Blobs directory: " + blobsDirPath);
 
-        ClassLoader classLoader = getClass().getClassLoader();
-        logger.debug("Registering application class loader");
+        File groovyClasspath = new File(applicationDirectory, "groovy");
+        logger.info("Initializing Groovy script engine with classpath: " + groovyClasspath.getAbsolutePath());
+        ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(groovyClasspath);
+
+        logger.debug("Registering Groovy class loader");
+        GroovyScriptEngine groovyScriptEngine = createScriptEngine(groovyClasspath);
+        ClassLoader classLoader = groovyScriptEngine.getGroovyClassLoader();
+        servletContext.setAttribute(BaseModule.GROOVY_CLASS_PATH, groovyClasspath);
         servletContext.setAttribute(BaseModule.CLASS_LOADER, classLoader);
+        servletContext.setAttribute(BaseModule.GROOVY_SCRIPT_ENGINE, groovyScriptEngine);
 
         logger.debug("Installing I18n ResourceBundleManager");
         ResourceBundleManager resourceBundleManager = new ResourceBundleManager();
@@ -170,8 +176,6 @@ public class PortofinoListener
             logger.warn("Could not initialize resource bundle manager", e);
         }
         servletContext.setAttribute(BaseModule.RESOURCE_BUNDLE_MANAGER, resourceBundleManager);
-        applicationListeners = new ArrayList<ApplicationListener>();
-        servletContext.setAttribute(BaseModule.APP_LISTENERS, applicationListeners);
 
         logger.info("Servlet API version is " + serverInfo.getServletApiVersion());
         if (serverInfo.getServletApiMajor() < 3) {
@@ -182,7 +186,7 @@ public class PortofinoListener
 
         logger.info("Loading modules...");
         moduleRegistry = new ModuleRegistry(configuration);
-        discoverModules(moduleRegistry);
+        discoverModules(moduleRegistry, classLoader);
         servletContext.setAttribute(BaseModule.MODULE_REGISTRY, moduleRegistry);
         moduleRegistry.migrateAndInit(servletContext);
         logger.info("All modules loaded.");
@@ -195,12 +199,6 @@ public class PortofinoListener
         }
         if(!"UTF-8".equals(encoding)) {
             logger.warn("URL encoding is not UTF-8, but the Stripes framework always generates UTF-8 encoded URLs. URLs with non-ASCII characters may not work.");
-        }
-
-        logger.info("Invoking application listeners...");
-        for(ApplicationListener listener : applicationListeners) {
-            Injections.inject(listener, servletContext, null);
-            listener.applicationStarting();
         }
 
         String lineSeparator = System.getProperty("line.separator", "\n");
@@ -216,8 +214,28 @@ public class PortofinoListener
         );
     }
 
-    protected void discoverModules(ModuleRegistry moduleRegistry) {
+    protected GroovyScriptEngine createScriptEngine(File classpathFile) {
+        CompilerConfiguration cc = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
+        String classpath = classpathFile.getAbsolutePath();
+        logger.info("Groovy classpath: " + classpath);
+        cc.setClasspath(classpath);
+        cc.setRecompileGroovySource(true);
+        GroovyScriptEngine scriptEngine;
+        try {
+            scriptEngine =
+                    new GroovyScriptEngine(new URL[] { classpathFile.toURI().toURL() },
+                                           getClass().getClassLoader());
+        } catch (IOException e) {
+            throw new Error(e);
+        }
+        scriptEngine.setConfig(cc);
+        return scriptEngine;
+    }
+
+    protected void discoverModules(ModuleRegistry moduleRegistry, ClassLoader classLoader) {
         ResolverUtil<Module> resolver = new ResolverUtil<Module>();
+        resolver.setExtensions(".class", ".groovy");
+        resolver.setClassLoader(classLoader);
         resolver.findImplementations(Module.class, Module.class.getPackage().getName());
         Set<Class<? extends Module>> classes = resolver.getClasses();
         classes.remove(Module.class);
@@ -235,10 +253,6 @@ public class PortofinoListener
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         MDC.clear();
         logger.info("ManyDesigns Portofino stopping...");
-        logger.info("Invoking application listeners...");
-        for(ApplicationListener listener : applicationListeners) {
-            listener.applicationDestroying();
-        }
         logger.info("Destroying modules...");
         moduleRegistry.destroy();
         logger.info("ManyDesigns Portofino stopped.");
@@ -267,18 +281,6 @@ public class PortofinoListener
         logger.info("Application directory: {}", applicationDirectory.getAbsolutePath());
         File appConfigurationFile = new File(applicationDirectory, "portofino.properties");
         configuration = new PropertiesConfiguration(appConfigurationFile);
-    }
-
-    public void addConfiguration(CompositeConfiguration configuration, String resource) {
-        try {
-            PropertiesConfiguration propertiesConfiguration =
-                    new PropertiesConfiguration(resource);
-            configuration.addConfiguration(propertiesConfiguration);
-        } catch (Throwable e) {
-            String errorMessage = ExceptionUtils.getRootCauseMessage(e);
-            logger.warn(errorMessage);
-            logger.debug("Error loading configuration", e);
-        }
     }
 
     public void setupCommonsConfiguration() {

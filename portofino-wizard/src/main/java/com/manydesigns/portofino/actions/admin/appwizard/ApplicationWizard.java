@@ -1083,7 +1083,7 @@ public class ApplicationWizard extends AbstractPageAction {
             bindings.put("adminGroupName", StringUtils.defaultString(adminGroupName));
 
             bindings.put("encryptionAlgorithm", encryptionAlgorithm);
-            File gcp = (File) context.getServletContext().getAttribute(PageactionsModule.GROOVY_CLASS_PATH);
+            File gcp = (File) context.getServletContext().getAttribute(BaseModule.GROOVY_CLASS_PATH);
             FileWriter fw = new FileWriter(new File(gcp, "Security.groovy"));
             secTemplate.make(bindings).writeTo(fw);
             IOUtils.closeQuietly(fw);

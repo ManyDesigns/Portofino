@@ -36,23 +36,17 @@ import com.manydesigns.portofino.pageactions.login.OpenIdLoginAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
 import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
-import groovy.lang.GroovyClassLoader;
-import groovy.util.GroovyScriptEngine;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.WebEnvironment;
-import org.codehaus.groovy.control.CompilerConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -81,10 +75,10 @@ public class PageactionsModule implements Module {
     public MenuBuilder adminMenu;
 
     @Inject(BaseModule.CLASS_LOADER)
-    public ClassLoader originalClassLoader;
+    public ClassLoader classLoader;
 
-    @Inject(BaseModule.APP_LISTENERS)
-    public List<ApplicationListener> applicationListeners;
+    @Inject(BaseModule.GROOVY_CLASS_PATH)
+    public File groovyClasspath;
 
     @Inject(BaseModule.CACHE_RESET_LISTENER_REGISTRY)
     public CacheResetListenerRegistry cacheResetListenerRegistry;
@@ -93,16 +87,12 @@ public class PageactionsModule implements Module {
 
     protected CacheManager cacheManager;
 
-    protected GroovyClassLoader groovyClassLoader;
-
     protected ModuleStatus status = ModuleStatus.CREATED;
 
     //**************************************************************************
     // Constants
     //**************************************************************************
 
-    public static final String GROOVY_SCRIPT_ENGINE = "GROOVY_SCRIPT_ENGINE";
-    public static final String GROOVY_CLASS_PATH = "GROOVY_CLASS_PATH";
     public static final String PAGES_DIRECTORY = "PAGES_DIRECTORY";
     public static final String EHCACHE_MANAGER = "portofino.ehcache.manager";
     public static final String PAGE_ACTIONS_REGISTRY =
@@ -161,37 +151,6 @@ public class PageactionsModule implements Module {
         logger.debug("Publishing the Application Realm in the servlet context");
         RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
 
-        File groovyClasspath = new File(applicationDirectory, "groovy");
-        logger.info("Initializing Groovy script engine with classpath: " + groovyClasspath.getAbsolutePath());
-        ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(groovyClasspath);
-
-        servletContext.setAttribute(GROOVY_CLASS_PATH, groovyClasspath);
-        GroovyScriptEngine groovyScriptEngine = createScriptEngine(groovyClasspath);
-        groovyClassLoader = groovyScriptEngine.getGroovyClassLoader();
-        servletContext.setAttribute(BaseModule.CLASS_LOADER, groovyClassLoader);
-        servletContext.setAttribute(GROOVY_SCRIPT_ENGINE, groovyScriptEngine);
-
-        try {
-            Object listener = groovyClassLoader.loadClass("AppListener").newInstance();
-            if(listener != null) {
-                if(listener instanceof ApplicationListener) {
-                    ApplicationListener applicationListener = (ApplicationListener) listener;
-                    logger.info("Groovy application listener found: {}", listener);
-                    applicationListeners.add(applicationListener);
-                } else {
-                    logger.error(
-                            "Candidate Groovy application listener " + listener +
-                            " is not an instance of " + ApplicationListener.class);
-                }
-            } else {
-                logger.debug("No Groovy app listener present");
-            }
-        } catch (ClassNotFoundException e) {
-            logger.debug("Groovy AppListener not present", e);
-        } catch (Throwable e) {
-            logger.error("Could not invoke app listener", e);
-        }
-
         File pagesDirectory = new File(applicationDirectory, "pages");
         logger.info("Pages directory: " + pagesDirectory);
         ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(pagesDirectory);
@@ -220,7 +179,7 @@ public class PageactionsModule implements Module {
 
         logger.debug("Creating SecurityGroovyRealm");
         try {
-            SecurityGroovyRealm realm = new SecurityGroovyRealm(groovyClassLoader);
+            SecurityGroovyRealm realm = new SecurityGroovyRealm(classLoader);
             LifecycleUtils.init(realm);
             rsm.setRealm(realm);
             status = ModuleStatus.ACTIVE;
@@ -228,24 +187,6 @@ public class PageactionsModule implements Module {
             logger.error("Security.groovy not found or invalid", e);
             status = ModuleStatus.FAILED;
         }
-    }
-
-    protected GroovyScriptEngine createScriptEngine(File classpathFile) {
-        CompilerConfiguration cc = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
-        String classpath = classpathFile.getAbsolutePath();
-        logger.info("Groovy classpath: " + classpath);
-        cc.setClasspath(classpath);
-        cc.setRecompileGroovySource(true);
-        GroovyScriptEngine scriptEngine;
-        try {
-            scriptEngine =
-                    new GroovyScriptEngine(new URL[] { classpathFile.toURI().toURL() },
-                                           originalClassLoader);
-        } catch (IOException e) {
-            throw new Error(e);
-        }
-        scriptEngine.setConfig(cc);
-        return scriptEngine;
     }
 
     protected void preloadPageActions(File directory) {
@@ -283,7 +224,7 @@ public class PageactionsModule implements Module {
                 String className = pkg + name.substring(0, name.length() - ".groovy".length());
                 logger.debug("Preloading " + className);
                 try {
-                    Class.forName(className, true, groovyClassLoader);
+                    Class.forName(className, true, classLoader);
                 } catch(Throwable t) {
                     logger.warn("Groovy class preload failed for class " + className, t);
                 }
@@ -297,10 +238,6 @@ public class PageactionsModule implements Module {
         environmentLoader.destroyEnvironment(servletContext);
         logger.info("Shutting down cache...");
         cacheManager.shutdown();
-        logger.info("Removing Groovy classloader...");
-        servletContext.removeAttribute(GROOVY_SCRIPT_ENGINE);
-        servletContext.removeAttribute(GROOVY_CLASS_PATH);
-        servletContext.setAttribute(BaseModule.CLASS_LOADER, originalClassLoader);
         status = ModuleStatus.DESTROYED;
     }
 

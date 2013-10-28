@@ -55,6 +55,8 @@ public class BaseModule implements Module {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(BaseModule.class);
+    public static final String GROOVY_SCRIPT_ENGINE = "GROOVY_SCRIPT_ENGINE";
+    public static final String GROOVY_CLASS_PATH = "GROOVY_CLASS_PATH";
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -68,7 +70,6 @@ public class BaseModule implements Module {
     public final static String RESOURCE_BUNDLE_MANAGER = "com.manydesigns.portofino.resourceBundleManager";
     public final static String ELEMENTS_CONFIGURATION = "com.manydesigns.portofino.elementsConfiguration";
     public final static String SERVER_INFO = "com.manydesigns.portofino.serverInfo";
-    public final static String APP_LISTENERS = "com.manydesigns.portofino.application.listeners";
     public final static String CLASS_LOADER = "com.manydesigns.portofino.application.classLoader";
     public final static String MODULE_REGISTRY = "com.manydesigns.portofino.modules.ModuleRegistry";
     public final static String CACHE_RESET_LISTENER_REGISTRY = "com.manydesigns.portofino.cache.CacheResetListenerRegistry";
