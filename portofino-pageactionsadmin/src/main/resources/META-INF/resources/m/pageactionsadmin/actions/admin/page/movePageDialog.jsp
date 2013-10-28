@@ -2,21 +2,9 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
-<div id="dialog-move-page" class="modal hide">
-    <script type="text/javascript">
-        $("#confirmMovePageButton").click(function() {
-            var form = $("#pageAdminForm");
-            portofino.copyFormAsHiddenFields($("#dialog-move-page"), form);
-            form.submit();
-        });
-
-        $("#cancelMovePageButton, #closeMovePageButton").click(function() {
-            $("#dialog-move-page").modal("hide");
-            $("#dialog-move-page").remove();
-        });
-    </script>
+<div class="dialog-move-page modal hide">
     <div class="modal-header">
-        <button id="closeMovePageButton" type="button" class="close" aria-hidden="true">&times;</button>
+        <button name="closeMovePageButton" type="button" class="close" aria-hidden="true">&times;</button>
         <h4><fmt:message key="layouts.admin.movePageDialog.move_to"/></h4>
     </div>
     <div class="modal-body form-horizontal">
@@ -24,10 +12,10 @@
         <mde:write name="actionBean" property="moveForm"/>
     </div>
     <div class="modal-footer">
-        <button id="cancelMovePageButton" type="button" class="btn">
+        <button name="cancelMovePageButton" type="button" class="btn">
             <fmt:message key="commons.cancel" />
         </button>
-        <button id="confirmMovePageButton" type="button" class="btn btn-warning">
+        <button name="confirmMovePageButton" type="button" class="btn btn-warning">
             <fmt:message key="commons.move" />
         </button>
     </div>

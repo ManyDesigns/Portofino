@@ -6,21 +6,9 @@
 <%@ page import="java.util.List" %>
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
-<div id="dialog-confirm-delete-page" class="modal hide">
-    <script type="text/javascript">
-        $("#confirmDeletePageButton").click(function() {
-            var form = $("#pageAdminForm");
-            portofino.copyFormAsHiddenFields($("#dialog-confirm-delete-page"), form);
-            form.submit();
-        });
-
-        $("#cancelDeletePageButton, #closeDeletePageButton").click(function() {
-            $("#dialog-confirm-delete-page").modal("hide");
-            $("#dialog-confirm-delete-page").remove();
-        });
-    </script>
+<div class="dialog-confirm-delete-page modal hide">
     <div class="modal-header">
-        <button id="closeDeletePageButton" type="button" class="close" aria-hidden="true">&times;</button>
+        <button name="closeDeletePageButton" type="button" class="close" aria-hidden="true">&times;</button>
         <h4><fmt:message key="layouts.admin.deletePageDialog.really_delete"/></h4>
     </div>
     <div class="modal-body">
@@ -37,10 +25,10 @@
         <input type="hidden" name="deletePage" value="action" />
     </div>
     <div class="modal-footer">
-        <button id="cancelDeletePageButton" type="button" class="btn">
+        <button name="cancelDeletePageButton" type="button" class="btn">
             <fmt:message key="commons.cancel" />
         </button>
-        <button id="confirmDeletePageButton" type="button" class="btn btn-warning">
+        <button name="confirmDeletePageButton" type="button" class="btn btn-warning">
             <fmt:message key="commons.delete" />
         </button>
     </div>

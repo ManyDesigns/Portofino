@@ -265,7 +265,17 @@ var portofino = {
     confirmDeletePage: function(pagePath, contextPath) {
         var dialogDiv = $("<div></div>").appendTo($("body"));
         dialogDiv.load(contextPath + "/actions/admin/page?confirmDelete&originalPath=" + pagePath, function() {
-            var dialog = dialogDiv.find("#dialog-confirm-delete-page");
+            var dialog = dialogDiv.find(".dialog-confirm-delete-page");
+            dialog.find("button[name=confirmDeletePageButton]").click(function() {
+                var form = $("#pageAdminForm");
+                portofino.copyFormAsHiddenFields(dialog, form);
+                form.submit();
+            });
+
+            dialog.find("button[name=cancelDeletePageButton], button[name=closeDeletePageButton]").click(function() {
+                dialog.modal("hide");
+                dialog.remove();
+            });
             dialog.modal({ backdrop: 'static'});
         });
     },
@@ -273,7 +283,17 @@ var portofino = {
     showMovePageDialog: function(pagePath, contextPath) {
         var dialogDiv = $("<div></div>").appendTo($("body"));
         dialogDiv.load(contextPath + "/actions/admin/page?chooseNewLocation&originalPath=" + pagePath, function() {
-            var dialog = dialogDiv.find("#dialog-move-page");
+            var dialog = dialogDiv.find(".dialog-move-page");
+            dialog.find("button[name=confirmMovePageButton]").click(function() {
+                var form = $("#pageAdminForm");
+                portofino.copyFormAsHiddenFields(dialog, form);
+                form.submit();
+            });
+
+            dialog.find("button[name=cancelMovePageButton], button[name=closeMovePageButton]").click(function() {
+                dialog.modal("hide");
+                dialog.remove();
+            });
             dialog.modal({ backdrop: 'static'});
         });
     },
@@ -281,7 +301,17 @@ var portofino = {
     showCopyPageDialog: function(pagePath, contextPath) {
         var dialogDiv = $("<div></div>").appendTo($("body"));
         dialogDiv.load(contextPath + "/actions/admin/page?copyPageDialog&originalPath=" + pagePath, function() {
-            var dialog = dialogDiv.find("#dialog-copy-page");
+            var dialog = dialogDiv.find(".dialog-copy-page");
+            dialog.find("button[name=confirmCopyPageButton]").click(function() {
+                var form = $("#pageAdminForm");
+                portofino.copyFormAsHiddenFields(dialog, form);
+                form.submit();
+            });
+
+            dialog.find("button[name=cancelCopyPageButton], button[name=closeCopyPageButton]").click(function() {
+                dialog.modal("hide");
+                dialog.remove();
+            });
             dialog.modal({ backdrop: 'static'});
         });
     }
