@@ -90,7 +90,7 @@ public class MailModule implements Module {
 
     @Override
     public double getPriority() {
-        return 1;
+        return 20;
     }
 
     @Override

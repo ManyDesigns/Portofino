@@ -119,7 +119,7 @@ public class PageactionsModule implements Module {
 
     @Override
     public double getPriority() {
-        return 1;
+        return 10;
     }
 
     @Override

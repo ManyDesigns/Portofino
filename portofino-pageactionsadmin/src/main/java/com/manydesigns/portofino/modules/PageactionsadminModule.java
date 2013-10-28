@@ -70,7 +70,7 @@ public class PageactionsadminModule implements Module {
 
     @Override
     public double getPriority() {
-        return 1;
+        return 20;
     }
 
     @Override

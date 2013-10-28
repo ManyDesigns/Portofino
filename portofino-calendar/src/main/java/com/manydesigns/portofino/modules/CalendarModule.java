@@ -68,7 +68,7 @@ public class CalendarModule implements Module {
 
     @Override
     public double getPriority() {
-        return 2;
+        return 20;
     }
 
     @Override

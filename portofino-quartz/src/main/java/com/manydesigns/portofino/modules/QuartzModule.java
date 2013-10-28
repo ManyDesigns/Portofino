@@ -78,7 +78,7 @@ public class QuartzModule implements Module {
 
     @Override
     public double getPriority() {
-        return 3;
+        return 10;
     }
 
     @Override

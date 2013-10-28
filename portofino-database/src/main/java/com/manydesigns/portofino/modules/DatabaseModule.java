@@ -100,7 +100,7 @@ public class DatabaseModule implements Module {
 
     @Override
     public double getPriority() {
-        return 2;
+        return 10;
     }
 
     @Override

@@ -72,7 +72,7 @@ public class GooglecloudsqlModule implements Module {
 
     @Override
     public double getPriority() {
-        return 3;
+        return 20;
     }
 
     @Override
