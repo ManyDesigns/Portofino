@@ -4,7 +4,7 @@
         <property updatable="false" searchable="false" name="project_id" insertable="false" inSummary="false" enabled="false">
             <annotations/>
         </property>
-        <property updatable="false" searchable="false" name="n" insertable="false" inSummary="false" enabled="false">
+        <property updatable="false" searchable="false" name="n" label="" insertable="false" inSummary="true" enabled="true">
             <annotations/>
         </property>
         <property updatable="true" searchable="true" name="title" label="" insertable="true" inSummary="true" enabled="true">
