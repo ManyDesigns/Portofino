@@ -105,7 +105,7 @@ public class ModulesAction extends AbstractActionBean {
         public String id;
         public String name;
         public String version;
-        @Status(red = { "FAILED" }, amber = { "CREATED" }, green = { "ACTIVE" })
+        @Status(red = { "FAILED", "DESTROYED" }, amber = { "CREATED", "STOPPED" }, green = { "ACTIVE", "STARTED" })
         public String status;
 
     }

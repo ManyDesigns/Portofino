@@ -128,15 +128,44 @@ public class ModuleRegistry {
         return "" + module.getName() + " (" + module.getId() + ")";
     }
 
-    public void destroy() {
-        for(Module module : modules.descendingSet()) { //Iterate backwards
+    public void start() {
+        for(Module module : modules) {
             if(module.getStatus() == ModuleStatus.ACTIVE) {
+                try {
+                    logger.debug("Module " + printModule(module) + " starting...");
+                    module.start();
+                    logger.info("Module " + printModule(module) + " started.");
+                } catch (Throwable e) {
+                    logger.error("Could not start module " + printModule(module), e);
+                }
+            }
+        }
+    }
+
+    public void stop() {
+        for(Module module : modules.descendingSet()) {
+            if(module.getStatus() == ModuleStatus.STARTED) {
+                try {
+                    logger.debug("Stopping module " + printModule(module) + " ...");
+                    module.stop();
+                    logger.info("Module " + printModule(module) + " stopped.");
+                } catch (Throwable e) {
+                    logger.error("Could not stop module " + printModule(module), e);
+                }
+            }
+        }
+    }
+
+    public void destroy() {
+        stop();
+        for(Module module : modules.descendingSet()) { //Iterate backwards
+            if(module.getStatus() == ModuleStatus.STOPPED) {
                 try {
                     logger.debug("Destroying module " + printModule(module) + "...");
                     module.destroy();
                     logger.info("Destroyed module " + printModule(module));
                 } catch (Throwable e) {
-                    logger.error("Could not destroy module " + printModule(module));
+                    logger.error("Could not destroy module " + printModule(module), e);
                 }
             }
         }

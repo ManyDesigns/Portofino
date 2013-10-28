@@ -59,6 +59,8 @@ public class MailModule implements Module {
     @Inject(BaseModule.ADMIN_MENU)
     public MenuBuilder adminMenu;
 
+    protected MailQueueSetup mailQueueSetup;
+
     protected ModuleStatus status = ModuleStatus.CREATED;
 
     //**************************************************************************
@@ -115,7 +117,7 @@ public class MailModule implements Module {
         } catch (ConfigurationException e) {
             logger.error("Could not load mail configuration defaults");
         }
-        MailQueueSetup mailQueueSetup = new MailQueueSetup(mailConfiguration);
+        mailQueueSetup = new MailQueueSetup(mailConfiguration);
         mailQueueSetup.setup();
 
         MailQueue mailQueue = mailQueueSetup.getMailQueue();
@@ -128,15 +130,6 @@ public class MailModule implements Module {
         servletContext.setAttribute(MAIL_SENDER, mailQueueSetup.getMailSender());
         servletContext.setAttribute(MAIL_CONFIGURATION, mailQueueSetup.getMailConfiguration());
 
-        //Quartz integration (optional)
-        try {
-            //In classe separata per permettere al Listener di essere caricato anche in assenza di Quartz a runtime
-            MailScheduler.setupMailScheduler(mailQueueSetup);
-        } catch (NoClassDefFoundError e) {
-            logger.debug(e.getMessage(), e);
-            logger.info("Quartz is not available, mail scheduler not started");
-        }
-
         SimpleMenuAppender group = SimpleMenuAppender.group("mail", null, "Mail", 4.0);
         adminMenu.menuAppenders.add(group);
 
@@ -148,9 +141,25 @@ public class MailModule implements Module {
     }
 
     @Override
+    public void start() {
+        //Quartz integration (optional)
+        try {
+            //In classe separata per permettere al Listener di essere caricato anche in assenza di Quartz a runtime
+            MailScheduler.setupMailScheduler(mailQueueSetup);
+        } catch (NoClassDefFoundError e) {
+            logger.debug(e.getMessage(), e);
+            logger.info("Quartz is not available, mail scheduler not started");
+        }
+        status = ModuleStatus.STARTED;
+    }
+
+    @Override
+    public void stop() {
+        status = ModuleStatus.STOPPED;
+    }
+
+    @Override
     public void destroy() {
-        logger.info("ManyDesigns Mail module stopping...");
-        logger.info("ManyDesigns Mail module stopped.");
         status = ModuleStatus.DESTROYED;
     }
 

@@ -91,7 +91,18 @@ public class TextModule implements Module {
         pageActionRegistry.register(TextAction.class);
         status = ModuleStatus.ACTIVE;
     }
-@Override
+
+    @Override
+    public void start() {
+        status = ModuleStatus.STARTED;
+    }
+
+    @Override
+    public void stop() {
+        status = ModuleStatus.STOPPED;
+    }
+
+    @Override
     public void destroy() {
         status = ModuleStatus.DESTROYED;
     }

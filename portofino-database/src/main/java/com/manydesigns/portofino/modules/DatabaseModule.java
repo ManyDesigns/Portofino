@@ -68,6 +68,8 @@ public class DatabaseModule implements Module {
     @Inject(BaseModule.ADMIN_MENU)
     public MenuBuilder adminMenu;
 
+    protected Persistence persistence;
+
     protected ModuleStatus status = ModuleStatus.CREATED;
 
     //**************************************************************************
@@ -130,8 +132,7 @@ public class DatabaseModule implements Module {
         logger.info("Initializing persistence");
         DatabasePlatformsManager databasePlatformsManager = new DatabasePlatformsManager(configuration);
 
-        Persistence persistence =
-                new Persistence(applicationDirectory, configuration, databasePlatformsManager);
+        persistence = new Persistence(applicationDirectory, configuration, databasePlatformsManager);
         Injections.inject(persistence, servletContext, null);
         servletContext.setAttribute(DATABASE_PLATFORMS_MANAGER, databasePlatformsManager);
         servletContext.setAttribute(PERSISTENCE, persistence);
@@ -157,6 +158,18 @@ public class DatabaseModule implements Module {
         link = SimpleMenuAppender.link(
                 "dataModeling", "reloadModel", null, "Reload model", ReloadModelAction.URL_BINDING, 3.0);
         adminMenu.menuAppenders.add(link);
+    }
+
+    @Override
+    public void start() {
+        persistence.loadXmlModel();
+        status = ModuleStatus.STARTED;
+    }
+
+    @Override
+    public void stop() {
+        persistence.shutdown();
+        status = ModuleStatus.STOPPED;
     }
 
     @Override

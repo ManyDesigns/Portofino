@@ -23,6 +23,8 @@ package com.manydesigns.portofino.servlets;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.configuration.BeanLookup;
+import com.manydesigns.elements.servlet.AttributeMap;
+import com.manydesigns.elements.servlet.ElementsFilter;
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.i18n.ResourceBundleManager;
@@ -106,6 +108,10 @@ public class PortofinoListener
             ElementsThreadLocals.setupDefaultElementsContext();
             ServletContext servletContext = servletContextEvent.getServletContext();
             ElementsThreadLocals.setServletContext(servletContext);
+            AttributeMap servletContextAttributeMap = AttributeMap.createAttributeMap(servletContext);
+            ElementsThreadLocals.getOgnlContext().put(
+                    ElementsFilter.SERVLET_CONTEXT_OGNL_ATTRIBUTE,
+                    servletContextAttributeMap);
             init(servletContextEvent);
         } catch (Throwable e) {
             logger.error("Could not start ManyDesigns Portofino", e);
@@ -190,6 +196,7 @@ public class PortofinoListener
         servletContext.setAttribute(BaseModule.MODULE_REGISTRY, moduleRegistry);
         moduleRegistry.migrateAndInit(servletContext);
         logger.info("All modules loaded.");
+        moduleRegistry.start();
 
         String encoding = configuration.getString(
                 PortofinoProperties.URL_ENCODING, PortofinoProperties.URL_ENCODING_DEFAULT);
@@ -253,6 +260,8 @@ public class PortofinoListener
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         MDC.clear();
         logger.info("ManyDesigns Portofino stopping...");
+        logger.info("Stopping modules...");
+        moduleRegistry.stop();
         logger.info("Destroying modules...");
         moduleRegistry.destroy();
         logger.info("ManyDesigns Portofino stopped.");

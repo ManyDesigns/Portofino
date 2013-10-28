@@ -98,7 +98,18 @@ public class Db2Module implements Module {
         databasePlatformsManager.addDatabasePlatform(new IbmDb2DatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }
-@Override
+
+    @Override
+    public void start() {
+        status = ModuleStatus.STARTED;
+    }
+
+    @Override
+    public void stop() {
+        status = ModuleStatus.STOPPED;
+    }
+
+    @Override
     public void destroy() {
         status = ModuleStatus.DESTROYED;
     }

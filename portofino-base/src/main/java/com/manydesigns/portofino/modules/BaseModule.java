@@ -163,6 +163,16 @@ public class BaseModule implements Module {
     }
 
     @Override
+    public void start() {
+        status = ModuleStatus.STARTED;
+    }
+
+    @Override
+    public void stop() {
+        status = ModuleStatus.STOPPED;
+    }
+
+    @Override
     public void destroy() {
         status = ModuleStatus.DESTROYED;
     }

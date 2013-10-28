@@ -53,6 +53,10 @@ public interface Module {
 
     void init();
 
+    void start();
+
+    void stop();
+
     void destroy();
 
     ModuleStatus getStatus();

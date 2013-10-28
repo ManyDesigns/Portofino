@@ -99,7 +99,18 @@ public class OracleModule implements Module {
         databasePlatformsManager.addDatabasePlatform(new OracleDatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }
-@Override
+
+    @Override
+    public void start() {
+        status = ModuleStatus.STARTED;
+    }
+
+    @Override
+    public void stop() {
+        status = ModuleStatus.STOPPED;
+    }
+
+    @Override
     public void destroy() {
         status = ModuleStatus.DESTROYED;
     }
