@@ -109,9 +109,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <modules>
+        <!-- Core stuff -->
         <module>elements</module>
         <module>portofino-base</module>
         <module>portofino-stripes</module>
+        <!-- Database persistence -->
         <module>portofino-database</module>
         <module>portofino-db2</module>
         <module>portofino-derby</module>
@@ -121,6 +123,7 @@
         <module>portofino-mysql</module>
         <module>portofino-oracle</module>
         <module>portofino-postgresql</module>
+        <!-- Pages -->
         <module>portofino-pageactions</module>
         <module>portofino-pageactionsadmin</module>
         <module>portofino-text</module>
@@ -130,8 +133,11 @@
         <module>portofino-many2many</module>
         <module>portofino-wizard</module>
         <module>portofino-theme</module>
-        <module>portofino-war-archetype</module>
+        <!-- Optional services -->
         <module>portofino-mail</module>
+        <module>portofino-quartz</module>
+        <!-- Applications -->
+        <module>portofino-war-archetype</module>
         <module>portofino-war-jee</module>
         <module>portofino-war-gae</module>
         <module>demo-tt</module>

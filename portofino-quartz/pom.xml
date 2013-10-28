@@ -8,13 +8,13 @@
         <artifactId>portofino</artifactId>
         <version>4.1.beta5-SNAPSHOT</version>
     </parent>
-    <artifactId>portofino-base</artifactId>
+    <artifactId>portofino-quartz</artifactId>
     <packaging>jar</packaging>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>elements</artifactId>
+            <artifactId>portofino-base</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -24,37 +24,11 @@
             <version>${javaee-web-api.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Quartz integration (optional) -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jstl</artifactId>
-            <version>${jstl.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>taglibs</groupId>
-            <artifactId>standard</artifactId>
-            <version>${jstl.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-web</artifactId>
-            <version>${shiro.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava-jdk5</artifactId> <!-- Used also by google OAuth client -->
-            <version>${guava.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.cage</groupId>
-            <artifactId>cage</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>${groovy.version}</version>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>${quartz.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

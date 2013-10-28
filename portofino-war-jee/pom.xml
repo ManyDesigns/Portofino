@@ -12,102 +12,113 @@
     <packaging>war</packaging>
     <url>http://www.manydesigns.com/</url>
     <dependencies>
+        <!-- Support for page actions. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-pageactions</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Support for database connectivity. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-database</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-db2</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-derby</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-googlecloudsql</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-h2</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-mssql</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-mysql</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-oracle</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-postgresql</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
+        <!-- Page administration (CMS). Remove to disable this feature. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-pageactionsadmin</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Database implementations. Choose the ones that apply. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-derby</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-googlecloudsql</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-h2</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-mssql</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-mysql</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-oracle</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-postgresql</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Text pages. Remove to disable this feature. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-text</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- CRUD pages. Remove to disable this feature. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-crud</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Chart pages. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-chart</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Calendar pages. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-calendar</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Many-to-many pages. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-many2many</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Wizard to generate an application from an existing database. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-wizard</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Reliable mail sender. Remove to disable this feature. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-mail</artifactId>
@@ -120,11 +131,25 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- Theme -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-theme</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>
+        </dependency>
+        <!-- Quartz -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-quartz</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>c3p0</groupId>
+                    <artifactId>c3p0</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
@@ -156,19 +181,6 @@
             <artifactId>logback-core</artifactId>
             <version>${logback.version}</version>
             <scope>compile</scope>
-        </dependency>
-        <!-- Quartz -->
-        <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz</artifactId>
-            <version>${quartz.version}</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>c3p0</groupId>
-                    <artifactId>c3p0</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!-- mail -->
         <dependency>
