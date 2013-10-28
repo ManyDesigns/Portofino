@@ -1,7 +1,0 @@
-<configuration
-        database="redmine" legend="Workload" name="Workload" orientation="HORIZONTAL"
-        query="select u.&quot;id&quot;, count(&quot;issues&quot;.&quot;id&quot;), &quot;login&quot;
-               from &quot;issues&quot; join &quot;users&quot; u on &quot;assigned_to_id&quot; = u.&quot;id&quot;
-               group by u.&quot;id&quot;, u.&quot;login&quot;"
-        type="PIE3D" urlExpression="/people/%{key}">
-</configuration>

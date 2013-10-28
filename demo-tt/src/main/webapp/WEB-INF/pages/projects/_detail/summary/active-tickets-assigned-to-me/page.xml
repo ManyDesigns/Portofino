@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page title="Active tickets assigned to me" navigationRoot="INHERIT" id="w8ed362f4gvzao3dp8mewvrkt" description="Active tickets assigned to me">
+    <detailLayout>
+        <childPages/>
+    </detailLayout>
+    <layout template="default">
+        <childPages/>
+    </layout>
+    <permissions/>
+</page>

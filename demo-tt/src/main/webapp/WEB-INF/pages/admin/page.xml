@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page title="Admin" navigationRoot="INHERIT" id="fdna5k8iaxxkbach3p9r7uoad" description="Admin">
+    <detailLayout template="default">
+        <childPages/>
+    </detailLayout>
+    <layout template="default">
+        <childPages>
+            <childPage showInNavigation="true" name="users"/>
+        </childPages>
+    </layout>
+    <permissions/>
+</page>

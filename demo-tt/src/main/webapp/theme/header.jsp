@@ -1,17 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
-%><%@ page import="com.manydesigns.elements.util.Util"
 %><%@ page import="com.manydesigns.portofino.PortofinoProperties"
-%><%@ page import="com.manydesigns.portofino.actions.admin.AdminAction"
-%><%@ page import="com.manydesigns.portofino.actions.admin.page.PageAdminAction"
-%><%@ page import="com.manydesigns.portofino.dispatcher.PageAction"
-%><%@ page import="com.manydesigns.portofino.logic.SecurityLogic"
-%><%@ page import="com.manydesigns.portofino.security.AccessLevel"
-%><%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"
-%><%@ page import="net.sourceforge.stripes.util.UrlBuilder"
 %><%@ page import="org.apache.shiro.SecurityUtils"
 %><%@ page import="org.apache.shiro.subject.Subject"
-%><%@ page import="java.io.Serializable"
-%><%@ page import="java.util.Locale"
+%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
@@ -25,159 +17,121 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
         <div class="container">
-            <h4 class="pull-left">
-                <stripes:link href="/">
-                    <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
-                </stripes:link>
-            </h4>
             <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <div class="header-menu nav-collapse collapse">
+            <stripes:link href="/" class="brand">
+                <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
+            </stripes:link>
+            <div id="header-menu" class="nav-collapse collapse pull-right">
+                <div class="navbar-text pull-right">
+
                 <c:if test="${not empty actionBean.pageInstance}">
                     <form id="pageAdminForm" action="${pageContext.request.contextPath}/actions/admin/page">
                         <input type="hidden" name="originalPath" value="${actionBean.context.actualServletPath}" />
                     </form>
                 </c:if>
-                <ul class="nav">
-                    <%
-                        Subject subject = SecurityUtils.getSubject();
-                        String actionPath = actionBean.getContext().getActualServletPath();
-                        String loginPage = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PAGE);
-                        if(subject.isAuthenticated()) {
+                <c:set var="actionPath" value="${actionBean.context.actualServletPath}"/>
+                <ul id="app-menu" class="nav">
+                    <shiro:authenticated>
+                        <%
+                            Subject subject = SecurityUtils.getSubject();
                             Object principal = subject.getPrincipal();
-                            String prettyName = ShiroUtils.getPortofinoRealm().getUserPrettyName((Serializable) principal);
-                    %>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="icon-user icon-white"></i>
-                            <%= prettyName %> <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <%
-
-                                UrlBuilder changePasswordUrlBuilder =
-                                        new UrlBuilder(request.getLocale(), loginPage, true);
-                                changePasswordUrlBuilder.addParameter("returnUrl", actionPath);
-                                changePasswordUrlBuilder.addParameter("cancelReturnUrl", actionPath);
-                                changePasswordUrlBuilder.addParameter("changePassword");
-                                String changePasswordUrl = Util.getAbsoluteUrl(changePasswordUrlBuilder.toString());
-                            %>
-                            <li>
-                                <a href="<%= changePasswordUrl %>">
-                                    <fmt:message key="skins.default.header.change.password" />
-                                </a>
-                            </li>
-                            <%
-                                if(SecurityLogic.isAdministrator(request)) {
-                                    UrlBuilder urlBuilder = new UrlBuilder(request.getLocale(), AdminAction.class, true);
-                                    String adminUrl = Util.getAbsoluteUrl(urlBuilder.toString());
-                                    %>
-                            <li>
-                                <a href="<%= adminUrl %>">
-                                    <fmt:message key="skins.default.header.administration" />
-                                </a>
-                            </li>
-                            <%
-                                }
-                                UrlBuilder logoutUrlBuilder =
-                                        new UrlBuilder(request.getLocale(), loginPage, true);
-                                logoutUrlBuilder.addParameter("returnUrl", actionPath);
-                                logoutUrlBuilder.addParameter("cancelReturnUrl", actionPath);
-                                logoutUrlBuilder.addParameter("logout");
-                                String logoutUrl = Util.getAbsoluteUrl(logoutUrlBuilder.toString());
-                            %>
-                            <li>
-                                <a href="<%= logoutUrl %>">
-                                    <fmt:message key="skins.default.header.log_out" />
-                                </a>
-                            </li>
-                            <%
-                                if(request.getAttribute("actionBean") instanceof PageAction) {
-                                    PageAction pageAction = (PageAction) request.getAttribute("actionBean");
-                                    if(pageAction.getPageInstance() != null &&
-                                       SecurityLogic.hasPermissions(
-                                               portofinoConfiguration, pageAction.getPageInstance(),
-                                               subject, AccessLevel.EDIT)) {%>
-                            <li class="divider"></li>
-                            <li>
-                                <a href="javascript:portofino.enablePageActionDragAndDrop($(this), '${actionBean.context.actualServletPath}');">
-                                    <i class="icon-file"></i> Edit layout
-                                </a>
-                            </li>
-                            <li>
-                                <%
-                                    UrlBuilder urlBuilder = new UrlBuilder(request.getLocale(), PageAdminAction.class, true);
-                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getActualServletPath());
-                                    urlBuilder.setEvent("pageChildren");
-                                %>
-                                <a href="<%= request.getContextPath() + urlBuilder %>">
-                                    <i class="icon-folder-open"></i> Page children
-                                </a>
-                            </li>
-                            <li>
-                                <%
-                                    urlBuilder = new UrlBuilder(request.getLocale(), PageAdminAction.class, true);
-                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getActualServletPath());
-                                    urlBuilder.setEvent("newPage");
-                                %>
-                                <a href="<%= request.getContextPath() + urlBuilder %>">
-                                    <i class="icon-plus"></i> Add new page
-                                </a>
-                            </li>
-                            <%
-                                String jsArgs = "('" +
-                                        pageAction.getContext().getActualServletPath() + "', '" +
-                                        request.getContextPath() + "');";
-
-                            %>
-                            <li>
-                                <a href="javascript:portofino.confirmDeletePage<%= jsArgs %>">
-                                    <i class="icon-minus"></i> Delete page
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:portofino.showCopyPageDialog<%= jsArgs %>">
-                                    <i class="icon-file"></i> Copy page
-                                </a>
-                            </li>
-                            <li>
-                                <a href="javascript:portofino.showMovePageDialog<%= jsArgs %>">
-                                    <i class="icon-share"></i> Move page
-                                </a>
-                            </li>
-                            <%
-                                if(SecurityLogic.hasPermissions(
-                                        portofinoConfiguration, pageAction.getPageInstance(),
-                                        subject, AccessLevel.DEVELOP)) {
-                                    urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, true);
-                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getActualServletPath());
-                                    urlBuilder.setEvent("pagePermissions");
-                            %>
-                            <li>
-                                <a href="<%= request.getContextPath() + urlBuilder %>">
-                                    <i class="icon-user"></i> Page permissions
-                                </a>
-                            </li>
-                            <% }}} %>
-                        </ul>
-                    </li>
-                    <% } else {
-                        UrlBuilder loginUrlBuilder =
-                                new UrlBuilder(request.getLocale(), loginPage, false);
-                        loginUrlBuilder.addParameter("returnUrl", actionPath);
-                        loginUrlBuilder.addParameter("cancelReturnUrl", actionPath);
-                        String loginUrl = Util.getAbsoluteUrl(loginUrlBuilder.toString());
+                            pageContext.setAttribute("principal", principal);
                         %>
-                        <li>
-                            <a href="<%= loginUrl %>">
-                                <fmt:message key="skins.default.header.log_in" />
+                        <shiro:hasRole name="administrators">
+                            <li >
+                                <stripes:link beanclass="com.manydesigns.portofino.actions.admin.AdminAction" class="navbar-link">
+                                    <fmt:message key="skins.default.header.administration" />
+                                </stripes:link>
+                            </li>
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Page <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="javascript:portofino.enablePageActionDragAndDrop($(this), '${actionBean.context.actualServletPath}');">
+                                            <i class="icon-file"></i> Edit layout
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <stripes:link beanclass="com.manydesigns.portofino.actions.admin.page.PageAdminAction" event="pageChildren">
+                                            <stripes:param name="originalPath" value="${actionBean.context.actualServletPath}"/>
+                                            <i class="icon-folder-open"></i> Page children
+                                        </stripes:link>
+                                    </li>
+                                    <li>
+                                        <stripes:link beanclass="com.manydesigns.portofino.actions.admin.page.PageAdminAction" event="newPage">
+                                            <stripes:param name="originalPath" value="${actionBean.context.actualServletPath}"/>
+                                            <i class="icon-plus"></i> Add new page
+                                        </stripes:link>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:portofino.confirmDeletePage('<c:out value="${actionBean.context.actualServletPath}"/>','<c:out value="${pageContext.request.contextPath}"/>');">
+                                            <i class="icon-minus"></i> Delete page
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:portofino.showCopyPageDialog('<c:out value="${actionBean.context.actualServletPath}"/>','<c:out value="${pageContext.request.contextPath}"/>');">
+                                            <i class="icon-file"></i> Copy page
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:portofino.showMovePageDialog('<c:out value="${actionBean.context.actualServletPath}"/>','<c:out value="${pageContext.request.contextPath}"/>');">
+                                            <i class="icon-share"></i> Move page
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <stripes:link beanclass="com.manydesigns.portofino.actions.admin.page.PageAdminAction" event="pagePermissions">
+                                            <stripes:param name="originalPath" value="${actionBean.context.actualServletPath}"/>
+                                            <i class="icon-user"></i> Page permissions
+                                        </stripes:link>
+                                    </li>
+                                </ul>
+                            </li>
+                        </shiro:hasRole>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="icon-user icon-white"></i>
+                                <c:out value="${principal.first_name} ${principal.last_name}"/> <b class="caret"></b>
                             </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <stripes:link href="/profile">
+                                        My profile
+                                    </stripes:link>
+                                </li>
+                                <li>
+                                    <stripes:link href="/login">
+                                        <stripes:param name="changePassword"/>
+                                        <stripes:param name="returnUrl" value="${actionPath}"/>
+                                        <stripes:param name="cancelReturnUrl" value="${actionPath}"/>
+                                        <fmt:message key="skins.default.header.change.password" />
+                                    </stripes:link>
+                                </li>
+                                <li>
+                                    <stripes:link href="/login">
+                                        <stripes:param name="logout"/>
+                                        <stripes:param name="returnUrl" value="${actionPath}"/>
+                                        <stripes:param name="cancelReturnUrl" value="${actionPath}"/>
+                                        <fmt:message key="skins.default.header.log_out" />
+                                    </stripes:link>
+                                </li>
+                            </ul>
                         </li>
-                    <% } %>
+                    </shiro:authenticated>
+                    <shiro:notAuthenticated>
+                        <li>
+                            <stripes:link href="/login">
+                                <stripes:param name="returnUrl" value="${actionPath}"/>
+                                <stripes:param name="cancelReturnUrl" value="${actionPath}"/>
+                                <fmt:message key="skins.default.header.log_in" />
+                            </stripes:link>
+                        </li>
+                    </shiro:notAuthenticated>
                 </ul>
+                </div>
             </div>
         </div>
     </div>

@@ -1,7 +1,0 @@
-<configuration
-        database="redmine" legend="Issues by project/status" name="Issues by project/status"
-        orientation="VERTICAL"
-        query="select &quot;status_id&quot;, &quot;project_id&quot;, count(*), status.&quot;name&quot;, &quot;projects&quot;.&quot;name&quot; from &quot;issues&quot; join &quot;issue_statuses&quot; status on &quot;status_id&quot; = status.&quot;id&quot; join &quot;projects&quot; on &quot;project_id&quot; = &quot;projects&quot;.&quot;id&quot; group by &quot;status_id&quot;, &quot;project_id&quot;"
-        type="STACKED_BAR_3D" urlExpression="/projects/%{category}/issues?search_status_id=%{series}"
-        xAxisName="Projects" yAxisName="Number of issues">
-</configuration>

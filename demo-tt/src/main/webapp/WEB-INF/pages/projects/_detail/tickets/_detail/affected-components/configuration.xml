@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration variable="" searchTitle="" rowsPerPage="10" readTitle="" query="from affected_components where project_id = %{#ticket.project_id} and n = %{#ticket.n}" name="Affected components" largeResultSet="false" editTitle="" database="tt" createTitle="">
+    <properties/>
+    <selectionProviders/>
+</configuration>

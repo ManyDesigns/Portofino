@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page title="Active tickets by version" navigationRoot="INHERIT" id="sqmyqz9rvdc2ncx4ycfrjl32v" description="Active tickets by version">
+    <detailLayout>
+        <childPages/>
+    </detailLayout>
+    <layout template="default">
+        <childPages/>
+    </layout>
+    <permissions/>
+</page>

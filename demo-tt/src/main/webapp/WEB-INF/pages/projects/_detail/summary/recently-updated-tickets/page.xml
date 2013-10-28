@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page title="Recently updated tickets" navigationRoot="INHERIT" id="qo507jrazk8r9s6yjb7ctiy0h" description="Recently updated tickets">
+    <detailLayout>
+        <childPages/>
+    </detailLayout>
+    <layout template="default">
+        <childPages/>
+    </layout>
+    <permissions/>
+</page>
