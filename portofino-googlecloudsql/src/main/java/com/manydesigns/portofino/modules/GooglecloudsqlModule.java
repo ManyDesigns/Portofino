@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.GoogleCloudSQLDatabasePlatform;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.liquibase.databases.GoogleCloudSQLDatabase;
@@ -48,8 +48,8 @@ public class GooglecloudsqlModule implements Module {
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
-    @Inject(DatabaseModule.DATABASE_PLATFORMS_MANAGER)
-    DatabasePlatformsManager databasePlatformsManager;
+    @Inject(DatabaseModule.DATABASE_PLATFORMS_REGISTRY)
+    DatabasePlatformsRegistry databasePlatformsRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -97,7 +97,7 @@ public class GooglecloudsqlModule implements Module {
         logger.debug("Registering GoogleCloudSQLLockDatabaseChangeLogGenerator");
         SqlGeneratorFactory.getInstance().register(
                 new GoogleCloudSQLLockDatabaseChangeLogGenerator());
-        databasePlatformsManager.addDatabasePlatform(new GoogleCloudSQLDatabasePlatform());
+        databasePlatformsRegistry.addDatabasePlatform(new GoogleCloudSQLDatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }
 

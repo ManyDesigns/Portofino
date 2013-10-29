@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.JTDSDatabasePlatform;
 import com.manydesigns.portofino.database.platforms.MSSqlServerDatabasePlatform;
 import com.manydesigns.portofino.di.Inject;
@@ -49,8 +49,8 @@ public class MssqlModule implements Module {
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
-    @Inject(DatabaseModule.DATABASE_PLATFORMS_MANAGER)
-    DatabasePlatformsManager databasePlatformsManager;
+    @Inject(DatabaseModule.DATABASE_PLATFORMS_REGISTRY)
+    DatabasePlatformsRegistry databasePlatformsRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -96,10 +96,10 @@ public class MssqlModule implements Module {
         logger.debug("Registering MSSQL");
         DatabaseFactory.getInstance().register(new PortofinoMSSQLDatabase());
         DatabaseSnapshotGeneratorFactory.getInstance().register(new MSSQLDatabaseSnapshotGenerator());
-        databasePlatformsManager.addDatabasePlatform(new MSSqlServerDatabasePlatform());
+        databasePlatformsRegistry.addDatabasePlatform(new MSSqlServerDatabasePlatform());
 
 
-        databasePlatformsManager.addDatabasePlatform(new JTDSDatabasePlatform());
+        databasePlatformsRegistry.addDatabasePlatform(new JTDSDatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }
 

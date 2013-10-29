@@ -8,7 +8,7 @@
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.mail.MailSettingsAction"/>
 <stripes:layout-render name="/m/base/admin-theme/admin-page.jsp">
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="layouts.admin.settings.settings"/>
+        Mail settings
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <p>Note: you have to restart the application for these properties to have effect.</p>

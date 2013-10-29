@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.MySql5DatabasePlatform;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.liquibase.databases.PortofinoMySQLDatabase;
@@ -48,8 +48,8 @@ public class MysqlModule implements Module {
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
-    @Inject(DatabaseModule.DATABASE_PLATFORMS_MANAGER)
-    DatabasePlatformsManager databasePlatformsManager;
+    @Inject(DatabaseModule.DATABASE_PLATFORMS_REGISTRY)
+    DatabasePlatformsRegistry databasePlatformsRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -95,7 +95,7 @@ public class MysqlModule implements Module {
         logger.debug("Registering MySQL");
         DatabaseFactory.getInstance().register(new PortofinoMySQLDatabase());
         DatabaseSnapshotGeneratorFactory.getInstance().register(new MySQLDatabaseSnapshotGenerator());
-        databasePlatformsManager.addDatabasePlatform(new MySql5DatabasePlatform());
+        databasePlatformsRegistry.addDatabasePlatform(new MySql5DatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }
 

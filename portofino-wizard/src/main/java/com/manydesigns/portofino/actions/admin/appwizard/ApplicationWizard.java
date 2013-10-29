@@ -45,7 +45,7 @@ import com.manydesigns.portofino.actions.forms.SelectableSchema;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.dispatcher.PageInstance;
@@ -237,8 +237,8 @@ public class ApplicationWizard extends AbstractPageAction {
 
         DefaultSelectionProvider driverSelectionProvider = new DefaultSelectionProvider("name");
         // database platforms
-        DatabasePlatformsManager manager =
-                persistence.getDatabasePlatformsManager();
+        DatabasePlatformsRegistry manager =
+                persistence.getDatabasePlatformsRegistry();
         DatabasePlatform[] databasePlatforms = manager.getDatabasePlatforms();
         for(DatabasePlatform dp : databasePlatforms) {
             if(DatabasePlatform.STATUS_OK.equals(dp.getStatus())) {
@@ -328,7 +328,7 @@ public class ApplicationWizard extends AbstractPageAction {
     }
 
     protected void configureEditSchemas() throws Exception {
-        connectionProvider.init(persistence.getDatabasePlatformsManager());
+        connectionProvider.init(persistence.getDatabasePlatformsRegistry());
         Connection conn = connectionProvider.acquireConnection();
         logger.debug("Reading database metadata");
         DatabaseMetaData metadata = conn.getMetaData();

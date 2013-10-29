@@ -35,7 +35,7 @@ import com.manydesigns.portofino.actions.forms.SelectableSchema;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.BaseModule;
@@ -142,8 +142,8 @@ public class ConnectionProvidersAction extends AbstractActionBean {
         tableForm.readFromObject(tableFormObj);
 
         // database platforms
-        DatabasePlatformsManager manager =
-                persistence.getDatabasePlatformsManager();
+        DatabasePlatformsRegistry manager =
+                persistence.getDatabasePlatformsRegistry();
         databasePlatforms = manager.getDatabasePlatforms();
         databasePlatformsTableForm =
                 new TableFormBuilder(DatabasePlatform.class)
@@ -262,7 +262,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
     @Button(list = "connectionProviders-read", key = "layouts.admin.connectionProviders.list.test", order = 3)
     public Resolution test() {
         connectionProvider = persistence.getConnectionProvider(databaseName);
-        connectionProvider.init(persistence.getDatabasePlatformsManager());
+        connectionProvider.init(persistence.getDatabasePlatformsRegistry());
         String status = connectionProvider.getStatus();
         if (ConnectionProvider.STATUS_CONNECTED.equals(status)) {
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("connectionProviders.test.successful"));
@@ -343,7 +343,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
             }
             form.writeToObject(connectionProviderForm);
             try {
-                connectionProvider.init(persistence.getDatabasePlatformsManager());
+                connectionProvider.init(persistence.getDatabasePlatformsRegistry());
                 persistence.initModel();
                 persistence.saveXmlModel();
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("connectionProviders.update.successful"));

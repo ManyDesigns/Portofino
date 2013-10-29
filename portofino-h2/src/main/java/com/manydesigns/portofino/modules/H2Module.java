@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.H2DatabasePlatform;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.liquibase.databases.PortofinoH2Database;
@@ -48,8 +48,8 @@ public class H2Module implements Module {
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
-    @Inject(DatabaseModule.DATABASE_PLATFORMS_MANAGER)
-    DatabasePlatformsManager databasePlatformsManager;
+    @Inject(DatabaseModule.DATABASE_PLATFORMS_REGISTRY)
+    DatabasePlatformsRegistry databasePlatformsRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -95,7 +95,7 @@ public class H2Module implements Module {
         logger.debug("Registering H2");
         DatabaseFactory.getInstance().register(new PortofinoH2Database());
         DatabaseSnapshotGeneratorFactory.getInstance().register(new H2DatabaseSnapshotGenerator());
-        databasePlatformsManager.addDatabasePlatform(new H2DatabasePlatform());
+        databasePlatformsRegistry.addDatabasePlatform(new H2DatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }
 

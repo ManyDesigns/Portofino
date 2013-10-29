@@ -61,7 +61,7 @@
                 $(function() {
                     $("#jdbcdriver").change(function() {
                         var connectionUrlDefaults = {
-                            <c:forEach var="db" items="${actionBean.persistence.databasePlatformsManager.databasePlatforms}"
+                            <c:forEach var="db" items="${actionBean.persistence.databasePlatformsRegistry.databasePlatforms}"
                                        varStatus="status">
                                 <c:out value="'${db.standardDriverClassName}': '${db.connectionStringTemplate}'" escapeXml="false"/>
                                 <c:if test="${!status.last}">,</c:if>

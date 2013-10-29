@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.database.platforms.ApacheDerbyDatabasePlatform;
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.liquibase.databases.PortofinoDerbyDatabase;
 import liquibase.database.DatabaseFactory;
@@ -48,8 +48,8 @@ public class DerbyModule implements Module {
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
-    @Inject(DatabaseModule.DATABASE_PLATFORMS_MANAGER)
-    DatabasePlatformsManager databasePlatformsManager;
+    @Inject(DatabaseModule.DATABASE_PLATFORMS_REGISTRY)
+    DatabasePlatformsRegistry databasePlatformsRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -95,7 +95,7 @@ public class DerbyModule implements Module {
         logger.debug("Registering Derby");
         DatabaseFactory.getInstance().register(new PortofinoDerbyDatabase());
         DatabaseSnapshotGeneratorFactory.getInstance().register(new DerbyDatabaseSnapshotGenerator());
-        databasePlatformsManager.addDatabasePlatform(new ApacheDerbyDatabasePlatform());
+        databasePlatformsRegistry.addDatabasePlatform(new ApacheDerbyDatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }
 

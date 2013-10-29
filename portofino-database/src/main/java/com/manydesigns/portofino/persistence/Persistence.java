@@ -24,7 +24,7 @@ import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
@@ -80,7 +80,7 @@ public class Persistence {
     // Fields
     //**************************************************************************
 
-    protected final DatabasePlatformsManager databasePlatformsManager;
+    protected final DatabasePlatformsRegistry databasePlatformsRegistry;
     protected Model model;
     protected final Map<String, HibernateDatabaseSetup> setups;
 
@@ -105,10 +105,10 @@ public class Persistence {
 
     public Persistence(
             File appDir, org.apache.commons.configuration.Configuration configuration,
-            DatabasePlatformsManager databasePlatformsManager) {
+            DatabasePlatformsRegistry databasePlatformsRegistry) {
         this.appDir = appDir;
         this.configuration = configuration;
-        this.databasePlatformsManager = databasePlatformsManager;
+        this.databasePlatformsRegistry = databasePlatformsRegistry;
 
         appDbsDir = new File(appDir, APP_DBS_DIR);
         logger.info("Application dbs dir: {}",
@@ -250,7 +250,7 @@ public class Persistence {
         model.init();
         for (Database database : model.getDatabases()) {
             ConnectionProvider connectionProvider = database.getConnectionProvider();
-            connectionProvider.init(databasePlatformsManager);
+            connectionProvider.init(databasePlatformsRegistry);
             if (connectionProvider.getStatus()
                     .equals(ConnectionProvider.STATUS_CONNECTED)) {
                 HibernateConfig builder =
@@ -297,8 +297,8 @@ public class Persistence {
         return configuration;
     }
 
-    public DatabasePlatformsManager getDatabasePlatformsManager() {
-        return databasePlatformsManager;
+    public DatabasePlatformsRegistry getDatabasePlatformsRegistry() {
+        return databasePlatformsRegistry;
     }
 
     //**************************************************************************

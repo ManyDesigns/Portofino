@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.elements.text.OgnlTextFormat;
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -77,9 +77,9 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     }
 
     @Override
-    public void init(DatabasePlatformsManager databasePlatformsManager) {
+    public void init(DatabasePlatformsRegistry databasePlatformsRegistry) {
         actualUrl = OgnlTextFormat.format(url, null);
-        super.init(databasePlatformsManager);
+        super.init(databasePlatformsRegistry);
     }
 
 

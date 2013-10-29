@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.OracleDatabasePlatform;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.liquibase.databases.PortofinoOracleDatabase;
@@ -48,8 +48,8 @@ public class OracleModule implements Module {
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
-    @Inject(DatabaseModule.DATABASE_PLATFORMS_MANAGER)
-    DatabasePlatformsManager databasePlatformsManager;
+    @Inject(DatabaseModule.DATABASE_PLATFORMS_REGISTRY)
+    DatabasePlatformsRegistry databasePlatformsRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -96,7 +96,7 @@ public class OracleModule implements Module {
         DatabaseFactory.getInstance().register(new PortofinoOracleDatabase());
         logger.debug("Registering GoogleCloudSQLLockDatabaseChangeLogGenerator");
         DatabaseSnapshotGeneratorFactory.getInstance().register(new PortofinoOracleDatabaseSnapshotGenerator());
-        databasePlatformsManager.addDatabasePlatform(new OracleDatabasePlatform());
+        databasePlatformsRegistry.addDatabasePlatform(new OracleDatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }
 

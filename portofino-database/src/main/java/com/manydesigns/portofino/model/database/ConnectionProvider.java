@@ -26,7 +26,7 @@ import com.manydesigns.elements.annotations.Updatable;
 import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +125,7 @@ public abstract class ConnectionProvider {
         lastTested = null;
     }
 
-    public void init(DatabasePlatformsManager databasePlatformsManager) {
+    public void init(DatabasePlatformsRegistry databasePlatformsRegistry) {
         Connection conn = null;
         ResultSet typeRs = null;
         String databaseName = getDatabase().getDatabaseName();
@@ -173,7 +173,7 @@ public abstract class ConnectionProvider {
             Collections.sort(types, new TypeComparator());
 
             databasePlatform =
-                    databasePlatformsManager.findApplicableAbstraction(this);
+                    databasePlatformsRegistry.findApplicableAbstraction(this);
             if (databasePlatform == null) {
                 status = STATUS_ERROR;
                 errorMessage = MessageFormat.format(

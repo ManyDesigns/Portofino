@@ -23,7 +23,7 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
 import com.manydesigns.portofino.actions.admin.ReloadModelAction;
 import com.manydesigns.portofino.actions.admin.TablesAction;
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoSelectFromDatabaseChangeLogLockGenerator;
@@ -78,8 +78,8 @@ public class DatabaseModule implements Module {
 
     public static final String PERSISTENCE =
             "com.manydesigns.portofino.modules.DatabaseModule.persistence";
-    public static final String DATABASE_PLATFORMS_MANAGER =
-            "com.manydesigns.portofino.modules.DatabaseModule.databasePlatformsManager";
+    public static final String DATABASE_PLATFORMS_REGISTRY =
+            "com.manydesigns.portofino.modules.DatabaseModule.databasePlatformsRegistry";
 
     //**************************************************************************
     // Logging
@@ -130,11 +130,11 @@ public class DatabaseModule implements Module {
         SqlGeneratorFactory.getInstance().register(new PortofinoSelectFromDatabaseChangeLogLockGenerator());
 
         logger.info("Initializing persistence");
-        DatabasePlatformsManager databasePlatformsManager = new DatabasePlatformsManager(configuration);
+        DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
 
-        persistence = new Persistence(applicationDirectory, configuration, databasePlatformsManager);
+        persistence = new Persistence(applicationDirectory, configuration, databasePlatformsRegistry);
         Injections.inject(persistence, servletContext, null);
-        servletContext.setAttribute(DATABASE_PLATFORMS_MANAGER, databasePlatformsManager);
+        servletContext.setAttribute(DATABASE_PLATFORMS_REGISTRY, databasePlatformsRegistry);
         servletContext.setAttribute(PERSISTENCE, persistence);
 
         appendToAdminMenu();

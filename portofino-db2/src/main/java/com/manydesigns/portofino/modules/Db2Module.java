@@ -20,7 +20,7 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.database.platforms.DatabasePlatformsManager;
+import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.IbmDb2DatabasePlatform;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.liquibase.databases.PortofinoDB2Database;
@@ -48,8 +48,8 @@ public class Db2Module implements Module {
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
 
-    @Inject(DatabaseModule.DATABASE_PLATFORMS_MANAGER)
-    DatabasePlatformsManager databasePlatformsManager;
+    @Inject(DatabaseModule.DATABASE_PLATFORMS_REGISTRY)
+    DatabasePlatformsRegistry databasePlatformsRegistry;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -95,7 +95,7 @@ public class Db2Module implements Module {
         logger.debug("Registering DB2");
         DatabaseFactory.getInstance().register(new PortofinoDB2Database());
         DatabaseSnapshotGeneratorFactory.getInstance().register(new DB2DatabaseSnapshotGenerator());
-        databasePlatformsManager.addDatabasePlatform(new IbmDb2DatabasePlatform());
+        databasePlatformsRegistry.addDatabasePlatform(new IbmDb2DatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }
 

@@ -120,6 +120,15 @@ public class MailModule implements Module {
         mailQueueSetup = new MailQueueSetup(mailConfiguration);
         mailQueueSetup.setup();
 
+        SimpleMenuAppender group = SimpleMenuAppender.group("mail", null, "Mail", 4.0);
+        adminMenu.menuAppenders.add(group);
+
+        SimpleMenuAppender link = SimpleMenuAppender.link(
+                "mail", "Mail", null, "Mail", MailSettingsAction.URL_BINDING, 1.0);
+        adminMenu.menuAppenders.add(link);
+
+        servletContext.setAttribute(MAIL_CONFIGURATION, mailQueueSetup.getMailConfiguration());
+
         MailQueue mailQueue = mailQueueSetup.getMailQueue();
         if(mailQueue == null) {
             logger.info("Mail queue not enabled");
@@ -128,14 +137,6 @@ public class MailModule implements Module {
 
         servletContext.setAttribute(MAIL_QUEUE, mailQueue);
         servletContext.setAttribute(MAIL_SENDER, mailQueueSetup.getMailSender());
-        servletContext.setAttribute(MAIL_CONFIGURATION, mailQueueSetup.getMailConfiguration());
-
-        SimpleMenuAppender group = SimpleMenuAppender.group("mail", null, "Mail", 4.0);
-        adminMenu.menuAppenders.add(group);
-
-        SimpleMenuAppender link = SimpleMenuAppender.link(
-                "mail", "Mail", null, "Mail", MailSettingsAction.URL_BINDING, 1.0);
-        adminMenu.menuAppenders.add(link);
 
         status = ModuleStatus.ACTIVE;
     }
@@ -144,7 +145,7 @@ public class MailModule implements Module {
     public void start() {
         //Quartz integration (optional)
         try {
-            //In classe separata per permettere al Listener di essere caricato anche in assenza di Quartz a runtime
+            //In classe separata per permettere al modulo di essere caricato anche in assenza di Quartz a runtime
             MailScheduler.setupMailScheduler(mailQueueSetup);
         } catch (NoClassDefFoundError e) {
             logger.debug(e.getMessage(), e);

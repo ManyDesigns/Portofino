@@ -34,7 +34,7 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class DatabasePlatformsManager {
+public class DatabasePlatformsRegistry {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -50,13 +50,13 @@ public class DatabasePlatformsManager {
     //**************************************************************************
 
     public static final Logger logger =
-            LoggerFactory.getLogger(DatabasePlatformsManager.class);
+            LoggerFactory.getLogger(DatabasePlatformsRegistry.class);
 
     //**************************************************************************
     // Constructors / building
     //**************************************************************************
 
-    public DatabasePlatformsManager(Configuration portofinoConfiguration) {
+    public DatabasePlatformsRegistry(Configuration portofinoConfiguration) {
         this.portofinoConfiguration = portofinoConfiguration;
     }
 

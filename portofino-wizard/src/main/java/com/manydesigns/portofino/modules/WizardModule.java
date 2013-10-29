@@ -24,12 +24,8 @@ import com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.menu.SimpleMenuAppender;
-import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.ServletContext;
-import java.io.File;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,28 +41,10 @@ public class WizardModule implements Module {
     // Fields
     //**************************************************************************
 
-    @Inject(BaseModule.SERVLET_CONTEXT)
-    public ServletContext servletContext;
-
-    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
-    public Configuration configuration;
-
-    @Inject(BaseModule.APPLICATION_DIRECTORY)
-    public File applicationDirectory;
-
     @Inject(BaseModule.ADMIN_MENU)
     public MenuBuilder adminMenu;
 
     protected ModuleStatus status = ModuleStatus.CREATED;
-
-    //**************************************************************************
-    // Constants
-    //**************************************************************************
-
-    public static final String PERSISTENCE =
-            "com.manydesigns.portofino.modules.DatabaseModule.persistence";
-    public static final String DATABASE_PLATFORMS_MANAGER =
-            "com.manydesigns.portofino.modules.DatabaseModule.databasePlatformsManager";
 
     //**************************************************************************
     // Logging
