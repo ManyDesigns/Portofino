@@ -21,12 +21,14 @@
 package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.annotations.CssClass;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.elements.util.BootstrapSizes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
@@ -99,37 +101,6 @@ public class SettingsAction extends AbstractActionBean {
                 .build();
 
         form.readFromObject(settings);
-        /*CommonsConfigurationAccessor accessor = new CommonsConfigurationAccessor(configuration);
-        form = new FormBuilder(accessor)
-                .configFields(PortofinoProperties.APP_NAME, PortofinoProperties.LANDING_PAGE,
-                              PortofinoProperties.LOGIN_PAGE, PortofinoProperties.GROOVY_PRELOAD_PAGES,
-                              PortofinoProperties.GROOVY_PRELOAD_CLASSES)
-                .configSelectionProvider(pagesSelectionProvider, PortofinoProperties.LANDING_PAGE)
-                .configSelectionProvider(pagesSelectionProvider, PortofinoProperties.LOGIN_PAGE)
-                .build();
-        //TODO I18n
-        TextField appNameField = (TextField) form.findFieldByPropertyName(PortofinoProperties.APP_NAME);
-        appNameField.setLabel("Application name");
-        appNameField.setRequired(true);
-        appNameField.setFieldCssClass(BootstrapSizes.BLOCK_LEVEL);
-
-        Field landingPageField = form.findFieldByPropertyName(PortofinoProperties.LANDING_PAGE);
-        landingPageField.setLabel("Landing page");
-        landingPageField.setRequired(true);
-
-        Field loginPageField = form.findFieldByPropertyName(PortofinoProperties.LOGIN_PAGE);
-        loginPageField.setLabel("Login page");
-        loginPageField.setRequired(true);
-
-        Field preloadPagesField = form.findFieldByPropertyName(PortofinoProperties.GROOVY_PRELOAD_PAGES);
-        loginPageField.setLabel("Preload Groovy pages at startup");
-        loginPageField.setRequired(true);
-
-        Field preloadClassesField = form.findFieldByPropertyName(PortofinoProperties.GROOVY_PRELOAD_CLASSES);
-        preloadClassesField.setLabel("Preload Groovy shared classes at startup");
-        preloadClassesField.setRequired(true);
-        
-        form.readFromObject(configuration);*/
     }
 
     @Button(list = "settings", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
@@ -188,6 +159,7 @@ public class SettingsAction extends AbstractActionBean {
 
         @Required
         @Label("Application name")
+        @CssClass(BootstrapSizes.BLOCK_LEVEL)
         public String appName;
         @Required
         public String landingPage;
