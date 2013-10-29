@@ -53,5 +53,9 @@ public final class PortofinoProperties {
     //The mail address used as the from: field in email messages sent by the application (e.g. password change)
     public static final String MAIL_FROM = "mail.from";
 
+    //Groovy
+    public static final String GROOVY_PRELOAD_PAGES = "groovy.preloadPages";
+    public static final String GROOVY_PRELOAD_CLASSES = "groovy.preloadClasses";
+
     private PortofinoProperties() {}
 }

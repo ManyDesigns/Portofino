@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.shiro;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.di.Injections;
 import groovy.lang.GroovyClassLoader;
@@ -36,6 +35,7 @@ import org.apache.shiro.util.LifecycleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
 import java.io.Serializable;
 import java.util.*;
 
@@ -60,6 +60,7 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     //--------------------------------------------------------------------------
 
     protected final GroovyClassLoader classLoader;
+    protected final ServletContext servletContext;
     protected volatile PortofinoRealm security;
     protected volatile boolean destroyed = false;
 
@@ -69,8 +70,11 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     // Constructors
     //--------------------------------------------------------------------------
 
-    public SecurityGroovyRealm(GroovyClassLoader classLoader) throws ClassNotFoundException {
+    public SecurityGroovyRealm(GroovyClassLoader classLoader, ServletContext servletContext)
+            throws ClassNotFoundException, IllegalAccessException, InstantiationException, ClassCastException {
         this.classLoader = classLoader;
+        this.servletContext = servletContext;
+        doEnsureDelegate();
     }
 
     //--------------------------------------------------------------------------
@@ -82,39 +86,44 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
             throw new IllegalStateException("This realm has been destroyed.");
         }
         try {
-            Class<?> scriptClass = classLoader.loadClass("Security", true, false, true);
-            if(scriptClass.isInstance(security)) { //Class did not change
-                return security;
-            } else {
-                logger.info("Refreshing Portofino Realm Delegate instance (Security.groovy)");
-                if(security != null) {
-                    logger.info("Script class changed: from " + security.getClass() + " to " + scriptClass);
-                }
-                Object securityTemp = scriptClass.newInstance();
-                if(securityTemp instanceof PortofinoRealm) {
-                    PortofinoRealm realm = (PortofinoRealm) securityTemp;
-                    configureDelegate(realm);
-                    PortofinoRealm oldSecurity = security;
-                    security = realm;
-                    LifecycleUtils.destroy(oldSecurity);
-                    return realm;
-                } else {
-                     throw new Error(
-                             "Security object is not an instance of " + PortofinoRealm.class + ": " + securityTemp +
-                             " (" + securityTemp.getClass().getSuperclass() + " " +
-                             Arrays.asList(securityTemp.getClass().getInterfaces()) + ")");
-                }
-            }
+            return doEnsureDelegate();
         } catch (Exception e) {
             throw new Error("Security.groovy not found or not loadable", e);
+        }
+    }
+
+    private PortofinoRealm doEnsureDelegate()
+            throws ClassNotFoundException, InstantiationException, IllegalAccessException, ClassCastException {
+        Class<?> scriptClass = classLoader.loadClass("Security", true, false, true);
+        if(scriptClass.isInstance(security)) { //Class did not change
+            return security;
+        } else {
+            logger.info("Refreshing Portofino Realm Delegate instance (Security.groovy)");
+            if(security != null) {
+                logger.debug("Script class changed: from " + security.getClass() + " to " + scriptClass);
+            }
+            Object securityTemp = scriptClass.newInstance();
+            if(securityTemp instanceof PortofinoRealm) {
+                PortofinoRealm realm = (PortofinoRealm) securityTemp;
+                configureDelegate(realm);
+                PortofinoRealm oldSecurity = security;
+                security = realm;
+                LifecycleUtils.destroy(oldSecurity);
+                return realm;
+            } else {
+                 throw new ClassCastException(
+                         "Security object is not an instance of " + PortofinoRealm.class + ": " + securityTemp +
+                         " (" + securityTemp.getClass().getSuperclass() + " " +
+                         Arrays.asList(securityTemp.getClass().getInterfaces()) + ")");
+            }
         }
     }
 
     protected void configureDelegate(PortofinoRealm security) {
         Injections.inject(
                 security,
-                ElementsThreadLocals.getServletContext(),
-                ElementsThreadLocals.getHttpServletRequest());
+                servletContext,
+                null);
         security.setCacheManager(cacheManager);
         LifecycleUtils.init(security);
     }

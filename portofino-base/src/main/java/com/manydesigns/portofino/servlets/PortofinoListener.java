@@ -236,6 +236,7 @@ public class PortofinoListener
             throw new Error(e);
         }
         scriptEngine.setConfig(cc);
+        scriptEngine.getGroovyClassLoader().setShouldRecompile(true);
         return scriptEngine;
     }
 

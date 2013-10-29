@@ -21,14 +21,12 @@
 package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.TextField;
+import com.manydesigns.elements.annotations.Label;
+import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.elements.reflection.CommonsConfigurationAccessor;
-import com.manydesigns.elements.util.BootstrapSizes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
@@ -88,10 +86,26 @@ public class SettingsAction extends AbstractActionBean {
         SelectionProvider pagesSelectionProvider =
                 DispatcherLogic.createPagesSelectionProvider(pagesDir);
 
-        CommonsConfigurationAccessor accessor = new CommonsConfigurationAccessor(configuration);
+        Settings settings = new Settings();
+        settings.appName = configuration.getString(PortofinoProperties.APP_NAME);
+        settings.landingPage = configuration.getString(PortofinoProperties.LANDING_PAGE);
+        settings.loginPage = configuration.getString(PortofinoProperties.LOGIN_PAGE);
+        settings.preloadGroovyPages = configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_PAGES, true);
+        settings.preloadGroovyClasses = configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_CLASSES, true);
+
+        form = new FormBuilder(Settings.class)
+                .configSelectionProvider(pagesSelectionProvider, "landingPage")
+                .configSelectionProvider(pagesSelectionProvider, "loginPage")
+                .build();
+
+        form.readFromObject(settings);
+        /*CommonsConfigurationAccessor accessor = new CommonsConfigurationAccessor(configuration);
         form = new FormBuilder(accessor)
-                .configFields(PortofinoProperties.APP_NAME, PortofinoProperties.LANDING_PAGE)
+                .configFields(PortofinoProperties.APP_NAME, PortofinoProperties.LANDING_PAGE,
+                              PortofinoProperties.LOGIN_PAGE, PortofinoProperties.GROOVY_PRELOAD_PAGES,
+                              PortofinoProperties.GROOVY_PRELOAD_CLASSES)
                 .configSelectionProvider(pagesSelectionProvider, PortofinoProperties.LANDING_PAGE)
+                .configSelectionProvider(pagesSelectionProvider, PortofinoProperties.LOGIN_PAGE)
                 .build();
         //TODO I18n
         TextField appNameField = (TextField) form.findFieldByPropertyName(PortofinoProperties.APP_NAME);
@@ -102,8 +116,20 @@ public class SettingsAction extends AbstractActionBean {
         Field landingPageField = form.findFieldByPropertyName(PortofinoProperties.LANDING_PAGE);
         landingPageField.setLabel("Landing page");
         landingPageField.setRequired(true);
+
+        Field loginPageField = form.findFieldByPropertyName(PortofinoProperties.LOGIN_PAGE);
+        loginPageField.setLabel("Login page");
+        loginPageField.setRequired(true);
+
+        Field preloadPagesField = form.findFieldByPropertyName(PortofinoProperties.GROOVY_PRELOAD_PAGES);
+        loginPageField.setLabel("Preload Groovy pages at startup");
+        loginPageField.setRequired(true);
+
+        Field preloadClassesField = form.findFieldByPropertyName(PortofinoProperties.GROOVY_PRELOAD_CLASSES);
+        preloadClassesField.setLabel("Preload Groovy shared classes at startup");
+        preloadClassesField.setRequired(true);
         
-        form.readFromObject(configuration);
+        form.readFromObject(configuration);*/
     }
 
     @Button(list = "settings", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
@@ -114,7 +140,19 @@ public class SettingsAction extends AbstractActionBean {
             logger.debug("Applying settings to model");
             try {
                 FileConfiguration fileConfiguration = (FileConfiguration) configuration;
-                form.writeToObject(fileConfiguration);
+                Settings settings = new Settings();
+                form.writeToObject(settings);
+                fileConfiguration.setProperty(PortofinoProperties.APP_NAME, settings.appName);
+                fileConfiguration.setProperty(PortofinoProperties.LANDING_PAGE, settings.landingPage);
+                fileConfiguration.setProperty(PortofinoProperties.LOGIN_PAGE, settings.loginPage);
+                if(!settings.preloadGroovyPages ||
+                   fileConfiguration.getProperty(PortofinoProperties.GROOVY_PRELOAD_PAGES) != null) {
+                    fileConfiguration.setProperty(PortofinoProperties.GROOVY_PRELOAD_PAGES, settings.preloadGroovyPages);
+                }
+                if(!settings.preloadGroovyClasses ||
+                   fileConfiguration.getProperty(PortofinoProperties.GROOVY_PRELOAD_CLASSES) != null) {
+                    fileConfiguration.setProperty(PortofinoProperties.GROOVY_PRELOAD_CLASSES, settings.preloadGroovyClasses);
+                }
                 fileConfiguration.save();
                 logger.info("Configuration saved to " + fileConfiguration.getFile().getAbsolutePath());
             } catch (Exception e) {
@@ -140,6 +178,28 @@ public class SettingsAction extends AbstractActionBean {
 
     public Form getForm() {
         return form;
+    }
+
+    //--------------------------------------------------------------------------
+    // Form
+    //--------------------------------------------------------------------------
+
+    public static class Settings {
+
+        @Required
+        @Label("Application name")
+        public String appName;
+        @Required
+        public String landingPage;
+        @Required
+        public String loginPage;
+        @Required
+        @Label("Preload Groovy pages at startup")
+        public boolean preloadGroovyPages;
+        @Required
+        @Label("Preload Groovy shared classes at startup")
+        public boolean preloadGroovyClasses;
+
     }
 
 }

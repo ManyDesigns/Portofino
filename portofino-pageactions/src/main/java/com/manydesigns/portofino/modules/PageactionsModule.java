@@ -20,8 +20,8 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.ElementsFileUtils;
+import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.admin.SettingsAction;
 import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListener;
@@ -155,11 +155,14 @@ public class PageactionsModule implements Module {
         logger.info("Pages directory: " + pagesDirectory);
         ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(pagesDirectory);
 
-        ElementsThreadLocals.setServletContext(servletContext); //Necessary for getGroovyObject
-        logger.info("Preloading pages");
-        preloadPageActions(pagesDirectory);
-        logger.info("Preloading Groovy classes");
-        preloadGroovyClasses(groovyClasspath);
+        if(configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_PAGES, true)) {
+            logger.info("Preloading pages");
+            preloadPageActions(pagesDirectory);
+        }
+        if(configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_CLASSES, true)) {
+            logger.info("Preloading Groovy classes");
+            preloadGroovyClasses(groovyClasspath);
+        }
         servletContext.setAttribute(PAGES_DIRECTORY, pagesDirectory);
 
         logger.debug("Creating pageactions registry");
@@ -178,11 +181,11 @@ public class PageactionsModule implements Module {
 
         logger.debug("Creating SecurityGroovyRealm");
         try {
-            SecurityGroovyRealm realm = new SecurityGroovyRealm(classLoader);
+            SecurityGroovyRealm realm = new SecurityGroovyRealm(classLoader, servletContext);
             LifecycleUtils.init(realm);
             rsm.setRealm(realm);
             status = ModuleStatus.ACTIVE;
-        } catch (ClassNotFoundException e) {
+        } catch (Exception  e) {
             logger.error("Security.groovy not found or invalid", e);
             status = ModuleStatus.FAILED;
         }
