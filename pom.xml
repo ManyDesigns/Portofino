@@ -135,6 +135,7 @@
         <module>portofino-theme</module>
         <!-- Optional services -->
         <module>portofino-mail</module>
+        <module>portofino-openid</module>
         <module>portofino-quartz</module>
         <!-- Applications -->
         <module>portofino-war-archetype</module>

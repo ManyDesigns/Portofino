@@ -7,7 +7,7 @@
     <title>OpenID Authentication - redirecting to your Provider</title>
 </head>
 <body onload="document.forms['openIDForm'].submit();">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.login.OpenIdLoginAction "/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.openid.OpenIdLoginAction "/>
     <form name="openIDForm" action="${actionBean.openIdDestinationUrl}" method="post" accept-charset="utf-8">
         <c:forEach var="param" items="${actionBean.openIdParameterMap}">
             <input type="hidden" name="${param.key}" value="${param.value}"/>

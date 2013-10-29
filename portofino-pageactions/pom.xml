@@ -55,28 +55,6 @@
             <version>1.7.5</version>
             <scope>provided</scope>
         </dependency>
-        <!-- OpenID -->
-        <dependency>
-            <groupId>org.openid4java</groupId>
-            <artifactId>openid4java</artifactId>
-            <version>0.9.8</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.google.code.guice</groupId>
-                    <artifactId>guice</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <!-- For OpenID4Java -->
-            <groupId>com.google.inject</groupId>
-            <artifactId>guice</artifactId>
-            <version>3.0</version>
-        </dependency>
         <!-- Google OAuth client -->
         <dependency>
             <groupId>com.google.oauth-client</groupId>

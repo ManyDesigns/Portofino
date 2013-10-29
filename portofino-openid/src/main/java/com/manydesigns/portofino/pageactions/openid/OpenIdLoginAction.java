@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.pageactions.login;
+package com.manydesigns.portofino.pageactions.openid;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.SessionMessages;
@@ -9,6 +9,7 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
+import com.manydesigns.portofino.pageactions.login.DefaultLoginAction;
 import com.manydesigns.portofino.shiro.PortofinoRealm;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.shiro.openid.OpenIDToken;
@@ -84,7 +85,7 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
     public Map openIdParameterMap;
 
     protected String getLoginPage() {
-        return "/m/pageactions/pageactions/login/openIdLogin.jsp";
+        return "/m/openid/pageactions/openid/openIdLogin.jsp";
     }
 
     public Resolution showOpenIDForm()
@@ -122,7 +123,7 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
             if(authReq.isVersion2()) {
                 openIdDestinationUrl = authReq.getDestinationUrl(false);
                 openIdParameterMap = authReq.getParameterMap();
-                return new ForwardResolution("/m/pageactions/pageactions/login/openIDFormRedirect.jsp");
+                return new ForwardResolution("/m/openid/pageactions/openid/openIDFormRedirect.jsp");
             } else {
                 SessionMessages.addErrorMessage("Cannot login, payload too big and OpenID version 2 not supported.");
                 return new ForwardResolution(getLoginPage());

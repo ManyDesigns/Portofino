@@ -145,6 +145,14 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- OpenID -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-openid</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Servlet API -->
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>

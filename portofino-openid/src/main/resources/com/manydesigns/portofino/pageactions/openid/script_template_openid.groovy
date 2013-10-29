@@ -1,4 +1,4 @@
-import com.manydesigns.portofino.pageactions.login.OpenIdLoginAction
+import com.manydesigns.portofino.pageactions.openid.OpenIdLoginAction
 
 class MyOpenIdLoginAction extends OpenIdLoginAction {
 

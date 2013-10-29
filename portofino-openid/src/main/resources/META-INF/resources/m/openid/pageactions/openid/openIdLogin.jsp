@@ -5,7 +5,7 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <stripes:layout-render name="/theme/templates/dialog/modal.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.login.OpenIdLoginAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.openid.OpenIdLoginAction"/>
     <stripes:layout-component name="pageTitle">
         <fmt:message key="skins.default.login.login_to">
             <fmt:param value="${actionBean.applicationName}" />
@@ -13,11 +13,11 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <!-- Simple OpenID Selector -->
-        <script type="text/javascript" src="<stripes:url value="/m/pageactions/openid-selector/js/openid-jquery.js" />"></script>
-        <script type="text/javascript" src="<stripes:url value="/m/pageactions/openid-custom.js"/>"></script>
+        <script type="text/javascript" src="<stripes:url value="/m/openid/openid-selector/js/openid-jquery.js" />"></script>
+        <script type="text/javascript" src="<stripes:url value="/m/openid/openid-custom.js"/>"></script>
         <script type="text/javascript">
             $(document).ready(function() {
-                openid.img_path = '${pageContext.request.contextPath}/m/pageactions/openid-selector/images/';
+                openid.img_path = '${pageContext.request.contextPath}/m/openid/openid-selector/images/';
                 openid.useInputBox = function(provider) {
                     var input_area = $('#openid_input_area');
                     var html = '';
