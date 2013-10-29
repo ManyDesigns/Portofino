@@ -309,7 +309,7 @@ License: Apache License v2.0
 
 Quartz Scheduler
 Site: http://quartz-scheduler.org/
-File: quartz-2.1.3.jar
+File: quartz-2.1.6.jar
 License: Apache License v2.0
 
 Standard: An Implementation of the JSP™ Standard Tag Library (JSTL)
