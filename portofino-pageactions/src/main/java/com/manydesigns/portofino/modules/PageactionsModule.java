@@ -36,6 +36,7 @@ import com.manydesigns.portofino.pageactions.login.OpenIdLoginAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
 import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
+import groovy.lang.GroovyClassLoader;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.mgt.RealmSecurityManager;
@@ -75,7 +76,7 @@ public class PageactionsModule implements Module {
     public MenuBuilder adminMenu;
 
     @Inject(BaseModule.CLASS_LOADER)
-    public ClassLoader classLoader;
+    public GroovyClassLoader classLoader;
 
     @Inject(BaseModule.GROOVY_CLASS_PATH)
     public File groovyClasspath;
@@ -224,7 +225,7 @@ public class PageactionsModule implements Module {
                 String className = pkg + name.substring(0, name.length() - ".groovy".length());
                 logger.debug("Preloading " + className);
                 try {
-                    Class.forName(className, true, classLoader);
+                    classLoader.loadClass(className, true, false, true);
                 } catch(Throwable t) {
                     logger.warn("Groovy class preload failed for class " + className, t);
                 }

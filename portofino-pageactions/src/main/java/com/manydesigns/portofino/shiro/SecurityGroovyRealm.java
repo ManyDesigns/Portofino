@@ -23,6 +23,7 @@ package com.manydesigns.portofino.shiro;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.di.Injections;
+import groovy.lang.GroovyClassLoader;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -58,7 +59,7 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     // Properties
     //--------------------------------------------------------------------------
 
-    protected final ClassLoader classLoader;
+    protected final GroovyClassLoader classLoader;
     protected volatile PortofinoRealm security;
     protected volatile boolean destroyed = false;
 
@@ -68,7 +69,7 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     // Constructors
     //--------------------------------------------------------------------------
 
-    public SecurityGroovyRealm(ClassLoader classLoader) throws ClassNotFoundException {
+    public SecurityGroovyRealm(GroovyClassLoader classLoader) throws ClassNotFoundException {
         this.classLoader = classLoader;
     }
 
@@ -81,7 +82,7 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
             throw new IllegalStateException("This realm has been destroyed.");
         }
         try {
-            Class<?> scriptClass = Class.forName("Security", true, classLoader);
+            Class<?> scriptClass = classLoader.loadClass("Security", true, false, true);
             if(scriptClass.isInstance(security)) { //Class did not change
                 return security;
             } else {
