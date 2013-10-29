@@ -1,28 +1,27 @@
+import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.reflection.ClassAccessor
-import com.manydesigns.elements.reflection.JavaClassAccessor
-import com.manydesigns.elements.util.RandomUtil
+import com.manydesigns.mail.stripes.SendMailAction
 import com.manydesigns.portofino.di.Inject
+import com.manydesigns.portofino.logic.SecurityLogic
 import com.manydesigns.portofino.model.database.Database
 import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.model.database.Table
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.reflection.TableAccessor
-import com.manydesigns.portofino.shiro.openid.OpenIDToken
+import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import java.security.MessageDigest
+import org.apache.shiro.crypto.hash.Md5Hash
 import org.hibernate.Criteria
-import org.hibernate.SQLQuery
 import org.hibernate.Session
 import org.hibernate.criterion.Restrictions
-import org.hibernate.exception.ConstraintViolationException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import com.manydesigns.portofino.shiro.*
 import org.apache.shiro.authc.*
-import com.manydesigns.portofino.PortofinoProperties
-import com.manydesigns.portofino.logic.SecurityLogic
 
 class Security extends AbstractPortofinoRealm {
+
+    public static final String ADMIN_GROUP_NAME = "admin";
 
     private static final Logger logger = LoggerFactory.getLogger(Security.class);
 
@@ -39,98 +38,54 @@ class Security extends AbstractPortofinoRealm {
     }
 
     public AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {
-        if(usernamePasswordToken.password == null) {
-            throw new IncorrectCredentialsException("Password not provided");
+        String login = usernamePasswordToken.username;
+        String plainTextPassword;
+        if (usernamePasswordToken.password == null) {
+            plainTextPassword = "";
+        } else {
+            plainTextPassword = new String(usernamePasswordToken.password);
         }
-        String userName = usernamePasswordToken.username;
-        String password = new String(usernamePasswordToken.password);
-        String hashedPassword = hashPassword(password);
 
-        Session session = persistence.getSession("redmine");
-        org.hibernate.Criteria criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("login", userName));
-        criteria.add(Restrictions.eq("hashed_password", hashedPassword));
+        String encryptedPassword = encryptPassword(plainTextPassword);
+        Session session = persistence.getSession("tt");
 
-        Serializable principal = (Serializable) criteria.uniqueResult();
+        Criteria criteria = session.createCriteria("users");
+        criteria.add(Restrictions.eq("email", login));
+
+        Serializable principal = (Serializable)criteria.uniqueResult();
 
         if (principal == null) {
-            throw new AuthenticationException("Login failed");
+            throw new UnknownAccountException("Unknown user");
+        } else if (!encryptedPassword.equals(principal.password)) {
+            throw new IncorrectCredentialsException("Wrong password");
+        } else if (!principal.validated) {
+            throw new DisabledAccountException("User not validated");
         } else {
-            SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(
-                            principal, password.toCharArray(), getName());
-            return info;
+            logger.debug("Aggiorno i campi accesso.");
+            updateAccess(principal, new Date());
+            session.update("users", (Object)principal);
+            session.getTransaction().commit();
         }
+
+        SimpleAuthenticationInfo info =
+                new SimpleAuthenticationInfo(
+                        principal, plainTextPassword.toCharArray(), getName());
+        return info;
     }
 
-    public AuthenticationInfo loadAuthenticationInfo(OpenIDToken openIDToken) {
-        Session session = persistence.getSession("redmine");
-        org.hibernate.Criteria criteria = session.createCriteria("users");
-        if(openIDToken.firstLoginToken != null) {
-            criteria.add(Restrictions.eq("token", openIDToken.firstLoginToken));
-        } else {
-            criteria.add(Restrictions.eq("identity_url", openIDToken.principal.identifier));
-        }
-
-        Serializable principal = (Serializable) criteria.uniqueResult();
-
-        if (principal == null) {
-            throw new UnknownAccountException();
-        } else {
-            if(openIDToken.firstLoginToken != null) {
-                session.beginTransaction();
-                principal.token = null; //Consume token
-                principal.identity_url = openIDToken.principal.identifier;
-                session.update("users", (Object) principal);
-                session.transaction.commit();
-            }
-            SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(
-                            principal, openIDToken.credentials, getName());
-            return info;
-        }
+    private void updateAccess(Object principal, Date now) {
+        def request = ElementsThreadLocals.getHttpServletRequest();
+        principal.last_access = now;
+        principal.access_ip = request.getRemoteAddr();
     }
 
-    AuthenticationInfo loadAuthenticationInfo(PasswordResetToken token) {
-        Session session = persistence.getSession("redmine");
-        Criteria criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("token", token.principal));
 
-        List result = criteria.list();
-
-        if (result.size() == 1) {
-            def user = result.get(0);
-            user.token = null; //Consume token
-            user.hashed_password = hashPassword(token.newPassword);
-            session.update("users", (Object) user);
-            session.transaction.commit();
-            SimpleAuthenticationInfo info =
-                new SimpleAuthenticationInfo(user, token.credentials, getName());
-            return info;
-        } else {
-            throw new IncorrectCredentialsException("Invalid token");
-        }
+    public String encryptPassword(String plainText) {
+        Md5Hash md5Hash = new Md5Hash(plainText);
+        String encrypted = md5Hash.toBase64();
+        return encrypted;
     }
 
-    AuthenticationInfo loadAuthenticationInfo(SignUpToken token) {
-        Session session = persistence.getSession("redmine");
-        Criteria criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("token", token.principal));
-
-        List result = criteria.list();
-
-        if (result.size() == 1) {
-            def user = result.get(0);
-            user.token = null; //Consume token
-            session.update("users", (Object) user);
-            session.transaction.commit();
-            SimpleAuthenticationInfo info =
-                new SimpleAuthenticationInfo(user, token.credentials, getName());
-            return info;
-        } else {
-            throw new IncorrectCredentialsException("Invalid token");
-        }
-    }
 
     protected String hashPassword(String password) {
         MessageDigest md = MessageDigest.getInstance("SHA-1");
@@ -150,12 +105,23 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     protected Collection<String> loadAuthorizationInfo(Serializable principal) {
-        if("admin".equals(principal.login)) {
-            return [ SecurityLogic.getAdministratorsGroup(portofinoConfiguration) ]
-        } else {
-            return []
+        List<String> result = new ArrayList<String>()
+        if (principal.admin) {
+            result.add(ADMIN_GROUP_NAME);
+            if (isLocalUser()) {
+                result.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
+            }
         }
+        return result;
     }
+
+    protected boolean isLocalUser() {
+        String remoteIp =
+            ElementsThreadLocals.getHttpServletRequest().getRemoteAddr();
+        InetAddress clientAddr = InetAddress.getByName(remoteIp);
+        return SendMailAction.isLocalIPAddress(clientAddr)
+    }
+
 
     //--------------------------------------------------------------------------
     // Users crud
@@ -163,31 +129,36 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     Map<Serializable, String> getUsers() {
-        Session session = persistence.getSession("redmine");
-        SQLQuery query = session.createSQLQuery("select \"id\", \"login\" from \"users\" order by \"login\"");
-        def users = new LinkedHashMap();
-        for(Object[] user : query.list()) {
-            users.put(user[0], user[1]);
+        Session session = persistence.getSession("tt");
+        Criteria criteria = session.createCriteria("users");
+        List users = criteria.list();
+
+        Map<Serializable, String> result = new HashMap<String>();
+        for (Serializable user : users) {
+            int id = user.id;
+            String prettyName = getUserPrettyName(user);
+            result.put(id, prettyName);
         }
-        return users;
+
+        return result;
     }
 
     @Override
     Serializable getUserById(String encodedUserId) {
-        Session session = persistence.getSession("redmine");
+        Session session = persistence.getSession("tt");
         return (Serializable) session.get("users", Integer.parseInt(encodedUserId));
     }
 
     Serializable getUserByEmail(String email) {
-        Session session = persistence.getSession("redmine");
+        Session session = persistence.getSession("tt");
         def criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("mail", email));
+        criteria.add(Restrictions.eq("email", email));
         return (Serializable) criteria.uniqueResult();
     }
 
     @Override
     String getUserPrettyName(Serializable user) {
-        return "${user.firstname} ${user.lastname}";
+        return "${user.first_name} ${user.last_name}";
     }
 
     Serializable getUserId(Serializable user) {
@@ -196,7 +167,7 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     Serializable saveUser(Serializable user) {
-        def session = persistence.getSession("redmine");
+        def session = persistence.getSession("tt");
         session.save("users", (Object) user);
         session.transaction.commit();
         return user;
@@ -204,7 +175,7 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     Serializable updateUser(Serializable user) {
-        def session = persistence.getSession("redmine");
+        def session = persistence.getSession("tt");
         session.update("users", (Object) user);
         session.transaction.commit();
         return user;
@@ -213,81 +184,10 @@ class Security extends AbstractPortofinoRealm {
     @Override
     ClassAccessor getUserClassAccessor() {
         Database database =
-            DatabaseLogic.findDatabaseByName(persistence.model, "redmine");
+            DatabaseLogic.findDatabaseByName(persistence.model, "tt");
         Table table =
             DatabaseLogic.findTableByEntityName(database, "users");
         return new TableAccessor(table);
-    }
-
-    @Override
-    void changePassword(Serializable user, String oldPassword, String newPassword) {
-        def session = persistence.getSession("redmine")
-        def q = session.createQuery(
-                "update users set hashed_password = :newPwd where id = :id and hashed_password = :oldPwd");
-        q.setParameter("newPwd", hashPassword(newPassword));
-        q.setParameter("oldPwd", hashPassword(oldPassword));
-        q.setParameter("id", user.id);
-        int rows = q.executeUpdate();
-        if(rows == 0) {
-            //Probably the password did not match
-            throw new IncorrectCredentialsException(
-                    "The password update query modified 0 rows. " +
-                    "This most probably means that the old password is wrong. " +
-                    "It may also mean that the user has been deleted.");
-        } else if(rows > 1) {
-            throw new Error("Password update query modified more than 1 row! Rolling back.");
-        } else {
-            session.transaction.commit();
-        }
-    }
-
-    @Override
-    String generateOneTimeToken(Serializable user) {
-        Session session = persistence.getSession("redmine");
-        user = (Serializable) session.get("users", user.id);
-        String token = RandomUtil.createRandomId(20);
-        user.token = token;
-        session.update("users", (Object) user);
-        session.transaction.commit();
-        return token;
-    }
-
-    String saveSelfRegisteredUser(Object user) throws RegistrationException {
-        Session session = persistence.getSession("redmine");
-        Map persistentUser = new HashMap();
-        persistentUser.login = user.username;
-        persistentUser.mail = user.email;
-        persistentUser.hashed_password = hashPassword(user.password);
-        persistentUser.firstname = user.firstname;
-        persistentUser.lastname = user.lastname;
-        persistentUser.admin = false;
-        persistentUser.status = 0;
-        persistentUser.mail_notification = "";
-
-        String token = RandomUtil.createRandomId(20);
-        persistentUser.token = token;
-
-        try {
-            session.save("users", (Object) persistentUser);
-            session.flush();
-        } catch (ConstraintViolationException e) {
-            throw new ExistingUserException(e);
-        }
-        session.transaction.commit();
-        return token;
-    }
-
-    @Override
-    ClassAccessor getSelfRegisteredUserClassAccessor() {
-        return JavaClassAccessor.getClassAccessor(DemoUser.class)
-    }
-
-    @Override
-    boolean supports(AuthenticationToken token) {
-        return (token instanceof PasswordResetToken) ||
-               (token instanceof SignUpToken) ||
-               (token instanceof OpenIDToken) ||
-               super.supports(token);
     }
 
 }

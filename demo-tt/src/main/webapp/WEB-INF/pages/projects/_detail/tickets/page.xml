@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page title="Tickets" navigationRoot="INHERIT" id="wzfccowrega5htzisex76k8vu" description="Tickets">
+    <detailLayout template="well-with-tabs">
+        <childPages>
+            <childPage showInNavigation="false" order="0" name="activity" container="default"/>
+            <childPage showInNavigation="false" order="0" name="attachments" container="default"/>
+            <childPage showInNavigation="false" order="0" name="affected-components" container="default"/>
+        </childPages>
+    </detailLayout>
+    <layout template="default">
+        <childPages/>
+    </layout>
+    <permissions/>
+</page>

@@ -9,7 +9,7 @@ import net.sourceforge.stripes.action.Resolution
 @RequiresPermissions(level = AccessLevel.VIEW)
 class MyCrudAction extends CrudAction {
 
-    //Automatically generated on Mon Oct 28 12:33:53 CET 2013 by ManyDesigns Portofino
+    //Automatically generated on Mon Oct 28 14:39:52 CET 2013 by ManyDesigns Portofino
     //Write your code here
 
     //**************************************************************************

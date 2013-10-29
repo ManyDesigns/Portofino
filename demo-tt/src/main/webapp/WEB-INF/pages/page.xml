@@ -1,14 +1,17 @@
-<page id="root" description="portofino 4" title="Ticket Tracker (Portofino 4 Demo)" navigationRoot="GHOST_ROOT">
-    <permissions>
-        <group level="VIEW" name="all"/>
-    </permissions>
-    <layout>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page title="Ticket Tracker (Portofino 4 Demo)" navigationRoot="GHOST_ROOT" id="root" description="portofino 4">
+    <detailLayout template="default">
+        <childPages/>
+    </detailLayout>
+    <layout template="default">
         <childPages>
-            <childPage name="welcome" showInNavigation="true"/>
-            <childPage name="projects" showInNavigation="true"/>
-            <childPage name="people" showInNavigation="true"/>
-            <childPage name="login" showInNavigation="false"/>
-            <childPage name="openidlogin" showInNavigation="false"/>
+            <childPage showInNavigation="true" name="home"/>
+            <childPage showInNavigation="false" name="login"/>
+            <childPage showInNavigation="true" name="projects"/>
+            <childPage showInNavigation="true" name="admin"/>
         </childPages>
     </layout>
+    <permissions>
+        <group name="all" level="VIEW"/>
+    </permissions>
 </page>

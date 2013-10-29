@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<page title="Versions" navigationRoot="INHERIT" id="qqt8i1mods75jv771uuall75q" description="Versions">
-    <detailLayout template="default">
+<page title="Active tickets assigned to me" navigationRoot="INHERIT" id="nezpaa8k1hgco8yftzixmjx0j" description="Active tickets assigned to me">
+    <detailLayout>
         <childPages/>
     </detailLayout>
     <layout template="default">

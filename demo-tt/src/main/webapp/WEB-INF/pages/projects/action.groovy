@@ -1,5 +1,5 @@
-import com.manydesigns.portofino.pageactions.crud.CrudAction
-import com.manydesigns.portofino.buttons.annotations.Button
+package com.manydesigns.portofino.pageactions.crud
+
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
@@ -8,22 +8,76 @@ import net.sourceforge.stripes.action.Resolution
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
-class projects extends CrudAction {
+class ProjectsCrudAction extends CrudAction {
 
-    void createSetup(object) {
-        object.status = 1;
+    //Automatically generated on Mon Oct 28 12:15:50 CET 2013 by ManyDesigns Portofino
+    //Write your code here
+    @Override
+    Resolution read() {
+        def path = getContext().actualServletPath
+        while (path.endsWith("/")) {
+            path = path.substring(0, path.length() -1 );
+        }
+        return new RedirectResolution(path + "/summary");
     }
 
-    boolean createValidate(object) {
-        Date now = new Date();
-        object.created_on = now;
-        object.updated_on = now;
+    //**************************************************************************
+    // Extension hooks
+    //**************************************************************************
+
+    protected void createSetup(Object object) {
+        object.last_ticket = 0L;
+    }
+
+    protected boolean createValidate(Object object) {
         return true;
     }
-    
-    boolean editValidate(object) {
-        object.updated_on = new Date();
+
+    protected void createPostProcess(Object object) {}
+
+
+    protected void editSetup(Object object) {}
+
+    protected boolean editValidate(Object object) {
         return true;
+    }
+
+    protected void editPostProcess(Object object) {}
+
+
+    protected boolean deleteValidate(Object object) {
+        return true;
+    }
+
+    protected void deletePostProcess(Object object) {}
+
+
+    protected Resolution getBulkEditView() {
+        return super.getBulkEditView();
+    }
+
+    protected Resolution getCreateView() {
+        return super.getCreateView();
+    }
+
+    protected Resolution getEditView() {
+        return super.getEditView();
+    }
+
+    protected Resolution getReadView() {
+        return super.getReadView();
+    }
+
+    protected Resolution getSearchView() {
+        return super.getSearchView();
+    }
+
+    protected Resolution getEmbeddedSearchView() {
+        return super.getEmbeddedSearchView();
+    }
+
+    protected Resolution getSearchResultsPageView() {
+        return super.getSearchResultsPageView()
     }
 
 }

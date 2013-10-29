@@ -1,957 +1,83 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model>
     <databases>
-        <database databaseName="redmine">
-            <!--<jdbcConnection driver="org.postgresql.Driver" password="manydesigns" url="jdbc:postgresql://localhost/portofino4" username="manydesigns"/>-->
-            <!-- TODO esporre app dir e war dir come oggetti OGNL -->
-            <jdbcConnection driver="org.h2.Driver" password="" url="jdbc:h2:%{#servletContext['com.manydesigns.portofino.application.directory'].absolutePath}/dbs/redmine" username="sa"/>
-            <!--<jdbcConnection driver="com.google.appengine.api.rdbms.AppEngineDriver" url="jdbc:google:rdbms://manydesigns.com:prova1:dbprova1/PUBLIC" />-->
-            <!--<jdbcConnection driver="com.mysql.jdbc.Driver" password="" url="jdbc:mysql://localhost/public" username="root"/>-->
+        <database databaseName="tt">
+            <jdbcConnection username="manydesigns" url="jdbc:postgresql://localhost:5432/tt" password="manydesigns" driver="org.postgresql.Driver"/>
             <schemas>
-                <schema schemaName="PUBLIC">
+                <schema schemaName="public">
                     <tables>
-                        <table tableName="custom_values">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="customized_type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="customized_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="custom_field_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="value" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_4">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="repositories">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="url" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="login" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="60" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="password" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="60" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="root_url" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_7">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="journal_details">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="journal_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="property" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="prop_key" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="old_value" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="value" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_9">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="time_entries">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="user_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="issue_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="hours" columnType="DOUBLE" javaType="java.lang.Double" jdbcType="8" length="17" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="comments" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="activity_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="spent_on" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="8" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="tyear" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="tmonth" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="tweek" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_3E">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table shortName="%{name}" tableName="trackers">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="is_in_chlog" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="is_in_roadmap" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_4B">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="changes">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="changeset_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="action" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="1" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="path" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="from_path" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="from_revision" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="revision" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="branch" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_2">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="settings">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="value" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_55">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="issue_relations">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="issue_from_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="issue_to_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="relation_type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="delay" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_5">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="boards">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="topics_count" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="messages_count" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="last_message_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_A">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="messages">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="board_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="parent_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="subject" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="content" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="author_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="replies_count" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="last_reply_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="locked" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="sticky" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_E">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="open_id_authentication_associations">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="issued" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="lifetime" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="handle" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="assoc_type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="server_url" columnType="VARBINARY" javaType="[B" jdbcType="-3" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="secret" columnType="VARBINARY" javaType="[B" jdbcType="-3" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_A5">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="custom_fields_projects">
-                            <annotations/>
-                            <columns>
-<column autoincrement="false" columnName="custom_field_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="user_preferences">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="user_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="others" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="hide_mail" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="time_zone" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_1">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="groups_users">
-                            <annotations/>
-                            <columns>
-<column autoincrement="false" columnName="group_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="user_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="members">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="user_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="mail_notification" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_38">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="news">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="title" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="60" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="summary" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="author_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="comments_count" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_33">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="tokens">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="user_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="action" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="value" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="40" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_CC">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="users">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="login" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="hashed_password" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="40" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="firstname" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="lastname" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="mail" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="60" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="admin" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="status" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="last_login_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="language" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="5" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="auth_source_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="identity_url" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="mail_notification" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="token" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="25" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_6A">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="wiki_contents">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="page_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="author_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="text" columnType="LONGVARCHAR" javaType="java.lang.String" jdbcType="2005" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="comments" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="version" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_58">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="issues">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="tracker_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="subject" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="due_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="8" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="category_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="status_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="assigned_to_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="priority_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="fixed_version_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="author_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="lock_version" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="start_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="8" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="done_ratio" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="estimated_hours" columnType="DOUBLE" javaType="java.lang.Double" jdbcType="8" length="17" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="parent_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="root_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="lft" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="rgt" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_B">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders>
-<query name="sp_issue_tracker_and_status" sql="select t.&quot;id&quot;, t.&quot;name&quot;, s.&quot;id&quot;, s.&quot;name&quot; from &quot;trackers&quot; t, &quot;issue_statuses&quot; s" toDatabase="redmine" toSchema="PUBLIC">
-    <references>
-        <reference fromColumn="tracker_id"/>
-        <reference fromColumn="status_id"/>
-    </references>
-</query>
-<query hql="from trackers" name="sp_issue_tracker" toDatabase="redmine" toSchema="PUBLIC">
-    <references>
-        <reference fromColumn="tracker_id"/>
-    </references>
-</query>
-<query hql="from issue_statuses" name="sp_issue_status" toDatabase="redmine" toSchema="PUBLIC">
-    <references>
-        <reference fromColumn="status_id"/>
-    </references>
-</query>
-<query hql="from enumerations where type = 'IssuePriority'" name="sp_issue_priority" toDatabase="redmine" toSchema="PUBLIC">
-    <references>
-        <reference fromColumn="priority_id"/>
-    </references>
-</query>
-                            </selectionProviders>
-                        </table>
-                        <table tableName="versions">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="effective_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="8" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="wiki_page_title" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="status" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="sharing" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_89">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="documents">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="category_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="title" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="60" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_3">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table shortName="%{name}" tableName="issue_statuses">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="is_closed" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="is_default" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="default_done_ratio" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_FF">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="journals">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="journalized_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="journalized_type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="user_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="notes" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_C1">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="enabled_modules">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_C">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table shortName="%{name}" tableName="enumerations">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="is_default" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="active" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="parent_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_86">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="projects_trackers">
-                            <annotations/>
-                            <columns>
-<column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="tracker_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <selectionProviders/>
-                        </table>
                         <table tableName="roles">
                             <annotations/>
                             <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="id" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="assignable" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="builtin" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="permissions" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
+<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="role" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_6">
+                            <primaryKey primaryKeyName="PK_ROLES">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="wiki_redirects">
+                        <table tableName="ticket_types" shortName="%{type}">
                             <annotations/>
                             <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="id" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="wiki_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="title" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="redirects_to" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
-    <annotations/>
+<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="type" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>50</value>
+        </annotation>
+    </annotations>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_28">
+                            <primaryKey primaryKeyName="PK_TICKET_TYPES">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="wiki_pages">
+                        <table tableName="activity">
                             <annotations/>
                             <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="serial" columnName="id" autoincrement="true">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="wiki_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="project_id" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="title" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="n" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
+<column scale="6" nullable="false" length="35" jdbcType="93" columnType="TIMESTAMP WITH TIME ZONE" columnName="date" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="protected" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
+<column scale="0" nullable="false" length="4000" jdbcType="12" columnType="VARCHAR" columnName="message" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="parent_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="user_id" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_24">
+                            <foreignKeys>
+<foreignKey toTable="users" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_activity_user" hql="from users">
+    <references>
+        <reference toColumn="id" fromColumn="user_id"/>
+    </references>
+</foreignKey>
+<foreignKey toTable="tickets" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_activity_ticket" hql="from tickets">
+    <references>
+        <reference toColumn="project_id" fromColumn="project_id"/>
+        <reference toColumn="n" fromColumn="n"/>
+    </references>
+</foreignKey>
+                            </foreignKeys>
+                            <primaryKey primaryKeyName="PK_ACTIVITY">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -959,356 +85,249 @@
                         <table tableName="comments">
                             <annotations/>
                             <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="serial" columnName="id" autoincrement="true">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="commented_type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
+<column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project_id" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="commented_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="n" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="author_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="4000" jdbcType="12" columnType="VARCHAR" columnName="message" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="comments" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="user_id" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_DC">
+                            <foreignKeys>
+<foreignKey toTable="tickets" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_comment_ticket" hql="from tickets">
+    <references>
+        <reference toColumn="project_id" fromColumn="project_id"/>
+        <reference toColumn="n" fromColumn="n"/>
+    </references>
+</foreignKey>
+<foreignKey toTable="users" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_comment_user" hql="from users">
+    <references>
+        <reference toColumn="id" fromColumn="user_id"/>
+    </references>
+</foreignKey>
+                            </foreignKeys>
+                            <primaryKey primaryKeyName="PK_COMMENTS">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="queries">
+                        <table tableName="components">
                             <annotations/>
                             <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="serial" columnName="id" autoincrement="true">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="name" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
+<column scale="0" nullable="false" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="filters" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="user_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="is_public" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="column_names" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="sort_criteria" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="group_by" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
+<column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project_id" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_27">
+                            <foreignKeys>
+<foreignKey toTable="projects" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_component_project" hql="from projects">
+    <references>
+        <reference toColumn="id" fromColumn="project_id"/>
+    </references>
+</foreignKey>
+                            </foreignKeys>
+                            <primaryKey primaryKeyName="PK_COMPONENTS">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="custom_fields">
+                        <table tableName="affected_components">
                             <annotations/>
                             <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="serial" columnName="id" autoincrement="true">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
+<column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project_id" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="n" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="field_format" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="possible_values" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="regexp" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="min_length" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="max_length" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="is_required" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="is_for_all" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="is_filter" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="position" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="searchable" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="default_value" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="editable" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="visible" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="component_id" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_2E">
+                            <foreignKeys>
+<foreignKey toTable="tickets" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_affected_component_ticket" hql="from tickets">
+    <references>
+        <reference toColumn="project_id" fromColumn="project_id"/>
+        <reference toColumn="n" fromColumn="n"/>
+    </references>
+</foreignKey>
+<foreignKey toTable="components" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_affected_component_component" hql="from components">
+    <references>
+        <reference toColumn="id" fromColumn="component_id"/>
+    </references>
+</foreignKey>
+                            </foreignKeys>
+                            <primaryKey primaryKeyName="PK_AFFECTED_COMPONENTS">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="issue_categories">
+                        <table tableName="version_states">
                             <annotations/>
                             <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="id" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="assigned_to_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
+<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="state" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_F2">
+                            <primaryKey primaryKeyName="PK_VERSION_STATES">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="wikis">
+                        <table tableName="members">
                             <annotations/>
                             <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="serial" columnName="id" autoincrement="true">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="project_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project_id" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="start_page" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="user_id" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="status" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="role_id" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_6B">
+                            <foreignKeys>
+<foreignKey toTable="projects" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_member_project" hql="from projects">
+    <references>
+        <reference toColumn="id" fromColumn="project_id"/>
+    </references>
+</foreignKey>
+<foreignKey toTable="roles" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_member_role" hql="from roles">
+    <references>
+        <reference toColumn="id" fromColumn="role_id"/>
+    </references>
+</foreignKey>
+<foreignKey toTable="users" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_member_user" hql="from users">
+    <references>
+        <reference toColumn="id" fromColumn="user_id"/>
+    </references>
+</foreignKey>
+                            </foreignKeys>
+                            <primaryKey primaryKeyName="PK_MEMBERS">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="wiki_content_versions">
+                        <table tableName="users" shortName="%{first_name} %{last_name}">
                             <annotations/>
                             <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="serial" columnName="id" autoincrement="true">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="wiki_content_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="150" jdbcType="12" columnType="VARCHAR" columnName="email" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>150</value>
+        </annotation>
+    </annotations>
+</column>
+<column scale="0" nullable="true" length="50" jdbcType="12" columnType="VARCHAR" columnName="password" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>50</value>
+        </annotation>
+    </annotations>
+</column>
+<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="first_name" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>50</value>
+        </annotation>
+    </annotations>
+</column>
+<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="last_name" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>50</value>
+        </annotation>
+    </annotations>
+</column>
+<column scale="6" nullable="false" length="35" jdbcType="93" columnType="TIMESTAMP WITH TIME ZONE" columnName="creation_date" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="page_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="6" nullable="false" length="35" jdbcType="93" columnType="TIMESTAMP WITH TIME ZONE" columnName="deletion_date" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="author_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
+<column scale="0" nullable="false" length="45" jdbcType="12" columnType="VARCHAR" columnName="creation_ip" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>45</value>
+        </annotation>
+    </annotations>
+</column>
+<column scale="6" nullable="true" length="35" jdbcType="93" columnType="TIMESTAMP WITH TIME ZONE" columnName="last_access" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="data" columnType="VARBINARY" javaType="[B" jdbcType="-3" length="2147483647" nullable="true" scale="0">
+<column scale="0" nullable="true" length="45" jdbcType="12" columnType="VARCHAR" columnName="access_ip" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>45</value>
+        </annotation>
+    </annotations>
+</column>
+<column scale="0" nullable="true" length="1" jdbcType="-7" columnType="bool" columnName="validated" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="compression" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="6" nullable="true" scale="0">
+<column scale="0" nullable="false" length="1" jdbcType="-7" columnType="bool" columnName="admin" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="comments" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="version" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
+<column scale="0" nullable="true" length="50" jdbcType="12" columnType="VARCHAR" columnName="token" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>50</value>
+        </annotation>
+    </annotations>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_F7">
+                            <primaryKey primaryKeyName="PK_USERS">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="changesets_issues">
+                        <table tableName="ticket_states" shortName="%{state}">
                             <annotations/>
                             <columns>
-<column autoincrement="false" columnName="changeset_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="id" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="issue_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
+<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="state" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>50</value>
+        </annotation>
+    </annotations>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="changesets">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="repository_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="revision" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="committer" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="committed_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="false" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="comments" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="commit_date" columnType="DATE" javaType="java.util.Date" jdbcType="91" length="8" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="scmid" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="user_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_8">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="schema_migrations">
-                            <annotations/>
-                            <columns>
-<column autoincrement="false" columnName="version" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="custom_fields_trackers">
-                            <annotations/>
-                            <columns>
-<column autoincrement="false" columnName="custom_field_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="tracker_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="auth_sources">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="60" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="host" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="60" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="port" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="account" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="account_password" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="60" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="base_dn" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="attr_login" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="attr_firstname" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="attr_lastname" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="attr_mail" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="onthefly_register" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="tls" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_F">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="workflows">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="tracker_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="old_status_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="new_status_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="role_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_41">
+                            <primaryKey primaryKeyName="PK_TICKET_STATES">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
@@ -1316,161 +335,252 @@
                         <table tableName="attachments">
                             <annotations/>
                             <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="serial" columnName="id" autoincrement="true">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="container_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="file" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="container_type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="30" nullable="false" scale="0">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="filename" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
+<column scale="0" nullable="false" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="disk_filename" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
+<column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project_id" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="filesize" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="content_type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="digest" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="40" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="downloads" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="author_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="n" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_D">
+                            <foreignKeys>
+<foreignKey toTable="tickets" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_attachment_ticket" hql="from tickets">
+    <references>
+        <reference toColumn="project_id" fromColumn="project_id"/>
+        <reference toColumn="n" fromColumn="n"/>
+    </references>
+</foreignKey>
+                            </foreignKeys>
+                            <primaryKey primaryKeyName="PK_ATTACHMENTS">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="watchers">
+                        <table tableName="tickets" shortName="%{project_id}-%{n}">
                             <annotations/>
                             <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="watchable_type" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="watchable_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="user_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_20">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="member_roles">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="member_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="role_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="inherited_from" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
-    <annotations/>
-</column>
-                            </columns>
-                            <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_FD">
-<column columnName="id"/>
-                            </primaryKey>
-                            <selectionProviders/>
-                        </table>
-                        <table tableName="projects" shortName="%{name}">
-                            <annotations/>
-                            <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
-    <annotations/>
-</column>
-<column autoincrement="false" columnName="name" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
-    <annotations />
-</column>
-<column autoincrement="false" columnName="description" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="2147483647" nullable="true" scale="0">
+<column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project_id" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.RichText">
-            <value>true</value>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>100</value>
         </annotation>
     </annotations>
 </column>
-<column autoincrement="false" columnName="homepage" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="n" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="is_public" columnType="BOOLEAN" javaType="java.lang.Boolean" jdbcType="16" length="1" nullable="false" scale="0">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>255</value>
+        </annotation>
+    </annotations>
+</column>
+<column scale="0" nullable="false" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>4000</value>
+        </annotation>
+    </annotations>
+</column>
+<column scale="0" nullable="true" length="10" jdbcType="4" columnType="int4" columnName="assignee" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="parent_id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="created_by" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="created_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="state_id" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="updated_on" columnType="TIMESTAMP" jdbcType="93" length="23" nullable="true" scale="10">
+<column scale="0" nullable="true" length="10" jdbcType="4" columnType="int4" columnName="affected_version" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="identifier" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
+<column scale="0" nullable="true" length="10" jdbcType="4" columnType="int4" columnName="fix_version" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="status" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="priority_id" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="lft" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="type_id" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="rgt" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="true" scale="0">
+<column scale="0" nullable="true" length="10" jdbcType="4" columnType="int4" columnName="resolution_id" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="6" nullable="false" length="35" jdbcType="93" columnType="TIMESTAMP WITH TIME ZONE" columnName="date_created" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="6" nullable="false" length="35" jdbcType="93" columnType="TIMESTAMP WITH TIME ZONE" columnName="date_updated" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
+                            <foreignKeys>
+<foreignKey toTable="versions" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_fix_version" hql="from versions">
+    <references>
+        <reference toColumn="id" fromColumn="fix_version"/>
+    </references>
+</foreignKey>
+<foreignKey toTable="users" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_assignee" hql="from users">
+    <references>
+        <reference toColumn="id" fromColumn="assignee"/>
+    </references>
+</foreignKey>
+<foreignKey toTable="projects" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_project" hql="from projects">
+    <references>
+        <reference toColumn="id" fromColumn="project_id"/>
+    </references>
+</foreignKey>
+<foreignKey toTable="ticket_resolutions" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_resolution" hql="from ticket_resolutions">
+    <references>
+        <reference toColumn="id" fromColumn="resolution_id"/>
+    </references>
+</foreignKey>
+<foreignKey toTable="ticket_priorities" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_priority" hql="from ticket_priorities">
+    <references>
+        <reference toColumn="id" fromColumn="priority_id"/>
+    </references>
+</foreignKey>
+<foreignKey toTable="ticket_types" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_type" hql="from ticket_types">
+    <references>
+        <reference toColumn="id" fromColumn="type_id"/>
+    </references>
+</foreignKey>
+<foreignKey toTable="ticket_states" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_state" hql="from ticket_states">
+    <references>
+        <reference toColumn="id" fromColumn="state_id"/>
+    </references>
+</foreignKey>
+<foreignKey toTable="versions" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_affected_version" hql="from versions">
+    <references>
+        <reference toColumn="id" fromColumn="affected_version"/>
+    </references>
+</foreignKey>
+<foreignKey toTable="users" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_creator" hql="from users">
+    <references>
+        <reference toColumn="id" fromColumn="created_by"/>
+    </references>
+</foreignKey>
+                            </foreignKeys>
+                            <primaryKey primaryKeyName="pk_ticket">
+<column columnName="project_id"/>
+<column columnName="n"/>
+                            </primaryKey>
+                            <selectionProviders/>
+                        </table>
+                        <table tableName="ticket_priorities" shortName="%{priority}">
+                            <annotations/>
+                            <columns>
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="id" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="priority" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>50</value>
+        </annotation>
+    </annotations>
+</column>
+                            </columns>
                             <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_C4">
+                            <primaryKey primaryKeyName="PK_TICKET_PRIORITIES">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="open_id_authentication_nonces">
+                        <table tableName="versions">
                             <annotations/>
                             <columns>
-<column autoincrement="true" columnName="id" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="serial" columnName="id" autoincrement="true">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="timestamp" columnType="INT" javaType="java.lang.Integer" jdbcType="4" length="10" nullable="false" scale="0">
+<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="name" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="server_url" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="true" scale="0">
+<column scale="0" nullable="true" length="13" jdbcType="91" columnType="DATE" columnName="planned_date" autoincrement="false">
     <annotations/>
 </column>
-<column autoincrement="false" columnName="salt" columnType="VARCHAR" javaType="java.lang.String" jdbcType="12" length="255" nullable="false" scale="0">
+<column scale="0" nullable="true" length="13" jdbcType="91" columnType="DATE" columnName="released_date" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project_id" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="state_id" autoincrement="false">
+    <annotations/>
+</column>
+                            </columns>
+                            <foreignKeys>
+<foreignKey toTable="version_states" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_version_state" hql="from version_states">
+    <references>
+        <reference toColumn="id" fromColumn="state_id"/>
+    </references>
+</foreignKey>
+<foreignKey toTable="projects" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_version_project" hql="from projects">
+    <references>
+        <reference toColumn="id" fromColumn="project_id"/>
+    </references>
+</foreignKey>
+                            </foreignKeys>
+                            <primaryKey primaryKeyName="PK_VERSIONS">
+<column columnName="id"/>
+                            </primaryKey>
+                            <selectionProviders/>
+                        </table>
+                        <table tableName="projects">
+                            <annotations/>
+                            <columns>
+<column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="id" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="false" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="true" length="100" jdbcType="12" columnType="VARCHAR" columnName="url" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="false" length="1" jdbcType="-7" columnType="bool" columnName="public" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="last_ticket" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
                             <foreignKeys/>
-                            <primaryKey primaryKeyName="CONSTRAINT_EA">
+                            <primaryKey primaryKeyName="PK_PROJECTS">
+<column columnName="id"/>
+                            </primaryKey>
+                            <selectionProviders/>
+                        </table>
+                        <table tableName="ticket_resolutions" shortName="%{resolution}">
+                            <annotations/>
+                            <columns>
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="id" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="resolution" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>50</value>
+        </annotation>
+    </annotations>
+</column>
+                            </columns>
+                            <foreignKeys/>
+                            <primaryKey primaryKeyName="PK_TICKET_RESOLUTIONS">
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>

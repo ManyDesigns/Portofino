@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page title="Home" navigationRoot="INHERIT" id="tkwxs2rtbixy6c6hy2b3h3n0i" description="Home">
+    <detailLayout>
+        <childPages/>
+    </detailLayout>
+    <layout template="default">
+        <childPages>
+            <childPage showInNavigation="false" order="0" name="active-tickets-assigned-to-me" container="contentLayoutLeft"/>
+            <childPage showInNavigation="false" order="1" name="projects" container="contentLayoutLeft"/>
+            <childPage showInNavigation="false" order="0" name="activity" container="contentLayoutRight"/>
+        </childPages>
+    </layout>
+    <permissions/>
+</page>

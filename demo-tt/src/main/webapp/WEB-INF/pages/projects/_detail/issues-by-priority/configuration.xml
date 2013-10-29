@@ -1,2 +1,0 @@
-<configuration database="redmine" legend="Issues by priority" name="Issues by priority" orientation="HORIZONTAL" query="select &quot;priority_id&quot;, count(*), priority.&quot;name&quot; from &quot;issues&quot; join &quot;enumerations&quot; priority on &quot;issues&quot;.&quot;priority_id&quot; = priority.&quot;id&quot; where &quot;issues&quot;.&quot;project_id&quot; = %{#project.id} group by priority.&quot;id&quot;" type="PIE3D" urlExpression="/projects/%{#project.id}/issues?search_priority_id=%{key}">
-</configuration>

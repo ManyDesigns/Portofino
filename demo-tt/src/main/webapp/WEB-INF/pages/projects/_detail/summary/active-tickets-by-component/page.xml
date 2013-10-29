@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<page title="Versions" navigationRoot="INHERIT" id="qqt8i1mods75jv771uuall75q" description="Versions">
+<page title="Active tickets by component" navigationRoot="INHERIT" id="kpuiax1flg7qlwd63waig1cmh" description="Active tickets by component">
     <detailLayout template="default">
         <childPages/>
     </detailLayout>

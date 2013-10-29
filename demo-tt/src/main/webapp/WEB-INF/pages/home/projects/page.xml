@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<page title="Versions" navigationRoot="INHERIT" id="qqt8i1mods75jv771uuall75q" description="Versions">
-    <detailLayout template="default">
+<page title="Projects" navigationRoot="INHERIT" id="goum9vrp6nwt4wrkaws3gc3bv" description="Projects">
+    <detailLayout>
         <childPages/>
     </detailLayout>
     <layout template="default">

@@ -1,40 +1,22 @@
-<configuration createTitle="New project" database="redmine" editTitle="Edit project" largeResultSet="false" name="projects" query="FROM projects ORDER BY name" readTitle="Overview" searchTitle="Projects" variable="project">
-    <annotations/>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration variable="project" searchTitle="" rowsPerPage="10" readTitle="" query="from projects" name="Projects" largeResultSet="false" editTitle="" database="tt" createTitle="">
     <properties>
-        <property enabled="true" inSummary="true" insertable="true" label="" name="id" searchable="false" updatable="true">
+        <property updatable="false" searchable="false" name="id" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
-        <property enabled="true" inSummary="true" insertable="true" label="" name="name" searchable="true" updatable="true">
+        <property updatable="true" searchable="false" name="title" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
-        <property enabled="true" inSummary="true" insertable="true" label="" name="description" searchable="false" updatable="true">
+        <property updatable="true" searchable="false" name="description" label="" insertable="true" inSummary="false" enabled="true">
             <annotations/>
         </property>
-        <property enabled="true" inSummary="false" insertable="false" label="" name="homepage" searchable="false" updatable="false">
+        <property updatable="true" searchable="false" name="url" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
-        <property enabled="true" inSummary="false" insertable="true" label="Public" name="is_public" searchable="false" updatable="false">
+        <property updatable="true" searchable="false" name="public" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
-        <property enabled="false" inSummary="true" insertable="true" label="" name="parent_id" searchable="false" updatable="false">
-            <annotations/>
-        </property>
-        <property enabled="false" inSummary="false" insertable="false" label="" name="created_on" searchable="false" updatable="false">
-            <annotations/>
-        </property>
-        <property enabled="false" inSummary="false" insertable="false" label="" name="updated_on" searchable="false" updatable="false">
-            <annotations/>
-        </property>
-        <property enabled="false" inSummary="false" insertable="false" label="" name="identifier" searchable="false" updatable="false">
-            <annotations/>
-        </property>
-        <property enabled="true" inSummary="true" insertable="true" label="" name="status" searchable="false" updatable="true">
-            <annotations/>
-        </property>
-        <property enabled="false" inSummary="false" insertable="false" label="" name="lft" searchable="false" updatable="false">
-            <annotations/>
-        </property>
-        <property enabled="false" inSummary="false" insertable="false" label="" name="rgt" searchable="false" updatable="false">
+        <property updatable="false" searchable="false" name="last_ticket" insertable="false" inSummary="false" enabled="false">
             <annotations/>
         </property>
     </properties>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page title="Summary" navigationRoot="INHERIT" id="959z4v86luqj436padniigsuf" description="Summary">
+    <detailLayout template="default">
+        <childPages/>
+    </detailLayout>
+    <layout template="default">
+        <childPages>
+            <childPage showInNavigation="false" order="1" name="recently-updated-tickets" container="contentLayoutLeft"/>
+            <childPage showInNavigation="false" order="2" name="active-tickets-assigned-to-me" container="contentLayoutLeft"/>
+            <childPage showInNavigation="false" order="3" name="tickets-by-status" container="contentLayoutLeft"/>
+            <childPage showInNavigation="false" order="0" name="active-tickets-by-priority" container="contentLayoutRight"/>
+            <childPage showInNavigation="false" order="1" name="active-tickets-by-version" container="contentLayoutRight"/>
+            <childPage showInNavigation="false" order="2" name="active-tickets-by-component" container="contentLayoutRight"/>
+        </childPages>
+    </layout>
+    <permissions/>
+</page>
