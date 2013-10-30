@@ -84,7 +84,7 @@ public class OgnlUtils {
             }
         } catch (OgnlException e) {
             result = null;
-            logger.warn("Error during evaluation of ognl expression: " +
+            logger.debug("Error during evaluation of ognl expression: " +
                     parsedExpression.toString(), e);
         }
         return result;
@@ -100,5 +100,14 @@ public class OgnlUtils {
 
         return typeConverter.convertValue(
                 ognlContext, null, null, null, value, toType);
+    }
+
+    public static Object convertValueQuietly(Object value, Class toType) {
+        try {
+            return convertValue(value, toType);
+        } catch (Throwable e) {
+            logger.debug("Error during conversion of value: " + value, e);
+            return null;
+        }
     }
 }

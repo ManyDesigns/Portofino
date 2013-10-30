@@ -499,7 +499,7 @@
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="versions">
+                        <table tableName="versions" shortName="%{name}">
                             <annotations/>
                             <columns>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="serial" columnName="id" autoincrement="true">

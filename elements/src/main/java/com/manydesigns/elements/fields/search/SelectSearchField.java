@@ -22,7 +22,10 @@ package com.manydesigns.elements.fields.search;
 
 import com.manydesigns.elements.annotations.Select;
 import com.manydesigns.elements.ognl.OgnlUtils;
-import com.manydesigns.elements.options.*;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.SearchDisplayMode;
+import com.manydesigns.elements.options.SelectionModel;
+import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.ArrayUtils;
@@ -162,7 +165,7 @@ public class SelectSearchField extends AbstractSearchField {
             for (int i=0;i<values.length;i++){
                 if(!StringUtils.isEmpty((String) values[i])) {
                     castedValues[i] =
-                            OgnlUtils.convertValue(values[i], accessor.getType());
+                            OgnlUtils.convertValueQuietly(values[i], accessor.getType());
                 }
             }
             selectionModel.setValue(selectionModelIndex, castedValues);
