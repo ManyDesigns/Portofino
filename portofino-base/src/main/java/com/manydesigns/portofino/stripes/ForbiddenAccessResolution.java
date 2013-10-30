@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.stripes;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.stripes.ElementsActionBeanContext;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.modules.BaseModule;
@@ -75,7 +76,7 @@ public class ForbiddenAccessResolution implements Resolution {
         urlBuilder.addParameters(parameters);
         String returnUrl = urlBuilder.toString();
         boolean ajax = "true".equals(request.getParameter("ajax"));
-        ServletContext servletContext = request.getServletContext();
+        ServletContext servletContext = ElementsThreadLocals.getServletContext();
         Configuration configuration =
                 (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
         if (!subject.isAuthenticated() && !ajax) {

@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.logic;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.dispatcher.Dispatch;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.modules.BaseModule;
@@ -38,6 +39,7 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
@@ -207,8 +209,9 @@ public class SecurityLogic {
     }
 
     public static boolean isAdministrator(ServletRequest request) {
+        ServletContext servletContext = ElementsThreadLocals.getServletContext();
         Configuration conf =
-                (Configuration) request.getServletContext().getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
+                (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
         return isAdministrator(conf);
     }
 

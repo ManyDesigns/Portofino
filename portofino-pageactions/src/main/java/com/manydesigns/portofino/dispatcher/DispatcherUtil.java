@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.stripes.ElementsActionBeanContext;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.modules.BaseModule;
@@ -49,7 +50,7 @@ public class DispatcherUtil {
     }
 
     public static Dispatcher install(HttpServletRequest request) {
-        ServletContext servletContext = request.getServletContext();
+        ServletContext servletContext = ElementsThreadLocals.getServletContext();
         Configuration configuration =
                 (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
         File pagesDir = (File) servletContext.getAttribute(PageactionsModule.PAGES_DIRECTORY);

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2005-2013 ManyDesigns srl
+-->
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+      version="3.0">
+    <display-name>Portofino Demo-TT</display-name>
+    <description>Portofino Demo-TT</description>
+
+    <filter>
+        <filter-name>elements-filter</filter-name>
+        <filter-class>
+            com.manydesigns.elements.servlet.ElementsFilter
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>elements-filter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
+    <listener>
+        <description>Application context and session listener</description>
+        <listener-class>
+            com.manydesigns.portofino.servlets.PortofinoListener
+        </listener-class>
+    </listener>
+
+    <!-- Shiro -->
+    <filter>
+        <filter-name>ShiroFilter</filter-name>
+        <filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>ShiroFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+
+
+    <listener>
+        <description>Blob Cleanup Listener</description>
+        <listener-class>com.manydesigns.portofino.servlets.BlobCleanupListener</listener-class>
+    </listener>
+
+    <filter>
+        <filter-name>cleanup-filter</filter-name>
+        <filter-class>
+            com.manydesigns.portofino.servlets.CleanupFilter
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>cleanup-filter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
+
+
+
+        <filter>
+        <filter-name>ckeditor-filter</filter-name>
+        <filter-class>
+            com.manydesigns.portofino.servlets.UTF8ResponseFilter
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>ckeditor-filter</filter-name>
+        <url-pattern>/ckeditor/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
+    <!--
+        Include the following in your web.xml to enable container-managed security.
+
+        For Google AppEngine only:
+        note that, in order to properly use the GAE user service, you must also ensure that the class defined in your
+        Security.groovy file inherits from com.manydesigns.portofino.shiro.GAEPortofinoRealm and that your
+        app.properties file contains the following settings:
+
+            login.link={0}/actions/user/login.gae?login=&returnUrl={1}
+            logout.link={0}/actions/user/login.gae?logout=
+
+        Those URLs point to the built-in action com.manydesigns.portofino.actions.GAELoginAction which is mapped to
+        the path /actions/user/login.gae and exposes the two methods login() and logout(). The action is automatically
+        discovered by Stripes based on its package.
+    -->
+    <!--
+    <filter>
+        <filter-name>ServletContainerSecurityFilter</filter-name>
+        <filter-class>com.manydesigns.portofino.shiro.ServletContainerSecurityFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>ServletContainerSecurityFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    -->
+
+    <filter>
+        <filter-name>portofino-dispatcher</filter-name>
+        <filter-class>
+            com.manydesigns.portofino.servlets.DispatcherFilter
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>portofino-dispatcher</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
+
+
+
+        <context-param>
+        <param-name>ActionResolver.Packages</param-name>
+        <param-value>com.manydesigns.portofino.actions</param-value>
+    </context-param>
+    <context-param>
+        <param-name>Extension.Packages</param-name>
+        <param-value>com.manydesigns.portofino.stripes,com.manydesigns.portofino.interceptors</param-value>
+    </context-param>
+    <context-param>
+        <param-name>LocalePicker.Class</param-name>
+        <param-value>com.manydesigns.portofino.stripes.LocalePicker</param-value>
+    </context-param>
+    <context-param>
+        <param-name>LocalePicker.Locales</param-name>
+        <param-value>en,it</param-value>
+    </context-param>
+    <context-param>
+        <param-name>MultipartWrapper.Class</param-name>
+        <param-value>com.manydesigns.portofino.stripes.StreamingCommonsMultipartWrapper</param-value>
+    </context-param>
+    <context-param>
+        <param-name>ActionBeanContext.Class</param-name>
+        <param-value>com.manydesigns.elements.stripes.ElementsActionBeanContext</param-value>
+    </context-param>
+
+    <!-- Stripes -->
+    <filter>
+        <description>Stripes Filter</description>
+        <display-name>Stripes Filter</display-name>
+        <filter-name>StripesFilter</filter-name>
+        <filter-class>
+            net.sourceforge.stripes.controller.StripesFilter
+        </filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>StripesFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+
+    <!-- Must be mapped after StripesFilter so it can pick the correct request locale -->
+    <filter>
+        <filter-name>I18nFilter</filter-name>
+        <filter-class>com.manydesigns.portofino.servlets.I18nFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>I18nFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <description>Dynamically maps URLs to ActionBeans.</description>
+        <display-name>Stripes Dynamic Mapping Filter</display-name>
+        <filter-name>DynamicMappingFilter</filter-name>
+        <filter-class>
+            net.sourceforge.stripes.controller.DynamicMappingFilter
+        </filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>DynamicMappingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+
+    <session-config>
+        <session-timeout>60</session-timeout>
+    </session-config>
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+</web-app>

@@ -25,7 +25,6 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.dispatcher.*;
-import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -34,7 +33,6 @@ import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
@@ -68,11 +66,6 @@ public class ApplicationInterceptor implements Interceptor {
 
         logger.debug("Retrieving Servlet API objects");
         HttpServletRequest request = actionContext.getRequest();
-
-        logger.debug("Retrieving Portofino configuration");
-        ServletContext servletContext = request.getServletContext();
-        Configuration configuration =
-                (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
 
         logger.debug("Starting page response timer");
         StopWatch stopWatch = new StopWatch();
@@ -134,7 +127,8 @@ public class ApplicationInterceptor implements Interceptor {
     protected void configureActionBean
             (PageAction actionBean, PageInstance pageInstance, HttpServletRequest request)
             throws JAXBException, IOException {
-        Injections.inject(actionBean, request.getServletContext(), request);
+        ServletContext servletContext = ElementsThreadLocals.getServletContext();
+        Injections.inject(actionBean, servletContext, request);
 
         if(pageInstance.getConfiguration() != null) {
             logger.debug("Page instance {} is already configured");

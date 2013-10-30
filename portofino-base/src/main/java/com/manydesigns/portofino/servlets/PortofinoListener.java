@@ -185,9 +185,8 @@ public class PortofinoListener
 
         logger.info("Servlet API version is " + serverInfo.getServletApiVersion());
         if (serverInfo.getServletApiMajor() < 3) {
-            String msg = "Servlet API version must be >= 3.0.";
-            logger.error(msg);
-            throw new InternalError(msg);
+            String msg = "Servlet API version should be >= 3.0.";
+            logger.warn(msg);
         }
 
         logger.info("Loading modules...");

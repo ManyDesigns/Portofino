@@ -71,7 +71,7 @@ public class ServletContextAction extends AbstractActionBean {
     }
 
     protected void setupForm() {
-        ServletContext servletContext = context.getRequest().getServletContext();
+        ServletContext servletContext = context.getServletContext();
         Enumeration<String> attributeNames = servletContext.getAttributeNames();
         List<KeyValue> attributes = new ArrayList<KeyValue>();
         while (attributeNames.hasMoreElements()) {

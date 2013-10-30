@@ -1,0 +1,526 @@
+/*******************************************************************************
+Header / footer
+*******************************************************************************/
+
+footer {
+    border-top: 1px solid #E5E5E5;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.header-menu {
+    float: right;
+}
+
+@media (max-width: 979px) {
+    .header-menu {
+        float: none;
+    }
+}
+
+/*******************************************************************************
+Error/warning/info messages (Elements)
+*******************************************************************************/
+
+.userMessages {
+    margin-bottom: 1em;
+}
+
+ul.errorMessages, ul.warningMessages, ul.infoMessages {
+    margin: 0;
+    padding: 0;
+    font-weight: normal;
+    font-style: italic;
+    list-style-type: none;
+    background: no-repeat 0 center;
+}
+
+ul.errorMessages li, ul.warningMessages li, ul.infoMessages li {
+    list-style-type: none;
+    padding-left: 30px;
+}
+
+ul.errorMessages {
+    background-image: url("SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-cross-24.png");
+}
+
+ul.warningMessages {
+    background-image: url("SweetiePlus-v2-SublinkInteractive/with-shadows/warning-24.png");
+}
+
+ul.infoMessages {
+    background-image: url("SweetiePlus-v2-SublinkInteractive/with-shadows/badge-circle-check-24.png");
+}
+
+/*******************************************************************************
+Forms (Elements)
+*******************************************************************************/
+
+.hidden-submit {
+    border: 0 none;
+    height: 0;
+    width: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+.controls .value {
+    padding-top: 5px;
+}
+
+.form-horizontal .control-group.readonly {
+    margin-bottom: 10px;
+}
+
+input.mde-text-field-with-explicit-size, textarea.mde-text-field-with-explicit-size {
+    width: auto;
+}
+
+fieldset.radio {
+    margin-bottom: 0;
+}
+
+.horizontalSeparator {
+    border-top: 1px solid #eeeeee;
+    margin: 1.5em 0;
+    clear: both;
+}
+
+.mde-table-form input[type='checkbox'] {
+    margin: 0;
+}
+
+.table.mde-table-form th, .table.mde-table-form td {
+    vertical-align: middle;
+}
+
+label.control-label:after {
+    content: ":";
+}
+
+.control-group.readwrite.required label.control-label:before {
+    content: "* ";
+}
+
+/*******************************************************************************
+General
+*******************************************************************************/
+
+/* status */
+.status_red {
+    color: red;
+    font-weight: bold;
+}
+
+.status_amber {
+    color: #880;
+    font-weight: bold;
+}
+
+.status_green {
+    color: green;
+    font-weight: bold;
+}
+
+.blob-error {
+    color: gray;
+    font-weight: bold;
+}
+
+/*******************************************************************************
+Dialog (e.g., login)
+*******************************************************************************/
+
+body.dialog {
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background-color: #f5f5f5;
+}
+
+.dialog-container {
+    max-width: 360px;
+    padding: 19px 29px 29px;
+    margin: 0 auto 20px;
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+    -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+}
+
+.spacingTop {
+    margin-top: 20px;
+}
+
+/*******************************************************************************
+Breadcrumbs
+*******************************************************************************/
+
+div.breadcrumbs {
+    display: inline;
+}
+
+div.breadcrumbs .inner {
+    display: inline;
+}
+
+a.breadcrumb-item {
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+span.breadcrumb-item {
+    color: #333333;
+    font-weight: bold;
+}
+
+/*******************************************************************************
+Content
+*******************************************************************************/
+
+#pageAdminForm {
+    display: inline;
+}
+
+.navigation {
+    margin-bottom: 1em;
+}
+
+/*******************************************************************************
+PageActions
+*******************************************************************************/
+
+.pageHeader {
+    margin-bottom: 12px;
+    margin-top: 10px;
+    float: left;
+    width: 100%;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #E5E5E5;
+}
+
+.pageHeader h3, .pageHeader h4 {
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.pageHeader form {
+    margin: 0;
+}
+
+.pageBody {
+    clear: left;
+}
+
+.embeddedPageActionPlaceholder {
+    border: 1px solid #fcefa1;
+    background: #fbf9ee;
+    color: #363636;
+    height: 10em;
+}
+
+/*******************************************************************************
+Search form
+*******************************************************************************/
+
+.search_form {
+    overflow: hidden;
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
+    margin-top: 1em;
+}
+
+.searchform select, .searchform input {
+    width: auto;
+}
+
+.searchform .control-group {
+    display: inline-block;
+    margin-right: 1em;
+}
+
+.searchform label.match_mode {
+    display: none;
+}
+
+.form-inline .searchform .controls {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+.searchform .controls label.checkbox {
+    margin-bottom: 5px;
+    padding: 0;
+}
+
+.searchform .controls label.checkbox input {
+    margin-top: 0;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.searchform fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0 none;
+}
+
+.search_results {
+    overflow-x: auto;
+    overflow-y: hidden; /* Fixes a bug in Chrome */
+    margin-bottom: 20px;
+    border-top: 1px solid #DDDDDD;
+}
+
+.search_results th a {
+    color: #000000;
+}
+
+.search_results table {
+    margin-bottom: 0;
+}
+
+.searchFormButtons {
+    margin-top: 1em;
+}
+
+/*******************************************************************************
+Treetable
+*******************************************************************************/
+
+table.treetable span.indenter {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    text-align: right;
+    user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    -webkit-user-select: none;
+    width: 19px;
+}
+
+table.treetable span.indenter a {
+    background: no-repeat left center;
+    display: inline-block;
+    text-decoration: none;
+    width: 19px;
+}
+
+table.treetable {
+    border: 1px solid #888;
+    border-collapse: collapse;
+    margin: .6em 0 1.8em 0;
+    width: 100%;
+}
+
+table.treetable caption {
+    font-weight: bold;
+    margin-bottom: .2em;
+}
+
+table.treetable thead {
+    background: #aaa url(jquery-treetable/images/bg-table-thead.png) repeat-x top left;
+}
+
+table.treetable thead tr th {
+    border: 1px solid #888;
+    font-weight: normal;
+    padding: .3em 1em .1em 1em;
+    text-align: left;
+}
+
+table.treetable tbody tr td {
+    cursor: default;
+    padding: .3em 1em;
+}
+
+table.treetable span {
+    background-position: center left;
+    background-repeat: no-repeat;
+    padding: .2em 0 .2em 1.5em;
+}
+
+table.treetable span.file {
+    background-image: url(jquery-treetable/images/file.png);
+}
+
+table.treetable span.folder {
+    background-image: url(jquery-treetable/images/folder.png);
+}
+
+table.treetable tr.collapsed span.indenter a {
+    background-image: url(jquery-treetable/images/expand.png);
+}
+
+table.treetable tr.expanded span.indenter a {
+    background-image: url(jquery-treetable/images/collapse.png);
+}
+
+table.treetable tr.selected {
+    background-color: #3875d7;
+    color: #fff;
+}
+
+table.treetable tr.collapsed.selected span.indenter a {
+    background-image: url(jquery-treetable/images/expand-light.png);
+}
+
+table.treetable tr.expanded.selected span.indenter a {
+    background-image: url(jquery-treetable/images/collapse-light.png);
+}
+
+table.treetable tr.accept {
+    background-color: #a3bce4;
+    color: #fff
+}
+
+table.treetable tr.collapsed.accept td span.indenter a {
+    background-image: url(jquery-treetable/images/expand-light.png);
+}
+
+table.treetable tr.expanded.accept td span.indenter a {
+    background-image: url(jquery-treetable/images/collapse-light.png);
+}
+
+/*******************************************************************************
+Forms
+*******************************************************************************/
+
+#scriptEditor {
+    min-height: 20em;
+    width: 100%;
+    display: none;
+    position: relative;
+    padding: 0;
+}
+
+td.selection-cell {
+    width: 13px;
+}
+
+.attachment {
+    margin: 0.2em 2em 0.2em 0;
+    float: left;
+    padding-left: 20px;
+}
+
+.attachmentName {
+    font-weight: bold;
+}
+
+.pageActionBox {
+    padding: 1em 0;
+    border: 1px dashed gray;
+    margin-bottom: 1em;
+    min-height: 12em;
+}
+
+/*******************************************************************************
+Permissions
+*******************************************************************************/
+
+table#userPermissionTestResults th,
+table#userPermissionTestResults td {
+    border: none;
+    text-align: left;
+}
+
+/*******************************************************************************
+Configuration
+*******************************************************************************/
+
+#crudSelectionProvidersFieldset select, #crudSelectionProvidersFieldset input {
+    width: auto;
+}
+
+/*******************************************************************************
+Wizard
+*******************************************************************************/
+
+.wizard-header {
+    overflow-y: hidden;
+    padding-left: 0;
+}
+
+.wizard-header ul {
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+}
+
+.wizard-header ul li {
+    height: 46px;
+    line-height: 46px;
+    margin: 0;
+    padding: 0 10px 0 30px;
+    position: relative;
+    float: left;
+    background-color: #F8F8FF;
+}
+
+.wizard-header ul li .chevron {
+    position: absolute;
+    top: 0;
+    right: -14px;
+    display: block;
+    border: 24px solid transparent;
+    border-right: 0;
+    border-left: 14px solid #d4d4d4;
+}
+
+.wizard-header ul li .chevron:before {
+    position: absolute;
+    top: -24px;
+    right: 1px;
+    display: block;
+    border: 24px solid transparent;
+    border-right: 0;
+    border-left: 14px solid #F8F8FF;
+    content: "";
+}
+
+.wizard-header ul li.active {
+    background: none repeat scroll 0 0 #F1F6FC;
+    color: #3A87AD;
+    font-weight: bold;
+}
+
+.wizard-header ul li.active .chevron:before {
+    border-left: 14px solid #F1F6FC;
+}
+
+.wizard-header ul li.first {
+    padding-left: 10px;
+}
+
+.wizard-header ul li.before {
+    color: #468847;
+    background-color: #F3F4F5;
+}
+
+.wizard-header ul li.before .chevron:before {
+    border-left: 14px solid #F3F4F5;
+}
+
+/* ============================================== */
+/* theme/templates/well-with-tabs/main.jsp        */
+/* ============================================== */
+
+.tab-content .pageHeader {
+    display: none;
+}
+
+/*******************************************************************************
+CRUD
+*******************************************************************************/
+
+.crudReadButtons {
+    border-top: solid 1px #E5E5E5;
+    padding-top: 10px;
+}

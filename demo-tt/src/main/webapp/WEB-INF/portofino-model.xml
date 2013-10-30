@@ -2,9 +2,10 @@
 <model>
     <databases>
         <database databaseName="tt">
-            <jdbcConnection username="manydesigns" url="jdbc:postgresql://localhost:5432/tt" password="manydesigns" driver="org.postgresql.Driver"/>
+            <jdbcConnection username="tt" url="jdbc:mysql://localhost/tt?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI" password="tt" driver="com.mysql.jdbc.Driver"/>
+<!--<jdbcConnection driver="com.google.cloud.sql.jdbc.Driver" url="jdbc:google:rdbms://manydesigns.com:prova1:dbprova1/tt" />-->
             <schemas>
-                <schema schemaName="public">
+                <schema schemaName="tt">
                     <tables>
                         <table tableName="roles">
                             <annotations/>
@@ -65,12 +66,12 @@
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey toTable="users" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_activity_user" hql="from users">
+<foreignKey toTable="users" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_activity_user" hql="from users">
     <references>
         <reference toColumn="id" fromColumn="user_id"/>
     </references>
 </foreignKey>
-<foreignKey toTable="tickets" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_activity_ticket" hql="from tickets">
+<foreignKey toTable="tickets" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_activity_ticket" hql="from tickets">
     <references>
         <reference toColumn="project_id" fromColumn="project_id"/>
         <reference toColumn="n" fromColumn="n"/>
@@ -102,13 +103,13 @@
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey toTable="tickets" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_comment_ticket" hql="from tickets">
+<foreignKey toTable="tickets" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_comment_ticket" hql="from tickets">
     <references>
         <reference toColumn="project_id" fromColumn="project_id"/>
         <reference toColumn="n" fromColumn="n"/>
     </references>
 </foreignKey>
-<foreignKey toTable="users" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_comment_user" hql="from users">
+<foreignKey toTable="users" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_comment_user" hql="from users">
     <references>
         <reference toColumn="id" fromColumn="user_id"/>
     </references>
@@ -136,7 +137,7 @@
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey toTable="projects" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_component_project" hql="from projects">
+<foreignKey toTable="projects" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_component_project" hql="from projects">
     <references>
         <reference toColumn="id" fromColumn="project_id"/>
     </references>
@@ -164,13 +165,13 @@
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey toTable="tickets" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_affected_component_ticket" hql="from tickets">
+<foreignKey toTable="tickets" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_affected_component_ticket" hql="from tickets">
     <references>
         <reference toColumn="project_id" fromColumn="project_id"/>
         <reference toColumn="n" fromColumn="n"/>
     </references>
 </foreignKey>
-<foreignKey toTable="components" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_affected_component_component" hql="from components">
+<foreignKey toTable="components" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_affected_component_component" hql="from components">
     <references>
         <reference toColumn="id" fromColumn="component_id"/>
     </references>
@@ -214,17 +215,17 @@
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey toTable="projects" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_member_project" hql="from projects">
+<foreignKey toTable="projects" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_member_project" hql="from projects">
     <references>
         <reference toColumn="id" fromColumn="project_id"/>
     </references>
 </foreignKey>
-<foreignKey toTable="roles" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_member_role" hql="from roles">
+<foreignKey toTable="roles" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_member_role" hql="from roles">
     <references>
         <reference toColumn="id" fromColumn="role_id"/>
     </references>
 </foreignKey>
-<foreignKey toTable="users" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_member_user" hql="from users">
+<foreignKey toTable="users" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_member_user" hql="from users">
     <references>
         <reference toColumn="id" fromColumn="user_id"/>
     </references>
@@ -355,7 +356,7 @@
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey toTable="tickets" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_attachment_ticket" hql="from tickets">
+<foreignKey toTable="tickets" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_attachment_ticket" hql="from tickets">
     <references>
         <reference toColumn="project_id" fromColumn="project_id"/>
         <reference toColumn="n" fromColumn="n"/>
@@ -426,47 +427,47 @@
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey toTable="versions" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_fix_version" hql="from versions">
+<foreignKey toTable="versions" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_fix_version" hql="from versions">
     <references>
         <reference toColumn="id" fromColumn="fix_version"/>
     </references>
 </foreignKey>
-<foreignKey toTable="users" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_assignee" hql="from users">
+<foreignKey toTable="users" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_assignee" hql="from users">
     <references>
         <reference toColumn="id" fromColumn="assignee"/>
     </references>
 </foreignKey>
-<foreignKey toTable="projects" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_project" hql="from projects">
+<foreignKey toTable="projects" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_project" hql="from projects">
     <references>
         <reference toColumn="id" fromColumn="project_id"/>
     </references>
 </foreignKey>
-<foreignKey toTable="ticket_resolutions" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_resolution" hql="from ticket_resolutions">
+<foreignKey toTable="ticket_resolutions" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_resolution" hql="from ticket_resolutions">
     <references>
         <reference toColumn="id" fromColumn="resolution_id"/>
     </references>
 </foreignKey>
-<foreignKey toTable="ticket_priorities" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_priority" hql="from ticket_priorities">
+<foreignKey toTable="ticket_priorities" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_priority" hql="from ticket_priorities">
     <references>
         <reference toColumn="id" fromColumn="priority_id"/>
     </references>
 </foreignKey>
-<foreignKey toTable="ticket_types" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_type" hql="from ticket_types">
+<foreignKey toTable="ticket_types" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_type" hql="from ticket_types">
     <references>
         <reference toColumn="id" fromColumn="type_id"/>
     </references>
 </foreignKey>
-<foreignKey toTable="ticket_states" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_state" hql="from ticket_states">
+<foreignKey toTable="ticket_states" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_state" hql="from ticket_states">
     <references>
         <reference toColumn="id" fromColumn="state_id"/>
     </references>
 </foreignKey>
-<foreignKey toTable="versions" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_affected_version" hql="from versions">
+<foreignKey toTable="versions" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_affected_version" hql="from versions">
     <references>
         <reference toColumn="id" fromColumn="affected_version"/>
     </references>
 </foreignKey>
-<foreignKey toTable="users" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_creator" hql="from users">
+<foreignKey toTable="users" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_creator" hql="from users">
     <references>
         <reference toColumn="id" fromColumn="created_by"/>
     </references>
@@ -521,12 +522,12 @@
 </column>
                             </columns>
                             <foreignKeys>
-<foreignKey toTable="version_states" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_version_state" hql="from version_states">
+<foreignKey toTable="version_states" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_version_state" hql="from version_states">
     <references>
         <reference toColumn="id" fromColumn="state_id"/>
     </references>
 </foreignKey>
-<foreignKey toTable="projects" toSchema="public" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_version_project" hql="from projects">
+<foreignKey toTable="projects" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_version_project" hql="from projects">
     <references>
         <reference toColumn="id" fromColumn="project_id"/>
     </references>
