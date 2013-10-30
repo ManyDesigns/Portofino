@@ -1,22 +1,30 @@
 package com.manydesigns.portofino.pageactions.crud
 
+import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
+import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.Resolution
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
 class MyCrudAction extends CrudAction {
 
-    //Automatically generated on Mon Oct 28 12:33:53 CET 2013 by ManyDesigns Portofino
-    //Write your code here
+    Serializable project;
+
+    @Before
+    public void prepareProject() {
+        project = ElementsThreadLocals.getOgnlContext().get("project");
+    }
 
     //**************************************************************************
     // Extension hooks
     //**************************************************************************
 
-    protected void createSetup(Object object) {}
+    protected void createSetup(Object object) {
+        object.project_id = project.id;
+    }
 
     protected boolean createValidate(Object object) {
         return true;

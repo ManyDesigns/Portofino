@@ -21,7 +21,7 @@ class ActiveTicketsByPriorityAction extends CustomAction {
     from ticket_priorities p
     left join tickets t on (p.id = t.priority_id and t.project_id = :project_id and t.state_id <> 4)
     group by p.id, p.priority
-    order by p.id
+    order by p.id desc
     """;
 
     @Inject(DatabaseModule.PERSISTENCE)
@@ -39,7 +39,7 @@ class ActiveTicketsByPriorityAction extends CustomAction {
                 Object transformTuple(Object[] tuple, String[] aliases) {
                     String groupId = tuple[0];
                     String groupName = tuple[1];
-                    String url = "/projects/" + project.id + "/tickets?search_priority_id=" + groupId;
+                    String url = "/projects/$project.id/tickets?search_state_id=1&search_state_id=2&search_state_id=3&search_priority_id=$groupId";
                     int groupCount = (int)tuple[2];
                     return new TicketGroup(groupName, url, groupCount);
                 }
