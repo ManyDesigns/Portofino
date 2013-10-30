@@ -49,9 +49,9 @@ public class GoogleCloudSQLDatabasePlatform extends AbstractDatabasePlatform {
     public GoogleCloudSQLDatabasePlatform() {
         super(new MySQLDialect(), "jdbc:google:rdbms://<instance-name>/<database>");
         try {
-            DriverManager.registerDriver((Driver) Class.forName("com.google.cloud.sql.jdbc.Driver").newInstance());
+            DriverManager.registerDriver((Driver) Class.forName("com.google.cloud.sql.Driver").newInstance());
         } catch (Exception e) {
-            logger.debug("Driver not found", e);
+            logger.debug("The driver to connect to Google Cloud SQL from a non-GAE application was not found", e);
         }
     }
 

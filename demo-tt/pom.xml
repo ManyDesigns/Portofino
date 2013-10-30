@@ -20,12 +20,6 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-googlecloudsql</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
             <artifactId>portofino-mail</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
@@ -137,6 +131,26 @@
                 <version>2.4</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-maven-plugin</artifactId>
+                <version>1.7.7.1</version>
+                <configuration>
+                    <jvmFlags>
+                        <jvmFlag>-Drdbms.server=local</jvmFlag>
+                        <jvmFlag>-Drdbms.driver=com.mysql.jdbc.Driver</jvmFlag>
+                        <jvmFlag>-Drdbms.url=jdbc:mysql://localhost/tt?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI,character_set_database=utf8</jvmFlag>
+                        <jvmFlag>-Xdebug</jvmFlag>
+                        <jvmFlag>-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005</jvmFlag>
+                        <jvmFlag>-Xmx128M</jvmFlag>
+                        <jvmFlag>-XX:MaxPermSize=128M</jvmFlag>
+                        <jvmFlag>-XX:+UseConcMarkSweepGC</jvmFlag>
+                        <jvmFlag>-XX:+CMSClassUnloadingEnabled</jvmFlag>
+                        <jvmFlag>-ea</jvmFlag>
+                    </jvmFlags>
+                    <disableUpdateCheck>true</disableUpdateCheck>
                 </configuration>
             </plugin>
         </plugins>
