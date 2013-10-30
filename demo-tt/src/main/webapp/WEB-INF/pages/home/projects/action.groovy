@@ -26,6 +26,17 @@ class HomeProjectsAction extends CustomAction {
     public final static String LOGGED_SQL = """
     select p.id, p.title, p.description, count(t.n) as c
     from projects p
+    left join members m on m.project_id = p.id
+    left join tickets t on (t.project_id = p.id and t.state_id <>4)
+    where p.public = true
+    or m.user_id = :user_id
+    group by p.id, p.title, p.description
+    order by id
+    """;
+
+    public final static String LOGGED_SQL2 = """
+    select p.id, p.title, p.description, count(t.n) as c
+    from projects p
     left join tickets t on (t.project_id = p.id and t.state_id <>4)
     where p.public = true
     union select p.id, p.title, p.description, count(t.n) as c

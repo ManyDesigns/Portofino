@@ -1,19 +1,25 @@
+import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.portofino.pageactions.custom.CustomAction
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
+import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.DefaultHandler
+import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.Resolution
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class MyCustomAction extends CustomAction {
+class ProjectSummaryAction extends CustomAction {
 
-    //Automatically generated on Mon Oct 28 12:21:38 CET 2013 by ManyDesigns Portofino
-    //Write your code here
+    Serializable project;
+
+    @Before
+    public void prepareProject() {
+        project = ElementsThreadLocals.getOgnlContext().get("project");
+    }
 
     @DefaultHandler
     public Resolution execute() {
-        String fwd = "/m/pageactions/pageactions/custom/example.jsp";
-        return forwardTo(fwd);
+        return new ForwardResolution("/jsp/projects/summary.jsp");
     }
 
 }
