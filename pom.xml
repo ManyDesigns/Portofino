@@ -104,7 +104,7 @@
         <quartz.version>2.1.6</quartz.version>
         <c3p0.version>0.9.1.2</c3p0.version> <!-- Hibernate uses 0.9.1, Quartz uses 0.9.1.1 -->
         <google.appengine.sdk.version>1.7.7.1</google.appengine.sdk.version> <!-- Last version supporting Java 6 -->
-        <guava.version>13.0</guava.version>
+        <guava.version>14.0.1</guava.version> <!-- Following GAE dependency -->
         <shiro.version>1.2.2</shiro.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
