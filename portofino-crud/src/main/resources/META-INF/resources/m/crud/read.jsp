@@ -7,11 +7,13 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"
 /><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
-    <stripes:layout-component name="beforeBreadcrumbs">
+    <stripes:layout-component name="contentHeader">
+        <mde:sessionMessages />
         <div class="pull-right">
             <jsp:include page="/m/crud/result-set-navigation.jsp" />
             <jsp:include page="/m/crud/return-to-parent.jsp" />
         </div>
+        <jsp:include page="/theme/breadcrumbs.jsp" />
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.readTitle}"/>
