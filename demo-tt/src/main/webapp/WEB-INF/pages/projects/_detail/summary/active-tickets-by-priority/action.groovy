@@ -37,7 +37,7 @@ class ActiveTicketsByPriorityAction extends CustomAction {
             SQLQuery query = session.createSQLQuery(SQL);
             query.setResultTransformer(new ResultTransformer() {
                 Object transformTuple(Object[] tuple, String[] aliases) {
-                    String groupId = tuple[0];
+                    int groupId = tuple[0];
                     String groupName = tuple[1];
                     String url = "/projects/$project.id/tickets?search_state_id=1&search_state_id=2&search_state_id=3&search_priority_id=$groupId";
                     int groupCount = (int)tuple[2];

@@ -39,7 +39,7 @@ class ActiveTicketsByVersionAction extends CustomAction {
             SQLQuery query = session.createSQLQuery(SQL);
             query.setResultTransformer(new ResultTransformer() {
                 Object transformTuple(Object[] tuple, String[] aliases) {
-                    String groupId = tuple[0];
+                    Integer groupId = tuple[0];
                     String groupName = tuple[1];
                     if (groupName == null) {
                         groupName = "Unassigned"
