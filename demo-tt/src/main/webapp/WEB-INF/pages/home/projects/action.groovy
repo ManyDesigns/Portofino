@@ -10,10 +10,15 @@ import net.sourceforge.stripes.action.Resolution
 import org.hibernate.Session
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class MyCustomAction extends CustomAction {
+class HomeProjectsAction extends CustomAction {
 
-    //Automatically generated on Mon Oct 28 13:29:47 CET 2013 by ManyDesigns Portofino
-    //Write your code here
+    public final static String sql = """
+    select p.id, p.title, p.description, count(t.n) as c
+    from projects p
+    left join tickets t on (t.project_id = p.id and t.state_id <>4)
+    group by p.id, p.title, p.description
+    order by p.id
+    """;
 
     @Inject(DatabaseModule.PERSISTENCE)
     private Persistence persistence;
@@ -23,8 +28,7 @@ class MyCustomAction extends CustomAction {
     @DefaultHandler
     public Resolution execute() {
         Session session = persistence.getSession("tt");
-        String hql = "from projects order by id"
-        projects = session.createQuery(hql).list();
+        projects = session.createSQLQuery(sql).list();
 
         return new ForwardResolution("/jsp/home/projects.jsp");
     }
