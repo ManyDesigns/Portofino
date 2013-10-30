@@ -381,6 +381,9 @@
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="n" autoincrement="false">
     <annotations/>
 </column>
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="type_id" autoincrement="false">
+    <annotations/>
+</column>
 <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
     <annotations>
         <annotation type="com.manydesigns.elements.annotations.MaxLength">
@@ -393,27 +396,30 @@
         <annotation type="com.manydesigns.elements.annotations.MaxLength">
             <value>4000</value>
         </annotation>
+        <annotation type="com.manydesigns.elements.annotations.Multiline">
+            <value>true</value>
+        </annotation>
+        <annotation type="com.manydesigns.elements.annotations.CssClass">
+            <value>input-block-level</value>
+        </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="true" length="10" jdbcType="4" columnType="int4" columnName="assignee" autoincrement="false">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="state_id" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="priority_id" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="created_by" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="state_id" autoincrement="false">
+<column scale="0" nullable="true" length="10" jdbcType="4" columnType="int4" columnName="assignee" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="true" length="10" jdbcType="4" columnType="int4" columnName="affected_version" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="true" length="10" jdbcType="4" columnType="int4" columnName="fix_version" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="priority_id" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="int4" columnName="type_id" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="true" length="10" jdbcType="4" columnType="int4" columnName="resolution_id" autoincrement="false">

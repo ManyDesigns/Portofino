@@ -1,11 +1,14 @@
 package com.manydesigns.portofino.pageactions.crud
 
 import com.manydesigns.elements.ElementsThreadLocals
+import com.manydesigns.elements.Mode
+import com.manydesigns.elements.forms.FormBuilder
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
 import com.manydesigns.portofino.shiro.ShiroUtils
 import net.sourceforge.stripes.action.Before
+import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.Resolution
 import org.apache.shiro.SecurityUtils
 import org.hibernate.LockOptions
@@ -19,6 +22,25 @@ class ProjectsTicketsAction extends CrudAction {
     @Before
     public void prepareProject() {
         project = ElementsThreadLocals.getOgnlContext().get("project");
+    }
+
+    @Override
+    protected FormBuilder configureFormBuilder(FormBuilder formBuilder, Mode mode) {
+        formBuilder.configPrefix(prefix).configMode(mode);
+        configureFormSelectionProviders(formBuilder);
+
+        if (mode == Mode.VIEW) {
+            formBuilder.configFields(
+                    "created_by",
+                    "assignee",
+                    "resolution_id",
+                    "affected_version",
+                    "fix_version",
+                    "date_created",
+                    "date_updated",
+            );
+        }
+        return formBuilder;
     }
 
     //Automatically generated on Mon Oct 28 12:30:32 CET 2013 by ManyDesigns Portofino
@@ -82,7 +104,7 @@ class ProjectsTicketsAction extends CrudAction {
     }
 
     protected Resolution getReadView() {
-        return super.getReadView();
+        return new ForwardResolution("/jsp/projects/tickets/ticket-read.jsp")
     }
 
     protected Resolution getSearchView() {

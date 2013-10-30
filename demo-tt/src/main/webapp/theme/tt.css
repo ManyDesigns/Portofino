@@ -1,0 +1,6 @@
+.ticket-read .controls {
+    font-weight: bold;
+}
+.ticket-read .controls .value {
+    padding-top: 0;
+}
