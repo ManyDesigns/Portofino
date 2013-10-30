@@ -14,7 +14,7 @@ import org.hibernate.criterion.Order
 import org.hibernate.criterion.Restrictions
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class MyCustomAction extends CustomAction {
+class HomeActiveTicketsAssignedToMeAction extends CustomAction {
 
     @Inject(DatabaseModule.PERSISTENCE)
     private Persistence persistence;
@@ -36,7 +36,7 @@ class MyCustomAction extends CustomAction {
             tickets = Collections.EMPTY_LIST;
         }
 
-        return new ForwardResolution("/jsp/home/active-tickets-assigned-to-me.jsp");
+        return new ForwardResolution("/jsp/common/active-tickets-assigned-to-me.jsp");
     }
 
 

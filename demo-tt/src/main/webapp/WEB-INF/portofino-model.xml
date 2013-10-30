@@ -538,7 +538,7 @@
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="projects">
+                        <table tableName="projects" shortName="%{id} - %{title}">
                             <annotations/>
                             <columns>
 <column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="id" autoincrement="false">
