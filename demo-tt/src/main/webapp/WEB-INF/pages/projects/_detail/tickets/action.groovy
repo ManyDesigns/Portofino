@@ -12,7 +12,7 @@ import org.hibernate.LockOptions
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
-class ProjectsTicketsCrudAction extends CrudAction {
+class ProjectsTicketsAction extends CrudAction {
 
     Serializable project;
 
