@@ -7,13 +7,47 @@ import com.manydesigns.portofino.security.RequiresPermissions
 import net.sourceforge.stripes.action.DefaultHandler
 import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.Resolution
+import org.apache.shiro.SecurityUtils
+import org.apache.shiro.subject.Subject
 import org.hibernate.Session
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class MyCustomAction extends CustomAction {
+class HomeProjectsAction extends CustomAction {
 
-    //Automatically generated on Mon Oct 28 13:29:47 CET 2013 by ManyDesigns Portofino
-    //Write your code here
+    public final static String ANONYMOUS_SQL = """
+    select p.id, p.title, p.description, count(t.n) as c
+    from projects p
+    left join tickets t on (t.project_id = p.id and t.state_id <>4)
+    where p.public
+    group by p.id, p.title, p.description
+    order by p.id
+    """;
+
+    public final static String LOGGED_SQL = """
+    select p.id, p.title, p.description, count(t.n) as c
+    from projects p
+    left join members m on m.project_id = p.id
+    left join tickets t on (t.project_id = p.id and t.state_id <>4)
+    where p.public = true
+    or m.user_id = :user_id
+    group by p.id, p.title, p.description
+    order by id
+    """;
+
+    public final static String LOGGED_SQL2 = """
+    select p.id, p.title, p.description, count(t.n) as c
+    from projects p
+    left join tickets t on (t.project_id = p.id and t.state_id <>4)
+    where p.public = true
+    union select p.id, p.title, p.description, count(t.n) as c
+    from projects p
+    join members m on m.project_id = p.id
+    left join tickets t on (t.project_id = p.id and t.state_id <>4)
+    where p.public = false
+    and m.user_id = :user_id
+    group by p.id, p.title, p.description
+    order by id
+    """;
 
     @Inject(DatabaseModule.PERSISTENCE)
     private Persistence persistence;
@@ -23,8 +57,14 @@ class MyCustomAction extends CustomAction {
     @DefaultHandler
     public Resolution execute() {
         Session session = persistence.getSession("tt");
-        String hql = "from projects order by id"
-        projects = session.createQuery(hql).list();
+        Subject subject = SecurityUtils.getSubject();
+        if (subject.isAuthenticated()) {
+            projects = session.createSQLQuery(LOGGED_SQL)
+                    .setParameter("user_id", subject.getPrincipal().id)
+                    .list();
+        } else {
+            projects = session.createSQLQuery(ANONYMOUS_SQL).list();
+        }
 
         return new ForwardResolution("/jsp/home/projects.jsp");
     }
