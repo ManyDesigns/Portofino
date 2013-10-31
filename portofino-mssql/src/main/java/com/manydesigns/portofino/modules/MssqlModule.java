@@ -93,9 +93,11 @@ public class MssqlModule implements Module {
 
     @Override
     public void init() {
-        logger.debug("Registering MSSQL");
-        DatabaseFactory.getInstance().register(new PortofinoMSSQLDatabase());
-        DatabaseSnapshotGeneratorFactory.getInstance().register(new MSSQLDatabaseSnapshotGenerator());
+        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
+            logger.debug("Registering MSSQL");
+            DatabaseFactory.getInstance().register(new PortofinoMSSQLDatabase());
+            DatabaseSnapshotGeneratorFactory.getInstance().register(new MSSQLDatabaseSnapshotGenerator());
+        }
         databasePlatformsRegistry.addDatabasePlatform(new MSSqlServerDatabasePlatform());
 
 

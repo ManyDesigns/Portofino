@@ -9,6 +9,10 @@
     </ordering>
 
     <context-param>
+        <param-name>ActionResolver.Class</param-name>
+        <param-value>com.manydesigns.portofino.stripes.ModelActionResolver</param-value>
+    </context-param>
+    <context-param>
         <param-name>ActionResolver.Packages</param-name>
         <param-value>com.manydesigns.portofino.actions</param-value>
     </context-param>
@@ -19,6 +23,10 @@
     <context-param>
         <param-name>LocalePicker.Class</param-name>
         <param-value>com.manydesigns.portofino.stripes.LocalePicker</param-value>
+    </context-param>
+    <context-param>
+        <param-name>LocalizationBundleFactory.Class</param-name>
+        <param-value>com.manydesigns.portofino.stripes.PortofinoLocalizationBundleFactory</param-value>
     </context-param>
     <context-param>
         <param-name>LocalePicker.Locales</param-name>

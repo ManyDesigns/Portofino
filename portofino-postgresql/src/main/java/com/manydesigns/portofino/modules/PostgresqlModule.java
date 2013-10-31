@@ -94,22 +94,24 @@ public class PostgresqlModule implements Module {
 
     @Override
     public void init() {
-        logger.debug("Registering Postgres");
-        DatabaseFactory.getInstance().register(new PortofinoPostgresDatabase());
-        DatabaseSnapshotGeneratorFactory.getInstance().register(new PortofinoPostgresDatabaseSnapshotGenerator());
-        logger.debug("Setting up Liquibase sql generator factory");
-        SqlGeneratorFactory sqlGeneratorFactory =
-                SqlGeneratorFactory.getInstance();
-        sqlGeneratorFactory.register(
-                new PortofinoPostgresCreateDatabaseChangeLogTableGenerator());
-        sqlGeneratorFactory.register(
-                new PortofinoPostgresCreateDatabaseChangeLogLockTableGenerator());
-        sqlGeneratorFactory.register(
-                new PortofinoPostgresLockDatabaseChangeLogGenerator());
-        sqlGeneratorFactory.register(
-                new PortofinoPostgresMarkChangeSetRanGenerator());
-        sqlGeneratorFactory.register(
-                new PortofinoPostgresUnlockDatabaseChangeLogGenerator());
+        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
+            logger.debug("Registering Postgres");
+            DatabaseFactory.getInstance().register(new PortofinoPostgresDatabase());
+            DatabaseSnapshotGeneratorFactory.getInstance().register(new PortofinoPostgresDatabaseSnapshotGenerator());
+            logger.debug("Setting up Liquibase sql generator factory");
+            SqlGeneratorFactory sqlGeneratorFactory =
+                    SqlGeneratorFactory.getInstance();
+            sqlGeneratorFactory.register(
+                    new PortofinoPostgresCreateDatabaseChangeLogTableGenerator());
+            sqlGeneratorFactory.register(
+                    new PortofinoPostgresCreateDatabaseChangeLogLockTableGenerator());
+            sqlGeneratorFactory.register(
+                    new PortofinoPostgresLockDatabaseChangeLogGenerator());
+            sqlGeneratorFactory.register(
+                    new PortofinoPostgresMarkChangeSetRanGenerator());
+            sqlGeneratorFactory.register(
+                    new PortofinoPostgresUnlockDatabaseChangeLogGenerator());
+        }
         databasePlatformsRegistry.addDatabasePlatform(new PostgreSQLDatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }

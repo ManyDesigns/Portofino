@@ -92,9 +92,11 @@ public class H2Module implements Module {
 
     @Override
     public void init() {
-        logger.debug("Registering H2");
-        DatabaseFactory.getInstance().register(new PortofinoH2Database());
-        DatabaseSnapshotGeneratorFactory.getInstance().register(new H2DatabaseSnapshotGenerator());
+        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
+            logger.debug("Registering H2");
+            DatabaseFactory.getInstance().register(new PortofinoH2Database());
+            DatabaseSnapshotGeneratorFactory.getInstance().register(new H2DatabaseSnapshotGenerator());
+        }
         databasePlatformsRegistry.addDatabasePlatform(new H2DatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }

@@ -80,6 +80,8 @@ public class DatabaseModule implements Module {
             "com.manydesigns.portofino.modules.DatabaseModule.persistence";
     public static final String DATABASE_PLATFORMS_REGISTRY =
             "com.manydesigns.portofino.modules.DatabaseModule.databasePlatformsRegistry";
+    //Liquibase properties
+    public static final String LIQUIBASE_ENABLED = "liquibase.enabled";
 
     //**************************************************************************
     // Logging
@@ -120,14 +122,18 @@ public class DatabaseModule implements Module {
 
     @Override
     public void init() {
-        logger.info("Setting up Liquibase");
-        DatabaseFactory databaseFactory = DatabaseFactory.getInstance();
-        logger.debug("Clearing Liquibase database factory registry");
-        databaseFactory.clearRegistry();
-        logger.debug("Clearing Liquibase database snapshot generator factory registry");
-        List<DatabaseSnapshotGenerator> registry = DatabaseSnapshotGeneratorFactory.getInstance().getRegistry();
-        registry.clear();
-        SqlGeneratorFactory.getInstance().register(new PortofinoSelectFromDatabaseChangeLogLockGenerator());
+        if(configuration.getBoolean(LIQUIBASE_ENABLED, true)) {
+            logger.info("Setting up Liquibase");
+            DatabaseFactory databaseFactory = DatabaseFactory.getInstance();
+            logger.debug("Clearing Liquibase database factory registry");
+            databaseFactory.clearRegistry();
+            logger.debug("Clearing Liquibase database snapshot generator factory registry");
+            List<DatabaseSnapshotGenerator> registry = DatabaseSnapshotGeneratorFactory.getInstance().getRegistry();
+            registry.clear();
+            SqlGeneratorFactory.getInstance().register(new PortofinoSelectFromDatabaseChangeLogLockGenerator());
+        } else {
+            logger.info("Liquibase is disabled");
+        }
 
         logger.info("Initializing persistence");
         DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);

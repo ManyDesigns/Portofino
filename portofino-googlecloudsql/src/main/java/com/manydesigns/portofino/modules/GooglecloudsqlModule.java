@@ -92,11 +92,13 @@ public class GooglecloudsqlModule implements Module {
 
     @Override
     public void init() {
-        logger.debug("Registering Google Cloud SQL");
-        DatabaseFactory.getInstance().register(new GoogleCloudSQLDatabase());
-        logger.debug("Registering GoogleCloudSQLLockDatabaseChangeLogGenerator");
-        SqlGeneratorFactory.getInstance().register(
-                new GoogleCloudSQLLockDatabaseChangeLogGenerator());
+        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
+            logger.debug("Registering Google Cloud SQL");
+            DatabaseFactory.getInstance().register(new GoogleCloudSQLDatabase());
+            logger.debug("Registering GoogleCloudSQLLockDatabaseChangeLogGenerator");
+            SqlGeneratorFactory.getInstance().register(
+                    new GoogleCloudSQLLockDatabaseChangeLogGenerator());
+        }
         databasePlatformsRegistry.addDatabasePlatform(new GoogleCloudSQLDatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }

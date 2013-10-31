@@ -24,7 +24,7 @@
     <listener>
         <description>Application context and session listener</description>
         <listener-class>
-            com.manydesigns.portofino.servlets.PortofinoListener
+            com.manydesigns.portofino.servlets.DemoTTListener
         </listener-class>
     </listener>
 
@@ -62,7 +62,7 @@
 
 
 
-        <filter>
+    <filter>
         <filter-name>ckeditor-filter</filter-name>
         <filter-class>
             com.manydesigns.portofino.servlets.UTF8ResponseFilter
@@ -116,7 +116,11 @@
 
 
 
-        <context-param>
+    <context-param>
+        <param-name>ActionResolver.Class</param-name>
+        <param-value>com.manydesigns.portofino.stripes.ModelActionResolver</param-value>
+    </context-param>
+    <context-param>
         <param-name>ActionResolver.Packages</param-name>
         <param-value>com.manydesigns.portofino.actions</param-value>
     </context-param>
@@ -127,6 +131,10 @@
     <context-param>
         <param-name>LocalePicker.Class</param-name>
         <param-value>com.manydesigns.portofino.stripes.LocalePicker</param-value>
+    </context-param>
+    <context-param>
+        <param-name>LocalizationBundleFactory.Class</param-name>
+        <param-value>com.manydesigns.portofino.stripes.PortofinoLocalizationBundleFactory</param-value>
     </context-param>
     <context-param>
         <param-name>LocalePicker.Locales</param-name>

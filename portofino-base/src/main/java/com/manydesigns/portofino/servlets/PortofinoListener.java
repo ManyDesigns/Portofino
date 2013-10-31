@@ -43,9 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import javax.servlet.*;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
@@ -64,7 +62,7 @@ import java.util.Set;
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
 public class PortofinoListener
-        implements ServletContextListener, HttpSessionListener {
+        implements ServletContextListener, HttpSessionListener, ServletContextAttributeListener {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
@@ -298,5 +296,20 @@ public class PortofinoListener
         ConfigurationInterpolator.registerGlobalLookup(
                 "serverInfo",
                 serverInfoLookup);
+    }
+
+    @Override
+    public void attributeAdded(ServletContextAttributeEvent servletContextAttributeEvent) {
+        logger.debug("Servlet context attribute added: " + servletContextAttributeEvent.getName() + " = " + servletContextAttributeEvent.getValue());
+    }
+
+    @Override
+    public void attributeRemoved(ServletContextAttributeEvent servletContextAttributeEvent) {
+        logger.debug("Servlet context attribute removed: " + servletContextAttributeEvent.getName() + " = " + servletContextAttributeEvent.getValue());
+    }
+
+    @Override
+    public void attributeReplaced(ServletContextAttributeEvent servletContextAttributeEvent) {
+        logger.debug("Servlet context attribute replaced: " + servletContextAttributeEvent.getName() + " = " + servletContextAttributeEvent.getValue());
     }
 }

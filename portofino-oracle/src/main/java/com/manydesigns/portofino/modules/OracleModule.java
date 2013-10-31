@@ -92,10 +92,12 @@ public class OracleModule implements Module {
 
     @Override
     public void init() {
-        logger.debug("Registering Oracle");
-        DatabaseFactory.getInstance().register(new PortofinoOracleDatabase());
-        logger.debug("Registering GoogleCloudSQLLockDatabaseChangeLogGenerator");
-        DatabaseSnapshotGeneratorFactory.getInstance().register(new PortofinoOracleDatabaseSnapshotGenerator());
+        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
+            logger.debug("Registering Oracle");
+            DatabaseFactory.getInstance().register(new PortofinoOracleDatabase());
+            logger.debug("Registering GoogleCloudSQLLockDatabaseChangeLogGenerator");
+            DatabaseSnapshotGeneratorFactory.getInstance().register(new PortofinoOracleDatabaseSnapshotGenerator());
+        }
         databasePlatformsRegistry.addDatabasePlatform(new OracleDatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }
