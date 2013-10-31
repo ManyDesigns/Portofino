@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration variable="project" searchTitle="" rowsPerPage="10" readTitle="" query="select p from projects p left outer join p.fk_member_project as m where p.public = true or m.user_id = 1 order by p.id asc" name="Projects" largeResultSet="false" editTitle="" database="tt" createTitle="">
+<configuration variable="project" searchTitle="" rowsPerPage="10" readTitle="" query="select p from projects p left outer join p.fk_member_project as m where p.public = true or m.user = 1 order by p.id asc" name="Projects" largeResultSet="false" editTitle="" database="tt" createTitle="">
     <properties>
         <property updatable="false" searchable="false" name="id" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>

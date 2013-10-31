@@ -33,7 +33,7 @@ class ProjectsTicketsAction extends CrudAction {
             formBuilder.configFields(
                     "created_by",
                     "assignee",
-                    "resolution_id",
+                    "resolution",
                     "affected_version",
                     "fix_version",
                     "date_created",
@@ -52,9 +52,9 @@ class ProjectsTicketsAction extends CrudAction {
 
     protected void createSetup(Object object) {
         Object principal = ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject());
-        object.project_id = project.id;
-        object.state_id = 1L;
-        object.priority_id = 1L;
+        object.project = project.id;
+        object.state = 1L;
+        object.priority = 1L;
         object.created_by = principal.id;
     }
 

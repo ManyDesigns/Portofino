@@ -25,7 +25,7 @@
             </stripes:form>
         </div>
         <div>
-            <strong><c:out value="${actionBean.object.project_id}-${actionBean.object.n}"/></strong>
+            <strong><c:out value="${actionBean.object.project}-${actionBean.object.n}"/></strong>
             <span class="label label-info"><c:out value="${actionBean.object.fk_ticket_type.type}"/></span>
             <span class="label label-success"><c:out value="${actionBean.object.fk_ticket_state.state}"/></span>
             <span class="label label-warning">Priority: <c:out value="${actionBean.object.fk_ticket_priority.priority}"/></span>

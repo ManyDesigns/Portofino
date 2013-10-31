@@ -16,8 +16,8 @@
                 <dl>
                     <c:forEach items="${actionBean.tickets}" var="ticket">
                         <dt>
-                            <stripes:link href="/projects/${ticket.project_id}/tickets/${ticket.project_id}/${ticket.n}">
-                                <c:out value="${ticket.project_id}-${ticket.n}"/>
+                            <stripes:link href="/projects/${ticket.project}/tickets/${ticket.project}/${ticket.n}">
+                                <c:out value="${ticket.project}-${ticket.n}"/>
                             </stripes:link>
                         </dt>
                         <dd>

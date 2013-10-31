@@ -19,7 +19,7 @@ class ActiveTicketsByPriorityAction extends CustomAction {
     public final static String SQL = """
     select p.id, p.priority, count(t.n)
     from ticket_priorities p
-    left join tickets t on (p.id = t.priority_id and t.project_id = :project_id and t.state_id <> 4)
+    left join tickets t on (p.id = t.priority and t.project = :project and t.state <> 4)
     group by p.id, p.priority
     order by p.id desc
     """;
@@ -39,7 +39,7 @@ class ActiveTicketsByPriorityAction extends CustomAction {
                 Object transformTuple(Object[] tuple, String[] aliases) {
                     int groupId = tuple[0];
                     String groupName = tuple[1];
-                    String url = "/projects/$project.id/tickets?search_state_id=1&search_state_id=2&search_state_id=3&search_priority_id=$groupId";
+                    String url = "/projects/$project.id/tickets?search_state=1&search_state=2&search_state=3&search_priority=$groupId";
                     int groupCount = (int)tuple[2];
                     return new TicketGroup(groupName, url, groupCount);
                 }
@@ -47,7 +47,7 @@ class ActiveTicketsByPriorityAction extends CustomAction {
                     return collection;
                 }
             });
-            query.setParameter("project_id", project.id);
+            query.setParameter("project", project.id);
             groups = query.list();
 
             return new ForwardResolution("/jsp/common/ticket-groups.jsp");

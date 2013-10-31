@@ -20,8 +20,8 @@ class ActiveTicketsByVersionAction extends CustomAction {
     select v.id, v.name, count(t.n)
     from tickets t
     left join versions v on v.id = t.fix_version
-    where t.project_id = :project_id
-    and t.state_id <> 4
+    where t.project = :project
+    and t.state <> 4
     group by v.id, v.name
     order by v.id desc
     """;
@@ -44,7 +44,7 @@ class ActiveTicketsByVersionAction extends CustomAction {
                     if (groupName == null) {
                         groupName = "Unassigned"
                     }
-                    String url = "/projects/$project.id/tickets?search_state_id=1&search_state_id=2&search_state_id=3&search_fix_version=$groupId";
+                    String url = "/projects/$project.id/tickets?search_state=1&search_state=2&search_state=3&search_fix_version=$groupId";
                     int groupCount = (int)tuple[2];
                     return new TicketGroup(groupName, url, groupCount);
                 }
@@ -52,7 +52,7 @@ class ActiveTicketsByVersionAction extends CustomAction {
                     return collection;
                 }
             });
-            query.setParameter("project_id", project.id);
+            query.setParameter("project", project.id);
             groups = query.list();
 
             return new ForwardResolution("/jsp/common/ticket-groups.jsp");

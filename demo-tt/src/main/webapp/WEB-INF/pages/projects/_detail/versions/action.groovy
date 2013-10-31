@@ -23,7 +23,7 @@ class MyCrudAction extends CrudAction {
     //**************************************************************************
 
     protected void createSetup(Object object) {
-        object.project_id = project.id;
+        object.project = project.id;
     }
 
     protected boolean createValidate(Object object) {

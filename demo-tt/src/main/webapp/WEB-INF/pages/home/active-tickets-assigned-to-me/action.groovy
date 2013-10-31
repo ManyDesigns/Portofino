@@ -28,8 +28,8 @@ class HomeActiveTicketsAssignedToMeAction extends CustomAction {
         if (subject.isAuthenticated()) {
             tickets = session.createCriteria("tickets")
                     .add(Restrictions.eq("assignee", subject.getPrincipal().id))
-                    .add(Restrictions.ne("state_id", 4L))
-                    .addOrder(Order.asc("project_id"))
+                    .add(Restrictions.ne("state", 4L))
+                    .addOrder(Order.asc("project"))
                     .addOrder(Order.asc("n"))
                     .list();
         } else {

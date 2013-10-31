@@ -30,9 +30,9 @@ class ProjectsActiveTicketsAssignedToMeAction extends CustomAction {
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
             tickets = session.createCriteria("tickets")
-                    .add(Restrictions.eq("project_id", project.id))
+                    .add(Restrictions.eq("project", project.id))
                     .add(Restrictions.eq("assignee", subject.getPrincipal().id))
-                    .add(Restrictions.ne("state_id", 4L))
+                    .add(Restrictions.ne("state", 4L))
                     .addOrder(Order.asc("n"))
                     .list();
         } else {

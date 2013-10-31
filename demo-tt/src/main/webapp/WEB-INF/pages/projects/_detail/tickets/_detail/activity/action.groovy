@@ -1,19 +1,60 @@
+import com.manydesigns.elements.ElementsThreadLocals
+import com.manydesigns.elements.messages.SessionMessages
+import com.manydesigns.portofino.di.Inject
+import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.pageactions.custom.CustomAction
+import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
-import net.sourceforge.stripes.action.DefaultHandler
-import net.sourceforge.stripes.action.Resolution
+import org.apache.shiro.SecurityUtils
+import org.hibernate.Session
+import org.hibernate.criterion.Order
+import org.hibernate.criterion.Restrictions
+import net.sourceforge.stripes.action.*
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class MyCustomAction extends CustomAction {
+class TicketsActivityAction extends CustomAction {
 
-    //Automatically generated on Mon Oct 28 14:37:09 CET 2013 by ManyDesigns Portofino
-    //Write your code here
+    Serializable ticket;
+
+    String comment
+
+    @Before
+    public void prepareProject() {
+        ticket = ElementsThreadLocals.getOgnlContext().get("ticket");
+    }
+
+    @Inject(DatabaseModule.PERSISTENCE)
+    private Persistence persistence;
+
+    List activityItems;
 
     @DefaultHandler
     public Resolution execute() {
-        String fwd = "/m/pageactions/pageactions/custom/example.jsp";
-        return forwardTo(fwd);
+        Session session = persistence.getSession("tt");
+        activityItems = session.createCriteria("activity")
+                .add(Restrictions.eq("project", ticket.project))
+                .add(Restrictions.eq("n", ticket.n))
+                .addOrder(Order.asc("id"))
+                .list();
+
+        return new ForwardResolution("/jsp/projects/tickets/activity.jsp");
+    }
+
+    public Resolution addComment() {
+        Session session = persistence.getSession("tt");
+        Object principal = SecurityUtils.subject.principal;
+        Map<String, Object> newComment = new HashMap<String, Object>();
+        newComment.project = ticket.project;
+        newComment.n = ticket.n;
+        newComment.message = comment;
+        newComment.type = 10L;
+        newComment.date = new Date();
+        newComment.user = principal.id;
+        session.save("activity", (Object)newComment);
+        session.getTransaction().commit();
+        SessionMessages.addInfoMessage("Comment added successfully");
+        return new RedirectResolution("/projects/$ticket.project/tickets/$ticket.project/$ticket.n")
     }
 
 }

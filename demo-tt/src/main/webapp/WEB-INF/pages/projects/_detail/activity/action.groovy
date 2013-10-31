@@ -1,19 +1,27 @@
+import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.portofino.pageactions.custom.CustomAction
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
+import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.DefaultHandler
+import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.Resolution
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class MyCustomAction extends CustomAction {
 
-    //Automatically generated on Mon Oct 28 12:30:08 CET 2013 by ManyDesigns Portofino
-    //Write your code here
+    Serializable ticket;
+
+    @Before
+    public void prepareProject() {
+        ticket = ElementsThreadLocals.getOgnlContext().get("ticket");
+    }
+
 
     @DefaultHandler
     public Resolution execute() {
-        String fwd = "/m/pageactions/pageactions/custom/example.jsp";
-        return forwardTo(fwd);
+        String fwd = "/jsp/projects/tickets/activity.jsp";
+        return new ForwardResolution(fwd);
     }
 
 }

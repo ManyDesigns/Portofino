@@ -17,7 +17,7 @@ class HomeProjectsAction extends CustomAction {
     public final static String ANONYMOUS_SQL = """
     select p.id, p.title, p.description, count(t.n) as c
     from projects p
-    left join tickets t on (t.project_id = p.id and t.state_id <>4)
+    left join tickets t on (t.project = p.id and t.state <>4)
     where p.public
     group by p.id, p.title, p.description
     order by p.id
@@ -26,10 +26,10 @@ class HomeProjectsAction extends CustomAction {
     public final static String LOGGED_SQL = """
     select p.id, p.title, p.description, count(t.n) as c
     from projects p
-    left join members m on m.project_id = p.id
-    left join tickets t on (t.project_id = p.id and t.state_id <>4)
+    left join members m on m.project = p.id
+    left join tickets t on (t.project = p.id and t.state <>4)
     where p.public = true
-    or m.user_id = :user_id
+    or m.user = :user
     group by p.id, p.title, p.description
     order by id
     """;
@@ -37,14 +37,14 @@ class HomeProjectsAction extends CustomAction {
     public final static String LOGGED_SQL2 = """
     select p.id, p.title, p.description, count(t.n) as c
     from projects p
-    left join tickets t on (t.project_id = p.id and t.state_id <>4)
+    left join tickets t on (t.project = p.id and t.state <>4)
     where p.public = true
     union select p.id, p.title, p.description, count(t.n) as c
     from projects p
-    join members m on m.project_id = p.id
-    left join tickets t on (t.project_id = p.id and t.state_id <>4)
+    join members m on m.project = p.id
+    left join tickets t on (t.project = p.id and t.state <>4)
     where p.public = false
-    and m.user_id = :user_id
+    and m.user = :user
     group by p.id, p.title, p.description
     order by id
     """;
@@ -60,7 +60,7 @@ class HomeProjectsAction extends CustomAction {
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
             projects = session.createSQLQuery(LOGGED_SQL)
-                    .setParameter("user_id", subject.getPrincipal().id)
+                    .setParameter("user", subject.getPrincipal().id)
                     .list();
         } else {
             projects = session.createSQLQuery(ANONYMOUS_SQL).list();

@@ -19,7 +19,7 @@ class TicketsByStatusAction extends CustomAction {
     public final static String SQL = """
     select s.id, s.state, count(t.n)
     from ticket_states s
-    left join tickets t on (s.id = t.state_id and t.project_id = :project_id)
+    left join tickets t on (s.id = t.state and t.project = :project)
     group by s.id, s.state
     order by s.id asc
     """;
@@ -39,7 +39,7 @@ class TicketsByStatusAction extends CustomAction {
                 Object transformTuple(Object[] tuple, String[] aliases) {
                     int groupId = tuple[0];
                     String groupName = tuple[1];
-                    String url = "/projects/$project.id/tickets?search_state_id=$groupId";
+                    String url = "/projects/$project.id/tickets?search_state=$groupId";
                     int groupCount = (int)tuple[2];
                     return new TicketGroup(groupName, url, groupCount);
                 }
@@ -47,7 +47,7 @@ class TicketsByStatusAction extends CustomAction {
                     return collection;
                 }
             });
-            query.setParameter("project_id", project.id);
+            query.setParameter("project", project.id);
             groups = query.list();
 
             return new ForwardResolution("/jsp/common/ticket-groups.jsp");

@@ -14,12 +14,13 @@
             <stripes:layout-component name="pageTitle">
                 <c:out value="${actionBean.project.id} - ${actionBean.project.title}"/>
             </stripes:layout-component>
-            <c:if test="${actionBean.project.public}">
+<%--            <c:if test="${actionBean.project.public}">--%>
                 <span style="vertical-align: middle" class="label label-success">Public project</span>
-            </c:if>
+<%--            </c:if>
             <c:if test="${not actionBean.project.public}">
                 <span style="vertical-align: middle" class="label label-warning">Private project</span>
             </c:if>
+            --%>
         </h3>
         <div><c:out value="${actionBean.project.description}"/></div>
         <div><stripes:link href="${actionBean.project.url}"><c:out value="${actionBean.project.url}"/></stripes:link></div>

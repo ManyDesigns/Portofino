@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration variable="" searchTitle="" rowsPerPage="10" readTitle="" query="from attachments where project_id = %{#ticket.project_id} and n = %{#ticket.n}" name="Attachments" largeResultSet="false" editTitle="" database="tt" createTitle="">
+<configuration variable="" searchTitle="" rowsPerPage="10" readTitle="" query="from attachments where project = %{#ticket.project} and n = %{#ticket.n}" name="Attachments" largeResultSet="false" editTitle="" database="tt" createTitle="">
     <properties/>
     <selectionProviders/>
 </configuration>
