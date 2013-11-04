@@ -101,12 +101,21 @@ public abstract class LoginAction extends AbstractActionBean {
     // Captcha
     //**************************************************************************
 
-    private static final Cage cage = new CaptchaGenerator();
+    private static Cage cage;
     public static final String CAPTCHA_SESSION_ATTRIBUTE = "LoginAction.captcha";
     public boolean captchaValidationFailed;
 
     public static final Logger logger =
             LoggerFactory.getLogger(LoginAction.class);
+
+    static {
+        try {
+            cage = new CaptchaGenerator();
+        } catch (NoClassDefFoundError e) {
+            cage = null;
+            logger.warn("Captcha generator not available", e);
+        }
+    }
 
     public LoginAction() {}
 
