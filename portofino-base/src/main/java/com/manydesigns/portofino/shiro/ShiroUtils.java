@@ -22,7 +22,6 @@ package com.manydesigns.portofino.shiro;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.RealmSecurityManager;
-import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 
@@ -82,16 +81,7 @@ public class ShiroUtils {
     }
 
     public static Serializable getUserId(Subject subject) {
-        RealmSecurityManager realmSecurityManager =
-                (RealmSecurityManager)SecurityUtils.getSecurityManager();
-        PortofinoRealm portofinoRealm = null;
-        for(Realm realm : realmSecurityManager.getRealms()) {
-            if(realm instanceof PortofinoRealm) {
-                portofinoRealm = (PortofinoRealm) realm;
-                break;
-            }
-        }
-
+        PortofinoRealm portofinoRealm = getPortofinoRealm();
         Serializable principal = (Serializable) getPrimaryPrincipal(subject);
         if(portofinoRealm != null) {
             return portofinoRealm.getUserId(principal);

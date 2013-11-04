@@ -26,6 +26,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
+import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
@@ -43,7 +44,7 @@ import java.io.Serializable;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@UrlBinding("/actions/user/login.gae")
+@UrlBinding("/actions/user/login")
 public class GAELoginAction extends AbstractActionBean {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
@@ -52,6 +53,7 @@ public class GAELoginAction extends AbstractActionBean {
 
     protected String returnUrl;
 
+    @DefaultHandler
     public Resolution login() {
         Subject subject = SecurityUtils.getSubject();
         if (!subject.isAuthenticated()) {

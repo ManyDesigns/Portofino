@@ -82,14 +82,12 @@
         Security.groovy file inherits from com.manydesigns.portofino.shiro.GAEPortofinoRealm and that your
         app.properties file contains the following settings:
 
-            login.link={0}/actions/user/login.gae?login=&returnUrl={1}
-            logout.link={0}/actions/user/login.gae?logout=
+            login.page=/actions/user/login
 
-        Those URLs point to the built-in action com.manydesigns.portofino.actions.GAELoginAction which is mapped to
-        the path /actions/user/login.gae and exposes the two methods login() and logout(). The action is automatically
+        That URL points to the built-in action com.manydesigns.portofino.actions.GAELoginAction which is mapped to
+        the path /actions/user/login and exposes the two methods login() and logout(). The action is automatically
         discovered by Stripes based on its package.
     -->
-    <!--
     <filter>
         <filter-name>ServletContainerSecurityFilter</filter-name>
         <filter-class>com.manydesigns.portofino.shiro.ServletContainerSecurityFilter</filter-class>
@@ -99,7 +97,6 @@
         <filter-name>ServletContainerSecurityFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    -->
 
     <filter>
         <filter-name>portofino-dispatcher</filter-name>

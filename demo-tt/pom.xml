@@ -146,9 +146,73 @@
                     <artifactItems>
                         <artifactItem>
                             <groupId>com.manydesigns</groupId>
-                            <artifactId>portofino-theme</artifactId>
+                            <artifactId>portofino-base</artifactId>
+                            <version>${project.version}</version>
                             <type>jar</type>
                             <overWrite>true</overWrite>
+                            <outputDirectory>${project.build.directory}/tmp</outputDirectory>
+                            <includes>META-INF/resources/**</includes>
+                        </artifactItem>
+                        <artifactItem>
+                            <groupId>com.manydesigns</groupId>
+                            <artifactId>portofino-crud</artifactId>
+                            <version>${project.version}</version>
+                            <type>jar</type>
+                            <overWrite>true</overWrite>
+                            <outputDirectory>${project.build.directory}/tmp</outputDirectory>
+                            <includes>META-INF/resources/**</includes>
+                        </artifactItem>
+                        <artifactItem>
+                            <groupId>com.manydesigns</groupId>
+                            <artifactId>portofino-database</artifactId>
+                            <version>${project.version}</version>
+                            <type>jar</type>
+                            <overWrite>true</overWrite>
+                            <outputDirectory>${project.build.directory}/tmp</outputDirectory>
+                            <includes>META-INF/resources/**</includes>
+                        </artifactItem>
+                        <artifactItem>
+                            <groupId>com.manydesigns</groupId>
+                            <artifactId>portofino-openid</artifactId>
+                            <version>${project.version}</version>
+                            <type>jar</type>
+                            <overWrite>true</overWrite>
+                            <outputDirectory>${project.build.directory}/tmp</outputDirectory>
+                            <includes>META-INF/resources/**</includes>
+                        </artifactItem>
+                        <artifactItem>
+                            <groupId>com.manydesigns</groupId>
+                            <artifactId>portofino-pageactions</artifactId>
+                            <version>${project.version}</version>
+                            <type>jar</type>
+                            <overWrite>true</overWrite>
+                            <outputDirectory>${project.build.directory}/tmp</outputDirectory>
+                            <includes>META-INF/resources/**</includes>
+                        </artifactItem>
+                        <artifactItem>
+                            <groupId>com.manydesigns</groupId>
+                            <artifactId>portofino-pageactionsadmin</artifactId>
+                            <version>${project.version}</version>
+                            <type>jar</type>
+                            <overWrite>true</overWrite>
+                            <outputDirectory>${project.build.directory}/tmp</outputDirectory>
+                            <includes>META-INF/resources/**</includes>
+                        </artifactItem>
+                        <artifactItem>
+                            <groupId>com.manydesigns</groupId>
+                            <artifactId>portofino-text</artifactId>
+                            <version>${project.version}</version>
+                            <type>jar</type>
+                            <overWrite>true</overWrite>
+                            <outputDirectory>${project.build.directory}/tmp</outputDirectory>
+                            <includes>META-INF/resources/**</includes>
+                        </artifactItem>
+                        <artifactItem>
+                            <groupId>com.manydesigns</groupId>
+                            <artifactId>portofino-theme</artifactId>
+                            <version>${project.version}</version>
+                            <type>jar</type>
+                            <overWrite>false</overWrite>
                             <outputDirectory>${project.build.directory}/tmp</outputDirectory>
                             <includes>META-INF/resources/**</includes>
                         </artifactItem>
@@ -166,6 +230,11 @@
                     <webResources>
                         <resource>
                             <directory>${project.build.directory}/tmp/META-INF/resources</directory>
+                            <excludes>
+                                <exclude>theme/footer.jsp</exclude>
+                                <exclude>theme/head.jsp</exclude>
+                                <exclude>theme/header.jsp</exclude>
+                            </excludes>
                         </resource>
                     </webResources>
                 </configuration>

@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.shiro;
 
+import com.manydesigns.elements.messages.SessionMessages;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
@@ -60,14 +61,17 @@ public class ServletContainerSecurityFilter extends PathMatchingFilter {
         HttpServletRequest req = (HttpServletRequest) request;
         boolean shiroAuthenticated = subject.isAuthenticated();
         boolean containerAuthenticated = req.getUserPrincipal() != null;
-        logger.debug("User authenticated by Shiro? {} User authenticated by the container? {}", shiroAuthenticated, containerAuthenticated);
+        logger.debug("User authenticated by Shiro? {} User authenticated by the container? {}",
+                shiroAuthenticated, containerAuthenticated);
         if (!shiroAuthenticated && containerAuthenticated) {
             logger.debug("User is known to the servlet container, but not to Shiro, attempting programmatic login");
             try {
                 subject.login(new ServletContainerToken(req));
-                logger.info("User {} login", req.getUserPrincipal().getName());
+                Serializable userId = ShiroUtils.getUserId(SecurityUtils.getSubject());
+                logger.info("User {} login", userId);
             } catch (AuthenticationException e) {
                 logger.warn("Programmatic login failed", e);
+                SessionMessages.addErrorMessage("There was an error logging you into the system");
             }
         } else if(shiroAuthenticated && !containerAuthenticated) {
             logger.debug("User is authenticated to Shiro, but not to the servlet container; logging out of Shiro.");
