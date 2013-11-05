@@ -19,7 +19,7 @@
                       class="form-horizontal">
             <mde:write name="actionBean" property="pageConfigurationForm"/>
             <mde:write name="actionBean" property="configurationForm" />
-            <%@include file="/m/pageactions/script-configuration.jsp" %>
+            <jsp:include page="/m/pageactions/script-configuration.jsp" />
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
             <div class="form-actions">
                 <portofino:buttons list="configuration" />
