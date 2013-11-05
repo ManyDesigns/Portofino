@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.shiro;
 
-import com.manydesigns.elements.messages.SessionMessages;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
@@ -31,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 
 /**
@@ -48,18 +48,12 @@ public class ServletContainerSecurityFilter extends PathMatchingFilter {
     public static final Logger logger = LoggerFactory.getLogger(ServletContainerSecurityFilter.class);
 
     @Override
-    protected void onFilterConfigSet() throws Exception {
-        if(this.appliedPaths.isEmpty()) {
-            processPathConfig("/**", null);
-        }
-        super.onFilterConfigSet();
-    }
-
-    @Override
     protected boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
         Subject subject = SecurityUtils.getSubject();
         HttpServletRequest req = (HttpServletRequest) request;
         boolean shiroAuthenticated = subject.isAuthenticated();
+        //Returns: a java.security.Principal containing the name of the user making this request;
+        //null if the user has not been authenticated
         boolean containerAuthenticated = req.getUserPrincipal() != null;
         logger.debug("User authenticated by Shiro? {} User authenticated by the container? {}",
                 shiroAuthenticated, containerAuthenticated);
@@ -70,8 +64,19 @@ public class ServletContainerSecurityFilter extends PathMatchingFilter {
                 Serializable userId = ShiroUtils.getUserId(SecurityUtils.getSubject());
                 logger.info("User {} login", userId);
             } catch (AuthenticationException e) {
-                logger.warn("Programmatic login failed", e);
-                SessionMessages.addErrorMessage("There was an error logging you into the system");
+                HttpSession session = req.getSession(false);
+                String attrName = ServletContainerSecurityFilter.class.getName() + ".shiroLoginFailedErrorLogged";
+                String msg =
+                        "User " + req.getUserPrincipal() + " is known to the servlet container, " +
+                        "but not to Shiro, and programmatic login failed!";
+                if(session == null || session.getAttribute(attrName) == null) {
+                    logger.error(msg, e);
+                } else {
+                    logger.debug(msg, e);
+                }
+                if(session != null) {
+                    session.setAttribute(attrName, true);
+                }
             }
         } else if(shiroAuthenticated && !containerAuthenticated) {
             logger.debug("User is authenticated to Shiro, but not to the servlet container; logging out of Shiro.");

@@ -10,7 +10,7 @@
         <c:forEach items="${actionBean.projects}" var="project">
             <div class="media">
                 <stripes:link class="pull-left" href="/projects/${project[0]}">
-                    <img class="media-object" alt="project" src="<stripes:url value="/images/placeholder-64x64.png"/>">
+                    <img class="media-object" alt="project" src="<stripes:url value="/images/placeholder-64x64.png"/>" />
                 </stripes:link>
                 <div class="media-body">
                     <h4 class="media-heading">
@@ -23,5 +23,6 @@
                 </div>
             </div>
         </c:forEach>
+        <div class="media"></div>
     </stripes:layout-component>
 </stripes:layout-render>

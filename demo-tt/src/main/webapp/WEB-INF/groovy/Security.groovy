@@ -162,9 +162,9 @@ class Security extends GAEPortofinoRealm {
         Criteria criteria = session.createCriteria("users");
         List users = criteria.list();
 
-        Map<Serializable, String> result = new HashMap<String>();
+        Map result = new HashMap();
         for (Serializable user : users) {
-            int id = user.id;
+            long id = user.id;
             String prettyName = getUserPrettyName(user);
             result.put(id, prettyName);
         }
@@ -175,7 +175,7 @@ class Security extends GAEPortofinoRealm {
     @Override
     Serializable getUserById(String encodedUserId) {
         Session session = persistence.getSession("tt");
-        return (Serializable) session.get("users", Integer.parseInt(encodedUserId));
+        return (Serializable) session.get("users", Long.parseLong(encodedUserId));
     }
 
     Serializable getUserByEmail(String email) {
