@@ -246,15 +246,17 @@ var portofino = {
             var theButton = $(this);
             $('div.embeddedPageAction').each(function(index, element) {
                 var wrapper = $(element);
-                var templateHiddenField = wrapper.children("input[type=hidden]").first();
-                var elements = wrapper.sortable('toArray');
-                for(var e in elements) {
-                    var id = elements[e];
-                    var hiddenField = document.createElement("input");
-                    hiddenField.setAttribute("type", "hidden");
-                    hiddenField.setAttribute("name", templateHiddenField.val());
-                    hiddenField.setAttribute("value", id.substring("embeddedPageActionWrapper_".length));
-                    theButton.before(hiddenField);
+                var listName = wrapper.data("page-action-list");
+                if(listName) {
+                    var elements = wrapper.sortable('toArray');
+                    for(var e in elements) {
+                        var id = elements[e];
+                        var hiddenField = document.createElement("input");
+                        hiddenField.setAttribute("type", "hidden");
+                        hiddenField.setAttribute("name", "embeddedPageAction_" + listName);
+                        hiddenField.setAttribute("value", id);
+                        theButton.before(hiddenField);
+                    }
                 }
             });
             return true;

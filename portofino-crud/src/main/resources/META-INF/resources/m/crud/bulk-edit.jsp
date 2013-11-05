@@ -19,7 +19,7 @@
             <c:if test="${not empty actionBean.searchString}">
                 <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
             </c:if>
-            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+            <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <div class="form-actions">
                 <portofino:buttons list="crud-bulk-edit" />
             </div>

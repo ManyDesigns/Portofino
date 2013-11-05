@@ -93,7 +93,7 @@ public class TablesAction extends AbstractActionBean {
     protected String schemaName;
     protected String tableName;
     protected String columnName;
-    protected String cancelReturnUrl;
+    protected String returnUrl;
     protected String shortName;
     protected String selectionProviderName;
     protected final Map<String, String> fkOnePropertyNames = new HashMap<String, String>();

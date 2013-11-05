@@ -16,7 +16,7 @@
         <mde:write name="actionBean" property="detailChildPagesForm" />
     </div>
 </c:if>
-<input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+<input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
 <script type="text/javascript">
     $(function() {
         var originalPathInput = $("input[name=originalPath]");

@@ -38,7 +38,7 @@
                     </tbody>
                 </table>
             </fieldset>
-            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+            <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <div class="form-actions">
                 <portofino:buttons list="page-create" />
             </div>

@@ -32,7 +32,7 @@ portofino.dataTable = function(elem) {
                         //Redirect to login page (link included in the response)
                         var loginUrl = xhr.responseText;
                         loginUrl = removeQueryStringArgument(loginUrl, "returnUrl");
-                        loginUrl = removeQueryStringArgument(loginUrl, "cancelReturnUrl");
+                        loginUrl = removeQueryStringArgument(loginUrl, "returnUrl");
                         window.location.href =
                                 loginUrl + (loginUrl.indexOf("?") > -1 ? "&" : "?") + "returnUrl=" +
                                 encodeURIComponent(window.location.href);

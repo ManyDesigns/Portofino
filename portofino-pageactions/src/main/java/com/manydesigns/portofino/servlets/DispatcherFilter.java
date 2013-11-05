@@ -90,7 +90,7 @@ public class DispatcherFilter implements Filter {
             if(attrName.startsWith("javax.servlet")) {
                 continue;
             }
-            if(attrName.equals("cancelReturnUrl")) {
+            if(attrName.equals("returnUrl")) {
                 continue;
             }
             request.removeAttribute(attrName);

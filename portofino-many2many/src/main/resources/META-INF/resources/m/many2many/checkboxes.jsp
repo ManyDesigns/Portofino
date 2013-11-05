@@ -27,7 +27,7 @@
                       class="form-inline">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
-            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+            <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <c:if test="${not empty actionBean.oneSelectField}">
                 <span class="onePkContainer"><mde:write name="actionBean" property="oneSelectField" /></span>
                 <br />

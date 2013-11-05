@@ -17,7 +17,7 @@
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actualServletPath}" method="post" enctype="multipart/form-data"
                       class="form-inline">
-            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+            <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <c:if test="${not empty actionBean.textConfiguration.attachments}">
                 <fmt:message key="commons.attachments"/>:
                 <br/>

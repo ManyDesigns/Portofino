@@ -16,7 +16,7 @@
                 data-search-visible="${actionBean.searchVisible}">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
-            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+            <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <c:if test="${not empty actionBean.searchForm}">
                 <c:if test="${actionBean.searchVisible}">
                     <a class="search_form_toggle_link" href="${pageContext.request.contextPath}${actionBean.context.actualServletPath}">

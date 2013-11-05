@@ -3,14 +3,14 @@
     <detailLayout template="default">
         <childPages/>
     </detailLayout>
-    <layout template="default">
+    <layout template="main-with-tabs">
         <childPages>
-            <childPage showInNavigation="false" order="1" name="recently-updated-tickets" container="contentLayoutLeft"/>
-            <childPage showInNavigation="false" order="2" name="active-tickets-assigned-to-me" container="contentLayoutLeft"/>
-            <childPage showInNavigation="false" order="3" name="tickets-by-status" container="contentLayoutLeft"/>
-            <childPage showInNavigation="false" order="0" name="active-tickets-by-priority" container="contentLayoutRight"/>
-            <childPage showInNavigation="false" order="1" name="active-tickets-by-version" container="contentLayoutRight"/>
-            <childPage showInNavigation="false" order="2" name="active-tickets-by-component" container="contentLayoutRight"/>
+            <childPage showInNavigation="false" order="1" name="recently-updated-tickets" container="default"/>
+            <childPage showInNavigation="false" order="2" name="active-tickets-assigned-to-me" container="default"/>
+            <childPage showInNavigation="false" order="3" name="tickets-by-status" container="default"/>
+            <childPage showInNavigation="false" order="0" name="active-tickets-by-priority" container="default"/>
+            <childPage showInNavigation="false" order="1" name="active-tickets-by-version" container="default"/>
+            <childPage showInNavigation="false" order="2" name="active-tickets-by-component" container="default"/>
         </childPages>
     </layout>
     <permissions/>

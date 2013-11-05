@@ -59,4 +59,11 @@ public interface PageAction extends ActionBean {
 
     @Override
     ElementsActionBeanContext getContext();
+
+    /**
+     * This is the URL (typically relative to the application, i.e. without scheme, host, and port components)
+     * where the action should redirect to after handling an event.
+     * @return the return URL.
+     */
+    String getReturnUrl();
 }

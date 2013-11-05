@@ -323,10 +323,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             if(PageActionLogic.isEmbedded(this)) {
                 return getEmbeddedSearchView();
             } else {
-                cancelReturnUrl = new UrlBuilder(
+                returnUrl = new UrlBuilder(
                     context.getLocale(), Util.getAbsoluteUrl(context.getActualServletPath()), false)
                     .toString();
-                cancelReturnUrl = appendSearchStringParamIfNecessary(cancelReturnUrl);
+                returnUrl = appendSearchStringParamIfNecessary(returnUrl);
                 setupReturnToParentTarget();
                 return getSearchView();
             }
@@ -416,11 +416,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         form.readFromObject(object);
         refreshBlobDownloadHref();
 
-        cancelReturnUrl = new UrlBuilder(
+        returnUrl = new UrlBuilder(
                 Locale.getDefault(), Util.getAbsoluteUrl(context.getActualServletPath()), false)
                 .toString();
 
-        cancelReturnUrl = appendSearchStringParamIfNecessary(cancelReturnUrl);
+        returnUrl = appendSearchStringParamIfNecessary(returnUrl);
 
         setupReturnToParentTarget();
 
@@ -638,7 +638,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public Resolution bulkEdit() {
         if (selection == null || selection.length == 0) {
             SessionMessages.addWarningMessage(ElementsThreadLocals.getText("commons.bulkUpdate.nothingSelected"));
-            return new RedirectResolution(cancelReturnUrl, false);
+            return new RedirectResolution(returnUrl, false);
         }
 
         if (selection.length == 1) {
@@ -646,7 +646,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             String url = context.getActualServletPath() + "/" + getPkForUrl(pk);
             url = appendSearchStringParamIfNecessary(url);
             return new RedirectResolution(url)
-                    .addParameter("cancelReturnUrl", cancelReturnUrl)
+                    .addParameter("returnUrl", returnUrl)
                     .addParameter("edit");
         }
 

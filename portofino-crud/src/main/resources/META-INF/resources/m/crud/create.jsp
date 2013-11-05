@@ -29,7 +29,7 @@
         <stripes:form action="${actionBean.context.actualServletPath}" method="post"
                       enctype="multipart/form-data" class="form-horizontal">
             <mde:write name="actionBean" property="form"/>
-            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+            <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <div class="form-actions">
                 <portofino:buttons list="crud-create" />
             </div>

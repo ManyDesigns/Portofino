@@ -33,7 +33,7 @@
                 <input type="text" name="title" value="<c:out value="${actionBean.title}"/>"
                        class="input-block-level"/>
                 <stripes:textarea class="mde-form-rich-text" name="content" value="${actionBean.content}"/>
-                <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+                <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             </fieldset>
             <div class="form-actions">
                 <portofino:buttons list="edit-content" />

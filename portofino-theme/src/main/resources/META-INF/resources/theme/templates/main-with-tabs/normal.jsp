@@ -1,12 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ page import="com.manydesigns.portofino.pageactions.PageActionLogic"
 %><%@ page import="org.slf4j.LoggerFactory"
-%>
-<%@ page import="java.util.Set" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.List" %>
-<%@ page import="com.manydesigns.portofino.pageactions.EmbeddedPageAction" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
+%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
@@ -20,8 +15,8 @@
         <stripes:layout-component name="pageHeader">
             <div class="pull-right">
                 <stripes:form action="${actionBean.context.actualServletPath}" method="post">
-                    <input type="hidden" name="cancelReturnUrl" 
-                           value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+                    <input type="hidden" name="returnUrl"
+                           value="<c:out value="${actionBean.returnUrl}"/>"/>
                     <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
                 </stripes:form>
             </div>
@@ -66,8 +61,8 @@
                         <div class="pull-right">
                             <stripes:form action="${actionBean.context.actualServletPath}"
                                           method="post">
-                                <input type="hidden" name="cancelReturnUrl" 
-                                       value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+                                <input type="hidden" name="returnUrl"
+                                       value="<c:out value="${actionBean.returnUrl}"/>"/>
                                 <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
                             </stripes:form>
                         </div>
@@ -88,37 +83,59 @@
                 <div class="row-fluid">
                     <div class="span12">
                         <ul class="nav nav-tabs tabs-header">
+                            <% actionBean.initEmbeddedPageActions(); %>
                             <c:forEach var="embeddedPageAction" items="${ actionBean.embeddedPageActions['default'] }">
                                 <li>
-                                    <a href="#embeddedPageActionWrapper_<c:out value='${embeddedPageAction.id}' />"
+                                    <a href="#<c:out value='${embeddedPageAction.id}' />"
+                                       data-target=".embedded-page-tab-<c:out value='${embeddedPageAction.id}' />"
                                        data-toggle="tab"><c:out value='${embeddedPageAction.page.title}' /></a>
                                 </li>
                             </c:forEach>
                         </ul>
                         <div class="tab-content">
                             <c:forEach var="embeddedPageAction" items="${ actionBean.embeddedPageActions['default'] }">
-                                <div class="tab-pane" id="embeddedPageActionWrapper_<c:out value='${embeddedPageAction.id}' />">
+                                <a name="<c:out value='${embeddedPageAction.id}' />"></a>
+                                <div class="tab-pane embedded-page-tab-<c:out value='${embeddedPageAction.id}' />">
                                     <% try {%>
-                                    <jsp:include page="${embeddedPageAction.path}" flush="false" />
+                                        <jsp:include page="${embeddedPageAction.path}" flush="false">
+                                            <jsp:param name="returnUrl" value="${actionBean.returnUrl}#${embeddedPageAction.id}" />
+                                        </jsp:include>
                                     <%} catch (Throwable t) {
                                         LoggerFactory.getLogger(actionBean.getClass()).error("Error in included page", t);
                                     %>
-                                    <div class="alert alert-error">
-                                        <button data-dismiss="alert" class="close" type="button">&times;</button>
-                                        <ul class="errorMessages">
-                                            <li>
-                                                <fmt:message key="pageaction.view.error">
-                                                    <fmt:param value="${embeddedPageAction.path}" />
-                                                </fmt:message>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                        <div class="alert alert-error">
+                                            <button data-dismiss="alert" class="close" type="button">&times;</button>
+                                            <ul class="errorMessages">
+                                                <li>
+                                                    <fmt:message key="pageaction.view.error">
+                                                        <fmt:param value="${embeddedPageAction.path}" />
+                                                    </fmt:message>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     <%}%>
                                 </div>
                             </c:forEach>
                         </div>
                         <script>
-                            $('.tabs-header a:first').tab('show');
+                            $(function() {
+                                var tab = $('.tabs-header a:first');
+                                if(window.location.hash) {
+                                    var candidateTab = $("a[data-target='.embedded-page-tab-" + window.location.hash.substring(1) + "']");
+                                    if(candidateTab.length) {
+                                        tab = candidateTab;
+                                    }
+                                }
+                                tab.tab('show');
+
+                                $('.tabs-header a').on('shown', function (e) {
+                                    if(history.pushState) {
+                                        history.pushState(null, null, e.target.hash);
+                                    } else {
+                                        window.location.hash = e.target.hash; //Polyfill for old browsers
+                                    }
+                                })
+                            });
                         </script>
                     </div>
                 </div>

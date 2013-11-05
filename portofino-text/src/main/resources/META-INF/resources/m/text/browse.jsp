@@ -15,7 +15,7 @@
     <div class="container">
     <% if(request.getParameter("images-only") == null) { %>
         <form action="${pageContext.request.contextPath}${actionBean.context.actualServletPath}">
-            <input type="hidden" name="cancelReturnUrl"
+            <input type="hidden" name="returnUrl"
                    value='<%= request.getContextPath() + actionBean.getContext().getActualServletPath() + "?" + request.getQueryString() %>' />
             <input type="hidden" name="CKEditorFuncNum" value='${actionBean.CKEditorFuncNum}' />
             <fmt:message key="layouts.text.browse.pages"/>:

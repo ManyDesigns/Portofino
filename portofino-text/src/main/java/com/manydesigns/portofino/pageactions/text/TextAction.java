@@ -442,7 +442,7 @@ public class TextAction extends AbstractPageAction {
         }
         return new RedirectResolution(context.getActualServletPath())
                 .addParameter("manageAttachments")
-                .addParameter("cancelReturnUrl", cancelReturnUrl);
+                .addParameter("returnUrl", returnUrl);
     }
 
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
@@ -618,7 +618,7 @@ public class TextAction extends AbstractPageAction {
         }
         return new RedirectResolution(context.getActualServletPath())
                 .addParameter("manageAttachments")
-                .addParameter("cancelReturnUrl", cancelReturnUrl);
+                .addParameter("returnUrl", returnUrl);
     }
 
     @Button(list = "manage-attachments", key = "commons.ok", order = 1, type = Button.TYPE_PRIMARY)
