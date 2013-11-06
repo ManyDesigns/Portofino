@@ -92,9 +92,11 @@ public class MysqlModule implements Module {
 
     @Override
     public void init() {
-        logger.debug("Registering MySQL");
-        DatabaseFactory.getInstance().register(new PortofinoMySQLDatabase());
-        DatabaseSnapshotGeneratorFactory.getInstance().register(new MySQLDatabaseSnapshotGenerator());
+        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
+            logger.debug("Registering MySQL");
+            DatabaseFactory.getInstance().register(new PortofinoMySQLDatabase());
+            DatabaseSnapshotGeneratorFactory.getInstance().register(new MySQLDatabaseSnapshotGenerator());
+        }
         databasePlatformsRegistry.addDatabasePlatform(new MySql5DatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }

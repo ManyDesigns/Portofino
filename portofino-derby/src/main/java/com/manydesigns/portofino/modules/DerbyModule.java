@@ -92,9 +92,11 @@ public class DerbyModule implements Module {
 
     @Override
     public void init() {
-        logger.debug("Registering Derby");
-        DatabaseFactory.getInstance().register(new PortofinoDerbyDatabase());
-        DatabaseSnapshotGeneratorFactory.getInstance().register(new DerbyDatabaseSnapshotGenerator());
+        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
+            logger.debug("Registering Derby");
+            DatabaseFactory.getInstance().register(new PortofinoDerbyDatabase());
+            DatabaseSnapshotGeneratorFactory.getInstance().register(new DerbyDatabaseSnapshotGenerator());
+        }
         databasePlatformsRegistry.addDatabasePlatform(new ApacheDerbyDatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }

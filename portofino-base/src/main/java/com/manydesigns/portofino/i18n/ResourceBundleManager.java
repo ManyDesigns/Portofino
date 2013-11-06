@@ -114,6 +114,7 @@ public class ResourceBundleManager {
                 }
             }
             bundle = new ConfigurationResourceBundle(configuration, locale);
+            //TODO setParent?
             resourceBundles.put(locale, bundle);
         }
         return bundle;

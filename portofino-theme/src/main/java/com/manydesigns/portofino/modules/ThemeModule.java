@@ -67,7 +67,7 @@ public class ThemeModule implements Module {
 
     @Override
     public double getPriority() {
-        return 10;
+        return 20;
     }
 
     @Override

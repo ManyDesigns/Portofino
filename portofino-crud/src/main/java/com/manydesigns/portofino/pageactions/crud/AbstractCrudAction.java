@@ -323,10 +323,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             if(PageActionLogic.isEmbedded(this)) {
                 return getEmbeddedSearchView();
             } else {
-                cancelReturnUrl = new UrlBuilder(
+                returnUrl = new UrlBuilder(
                     context.getLocale(), Util.getAbsoluteUrl(context.getActualServletPath()), false)
                     .toString();
-                cancelReturnUrl = appendSearchStringParamIfNecessary(cancelReturnUrl);
+                returnUrl = appendSearchStringParamIfNecessary(returnUrl);
                 setupReturnToParentTarget();
                 return getSearchView();
             }
@@ -416,11 +416,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         form.readFromObject(object);
         refreshBlobDownloadHref();
 
-        cancelReturnUrl = new UrlBuilder(
+        returnUrl = new UrlBuilder(
                 Locale.getDefault(), Util.getAbsoluteUrl(context.getActualServletPath()), false)
                 .toString();
 
-        cancelReturnUrl = appendSearchStringParamIfNecessary(cancelReturnUrl);
+        returnUrl = appendSearchStringParamIfNecessary(returnUrl);
 
         setupReturnToParentTarget();
 
@@ -530,21 +530,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     popupCloseCallback += "(true)";
                     return new ForwardResolution("/m/crud/popup/close.jsp");
                 } else {
-                    pk = pkHelper.generatePkStringArray(object);
-                    String url = context.getActualServletPath() + "/" + getPkForUrl(pk);
-                    XhtmlBuffer buffer = new XhtmlBuffer();
-                    buffer.write(ElementsThreadLocals.getText("commons.save.successful") + ". ");
-                    String createUrl = Util.getAbsoluteUrl(context.getActualServletPath());
-                    if(!createUrl.contains("?")) {
-                        createUrl += "?";
-                    } else {
-                        createUrl += "&";
-                    }
-                    createUrl += "create=";
-                    createUrl = appendSearchStringParamIfNecessary(createUrl);
-                    buffer.writeAnchor(createUrl, ElementsThreadLocals.getText("commons.create.another"));
-                    SessionMessages.addInfoMessage(buffer);
-                    return new RedirectResolution(url);
+                    addSuccessfulSaveInfoMessage();
+                    return getSuccessfulSaveView();
                 }
             }
         } else {
@@ -638,7 +625,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public Resolution bulkEdit() {
         if (selection == null || selection.length == 0) {
             SessionMessages.addWarningMessage(ElementsThreadLocals.getText("commons.bulkUpdate.nothingSelected"));
-            return new RedirectResolution(cancelReturnUrl, false);
+            return new RedirectResolution(returnUrl, false);
         }
 
         if (selection.length == 1) {
@@ -646,7 +633,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             String url = context.getActualServletPath() + "/" + getPkForUrl(pk);
             url = appendSearchStringParamIfNecessary(url);
             return new RedirectResolution(url)
-                    .addParameter("cancelReturnUrl", cancelReturnUrl)
+                    .addParameter("returnUrl", returnUrl)
                     .addParameter("edit");
         }
 
@@ -841,6 +828,46 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         } else {
             return new ForwardResolution("/m/crud/create.jsp");
         }
+    }
+
+    /**
+     * Returns the Resolution used to show the effect of a successful save action.
+     * @return by default, a redirect to the returnUrl if present, to the search page otherwise.
+     */
+    protected Resolution getSuccessfulSaveView() {
+        if(StringUtils.isEmpty(returnUrl)) {
+            return new RedirectResolution(context.getActualServletPath());
+        } else {
+            return new RedirectResolution(returnUrl);
+        }
+    }
+
+    /**
+     * Adds an information message (using {@link SessionMessages}) after successful creation of a new record.
+     * By default, the message contains a link to the created object as well as a link for creating a new one.
+     */
+    protected void addSuccessfulSaveInfoMessage() {
+        XhtmlBuffer buffer = new XhtmlBuffer();
+
+        pk = pkHelper.generatePkStringArray(object);
+        String readUrl = context.getActualServletPath() + "/" + getPkForUrl(pk);
+        String prettyName = ShortNameUtils.getName(getClassAccessor(), object);
+        XhtmlBuffer linkToObjectBuffer = new XhtmlBuffer();
+        linkToObjectBuffer.writeAnchor(Util.getAbsoluteUrl(readUrl), prettyName);
+        buffer.writeNoHtmlEscape(ElementsThreadLocals.getText("crud.create.successful", linkToObjectBuffer));
+
+        String createUrl = Util.getAbsoluteUrl(context.getActualServletPath());
+        if(!createUrl.contains("?")) {
+            createUrl += "?";
+        } else {
+            createUrl += "&";
+        }
+        createUrl += "create=";
+        createUrl = appendSearchStringParamIfNecessary(createUrl);
+        buffer.write(" ");
+        buffer.writeAnchor(createUrl, ElementsThreadLocals.getText("crud.create.another"));
+
+        SessionMessages.addInfoMessage(buffer);
     }
 
     /**
@@ -1291,32 +1318,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 returnToParentParams.put(SEARCH_STRING_PARAM, searchString);
             }
             returnToParentTarget = ElementsThreadLocals.getText("layouts.crud.search");
-        }/* else {
-            PageInstance[] pageInstancePath =
-                dispatch.getPageInstancePath();
-            boolean hasPrevious = getPage().getActualNavigationRoot() == NavigationRoot.INHERIT;
-            hasPrevious = hasPrevious && pageInstancePath.length > 1;
-            if(hasPrevious) {
-                Page parentPage = pageInstancePath[pageInstancePath.length - 2].getPage();
-                hasPrevious = parentPage.getActualNavigationRoot() != NavigationRoot.GHOST_ROOT;
-            }
-            returnToParentTarget = null;
-            if (hasPrevious) {
-                int previousPos = pageInstancePath.length - 2;
-                PageInstance previousPageInstance = pageInstancePath[previousPos];
-                //Page previousPage = previousPageInstance.getPage();
-
-                //TODO ripristinare
-                //if(!previousPage.isShowInNavigation()) {
-                //    return;
-                //}
-
-                PageAction actionBean = previousPageInstance.getActionBean();
-                if(actionBean != null) {
-                    returnToParentTarget = actionBean.getDescription();
-                }
-            }
-        }*/
+        }
     }
 
     public Resolution returnToParent() throws Exception {
@@ -1325,19 +1327,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
         } else {
             return new ErrorResolution(500);
-        }/* else {
-            PageInstance[] pageInstancePath =
-                    getDispatch().getPageInstancePath();
-            int previousPos = pageInstancePath.length - 2;
-            if (previousPos >= 0) {
-                PageInstance previousPageInstance = pageInstancePath[previousPos];
-                String url = previousPageInstance.getPath();
-                resolution = new RedirectResolution(url, true);
-            } else {
-                resolution = new RedirectResolution(
-                        appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
-            }
-        }*/
+        }
     }
 
     @Override
@@ -2127,7 +2117,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             CrudPropertyEdit edit = new CrudPropertyEdit();
             PropertyAccessor propertyAccessor = propertyAccessors[i];
             edit.name = propertyAccessor.getName();
-            com.manydesigns.elements.annotations.Label labelAnn = propertyAccessor.getAnnotation(com.manydesigns.elements.annotations.Label.class);
+            com.manydesigns.elements.annotations.Label labelAnn =
+                    propertyAccessor.getAnnotation(com.manydesigns.elements.annotations.Label.class);
             edit.label = labelAnn != null ? labelAnn.value() : null;
             Enabled enabledAnn = propertyAccessor.getAnnotation(Enabled.class);
             edit.enabled = enabledAnn != null && enabledAnn.value();

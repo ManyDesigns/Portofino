@@ -7,9 +7,6 @@
     <sessions-enabled>true</sessions-enabled>
     <!--<async-session-persistence enabled="true"/>-->
 
-    <static-files>
-   </static-files>
-
     <system-properties>
         <!-- Configure logging -->
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>

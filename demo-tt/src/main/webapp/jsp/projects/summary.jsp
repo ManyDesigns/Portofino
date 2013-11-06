@@ -23,7 +23,11 @@
             --%>
         </h3>
         <div><c:out value="${actionBean.project.description}"/></div>
-        <div><stripes:link href="${actionBean.project.url}"><c:out value="${actionBean.project.url}"/></stripes:link></div>
+        <div>
+            <c:if test="${not empty actionBean.project.url}">
+                <stripes:link href="${actionBean.project.url}"><c:out value="${actionBean.project.url}"/></stripes:link>
+            </c:if>
+        </div>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
     </stripes:layout-component>

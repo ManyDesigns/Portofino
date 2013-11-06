@@ -21,7 +21,7 @@
             class="btn">
         Choose
     </button>
-    <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
+    <input type="hidden" name="returnUrl" value="${actionBean.returnUrl}" />
     <button name="cancel" type="submit" class="btn">
         Cancel
     </button>
@@ -38,7 +38,7 @@
             class="btn">
         Choose
     </button>
-    <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />
+    <input type="hidden" name="returnUrl" value="${actionBean.returnUrl}" />
     <button name="cancel" type="submit" class="btn">
         Cancel
     </button>

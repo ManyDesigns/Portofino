@@ -25,8 +25,11 @@ public class ResolverUtil<T> extends net.sourceforge.stripes.util.ResolverUtil<T
 
         ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(getClassLoader());
+            ClassLoader classLoader = getClassLoader();
+            Thread.currentThread().setContextClassLoader(classLoader);
+            logger.debug("Listing path {} using classloader {}", path, classLoader);
             List<String> children = VFS.getInstance().list(path);
+            logger.debug("Found: {}", children);
             for (String child : children) {
                 for(String extension : extensions) {
                     if (child.endsWith(extension)) {
@@ -35,11 +38,9 @@ public class ResolverUtil<T> extends net.sourceforge.stripes.util.ResolverUtil<T
                     }
                 }
             }
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             logger.warn("Could not read package: " + packageName + " -- " + ioe);
-        }
-        finally {
+        } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
 

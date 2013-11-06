@@ -26,6 +26,7 @@ import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.InputStream;
 
@@ -112,6 +113,6 @@ public class PageActionLogic {
         }
         String parentPath = parentActionBean.getContext().getActualServletPath();
         String myPath = pageAction.getContext().getActualServletPath();
-        return !parentPath.equals(myPath);
+        return !StringUtils.equals(parentPath, myPath);
     }
 }

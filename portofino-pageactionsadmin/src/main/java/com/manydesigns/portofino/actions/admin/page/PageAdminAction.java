@@ -147,11 +147,11 @@ public class PageAdminAction extends AbstractPageAction {
         Enumeration parameters = request.getParameterNames();
         while(parameters.hasMoreElements()) {
             String parameter = (String) parameters.nextElement();
-            if(parameter.startsWith("embeddedPageActionWrapper_")) {
-                String layoutContainer = parameter.substring("embeddedPageActionWrapper_".length());
-                String[] embeddedPageActionWrapperIds = request.getParameterValues(parameter);
+            if(parameter.startsWith("embeddedPageAction_")) {
+                String layoutContainer = parameter.substring("embeddedPageAction_".length());
+                String[] embeddedPageActionIds = request.getParameterValues(parameter);
                 try {
-                    updateLayout(layoutContainer, embeddedPageActionWrapperIds);
+                    updateLayout(layoutContainer, embeddedPageActionIds);
                 } catch (Exception e) {
                     logger.error("Error updating layout", e);
                     SessionMessages.addErrorMessage(ElementsThreadLocals.getText("layout.update.failed"));
@@ -161,15 +161,15 @@ public class PageAdminAction extends AbstractPageAction {
         return new RedirectResolution(originalPath);
     }
 
-    protected void updateLayout(String layoutContainer, String[] embeddedPageActionWrapperIds) throws Exception {
+    protected void updateLayout(String layoutContainer, String[] embeddedPageActionIds) throws Exception {
         PageInstance instance = getPageInstance();
         Layout layout = instance.getLayout();
         if(layout == null) {
             layout = new Layout();
             instance.setLayout(layout);
         }
-        for(int i = 0; i < embeddedPageActionWrapperIds.length; i++) {
-            String pageFragment = embeddedPageActionWrapperIds[i];
+        for(int i = 0; i < embeddedPageActionIds.length; i++) {
+            String pageFragment = embeddedPageActionIds[i];
             for(ChildPage p : layout.getChildPages()) {
                 if(pageFragment.equals(p.getName())) {
                     p.setContainer(layoutContainer);
@@ -343,7 +343,7 @@ public class PageAdminAction extends AbstractPageAction {
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("page.create.successful"));
             String url = context.getRequest().getContextPath() + configurePath + "/" + fragment;
             return new RedirectResolution(url, false)
-                            .addParameter("configure").addParameter("cancelReturnUrl", url);
+                            .addParameter("configure").addParameter("returnUrl", url);
         } else {
             return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/new-page.jsp");
         }

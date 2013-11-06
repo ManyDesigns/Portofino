@@ -7,6 +7,6 @@
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        This is an example custom page.
+        <p>This is an example custom page.</p>
     </stripes:layout-component>
 </stripes:layout-render>

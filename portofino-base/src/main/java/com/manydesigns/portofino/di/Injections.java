@@ -59,6 +59,7 @@ public class Injections {
         }
         Field[] fields = findAnnotatedFields(obj.getClass());
         for (Field field : fields) {
+            logger.debug("Found annotated field: " + field);
             Inject annotation = field.getAnnotation(Inject.class);
             assert annotation != null;
             String key = annotation.value();

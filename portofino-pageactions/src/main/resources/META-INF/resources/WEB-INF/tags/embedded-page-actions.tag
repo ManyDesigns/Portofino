@@ -6,13 +6,15 @@
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.pageactions.AbstractPageAction"/>
-<div class="${cssClass} embeddedPageAction">
-    <input type="hidden" name="embeddedPageActionWrapperName_${list}" value="embeddedPageActionWrapper_${list}" />
+<div class="${cssClass} embeddedPageAction" data-page-action-list="${list}">
     <% actionBean.initEmbeddedPageActions(); %>
     <c:forEach var="embeddedPageAction" items="${ actionBean.embeddedPageActions[list] }">
-        <div id="embeddedPageActionWrapper_<c:out value='${embeddedPageAction.id}' />">
+        <a name="<c:out value='${embeddedPageAction.id}' />"></a>
+        <div>
             <% try {%>
-                <jsp:include page="${embeddedPageAction.path}" flush="false" />
+                <jsp:include page="${embeddedPageAction.path}" flush="false">
+                    <jsp:param name="returnUrl" value="${actionBean.returnUrl}#${embeddedPageAction.id}" />
+                </jsp:include>
             <%} catch (Throwable t) {
                 LoggerFactory.getLogger(actionBean.getClass()).error("Error in included page", t);
             %>

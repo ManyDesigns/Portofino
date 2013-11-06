@@ -33,8 +33,8 @@
                 <% } %>
             </p>
 
-            <%@include file="/m/pageactions/script-configuration.jsp" %>
-            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+            <jsp:include page="/m/pageactions/script-configuration.jsp" />
+            <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <div class="form-actions">
                 <portofino:buttons list="configuration" />
             </div>

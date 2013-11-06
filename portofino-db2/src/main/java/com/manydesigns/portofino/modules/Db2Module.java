@@ -92,9 +92,11 @@ public class Db2Module implements Module {
 
     @Override
     public void init() {
-        logger.debug("Registering DB2");
-        DatabaseFactory.getInstance().register(new PortofinoDB2Database());
-        DatabaseSnapshotGeneratorFactory.getInstance().register(new DB2DatabaseSnapshotGenerator());
+        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
+            logger.debug("Registering DB2");
+            DatabaseFactory.getInstance().register(new PortofinoDB2Database());
+            DatabaseSnapshotGeneratorFactory.getInstance().register(new DB2DatabaseSnapshotGenerator());
+        }
         databasePlatformsRegistry.addDatabasePlatform(new IbmDb2DatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }

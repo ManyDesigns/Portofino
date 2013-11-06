@@ -29,6 +29,7 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.modules.BaseModule;
+import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.hibernate.HibernateConfig;
 import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -130,9 +131,6 @@ public class Persistence {
     // Model loading
     //**************************************************************************
 
-    //Liquibase properties
-    public static final String LIQUIBASE_ENABLED = "liquibase.enabled";
-
     public synchronized void loadXmlModel() {
         logger.info("Loading xml model from file: {}", appModelFile.getAbsolutePath());
 
@@ -142,7 +140,7 @@ public class Persistence {
             model = (Model) um.unmarshal(appModelFile);
             boolean syncOnStart = false;
             initModel();
-            if(configuration.getBoolean(LIQUIBASE_ENABLED, true)) {
+            if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
                 runLiquibaseScripts();
             }
             if (syncOnStart) {
@@ -310,6 +308,10 @@ public class Persistence {
     }
 
     public void syncDataModel(String databaseName) throws Exception {
+        if(!configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
+            logger.warn("syncDataModel called, but Liquibase is not enabled");
+            return;
+        }
         Database sourceDatabase =
             DatabaseLogic.findDatabaseByName(model, databaseName);
         ConnectionProvider connectionProvider =

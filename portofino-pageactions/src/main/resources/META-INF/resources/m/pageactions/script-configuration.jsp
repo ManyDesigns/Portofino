@@ -1,12 +1,12 @@
+<%@ page import="com.manydesigns.portofino.dispatcher.PageInstance" %>
 <%@ page import="com.manydesigns.portofino.logic.SecurityLogic" %>
+<%@ page import="com.manydesigns.portofino.pageactions.AbstractPageAction" %>
 <%@ page import="com.manydesigns.portofino.security.AccessLevel" %>
+<%@ page import="org.apache.commons.configuration.Configuration" %>
 <%@ page import="org.apache.shiro.SecurityUtils" %>
 <%@ page import="org.apache.shiro.subject.Subject" %>
-<%@ page import="com.manydesigns.portofino.stripes.AbstractActionBean" %>
-<%@ page import="com.manydesigns.portofino.pageactions.AbstractPageAction" %>
-<%@ page import="org.apache.commons.configuration.Configuration" %>
-<%@ page import="com.manydesigns.portofino.dispatcher.PageInstance" %>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
     AbstractPageAction theActionBean = (AbstractPageAction) request.getAttribute("actionBean");
     Subject subject = SecurityUtils.getSubject();

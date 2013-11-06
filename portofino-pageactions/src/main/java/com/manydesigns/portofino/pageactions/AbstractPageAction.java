@@ -61,7 +61,6 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -121,7 +120,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Navigation
     //--------------------------------------------------------------------------
 
-    public String cancelReturnUrl;
+    public String returnUrl;
 
     //**************************************************************************
     // Scripting
@@ -224,7 +223,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     @Button(list = "configuration", key = "commons.cancel", order = 99)
     public Resolution cancel() {
-        return new RedirectResolution(getCancelReturnUrl(), false);
+        return new RedirectResolution(getReturnUrl(), false);
     }
 
     public PageInstance getPageInstance() {
@@ -239,25 +238,26 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return getPageInstance().getPage();
     }
 
-    public String getCancelReturnUrl() {
-        if (!StringUtils.isEmpty(cancelReturnUrl)) {
-            return cancelReturnUrl;
+    @Override
+    public String getReturnUrl() {
+        if (!StringUtils.isEmpty(returnUrl)) {
+            return returnUrl;
         } else {
-            String url = (String) context.getRequest().getAttribute("cancelReturnUrl");
+            String url = (String) context.getRequest().getAttribute("returnUrl");
             if(!StringUtils.isEmpty(url)) {
                 return url;
             } else {
-                return getDefaultCancelReturnUrl();
+                return getDefaultReturnUrl();
             }
         }
     }
 
-    protected String getDefaultCancelReturnUrl() {
+    protected String getDefaultReturnUrl() {
         return Util.getAbsoluteUrl(context.getActualServletPath());
     }
 
-    public void setCancelReturnUrl(String cancelReturnUrl) {
-        this.cancelReturnUrl = cancelReturnUrl;
+    public void setReturnUrl(String returnUrl) {
+        this.returnUrl = returnUrl;
     }
 
     //--------------------------------------------------------------------------
@@ -499,8 +499,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
      * @return a Resolution that forwards to the given page.
      */
     public Resolution forwardTo(String page) {
-        HttpServletRequest request = context.getRequest();
-        request.setAttribute("cancelReturnUrl", getCancelReturnUrl());
         return new ForwardResolution(page);
     }
 

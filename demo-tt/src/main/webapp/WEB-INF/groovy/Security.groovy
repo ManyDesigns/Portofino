@@ -1,6 +1,8 @@
+import com.google.appengine.api.users.User
+import com.google.appengine.api.users.UserService
+import com.google.appengine.api.users.UserServiceFactory
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.reflection.ClassAccessor
-import com.manydesigns.mail.stripes.SendMailAction
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.logic.SecurityLogic
 import com.manydesigns.portofino.model.database.Database
@@ -9,9 +11,10 @@ import com.manydesigns.portofino.model.database.Table
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.reflection.TableAccessor
-import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
+import com.manydesigns.portofino.shiro.GAEPortofinoRealm
 import java.security.MessageDigest
 import org.apache.shiro.crypto.hash.Md5Hash
+import org.apache.shiro.subject.SimplePrincipalCollection
 import org.hibernate.Criteria
 import org.hibernate.Session
 import org.hibernate.criterion.Restrictions
@@ -19,7 +22,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.apache.shiro.authc.*
 
-class Security extends AbstractPortofinoRealm {
+class Security extends GAEPortofinoRealm {
 
     public static final String ADMIN_GROUP_NAME = "admin";
 
@@ -34,10 +37,35 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
-        return loadAuthenticationInfo(token);
+        //return loadAuthenticationInfo(token);
+        def info = super.doGetAuthenticationInfo(token);
+        User user = (User) info.principals.asList()[0];
+
+        Session session = persistence.getSession("tt");
+        Criteria criteria = session.createCriteria("users");
+        criteria.add(Restrictions.eq("email", user.email));
+
+        Serializable principal = (Serializable)criteria.uniqueResult();
+
+        if (principal == null) {
+            throw new UnknownAccountException("Unknown user");
+        } else if (!principal.validated) {
+            throw new DisabledAccountException("User not validated");
+        } else {
+            logger.debug("Aggiorno i campi accesso.");
+            updateAccess(principal, new Date());
+            session.update("users", (Object)principal);
+            session.getTransaction().commit();
+        }
+
+        /*def pc = new SimplePrincipalCollection([principal, user], getName());
+        SimpleAuthenticationInfo infoEx =
+                new SimpleAuthenticationInfo(pc, "", getName());
+        return infoEx;*/
+        return new SimpleAuthenticationInfo(principal, "", getName());
     }
 
-    public AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {
+    /*public AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {
         String login = usernamePasswordToken.username;
         String plainTextPassword;
         if (usernamePasswordToken.password == null) {
@@ -71,7 +99,7 @@ class Security extends AbstractPortofinoRealm {
                 new SimpleAuthenticationInfo(
                         principal, plainTextPassword.toCharArray(), getName());
         return info;
-    }
+    }*/
 
     private void updateAccess(Object principal, Date now) {
         def request = ElementsThreadLocals.getHttpServletRequest();
@@ -108,19 +136,20 @@ class Security extends AbstractPortofinoRealm {
         List<String> result = new ArrayList<String>()
         if (principal.admin) {
             result.add(ADMIN_GROUP_NAME);
-            if (isLocalUser()) {
+            UserService userService = UserServiceFactory.getUserService();
+            if (userService.isUserAdmin()) {
                 result.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
             }
         }
         return result;
     }
 
-    protected boolean isLocalUser() {
+    /*protected boolean isLocalUser() {
         String remoteIp =
             ElementsThreadLocals.getHttpServletRequest().getRemoteAddr();
         InetAddress clientAddr = InetAddress.getByName(remoteIp);
         return SendMailAction.isLocalIPAddress(clientAddr)
-    }
+    }*/
 
 
     //--------------------------------------------------------------------------
@@ -133,9 +162,9 @@ class Security extends AbstractPortofinoRealm {
         Criteria criteria = session.createCriteria("users");
         List users = criteria.list();
 
-        Map<Serializable, String> result = new HashMap<String>();
+        Map result = new HashMap();
         for (Serializable user : users) {
-            int id = user.id;
+            long id = user.id;
             String prettyName = getUserPrettyName(user);
             result.put(id, prettyName);
         }
@@ -146,7 +175,7 @@ class Security extends AbstractPortofinoRealm {
     @Override
     Serializable getUserById(String encodedUserId) {
         Session session = persistence.getSession("tt");
-        return (Serializable) session.get("users", Integer.parseInt(encodedUserId));
+        return (Serializable) session.get("users", Long.parseLong(encodedUserId));
     }
 
     Serializable getUserByEmail(String email) {
