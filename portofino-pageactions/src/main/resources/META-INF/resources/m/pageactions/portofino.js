@@ -226,8 +226,8 @@ var portofino = {
     },
 
     enablePageActionDragAndDrop: function(button, originalPath) {
-        $("div.embeddedPageAction").sortable({
-            connectWith: "div.embeddedPageAction",
+        $("div.embeddedPageActions").sortable({
+            connectWith: "div.embeddedPageActions",
             placeholder: "embeddedPageActionPlaceholder",
             cursor: "move", // cursor image
             revert: true, // moves the portlet to its new position with a smooth transition
@@ -244,13 +244,16 @@ var portofino = {
             </form>');
         container.find("button[name=updateLayout]").click(function() {
             var theButton = $(this);
-            $('div.embeddedPageAction').each(function(index, element) {
+            $('div.embeddedPageActions').each(function(index, element) {
                 var wrapper = $(element);
                 var listName = wrapper.data("page-action-list");
                 if(listName) {
                     var elements = wrapper.sortable('toArray');
                     for(var e in elements) {
-                        var id = elements[e];
+                        var id = elements[e].substring("embeddedPageAction_".length);
+                        if((id || "").length < 1) {
+                            continue;
+                        }
                         var hiddenField = document.createElement("input");
                         hiddenField.setAttribute("type", "hidden");
                         hiddenField.setAttribute("name", "embeddedPageAction_" + listName);

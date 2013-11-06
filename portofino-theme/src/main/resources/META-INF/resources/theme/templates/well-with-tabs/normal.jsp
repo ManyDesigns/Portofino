@@ -1,6 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ page import="com.manydesigns.portofino.pageactions.PageActionLogic"
-%><%@ page import="org.slf4j.LoggerFactory"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
@@ -87,27 +86,11 @@
                         </ul>
                         <div class="tab-content">
                             <c:forEach var="embeddedPageAction" items="${ actionBean.embeddedPageActions['default'] }">
-                                <a name="<c:out value='${embeddedPageAction.id}' />"></a>
-                                <div class="tab-pane embedded-page-tab-<c:out value='${embeddedPageAction.id}' />">
-                                    <% try {%>
-                                        <jsp:include page="${embeddedPageAction.path}" flush="false">
-                                            <jsp:param name="returnUrl" value="${actionBean.returnUrl}#${embeddedPageAction.id}" />
-                                        </jsp:include>
-                                    <%} catch (Throwable t) {
-                                        LoggerFactory.getLogger(actionBean.getClass()).error("Error in included page", t);
-                                    %>
-                                        <div class="alert alert-error">
-                                            <button data-dismiss="alert" class="close" type="button">&times;</button>
-                                            <ul class="errorMessages">
-                                                <li>
-                                                    <fmt:message key="pageaction.view.error">
-                                                        <fmt:param value="${embeddedPageAction.path}" />
-                                                    </fmt:message>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    <%}%>
-                                </div>
+                                <portofino:embedded-page-action
+                                        id="${embeddedPageAction.id}" path="${embeddedPageAction.path}"
+                                        returnUrl="${actionBean.returnUrl}#${embeddedPageAction.id}"
+                                        cssClass="tab-pane embedded-page-tab-${embeddedPageAction.id}"
+                                        anchor="false"/>
                             </c:forEach>
                         </div>
                         <script>

@@ -150,18 +150,19 @@ public class PageAdminAction extends AbstractPageAction {
             if(parameter.startsWith("embeddedPageAction_")) {
                 String layoutContainer = parameter.substring("embeddedPageAction_".length());
                 String[] embeddedPageActionIds = request.getParameterValues(parameter);
-                try {
-                    updateLayout(layoutContainer, embeddedPageActionIds);
-                } catch (Exception e) {
-                    logger.error("Error updating layout", e);
-                    SessionMessages.addErrorMessage(ElementsThreadLocals.getText("layout.update.failed"));
-                }
+                updateLayout(layoutContainer, embeddedPageActionIds);
             }
+        }
+        try {
+            DispatcherLogic.savePage(getPageInstance());
+        } catch (Exception e) {
+            logger.error("Error updating layout", e);
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("layout.update.failed"));
         }
         return new RedirectResolution(originalPath);
     }
 
-    protected void updateLayout(String layoutContainer, String[] embeddedPageActionIds) throws Exception {
+    protected void updateLayout(String layoutContainer, String[] embeddedPageActionIds) {
         PageInstance instance = getPageInstance();
         Layout layout = instance.getLayout();
         if(layout == null) {
@@ -177,7 +178,6 @@ public class PageAdminAction extends AbstractPageAction {
                 }
             }
         }
-        DispatcherLogic.savePage(instance);
     }
 
     public Resolution newPage() throws Exception {
