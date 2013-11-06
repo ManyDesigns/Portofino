@@ -24,6 +24,7 @@
 <script type="text/javascript" src="<stripes:url value='/theme/jquery-ui/js/jquery-ui-1.10.3.custom.min.js' />" ></script>
 
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/portofino.css' />">
+<link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/tt.css' />">
 <link type="text/css" rel="stylesheet" href="<stripes:url value="/m/openid/openid-selector/css/openid.css" />" />
 <style type="text/css">
     #openid_form { width: auto; }

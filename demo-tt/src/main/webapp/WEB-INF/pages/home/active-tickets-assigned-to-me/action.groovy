@@ -14,7 +14,7 @@ import org.hibernate.criterion.Order
 import org.hibernate.criterion.Restrictions
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class MyCustomAction extends CustomAction {
+class HomeActiveTicketsAssignedToMeAction extends CustomAction {
 
     @Inject(DatabaseModule.PERSISTENCE)
     private Persistence persistence;
@@ -28,15 +28,15 @@ class MyCustomAction extends CustomAction {
         if (subject.isAuthenticated()) {
             tickets = session.createCriteria("tickets")
                     .add(Restrictions.eq("assignee", subject.getPrincipal().id))
-                    .add(Restrictions.ne("state_id", 4L))
-                    .addOrder(Order.asc("project_id"))
+                    .add(Restrictions.ne("state", 4L))
+                    .addOrder(Order.asc("project"))
                     .addOrder(Order.asc("n"))
                     .list();
         } else {
             tickets = Collections.EMPTY_LIST;
         }
 
-        return new ForwardResolution("/jsp/home/active-tickets-assigned-to-me.jsp");
+        return new ForwardResolution("/jsp/common/active-tickets-assigned-to-me.jsp");
     }
 
 

@@ -1,11 +1,14 @@
 package com.manydesigns.portofino.pageactions.crud
 
 import com.manydesigns.elements.ElementsThreadLocals
+import com.manydesigns.elements.Mode
+import com.manydesigns.elements.forms.FormBuilder
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
 import com.manydesigns.portofino.shiro.ShiroUtils
 import net.sourceforge.stripes.action.Before
+import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.Resolution
 import org.apache.shiro.SecurityUtils
 import org.hibernate.LockOptions
@@ -21,6 +24,25 @@ class ProjectsTicketsAction extends CrudAction {
         project = ElementsThreadLocals.getOgnlContext().get("project");
     }
 
+    @Override
+    protected FormBuilder configureFormBuilder(FormBuilder formBuilder, Mode mode) {
+        formBuilder.configPrefix(prefix).configMode(mode);
+        configureFormSelectionProviders(formBuilder);
+
+        if (mode == Mode.VIEW) {
+            formBuilder.configFields(
+                    "created_by",
+                    "assignee",
+                    "resolution",
+                    "affected_version",
+                    "fix_version",
+                    "date_created",
+                    "date_updated",
+            );
+        }
+        return formBuilder;
+    }
+
     //Automatically generated on Mon Oct 28 12:30:32 CET 2013 by ManyDesigns Portofino
     //Write your code here
 
@@ -30,9 +52,9 @@ class ProjectsTicketsAction extends CrudAction {
 
     protected void createSetup(Object object) {
         Object principal = ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject());
-        object.project_id = project.id;
-        object.state_id = 1L;
-        object.priority_id = 1L;
+        object.project = project.id;
+        object.state = 1L;
+        object.priority = 1L;
         object.created_by = principal.id;
     }
 
@@ -82,7 +104,7 @@ class ProjectsTicketsAction extends CrudAction {
     }
 
     protected Resolution getReadView() {
-        return super.getReadView();
+        return new ForwardResolution("/jsp/projects/tickets/ticket-read.jsp")
     }
 
     protected Resolution getSearchView() {

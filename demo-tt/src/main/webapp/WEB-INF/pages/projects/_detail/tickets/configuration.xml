@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration variable="ticket" searchTitle="" rowsPerPage="10" readTitle="" query="from tickets where project_id = %{#project.id}" name="Tickets" largeResultSet="false" editTitle="" database="tt" createTitle="">
+<configuration variable="ticket" searchTitle="" rowsPerPage="10" readTitle="" query="from tickets where project = %{#project.id}" name="Tickets" largeResultSet="false" editTitle="" database="tt" createTitle="">
     <properties>
-        <property updatable="false" searchable="false" name="project_id" insertable="false" inSummary="false" enabled="false">
+        <property updatable="false" searchable="false" name="project" insertable="false" inSummary="false" enabled="false">
             <annotations/>
         </property>
         <property updatable="false" searchable="false" name="n" label="" insertable="false" inSummary="true" enabled="true">
@@ -19,7 +19,7 @@
         <property updatable="false" searchable="true" name="created_by" label="" insertable="false" inSummary="true" enabled="true">
             <annotations/>
         </property>
-        <property updatable="true" searchable="false" name="state_id" label="" insertable="true" inSummary="false" enabled="true">
+        <property updatable="true" searchable="true" name="state" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
         <property updatable="true" searchable="true" name="affected_version" label="" insertable="true" inSummary="true" enabled="true">
@@ -28,13 +28,13 @@
         <property updatable="true" searchable="true" name="fix_version" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
-        <property updatable="true" searchable="true" name="priority_id" label="" insertable="true" inSummary="true" enabled="true">
+        <property updatable="true" searchable="true" name="priority" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
-        <property updatable="true" searchable="false" name="type_id" label="" insertable="true" inSummary="false" enabled="true">
+        <property updatable="true" searchable="false" name="type" label="" insertable="true" inSummary="false" enabled="true">
             <annotations/>
         </property>
-        <property updatable="true" searchable="false" name="resolution_id" label="" insertable="true" inSummary="false" enabled="true">
+        <property updatable="true" searchable="false" name="resolution" label="" insertable="true" inSummary="false" enabled="true">
             <annotations/>
         </property>
         <property updatable="false" searchable="false" name="date_created" label="" insertable="false" inSummary="false" enabled="true">
@@ -48,7 +48,7 @@
         <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_fix_version" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
         <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_type" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
         <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_creator" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
-        <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_state" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
+        <selectionProvider searchDisplayMode="MULTIPLESELECT" fk="fk_ticket_state" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
         <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_affected_version" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
         <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_project" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
         <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_priority" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>

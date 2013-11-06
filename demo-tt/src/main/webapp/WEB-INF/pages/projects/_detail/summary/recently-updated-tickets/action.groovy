@@ -1,19 +1,36 @@
+import com.manydesigns.elements.ElementsThreadLocals
+import com.manydesigns.portofino.di.Inject
+import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.pageactions.custom.CustomAction
+import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import net.sourceforge.stripes.action.DefaultHandler
+import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.Resolution
+import org.hibernate.Session
+import org.hibernate.criterion.Order
+import org.hibernate.criterion.Restrictions
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class MyCustomAction extends CustomAction {
+class ProjectsRecentlyUpdatedTicketsAction extends CustomAction {
 
-    //Automatically generated on Mon Oct 28 12:22:34 CET 2013 by ManyDesigns Portofino
-    //Write your code here
+    @Inject(DatabaseModule.PERSISTENCE)
+    private Persistence persistence;
+
+    List tickets;
 
     @DefaultHandler
     public Resolution execute() {
-        String fwd = "/m/pageactions/pageactions/custom/example.jsp";
-        return forwardTo(fwd);
-    }
+        Object project = ElementsThreadLocals.getOgnlContext().get("project");
 
+        Session session = persistence.getSession("tt");
+        tickets = session.createCriteria("tickets")
+                .add(Restrictions.eq("project", project.id))
+                .addOrder(Order.desc("date_updated"))
+                .setMaxResults(10)
+                .list();
+
+        return new ForwardResolution("/jsp/common/recently-updated-tickets.jsp");
+    }
 }

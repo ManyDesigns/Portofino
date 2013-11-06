@@ -6,7 +6,5 @@
     <layout template="default">
         <childPages/>
     </layout>
-    <permissions>
-        <group name="anonymous" level="DENY"/>
-    </permissions>
+    <permissions/>
 </page>
