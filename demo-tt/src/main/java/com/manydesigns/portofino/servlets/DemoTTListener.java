@@ -47,8 +47,8 @@ public class DemoTTListener extends PortofinoListener {
         try {
             Module[] modules = new Module[] {
                     new BaseModule(), new PageactionsModule(), new PageactionsadminModule(),
-                    new DatabaseModule(), new GooglecloudsqlModule(), new CrudModule(), new TextModule(),
-                    new ThemeModule(),
+                    new DatabaseModule(), new MysqlModule(), new GooglecloudsqlModule(),
+                    new CrudModule(), new TextModule(), new ThemeModule(),
                     (Module) classLoader.loadClass("com.manydesigns.portofino.modules.DemoTTModule").newInstance()
             };
             for(Module module : modules) {

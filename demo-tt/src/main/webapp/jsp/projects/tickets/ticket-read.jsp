@@ -19,8 +19,8 @@
         <div class="pull-right">
             <stripes:form action="${actionBean.context.actualServletPath}"
                           method="post">
-                <input type="hidden" name="cancelReturnUrl"
-                       value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+                <input type="hidden" name="returnUrl"
+                       value="<c:out value="${actionBean.returnUrl}"/>"/>
                 <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
             </stripes:form>
         </div>
@@ -47,7 +47,7 @@
                 <portofino:buttons list="crud-read" />
             </div>
             <hr/>
-            <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
+            <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <mde:write name="actionBean" property="form"/>
             <c:if test="${not empty actionBean.searchString}">
                 <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
