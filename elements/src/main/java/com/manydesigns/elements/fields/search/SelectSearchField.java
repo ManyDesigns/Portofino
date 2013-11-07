@@ -350,18 +350,24 @@ public class SelectSearchField extends AbstractSearchField {
                     OgnlUtils.convertValueToString(optionValue);
             String optionLabel = option.getValue().label;
             boolean checked =  ArrayUtils.contains(values, optionValue);
-            xb.writeInputCheckbox(id + "_" + counter,inputName, optionStringValue, checked);
+            String checkboxId = id + "_" + counter;
+            xb.openElement("label");
+            xb.addAttribute("class", "checkbox");
+            xb.addAttribute("for", checkboxId);
             xb.writeNbsp();
-            xb.writeLabel(optionLabel, id + "_" + counter, null);
+            xb.write(optionLabel);
             xb.writeNbsp();
+            xb.writeInputCheckbox(checkboxId, inputName, optionStringValue, checked);
+            xb.closeElement("label");
             counter++;
         }
         xb.closeElement("div");
     }
 
     private void valueToXhtmlMultipleSelection(XhtmlBuffer xb) {
-        xb.openElement("fieldset");
-        xb.writeLegend(StringUtils.capitalize(label), ATTR_NAME_HTML_CLASS);
+        xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
+        xb.openElement("div");
+        xb.addAttribute("class", "controls");
 
         Object[] values = getValues();
         Map<Object, SelectionModel.Option> options =
@@ -387,7 +393,7 @@ public class SelectSearchField extends AbstractSearchField {
             xb.writeOption(optionStringValue, checked, optionLabel);
         }
         xb.closeElement("select");
-        xb.closeElement("fieldset");
+        xb.closeElement("div");
     }
 
     public String composeAutocompleteJs() {

@@ -257,12 +257,6 @@ Search form
     padding: 0;
 }
 
-.searchform .controls label.checkbox input {
-    margin-top: 0;
-    margin-left: 10px;
-    margin-right: 10px;
-}
-
 .searchform fieldset {
     margin: 0;
     padding: 0;
