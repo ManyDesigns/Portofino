@@ -50,7 +50,9 @@ public class SelectSearchField extends AbstractSearchField {
 
     protected SelectionModel selectionModel;
     protected int selectionModelIndex;
+    protected boolean notSet;
     protected String comboLabel;
+    protected String notSetLabel;
     protected SearchDisplayMode displayMode;
     protected String autocompleteId;
     protected String autocompleteInputName;
@@ -58,6 +60,7 @@ public class SelectSearchField extends AbstractSearchField {
     protected SelectSearchField nextSelectField;
 
     public final static String AUTOCOMPLETE_SUFFIX = "_autocomplete";
+    public final static String VALUE_NOT_SET = "__notset__";
 
     public SelectSearchField(PropertyAccessor accessor, String prefix) {
         this(accessor, null, prefix);
@@ -88,6 +91,7 @@ public class SelectSearchField extends AbstractSearchField {
         }
         selectionModelIndex = 0;
         comboLabel = getText("elements.field.select.select", label);
+        notSetLabel = getText("elements.search.select.notset", label);
         autocompleteId = id + AUTOCOMPLETE_SUFFIX;
         autocompleteInputName = inputName + AUTOCOMPLETE_SUFFIX;
     }
@@ -98,6 +102,10 @@ public class SelectSearchField extends AbstractSearchField {
     }
 
     public void toSearchString(StringBuilder sb) {
+        if(!required && notSet) {
+            appendToSearchString(sb, inputName, VALUE_NOT_SET);
+            return;
+        }
         Object[] values = getValues();
         if (null==values){
             return;
@@ -110,17 +118,21 @@ public class SelectSearchField extends AbstractSearchField {
     }
 
     public void configureCriteria(Criteria criteria) {
-       Object[] values = getValues();
-       if (values == null) {
-           logger.debug("Null values array. Not adding 'in' criteria.");
-       } else if (values.length == 0) {
-           logger.debug("Enpty values array. Not adding 'in' criteria.");
-       } else {
-           if(logger.isDebugEnabled()) {
-               logger.debug("Adding 'in' criteria for values: {}", ArrayUtils.toString(values));
-           }
-           criteria.in(accessor, values);
-       }
+        if(!required && notSet) {
+            criteria.isNull(accessor);
+            return;
+        }
+        Object[] values = getValues();
+        if (values == null) {
+            logger.debug("Null values array. Not adding 'in' criteria.");
+        } else if (values.length == 0) {
+            logger.debug("Enpty values array. Not adding 'in' criteria.");
+        } else {
+            if(logger.isDebugEnabled()) {
+                logger.debug("Adding 'in' criteria for values: {}", ArrayUtils.toString(values));
+            }
+            criteria.in(accessor, values);
+        }
     }
 
     //**************************************************************************
@@ -131,6 +143,8 @@ public class SelectSearchField extends AbstractSearchField {
         Object[] values = req.getParameterValues(inputName);
         if (values == null){
             return;
+        } else if(values.length == 1 && VALUE_NOT_SET.equals(values[0])) {
+            notSet = true;
         } else if(SearchDisplayMode.AUTOCOMPLETE == displayMode) {
             String stringValue = values[0].toString();
             boolean search;
@@ -214,9 +228,13 @@ public class SelectSearchField extends AbstractSearchField {
         xb.addAttribute("id", id);
         xb.addAttribute("name", inputName);
 
-        boolean checked = (values == null);
+        boolean selected = (values == null && !notSet);
         if (!options.isEmpty()) {
-            xb.writeOption("", checked, comboLabel);
+            xb.writeOption("", selected, comboLabel);
+        }
+
+        if(!required) {
+            xb.writeOption(VALUE_NOT_SET, notSet, notSetLabel);
         }
 
         for (Map.Entry<Object,SelectionModel.Option> option :
@@ -226,8 +244,8 @@ public class SelectSearchField extends AbstractSearchField {
             String optionStringValue =
                     OgnlUtils.convertValueToString(optionValue);
             String optionLabel = option.getValue().label;
-            checked = ArrayUtils.contains(values, optionValue);
-            xb.writeOption(optionStringValue, checked, optionLabel);
+            selected = ArrayUtils.contains(values, optionValue);
+            xb.writeOption(optionStringValue, selected, optionLabel);
         }
         xb.closeElement("select");
 
@@ -446,6 +464,14 @@ public class SelectSearchField extends AbstractSearchField {
 
     public void setComboLabel(String comboLabel) {
         this.comboLabel = comboLabel;
+    }
+
+    public String getNotSetLabel() {
+        return notSetLabel;
+    }
+
+    public void setNotSetLabel(String notSetLabel) {
+        this.notSetLabel = notSetLabel;
     }
 
     public SearchDisplayMode getDisplayMode() {
