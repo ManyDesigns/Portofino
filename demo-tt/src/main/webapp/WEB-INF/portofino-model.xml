@@ -2,6 +2,7 @@
 <model>
     <databases>
         <database databaseName="tt">
+            <!--<jdbcConnection driver="com.google.appengine.api.rdbms.AppEngineDriver" url="jdbc:google:rdbms://manydesigns.com:prova1:dbprova1/tt" />-->
             <jdbcConnection username="tt" url="jdbc:mysql://localhost/tt?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI" password="tt" driver="com.mysql.jdbc.Driver"/>
             <schemas>
                 <schema schemaName="tt">
