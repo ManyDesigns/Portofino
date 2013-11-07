@@ -219,6 +219,8 @@
                         <link>http://stripes.sourceforge.net/docs/current/javadoc/</link>
                         <link>http://commons.apache.org/configuration/apidocs/</link>
                         <link>http://docs.jboss.org/hibernate/core/3.6/javadocs/</link>
+                        <link>http://groovy.codehaus.org/api/</link>
+                        <link>http://tomcat.apache.org/tomcat-7.0-doc/servletapi/</link>
                     </links>
                 </configuration>
                 <executions>
