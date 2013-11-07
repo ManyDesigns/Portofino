@@ -9,16 +9,19 @@
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <div>
-            <strong><i class="icon-tag"></i> Ticket description:</strong>
-        </div>
-        <div><c:out value="${actionBean.ticket.description}"/></div>
         <c:forEach var="activityItem" items="${actionBean.activityItems}">
+            <c:set var="ticket" value="${activityItem.fk_activity_ticket}"/>
             <div class="media">
                 <stripes:link class="pull-left" href="/users/${activityItem.user}">
                     <img class="media-object" alt="user" src="<stripes:url value="/images/user-placeholder-40x40.png"/>" />
                 </stripes:link>
                 <div class="media-body">
+                    <div>
+                        <strong>
+                        <stripes:link href="/projects/${ticket.project}/tickets/${ticket.project}/${ticket.n}"><c:out value="${ticket.project}-${ticket.n}"/></stripes:link>
+                        <c:out value="${ticket.title}"/>
+                        </strong>
+                    </div>
                     <div>
                         <strong>
                         <stripes:link href="/users/${activityItem.user}"><c:out value="${activityItem.fk_activity_user.first_name} ${activityItem.fk_activity_user.last_name}"/></stripes:link>
@@ -29,12 +32,5 @@
                 </div>
             </div>
         </c:forEach>
-        <hr/>
-        <stripes:form action="${actionBean.context.actualServletPath}" method="post">
-            <label>Add a comment:
-            <textarea name="comment" class="input-block-level"></textarea>
-            </label>
-            <button name="addComment" class="btn">Post comment</button>
-        </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

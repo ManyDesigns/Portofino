@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration variable="" searchTitle="" rowsPerPage="10" readTitle="" query="from users" name="" largeResultSet="false" editTitle="" database="tt" createTitle="">
+    <properties>
+        <property updatable="false" searchable="false" name="id" label="" insertable="false" inSummary="false" enabled="false">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="email" label="" insertable="false" inSummary="true" enabled="true">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="password" insertable="false" inSummary="false" enabled="false">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="true" name="first_name" label="" insertable="false" inSummary="true" enabled="true">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="true" name="last_name" label="" insertable="false" inSummary="true" enabled="true">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="creation_date" insertable="false" inSummary="false" enabled="false">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="creation_ip" insertable="false" inSummary="false" enabled="false">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="last_access" insertable="false" inSummary="false" enabled="false">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="access_ip" insertable="false" inSummary="false" enabled="false">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="validated" insertable="false" inSummary="false" enabled="false">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="admin" insertable="false" inSummary="false" enabled="false">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="token" insertable="false" inSummary="false" enabled="false">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="project_manager" insertable="false" inSummary="false" enabled="false">
+            <annotations/>
+        </property>
+    </properties>
+    <selectionProviders/>
+</configuration>

@@ -9,6 +9,7 @@
             <childPage showInNavigation="false" name="login"/>
             <childPage showInNavigation="true" name="projects"/>
             <childPage showInNavigation="true" name="admin"/>
+            <childPage showInNavigation="true" name="users"/>
         </childPages>
     </layout>
     <permissions>

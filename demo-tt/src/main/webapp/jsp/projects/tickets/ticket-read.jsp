@@ -26,9 +26,9 @@
         </div>
         <div>
             <strong><c:out value="${actionBean.object.project}-${actionBean.object.n}"/></strong>
-            <span class="label label-info"><c:out value="${actionBean.object.fk_ticket_type.type}"/></span>
-            <span class="label label-success"><c:out value="${actionBean.object.fk_ticket_state.state}"/></span>
-            <span class="label label-warning">Priority: <c:out value="${actionBean.object.fk_ticket_priority.priority}"/></span>
+            <span class="<c:out value="${actionBean.object.fk_ticket_type.css_class}"/>"><c:out value="${actionBean.object.fk_ticket_type.type}"/></span>
+            <span class="<c:out value="${actionBean.object.fk_ticket_state.css_class}"/>"><c:out value="${actionBean.object.fk_ticket_state.state}"/></span>
+            <span class="<c:out value="${actionBean.object.fk_ticket_priority.css_class}"/>">Priority: <c:out value="${actionBean.object.fk_ticket_priority.priority}"/></span>
         </div>
         <h3 class="pageTitle">
             <stripes:layout-component name="pageTitle">
