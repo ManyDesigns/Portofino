@@ -286,9 +286,13 @@ public class SelectSearchField extends AbstractSearchField {
 
         if (!required) {
             String radioId = id + "_" + counter;
-            boolean checked = (values == null);
+            boolean checked = (values == null && !notSet);
             writeRadioWithLabel(xb, radioId,
-                    getText("elements.field.select.none"), "", checked);
+                    getText("elements.search.select.none"), "", checked);
+            counter++;
+            radioId = id + "_" + counter;
+            writeRadioWithLabel(xb, radioId,
+                    getText("elements.search.select.notset.radio"), VALUE_NOT_SET, notSet);
             counter++;
         }
 
@@ -317,10 +321,12 @@ public class SelectSearchField extends AbstractSearchField {
                                        String label,
                                        String stringValue,
                                        boolean checked) {
+        xb.openElement("label");
+        xb.addAttribute("class", "radio inline");
+        xb.addAttribute("for", radioId);
+        xb.write(label);
         xb.writeInputRadio(radioId, inputName, stringValue, checked);
-        xb.writeNbsp();
-        xb.writeLabel(label, radioId, null);
-        xb.writeNbsp();
+        xb.closeElement("label");
     }
 
     public void valueToXhtmlAutocomplete(XhtmlBuffer xb) {
@@ -376,6 +382,7 @@ public class SelectSearchField extends AbstractSearchField {
             xb.write(optionLabel);
             xb.writeNbsp();
             xb.writeInputCheckbox(checkboxId, inputName, optionStringValue, checked);
+            xb.writeNbsp();
             xb.closeElement("label");
             counter++;
         }
