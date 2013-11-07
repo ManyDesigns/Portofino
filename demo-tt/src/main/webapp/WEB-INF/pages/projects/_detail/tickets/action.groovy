@@ -119,4 +119,20 @@ class ProjectsTicketsAction extends CrudAction {
         return super.getSearchResultsPageView()
     }
 
+    @Override
+    public Resolution delete() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Resolution exportReadPdf() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Resolution exportReadExcel() {
+        throw new UnsupportedOperationException();
+    }
+
+
 }

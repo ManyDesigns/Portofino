@@ -1,8 +1,7 @@
 import com.google.appengine.api.users.User
-import com.google.appengine.api.users.UserService
-import com.google.appengine.api.users.UserServiceFactory
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.reflection.ClassAccessor
+import com.manydesigns.mail.stripes.SendMailAction
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.logic.SecurityLogic
 import com.manydesigns.portofino.model.database.Database
@@ -12,9 +11,9 @@ import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.reflection.TableAccessor
 import com.manydesigns.portofino.shiro.GAEPortofinoRealm
+import com.manydesigns.portofino.shiro.ServletContainerToken
 import java.security.MessageDigest
 import org.apache.shiro.crypto.hash.Md5Hash
-import org.apache.shiro.subject.SimplePrincipalCollection
 import org.hibernate.Criteria
 import org.hibernate.Session
 import org.hibernate.criterion.Restrictions
@@ -37,7 +36,10 @@ class Security extends GAEPortofinoRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
-        //return loadAuthenticationInfo(token);
+        return loadAuthenticationInfo(token);
+    }
+
+    protected AuthenticationInfo loadAuthenticationInfo(ServletContainerToken token) {
         def info = super.doGetAuthenticationInfo(token);
         User user = (User) info.principals.asList()[0];
 
@@ -65,7 +67,7 @@ class Security extends GAEPortofinoRealm {
         return new SimpleAuthenticationInfo(principal, "", getName());
     }
 
-    /*public AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {
+    public AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {
         String login = usernamePasswordToken.username;
         String plainTextPassword;
         if (usernamePasswordToken.password == null) {
@@ -99,7 +101,7 @@ class Security extends GAEPortofinoRealm {
                 new SimpleAuthenticationInfo(
                         principal, plainTextPassword.toCharArray(), getName());
         return info;
-    }*/
+    }
 
     private void updateAccess(Object principal, Date now) {
         def request = ElementsThreadLocals.getHttpServletRequest();
@@ -127,6 +129,12 @@ class Security extends GAEPortofinoRealm {
         return hashedPassword
     }
 
+    @Override
+    public boolean supports(AuthenticationToken token) {
+        return token instanceof ServletContainerToken ||
+               token instanceof UsernamePasswordToken;
+    }
+
     //--------------------------------------------------------------------------
     // Authorization
     //--------------------------------------------------------------------------
@@ -136,20 +144,21 @@ class Security extends GAEPortofinoRealm {
         List<String> result = new ArrayList<String>()
         if (principal.admin) {
             result.add(ADMIN_GROUP_NAME);
-            UserService userService = UserServiceFactory.getUserService();
-            if (userService.isUserAdmin()) {
+//            UserService userService = UserServiceFactory.getUserService();
+//            if (userService.isUserAdmin()) {
+            if (isLocalUser()) {
                 result.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
             }
         }
         return result;
     }
 
-    /*protected boolean isLocalUser() {
+    protected boolean isLocalUser() {
         String remoteIp =
             ElementsThreadLocals.getHttpServletRequest().getRemoteAddr();
         InetAddress clientAddr = InetAddress.getByName(remoteIp);
         return SendMailAction.isLocalIPAddress(clientAddr)
-    }*/
+    }
 
 
     //--------------------------------------------------------------------------

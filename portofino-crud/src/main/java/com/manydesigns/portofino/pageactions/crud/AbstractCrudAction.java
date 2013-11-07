@@ -838,7 +838,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         if(StringUtils.isEmpty(returnUrl)) {
             return new RedirectResolution(context.getActualServletPath());
         } else {
-            return new RedirectResolution(returnUrl);
+            return new RedirectResolution(returnUrl, false);
         }
     }
 

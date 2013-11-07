@@ -22,9 +22,6 @@
             <column name="creation_date" type="datetime">
                 <constraints nullable="false"/>
             </column>
-            <column name="deletion_date" type="datetime">
-                <constraints nullable="false"/>
-            </column>
             <column name="creation_ip" type="varchar(45)">
                 <constraints nullable="false"/>
             </column>
@@ -79,7 +76,7 @@
             <column name="title" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="varchar(4000)">
+            <column name="description" type="varchar(64000)">
                 <constraints nullable="false"/>
             </column>
             <column name="assignee" type="int">
@@ -120,7 +117,10 @@
             <column name="id" autoIncrement="true" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="name" type="varchar(50)">
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(4000)">
                 <constraints nullable="false"/>
             </column>
             <column name="planned_date" type="date"/>
