@@ -46,6 +46,12 @@
             <div>
                 <portofino:buttons list="crud-read" />
             </div>
+            <div style="margin-top:10px">
+                <portofino:buttons list="ticket-workflow1" />
+            </div>
+            <div style="margin-top:10px">
+                <portofino:buttons list="ticket-workflow2" />
+            </div>
             <hr/>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <mde:write name="actionBean" property="form"/>

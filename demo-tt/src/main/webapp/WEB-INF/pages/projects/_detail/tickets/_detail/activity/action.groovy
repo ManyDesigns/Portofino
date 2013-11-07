@@ -1,3 +1,4 @@
+import com.manydesigns.portofino.demott.TtUtils
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.portofino.di.Inject
@@ -44,14 +45,8 @@ class TicketsActivityAction extends CustomAction {
     public Resolution addComment() {
         Session session = persistence.getSession("tt");
         Object principal = SecurityUtils.subject.principal;
-        Map<String, Object> newComment = new HashMap<String, Object>();
-        newComment.project = ticket.project;
-        newComment.n = ticket.n;
-        newComment.message = comment;
-        newComment.type = 10L;
-        newComment.date = new Date();
-        newComment.user = principal.id;
-        session.save("activity", (Object)newComment);
+        Date now = new Date();
+        TtUtils.addActivity(session, ticket, principal.id, now, TtUtils.ACTIVITY_TYPE_COMMENTED, comment);
         session.getTransaction().commit();
         SessionMessages.addInfoMessage("Comment added successfully");
         return new RedirectResolution("/projects/$ticket.project/tickets/$ticket.project/$ticket.n")

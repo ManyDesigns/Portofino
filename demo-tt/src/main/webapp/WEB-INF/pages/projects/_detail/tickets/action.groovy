@@ -1,17 +1,25 @@
 package com.manydesigns.portofino.pageactions.crud
 
+import com.manydesigns.portofino.demott.TtUtils
+
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.forms.FormBuilder
+import com.manydesigns.elements.messages.SessionMessages
+import com.manydesigns.portofino.buttons.GuardType
+import com.manydesigns.portofino.buttons.annotations.Button
+import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
 import com.manydesigns.portofino.shiro.ShiroUtils
 import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.ForwardResolution
+import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
 import org.apache.shiro.SecurityUtils
 import org.hibernate.LockOptions
+import org.hibernate.Session
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
@@ -74,14 +82,26 @@ class ProjectsTicketsAction extends CrudAction {
 
     protected void createPostProcess(Object object) {}
 
+    Object old;
 
-    protected void editSetup(Object object) {}
+
+    protected void editSetup(Object object) {
+        old = object.clone();
+    }
 
     protected boolean editValidate(Object object) {
         return true;
     }
 
-    protected void editPostProcess(Object object) {}
+    protected void editPostProcess(Object object) {
+        Object principal = SecurityUtils.subject.principal;
+        String message = TtUtils.createDiffMessage(classAccessor, old, object);
+        if (message != null) {
+            Date now = new Date();
+            Session session = persistence.getSession("tt");
+            TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_UPDATED_TICKET, message);
+        }
+    }
 
 
     protected boolean deleteValidate(Object object) {
@@ -132,6 +152,106 @@ class ProjectsTicketsAction extends CrudAction {
     @Override
     public Resolution exportReadExcel() {
         throw new UnsupportedOperationException();
+    }
+
+    // Workflow buttons
+
+    @Button(list = "crud-read", key = "tt.assign.to.me", order = 2d, icon = "icon-hand-right",
+            group = "crud", type = Button.TYPE_DEFAULT)
+    @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_EDIT)
+    @Guard(test="canAssignToMe()", type=GuardType.VISIBLE)
+    public Resolution assignToMe() {
+        old = object.clone();
+        Object principal = SecurityUtils.subject.principal;
+        object.assignee = principal.id;
+        String message = TtUtils.createDiffMessage(classAccessor, old, object);
+        if (message == null) {
+            return new RedirectResolution(context.actualServletPath);
+        }
+        Date now = new Date();
+        Session session = persistence.getSession("tt");
+        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_UPDATED_TICKET, message);
+        session.getTransaction().commit();
+        SessionMessages.addInfoMessage("Ticket assigned to you");
+        return new RedirectResolution(context.actualServletPath);
+    }
+
+    public boolean canAssignToMe() {
+        Object principal = SecurityUtils.subject.principal;
+        return object.assignee != principal.id;
+    }
+
+
+    @Button(list = "ticket-workflow1", key = "tt.start.work", order = 2d, icon = "icon-play icon-white",
+            group = "wf", type = Button.TYPE_INFO)
+    @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_EDIT)
+    @Guard(test="canStartWork()", type=GuardType.VISIBLE)
+    public Resolution startWork() {
+        changeState(TtUtils.TICKET_STATE_WORK_IN_PROGRESS);
+        SessionMessages.addInfoMessage("Started work");
+        return new RedirectResolution(context.actualServletPath)
+    }
+
+    public boolean canStartWork() {
+        return object.state != TtUtils.TICKET_STATE_WORK_IN_PROGRESS;
+    }
+
+    private void changeState(long newState) {
+        old = object.clone();
+        Session session = persistence.getSession("tt");
+        Object principal = SecurityUtils.subject.principal;
+        object.state = newState;
+        Date now = new Date();
+        String message = TtUtils.createDiffMessage(classAccessor, old, object);
+        if (message == null) {
+            return;
+        }
+        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_UPDATED_TICKET, message);
+        session.getTransaction().commit();
+    }
+
+    @Button(list = "ticket-workflow2", key = "tt.resolve", order = 2d, icon = "icon-thumbs-up icon-white",
+            group = "wf", type = Button.TYPE_PRIMARY)
+    @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_EDIT)
+    @Guard(test="canResolve()", type=GuardType.VISIBLE)
+    public Resolution resolve() {
+        changeState(TtUtils.TICKET_STATE_RESOLVED);
+        SessionMessages.addInfoMessage("Ticket resolved");
+        return new RedirectResolution(context.actualServletPath);
+    }
+
+    public boolean canResolve() {
+        return object.state != TtUtils.TICKET_STATE_RESOLVED;
+    }
+
+
+    @Button(list = "ticket-workflow2", key = "tt.close", order = 3d, icon = "icon-thumbs-up icon-white",
+            group = "wf", type = Button.TYPE_PRIMARY)
+    @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_EDIT)
+    @Guard(test="canClose()", type=GuardType.VISIBLE)
+    public Resolution close() {
+        changeState(TtUtils.TICKET_STATE_CLOSED);
+        SessionMessages.addInfoMessage("Ticket closed");
+        return new RedirectResolution(context.actualServletPath);
+    }
+
+    public boolean canClose() {
+        return object.state != TtUtils.TICKET_STATE_CLOSED;
+    }
+
+
+    @Button(list = "ticket-workflow1", key = "tt.reopen", order = 1d, icon = "icon-repeat icon-white",
+            group = "wf", type = Button.TYPE_INFO)
+    @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_EDIT)
+    @Guard(test="canReopen()", type=GuardType.VISIBLE)
+    public Resolution reopen() {
+        changeState(TtUtils.TICKET_STATE_OPEN);
+        SessionMessages.addInfoMessage("Ticket reopened");
+        return new RedirectResolution(context.actualServletPath);
+    }
+
+    public boolean canReopen() {
+        return object.state != TtUtils.TICKET_STATE_OPEN;
     }
 
 
