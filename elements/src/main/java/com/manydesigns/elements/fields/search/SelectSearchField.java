@@ -231,10 +231,9 @@ public class SelectSearchField extends AbstractSearchField {
         boolean selected = (values == null && !notSet);
         if (!options.isEmpty()) {
             xb.writeOption("", selected, comboLabel);
-        }
-
-        if(!required) {
-            xb.writeOption(VALUE_NOT_SET, notSet, notSetLabel);
+            if(!required) {
+                xb.writeOption(VALUE_NOT_SET, notSet, notSetLabel);
+            }
         }
 
         for (Map.Entry<Object,SelectionModel.Option> option :
