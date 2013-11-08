@@ -76,7 +76,7 @@
             <column name="title" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="varchar(64000)">
+            <column name="description" type="varchar(21000)">
                 <constraints nullable="false"/>
             </column>
             <column name="assignee" type="int">

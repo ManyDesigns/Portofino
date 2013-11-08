@@ -111,6 +111,7 @@
                                     </stripes:link>
                                 </li>--%>
                                 <li>
+<%--                                    <stripes:link href="/login">--%>
                                     <stripes:link href="/actions/user/login">
                                         <stripes:param name="logout"/>
                                         <stripes:param name="returnUrl" value="${actionPath}"/>
@@ -123,8 +124,8 @@
                     </shiro:authenticated>
                     <shiro:notAuthenticated>
                         <li>
-                            <stripes:link href="/login">
-                                <stripes:param name="returnUrl" value="${actionPath}"/>
+<%--                            <stripes:link href="/login">--%>
+                            <stripes:link href="/actions/user/login">                                <stripes:param name="returnUrl" value="${actionPath}"/>
                                 <stripes:param name="cancelReturnUrl" value="${actionPath}"/>
                                 <fmt:message key="skins.default.header.log_in" />
                             </stripes:link>

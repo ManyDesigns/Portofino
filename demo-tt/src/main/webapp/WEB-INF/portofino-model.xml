@@ -2,8 +2,8 @@
 <model>
     <databases>
         <database databaseName="tt">
-            <!--<jdbcConnection driver="com.google.appengine.api.rdbms.AppEngineDriver" url="jdbc:google:rdbms://manydesigns.com:prova1:dbprova1/tt" />-->
-            <jdbcConnection username="tt" url="jdbc:mysql://localhost/tt?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI" password="tt" driver="com.mysql.jdbc.Driver"/>
+            <jdbcConnection driver="com.google.appengine.api.rdbms.AppEngineDriver" url="jdbc:google:rdbms://manydesigns.com:prova1:dbprova1/tt" />
+            <!--<jdbcConnection username="tt" url="jdbc:mysql://localhost/tt?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI" password="tt" driver="com.mysql.jdbc.Driver"/>-->
             <schemas>
                 <schema schemaName="tt">
                     <tables>
@@ -384,10 +384,10 @@
         </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="64000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
+<column scale="0" nullable="false" length="21000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
     <annotations>
         <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>4000</value>
+            <value>21000</value>
         </annotation>
         <annotation type="com.manydesigns.elements.annotations.Multiline">
             <value>true</value>
