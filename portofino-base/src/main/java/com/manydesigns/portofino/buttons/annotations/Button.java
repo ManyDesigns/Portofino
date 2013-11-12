@@ -45,7 +45,8 @@ public @interface Button {
         TYPE_INFO = " btn-info ",
         TYPE_SUCCESS = " btn-success ",
         TYPE_WARNING = " btn-warning ",
-        TYPE_ERROR = " btn-danger ",
+        TYPE_DANGER = " btn-danger ",
+        TYPE_INVERSE = " btn-inverse ",
         TYPE_LINK = " btn-link ";
 
     public static final String
