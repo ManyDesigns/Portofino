@@ -55,14 +55,12 @@ portofino.dataTable = function(elem) {
 };
 
 $(function() {
-    var form = $(".crud-search-form");
-
     //Enable AJAX paginators
     $(".portofino-datatable").each(function(index, elem) {
         portofino.dataTable(elem);
     });
 
-    form.each(function(i, form) {
+    $(".crud-search-form").each(function(i, form) {
         form = $(form);
         form.find(".search_form_toggle_link").click(function() {
             var target = $(this);

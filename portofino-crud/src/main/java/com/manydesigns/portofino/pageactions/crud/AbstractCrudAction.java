@@ -1473,9 +1473,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // ExportSearch
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.exportExcel", order = 5, group = "export")
+    @Button(list = "crud-search", key = "commons.exportExcel", order = 5, group = "export", type = Button.TYPE_NO_UI_BLOCK)
     public Resolution exportSearchExcel() {
         try {
+            Thread.sleep(10000);
             TempFileService fileService = TempFileService.getInstance();
             TempFile tempFile =
                     fileService.newTempFile("application/vnd.ms-excel", crudConfiguration.getSearchTitle() + ".xls");
@@ -1546,7 +1547,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // ExportRead
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "commons.exportExcel", order = 4, group = "export")
+    @Button(list = "crud-read", key = "commons.exportExcel", order = 4, group = "export", type = Button.TYPE_NO_UI_BLOCK)
     public Resolution exportReadExcel() {
         try {
             TempFileService fileService = TempFileService.getInstance();
@@ -1706,7 +1707,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // exportSearchPdf
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.exportPdf", order = 4, group = "export")
+    @Button(list = "crud-search", key = "commons.exportPdf", order = 4, group = "export", type = Button.TYPE_NO_UI_BLOCK)
     public Resolution exportSearchPdf() {
         try {
             //final File tmpFile = File.createTempFile(crudConfiguration.getName() + ".search", ".pdf");
@@ -2014,7 +2015,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    @Button(list = "crud-read", key = "commons.exportPdf", order = 3, group = "export")
+    @Button(list = "crud-read", key = "commons.exportPdf", order = 3, group = "export", type = Button.TYPE_NO_UI_BLOCK)
     public Resolution exportReadPdf() {
         try {
             final File tmpFile = File.createTempFile("export." + crudConfiguration.getName(), ".read.pdf");

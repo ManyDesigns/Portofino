@@ -346,35 +346,28 @@ function htmlEscape (string) {
 $(function() {
     portofino.locale = $("html").attr("lang").substring(0, 2).toLowerCase();
 
+    $('form').find(':submit').click(function() {
+        var form = $(this).prop('form');
+        $(form).data('form-post-button', $(this));
+    });
+
     $('form').on('submit', function() {
-        //Prevent double submit
-        var form = $(this);
-        var buttons = form.find(":submit");
-        var undo = new Array();
-        buttons.each(function(index, current) {
-            var button = $(current);
-            var clone = button.clone();
-            var display = button.css("display");
-            clone.removeAttr("name");
-            clone.attr("disabled", "disabled");
-            button.css("display", "none");
-            button.after(clone);
-            button.appendTo(form);
-            undo.push({ button: button, clone: clone, display: display });
-        });
-        //Restore the buttons after 10s...
-        var timeout = setTimeout(function() {
-            undo.forEach(function(obj) {
-                obj.clone.before(obj.button);
-                obj.clone.remove();
-                obj.button.css("display", obj.display);
+        var postedButton = $(this).data('form-post-button');
+        if(postedButton && !postedButton.is(".no-ui-block")) {
+            //Prevent double submit
+            var form = $(this);
+            var buttons = form.find(":submit");
+            buttons.each(function(index, current) {
+                var button = $(current);
+                var clone = button.clone();
+                var display = button.css("display");
+                clone.removeAttr("name");
+                clone.attr("disabled", "disabled");
+                button.css("display", "none");
+                button.after(clone);
+                button.appendTo(form);
             });
-        }, 10000);
-        //...unless we have requested another page (note: beforeunload is triggered even if the page doesn't change,
-        //e.g. when downloading a pdf export)
-        $(window).unload(function() {
-            clearTimeout(timeout);
-        });
+        }
 
         //Page abandon
         $(this).data("dirty", false);

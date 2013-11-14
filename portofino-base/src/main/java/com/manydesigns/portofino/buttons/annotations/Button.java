@@ -47,7 +47,8 @@ public @interface Button {
         TYPE_WARNING = " btn-warning ",
         TYPE_DANGER = " btn-danger ",
         TYPE_INVERSE = " btn-inverse ",
-        TYPE_LINK = " btn-link ";
+        TYPE_LINK = " btn-link ",
+        TYPE_NO_UI_BLOCK = " no-ui-block ";
 
     public static final String
         ICON_WHITE = " icon-white ",
