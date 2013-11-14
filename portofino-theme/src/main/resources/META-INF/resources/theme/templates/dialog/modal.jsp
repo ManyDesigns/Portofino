@@ -7,7 +7,7 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><stripes:layout-definition><%--
 --%><!DOCTYPE html>
-    <html lang="en">
+    <html lang="<%= request.getLocale() %>">
     <jsp:include page="/theme/head.jsp">
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>

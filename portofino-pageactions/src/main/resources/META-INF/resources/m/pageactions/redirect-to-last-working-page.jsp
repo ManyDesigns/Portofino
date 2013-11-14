@@ -41,7 +41,7 @@
     response.setHeader("Refresh", "0; " + targetUrl);
     
     %><!doctype html>
-<html lang="en">
+<html lang="<%= request.getLocale() %>">
     <head>
         <meta http-equiv="refresh" content='<%= "0; " + targetUrl %>' />
     </head>

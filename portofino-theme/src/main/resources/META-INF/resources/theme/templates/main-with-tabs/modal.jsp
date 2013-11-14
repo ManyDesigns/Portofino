@@ -4,7 +4,7 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><stripes:layout-definition><%--
 --%><!DOCTYPE html>
-<html lang="en">
+<html lang="<%= request.getLocale() %>">
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.pageactions.AbstractPageAction" />
     <jsp:include page="/theme/head.jsp">

@@ -34,7 +34,7 @@
 --%></c:if><%--
 --%><c:if test="${not embedded}"><%--
 --%><!DOCTYPE html>
-<html lang="en">
+<html lang="<%= request.getLocale() %>">
     <jsp:include page="/theme/head.jsp">
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>

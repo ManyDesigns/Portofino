@@ -12,7 +12,7 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><stripes:layout-definition><%--
 --%><!doctype html>
-    <html lang="en">
+    <html lang="<%= request.getLocale() %>">
     <jsp:include page="/theme/head.jsp">
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>

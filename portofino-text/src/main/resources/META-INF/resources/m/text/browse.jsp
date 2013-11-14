@@ -4,7 +4,7 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%--
 --%><!doctype html>
-<html lang="en">
+<html lang="<%= request.getLocale() %>">
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.pageactions.text.TextAction"/>
 <fmt:message key="layouts.text.browse.browse_server" var="pageTitle"/>

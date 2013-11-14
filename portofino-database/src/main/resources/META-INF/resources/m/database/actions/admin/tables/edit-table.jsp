@@ -78,7 +78,7 @@
             </ul>
             <div class="tab-content">
                 <div id="tab-table-columns" class="tab-pane fade in active">
-                    <div style="visibility: hidden;">
+                    <div style="visibility: hidden; min-height: 0; max-height: 0;">
                         <portofino:buttons list="table-edit" /><%-- So pressing Enter calls Save--%>
                     </div>
                     <div class="controls-row">
