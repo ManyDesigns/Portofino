@@ -170,7 +170,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
             session.save(baseTable.getActualEntityName(), object);
         } catch(ConstraintViolationException e) {
             logger.warn("Constraint violation in save", e);
-            throw new RuntimeException(ElementsThreadLocals.getText("crud.constraintViolation"));
+            throw new RuntimeException(ElementsThreadLocals.getText("save.failed.because.constraint.violated"));
         }
     }
 
@@ -180,7 +180,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
             session.update(baseTable.getActualEntityName(), object);
         } catch(ConstraintViolationException e) {
             logger.warn("Constraint violation in update", e);
-            throw new RuntimeException(ElementsThreadLocals.getText("crud.constraintViolation"));
+            throw new RuntimeException(ElementsThreadLocals.getText("save.failed.because.constraint.violated"));
         }
     }
 
@@ -269,7 +269,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
             logger.warn("Incorrect Field Type", e);
-            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("crud.incorrectFieldType"));
+            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("incorrect.field.type"));
         }
     }
 

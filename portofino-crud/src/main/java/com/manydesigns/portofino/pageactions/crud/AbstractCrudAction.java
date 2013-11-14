@@ -854,7 +854,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         String prettyName = ShortNameUtils.getName(getClassAccessor(), object);
         XhtmlBuffer linkToObjectBuffer = new XhtmlBuffer();
         linkToObjectBuffer.writeAnchor(Util.getAbsoluteUrl(readUrl), prettyName);
-        buffer.writeNoHtmlEscape(ElementsThreadLocals.getText("crud.create.successful", linkToObjectBuffer));
+        buffer.writeNoHtmlEscape(ElementsThreadLocals.getText("object._.saved", linkToObjectBuffer));
 
         String createUrl = Util.getAbsoluteUrl(context.getActualServletPath());
         if(!createUrl.contains("?")) {
@@ -865,7 +865,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         createUrl += "create=";
         createUrl = appendSearchStringParamIfNecessary(createUrl);
         buffer.write(" ");
-        buffer.writeAnchor(createUrl, ElementsThreadLocals.getText("crud.create.another"));
+        buffer.writeAnchor(createUrl, ElementsThreadLocals.getText("create.another.object"));
 
         SessionMessages.addInfoMessage(buffer);
     }
@@ -970,7 +970,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     protected Resolution notInUseCase(ActionBeanContext context, List<String> parameters) {
         logger.info("Not in use case: " + crudConfiguration.getName());
-        String msg = ElementsThreadLocals.getText("crud.notInUseCase", StringUtils.join(parameters, "/"));
+        String msg = ElementsThreadLocals.getText("object.not.found._", StringUtils.join(parameters, "/"));
         SessionMessages.addWarningMessage(msg);
         return new ForwardResolution("/m/pageactions/redirect-to-last-working-page.jsp");
     }
@@ -1317,7 +1317,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             if(!StringUtils.isBlank(searchString)) {
                 returnToParentParams.put(SEARCH_STRING_PARAM, searchString);
             }
-            returnToParentTarget = ElementsThreadLocals.getText("layouts.crud.search");
+            returnToParentTarget = ElementsThreadLocals.getText("search");
         }
     }
 

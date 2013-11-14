@@ -22,12 +22,12 @@
 
             <!-- Properties -->
             <fieldset id="crudPropertiesFieldset">
-                <legend><fmt:message key= "layouts.crud.configure.properties" /></legend>
+                <legend><fmt:message key= "properties" /></legend>
                 <c:if test="${not empty actionBean.propertiesTableForm}">
                     <mde:write name="actionBean" property="propertiesTableForm"/>
                 </c:if>
                 <c:if test="${empty actionBean.propertiesTableForm}">
-                    <fmt:message key= "layouts.crud.configure.table_first" />
+                    <fmt:message key= "you.must.write.a.query.first" />
                 </c:if>
             </fieldset>
             <c:if test="${not empty actionBean.propertiesTableForm}">
@@ -70,13 +70,13 @@
             <!-- End properties -->
 
             <fieldset id="crudSelectionProvidersFieldset">
-                <legend><fmt:message key="layouts.crud.configure.selectionProviders" /></legend>
+                <legend><fmt:message key="selection.providers" /></legend>
                 <c:choose>
                     <c:when test="${not empty actionBean.selectionProvidersForm}">
                         <mde:write name="actionBean" property="selectionProvidersForm"/>
                     </c:when>
                     <c:otherwise>
-                        <fmt:message key="layouts.crud.configure.noSelectionProviders" />
+                        <fmt:message key="none.available" />
                     </c:otherwise>
                 </c:choose>
             </fieldset>

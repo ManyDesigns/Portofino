@@ -21,15 +21,15 @@
                 <c:if test="${actionBean.searchVisible}">
                     <a href="${pageContext.request.contextPath}${actionBean.context.actualServletPath}"
                        class="search_form_toggle_link" data-search-visible="true">
-                        <span><fmt:message key="crud.search.hideSearch" /></span>
-                        <span style="display: none;"><fmt:message key="crud.search.showSearch" /></span>
+                        <span><fmt:message key="hide.search<<" /></span>
+                        <span style="display: none;"><fmt:message key="search>>" /></span>
                     </a>
                 </c:if>
                 <c:if test="${!actionBean.searchVisible}">
                     <a href="${pageContext.request.contextPath}${actionBean.context.actualServletPath}?search="
                        class="search_form_toggle_link" data-search-visible="false">
-                        <span style="display: none;"><fmt:message key="crud.search.hideSearch" /></span>
-                        <span><fmt:message key="crud.search.showSearch" /></span>
+                        <span style="display: none;"><fmt:message key="hide.search<<" /></span>
+                        <span><fmt:message key="search>>" /></span>
                     </a>
                 </c:if>
                 <div class="search_form" <c:if test="${!actionBean.searchVisible}">style="display: none;"</c:if>>

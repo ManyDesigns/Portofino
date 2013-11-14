@@ -11,7 +11,7 @@
         <c:out value="${actionBean.editTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <p><fmt:message key = "layouts.crud.bulk-edit.select_columns"/></p>
+        <p><fmt:message key = "in.the.first.column.select.the.fields.you.want.to.edit"/></p>
         <stripes:form action="${actionBean.context.actualServletPath}" method="post"
                       class="form-horizontal">
             <mde:write name="actionBean" property="form"/>
