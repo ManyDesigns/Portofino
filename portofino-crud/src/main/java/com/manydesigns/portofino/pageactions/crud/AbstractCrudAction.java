@@ -1476,7 +1476,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Button(list = "crud-search", key = "commons.exportExcel", order = 5, group = "export", type = Button.TYPE_NO_UI_BLOCK)
     public Resolution exportSearchExcel() {
         try {
-            Thread.sleep(10000);
             TempFileService fileService = TempFileService.getInstance();
             TempFile tempFile =
                     fileService.newTempFile("application/vnd.ms-excel", crudConfiguration.getSearchTitle() + ".xls");
