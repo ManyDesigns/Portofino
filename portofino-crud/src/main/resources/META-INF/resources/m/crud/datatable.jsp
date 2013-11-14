@@ -9,6 +9,9 @@
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"/>
 <c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
 <div class="portofino-datatable">
+    <span class="crud-confirm-bulk-delete" style="display: none;">
+        <fmt:message key="crud.confirm.bulk.delete " />
+    </span>
     <div class="search_results">
         <mde:write name="actionBean" property="tableForm" />
     </div>

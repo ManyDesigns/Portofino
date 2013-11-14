@@ -13,22 +13,23 @@
     <stripes:layout-component name="pageBody">
         <stripes:form
                 action="${actionBean.context.actualServletPath}" method="post"
-                class="form-inline crud-search-form dont-prompt-on-page-abandon"
-                data-search-visible="${actionBean.searchVisible}">
+                class="form-inline crud-search-form dont-prompt-on-page-abandon">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <c:if test="${not empty actionBean.searchForm}">
                 <c:if test="${actionBean.searchVisible}">
                     <a href="${pageContext.request.contextPath}${actionBean.context.actualServletPath}"
-                       class="search_form_toggle_link" >
-                        <fmt:message key="layouts.crud.search.hideSearch" />
+                       class="search_form_toggle_link" data-search-visible="true">
+                        <span><fmt:message key="crud.search.hideSearch" /></span>
+                        <span style="display: none;"><fmt:message key="crud.search.showSearch" /></span>
                     </a>
                 </c:if>
                 <c:if test="${!actionBean.searchVisible}">
                     <a href="${pageContext.request.contextPath}${actionBean.context.actualServletPath}?search="
-                       class="search_form_toggle_link" >
-                        <fmt:message key="layouts.crud.search.showSearch" />
+                       class="search_form_toggle_link" data-search-visible="false">
+                        <span style="display: none;"><fmt:message key="crud.search.hideSearch" /></span>
+                        <span><fmt:message key="crud.search.showSearch" /></span>
                     </a>
                 </c:if>
                 <div class="search_form" <c:if test="${!actionBean.searchVisible}">style="display: none;"</c:if>>

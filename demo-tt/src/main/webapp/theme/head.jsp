@@ -32,8 +32,9 @@
     div#openid_highlight { padding: 0; }
 </style>
 
+<script type="text/javascript" src="<stripes:url value='/m/pageactions/portofino-messages.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/m/pageactions/portofino.js' />" ></script>
-<script type="text/javascript" src="<stripes:url value='/m/crud/crud.js.jsp' />" ></script>
+<script type="text/javascript" src="<stripes:url value='/m/crud/crud.js' />" ></script>
 <script type="text/javascript">
     portofino.contextPath = '${pageContext.request.contextPath}';
 </script>

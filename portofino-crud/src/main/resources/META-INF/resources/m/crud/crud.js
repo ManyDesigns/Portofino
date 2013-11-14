@@ -1,5 +1,3 @@
-<%@page contentType="text/javascript" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 var portofino = portofino || {};
 
 portofino.dataTable = function(elem) {
@@ -49,7 +47,7 @@ portofino.dataTable = function(elem) {
         elem.find("a.paginator-link").click(makeLoaderFunction(elem));
         elem.find("a.sort-link").click(makeLoaderFunction(elem));
         elem.find("button[name=bulkDelete]").click(function() {
-            return confirm ('<fmt:message key="commons.confirm" />');
+            return confirm (elem.find(".crud-confirm-bulk-delete").html());
         });
     }
 
@@ -66,20 +64,13 @@ $(function() {
 
     form.each(function(i, form) {
         form = $(form);
-        form.find(".search_form_toggle_link").click(makeToggleFunction(form));
-    });
-
-    function makeToggleFunction(form) {
-        var visible = form.data("search-visible");
-        return function(event) {
-            $(this).next().slideToggle(300);
-            visible = !visible;
-            if(visible) {
-                $(event.target).html('<fmt:message key="layouts.crud.search.hideSearch" />');
-            } else {
-                $(event.target).html('<fmt:message key="layouts.crud.search.showSearch" />');
-            }
+        form.find(".search_form_toggle_link").click(function() {
+            var target = $(this);
+            var visible = target.data("search-visible");
+            target.next().slideToggle(300);
+            target.data("search-visible", !visible);
+            target.find("span").toggle();
             return false;
-        };
-    }
+        });
+    });
 });
