@@ -728,7 +728,7 @@ public class TablesAction extends AbstractActionBean {
         return column;
     }
 
-    @Button(list = "tables-list", key = "commons.returnToPages", order = 3)
+    @Button(list = "tables-list", key = "return.to.pages", order = 3)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

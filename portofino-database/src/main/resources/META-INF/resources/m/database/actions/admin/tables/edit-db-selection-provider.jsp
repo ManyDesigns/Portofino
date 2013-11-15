@@ -24,7 +24,7 @@
             $(function() {
                 $("button[name=removeSelectionProvider]").click(
                         function() {
-                            return confirm('<fmt:message key="commons.confirm" />');
+                            return confirm('<fmt:message key="are.you.sure" />');
                         });
             });
         </script>

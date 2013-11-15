@@ -14,7 +14,7 @@
         <c:out value="${actionBean.content}" escapeXml="false"/>
         <c:if test="${not empty actionBean.downloadableAttachments}">
             <div class="horizontalSeparator"></div>
-            <fmt:message key="commons.attachments"/>:
+            <fmt:message key="attachments"/>:
             <div class="attachmentBox">
                 <c:forEach var="attachment" items="${actionBean.downloadableAttachments}">
                     <div class="attachment">

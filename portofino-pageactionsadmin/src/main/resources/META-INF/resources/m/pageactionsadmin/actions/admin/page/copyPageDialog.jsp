@@ -16,7 +16,7 @@
             <fmt:message key="cancel" />
         </button>
         <button name="confirmCopyPageButton" type="button" class="btn btn-primary">
-            <fmt:message key="commons.copy" />
+            <fmt:message key="copy" />
         </button>
     </div>
 </div>

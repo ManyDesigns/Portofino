@@ -16,7 +16,7 @@
             <fmt:message key="cancel" />
         </button>
         <button name="confirmMovePageButton" type="button" class="btn btn-warning">
-            <fmt:message key="commons.move" />
+            <fmt:message key="move" />
         </button>
     </div>
 </div>

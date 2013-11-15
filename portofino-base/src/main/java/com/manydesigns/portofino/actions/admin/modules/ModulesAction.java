@@ -91,7 +91,7 @@ public class ModulesAction extends AbstractActionBean {
         form.readFromObject(modules);
     }
 
-    @Button(list = "modules", key = "commons.returnToPages", order = 2)
+    @Button(list = "modules", key = "return.to.pages", order = 2)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

@@ -75,7 +75,7 @@ public class ReloadModelAction extends AbstractActionBean {
         }
     }
 
-    @Button(list = "reload-model-bar", key = "commons.returnToPages", order = 1)
+    @Button(list = "reload-model-bar", key = "return.to.pages", order = 1)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

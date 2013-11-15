@@ -81,8 +81,8 @@ public abstract class RootConfigurationAction extends PageAdminAction {
     }
 
     @Buttons({
-        @Button(list = "root-permissions", key = "commons.returnToPages", order = 2),
-        @Button(list = "root-children", key = "commons.returnToPages", order = 2)
+        @Button(list = "root-permissions", key = "return.to.pages", order = 2),
+        @Button(list = "root-children", key = "return.to.pages", order = 2)
     })
     public Resolution returnToPages() {
         return new RedirectResolution("/");

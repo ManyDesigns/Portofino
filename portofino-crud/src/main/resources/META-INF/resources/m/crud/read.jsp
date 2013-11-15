@@ -32,7 +32,7 @@
             </div>
             <script type="text/javascript">
                 $(".crudReadButtons button[name=delete]").click(function() {
-                    return confirm ('<fmt:message key="commons.confirm" />');
+                    return confirm ('<fmt:message key="are.you.sure" />');
                 });
             </script>
         </stripes:form>

@@ -5,6 +5,7 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction" %>
 <%@ page import="java.io.Writer" %>
+<%@ page import="com.manydesigns.elements.ElementsThreadLocals" %>
 <%@ page language="java" %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"/>
 <c:set var="pageId" value="${actionBean.pageInstance.page.id}" />
@@ -54,7 +55,7 @@
             buf.addAttribute("class", "paginator-link");
             buf.addAttribute("href", actionBean.getLinkToPage(0));
         }
-        buf.addAttribute("title", actionBean.getMessage("commons.first"));
+        buf.addAttribute("title", ElementsThreadLocals.getText("first"));
         buf.writeNoHtmlEscape("&lt;&lt;");
         buf.closeElement("a");
         buf.closeElement("li");
@@ -69,7 +70,7 @@
             buf.addAttribute("class", "paginator-link");
             buf.addAttribute("href", actionBean.getLinkToPage(currentPage - 1));
         }
-        buf.addAttribute("title", actionBean.getMessage("commons.prev"));
+        buf.addAttribute("title", ElementsThreadLocals.getText("previous"));
         buf.writeNoHtmlEscape("&lt;");
         buf.closeElement("a");
         buf.closeElement("li");
@@ -96,7 +97,7 @@
             buf.openElement("a");
             buf.addAttribute("class", "paginator-link");
             buf.addAttribute("href", actionBean.getLinkToPage(pg));
-            buf.addAttribute("title", actionBean.getMessage("commons.pageNumber", (pg + 1)));
+            buf.addAttribute("title", ElementsThreadLocals.getText("page._.of._", pg + 1, lastPage + 1));
             buf.write("" + (pg + 1));
             buf.closeElement("a");
             buf.closeElement("li");
@@ -112,7 +113,7 @@
             buf.addAttribute("class", "paginator-link");
             buf.addAttribute("href", actionBean.getLinkToPage(currentPage + 1));
         }
-        buf.addAttribute("title", actionBean.getMessage("commons.next"));
+        buf.addAttribute("title", ElementsThreadLocals.getText("next"));
         buf.writeNoHtmlEscape("&gt;");
         buf.closeElement("a");
         buf.closeElement("li");
@@ -127,7 +128,7 @@
             buf.addAttribute("class", "paginator-link");
             buf.addAttribute("href", actionBean.getLinkToPage(lastPage));
         }
-        buf.addAttribute("title", actionBean.getMessage("commons.last") + " (" + (lastPage + 1) + ")");
+        buf.addAttribute("title", ElementsThreadLocals.getText("last") + " (" + (lastPage + 1) + ")");
         buf.writeNoHtmlEscape("&gt;&gt;");
         buf.closeElement("a");
         buf.closeElement("li");

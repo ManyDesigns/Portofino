@@ -138,7 +138,7 @@ public class SettingsAction extends AbstractActionBean {
         }
     }
 
-    @Button(list = "settings", key = "commons.returnToPages", order = 2)
+    @Button(list = "settings", key = "return.to.pages", order = 2)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

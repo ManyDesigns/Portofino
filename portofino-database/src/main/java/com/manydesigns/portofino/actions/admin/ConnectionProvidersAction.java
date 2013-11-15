@@ -449,14 +449,14 @@ public class ConnectionProvidersAction extends AbstractActionBean {
     }*/
 
     @Buttons({
-        @Button(list = "connectionProviders-read", key = "commons.returnToList", order = 1),
-        @Button(list = "connectionProviders-select-type-content-buttons", key = "commons.returnToList", order = 1)
+        @Button(list = "connectionProviders-read", key = "return.to.list", order = 1),
+        @Button(list = "connectionProviders-select-type-content-buttons", key = "return.to.list", order = 1)
     })
     public Resolution returnToList() {
         return new RedirectResolution(ConnectionProvidersAction.class);
     }
 
-    @Button(list = "connectionProviders-search", key = "commons.returnToPages", order = 3)
+    @Button(list = "connectionProviders-search", key = "return.to.pages", order = 3)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

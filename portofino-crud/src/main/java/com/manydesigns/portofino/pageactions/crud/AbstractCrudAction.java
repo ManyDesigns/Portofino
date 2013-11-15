@@ -229,8 +229,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Navigation
     //--------------------------------------------------------------------------
 
-    public String returnToParentTarget;
-    public final Map<String, String> returnToParentParams = new HashMap<String, String>();
     protected ResultSetNavigation resultSetNavigation;
 
     //--------------------------------------------------------------------------
@@ -296,8 +294,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
 
     @Buttons({
-        @Button(list = "crud-search-form", key = "commons.search", order = 1, type = Button.TYPE_PRIMARY),
-        @Button(list = "portlet-default-button", key = "commons.search") //XXX non va bene, posso avere diversi default su form diversi
+        @Button(list = "crud-search-form", key = "search", order = 1, type = Button.TYPE_PRIMARY),
+        @Button(list = "portlet-default-button", key = "search") //XXX non va bene, posso avere diversi default su form diversi
     })
     public Resolution search() {
         searchVisible = true;
@@ -327,7 +325,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     context.getLocale(), Util.getAbsoluteUrl(context.getActualServletPath()), false)
                     .toString();
                 returnUrl = appendSearchStringParamIfNecessary(returnUrl);
-                setupReturnToParentTarget();
                 return getSearchView();
             }
         } catch(Exception e) {
@@ -396,7 +393,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     public abstract long getTotalSearchRecords();
 
-    @Button(list = "crud-search-form", key = "commons.resetSearch", order = 2)
+    @Button(list = "crud-search-form", key = "reset.search", order = 2)
     public Resolution resetSearch() {
         return new RedirectResolution(context.getActualServletPath()).addParameter("searchVisible", true);
     }
@@ -421,8 +418,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 .toString();
 
         returnUrl = appendSearchStringParamIfNecessary(returnUrl);
-
-        setupReturnToParentTarget();
 
         if(PageActionLogic.isEmbedded(this)) {
             return getEmbeddedReadView();
@@ -1307,21 +1302,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Return to parent
     //**************************************************************************
 
-    /**
-     * <p>Detects the parent page to return to (using the return to... button). This can be another PageAction,
-     * or, at the discretion of subclasses, a different view of the same action.</p>
-     * <p>This method assigns a value to the returnToParentTarget field.</p>
-     */
-    public void setupReturnToParentTarget() {
-        if (pk != null) {
-            if(!StringUtils.isBlank(searchString)) {
-                returnToParentParams.put(SEARCH_STRING_PARAM, searchString);
-            }
-            returnToParentTarget = ElementsThreadLocals.getText("search");
-        }
-    }
-
-    public Resolution returnToParent() throws Exception {
+    public Resolution returnToSearch() throws Exception {
         if (pk != null) {
             return new RedirectResolution(
                     appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
@@ -1473,7 +1454,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // ExportSearch
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.exportExcel", order = 5, group = "export", type = Button.TYPE_NO_UI_BLOCK)
+    @Button(list = "crud-search", key = "excel", order = 5, group = "export", type = Button.TYPE_NO_UI_BLOCK)
     public Resolution exportSearchExcel() {
         try {
             TempFileService fileService = TempFileService.getInstance();
@@ -1486,7 +1467,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             return fileService.stream(tempFile);
         } catch (Exception e) {
             logger.error("Excel export failed", e);
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.export.failed"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("export.failed"));
             return new RedirectResolution(context.getActualServletPath());
         }
     }
@@ -1546,7 +1527,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // ExportRead
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "commons.exportExcel", order = 4, group = "export", type = Button.TYPE_NO_UI_BLOCK)
+    @Button(list = "crud-read", key = "excel", order = 4, group = "export", type = Button.TYPE_NO_UI_BLOCK)
     public Resolution exportReadExcel() {
         try {
             TempFileService fileService = TempFileService.getInstance();
@@ -1559,7 +1540,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             return fileService.stream(tempFile);
         } catch (Exception e) {
             logger.error("Excel export failed", e);
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.export.failed"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("export.failed"));
             return new RedirectResolution(context.getActualServletPath());
         }
     }
@@ -1706,7 +1687,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // exportSearchPdf
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.exportPdf", order = 4, group = "export", type = Button.TYPE_NO_UI_BLOCK)
+    @Button(list = "crud-search", key = "pdf", order = 4, group = "export", type = Button.TYPE_NO_UI_BLOCK)
     public Resolution exportSearchPdf() {
         try {
             //final File tmpFile = File.createTempFile(crudConfiguration.getName() + ".search", ".pdf");
@@ -1720,7 +1701,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             return fileService.stream(tempFile);
         } catch (Exception e) {
             logger.error("PDF export failed", e);
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.export.failed"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("export.failed"));
             return new RedirectResolution(context.getActualServletPath());
         }
     }
@@ -2014,7 +1995,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    @Button(list = "crud-read", key = "commons.exportPdf", order = 3, group = "export", type = Button.TYPE_NO_UI_BLOCK)
+    @Button(list = "crud-read", key = "pdf", order = 3, group = "export", type = Button.TYPE_NO_UI_BLOCK)
     public Resolution exportReadPdf() {
         try {
             final File tmpFile = File.createTempFile("export." + crudConfiguration.getName(), ".read.pdf");
@@ -2031,7 +2012,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }.setFilename(getReadTitle() + ".pdf");
         } catch (Exception e) {
             logger.error("PDF export failed", e);
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.export.failed"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("export.failed"));
             return new RedirectResolution(context.getActualServletPath());
         }
     }
@@ -2756,14 +2737,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public void setResultSetNavigation(ResultSetNavigation resultSetNavigation) {
         this.resultSetNavigation = resultSetNavigation;
-    }
-
-    public String getReturnToParentTarget() {
-        return returnToParentTarget;
-    }
-
-    public Map<String, String> getReturnToParentParams() {
-        return returnToParentParams;
     }
 
 }

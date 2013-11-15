@@ -24,7 +24,7 @@
         </form>
     <% } %>
     <c:if test="${not empty actionBean.textConfiguration.attachments}">
-        <fmt:message key="commons.attachments"/>:
+        <fmt:message key="attachments"/>:
         <ul>
             <c:forEach var="attachment" items="${actionBean.textConfiguration.attachments}">
                 <li><a href="#"

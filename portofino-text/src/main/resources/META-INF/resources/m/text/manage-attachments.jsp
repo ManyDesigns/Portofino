@@ -19,7 +19,7 @@
                       class="form-inline">
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <c:if test="${not empty actionBean.textConfiguration.attachments}">
-                <fmt:message key="commons.attachments"/>:
+                <fmt:message key="attachments"/>:
                 <br/>
                 <table>
                     <c:forEach var="attachment" items="${actionBean.textConfiguration.attachments}">

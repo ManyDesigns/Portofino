@@ -9,14 +9,14 @@
         <ul style="display: inline;">
             <c:if test="${not empty resultSetNavigation.firstUrl}">
                 <li>
-                    <fmt:message key="commons.first" var="pg_title" />
+                    <fmt:message key="first" var="pg_title" />
                     <stripes:link href="${resultSetNavigation.firstUrl}" title="${pg_title}"
                                   class="paginator-link">
                         &lt;&lt;
                     </stripes:link>
                 </li>
                 <li>
-                    <fmt:message key="commons.first" var="pg_title" />
+                    <fmt:message key="previous" var="pg_title" />
                     <stripes:link href="${resultSetNavigation.previousUrl}" title="${pg_title}"
                                   class="paginator-link">
                         &lt;
@@ -29,21 +29,22 @@
             </c:if>
             <li class="active">
                 <a class="paginator-link">
-                    <c:out value="${resultSetNavigation.position + 1}"/>
-                    <fmt:message key="commons.of" /> <c:out
-                        value="${resultSetNavigation.size}"/>
+                    <fmt:message key="_.of._">
+                        <fmt:param value="${resultSetNavigation.position + 1}" />
+                        <fmt:param value="${resultSetNavigation.size}" />
+                    </fmt:message>
                 </a>
             </li>
             <c:if test="${not empty resultSetNavigation.lastUrl}">
                 <li>
-                    <fmt:message key="commons.next" var="pg_title" />
+                    <fmt:message key="next" var="pg_title" />
                     <stripes:link href="${resultSetNavigation.nextUrl}" title="${pg_title}"
                                   class="paginator-link">
                         &gt;
                     </stripes:link>
                 </li>
                 <li>
-                    <fmt:message key="commons.last" var="pg_title" />
+                    <fmt:message key="last" var="pg_title" />
                     <stripes:link href="${resultSetNavigation.lastUrl}" title="${pg_title}"
                                   class="paginator-link">
                         &gt;&gt;

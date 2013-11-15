@@ -25,7 +25,7 @@
             $(function() {
                 $("#tables").treetable({"clickableNodeNames": true, "expandable":true, "treeColumn":0, "indent":20 });
                 $("button[name=bulkDelete]").click(function() {
-                    return confirm('<fmt:message key="commons.confirm" />');
+                    return confirm('<fmt:message key="are.you.sure" />');
                 });
             });
         </script>
