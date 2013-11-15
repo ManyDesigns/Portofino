@@ -38,7 +38,7 @@
                     <fmt:message key="skins.default.login.signUp" />
                 </button>
                 <button type="submit" name="cancel" class="btn btn-link">
-                    <fmt:message key="commons.cancel" />
+                    <fmt:message key="cancel" />
                 </button>
             </div>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>

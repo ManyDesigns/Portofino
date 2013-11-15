@@ -214,7 +214,7 @@
         xhtmlBuffer.addAttribute("class", "btn btn-primary");
         xhtmlBuffer.addAttribute("data-dismiss", "modal");
         xhtmlBuffer.addAttribute("aria-hidden", "true");
-        xhtmlBuffer.write(ElementsThreadLocals.getText("commons.close"));
+        xhtmlBuffer.write(ElementsThreadLocals.getText("close"));
         xhtmlBuffer.closeElement("button");
         xhtmlBuffer.closeElement("div"); // modal-footer
 

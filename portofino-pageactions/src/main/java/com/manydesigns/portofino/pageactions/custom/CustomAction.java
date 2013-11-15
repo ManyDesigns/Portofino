@@ -50,14 +50,14 @@ public class CustomAction extends AbstractPageAction {
     public static final Logger logger =
             LoggerFactory.getLogger(CustomAction.class);
 
-    @Button(list = "pageHeaderButtons", titleKey = "commons.configure", order = 1, icon = Button.ICON_WRENCH)
+    @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();
         return new ForwardResolution("/m/pageactions/pageactions/custom/configure.jsp");
     }
 
-    @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "configuration", key = "update.configuration", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() {
         prepareConfigurationForms();
@@ -65,7 +65,7 @@ public class CustomAction extends AbstractPageAction {
         boolean valid = validatePageConfiguration();
         if(valid) {
             updatePageConfiguration();
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.updated"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
         }
         return cancel();
     }

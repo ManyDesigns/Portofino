@@ -221,7 +221,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return forwardTo(pageJsp);
     }
 
-    @Button(list = "configuration", key = "commons.cancel", order = 99)
+    @Button(list = "configuration", key = "cancel", order = 99)
     public Resolution cancel() {
         return new RedirectResolution(getReturnUrl(), false);
     }

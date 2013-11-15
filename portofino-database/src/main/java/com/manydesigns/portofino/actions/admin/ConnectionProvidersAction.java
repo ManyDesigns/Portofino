@@ -276,12 +276,12 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                 .addParameter("databaseName", databaseName);
     }
 
-    @Button(list = "connectionProviders-search", key = "commons.create", order = 1)
+    @Button(list = "connectionProviders-search", key = "create.new", order = 1)
     public Resolution create() {
         return new RedirectResolution("/actions/admin/wizard");
     }
 
-    @Button(list = "connectionProviders-read", key = "commons.edit", order = 2)
+    @Button(list = "connectionProviders-read", key = "edit", order = 2)
     public Resolution edit() {
         connectionProvider = persistence.getConnectionProvider(databaseName);
         databasePlatform = connectionProvider.getDatabasePlatform();
@@ -360,14 +360,14 @@ public class ConnectionProvidersAction extends AbstractActionBean {
     }
 
     @Buttons({
-        @Button(list = "connectionProviders-edit", key = "commons.cancel", order = 2),
-        @Button(list = "connectionProviders-create", key = "commons.cancel", order = 2)
+        @Button(list = "connectionProviders-edit", key = "cancel", order = 2),
+        @Button(list = "connectionProviders-create", key = "cancel", order = 2)
     })
     public Resolution cancel() {
         return execute();
     }
 
-    @Button(list = "connectionProviders-read", key = "commons.delete", order = 6)
+    @Button(list = "connectionProviders-read", key = "delete", order = 6)
     public Resolution delete() {
         String[] databaseNames = new String[] {databaseName};
         try {
@@ -383,7 +383,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
         return new RedirectResolution(this.getClass());
     }
 
-    @Button(list = "connectionProviders-search", key = "commons.delete", order = 2)
+    @Button(list = "connectionProviders-search", key = "delete", order = 2)
     public Resolution bulkDelete() {
         if(null!=selection && 0!=selection.length){
             try {

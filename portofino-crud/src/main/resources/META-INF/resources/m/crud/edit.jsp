@@ -25,7 +25,7 @@
         </c:if>
         <p>
             <c:if test="${actionBean.requiredFieldsPresent}">
-                <fmt:message key="commons.fields_required"/>.
+                <fmt:message key="fields.marked.with.a.star.are.required"/>.
             </c:if>
         </p>
         <stripes:form action="${actionBean.context.actualServletPath}" method="post"

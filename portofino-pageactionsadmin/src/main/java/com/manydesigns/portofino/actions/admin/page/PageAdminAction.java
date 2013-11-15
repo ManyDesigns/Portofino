@@ -134,9 +134,9 @@ public class PageAdminAction extends AbstractPageAction {
     //--------------------------------------------------------------------------
 
     @Buttons({
-        @Button(list = "page-children-edit", key = "commons.cancel", order = 99),
-        @Button(list = "page-permissions-edit", key = "commons.cancel", order = 99),
-        @Button(list = "page-create", key = "commons.cancel", order = 99)
+        @Button(list = "page-children-edit", key = "cancel", order = 99),
+        @Button(list = "page-permissions-edit", key = "cancel", order = 99),
+        @Button(list = "page-create", key = "cancel", order = 99)
     })
     public Resolution cancel() {
         return new RedirectResolution(originalPath);
@@ -185,7 +185,7 @@ public class PageAdminAction extends AbstractPageAction {
         return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/new-page.jsp");
     }
 
-    @Button(list = "page-create", key = "commons.create", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "page-create", key = "create.new", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution createPage() {
         try {

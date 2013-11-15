@@ -103,10 +103,10 @@ public class MailSettingsAction extends AbstractActionBean {
                 logger.info("Configuration saved to " + fileConfiguration.getFile().getAbsolutePath());
             } catch (Exception e) {
                 logger.error("Configuration not saved", e);
-                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.configuration.notUpdated"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("the.configuration.could.not.be.saved"));
                 return new ForwardResolution("/m/mail/admin/settings.jsp");
             }
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.updated"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
             return new RedirectResolution(this.getClass());
         } else {
             return new ForwardResolution("/m/mail/admin/settings.jsp");

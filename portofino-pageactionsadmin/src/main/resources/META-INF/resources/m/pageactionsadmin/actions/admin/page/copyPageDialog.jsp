@@ -13,7 +13,7 @@
     </div>
     <div class="modal-footer">
         <button name="cancelCopyPageButton" type="button" class="btn">
-            <fmt:message key="commons.cancel" />
+            <fmt:message key="cancel" />
         </button>
         <button name="confirmCopyPageButton" type="button" class="btn btn-primary">
             <fmt:message key="commons.copy" />

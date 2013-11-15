@@ -488,7 +488,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Create/Save
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "commons.create", order = 1, type = Button.TYPE_SUCCESS,
+    @Button(list = "crud-search", key = "create.new", order = 1, type = Button.TYPE_SUCCESS,
             icon = Button.ICON_PLUS + Button.ICON_WHITE, group = "crud")
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     public Resolution create() {
@@ -500,7 +500,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return getCreateView();
     }
 
-    @Button(list = "crud-create", key = "commons.save", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "crud-create", key = "save", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     public Resolution save() {
         setupForm(Mode.CREATE);
@@ -547,7 +547,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Edit/Update
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "commons.edit", order = 1, icon = Button.ICON_EDIT + Button.ICON_WHITE,
+    @Button(list = "crud-read", key = "edit", order = 1, icon = Button.ICON_EDIT + Button.ICON_WHITE,
             group = "crud", type = Button.TYPE_SUCCESS)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution edit() {
@@ -619,7 +619,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 "bulkDelete".equals(context.getEventName());
     }
 
-    @Button(list = "crud-search", key = "commons.edit", order = 2, icon = Button.ICON_EDIT, group = "crud")
+    @Button(list = "crud-search", key = "edit", order = 2, icon = Button.ICON_EDIT, group = "crud")
     @Guard(test = "isBulkOperationsEnabled()", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkEdit() {
@@ -680,7 +680,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Delete
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "commons.delete", order = 2, icon = Button.ICON_TRASH, group = "crud")
+    @Button(list = "crud-read", key = "delete", order = 2, icon = Button.ICON_TRASH, group = "crud")
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution delete() {
         String url = calculateBaseSearchUrl();
@@ -690,7 +690,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 deletePostProcess(object);
                 commitTransaction();
                 deleteFileBlobs(object);
-                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.delete.successful"));
+                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.deleted.successfully"));
 
                 // invalidate the pk on this crud
                 pk = null;
@@ -703,13 +703,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return new RedirectResolution(appendSearchStringParamIfNecessary(url), false);
     }
 
-    @Button(list = "crud-search", key = "commons.delete", order = 3, icon = Button.ICON_TRASH, group = "crud")
+    @Button(list = "crud-search", key = "delete", order = 3, icon = Button.ICON_TRASH, group = "crud")
     @Guard(test = "isBulkOperationsEnabled()", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution bulkDelete() {
         int deleted = 0;
         if (selection == null) {
-            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("commons.bulkDelete.nothingSelected"));
+            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("no.object.was.selected"));
             return new RedirectResolution(appendSearchStringParamIfNecessary(context.getActualServletPath()));
         }
         List<T> objects = new ArrayList<T>(selection.length);
@@ -729,7 +729,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             for(T obj : objects) {
                 deleteFileBlobs(obj);
             }
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.bulkDelete.successful", deleted));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("_.objects.deleted.successfully", deleted));
         } catch (Exception e) {
             logger.warn(ExceptionUtils.getRootCauseMessage(e), e);
             SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
@@ -1332,10 +1332,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     @Override
     @Buttons({
-        @Button(list = "crud-edit", key = "commons.cancel", order = 99),
-        @Button(list = "crud-create", key = "commons.cancel", order = 99),
-        @Button(list = "crud-bulk-edit", key = "commons.cancel", order = 99),
-        @Button(list = "configuration", key = "commons.cancel", order = 99)
+        @Button(list = "crud-edit", key = "cancel", order = 99),
+        @Button(list = "crud-create", key = "cancel", order = 99),
+        @Button(list = "crud-bulk-edit", key = "cancel", order = 99),
+        @Button(list = "configuration", key = "cancel", order = 99)
     })
     public Resolution cancel() {
         if(isPopup()) {
@@ -2040,7 +2040,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Configuration
     //**************************************************************************
 
-    @Button(list = "pageHeaderButtons", titleKey = "commons.configure", order = 1, icon = Button.ICON_WRENCH)
+    @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();
@@ -2164,7 +2164,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "configuration", key = "update.configuration", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() {
         prepareConfigurationForms();
@@ -2207,10 +2207,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
             saveConfiguration(crudConfiguration);
 
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.updated"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
             return cancel();
         } else {
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.configuration.notUpdated"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("the.configuration.could.not.be.saved"));
             return getConfigurationView();
         }
     }

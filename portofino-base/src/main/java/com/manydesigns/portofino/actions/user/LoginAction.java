@@ -180,7 +180,7 @@ public abstract class LoginAction extends AbstractActionBean {
     // Cancel
     //**************************************************************************
 
-    @Button(list = "login-buttons", key = "commons.cancel", order = 2)
+    @Button(list = "login-buttons", key = "cancel", order = 2)
     public Resolution cancel() {
         String url = "/";
         if(!StringUtils.isBlank(cancelReturnUrl)) {

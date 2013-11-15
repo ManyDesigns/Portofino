@@ -26,10 +26,10 @@
     </div>
     <div class="modal-footer">
         <button name="cancelDeletePageButton" type="button" class="btn">
-            <fmt:message key="commons.cancel" />
+            <fmt:message key="cancel" />
         </button>
         <button name="confirmDeletePageButton" type="button" class="btn btn-warning">
-            <fmt:message key="commons.delete" />
+            <fmt:message key="delete" />
         </button>
     </div>
 

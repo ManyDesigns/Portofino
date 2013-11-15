@@ -393,14 +393,14 @@ public class ManyToManyAction extends AbstractPageAction {
 
     //Configuration
 
-    @Button(list = "pageHeaderButtons", titleKey = "commons.configure", order = 1, icon = Button.ICON_WRENCH)
+    @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();
         return new ForwardResolution("/m/many2many/configure.jsp");
     }
 
-    @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "configuration", key = "update.configuration", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() {
         prepareConfigurationForms();
@@ -415,10 +415,10 @@ public class ManyToManyAction extends AbstractPageAction {
             configurationForm.writeToObject(conf);
             conf.writeTo(m2mConfiguration);
             saveConfiguration(m2mConfiguration);
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.updated"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
             return cancel();
         } else {
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.configuration.notUpdated"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("the.configuration.could.not.be.saved"));
             return new ForwardResolution("/m/many2many/configure.jsp");
         }
     }

@@ -106,7 +106,7 @@
                                     </button>
                                     <button class="btn cancelSortButton"
                                             type="button" role="button" aria-disabled="false">
-                                        <fmt:message key="commons.cancel" />
+                                        <fmt:message key="cancel" />
                                     </button>
                                     <ul id="sortable">
                                         <c:forEach var="col" items="${actionBean.decoratedColumns}" varStatus="status">

@@ -175,7 +175,7 @@ public class TablesAction extends AbstractActionBean {
         return new ForwardResolution("/m/database/actions/admin/tables/edit-column.jsp");
     }
 
-    @Button(key = "commons.save", list = "table-edit", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(key = "save", list = "table-edit", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution saveTable() {
         com.manydesigns.portofino.actions.admin.tables.forms.TableForm tf = setupTableForm(Mode.EDIT);
         setupColumnsForm(Mode.EDIT);
@@ -268,12 +268,12 @@ public class TablesAction extends AbstractActionBean {
         }
     }
 
-    @Button(key = "commons.cancel", list = "table-edit", order = 2)
+    @Button(key = "cancel", list = "table-edit", order = 2)
     public Resolution returnToTables() {
         return new RedirectResolution(BASE_ACTION_PATH);
     }
 
-    @Button(key = "commons.save", list = "column-edit", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(key = "save", list = "column-edit", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution saveColumn() {
         setupTableForm(Mode.HIDDEN);
         tableForm.readFromRequest(context.getRequest());
@@ -323,9 +323,9 @@ public class TablesAction extends AbstractActionBean {
     }
 
     @Buttons({
-            @Button(key = "commons.cancel", list = "column-edit", order = 2),
-            @Button(key = "commons.cancel", list = "table-short-name", order = 2),
-            @Button(key = "commons.cancel", list = "table-selection-provider", order = 3)
+            @Button(key = "cancel", list = "column-edit", order = 2),
+            @Button(key = "cancel", list = "table-short-name", order = 2),
+            @Button(key = "cancel", list = "table-selection-provider", order = 3)
     })
     public Resolution returnToTable() {
         RedirectResolution resolution =
@@ -342,7 +342,7 @@ public class TablesAction extends AbstractActionBean {
         return doEditSelectionProvider(databaseSelectionProviderForm);
     }
 
-    @Button(key = "commons.delete", list="table-selection-provider", order = 2)
+    @Button(key = "delete", list="table-selection-provider", order = 2)
     @Guard(test = "getSelectionProviderName() != null", type = GuardType.VISIBLE)
     public Resolution removeSelectionProvider() {
         table = findTable();
@@ -396,7 +396,7 @@ public class TablesAction extends AbstractActionBean {
         return databaseSelectionProviderForm;
     }
 
-    @Button(key = "commons.save", list = "table-selection-provider", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(key = "save", list = "table-selection-provider", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution saveSelectionProvider() {
         table = findTable();
         Mode mode = selectionProviderName == null ? Mode.CREATE : Mode.EDIT;

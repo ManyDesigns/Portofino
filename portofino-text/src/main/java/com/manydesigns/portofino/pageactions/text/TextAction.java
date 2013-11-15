@@ -282,8 +282,8 @@ public class TextAction extends AbstractPageAction {
 
     @Override
     @Buttons({
-        @Button(list = "configuration", key = "commons.cancel", order = 99),
-        @Button(list = "edit-content",  key = "commons.cancel", order = 99)})
+        @Button(list = "configuration", key = "cancel", order = 99),
+        @Button(list = "edit-content",  key = "cancel", order = 99)})
     public Resolution cancel() {
         return super.cancel();
     }
@@ -403,7 +403,7 @@ public class TextAction extends AbstractPageAction {
         return new ForwardResolution("/m/text/edit-content.jsp");
     }
 
-    @Button(list = "pageHeaderButtons", titleKey = "commons.configure", order = 1, icon = Button.ICON_WRENCH,
+    @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH,
             group = "pageHeaderButtons")
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configurePage() {
@@ -411,7 +411,7 @@ public class TextAction extends AbstractPageAction {
         return new ForwardResolution("/m/text/configure.jsp");
     }
 
-    @Button(list = "configuration", key = "commons.updateConfiguration", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "configuration", key = "update.configuration", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updateConfiguration() throws IOException {
         prepareConfigurationForms();
@@ -419,7 +419,7 @@ public class TextAction extends AbstractPageAction {
         boolean valid = validatePageConfiguration();
         if (valid) {
             updatePageConfiguration();
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.configuration.updated"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
             return cancel();
         } else {
             return new ForwardResolution("/m/text/configure.jsp");
@@ -571,7 +571,7 @@ public class TextAction extends AbstractPageAction {
         title = context.getRequest().getParameter("title");
         title = StringUtils.trimToNull(title);
         if (title == null) {
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("commons.configuration.titleEmpty"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("title.cannot.be.empty"));
             return new ForwardResolution("/m/text/edit-content.jsp");
         }
         Page page = pageInstance.getPage();
@@ -587,7 +587,7 @@ public class TextAction extends AbstractPageAction {
         return cancel();
     }
 
-    @Button(list = "manage-attachments-delete", key = "commons.delete", order = 1)
+    @Button(list = "manage-attachments-delete", key = "delete", order = 1)
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution deleteAttachments() {
         if (selection == null || selection.length == 0) {
