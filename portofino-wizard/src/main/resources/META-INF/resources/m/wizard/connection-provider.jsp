@@ -71,15 +71,6 @@
                         $("input[name=jdbcurl]").val(connectionUrlDefaults[$(this).val()]);
                     });
 
-                    var buttons = $(".form-actions button");
-                    buttons.click(function() {
-                        buttons.unbind("click");
-                        buttons.click(function() {
-                            alert("<fmt:message key='commons.waitOperation' />");
-                            return false;
-                        });
-                    });
-
                     var toggleNewSPForm = function() {
                         if(${empty actionBean.persistence.model.databases}) {
                             return;

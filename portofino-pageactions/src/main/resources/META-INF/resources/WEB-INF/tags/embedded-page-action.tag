@@ -28,7 +28,7 @@
             <button data-dismiss="alert" class="close" type="button">&times;</button>
             <ul class="errorMessages">
                 <li>
-                    <fmt:message key="pageaction.view.error">
+                    <fmt:message key="this.page.has.thrown.an.exception.during.rendering">
                         <fmt:param value="${path}" />
                     </fmt:message>
                 </li>

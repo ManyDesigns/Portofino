@@ -7,17 +7,14 @@
 <stripes:layout-render name="/theme/templates/dialog/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="skins.default.login.signUp"/>
-    </stripes:layout-component>
-    <stripes:layout-component name="pageTitle">
-        <fmt:message key="skins.default.login.signUp" />
+        <fmt:message key="sign.up" />
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form id="signUpForm" action="${actionBean.context.actualServletPath}" method="post">
             <mde:write name="actionBean" property="signUpForm"/>
             <div class="control-group ${actionBean.captchaValidationFailed ? 'error' : ''}">
                 <label for="captcha" class="control-label required">
-                    <fmt:message key="skins.default.login.captcha" />
+                    <fmt:message key="please.type.the.text.shown.in.the.image" />
                 </label>
                 <div class="controls">
                     <div class="input-append" style="margin-top: 5px;">
@@ -29,13 +26,13 @@
                     </div>
                     <img alt="captcha image" id="captcha-image" src="${pageContext.request.contextPath}${actionBean.context.actualServletPath}?captcha=" />
                     <c:if test="${actionBean.captchaValidationFailed}">
-                        <span class="help-inline"><fmt:message key="skins.default.login.captcha.error" /></span>
+                        <span class="help-inline"><fmt:message key="wrong.text" /></span>
                     </c:if>
                 </div>
             </div>
             <div class="login-buttons" style="margin-top: 10px;">
                 <button type="submit" name="signUp2" class="btn btn-primary">
-                    <fmt:message key="skins.default.login.signUp" />
+                    <fmt:message key="sign.up" />
                 </button>
                 <button type="submit" name="cancel" class="btn btn-link">
                     <fmt:message key="cancel" />

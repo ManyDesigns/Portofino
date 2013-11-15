@@ -65,14 +65,6 @@
                 }
 
                 $(function() {
-                    var buttons = $(".form-actions button");
-                    buttons.click(function() {
-                        buttons.unbind("click");
-                        buttons.click(function() {
-                            alert("<fmt:message key='commons.waitOperation' />");
-                            return false;
-                        });
-                    });
                     toggleRootsForm();
                     $("input[name=generationStrategy]").change(toggleRootsForm);
                 });

@@ -102,7 +102,7 @@ public class ApplicationInterceptor implements Interceptor {
                     logger.error("PageAction prepare failed for " + page, t);
                     if(!PageActionLogic.isEmbedded(actionBean)) {
                         String msg = MessageFormat.format
-                                (ElementsThreadLocals.getText("pageaction.exception"), ExceptionUtils.getRootCause(t));
+                                (ElementsThreadLocals.getText("this.page.has.thrown.an.exception.during.execution"), ExceptionUtils.getRootCause(t));
                         SessionMessages.addErrorMessage(msg);
                     }
                     return new ForwardResolution("/m/pageactions/redirect-to-last-working-page.jsp");

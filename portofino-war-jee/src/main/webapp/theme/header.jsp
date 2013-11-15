@@ -67,7 +67,7 @@
                             %>
                             <li>
                                 <a href="<%= changePasswordUrl %>">
-                                    <fmt:message key="skins.default.header.change.password" />
+                                    <fmt:message key="change.password" />
                                 </a>
                             </li>
                             <%
@@ -77,7 +77,7 @@
                                     %>
                             <li>
                                 <a href="<%= adminUrl %>">
-                                    <fmt:message key="skins.default.header.administration" />
+                                    <fmt:message key="administration" />
                                 </a>
                             </li>
                             <%
@@ -91,7 +91,7 @@
                             %>
                             <li>
                                 <a href="<%= logoutUrl %>">
-                                    <fmt:message key="skins.default.header.log_out" />
+                                    <fmt:message key="log.out" />
                                 </a>
                             </li>
                             <%
@@ -173,7 +173,7 @@
                         %>
                         <li>
                             <a href="<%= loginUrl %>">
-                                <fmt:message key="skins.default.header.log_in" />
+                                <fmt:message key="log.in" />
                             </a>
                         </li>
                     <% } %>

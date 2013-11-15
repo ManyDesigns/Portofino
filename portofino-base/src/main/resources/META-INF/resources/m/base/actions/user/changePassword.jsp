@@ -15,11 +15,11 @@
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actualServletPath}" method="post">
             <input type="password" name="pwd" id="pwd" class="input-block-level"
-                   placeholder="<fmt:message key='skins.default.login.current.password'/>" />
+                   placeholder="<fmt:message key='current.password'/>" />
             <input type="password" name="newPassword" id="newPassword" class="input-block-level"
-                   placeholder="<fmt:message key='skins.default.login.new.password'/>" />
+                   placeholder="<fmt:message key='new.password'/>" />
             <input type="password" name="confirmNewPassword" id="confirmNewPassword" class="input-block-level"
-                   placeholder="<fmt:message key='skins.default.login.confirm.new.password'/>" />
+                   placeholder="<fmt:message key='confirm.new.password'/>" />
             <div class="login-buttons spacingTop">
                 <button type="submit" id="changePassword2" name="changePassword2" class="btn btn-primary">Change password</button>
                 <button type="submit" name="cancel" class="btn btn-link">Cancel</button>

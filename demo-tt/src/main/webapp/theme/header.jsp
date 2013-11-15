@@ -44,7 +44,7 @@
                         <shiro:hasRole name="administrators">
                             <li >
                                 <stripes:link beanclass="com.manydesigns.portofino.actions.admin.AdminAction" class="navbar-link">
-                                    <fmt:message key="skins.default.header.administration" />
+                                    <fmt:message key="administration" />
                                 </stripes:link>
                             </li>
                             <li class="dropdown">
@@ -107,7 +107,7 @@
                                         <stripes:param name="changePassword"/>
                                         <stripes:param name="returnUrl" value="${actionPath}"/>
                                         <stripes:param name="cancelReturnUrl" value="${actionPath}"/>
-                                        <fmt:message key="skins.default.header.change.password" />
+                                        <fmt:message key="change.password" />
                                     </stripes:link>
                                 </li>--%>
                                 <li>
@@ -116,7 +116,7 @@
                                         <stripes:param name="logout"/>
                                         <stripes:param name="returnUrl" value="${actionPath}"/>
                                         <stripes:param name="cancelReturnUrl" value="${actionPath}"/>
-                                        <fmt:message key="skins.default.header.log_out" />
+                                        <fmt:message key="log.out" />
                                     </stripes:link>
                                 </li>
                             </ul>
@@ -127,7 +127,7 @@
 <%--                            <stripes:link href="/login">--%>
                             <stripes:link href="/actions/user/login">                                <stripes:param name="returnUrl" value="${actionPath}"/>
                                 <stripes:param name="cancelReturnUrl" value="${actionPath}"/>
-                                <fmt:message key="skins.default.header.log_in" />
+                                <fmt:message key="log.in" />
                             </stripes:link>
                         </li>
                     </shiro:notAuthenticated>

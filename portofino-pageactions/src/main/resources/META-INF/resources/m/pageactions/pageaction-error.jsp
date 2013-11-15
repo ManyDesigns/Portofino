@@ -27,7 +27,7 @@
             <button data-dismiss="alert" class="close" type="button">&times;</button>
             <ul class="errorMessages">
                 <li>
-                    <fmt:message key="pageaction.exception">
+                    <fmt:message key="this.page.has.thrown.an.exception.during.execution">
                         <fmt:param value="${exceptionString}" />
                     </fmt:message>
                 </li>

@@ -8,21 +8,21 @@
 %><stripes:layout-render name="/theme/templates/dialog/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="skins.default.login.login_to">
+        <fmt:message key="login.to">
             <fmt:param value="${actionBean.applicationName}" />
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="skins.default.login.login_to">
+        <fmt:message key="login.to">
             <fmt:param value="${actionBean.applicationName}" />
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actualServletPath}" method="post" class="dont-prompt-on-page-abandon">
             <input type="text" name="userName" id="userName" class="input-block-level"
-                   placeholder="<fmt:message key='skins.default.login.username'/>" />
+                   placeholder="<fmt:message key='user.name'/>" />
             <input type="password" name="pwd" id="pwd" class="input-block-level"
-                   placeholder="<fmt:message key='skins.default.login.password'/>" />
+                   placeholder="<fmt:message key='password'/>" />
             <div class="login-buttons">
                 <button type="submit" name="login" class="btn btn-primary">Log in</button>
             </div>
@@ -39,7 +39,7 @@
                         <stripes:param name="forgotPassword" value=""/>
                         <stripes:param name="returnUrl" value="${actionBean.returnUrl}"/>
                         <stripes:param name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
-                        <fmt:message key='skins.default.login.forgot.your.password'/>
+                        <fmt:message key='forgot.your.password'/>
                     </stripes:link>
                 </div>
                 <div class="login-link">

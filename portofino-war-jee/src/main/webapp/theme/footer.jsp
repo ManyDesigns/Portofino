@@ -10,7 +10,7 @@
 <footer>
     <div class="container">
         <div class="pull-right">
-            <fmt:message key="skins.default.footer.response_time"/>: <c:out value="${stopWatch.time}"/> ms.
+            <fmt:message key="page.response.time"/>: <c:out value="${stopWatch.time}"/> ms.
         </div>
         Powered by <a href="http://www.manydesigns.com/">Portofino</a>
         <c:out value="<%= ModuleRegistry.getPortofinoVersion() %>"/>

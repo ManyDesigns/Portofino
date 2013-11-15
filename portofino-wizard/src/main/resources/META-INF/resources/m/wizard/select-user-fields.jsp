@@ -27,18 +27,6 @@
                 <mde:write name="actionBean" property="jndiCPForm"/>
                 <mde:write name="actionBean" property="jdbcCPForm"/>
             </div>
-            <script type="text/javascript">
-                $(function() {
-                    var buttons = $(".form-actions button");
-                    buttons.click(function() {
-                        buttons.unbind("click");
-                        buttons.click(function() {
-                            alert("<fmt:message key='commons.waitOperation' />");
-                            return false;
-                        });
-                    });
-                });
-            </script>
             <div class="form-actions" style="padding-left: 20px;">
                 <portofino:buttons list="select-user-fields" />
             </div>

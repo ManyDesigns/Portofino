@@ -7,7 +7,7 @@
 <stripes:layout-render name="/theme/templates/dialog/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.openid.OpenIdLoginAction"/>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="skins.default.login.login_to">
+        <fmt:message key="login.to">
             <fmt:param value="${actionBean.applicationName}" />
         </fmt:message>
     </stripes:layout-component>

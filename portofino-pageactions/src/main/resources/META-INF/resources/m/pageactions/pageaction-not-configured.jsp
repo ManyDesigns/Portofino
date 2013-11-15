@@ -11,7 +11,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <div>
-            <fmt:message key="layouts.pageactionNotConfigured" />
+            <fmt:message key="this.page.is.not.correctly.configured" />
         </div>
     </stripes:layout-component>
 </stripes:layout-render>

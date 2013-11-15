@@ -16,9 +16,9 @@
         <stripes:form action="${actionBean.context.actualServletPath}" method="post">
             <input type="hidden" name="token" id="token" value="${actionBean.token}" />
             <input type="password" name="newPassword" id="newPassword" class="input-block-level"
-                   placeholder="<fmt:message key='skins.default.login.new.password'/>" />
+                   placeholder="<fmt:message key='new.password'/>" />
             <input type="password" name="confirmNewPassword" id="confirmNewPassword" class="input-block-level"
-                   placeholder="<fmt:message key='skins.default.login.confirm.new.password'/>" />
+                   placeholder="<fmt:message key='confirm.new.password'/>" />
             <div class="login-buttons spacingTop">
                 <button type="submit" id="resetPassword2" name="resetPassword2" class="btn btn-primary">Reset password</button>
             </div>

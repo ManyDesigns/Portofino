@@ -65,12 +65,12 @@ public class ReloadModelAction extends AbstractActionBean {
         return new ForwardResolution("/m/database/actions/admin/reload-model.jsp");
     }
 
-    @Button(list = "reload-model", key = "model.reload", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "reload-model", key = "reload", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresAdministrator
     public Resolution reloadModel() {
         synchronized (persistence) {
             persistence.loadXmlModel();
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("model.reloaded"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("model.successfully.reloaded"));
             return new ForwardResolution("/m/database/actions/admin/reload-model.jsp");
         }
     }
