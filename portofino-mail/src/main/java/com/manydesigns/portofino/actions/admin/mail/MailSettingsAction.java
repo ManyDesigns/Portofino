@@ -78,7 +78,7 @@ public class MailSettingsAction extends AbstractActionBean {
         return new ForwardResolution("/m/mail/admin/settings.jsp");
     }
 
-    @Button(list = "settings", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "settings", key = "update", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution update() {
         setupFormAndBean();
         form.readFromRequest(context.getRequest());

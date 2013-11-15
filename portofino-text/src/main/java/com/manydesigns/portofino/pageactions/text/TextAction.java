@@ -565,7 +565,7 @@ public class TextAction extends AbstractPageAction {
         return new ForwardResolution("/m/text/manage-attachments.jsp");
     }
 
-    @Button(list = "edit-content", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "edit-content", key = "update", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution updateContent() {
         title = context.getRequest().getParameter("title");
@@ -579,10 +579,10 @@ public class TextAction extends AbstractPageAction {
         try {
             DispatcherLogic.savePage(pageInstance.getDirectory(), page);
             saveContent();
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.update.successful"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.updated.successfully"));
         } catch (Exception e) {
             logger.error("Could not save content for page " + pageInstance.getPath(), e);
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.update.failed"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("update.failed"));
         }
         return cancel();
     }
@@ -621,7 +621,7 @@ public class TextAction extends AbstractPageAction {
                 .addParameter("returnUrl", returnUrl);
     }
 
-    @Button(list = "manage-attachments", key = "commons.ok", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "manage-attachments", key = "ok", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution saveAttachments() {
         if(downloadable == null) {

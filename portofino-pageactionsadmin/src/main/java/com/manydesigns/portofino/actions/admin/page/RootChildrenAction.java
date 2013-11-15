@@ -60,7 +60,7 @@ public class RootChildrenAction extends RootConfigurationAction {
     }
 
     @Override
-    @Button(list = "root-children", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "root-children", key = "update", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution updatePageChildren() {
         return super.updatePageChildren();
     }

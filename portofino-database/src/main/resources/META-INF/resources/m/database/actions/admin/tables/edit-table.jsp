@@ -102,7 +102,7 @@
                                     <br /><br />
                                     <button class="btn confirmSortButton"
                                             type="button" role="button" aria-disabled="false">
-                                        <fmt:message key="commons.ok" />
+                                        <fmt:message key="ok" />
                                     </button>
                                     <button class="btn cancelSortButton"
                                             type="button" role="button" aria-disabled="false">

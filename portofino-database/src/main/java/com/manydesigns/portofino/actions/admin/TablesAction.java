@@ -470,7 +470,7 @@ public class TablesAction extends AbstractActionBean {
     protected void saveModel() throws IOException, JAXBException {
         persistence.initModel();
         persistence.saveXmlModel();
-        SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.save.successful"));
+        SessionMessages.addInfoMessage(ElementsThreadLocals.getText("model.saved.successfully"));
     }
 
     protected boolean saveToColumnForm(Form columnForm, ColumnForm cf) {

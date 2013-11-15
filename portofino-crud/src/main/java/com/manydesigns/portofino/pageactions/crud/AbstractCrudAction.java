@@ -557,7 +557,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return getEditView();
     }
 
-    @Button(list = "crud-edit", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "crud-edit", key = "update", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution update() {
         setupForm(Mode.EDIT);
@@ -592,7 +592,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     SessionMessages.addErrorMessage(rootCauseMessage);
                     return getEditView();
                 }
-                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.update.successful"));
+                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.updated.successfully"));
                 return new RedirectResolution(
                         appendSearchStringParamIfNecessary(context.getActualServletPath()));
             }
@@ -624,7 +624,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkEdit() {
         if (selection == null || selection.length == 0) {
-            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("commons.bulkUpdate.nothingSelected"));
+            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("no.object.was.selected"));
             return new RedirectResolution(returnUrl, false);
         }
 
@@ -642,7 +642,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return getBulkEditView();
     }
 
-    @Button(list = "crud-bulk-edit", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "crud-bulk-edit", key = "update", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkUpdate() {
         int updated = 0;
@@ -668,7 +668,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 return getBulkEditView();
             }
             SessionMessages.addInfoMessage(
-                    ElementsThreadLocals.getText("commons.bulkUpdate.successful", updated));
+                    ElementsThreadLocals.getText("update.of._.objects.successful", updated));
             return new RedirectResolution(
                     appendSearchStringParamIfNecessary(context.getActualServletPath()));
         } else {

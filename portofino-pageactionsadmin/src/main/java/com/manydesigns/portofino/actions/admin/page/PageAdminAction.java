@@ -695,7 +695,7 @@ public class PageAdminAction extends AbstractPageAction {
         return new String[] { "active", "name", "title", "showInNavigation", "embedded" };
     }
 
-    @Button(list = "page-children-edit", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "page-children-edit", key = "update", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updatePageChildren() {
         setupChildPages();
@@ -708,7 +708,7 @@ public class PageAdminAction extends AbstractPageAction {
             detailChildPages.clear();
         }
         setupChildPages(); //Re-read sorted values
-        SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.update.successful"));
+        SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.updated.successfully"));
         return forwardToPageChildren();
     }
 
@@ -889,7 +889,7 @@ public class PageAdminAction extends AbstractPageAction {
         groups = portofinoRealm.getGroups();
     }
 
-    @Button(list = "page-permissions-edit", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "page-permissions-edit", key = "update", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updatePagePermissions() {
         try {

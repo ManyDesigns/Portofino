@@ -52,7 +52,7 @@ public class RootPermissionsAction extends RootConfigurationAction {
         return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/rootPermissions.jsp");
     }
 
-    @Button(list = "root-permissions", key = "commons.update", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "root-permissions", key = "update", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution updatePagePermissions() {
         return super.updatePagePermissions();
     }

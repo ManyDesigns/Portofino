@@ -134,7 +134,7 @@ public abstract class LoginAction extends AbstractActionBean {
         return new ForwardResolution(getLoginPage());
     }
 
-    @Button(list = "login-buttons", key = "commons.login", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "login-buttons", key = "login", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution login() {
         Subject subject = SecurityUtils.getSubject();
         if (subject.isAuthenticated()) {
@@ -466,7 +466,7 @@ public abstract class LoginAction extends AbstractActionBean {
         return new ForwardResolution("/m/base/actions/user/changePassword.jsp");
     }
 
-    @Button(list = "changepassword", key = "commons.ok", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "changepassword", key = "ok", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresAuthentication
     public Resolution changePassword2() throws Exception {
         Subject subject = SecurityUtils.getSubject();

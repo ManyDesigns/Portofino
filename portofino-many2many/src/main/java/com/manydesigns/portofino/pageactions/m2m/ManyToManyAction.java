@@ -320,7 +320,7 @@ public class ManyToManyAction extends AbstractPageAction {
         return existing;
     }
 
-    @Button(list = "m2m-checkboxes-edit", key = "commons.update")
+    @Button(list = "m2m-checkboxes-edit", key = "update")
     @Guard(test = "onePk != null", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = ManyToManyAction.PERMISSION_UPDATE)
     public Resolution saveCheckboxes() throws Exception {
@@ -367,7 +367,7 @@ public class ManyToManyAction extends AbstractPageAction {
             }
         }
         session.getTransaction().commit();
-        SessionMessages.addInfoMessage(ElementsThreadLocals.getText("commons.update.successful"));
+        SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.updated.successfully"));
         if(oneSelectField != null) {
             session.beginTransaction();
             session.clear();
