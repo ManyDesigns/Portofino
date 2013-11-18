@@ -286,11 +286,11 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         formBuilder.configSelectionProvider(detailLayoutSelectionProvider, "detailTemplate");
 
         DefaultSelectionProvider navRootSelectionProvider = new DefaultSelectionProvider("navigationRoot");
-        String label = ElementsThreadLocals.getText("com.manydesigns.portofino.pageactions.EditPage.navigationRoot.inherit");
+        String label = ElementsThreadLocals.getText("inherit");
         navRootSelectionProvider.appendRow(NavigationRoot.INHERIT, label, true);
-        label = ElementsThreadLocals.getText("com.manydesigns.portofino.pageactions.EditPage.navigationRoot.root");
+        label = ElementsThreadLocals.getText("root");
         navRootSelectionProvider.appendRow(NavigationRoot.ROOT, label, true);
-        label = ElementsThreadLocals.getText("com.manydesigns.portofino.pageactions.EditPage.navigationRoot.ghost_root");
+        label = ElementsThreadLocals.getText("ghost.root");
         navRootSelectionProvider.appendRow(NavigationRoot.GHOST_ROOT, label, true);
         formBuilder.configSelectionProvider(navRootSelectionProvider, "navigationRoot");
 

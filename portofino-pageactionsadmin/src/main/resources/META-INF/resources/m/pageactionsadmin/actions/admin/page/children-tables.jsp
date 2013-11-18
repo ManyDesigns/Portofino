@@ -5,14 +5,14 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<p><fmt:message key="page.children.help" /></p>
+<p><fmt:message key="drag.the.rows.of.the.tables.to.reorder.the.children" /></p>
 <input type="hidden" name="originalPath" value="${actionBean.originalPath}" />
 <div id="directChildren" class="childrenTable">
     <mde:write name="actionBean" property="childPagesForm" />
 </div>
 <c:if test="${not empty actionBean.detailChildPagesForm}">
     <div id="detailChildren" class="childrenTable">
-        <h2><fmt:message key="page.children.detail" /></h2>
+        <h2><fmt:message key="detail" /></h2>
         <mde:write name="actionBean" property="detailChildPagesForm" />
     </div>
 </c:if>

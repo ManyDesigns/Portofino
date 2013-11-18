@@ -13,7 +13,7 @@
         <mde:sessionMessages />
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="page.children.title">
+        <fmt:message key="page.children.for._">
             <fmt:param value="<%= StringEscapeUtils.escapeHtml(actionBean.getPage().getTitle()) %>" />
         </fmt:message>
     </stripes:layout-component>

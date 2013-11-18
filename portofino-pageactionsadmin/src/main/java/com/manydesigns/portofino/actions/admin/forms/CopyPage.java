@@ -34,7 +34,7 @@ public class CopyPage {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    @RegExp(value = "[a-zA-Z0-9][a-zA-Z0-9_\\-]*", errorMessage = "page.invalid.fragment")
+    @RegExp(value = "[a-zA-Z0-9][a-zA-Z0-9_\\-]*", errorMessage = "invalid.fragment.only.letters.numbers.etc.are.allowed")
     @Required
     @Label("Fragment")
     public String fragment;

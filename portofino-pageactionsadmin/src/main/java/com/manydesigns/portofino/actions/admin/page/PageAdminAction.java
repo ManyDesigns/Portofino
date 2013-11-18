@@ -192,7 +192,7 @@ public class PageAdminAction extends AbstractPageAction {
             return doCreateNewPage();
         } catch (Exception e) {
             logger.error("Error creating page", e);
-            String msg = ElementsThreadLocals.getText("page.create.failed", e.getMessage());
+            String msg = ElementsThreadLocals.getText("error.creating.page._", e.getMessage());
             SessionMessages.addErrorMessage(msg);
             return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/new-page.jsp");
         }
@@ -293,7 +293,7 @@ public class PageAdminAction extends AbstractPageAction {
 
             if(directory.exists()) {
                 logger.error("Can't create page - directory {} exists", directory.getAbsolutePath());
-                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.create.failed.directoryExists"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("error.creating.page.the.directory.already.exists"));
                 return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/new-page.jsp");
             }
             if(ElementsFileUtils.safeMkdirs(directory)) {
@@ -331,16 +331,16 @@ public class PageAdminAction extends AbstractPageAction {
                     DispatcherLogic.savePage(parentDirectory, parentPage);
                 } catch (Exception e) {
                     logger.error("Exception saving page configuration");
-                    SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.create.failed"));
+                    SessionMessages.addErrorMessage(ElementsThreadLocals.getText("error.creating.page._"));
                     return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/new-page.jsp");
                 }
             } else {
                 logger.error("Can't create directory {}", directory.getAbsolutePath());
-                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.create.failed.cantCreateDir"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("error.creating.page.the.directory.could.not.be.created"));
                 return new ForwardResolution("/m/pageactionsadmin/actions/admin/page/new-page.jsp");
             }
             logger.info("Page " + pageId + " created. Path: " + directory.getAbsolutePath());
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("page.create.successful"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("page.created.successfully.you.should.now.configure.it"));
             String url = context.getRequest().getContextPath() + configurePath + "/" + fragment;
             return new RedirectResolution(url, false)
                             .addParameter("configure").addParameter("returnUrl", url);
@@ -353,7 +353,7 @@ public class PageAdminAction extends AbstractPageAction {
         PageInstance pageInstance = getPageInstance();
         PageInstance parentPageInstance = pageInstance.getParent();
         if(parentPageInstance == null) {
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.delete.forbidden.root"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("you.cant.delete.the.root.page"));
         } else {
             Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
             String contextPath = context.getRequest().getContextPath();
@@ -361,7 +361,7 @@ public class PageAdminAction extends AbstractPageAction {
             Dispatch landingPageDispatch = dispatcher.getDispatch(landingPagePath);
             if(landingPageDispatch != null &&
                landingPageDispatch.getLastPageInstance().getDirectory().equals(pageInstance.getDirectory())) {
-                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.delete.forbidden.landing"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("you.cant.delete.the.landing.page"));
                 return new RedirectResolution(originalPath);
             }
             try {
@@ -431,13 +431,13 @@ public class PageAdminAction extends AbstractPageAction {
 
     protected Resolution copyPage(String destinationPagePath, String newName, boolean deleteOriginal) {
         if(StringUtils.isEmpty(destinationPagePath)) {
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.copyOrMove.noDestination"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("you.must.select.a.destination"));
             return new RedirectResolution(originalPath);
         }
         PageInstance pageInstance = getPageInstance();
         PageInstance oldParent = pageInstance.getParent();
         if(oldParent == null) {
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.copyOrMove.forbidden.root"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("you.cant.copy.or.move.the.root.page"));
             return new RedirectResolution(originalPath);
         }
         if(deleteOriginal) {
@@ -448,7 +448,7 @@ public class PageAdminAction extends AbstractPageAction {
             Dispatch landingPageDispatch = dispatcher.getDispatch(landingPagePath);
             if(landingPageDispatch != null &&
                landingPageDispatch.getLastPageInstance().getDirectory().equals(pageInstance.getDirectory())) {
-                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.move.forbidden.landing"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("you.cant.move.the.landing.page"));
                 return new RedirectResolution(originalPath);
             }
         }
@@ -476,7 +476,7 @@ public class PageAdminAction extends AbstractPageAction {
         //Check permissions on target parent page
         Subject subject = SecurityUtils.getSubject();
         if(!SecurityLogic.hasPermissions(portofinoConfiguration, newParent, subject, AccessLevel.EDIT)) {
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("page.copyOrMove.forbidden.accessLevel"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("you.dont.have.edit.access.level.on.the.destination.page"));
             return new RedirectResolution(originalPath);
         }
 
@@ -532,7 +532,7 @@ public class PageAdminAction extends AbstractPageAction {
                     SessionMessages.addErrorMessage(msg);
                 }
             } else {
-                String msg = ElementsThreadLocals.getText("page.copyOrMove.destinationExists", newDirectory.getAbsolutePath());
+                String msg = ElementsThreadLocals.getText("destination.is.an.existing.file/directory._", newDirectory.getAbsolutePath());
                 SessionMessages.addErrorMessage(msg);
                 return new RedirectResolution(originalPath);
             }
@@ -545,7 +545,7 @@ public class PageAdminAction extends AbstractPageAction {
                 return new RedirectResolution(newParent.getPath());
             }
         } else {
-            String msg = ElementsThreadLocals.getText("page.copyOrMove.invalidDestination", destinationPagePath);
+            String msg = ElementsThreadLocals.getText("invalid.destination._", destinationPagePath);
             SessionMessages.addErrorMessage(msg);
             return new RedirectResolution(originalPath);
         }
@@ -747,7 +747,7 @@ public class PageAdminAction extends AbstractPageAction {
             }
             newChildren.add(childPage);
             if(!editChildPage.showInNavigation && !editChildPage.embedded) {
-                String msg = ElementsThreadLocals.getText("page.warnNotShowInNavigationNotEmbedded", editChildPage.name);
+                String msg = ElementsThreadLocals.getText("the.page._.is.not.embedded.and.not.included.in.navigation", editChildPage.name);
                 SessionMessages.addWarningMessage(msg);
             }
         }
@@ -770,7 +770,7 @@ public class PageAdminAction extends AbstractPageAction {
             DispatcherLogic.savePage(getPageInstance());
         } catch (Exception e) {
             logger.error("Couldn't save page", e);
-            String msg = ElementsThreadLocals.getText("page.update.failed", e.getMessage());
+            String msg = ElementsThreadLocals.getText("error.updating.page._", e.getMessage());
             SessionMessages.addErrorMessage(msg);
             return false;
         }

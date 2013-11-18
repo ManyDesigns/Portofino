@@ -34,33 +34,33 @@ public class EditPage {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.id")
+    @LabelI18N("id")
     @Updatable(false)
     public String id;
 
-    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.title")
+    @LabelI18N("title")
     @Required
     @CssClass(BootstrapSizes.BLOCK_LEVEL)
     public String title;
 
-    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.description")
+    @LabelI18N("description")
     @Required
     @CssClass(BootstrapSizes.BLOCK_LEVEL)
     public String description;
 
-    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.navigationRoot")
+    @LabelI18N("navigation.root")
     @Required
     public NavigationRoot navigationRoot;
 
-    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.template")
+    @LabelI18N("template")
     @Required
     public String template;
 
-    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.detailTemplate")
+    @LabelI18N("detail.template")
     @Required
     public String detailTemplate;
 
-    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.applyTemplateRecursively")
+    @LabelI18N("apply.template.recursively")
     @Required
     public boolean applyTemplateRecursively;
 

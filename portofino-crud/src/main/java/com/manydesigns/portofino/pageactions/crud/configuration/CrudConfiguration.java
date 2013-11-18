@@ -136,7 +136,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         return properties;
     }
 
-    @LabelI18N("com.manydesigns.portofino.model.pages.crud.Crud.name")
+    @LabelI18N("name")
     @XmlAttribute(required = true)
     public String getName() {
         return name;

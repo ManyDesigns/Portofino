@@ -62,7 +62,7 @@ public class NewPage extends Page {
         this.insertPositionName = insertPositionName;
     }
 
-    @RegExp(value = "[a-zA-Z0-9][a-zA-Z0-9_\\-]*", errorMessage = "page.invalid.fragment")
+    @RegExp(value = "[a-zA-Z0-9][a-zA-Z0-9_\\-]*", errorMessage = "invalid.fragment.only.letters.numbers.etc.are.allowed")
     @Required
     public String getFragment() {
         return fragment;

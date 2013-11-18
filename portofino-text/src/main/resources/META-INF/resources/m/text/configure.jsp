@@ -10,7 +10,7 @@
                type="com.manydesigns.portofino.pageactions.text.TextAction"
 /><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="com.manydesigns.portofino.pageactions.configure">
+        <fmt:message key="configure.page._">
             <fmt:param value="<%= StringEscapeUtils.escapeHtml(actionBean.getPage().getTitle()) %>" />
         </fmt:message>
     </stripes:layout-component>

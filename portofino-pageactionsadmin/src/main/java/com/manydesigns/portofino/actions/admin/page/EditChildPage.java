@@ -38,9 +38,9 @@ public class EditChildPage {
     @Insertable(false)
     public String name;
     public boolean active;
-    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.embedInParent")
+    @LabelI18N("embed.in.parent")
     public boolean embedded;
-    @LabelI18N("com.manydesigns.portofino.pageactions.EditPage.showInNavigation")
+    @LabelI18N("show.in.navigation")
     public boolean showInNavigation;
     @Updatable(false)
     @Insertable(false)
