@@ -422,7 +422,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             fw.close();
             Class<?> scriptClass = DispatcherLogic.getActionClass(portofinoConfiguration, directory, false);
             if(scriptClass == null) {
-                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("script.class.invalid"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("script.class.is.not.valid"));
             }
             if(this instanceof GroovyObject) {
                 //Attempt to remove old instance of custom action bean
@@ -437,12 +437,12 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             }
         } catch (IOException e) {
             logger.error("Error writing script to " + groovyScriptFile, e);
-            String msg = ElementsThreadLocals.getText("script.write.failed", groovyScriptFile.getAbsolutePath());
+            String msg = ElementsThreadLocals.getText("couldnt.write.script.to._", groovyScriptFile.getAbsolutePath());
             SessionMessages.addErrorMessage(msg);
         } catch (Exception e) {
             String pageId = pageInstance.getPage().getId();
             logger.warn("Couldn't compile script for page " + pageId, e);
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("script.compile.failed"));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("couldnt.compile.script"));
         } finally {
             IOUtils.closeQuietly(fw);
         }

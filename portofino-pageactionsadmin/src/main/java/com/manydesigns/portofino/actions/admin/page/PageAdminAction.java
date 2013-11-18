@@ -825,7 +825,7 @@ public class PageAdminAction extends AbstractPageAction {
         return forwardToPagePermissions();
     }
 
-    @Button(list = "testUserPermissions", key = "user.permissions.test")
+    @Button(list = "testUserPermissions", key = "test")
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution testUserPermissions() {
         testUserId = StringUtils.defaultIfEmpty(testUserId, null);

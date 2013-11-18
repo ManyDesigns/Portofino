@@ -78,7 +78,7 @@ public class GAELoginAction extends AbstractActionBean {
                 session.invalidate();
             }
 
-            String msg = ElementsThreadLocals.getText("user.logout");
+            String msg = ElementsThreadLocals.getText("user.disconnected");
             SessionMessages.addInfoMessage(msg);
             logger.info("User {} logout", userId);
             String logoutUrl = userService.createLogoutURL(context.getRequest().getContextPath() + "/");
