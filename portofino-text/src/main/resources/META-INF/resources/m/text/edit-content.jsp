@@ -29,7 +29,7 @@
         <stripes:form action="${actionBean.context.actualServletPath}" method="post" enctype="multipart/form-data">
             <!-- Content editor -->
             <fieldset style="margin-bottom: 2em;">
-                <legend><fmt:message key="layouts.text.configure.content"/></legend>
+                <legend><fmt:message key="edit.content"/></legend>
                 <input type="text" name="title" value="<c:out value="${actionBean.title}"/>"
                        class="input-block-level"/>
                 <stripes:textarea class="mde-form-rich-text" name="content" value="${actionBean.content}"/>

@@ -10,7 +10,7 @@
                type="com.manydesigns.portofino.pageactions.text.TextAction"
 /><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="layouts.text.manage-attachments.manage_attachments_for_page">
+        <fmt:message key="manage.attachments.for.page._">
             <fmt:param value="<%= StringEscapeUtils.escapeHtml(actionBean.getPage().getTitle()) %>" />
         </fmt:message>
     </stripes:layout-component>
@@ -35,7 +35,7 @@
                                 <label class="checkbox">
                                     <stripes:checkbox name="downloadable" value="${attachment.id}"
                                                       checked="${attachment.downloadable ? attachment.id : null}"/>
-                                    <fmt:message key="layouts.text.manage-attachments.downloadable" />
+                                    <fmt:message key="downloadable" />
                                 </label>
                             </td>
                         </tr>
@@ -46,19 +46,19 @@
                 <script type="text/javascript">
                     $(function() {
                         $("button.manage-attachments-delete").click(function() {
-                            return confirm('<fmt:message key="layouts.text.manage-attachments.confirm_delete"/>');
+                            return confirm('<fmt:message key="delete.selected.attachments"/>');
                         });
                     });
                 </script>
             </c:if><c:if test="${empty actionBean.textConfiguration.attachments}">
-                <fmt:message key="layouts.text.manage-attachments.there_are_no_attachments"/>
+                <fmt:message key="there.are.no.attachments"/>
             </c:if>
             <div class="horizontalSeparator"></div>
-            <fmt:message key="layouts.text.manage-attachments.upload_new_file"/>:
+            <fmt:message key="upload.a.new.file"/>:
             <stripes:file name="upload"/>
             <label class="checkbox">
                 <stripes:checkbox name="uploadDownloadable" checked="checked" />
-                <fmt:message key="layouts.text.manage-attachments.downloadable" />
+                <fmt:message key="downloadable" />
             </label>
             <br/>
             <br/>

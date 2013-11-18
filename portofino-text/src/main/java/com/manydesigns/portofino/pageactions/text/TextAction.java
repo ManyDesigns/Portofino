@@ -288,26 +288,6 @@ public class TextAction extends AbstractPageAction {
         return super.cancel();
     }
 
-    /*protected String convertPathToInternalLink(String path) {
-        Dispatcher dispatcher = new Dispatcher(application);
-        Dispatch pathDispatch = dispatcher.createDispatch(context.getRequest().getContextPath(), path);
-        PageInstance[] pageInstancePath = pathDispatch.getPageInstancePath();
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (PageInstance current : pageInstancePath) {
-            String pageId = current.getPage().getId();
-            String fragment = current.formatUrlFragment(pageId);
-            if (first) {
-                first = false;
-                // ignore fragment of root node
-            } else {
-                sb.append("/");
-                sb.append(fragment);
-            }
-        }
-        return sb.toString();
-    }*/
-
     protected String processContentBeforeView(String content) {
         content = restoreAttachmentUrls(content);
         content = restoreLocalUrls(content);
@@ -373,22 +353,7 @@ public class TextAction extends AbstractPageAction {
         return sb.toString();
     }
 
-    /*protected String convertInternalLinkToPath(String link) {
-        Dispatcher dispatcher = new Dispatcher(application) {
-            @Override
-            protected String getFragmentToMatch(Page page) {
-                return page.getId();
-            }
-            @Override
-            protected Dispatch checkDispatch(Dispatch dispatch) {
-                return dispatch;
-            }
-        };
-        Dispatch pathDispatch = dispatcher.createDispatch(context.getRequest().getContextPath(), link);
-        return pathDispatch.getPathUrl();
-    }*/
-
-    @Button(list = "pageHeaderButtons", titleKey = "layouts.text.edit", order = 2, icon = Button.ICON_EDIT,
+    @Button(list = "pageHeaderButtons", titleKey = "edit", order = 2, icon = Button.ICON_EDIT,
             group = "pageHeaderButtons")
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution configure() {
@@ -557,7 +522,7 @@ public class TextAction extends AbstractPageAction {
         return new ForwardResolution("/m/text/browsePages.jsp");
     }
 
-    @Button(list = "pageHeaderButtons", titleKey = "layouts.text.manage-attachments.manage_attachments", order = 3,
+    @Button(list = "pageHeaderButtons", titleKey = "manage.attachments", order = 3,
             icon = Button.ICON_PICTURE, group = "pageHeaderButtons")
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution manageAttachments() {

@@ -7,7 +7,7 @@
 <html lang="<%= request.getLocale() %>">
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.pageactions.text.TextAction"/>
-<fmt:message key="layouts.text.browse.browse_server" var="pageTitle"/>
+<fmt:message key="browse.server" var="pageTitle"/>
 <jsp:include page="/theme/head.jsp">
     <jsp:param name="pageTitle" value="${pageTitle}" />
 </jsp:include>
@@ -18,9 +18,9 @@
             <input type="hidden" name="returnUrl"
                    value='<%= request.getContextPath() + actionBean.getContext().getActualServletPath() + "?" + request.getQueryString() %>' />
             <input type="hidden" name="CKEditorFuncNum" value='${actionBean.CKEditorFuncNum}' />
-            <fmt:message key="layouts.text.browse.pages"/>:
+            <fmt:message key="pages"/>:
             <button class="btn" type="submit" name="browsePages" role="button" aria-disabled="false">
-                <fmt:message key="layouts.text.browse"/></button>
+                <fmt:message key="browse"/></button>
         </form>
     <% } %>
     <c:if test="${not empty actionBean.textConfiguration.attachments}">
@@ -38,8 +38,8 @@
         </ul>
     </c:if>
     <c:if test="${empty actionBean.textConfiguration.attachments}">
-        <fmt:message key="layouts.text.browse.there_are_no_attachments"/>
-        <a href="#" onclick="window.close()"><fmt:message key="layouts.text.browse.close_window"/></a>
+        <fmt:message key="there.are.no.attachments"/>
+        <a href="#" onclick="window.close()"><fmt:message key="close.window"/></a>
     </c:if>
     </div>
 </body>
