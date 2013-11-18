@@ -85,7 +85,7 @@
                                         <option value="">
                                             <fmt:message key='<%= "permissions.level." + parentAccessLevel.name().toLowerCase() %>'
                                                          var="parentAccessLevelName" />
-                                            <fmt:message key="permissions.level.inherited">
+                                            <fmt:message key="inherited._">
                                                 <fmt:param value="${parentAccessLevelName}" />
                                             </fmt:message>
                                         </option>
@@ -95,7 +95,7 @@
                                                         out.print("selected='selected'");
                                                     }
                                                 %>>
-                                            <fmt:message key="permissions.level.none" />
+                                            <fmt:message key="none" />
                                         </option>
                                         <option value="<%= AccessLevel.VIEW.name() %>"
                                                 <%
@@ -103,7 +103,7 @@
                                                         out.print("selected='selected'");
                                                     }
                                                 %>>
-                                            <fmt:message key="permissions.level.view" />
+                                            <fmt:message key="view" />
                                         </option>
                                         <option value="<%= AccessLevel.EDIT.name() %>"
                                                 <%
@@ -111,7 +111,7 @@
                                                         out.print("selected='selected'");
                                                     }
                                                 %>>
-                                            <fmt:message key="permissions.level.edit" />
+                                            <fmt:message key="edit" />
                                         </option>
                                         <option value="<%= AccessLevel.DEVELOP.name() %>"
                                                 <%
@@ -119,7 +119,7 @@
                                                         out.print("selected='selected'");
                                                     }
                                                 %>>
-                                            <fmt:message key="permissions.level.develop" />
+                                            <fmt:message key="develop" />
                                         </option>
                                         <option value="<%= AccessLevel.DENY.name() %>"
                                                 <%
@@ -127,7 +127,7 @@
                                                         out.print("selected='selected'");
                                                     }
                                                 %>>
-                                            <fmt:message key="permissions.level.deny" />
+                                            <fmt:message key="deny" />
                                         </option>
                                     </select>
                                 </td>

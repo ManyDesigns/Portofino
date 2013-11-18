@@ -894,7 +894,7 @@ public class PageAdminAction extends AbstractPageAction {
     public Resolution updatePagePermissions() {
         try {
             updatePagePermissions(getPageInstance());
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("permissions.page.updated"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("page.permissions.saved.successfully"));
             return new RedirectResolution(HttpUtil.getRequestedPath(context.getRequest()))
                     .addParameter("pagePermissions").addParameter("originalPath", originalPath);
         } catch (Exception e) {
