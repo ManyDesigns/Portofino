@@ -130,8 +130,8 @@
         </style>
         <table id="tables" style="width: auto;">
             <tr>
-                <th width="20%"><fmt:message key="layouts.admin.tables.databaseSlashSchema" /></th>
-                <th width="80%"><fmt:message key="layouts.admin.tables.table" /></th>
+                <th width="20%"><fmt:message key="database/schema" /></th>
+                <th width="80%"><fmt:message key="table.entity" /></th>
             </tr>
 
             <%

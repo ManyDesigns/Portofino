@@ -27,9 +27,9 @@
                        actionBean.getConfiguration().getActualRelationTable() != null) { %>
                     <a href="/${pageContext.request.contextPath}actions/admin/tables/${actionBean.configuration.actualRelationTable.databaseName}/${actionBean.configuration.actualRelationTable.schemaName}/${actionBean.configuration.actualRelationTable.tableName}?addSelectionProvider="
                        target="_blank">
-                        <fmt:message key="com.manydesigns.portofino.pageactions.m2m.configuration.addSelectionProvider.linkText" />
+                        <fmt:message key="add.a.selection.provider" />
                     </a>
-                    <fmt:message key="com.manydesigns.portofino.pageactions.m2m.configuration.addSelectionProvider.explanation" />
+                    <fmt:message key="save.this.configuration.to.see.it.in.selection.lists" />
                 <% } %>
             </p>
 

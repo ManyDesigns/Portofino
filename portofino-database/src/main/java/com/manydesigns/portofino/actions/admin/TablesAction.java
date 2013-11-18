@@ -221,7 +221,7 @@ public class TablesAction extends AbstractActionBean {
                                 if(fromColumn.getActualJavaType() != toColumn.getActualJavaType()) {
                                     SessionMessages.addWarningMessage(
                                             ElementsThreadLocals.getText(
-                                                    "layouts.admin.tables.typeMismatchInTable",
+                                                    "detected.type.mismatch.between.column._.and.column._",
                                                     fromColumn.getQualifiedName(),
                                                     fromColumn.getActualJavaType().getName(),
                                                     toColumn.getQualifiedName(),
@@ -258,7 +258,7 @@ public class TablesAction extends AbstractActionBean {
                             (ClassLoader) context.getServletContext().getAttribute(BaseModule.CLASS_LOADER);
                     Class.forName(javaClass, true, classLoader);
                 } catch (ClassNotFoundException e) {
-                    javaClassField.getErrors().add(ElementsThreadLocals.getText("layouts.admin.tables.classNotFound"));
+                    javaClassField.getErrors().add(ElementsThreadLocals.getText("class.not.found._"));
                     return false;
                 }
             }
@@ -299,7 +299,7 @@ public class TablesAction extends AbstractActionBean {
                                 }
                                 SessionMessages.addWarningMessage(
                                         ElementsThreadLocals.getText(
-                                                "layouts.admin.tables.typeMismatchInColumn",
+                                                "detected.type.mismatch.with.column._",
                                                 otherColumn.getQualifiedName(),
                                                 otherColumn.getActualJavaType().getName(),
                                                 fk.getName()));
@@ -415,7 +415,7 @@ public class TablesAction extends AbstractActionBean {
                (StringUtils.isEmpty(databaseSelectionProviderForm.getSql()) &&
                 StringUtils.isEmpty(databaseSelectionProviderForm.getHql()))) {
                 SessionMessages.addErrorMessage(
-                        ElementsThreadLocals.getText("layouts.admin.tables.selectionProvider.hqlSqlError"));
+                        ElementsThreadLocals.getText("please.fill.exactly.one.of.the.fields.hql.sql"));
                 return doEditSelectionProvider(databaseSelectionProviderForm);
             }
 
@@ -425,7 +425,7 @@ public class TablesAction extends AbstractActionBean {
                 Column col = DatabaseLogic.findColumnByName(table, c.trim());
                 if(col == null) {
                     SessionMessages.addErrorMessage(
-                            ElementsThreadLocals.getText("layouts.admin.tables.selectionProvider.columnNotFound", c));
+                            ElementsThreadLocals.getText("column._.not.found", c));
                     return doEditSelectionProvider(databaseSelectionProviderForm);
                 } else {
                     columns.add(col);
@@ -437,7 +437,7 @@ public class TablesAction extends AbstractActionBean {
                 if(DatabaseLogic.findSelectionProviderByName(
                         table, databaseSelectionProviderForm.getName()) != null) {
                     String message = ElementsThreadLocals.getText(
-                            "layouts.admin.tables.selectionProvider.alreadyExists",
+                            "selection.provider._.already.exists",
                             databaseSelectionProviderForm.getName());
                     SessionMessages.addErrorMessage(message);
                     return doEditSelectionProvider(databaseSelectionProviderForm);
@@ -480,7 +480,7 @@ public class TablesAction extends AbstractActionBean {
                 try {
                     new SimpleDateFormat(cf.getDateFormat());
                 } catch (Exception e) {
-                    String message = ElementsThreadLocals.getText("layouts.admin.tables.invalidDateFormat");
+                    String message = ElementsThreadLocals.getText("invalid.date.format.string");
                     columnForm.findFieldByPropertyName("dateFormat").getErrors().add(message);
                     return false;
                 }
@@ -522,7 +522,7 @@ public class TablesAction extends AbstractActionBean {
             } else {
                 SessionMessages.addWarningMessage(
                         ElementsThreadLocals.getText(
-                                "layouts.admin.tables.columnSkipped",
+                                "skipped.column._.with.unknown.type._",
                                 column.getColumnName(),
                                 column.getColumnType(),
                                 column.getJdbcType()));

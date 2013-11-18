@@ -8,7 +8,7 @@
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.ConnectionProvidersAction"/>
 <stripes:layout-render name="/m/base/admin-theme/admin-page.jsp">
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="layouts.admin.connectionProviders.edit.title"/>: <c:out value="${actionBean.databaseName}"/>
+        <fmt:message key="edit.connection.provider"/>: <c:out value="${actionBean.databaseName}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.ConnectionProvidersAction"
@@ -19,7 +19,7 @@
             </c:if>
             <c:if test="${actionBean.schemasForm != null}">
                 <div class="horizontalSeparator"></div>
-                <h4><fmt:message key="layouts.admin.connectionProviders.read.configured_schemas"/></h4>
+                <h4><fmt:message key="configured.schemas"/></h4>
                 <mde:write name="actionBean" property="schemasForm"/>
             </c:if>
             <stripes:hidden name="databaseName" value="${actionBean.databaseName}"/>

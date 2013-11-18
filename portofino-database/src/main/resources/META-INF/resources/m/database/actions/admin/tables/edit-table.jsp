@@ -70,10 +70,10 @@
         <stripes:form action="${actionBean.actionPath}" method="post">
             <ul id="tabs" class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#tab-table-columns">
-                    <fmt:message key="layouts.admin.tables.tableAndColumns" />
+                    <fmt:message key="table.and.columns" />
                 </a></li>
                 <li><a data-toggle="tab" href="#tab-fk-sp">
-                    <fmt:message key="layouts.admin.tables.editTable.foreignKeysAndSelectionProviders" />
+                    <fmt:message key="foreign.keys.and.selection.providers" />
                 </a></li>
             </ul>
             <div class="tab-content">
@@ -87,10 +87,10 @@
                     <div class="tableForm">
                         <fieldset>
                             <legend>
-                                <fmt:message key="layouts.admin.tables.editTable.columns" />
+                                <fmt:message key="columns" />
                                 <button class="btn sortButton"
                                     type="button" role="button" aria-disabled="false">
-                                    <fmt:message key="layouts.admin.tables.changeOrder" />
+                                    <fmt:message key="change.order" />
                                 </button>
                             </legend>
                             <div style="margin-top: 1em;">
@@ -98,7 +98,7 @@
                                     <mde:write name="actionBean" property="columnsTableForm" />
                                 </div>
                                 <div id="sortableContainer">
-                                    <fmt:message key="layouts.admin.tables.changeOrder.help" />
+                                    <fmt:message key="drag.the.columns.to.change.their.order.then.push.ok" />
                                     <br /><br />
                                     <button class="btn confirmSortButton"
                                             type="button" role="button" aria-disabled="false">
@@ -124,17 +124,17 @@
                 <div id="tab-fk-sp" class="tab-pane fade in">
                     <div class="tableForm">
                         <fieldset>
-                            <legend><fmt:message key="layouts.admin.tables.editTable.foreignKeys" /></legend>
+                            <legend><fmt:message key="foreign.keys" /></legend>
                             <div style="margin-top: 1em;">
                                 <c:if test="${not empty actionBean.table.foreignKeys}">
                                     <table>
                                         <tr>
-                                            <th><fmt:message key="layouts.admin.tables.editTable.name" /></th>
-                                            <th><fmt:message key="layouts.admin.tables.editTable.onePropertyName" /></th>
-                                            <th><fmt:message key="layouts.admin.tables.editTable.manyPropertyName" /></th>
-                                            <th><fmt:message key="layouts.admin.tables.editTable.columns" /></th>
-                                            <th><fmt:message key="layouts.admin.tables.editTable.refTable" /></th>
-                                            <th><fmt:message key="layouts.admin.tables.editTable.refColumns" /></th>
+                                            <th><fmt:message key="name" /></th>
+                                            <th><fmt:message key="property.name.one.side" /></th>
+                                            <th><fmt:message key="property.name.many.side" /></th>
+                                            <th><fmt:message key="columns" /></th>
+                                            <th><fmt:message key="referenced.table" /></th>
+                                            <th><fmt:message key="referenced.columns" /></th>
                                         </tr>
                                         <c:forEach items="${actionBean.table.foreignKeys}" var="fk">
                                             <tr>
@@ -181,22 +181,22 @@
                                     </table>
                                 </c:if>
                                 <c:if test="${empty actionBean.table.foreignKeys}">
-                                    <fmt:message key="layouts.admin.tables.editTable.noForeignKeys" />
+                                    <fmt:message key="none.available" />
                                 </c:if>
                             </div>
                         </fieldset>
                     </div>
                     <div class="tableForm">
                         <fieldset>
-                            <legend><fmt:message key="layouts.admin.tables.editTable.selectionProviders" /></legend>
+                            <legend><fmt:message key="selection.providers" /></legend>
                             <div style="margin-top: 1em;">
                                 <c:if test="${not empty actionBean.table.selectionProviders}">
                                     <table>
                                         <tr>
-                                            <th><fmt:message key="layouts.admin.tables.editTable.name" /></th>
-                                            <th><fmt:message key="layouts.admin.tables.editTable.columns" /></th>
-                                            <th><fmt:message key="layouts.admin.tables.editTable.database" /></th>
-                                            <th><fmt:message key="layouts.admin.tables.editTable.query" /></th>
+                                            <th><fmt:message key="name" /></th>
+                                            <th><fmt:message key="columns" /></th>
+                                            <th><fmt:message key="database" /></th>
+                                            <th><fmt:message key="query" /></th>
                                         </tr>
                                         <c:forEach items="${actionBean.table.selectionProviders}" var="sp">
                                             <tr>
@@ -235,7 +235,7 @@
                                     </table>
                                 </c:if>
                                 <c:if test="${empty actionBean.table.selectionProviders}">
-                                    <fmt:message key="layouts.admin.tables.editTable.noSelectionProviders" /><br />
+                                    <fmt:message key="none.available" /><br />
                                 </c:if>
                                 <br />
                                 <portofino:buttons list="table-selection-providers" />

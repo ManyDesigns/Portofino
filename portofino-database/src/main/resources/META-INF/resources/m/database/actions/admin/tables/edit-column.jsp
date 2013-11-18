@@ -8,7 +8,7 @@
 <stripes:layout-render name="/m/base/admin-theme/admin-page.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.TablesAction"/>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="layouts.admin.tables.editColumn.title">
+        <fmt:message key="edit.column._">
             <fmt:param value="${actionBean.column.qualifiedName}" />
         </fmt:message>
     </stripes:layout-component>

@@ -259,7 +259,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
         }
     }
 
-    @Button(list = "connectionProviders-read", key = "layouts.admin.connectionProviders.list.test", order = 3)
+    @Button(list = "connectionProviders-read", key = "test", order = 3)
     public Resolution test() {
         connectionProvider = persistence.getConnectionProvider(databaseName);
         connectionProvider.init(persistence.getDatabasePlatformsRegistry());
@@ -420,7 +420,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
         }
     }
 
-    @Button(list = "connectionProviders-read", key = "layouts.admin.connectionProviders.list.synchronize", order = 4)
+    @Button(list = "connectionProviders-read", key = "synchronize", order = 4)
     public Resolution sync() {
         try {
             persistence.syncDataModel(databaseName);
@@ -439,7 +439,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
     }
 
     /* TODO
-    @Button(list = "connectionProviders-read", key = "layouts.admin.connectionProviders.list.runWizard", order = 5)
+    @Button(list = "connectionProviders-read", key = "run.wizard", order = 5)
     public Resolution runWizard() {
         ConnectionProvider connectionProvider = persistence.getConnectionProvider(databaseName);
         return new RedirectResolution(ApplicationWizard.class)

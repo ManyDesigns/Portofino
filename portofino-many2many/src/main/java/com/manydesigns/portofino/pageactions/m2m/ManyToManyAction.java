@@ -457,11 +457,11 @@ public class ManyToManyAction extends AbstractPageAction {
         formBuilder.configFieldSetNames("Many to many");
 
         DefaultSelectionProvider viewTypeSelectionProvider = new DefaultSelectionProvider("viewType");
-        String label = ElementsThreadLocals.getText("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.CHECKBOXES");
+        String label = ElementsThreadLocals.getText("check.boxes.horizontal");
         viewTypeSelectionProvider.appendRow(ViewType.CHECKBOXES.name(), label, true);
-        label = ElementsThreadLocals.getText("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.CHECKBOXES_VERTICAL");
+        label = ElementsThreadLocals.getText("check.boxes.vertical");
         viewTypeSelectionProvider.appendRow(ViewType.CHECKBOXES_VERTICAL.name(), label, true);
-        //label = getMessage("com.manydesigns.portofino.pageactions.m2m.configuration.ViewType.LISTS");
+        //label = getMessage("lists");
         //viewTypeSelectionProvider.appendRow(ViewType.LISTS.name(), label, true);
         formBuilder.configSelectionProvider(viewTypeSelectionProvider, "viewType");
 

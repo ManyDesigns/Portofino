@@ -14,7 +14,7 @@
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.ConnectionProvidersAction"
                       method="post">
             <mde:write name="actionBean" property="tableForm"/>
-            <h4><fmt:message key="layouts.admin.connectionProviders.list.available_platforms"/></h4>
+            <h4><fmt:message key="available.database.platforms"/></h4>
             <mde:write name="actionBean" property="databasePlatformsTableForm"/>
             <div class="form-actions">
                 <portofino:buttons list="connectionProviders-search" />

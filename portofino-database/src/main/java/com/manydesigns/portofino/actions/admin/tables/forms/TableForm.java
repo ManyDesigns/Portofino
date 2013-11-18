@@ -57,22 +57,22 @@ public class TableForm extends Table {
     @FieldSize(50)
     @RegExp(
         value = "(_|$|[a-z]|[A-Z]|[\u0080-\ufffe])(_|$|[a-z]|[A-Z]|[\u0080-\ufffe]|[0-9])*",
-        errorMessage = "layouts.admin.tables.invalidEntityName")
-    @LabelI18N("layouts.admin.tables.entityName")
+        errorMessage = "invalid.entity.name")
+    @LabelI18N("entity.name")
     public String getEntityName() {
         return super.getEntityName();
     }
 
     @Override
     @FieldSize(50)
-    @LabelI18N("layouts.admin.tables.javaClass")
+    @LabelI18N("java.class")
     public String getJavaClass() {
         return super.getJavaClass();
     }
 
     @Override
     @FieldSize(50)
-    @LabelI18N("layouts.admin.tables.shortName")
+    @LabelI18N("short.name")
     public String getShortName() {
         return super.getShortName();
     }
