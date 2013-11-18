@@ -5,7 +5,7 @@
 <div class="dialog-move-page modal hide">
     <div class="modal-header">
         <button name="closeMovePageButton" type="button" class="close" aria-hidden="true">&times;</button>
-        <h4><fmt:message key="layouts.admin.movePageDialog.move_to"/></h4>
+        <h4><fmt:message key="move.to"/></h4>
     </div>
     <div class="modal-body form-horizontal">
         <input type="hidden" name="movePage" value="action" />

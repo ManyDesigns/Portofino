@@ -8,7 +8,7 @@
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.SettingsAction"/>
 <stripes:layout-render name="/m/base/admin-theme/admin-page.jsp">
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="layouts.admin.settings.settings"/>
+        <fmt:message key="settings"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.SettingsAction"

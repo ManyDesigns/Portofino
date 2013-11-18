@@ -5,7 +5,7 @@
 <div class="dialog-copy-page modal hide">
     <div class="modal-header">
         <button name="closeCopyPageButton" type="button" class="close" aria-hidden="true">&times;</button>
-        <h4><fmt:message key="layouts.admin.copyPageDialog.copy_to"/></h4>
+        <h4><fmt:message key="copy.to"/></h4>
     </div>
     <div class="modal-body form-horizontal">
         <input type="hidden" name="copyPage" value="action" />

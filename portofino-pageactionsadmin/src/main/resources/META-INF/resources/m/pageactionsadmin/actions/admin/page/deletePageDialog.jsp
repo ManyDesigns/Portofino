@@ -9,16 +9,16 @@
 <div class="dialog-confirm-delete-page modal hide">
     <div class="modal-header">
         <button name="closeDeletePageButton" type="button" class="close" aria-hidden="true">&times;</button>
-        <h4><fmt:message key="layouts.admin.deletePageDialog.really_delete"/></h4>
+        <h4><fmt:message key="really.delete"/></h4>
     </div>
     <div class="modal-body">
-        <p><fmt:message key="layouts.admin.deletePageDialog.are_you_sure"/></p>
+        <p><fmt:message key="are.you.sure.you.want.to.delete.this.page"/></p>
         <%
             PageInstance pageInstance = actionBean.getPageInstance();
             Page pg = pageInstance.getPage();
             if(!pg.getLayout().getChildPages().isEmpty() ||
                !pg.getDetailLayout().getChildPages().isEmpty()) { %>
-                <p><fmt:message key="layouts.admin.deletePageDialog.children"/></p><%
+                <p><fmt:message key="deleting.it.will.also.delete.its.children"/></p><%
                 out.print(displayPageChildrenAsList(pg));
             }
         %>

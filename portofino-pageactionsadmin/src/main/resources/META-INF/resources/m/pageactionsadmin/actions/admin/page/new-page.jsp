@@ -16,7 +16,7 @@
         <mde:sessionMessages />
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="layouts.page-crud.new-page.add_new_page"/>
+        <fmt:message key="add.new.page"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form action="/actions/admin/page" method="post" enctype="multipart/form-data"
@@ -24,7 +24,7 @@
             <input type="hidden" name="originalPath" value="${actionBean.originalPath}" />
             <mde:write name="actionBean" property="newPageForm"/>
             <fieldset>
-                <legend><fmt:message key="layouts.page-crud.new-page.preview"/></legend>
+                <legend><fmt:message key="preview"/></legend>
                 <table>
                     <tbody>
                     <tr>

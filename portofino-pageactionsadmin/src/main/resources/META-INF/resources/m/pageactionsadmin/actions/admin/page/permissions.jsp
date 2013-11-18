@@ -21,7 +21,7 @@
         <mde:sessionMessages />
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="layouts.page.permissions.page-permissions-for">
+        <fmt:message key="page.permissions.for._">
             <fmt:param value="<%= StringEscapeUtils.escapeHtml(actionBean.getPage().getTitle()) %>" />
         </fmt:message>
     </stripes:layout-component>
@@ -38,9 +38,9 @@
                         if(supportedPermissions != null) {
                     %>
                         <tr>
-                            <th rowspan="2"><fmt:message key="layouts.page.permissions.group" /></th>
-                            <th rowspan="2"><fmt:message key="layouts.page.permissions.access-level" /></th>
-                            <th colspan="<%= supportedPermissions.length %>"><fmt:message key="layouts.page.permissions.permissions" /></th>
+                            <th rowspan="2"><fmt:message key="group" /></th>
+                            <th rowspan="2"><fmt:message key="access.level" /></th>
+                            <th colspan="<%= supportedPermissions.length %>"><fmt:message key="permissions" /></th>
                         </tr>
                         <tr>
                             <c:forEach var="perm" items="<%= supportedPermissions %>">
@@ -49,8 +49,8 @@
                         </tr>
                     <%  } else { %>
                         <tr>
-                            <th><fmt:message key="layouts.page.permissions.group" /></th>
-                            <th><fmt:message key="layouts.page.permissions.access-level" /></th>
+                            <th><fmt:message key="group" /></th>
+                            <th><fmt:message key="access.level" /></th>
                         </tr>
                     <%  } %>
                         <c:forEach var="group" items="${actionBean.groups}">
@@ -155,8 +155,8 @@
                     </table>
                 </div>
                 <div class="span3">
-                    <h4 style="margin-top: 0;"><fmt:message key="layouts.page.permissions.test-a-user" /></h4>
-                    <label for="testUserIdSelect"><fmt:message key="layouts.page.permissions.select-a-user" /></label>
+                    <h4 style="margin-top: 0;"><fmt:message key="test.a.user" /></h4>
+                    <label for="testUserIdSelect"><fmt:message key="select.a.user.and.view.its.permissions" /></label>
                     <c:if test="${actionBean.users != null}">
                         <select name="testUserId" id="testUserIdSelect">
                             <c:forEach var="user" items="${actionBean.users}">
@@ -175,13 +175,13 @@
                     <table id="userPermissionTestResults">
                         <c:if test="${not empty actionBean.testedAccessLevel}">
                             <tr>
-                                <td><fmt:message key="layouts.page.permissions.access-level" />:</td>
+                                <td><fmt:message key="access.level" />:</td>
                                 <td><fmt:message key='<%= "permissions.level." + actionBean.getTestedAccessLevel().name().toLowerCase() %>' /></td>
                             </tr>
                         </c:if>
                         <c:if test="${not empty actionBean.testedPermissions}">
                             <tr>
-                                <td><fmt:message key="layouts.page.permissions.permissions" />:</td>
+                                <td><fmt:message key="permissions" />:</td>
                                 <td>
                                     <ul style="margin-bottom: 0;">
                                         <c:forEach var="perm" items="${actionBean.testedPermissions}">

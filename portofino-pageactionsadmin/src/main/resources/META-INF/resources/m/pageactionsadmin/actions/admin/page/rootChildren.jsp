@@ -9,7 +9,7 @@
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.admin.page.RootConfigurationAction"/>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="layouts.admin.rootChildren" />
+        <fmt:message key="top.level.pages" />
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.page.RootChildrenAction"

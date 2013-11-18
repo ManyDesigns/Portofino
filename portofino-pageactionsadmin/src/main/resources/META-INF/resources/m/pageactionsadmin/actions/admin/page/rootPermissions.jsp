@@ -12,7 +12,7 @@
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.admin.page.RootConfigurationAction"/>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="layouts.admin.rootPermissions" />
+        <fmt:message key="root.permissions" />
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <style type="text/css">
@@ -29,8 +29,8 @@
                     Page currentPage = currentPageInstance.getPage();
                 %>
                 <tr>
-                    <th><fmt:message key="layouts.page.permissions.group" /></th>
-                    <th><fmt:message key="layouts.page.permissions.access-level" /></th>
+                    <th><fmt:message key="group" /></th>
+                    <th><fmt:message key="access.level" /></th>
                 </tr>
                 <c:forEach var="group" items="${actionBean.groups}">
                     <tr>

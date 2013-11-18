@@ -34,7 +34,7 @@ public class MovePage {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     @Required
-    @LabelI18N("layouts.admin.movePageDialog.choose_where_move")
+    @LabelI18N("where.to.move")
     public String destinationPagePath;
 
 }
