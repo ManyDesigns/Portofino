@@ -133,7 +133,7 @@ public abstract class Chart2DGenerator extends AbstractChartGenerator {
 //        plot.setToolTipGenerator(new StandardPieToolTipGenerator("{0} = {1} ({2})"));
 
         // imposta il messaggio se non ci sono dati
-        plot.setNoDataMessage(ElementsThreadLocals.getText("chart.noDataMessage"));
+        plot.setNoDataMessage(ElementsThreadLocals.getText("no.data.available"));
         plot.setRangeGridlinesVisible(true);
         plot.setRangeGridlinePaint(Color.GRAY);
         plot.setAxisOffset(new RectangleInsets(0,0,0,0));

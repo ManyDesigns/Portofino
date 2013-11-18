@@ -114,7 +114,7 @@ public abstract class Chart1DGenerator extends AbstractChartGenerator {
 //        plot.setLabelGenerator(new MyPieSectionLabelGenerator());
 
         // imposta il messaggio se non ci sono dati
-        plot.setNoDataMessage(ElementsThreadLocals.getText("chart.noDataMessage"));
+        plot.setNoDataMessage(ElementsThreadLocals.getText("no.data.available"));
 
         plot.setCircular(true);
 

@@ -265,11 +265,11 @@ public class ConnectionProvidersAction extends AbstractActionBean {
         connectionProvider.init(persistence.getDatabasePlatformsRegistry());
         String status = connectionProvider.getStatus();
         if (ConnectionProvider.STATUS_CONNECTED.equals(status)) {
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("connectionProviders.test.successful"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("connection.tested.successfully"));
         } else {
             SessionMessages.addErrorMessage(
                     ElementsThreadLocals.getText(
-                            "connectionProviders.test.failed",
+                            "connection.failed.status._.error.message._",
                             status, connectionProvider.getErrorMessage()));
         }
         return new RedirectResolution(this.getClass())
@@ -346,7 +346,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                 connectionProvider.init(persistence.getDatabasePlatformsRegistry());
                 persistence.initModel();
                 persistence.saveXmlModel();
-                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("connectionProviders.update.successful"));
+                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("connection.provider.updated.successfully"));
             } catch (Exception e) {
                 String msg = "Cannot save model: " +
                         ExceptionUtils.getRootCauseMessage(e);
@@ -397,7 +397,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                 SessionMessages.addErrorMessage(msg);
             }
         } else {
-            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("connectionProviders.delete.noneSelected"));
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("no.connection.providers.selected"));
         }
         return new RedirectResolution(this.getClass());
     }
