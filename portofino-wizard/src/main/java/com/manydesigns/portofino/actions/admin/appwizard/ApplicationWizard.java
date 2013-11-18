@@ -186,7 +186,7 @@ public class ApplicationWizard extends AbstractPageAction {
     public static final Logger logger = LoggerFactory.getLogger(ApplicationWizard.class);
 
     @DefaultHandler
-    @Button(list = "select-schemas", key="wizard.prev", order = 1)
+    @Button(list = "select-schemas", key="<<previous", order = 1)
     public Resolution start() {
         buildCPForms();
         context.getRequest().getSession().removeAttribute(databaseSessionKey);
@@ -223,7 +223,7 @@ public class ApplicationWizard extends AbstractPageAction {
                             connectionProviderSP,
                             Mode.EDIT,
                             null);
-            connectionProviderField.setLabel(ElementsThreadLocals.getText("appwizard.existingConnectionProvider"));
+            connectionProviderField.setLabel(ElementsThreadLocals.getText("use.an.existing.database.connection"));
             connectionProviderField.setComboLabel("--");
         } catch (NoSuchFieldException e) {
             throw new Error(e);
@@ -253,7 +253,7 @@ public class ApplicationWizard extends AbstractPageAction {
                             .configSelectionProvider(driverSelectionProvider, "driver")
                             .build();
 
-        jdbcCPForm.findFieldByPropertyName("driver").setHelp(ElementsThreadLocals.getText("appwizard.jdbcDriver.help"));
+        jdbcCPForm.findFieldByPropertyName("driver").setHelp(ElementsThreadLocals.getText("additional.drivers.can.be.downloaded"));
 
         //Handle back
         jndiCPForm.readFromRequest(context.getRequest());
@@ -262,13 +262,13 @@ public class ApplicationWizard extends AbstractPageAction {
         connectionProviderField.readFromRequest(context.getRequest());
     }
 
-    @Button(list = "user-management", key="wizard.prev", order = 1)
+    @Button(list = "user-management", key="<<previous", order = 1)
     public Resolution backToSelectSchemas() {
         context.getRequest().getSession().removeAttribute(databaseSessionKey);
         return configureConnectionProvider();
     }
 
-    @Button(list = "connection-provider", key="wizard.next", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "connection-provider", key="next>>", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution configureConnectionProvider() {
         buildCPForms();
         if(connectionProviderField.validate()) {
@@ -302,7 +302,7 @@ public class ApplicationWizard extends AbstractPageAction {
             Database existingDatabase =
                     DatabaseLogic.findDatabaseByName(persistence.getModel(), edit.getDatabaseName());
             if(existingDatabase != null) {
-                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("appwizard.error.duplicateDatabase", edit.getDatabaseName()));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("there.is.already.a.database.named._", edit.getDatabaseName()));
                 return createConnectionProviderForm();
             }
             return afterCreateConnectionProvider();
@@ -316,7 +316,7 @@ public class ApplicationWizard extends AbstractPageAction {
             configureEditSchemas();
         } catch (Exception e) {
             logger.error("Couldn't read schema names from db", e);
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("appwizard.error.schemas", e));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("couldnt.read.schema.names.from.db._", e));
             return createConnectionProviderForm();
         }
         return selectSchemasForm();
@@ -353,8 +353,8 @@ public class ApplicationWizard extends AbstractPageAction {
     }
 
     @Buttons({
-        @Button(list = "select-schemas", key="wizard.next", order = 2, type = Button.TYPE_PRIMARY),
-        @Button(list = "select-user-fields", key="wizard.prev", order = 1)
+        @Button(list = "select-schemas", key="next>>", order = 2, type = Button.TYPE_PRIMARY),
+        @Button(list = "select-user-fields", key="<<previous", order = 1)
     })
     public Resolution selectSchemas() {
         configureConnectionProvider();
@@ -368,7 +368,7 @@ public class ApplicationWizard extends AbstractPageAction {
                 }
                 return afterSelectSchemas();
             } else {
-                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("appwizard.error.schemas.noneSelected"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("select.at.least.a.schema"));
                 return selectSchemasForm();
             }
         }
@@ -389,7 +389,7 @@ public class ApplicationWizard extends AbstractPageAction {
     protected void updateModelFailed(Exception e) {
         logger.error("Could not update model", e);
         SessionMessages.addErrorMessage(
-                ElementsThreadLocals.getText("appwizard.error.updateModelFailed", ExceptionUtils.getRootCauseMessage(e)));
+                ElementsThreadLocals.getText("could.not.save.model._", ExceptionUtils.getRootCauseMessage(e)));
         if(isNewConnectionProvider()) {
             persistence.getModel().getDatabases().remove(connectionProvider.getDatabase());
         }
@@ -429,7 +429,7 @@ public class ApplicationWizard extends AbstractPageAction {
             targetDatabase = dbSyncer.syncDatabase(refModel);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("appwizard.error.sync", e));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("error.in.database.synchronization._", e));
             return null;
         } finally {
             database.getSchemas().removeAll(tempSchemas);
@@ -499,7 +499,7 @@ public class ApplicationWizard extends AbstractPageAction {
             Field userGroupTableField = new SelectField(userGroupPropertyAccessor, selectionProvider, mode, "");
 
             userAndGroupTablesForm = new Form(mode);
-            FieldSet fieldSet = new FieldSet(ElementsThreadLocals.getText("appwizard.userAndGroupTables"), 1, mode);
+            FieldSet fieldSet = new FieldSet(ElementsThreadLocals.getText("users.and.groups.tables"), 1, mode);
             fieldSet.add(userTableField);
             fieldSet.add(groupTableField);
             fieldSet.add(userGroupTableField);
@@ -518,7 +518,7 @@ public class ApplicationWizard extends AbstractPageAction {
         return new ForwardResolution("/m/wizard/user-management.jsp");
     }
 
-    @Button(list = "user-management", key="wizard.next", order = 2, type = Button.TYPE_PRIMARY)
+    @Button(list = "user-management", key="next>>", order = 2, type = Button.TYPE_PRIMARY)
     public Resolution setupUserManagement() {
         selectSchemas();
 
@@ -559,23 +559,23 @@ public class ApplicationWizard extends AbstractPageAction {
         DefaultSelectionProvider algoSelectionProvider = new DefaultSelectionProvider("");
         algoSelectionProvider.appendRow(
                 "plaintext",
-                ElementsThreadLocals.getText("appwizard.userTable.encryption.plaintext"),
+                ElementsThreadLocals.getText("plain.text"),
                 true);
         algoSelectionProvider.appendRow(
                 "md5Base64",
-                ElementsThreadLocals.getText("appwizard.userTable.encryption.md5Base64"),
+                ElementsThreadLocals.getText("md5.base64.encoded"),
                 true);
         algoSelectionProvider.appendRow(
                 "md5Hex",
-                ElementsThreadLocals.getText("appwizard.userTable.encryption.md5Hex"),
+                ElementsThreadLocals.getText("md5.hex.encoded"),
                 true);
         algoSelectionProvider.appendRow(
                 "sha1Base64",
-                ElementsThreadLocals.getText("appwizard.userTable.encryption.sha1Base64"),
+                ElementsThreadLocals.getText("sha1.base64.encoded.portofino3"),
                 true);
         algoSelectionProvider.appendRow(
                 "sha1Hex",
-                ElementsThreadLocals.getText("appwizard.userTable.encryption.sha1Hex"),
+                ElementsThreadLocals.getText("sha1.hex.encoded"),
                 true);
         try {
             ClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(getClass());
@@ -607,7 +607,7 @@ public class ApplicationWizard extends AbstractPageAction {
             Field userTokenPropertyField = new SelectField(propertyAccessor, userSelectionProvider, mode, "");
             userTokenPropertyField.setRequired(false);
 
-            FieldSet uFieldSet = new FieldSet(ElementsThreadLocals.getText("appwizard.userTable"), 1, mode);
+            FieldSet uFieldSet = new FieldSet(ElementsThreadLocals.getText("users.table.setup"), 1, mode);
             uFieldSet.add(userIdPropertyField);
             uFieldSet.add(userNamePropertyField);
             uFieldSet.add(userPasswordPropertyField);
@@ -654,7 +654,7 @@ public class ApplicationWizard extends AbstractPageAction {
                 propertyAccessor = classAccessor.getProperty("adminGroupName");
                 Field adminGroupNameField = new TextField(propertyAccessor, mode);
 
-                FieldSet gFieldSet = new FieldSet(ElementsThreadLocals.getText("appwizard.groupTable"), 1, mode);
+                FieldSet gFieldSet = new FieldSet(ElementsThreadLocals.getText("groups.tables.setup"), 1, mode);
                 gFieldSet.add(groupIdPropertyField);
                 gFieldSet.add(groupNamePropertyField);
                 gFieldSet.add(groupLinkPropertyField);
@@ -681,7 +681,7 @@ public class ApplicationWizard extends AbstractPageAction {
         }
     }
 
-    @Button(list = "select-user-fields", key="wizard.next", order = 2, type = Button.TYPE_PRIMARY)
+    @Button(list = "select-user-fields", key="next>>", order = 2, type = Button.TYPE_PRIMARY)
     public Resolution selectUserFields() {
         setupUserManagement();
         if(userTable != null) {
@@ -713,7 +713,7 @@ public class ApplicationWizard extends AbstractPageAction {
         try {
             generateCalendarField =
                     new BooleanField(classAccessor.getProperty("generateCalendar"), Mode.EDIT);
-            generateCalendarField.setLabel(ElementsThreadLocals.getText("appwizard.generateCalendar"));
+            generateCalendarField.setLabel(ElementsThreadLocals.getText("generate.a.calendar.page"));
             generateCalendarField.readFromObject(this);
         } catch (NoSuchFieldException e) {
             throw new Error(e);
@@ -800,7 +800,7 @@ public class ApplicationWizard extends AbstractPageAction {
         return roots;
     }
 
-    @Button(list = "select-tables", key="wizard.next", order = 2, type = Button.TYPE_PRIMARY)
+    @Button(list = "select-tables", key="next>>", order = 2, type = Button.TYPE_PRIMARY)
     public Resolution selectTables() {
         selectUserFields();
 
@@ -810,13 +810,13 @@ public class ApplicationWizard extends AbstractPageAction {
         afterSelectSchemas();
 
         if(roots.isEmpty()) {
-            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("appwizard.warning.noRoot"));
+            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("no.page.will.be.generated"));
         }
 
         return buildAppForm();
     }
 
-    @Button(list = "select-tables", key="wizard.prev", order = 1)
+    @Button(list = "select-tables", key="<<previous", order = 1)
     public Resolution goBackFromSelectTables() {
         selectUserFields();
         if(userTable == null) {
@@ -834,13 +834,13 @@ public class ApplicationWizard extends AbstractPageAction {
         return new ForwardResolution("/m/wizard/build-app.jsp");
     }
 
-    @Button(list = "build-app", key="wizard.prev", order = 1)
+    @Button(list = "build-app", key="<<previous", order = 1)
     public Resolution returnToSelectTables() {
         selectTables();
         return selectTablesForm();
     }
 
-    @Button(list = "build-app", key="wizard.finish", order = 2, type = Button.TYPE_PRIMARY)
+    @Button(list = "build-app", key="finish", order = 2, type = Button.TYPE_PRIMARY)
     public Resolution buildApplication() {
         selectTables();
         Database oldDatabase =
@@ -887,7 +887,7 @@ public class ApplicationWizard extends AbstractPageAction {
                 DispatcherLogic.savePage(pagesDir, rootPage);
             } catch (Exception e) {
                 logger.error("Error while creating pages", e);
-                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("appwizard.error.createPagesFailed", e));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("could.not.create.pages._", e));
                 return buildAppForm();
             }
         }
@@ -904,10 +904,10 @@ public class ApplicationWizard extends AbstractPageAction {
         if(userTable != null) {
             SecurityUtils.getSubject().logout();
             context.getRequest().getSession().invalidate();
-            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("appwizard.warning.userTable.created"));
+            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("user.management.has.been.configured.please.edit.security.groovy"));
             //ShiroUtils.clearCache(SecurityUtils.getSubject().getPrincipals());
         }
-        SessionMessages.addInfoMessage(ElementsThreadLocals.getText("appwizard.finished"));
+        SessionMessages.addInfoMessage(ElementsThreadLocals.getText("application.created"));
         context.getRequest().getSession().removeAttribute(databaseSessionKey);
         return new RedirectResolution("/");
     }
@@ -997,7 +997,7 @@ public class ApplicationWizard extends AbstractPageAction {
             } else {
                 logger.warn("Couldn't create directory {}", dir.getAbsolutePath());
                 SessionMessages.addWarningMessage(
-                        ElementsThreadLocals.getText("appwizard.error.createDirectoryFailed", dir.getAbsolutePath()));
+                        ElementsThreadLocals.getText("couldnt.create.directory", dir.getAbsolutePath()));
             }
         }
     }
@@ -1089,7 +1089,7 @@ public class ApplicationWizard extends AbstractPageAction {
             IOUtils.closeQuietly(fw);
         } catch (Exception e) {
             logger.warn("Couldn't configure users", e);
-            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("appwizard.error.userSetupFailed", e));
+            SessionMessages.addWarningMessage(ElementsThreadLocals.getText("couldnt.set.up.user.management._", e));
         }
     }
 
@@ -1121,7 +1121,7 @@ public class ApplicationWizard extends AbstractPageAction {
             throws Exception {
         if(dir.exists()) {
             SessionMessages.addWarningMessage(
-                        ElementsThreadLocals.getText("appwizard.error.directoryExists", dir.getAbsolutePath()));
+                        ElementsThreadLocals.getText("directory.exists.page.not.created._", dir.getAbsolutePath()));
             return null;
         } else if(dir.mkdirs()) {
             logger.info("Creating CRUD page {}", dir.getAbsolutePath());
@@ -1179,7 +1179,7 @@ public class ApplicationWizard extends AbstractPageAction {
             if(!detailDir.isDirectory() && !detailDir.mkdir()) {
                 logger.warn("Could not create detail directory {}", detailDir.getAbsolutePath());
                 SessionMessages.addWarningMessage(
-                    ElementsThreadLocals.getText("appwizard.error.createDirectoryFailed", detailDir.getAbsolutePath()));
+                    ElementsThreadLocals.getText("couldnt.create.directory", detailDir.getAbsolutePath()));
             }
 
             ChildPage childPage = new ChildPage();
@@ -1191,7 +1191,7 @@ public class ApplicationWizard extends AbstractPageAction {
         } else {
             logger.warn("Couldn't create directory {}", dir.getAbsolutePath());
             SessionMessages.addWarningMessage(
-                    ElementsThreadLocals.getText("appwizard.error.createDirectoryFailed", dir.getAbsolutePath()));
+                    ElementsThreadLocals.getText("couldnt.create.directory", dir.getAbsolutePath()));
             return null;
         }
     }
@@ -1523,7 +1523,7 @@ public class ApplicationWizard extends AbstractPageAction {
         return selectableSchemas;
     }
 
-    @LabelI18N("appwizard.userTable.name")
+    @LabelI18N("users.table")
     public String getUserTableName() {
         return userTableName;
     }
@@ -1532,7 +1532,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.userTableName = userTableName;
     }
 
-    @LabelI18N("appwizard.groupTable.name")
+    @LabelI18N("groups.table")
     public String getGroupTableName() {
         return groupTableName;
     }
@@ -1549,7 +1549,7 @@ public class ApplicationWizard extends AbstractPageAction {
         return userManagementSetupForm;
     }
 
-    @LabelI18N("appwizard.userTable.nameProperty")
+    @LabelI18N("username.property")
     public String getUserNameProperty() {
         return userNameProperty;
     }
@@ -1558,7 +1558,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.userNameProperty = userNameProperty;
     }
 
-    @LabelI18N("appwizard.userTable.emailProperty")
+    @LabelI18N("email.property")
     public String getUserEmailProperty() {
         return userEmailProperty;
     }
@@ -1567,7 +1567,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.userEmailProperty = userEmailProperty;
     }
 
-    @LabelI18N("appwizard.userTable.tokenProperty")
+    @LabelI18N("token.property")
     public String getUserTokenProperty() {
         return userTokenProperty;
     }
@@ -1576,7 +1576,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.userTokenProperty = userTokenProperty;
     }
 
-    @LabelI18N("appwizard.userTable.idProperty")
+    @LabelI18N("user.id.property")
     public String getUserIdProperty() {
         return userIdProperty;
     }
@@ -1585,7 +1585,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.userIdProperty = userIdProperty;
     }
 
-    @LabelI18N("appwizard.userTable.passwordProperty")
+    @LabelI18N("password.property")
     public String getUserPasswordProperty() {
         return userPasswordProperty;
     }
@@ -1602,7 +1602,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.groupIdProperty = groupIdProperty;
     }
 
-    @LabelI18N("appwizard.userGroupTable.name")
+    @LabelI18N("user-group.join.table")
     public String getUserGroupTableName() {
         return userGroupTableName;
     }
@@ -1619,7 +1619,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.groupNameProperty = groupNameProperty;
     }
 
-    @LabelI18N("appwizard.userGroupTable.groupLinkProperty")
+    @LabelI18N("property.that.links.to.group")
     public String getGroupLinkProperty() {
         return groupLinkProperty;
     }
@@ -1628,7 +1628,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.groupLinkProperty = groupLinkProperty;
     }
 
-    @LabelI18N("appwizard.userGroupTable.userLinkProperty")
+    @LabelI18N("property.that.links.to.user")
     public String getUserLinkProperty() {
         return userLinkProperty;
     }
@@ -1637,7 +1637,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.userLinkProperty = userLinkProperty;
     }
 
-    @LabelI18N("appwizard.groupTable.adminGroupName")
+    @LabelI18N("name.of.the.administrators.group")
     public String getAdminGroupName() {
         return adminGroupName;
     }
@@ -1646,7 +1646,7 @@ public class ApplicationWizard extends AbstractPageAction {
         this.adminGroupName = adminGroupName;
     }
 
-    @LabelI18N("appwizard.userTable.encryption")
+    @LabelI18N("password.encryption.algorithm")
     public String getEncryptionAlgorithm() {
         return encryptionAlgorithm;
     }
@@ -1706,14 +1706,14 @@ public class ApplicationWizard extends AbstractPageAction {
 
     public List<Step> getSteps() {
         List<Step> steps = new ArrayList<Step>();
-        steps.add(new Step("1", ElementsThreadLocals.getText("appwizard.step1.title")));
-        steps.add(new Step("2", ElementsThreadLocals.getText("appwizard.step2.title")));
-        steps.add(new Step("3", ElementsThreadLocals.getText("appwizard.step3.title")));
+        steps.add(new Step("1", ElementsThreadLocals.getText("connect.to.your.database")));
+        steps.add(new Step("2", ElementsThreadLocals.getText("select.the.database.schemas.to.import")));
+        steps.add(new Step("3", ElementsThreadLocals.getText("set.up.user.management")));
         if(userTable != null) {
-            steps.add(new Step("3a", ElementsThreadLocals.getText("appwizard.step3a.title")));
+            steps.add(new Step("3a", ElementsThreadLocals.getText("customize.user.management")));
         }
-        steps.add(new Step("4", ElementsThreadLocals.getText("appwizard.step4.title")));
-        steps.add(new Step("5", ElementsThreadLocals.getText("appwizard.step5.title")));
+        steps.add(new Step("4", ElementsThreadLocals.getText("generate.pages")));
+        steps.add(new Step("5", ElementsThreadLocals.getText("build.the.application")));
         return steps;
     }
 

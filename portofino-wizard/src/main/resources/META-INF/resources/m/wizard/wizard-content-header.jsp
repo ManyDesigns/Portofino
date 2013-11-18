@@ -18,7 +18,7 @@
                 <c:out value="${step.title}" />
             </c:if>
             <c:if test="${not (status.index eq actionBean.currentStepIndex)}">
-                <fmt:message key="wizard.step">
+                <fmt:message key="step._">
                     <fmt:param value="${step.number}" />
                 </fmt:message>
             </c:if>

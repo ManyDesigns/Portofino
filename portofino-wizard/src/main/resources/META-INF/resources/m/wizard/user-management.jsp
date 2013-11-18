@@ -9,7 +9,7 @@
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="appwizard.step3.title" />
+        <fmt:message key="set.up.user.management" />
     </stripes:layout-component>
     <stripes:layout-component name="pageHeader">
         <jsp:include page="wizard-content-header.jsp" />
@@ -17,7 +17,7 @@
     <stripes:layout-component name="pageBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"
                       method="post" class="form-horizontal">
-            <p><fmt:message key="appwizard.userManagement.warning" /></p>
+            <p><fmt:message key="warning.configuring.user.management.will.overwrite" /></p>
             <mde:write name="actionBean" property="userAndGroupTablesForm"/>
             <div style="display: none;">
                 <mde:write name="actionBean" property="schemasForm"/>

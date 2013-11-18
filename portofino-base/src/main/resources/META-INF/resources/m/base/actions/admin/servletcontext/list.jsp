@@ -7,7 +7,7 @@
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.admin.servletcontext.ServletContextAction"/>
 <stripes:layout-render name="/m/base/admin-theme/admin-page.jsp">
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="modules"/>
+        <fmt:message key="servlet.context"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <mde:write name="actionBean" property="form"/>

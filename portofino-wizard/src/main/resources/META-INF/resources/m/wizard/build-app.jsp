@@ -9,7 +9,7 @@
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="appwizard.step4.title" />
+        <fmt:message key="generate.pages" />
     </stripes:layout-component>
     <stripes:layout-component name="pageHeader">
         <jsp:include page="wizard-content-header.jsp" />
@@ -18,7 +18,7 @@
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"
                       method="post">
             <p>
-                <fmt:message key="appwizard.finish.text" />
+                <fmt:message key="press.finish.to.build.the.application" />
             </p>
             <div style="display: none;">
                 <input type="hidden" name="generateCalendar" value="${actionBean.generateCalendar}" />

@@ -9,7 +9,7 @@
     <jsp:useBean id="actionBean" scope="request"
                  type="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"/>
     <stripes:layout-component name="pageTitle">
-        <fmt:message key="appwizard.step1.title" />
+        <fmt:message key="connect.to.your.database" />
     </stripes:layout-component>
     <stripes:layout-component name="pageHeader">
         <jsp:include page="wizard-content-header.jsp" />
@@ -28,10 +28,10 @@
             </script>
             <c:if test="${not empty actionBean.persistence.model.databases}">
                 <mde:write name="actionBean" property="connectionProviderField" />
-                <fmt:message key="appwizard.orNewConnectionProvider" />
+                <fmt:message key="or.create.a.new.one.choose.its.type" />
             </c:if>
             <c:if test="${empty actionBean.persistence.model.databases}">
-                <fmt:message key="appwizard.newConnectionProvider" />
+                <fmt:message key="create.a.new.connection.choose.type" />
             </c:if>
             <div id="connectionProviderTypeForm">
                 <label class="radio inline">
