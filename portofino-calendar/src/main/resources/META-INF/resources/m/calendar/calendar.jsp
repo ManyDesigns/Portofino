@@ -16,7 +16,7 @@
     </style>
     <div class="row-fluid">
         <div class="span2 calendar-calendars">
-            <strong><fmt:message key="calendar.calendars.legend" /></strong>
+            <strong><fmt:message key="calendars" /></strong>
             <ul class="calendars">
                 <c:forEach var="calendar" items="${actionBean.calendars}">
                     <li style="margin: 0.5em 0; list-style: none;">
@@ -34,7 +34,7 @@
                 <input type="hidden" name="referenceDateTimeLong" value="${actionBean.referenceDateTimeLong}" />
                 <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
                 <input type="hidden" name="calendarViewType" value="<c:out value="${actionBean.calendarViewType}"/>"/>
-                <a class="calendar-legend-hide-link" data-hide="false" href="#"><fmt:message key="calendar.hide.calendars" /></a>
+                <a class="calendar-legend-hide-link" data-hide="false" href="#"><fmt:message key="hide.calendars" /></a>
                 <jsp:include page="${actionBean.calendarViewType}.jsp" />
             </stripes:form>
         </div>
@@ -51,14 +51,14 @@
                     calendarsDiv.show();
                     viewDiv.removeClass("span12");
                     viewDiv.addClass("span10");
-                    link.text('<fmt:message key="calendar.hide.calendars" />');
+                    link.text('<fmt:message key="hide.calendars" />');
                     link.data("hide", false);
                 } else {
                     calendarsDiv.hide();
                     calendarsDiv.insertAfter(viewDiv);
                     viewDiv.removeClass("span10");
                     viewDiv.addClass("span12");
-                    link.text('<fmt:message key="calendar.show.calendars" />');
+                    link.text('<fmt:message key="show.calendars" />');
                     link.data("hide", true);
                 }
                 return false;

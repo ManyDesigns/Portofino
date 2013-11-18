@@ -84,8 +84,8 @@ public class CalendarConfiguration implements PageActionConfiguration {
 
     @XmlAttribute
     @Required
-    @FieldSet("calendar.configuration.monthView")
-    @LabelI18N("calendar.maxEventsPerCellInMonthView")
+    @FieldSet("month.view")
+    @LabelI18N("max.events.per.day")
     @MinIntValue(1)
     public int getMaxEventsPerCellInMonthView() {
         return maxEventsPerCellInMonthView;
@@ -97,8 +97,8 @@ public class CalendarConfiguration implements PageActionConfiguration {
 
     @XmlAttribute
     @Required
-    @FieldSet("calendar.configuration.agendaView")
-    @LabelI18N("calendar.estimateEventsPerPageInAgendaView")
+    @FieldSet("agenda.view")
+    @LabelI18N("events.per.page")
     @MinIntValue(1)
     public int getEstimateEventsPerPageInAgendaView() {
         return estimateEventsPerPageInAgendaView;

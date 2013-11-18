@@ -63,7 +63,7 @@
 <div>
     <div class="pull-right" >
         <button type="submit" name="monthView" class="btn btn-small">
-            <fmt:message key="calendar.monthView" />
+            <fmt:message key="month" />
         </button>
     </div>
     <div>
@@ -73,14 +73,14 @@
                     referenceDateTime.getYear() == today.getYear() && referenceDateTime.getDayOfYear() == today.getDayOfYear();
         %>
         <button type="submit" name="today" class="btn btn-small"<%= todayDisabled ? " disabled='true'" : "" %>>
-            <fmt:message key="calendar.today" />
+            <fmt:message key="today" />
         </button>
         <button type="submit" name="prevDay" class="btn btn-small">
             <i class="icon-chevron-left"></i>
-            <fmt:message key="calendar.previous" />
+            <fmt:message key="previous" />
         </button>
         <button type="submit" name="nextDay" class="btn btn-small">
-            <fmt:message key="calendar.next" />
+            <fmt:message key="next" />
             <i class="icon-chevron-right"></i>
         </button>
     </div>
@@ -201,7 +201,7 @@
         xhtmlBuffer.closeElement("p");
         if(event.getEditUrl() != null) {
             xhtmlBuffer.openElement("p");
-            String editText = ElementsThreadLocals.getText("calendar.event.edit");
+            String editText = ElementsThreadLocals.getText("edit");
             xhtmlBuffer.writeAnchor(event.getEditUrl(), editText);
             xhtmlBuffer.closeElement("p");
         }
@@ -238,13 +238,13 @@
                 xhtmlBuffer.write(" - " + hhmmFormatter.print(end));
             } else {
                 String msg = MessageFormat.format
-                        (ElementsThreadLocals.getText("calendar.agenda.until"), hhmmFormatter.print(end));
+                        (ElementsThreadLocals.getText("until._"), hhmmFormatter.print(end));
                 xhtmlBuffer.write(msg);
             }
             endPrinted = true;
         }
         if(!startPrinted && !endPrinted) {
-            xhtmlBuffer.write(ElementsThreadLocals.getText("calendar.agenda.wholeday"));
+            xhtmlBuffer.write(ElementsThreadLocals.getText("whole.day"));
         }
         xhtmlBuffer.closeElement("td");
     }

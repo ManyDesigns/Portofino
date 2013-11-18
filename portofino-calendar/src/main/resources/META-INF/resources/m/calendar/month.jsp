@@ -1,7 +1,7 @@
 <%@ page import="com.manydesigns.elements.xml.XhtmlBuffer" %>
 <%@ page import="com.manydesigns.portofino.pageactions.calendar.Event" %>
 <%@ page import="com.manydesigns.portofino.pageactions.calendar.EventWeek" %>
-<%@ page import="com.manydesigns.portofino.pageactions.calendar.MonthView" %>
+<%@ page import="com.manydesigns.portofino.pageactions.month" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.joda.time.DateMidnight" %>
 <%@ page import="org.joda.time.DateTime" %>
@@ -104,7 +104,7 @@
 <div>
     <div class="pull-right" >
         <button type="submit" name="agendaView" class="btn btn-small">
-            <fmt:message key="calendar.agendaView" />
+            <fmt:message key="agenda" />
         </button>
     </div>
     <div>
@@ -113,14 +113,14 @@
             boolean todayDisabled = monthInterval.contains(new DateTime());
         %>
         <button type="submit" name="today" class="btn btn-small"<%= todayDisabled ? " disabled='true'" : "" %>>
-            <fmt:message key="calendar.currentMonth" />
+            <fmt:message key="current.month" />
         </button>
         <button type="submit" name="prevMonth" class="btn btn-small">
             <i class="icon-chevron-left"></i>
-            <fmt:message key="calendar.previous" />
+            <fmt:message key="previous" />
         </button>
         <button type="submit" name="nextMonth" class="btn btn-small">
-            <fmt:message key="calendar.next" />
+            <fmt:message key="next" />
             <i class="icon-chevron-right"></i>
         </button>
     </div>
@@ -266,7 +266,7 @@
             xhtmlBuffer.closeElement("button");
 
             xhtmlBuffer.openElement("h3");
-            xhtmlBuffer.write(ElementsThreadLocals.getText("calendar.more.events"));
+            xhtmlBuffer.write(ElementsThreadLocals.getText("more.events"));
             xhtmlBuffer.closeElement("h3");
             xhtmlBuffer.closeElement("div"); // modal-header
 
@@ -307,7 +307,7 @@
             xhtmlBuffer.openElement("a");
             xhtmlBuffer.addAttribute("href", "#" + dialogId);
             xhtmlBuffer.addAttribute("data-toggle", "modal");
-            xhtmlBuffer.write(MessageFormat.format(ElementsThreadLocals.getText("calendar.moreEvents"), more));
+            xhtmlBuffer.write(MessageFormat.format(ElementsThreadLocals.getText("_.more"), more));
             xhtmlBuffer.closeElement("a");
         }
         xhtmlBuffer.closeElement("div");
@@ -381,7 +381,7 @@
         //Print edit link
         if(event.getEditUrl() != null) {
             xhtmlBuffer.openElement("p");
-            String editText = ElementsThreadLocals.getText("calendar.event.edit");
+            String editText = ElementsThreadLocals.getText("edit");
             xhtmlBuffer.writeAnchor(event.getEditUrl(), editText);
             xhtmlBuffer.closeElement("p");
         }
@@ -491,7 +491,7 @@
         if(eventWeek.isContinues()) {
             xhtmlBuffer.openElement("div");
             xhtmlBuffer.addAttribute("style", "float: right; margin-right: 1em;");
-            xhtmlBuffer.write(ElementsThreadLocals.getText("calendar.event.continues"));
+            xhtmlBuffer.write(ElementsThreadLocals.getText("continues"));
             xhtmlBuffer.closeElement("div");
         }
         xhtmlBuffer.closeElement("div");
