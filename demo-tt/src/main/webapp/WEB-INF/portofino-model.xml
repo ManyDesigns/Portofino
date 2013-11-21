@@ -2,8 +2,8 @@
 <model>
     <databases>
         <database databaseName="tt">
-            <jdbcConnection driver="com.google.appengine.api.rdbms.AppEngineDriver" url="jdbc:google:rdbms://manydesigns.com:prova1:dbprova1/tt" />
-            <!--<jdbcConnection username="tt" url="jdbc:mysql://localhost/tt?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI" password="tt" driver="com.mysql.jdbc.Driver"/>-->
+            <!--<jdbcConnection driver="com.google.appengine.api.rdbms.AppEngineDriver" url="jdbc:google:rdbms://manydesigns.com:prova1:dbprova1/tt" />-->
+            <jdbcConnection username="tt" url="jdbc:mysql://localhost/tt?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI" password="tt" driver="com.mysql.jdbc.Driver"/>
             <schemas>
                 <schema schemaName="tt">
                     <tables>
@@ -332,14 +332,13 @@
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="true">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="file" autoincrement="false">
-    <annotations/>
-</column>
 <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
-    <annotations/>
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="file" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.FileBlob"/>
+    </annotations>
 </column>
 <column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
     <annotations/>

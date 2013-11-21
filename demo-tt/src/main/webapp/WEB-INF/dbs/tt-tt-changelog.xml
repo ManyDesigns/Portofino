@@ -196,13 +196,10 @@
             <column name="id" autoIncrement="true" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-             <column name="file" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
             <column name="title" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="varchar(4000)">
+            <column name="file" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="project" type="varchar(100)">

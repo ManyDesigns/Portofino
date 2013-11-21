@@ -1,5 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration variable="" searchTitle="" rowsPerPage="10" readTitle="" query="from attachments where project = %{#ticket.project} and n = %{#ticket.n}" name="Attachments" largeResultSet="false" editTitle="" database="tt" createTitle="">
-    <properties/>
-    <selectionProviders/>
+<configuration variable="" searchTitle="" rowsPerPage="10" readTitle="" query="from attachments where project = %{#ticket.project} and n = %{#ticket.n} order by id" name="Attachments" largeResultSet="false" editTitle="" database="tt" createTitle="">
+    <properties>
+        <property updatable="false" searchable="false" name="id" insertable="false" inSummary="true" enabled="false">
+            <annotations/>
+        </property>
+        <property updatable="true" searchable="false" name="title" label="" insertable="true" inSummary="true" enabled="true">
+            <annotations/>
+        </property>
+        <property updatable="true" searchable="false" name="file" label="" insertable="true" inSummary="true" enabled="true">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="project" insertable="false" inSummary="false" enabled="false">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="n" insertable="false" inSummary="false" enabled="false">
+            <annotations/>
+        </property>
+    </properties>
+    <selectionProviders>
+        <selectionProvider fk="fk_attachment_ticket" enabled="false"/>
+    </selectionProviders>
 </configuration>
