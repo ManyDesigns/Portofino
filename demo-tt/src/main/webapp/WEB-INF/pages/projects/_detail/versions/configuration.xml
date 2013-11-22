@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration variable="" searchTitle="" rowsPerPage="10" readTitle="" query="from versions where project = %{#project.id}" name="Versions" largeResultSet="false" editTitle="" database="tt" createTitle="">
+<configuration variable="" searchTitle="" rowsPerPage="10" readTitle="" query="from versions where project = %{#project.id} order by id desc" name="Versions" largeResultSet="false" editTitle="" database="tt" createTitle="">
     <properties>
         <property updatable="false" searchable="false" name="id" insertable="false" inSummary="false" enabled="false">
             <annotations/>

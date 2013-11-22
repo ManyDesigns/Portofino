@@ -23,6 +23,5 @@
                 </div>
             </div>
         </c:forEach>
-        <div class="media"></div>
     </stripes:layout-component>
 </stripes:layout-render>

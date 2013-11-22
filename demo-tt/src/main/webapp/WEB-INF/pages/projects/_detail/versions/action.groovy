@@ -5,6 +5,7 @@ import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
 import net.sourceforge.stripes.action.Before
+import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.Resolution
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
@@ -24,6 +25,7 @@ class MyCrudAction extends CrudAction {
 
     protected void createSetup(Object object) {
         object.project = project.id;
+        object.state = 1L;
     }
 
     protected boolean createValidate(Object object) {
@@ -66,7 +68,7 @@ class MyCrudAction extends CrudAction {
     }
 
     protected Resolution getSearchView() {
-        return super.getSearchView();
+        return new ForwardResolution("/jsp/projects/versions/versions-search.jsp");
     }
 
     protected Resolution getEmbeddedSearchView() {
