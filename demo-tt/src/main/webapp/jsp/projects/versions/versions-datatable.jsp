@@ -50,17 +50,26 @@
                                 .createSQLQuery("select count(*) from tickets where state = 4 and fix_version = :versionId")
                                 .setLong("versionId", versionId)
                                 .uniqueResult()).intValue();
+                        int percentage = 0;
                         if (nTickets > 0) {
-                            int percentage = nClosedTickets * 100 / nTickets;
-                    %>
-                    <div>Progress: <%=percentage%>% (<%=nClosedTickets%> closed of <%=nTickets%>)</div>
-                    <%
-                        } else {
-                    %>
-                    <div>Progress: no tickets in this version</div>
-                    <%
+                            percentage = nClosedTickets * 100 / nTickets;
                         }
+                        pageContext.setAttribute("percentage", percentage);
+                        pageContext.setAttribute("nClosedTickets", nClosedTickets);
+                        pageContext.setAttribute("nTickets", nTickets);
                     %>
+                    <div>
+                        <c:if test="${nTickets > 0}">
+                            <fmt:message key="progress._._.closed.of._">
+                                <fmt:param value="${percentage}"/>
+                                <fmt:param value="${nClosedTickets}"/>
+                                <fmt:param value="${nTickets}"/>
+                            </fmt:message>
+                        </c:if>
+                        <c:if test="${nTickets == 0}">
+                        <fmt:message key="progress.no.tickets.in.this.version"/>
+                        </c:if>
+                    </div>
                 </div>
             </div>
         </c:forEach>
