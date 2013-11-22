@@ -4,7 +4,7 @@
         <property updatable="false" searchable="false" name="id" label="" insertable="false" inSummary="false" enabled="false">
             <annotations/>
         </property>
-        <property updatable="true" searchable="false" name="name" label="" insertable="true" inSummary="true" enabled="true">
+        <property updatable="true" searchable="false" name="title" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
         <property updatable="true" searchable="false" name="description" label="" insertable="true" inSummary="true" enabled="true">

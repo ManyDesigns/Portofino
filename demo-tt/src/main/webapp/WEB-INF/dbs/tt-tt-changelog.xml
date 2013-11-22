@@ -138,7 +138,7 @@
             <column name="id" autoIncrement="true" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="name" type="varchar(255)">
+            <column name="title" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="varchar(4000)">

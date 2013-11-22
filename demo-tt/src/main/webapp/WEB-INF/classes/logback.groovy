@@ -3,7 +3,7 @@ import ch.qos.logback.core.ConsoleAppender
 import static ch.qos.logback.classic.Level.INFO
 import static ch.qos.logback.classic.Level.WARN
 
-def defaultPattern = "%d %logger{40} [%F:%L]%n%level: %msg%n";
+def defaultPattern = "%d %-5level %msg : %logger{40} [%F:%L]%n";
 def appenders = new ArrayList();
 
 appender("PORTOFINO-CONSOLE", ConsoleAppender) {
