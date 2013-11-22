@@ -433,10 +433,18 @@
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="date_created" autoincrement="false">
-    <annotations/>
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.DateFormat">
+            <value>yyyy-MM-dd HH:mm:ss z</value>
+        </annotation>
+    </annotations>
 </column>
 <column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="date_updated" autoincrement="false">
-    <annotations/>
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.DateFormat">
+            <value>yyyy-MM-dd HH:mm:ss z</value>
+        </annotation>
+    </annotations>
 </column>
                             </columns>
                             <foreignKeys>

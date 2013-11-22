@@ -1,14 +1,14 @@
 package com.manydesigns.portofino.pageactions.crud
 
-import com.manydesigns.portofino.demott.TtUtils
-
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.forms.FormBuilder
 import com.manydesigns.elements.messages.SessionMessages
+import com.manydesigns.elements.util.Util
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.buttons.annotations.Guard
+import com.manydesigns.portofino.demott.TtUtils
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
@@ -46,10 +46,34 @@ class ProjectsTicketsAction extends CrudAction {
                     "fix_version",
                     "date_created",
                     "date_updated",
-            );
+            )
         }
         return formBuilder;
     }
+
+    protected Resolution getReadView() {
+        String createdByUrl = "/users/$object.created_by";
+        form.findFieldByPropertyName("created_by").href = Util.getAbsoluteUrl(createdByUrl);
+
+        if (object.assignee != null) {
+            String assigneeUrl = "/users/$object.assignee";
+            form.findFieldByPropertyName("assignee").href = Util.getAbsoluteUrl(assigneeUrl);
+        }
+
+        if (object.fix_version != null) {
+            String fixVersionUrl = "/projects/$object.project/versions/$object.fix_version";
+            form.findFieldByPropertyName("fix_version").href = Util.getAbsoluteUrl(fixVersionUrl);
+        }
+
+        if (object.affected_version != null) {
+            String affectedVersionUrl = "/projects/$object.project/versions/$object.affected_version";
+            form.findFieldByPropertyName("affected_version").href = Util.getAbsoluteUrl(affectedVersionUrl);
+
+        }
+
+        return new ForwardResolution("/jsp/projects/tickets/ticket-read.jsp")
+    }
+
 
     //Automatically generated on Mon Oct 28 12:30:32 CET 2013 by ManyDesigns Portofino
     //Write your code here
@@ -133,9 +157,6 @@ class ProjectsTicketsAction extends CrudAction {
         return super.getEditView();
     }
 
-    protected Resolution getReadView() {
-        return new ForwardResolution("/jsp/projects/tickets/ticket-read.jsp")
-    }
 
     protected Resolution getSearchView() {
         return super.getSearchView();
