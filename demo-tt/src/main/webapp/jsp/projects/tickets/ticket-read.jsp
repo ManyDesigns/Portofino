@@ -17,7 +17,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageHeader">
         <div class="pull-right">
-            <stripes:form action="${actionBean.context.actualServletPath}"
+            <stripes:form action="${actionBean.context.actionPath}"
                           method="post">
                 <input type="hidden" name="returnUrl"
                        value="<c:out value="${actionBean.returnUrl}"/>"/>
@@ -40,7 +40,7 @@
         <c:out value="${actionBean.object.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <stripes:form action="${actionBean.context.actualServletPath}" method="post" class="ticket-read">
+        <stripes:form action="${actionBean.context.actionPath}" method="post" class="ticket-read">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
             <div>

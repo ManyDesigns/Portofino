@@ -9,7 +9,7 @@
 <c:if test="${not empty actionBean.object}">
     <%
         UrlBuilder urlBuilder =
-                new UrlBuilder(request.getLocale(), actionBean.getContext().getActualServletPath(), false);
+                new UrlBuilder(request.getLocale(), actionBean.getContext().getActionPath(), false);
         if(!StringUtils.isBlank(actionBean.getSearchString())) {
             urlBuilder.addParameter(AbstractCrudAction.SEARCH_STRING_PARAM, actionBean.getSearchString());
         }

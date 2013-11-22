@@ -54,7 +54,7 @@ public class BaseHref {
         if(actionBean instanceof AbstractActionBean) {
             String baseHref =
                     request.getContextPath() +
-                    ((AbstractActionBean) actionBean).getContext().getActualServletPath();
+                    ((AbstractActionBean) actionBean).getContext().getActionPath();
             //Remove all trailing slashes
             while (baseHref.length() > 1 && baseHref.endsWith("/")) {
                 baseHref = baseHref.substring(0, baseHref.length() - 1);

@@ -44,7 +44,7 @@
             });
         </script>
         <!-- /Simple OpenID Selector -->
-        <stripes:form action="${pageContext.request.contextPath}${actionBean.context.actualServletPath}" method="post"
+        <stripes:form action="${pageContext.request.contextPath}${actionBean.context.actionPath}" method="post"
                       id="openid_form">
             <stripes:hidden name="returnUrl"/>
             <input type="hidden" name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}" />

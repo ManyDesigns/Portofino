@@ -20,13 +20,13 @@
         <script type="text/javascript">
             $(function() {
                 portofino.setupRichTextEditors({
-                    filebrowserBrowseUrl : '<c:out value="${pageContext.request.contextPath}${actionBean.context.actualServletPath}"/>?browse=',
-                    filebrowserImageBrowseUrl : '<c:out value="${pageContext.request.contextPath}${actionBean.context.actualServletPath}"/>?browse=&images-only=',
-                    filebrowserUploadUrl : '<c:out value="${pageContext.request.contextPath}${actionBean.context.actualServletPath}"/>?uploadAttachmentFromCKEditor='
+                    filebrowserBrowseUrl : '<c:out value="${pageContext.request.contextPath}${actionBean.context.actionPath}"/>?browse=',
+                    filebrowserImageBrowseUrl : '<c:out value="${pageContext.request.contextPath}${actionBean.context.actionPath}"/>?browse=&images-only=',
+                    filebrowserUploadUrl : '<c:out value="${pageContext.request.contextPath}${actionBean.context.actionPath}"/>?uploadAttachmentFromCKEditor='
                 });
             });
         </script>
-        <stripes:form action="${actionBean.context.actualServletPath}" method="post" enctype="multipart/form-data">
+        <stripes:form action="${actionBean.context.actionPath}" method="post" enctype="multipart/form-data">
             <!-- Content editor -->
             <fieldset style="margin-bottom: 2em;">
                 <legend><fmt:message key="edit.content"/></legend>

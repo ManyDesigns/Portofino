@@ -69,7 +69,7 @@ public class ForbiddenAccessResolution implements Resolution {
         //TODO ElementsActionBeanContext
         ElementsActionBeanContext context = new ElementsActionBeanContext();
         context.setRequest(request);
-        String originalPath = context.getActualServletPath();
+        String originalPath = context.getActionPath();
         UrlBuilder urlBuilder =
                 new UrlBuilder(Locale.getDefault(), originalPath, false);
         Map<?, ?> parameters = request.getParameterMap();

@@ -134,7 +134,7 @@ public class ChartAction extends AbstractPageAction {
 
             chartId = RandomUtil.createRandomId();
 
-            String actionurl = context.getActualServletPath();
+            String actionurl = context.getActionPath();
             UrlBuilder chartResolution =
                     new UrlBuilder(context.getLocale(), actionurl, false)
                             .addParameter("chartId", chartId)

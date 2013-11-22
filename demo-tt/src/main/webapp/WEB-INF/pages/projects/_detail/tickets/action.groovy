@@ -166,14 +166,14 @@ class ProjectsTicketsAction extends CrudAction {
         object.assignee = principal.id;
         String message = TtUtils.createDiffMessage(classAccessor, old, object);
         if (message == null) {
-            return new RedirectResolution(context.actualServletPath);
+            return new RedirectResolution(context.getActionPath);
         }
         Date now = new Date();
         Session session = persistence.getSession("tt");
         TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_UPDATED_TICKET, message);
         session.getTransaction().commit();
         SessionMessages.addInfoMessage("Ticket assigned to you");
-        return new RedirectResolution(context.actualServletPath);
+        return new RedirectResolution(context.getActionPath);
     }
 
     public boolean canAssignToMe() {
@@ -189,7 +189,7 @@ class ProjectsTicketsAction extends CrudAction {
     public Resolution startWork() {
         changeState(TtUtils.TICKET_STATE_WORK_IN_PROGRESS);
         SessionMessages.addInfoMessage("Started work");
-        return new RedirectResolution(context.actualServletPath)
+        return new RedirectResolution(context.getActionPath)
     }
 
     public boolean canStartWork() {
@@ -217,7 +217,7 @@ class ProjectsTicketsAction extends CrudAction {
     public Resolution resolve() {
         changeState(TtUtils.TICKET_STATE_RESOLVED);
         SessionMessages.addInfoMessage("Ticket resolved");
-        return new RedirectResolution(context.actualServletPath);
+        return new RedirectResolution(context.getActionPath);
     }
 
     public boolean canResolve() {
@@ -232,7 +232,7 @@ class ProjectsTicketsAction extends CrudAction {
     public Resolution close() {
         changeState(TtUtils.TICKET_STATE_CLOSED);
         SessionMessages.addInfoMessage("Ticket closed");
-        return new RedirectResolution(context.actualServletPath);
+        return new RedirectResolution(context.getActionPath);
     }
 
     public boolean canClose() {
@@ -247,7 +247,7 @@ class ProjectsTicketsAction extends CrudAction {
     public Resolution reopen() {
         changeState(TtUtils.TICKET_STATE_OPEN);
         SessionMessages.addInfoMessage("Ticket reopened");
-        return new RedirectResolution(context.actualServletPath);
+        return new RedirectResolution(context.getActionPath);
     }
 
     public boolean canReopen() {

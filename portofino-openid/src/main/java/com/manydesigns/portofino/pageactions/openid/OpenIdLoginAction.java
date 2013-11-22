@@ -99,7 +99,7 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
         // and retrieve one service endpoint for authentication
         DiscoveryInformation discovered = manager.associate(discoveries);
 
-        UrlBuilder urlBuilder = new UrlBuilder(context.getLocale(), context.getActualServletPath(), false);
+        UrlBuilder urlBuilder = new UrlBuilder(context.getLocale(), context.getActionPath(), false);
         urlBuilder.setEvent("handleOpenIDLogin");
         urlBuilder.addParameter("returnUrl", returnUrl);
         urlBuilder.addParameter("cancelReturnUrl", cancelReturnUrl);

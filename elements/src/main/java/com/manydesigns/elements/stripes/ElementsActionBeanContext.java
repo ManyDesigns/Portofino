@@ -45,7 +45,7 @@ public class ElementsActionBeanContext extends ActionBeanContext {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    protected String actualServletPath;
+    protected String actionPath;
 
     @Override
     public void setRequest(HttpServletRequest request) {
@@ -56,11 +56,11 @@ public class ElementsActionBeanContext extends ActionBeanContext {
         if (actualServletPath == null) {
             actualServletPath = ServletUtils.getPath(request);
         }
-        this.actualServletPath = actualServletPath;
+        this.actionPath = actualServletPath;
     }
 
-    public String getActualServletPath() {
-        return actualServletPath;
+    public String getActionPath() {
+        return actionPath;
     }
 
 }
