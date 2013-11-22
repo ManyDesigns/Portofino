@@ -50,13 +50,13 @@ public class ElementsActionBeanContext extends ActionBeanContext {
     @Override
     public void setRequest(HttpServletRequest request) {
         super.setRequest(request);
-        String actualServletPath =
+        String actionPath =
                 (String) request.getAttribute(
                         RequestDispatcher.INCLUDE_SERVLET_PATH);
-        if (actualServletPath == null) {
-            actualServletPath = ServletUtils.getPath(request);
+        if (actionPath == null) {
+            actionPath = ServletUtils.getPath(request);
         }
-        this.actionPath = actualServletPath;
+        this.actionPath = actionPath;
     }
 
     public String getActionPath() {

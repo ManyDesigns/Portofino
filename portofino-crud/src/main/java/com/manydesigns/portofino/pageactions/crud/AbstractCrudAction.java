@@ -2352,9 +2352,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @return the read link expression.
      */
     protected String getReadLinkExpression() {
-        String actualServletPath = context.getActionPath();
-        StringBuilder sb = new StringBuilder(actualServletPath);
-        if(!actualServletPath.endsWith("/")) {
+        String actionPath = context.getActionPath();
+        StringBuilder sb = new StringBuilder(actionPath);
+        if(!actionPath.endsWith("/")) {
             sb.append("/");
         }
         boolean first = true;

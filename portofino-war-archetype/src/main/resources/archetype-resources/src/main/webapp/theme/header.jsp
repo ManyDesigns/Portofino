@@ -38,13 +38,13 @@
             <div class="header-menu nav-collapse collapse">
                 <c:if test="${not empty actionBean.pageInstance}">
                     <form id="pageAdminForm" action="${pageContext.request.contextPath}/actions/admin/page">
-                        <input type="hidden" name="originalPath" value="${actionBean.context.actualServletPath}" />
+                        <input type="hidden" name="originalPath" value="${actionBean.context.actionPath}" />
                     </form>
                 </c:if>
                 <ul class="nav">
                     <%
                         Subject subject = SecurityUtils.getSubject();
-                        String actionPath = actionBean.getContext().getActualServletPath();
+                        String actionPath = actionBean.getContext().getactionPath();
                         String loginPage = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PAGE);
                         if(subject.isAuthenticated()) {
                             Object principal = subject.getPrincipal();
@@ -103,14 +103,14 @@
                                                subject, AccessLevel.EDIT)) {%>
                             <li class="divider"></li>
                             <li>
-                                <a href="javascript:portofino.enablePageActionDragAndDrop($(this), '${actionBean.context.actualServletPath}');">
+                                <a href="javascript:portofino.enablePageActionDragAndDrop($(this), '${actionBean.context.actionPath}');">
                                     <i class="icon-file"></i> Edit layout
                                 </a>
                             </li>
                             <li>
                                 <%
                                     UrlBuilder urlBuilder = new UrlBuilder(request.getLocale(), PageAdminAction.class, true);
-                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getActualServletPath());
+                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getactionPath());
                                     urlBuilder.setEvent("pageChildren");
                                 %>
                                 <a href="<%= request.getContextPath() + urlBuilder %>">
@@ -120,7 +120,7 @@
                             <li>
                                 <%
                                     urlBuilder = new UrlBuilder(request.getLocale(), PageAdminAction.class, true);
-                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getActualServletPath());
+                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getactionPath());
                                     urlBuilder.setEvent("newPage");
                                 %>
                                 <a href="<%= request.getContextPath() + urlBuilder %>">
@@ -129,7 +129,7 @@
                             </li>
                             <%
                                 String jsArgs = "('" +
-                                        pageAction.getContext().getActualServletPath() + "', '" +
+                                        pageAction.getContext().getactionPath() + "', '" +
                                         request.getContextPath() + "');";
 
                             %>
@@ -153,7 +153,7 @@
                                         portofinoConfiguration, pageAction.getPageInstance(),
                                         subject, AccessLevel.DEVELOP)) {
                                     urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, true);
-                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getActualServletPath());
+                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getactionPath());
                                     urlBuilder.setEvent("pagePermissions");
                             %>
                             <li>

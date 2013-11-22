@@ -68,8 +68,8 @@ public class DispatcherUtil {
     public static Dispatch getDispatch(HttpServletRequest request, Object actionBean) {
         Dispatcher dispatcher = get(request);
         if(actionBean instanceof AbstractActionBean) {
-            String actualServletPath = ((AbstractActionBean) actionBean).getContext().getActionPath();
-            return dispatcher.getDispatch(actualServletPath);
+            String actionPath = ((AbstractActionBean) actionBean).getContext().getActionPath();
+            return dispatcher.getDispatch(actionPath);
         } else {
             return getDispatch(request);
         }
