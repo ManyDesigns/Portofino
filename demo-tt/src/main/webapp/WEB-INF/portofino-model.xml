@@ -61,7 +61,7 @@
 <column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="date" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="4000" jdbcType="12" columnType="VARCHAR" columnName="message" autoincrement="false">
+<column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="message" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="user" autoincrement="false">

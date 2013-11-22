@@ -22,7 +22,15 @@
                     <div>
                         <strong>
                         <stripes:link href="/users/${activityItem.user}"><c:out value="${activityItem.fk_activity_user.first_name} ${activityItem.fk_activity_user.last_name}"/></stripes:link>
-                        <small class="muted"><c:out value="${activityItem.fk_activity_type.type}"/> on <fmt:formatDate value="${activityItem.date}" pattern="yyyy-MM-dd HH:mm:ss z"/></small>
+                        </strong>
+                    </div>
+                    <div>
+                        <strong>
+                        <small class="muted">
+                            <fmt:message key="${activityItem.fk_activity_type.type}">
+                                <fmt:param value="${activityItem.date}"/>
+                            </fmt:message>
+                        </small>
                         </strong>
                     </div>
                     <div><c:out value="${activityItem.message}"/></div>

@@ -225,7 +225,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="message" type="varchar(4000)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="user" type="int">
                 <constraints nullable="false"/>
@@ -413,35 +413,51 @@
     <changeSet id="tt-123" author="Paolo Predonzani">
         <insert tableName="activity_types">
             <column name="id" valueNumeric="1"/>
-            <column name="type" value="created ticket"/>
+            <column name="type" value="ticket.created"/>
         </insert>
         <insert tableName="activity_types">
             <column name="id" valueNumeric="2"/>
-            <column name="type" value="updated ticket"/>
+            <column name="type" value="ticket.updated"/>
         </insert>
         <insert tableName="activity_types">
-            <column name="id" valueNumeric="10"/>
-            <column name="type" value="commented"/>
+            <column name="id" valueNumeric="3"/>
+            <column name="type" value="ticket.deleted"/>
         </insert>
         <insert tableName="activity_types">
-            <column name="id" valueNumeric="20"/>
-            <column name="type" value="added attachment"/>
+            <column name="id" valueNumeric="11"/>
+            <column name="type" value="comment.created"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="12"/>
+            <column name="type" value="comment.updated"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="13"/>
+            <column name="type" value="comment.deleted"/>
         </insert>
         <insert tableName="activity_types">
             <column name="id" valueNumeric="21"/>
-            <column name="type" value="deleted attachment"/>
+            <column name="type" value="attachment.created"/>
         </insert>
         <insert tableName="activity_types">
-            <column name="id" valueNumeric="30"/>
-            <column name="type" value="added affected component"/>
+            <column name="id" valueNumeric="22"/>
+            <column name="type" value="attachment.updated"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="23"/>
+            <column name="type" value="attachment.deleted"/>
         </insert>
         <insert tableName="activity_types">
             <column name="id" valueNumeric="31"/>
-            <column name="type" value="deleted affected component"/>
+            <column name="type" value="affected.component.created"/>
         </insert>
         <insert tableName="activity_types">
-            <column name="id" valueNumeric="40"/>
-            <column name="type" value="started work"/>
+            <column name="id" valueNumeric="32"/>
+            <column name="type" value="affected.component.updated"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="33"/>
+            <column name="type" value="affected.component.deleted"/>
         </insert>
     </changeSet>
 

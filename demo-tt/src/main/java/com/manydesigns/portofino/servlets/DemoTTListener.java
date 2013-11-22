@@ -29,8 +29,6 @@
 
 package com.manydesigns.portofino.servlets;
 
-import com.manydesigns.portofino.modules.*;
-
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -41,23 +39,23 @@ public class DemoTTListener extends PortofinoListener {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    @Override
-    protected void discoverModules(ModuleRegistry moduleRegistry, ClassLoader classLoader) {
-        logger.info("Registering modules");
-        try {
-            Module[] modules = new Module[] {
-                    new BaseModule(), new PageactionsModule(), new PageactionsadminModule(),
-                    new DatabaseModule(), new MysqlModule(), new GooglecloudsqlModule(),
-                    new CrudModule(), new TextModule(), new ThemeModule(),
-                    (Module) classLoader.loadClass("com.manydesigns.portofino.modules.DemoTTModule").newInstance()
-            };
-            for(Module module : modules) {
-                logger.debug("Adding module " + module);
-                moduleRegistry.getModules().add(module);
-            }
-        } catch (Exception e) {
-            logger.error("Could not register modules", e);
-            super.discoverModules(moduleRegistry, classLoader);
-        }
-    }
+//    @Override
+//    protected void discoverModules(ModuleRegistry moduleRegistry, ClassLoader classLoader) {
+//        logger.info("Registering modules");
+//        try {
+//            Module[] modules = new Module[] {
+//                    new BaseModule(), new PageactionsModule(), new PageactionsadminModule(),
+//                    new DatabaseModule(), new MysqlModule(), new GooglecloudsqlModule(),
+//                    new CrudModule(), new TextModule(), new ThemeModule(),
+//                    (Module) classLoader.loadClass("com.manydesigns.portofino.modules.DemoTTModule").newInstance()
+//            };
+//            for(Module module : modules) {
+//                logger.debug("Adding module " + module);
+//                moduleRegistry.getModules().add(module);
+//            }
+//        } catch (Exception e) {
+//            logger.error("Could not register modules", e);
+//            super.discoverModules(moduleRegistry, classLoader);
+//        }
+//    }
 }

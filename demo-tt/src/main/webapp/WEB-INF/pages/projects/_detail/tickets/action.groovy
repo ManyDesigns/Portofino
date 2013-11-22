@@ -80,7 +80,12 @@ class ProjectsTicketsAction extends CrudAction {
         return true;
     }
 
-    protected void createPostProcess(Object object) {}
+    protected void createPostProcess(Object object) {
+        Object principal = SecurityUtils.subject.principal;
+        Date now = new Date();
+        Session session = persistence.getSession("tt");
+        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_TICKET_CREATED, null);
+    }
 
     Object old;
 
@@ -99,8 +104,13 @@ class ProjectsTicketsAction extends CrudAction {
         if (message != null) {
             Date now = new Date();
             Session session = persistence.getSession("tt");
-            TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_UPDATED_TICKET, message);
+            TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_TICKET_UPDATED, message);
         }
+    }
+
+    @Override
+    protected Resolution getSuccessfulSaveView() {
+        return new RedirectResolution(context.actualServletPath + "/" + object.project + "/" + object.n);
     }
 
 
@@ -170,7 +180,7 @@ class ProjectsTicketsAction extends CrudAction {
         }
         Date now = new Date();
         Session session = persistence.getSession("tt");
-        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_UPDATED_TICKET, message);
+        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_TICKET_UPDATED, message);
         session.getTransaction().commit();
         SessionMessages.addInfoMessage("Ticket assigned to you");
         return new RedirectResolution(context.actualServletPath);
@@ -206,7 +216,7 @@ class ProjectsTicketsAction extends CrudAction {
         if (message == null) {
             return;
         }
-        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_UPDATED_TICKET, message);
+        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_TICKET_UPDATED, message);
         session.getTransaction().commit();
     }
 

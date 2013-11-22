@@ -1,4 +1,9 @@
-import com.google.appengine.api.users.User
+//import com.google.appengine.api.users.User
+
+
+//import com.manydesigns.portofino.shiro.GAEPortofinoRealm
+
+
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.reflection.ClassAccessor
 import com.manydesigns.mail.stripes.SendMailAction
@@ -10,7 +15,7 @@ import com.manydesigns.portofino.model.database.Table
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.reflection.TableAccessor
-import com.manydesigns.portofino.shiro.GAEPortofinoRealm
+import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
 import com.manydesigns.portofino.shiro.ServletContainerToken
 import java.security.MessageDigest
 import org.apache.shiro.crypto.hash.Md5Hash
@@ -21,7 +26,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.apache.shiro.authc.*
 
-class Security extends GAEPortofinoRealm {
+class Security extends AbstractPortofinoRealm {
 
     public static final String ADMIN_GROUP_NAME = "admin";
 
@@ -39,33 +44,34 @@ class Security extends GAEPortofinoRealm {
         return loadAuthenticationInfo(token);
     }
 
-    protected AuthenticationInfo loadAuthenticationInfo(ServletContainerToken token) {
-        def info = super.doGetAuthenticationInfo(token);
-        User user = (User) info.principals.asList()[0];
-
-        Session session = persistence.getSession("tt");
-        Criteria criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("email", user.email));
-
-        Serializable principal = (Serializable)criteria.uniqueResult();
-
-        if (principal == null) {
-            throw new UnknownAccountException("Unknown user");
-        } else if (!principal.validated) {
-            throw new DisabledAccountException("User not validated");
-        } else {
-            logger.debug("Aggiorno i campi accesso.");
-            updateAccess(principal, new Date());
-            session.update("users", (Object)principal);
-            session.getTransaction().commit();
-        }
-
-        /*def pc = new SimplePrincipalCollection([principal, user], getName());
-        SimpleAuthenticationInfo infoEx =
-                new SimpleAuthenticationInfo(pc, "", getName());
-        return infoEx;*/
-        return new SimpleAuthenticationInfo(principal, "", getName());
-    }
+// 
+//    protected AuthenticationInfo loadAuthenticationInfo(ServletContainerToken token) {
+//        def info = super.doGetAuthenticationInfo(token);
+//        User user = (User) info.principals.asList()[0];
+//
+//        Session session = persistence.getSession("tt");
+//        Criteria criteria = session.createCriteria("users");
+//        criteria.add(Restrictions.eq("email", user.email));
+//
+//        Serializable principal = (Serializable)criteria.uniqueResult();
+//
+//        if (principal == null) {
+//            throw new UnknownAccountException("Unknown user");
+//        } else if (!principal.validated) {
+//            throw new DisabledAccountException("User not validated");
+//        } else {
+//            logger.debug("Aggiorno i campi accesso.");
+//            updateAccess(principal, new Date());
+//            session.update("users", (Object)principal);
+//            session.getTransaction().commit();
+//        }
+//
+//        /*def pc = new SimplePrincipalCollection([principal, user], getName());
+//        SimpleAuthenticationInfo infoEx =
+//                new SimpleAuthenticationInfo(pc, "", getName());
+//        return infoEx;*/
+//        return new SimpleAuthenticationInfo(principal, "", getName());
+//    }
 
     public AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {
         String login = usernamePasswordToken.username;

@@ -26,13 +26,14 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-h2</artifactId>
+            <artifactId>portofino-mysql</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!--
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-mysql</artifactId>
+            <artifactId>portofino-h2</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -48,6 +49,7 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-openid</artifactId>
@@ -110,11 +112,25 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- GAE needs java logging
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
             <version>${slf4j.version}</version>
             <scope>compile</scope>
         </dependency>
+        -->
         <!-- mail -->
         <dependency>
             <groupId>javax.mail</groupId>
@@ -122,12 +138,14 @@
             <version>${javax.mail.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!--
         <dependency>
            <groupId>com.google.appengine</groupId>
            <artifactId>appengine-api-1.0-sdk</artifactId>
            <version>${google.appengine.sdk.version}</version>
            <scope>compile</scope>
        </dependency>
+       -->
     </dependencies>
     <build>
         <plugins>

@@ -19,14 +19,18 @@ class TtUtils {
     static final public long TICKET_STATE_RESOLVED = 3L;
     static final public long TICKET_STATE_CLOSED = 4L;
 
-    static final public long ACTIVITY_TYPE_CREATED_TICKET = 1L;
-    static final public long ACTIVITY_TYPE_UPDATED_TICKET = 2L;
-    static final public long ACTIVITY_TYPE_COMMENTED = 10L;
-    static final public long ACTIVITY_TYPE_ADDED_ATTACHMENT = 20L;
-    static final public long ACTIVITY_TYPE_DELETED_ATTACHMENT = 21L;
-    static final public long ACTIVITY_TYPE_ADDED_AFFECTED_COMPONENT = 30L;
-    static final public long ACTIVITY_TYPE_DELETED_AFFECTED_COMPONENT = 31L;
-    static final public long ACTIVITY_TYPE_STARTED_WORK = 40L;
+    static final public long ACTIVITY_TYPE_TICKET_CREATED = 1L;
+    static final public long ACTIVITY_TYPE_TICKET_UPDATED = 2L;
+    static final public long ACTIVITY_TYPE_TICKET_DELETED = 3L;
+    static final public long ACTIVITY_TYPE_COMMENT_CREATED = 11L;
+    static final public long ACTIVITY_TYPE_COMMENT_UPDATED = 12L;
+    static final public long ACTIVITY_TYPE_COMMENT_DELETED = 13L;
+    static final public long ACTIVITY_TYPE_ATTACHMENT_CREATED = 21L;
+    static final public long ACTIVITY_TYPE_ATTACHMENT_UPDATED = 22L;
+    static final public long ACTIVITY_TYPE_ATTACHMENT_DELETED = 23L;
+    static final public long ACTIVITY_TYPE_AFFECTED_COMPONENT_CREATED = 31L;
+    static final public long ACTIVITY_TYPE_AFFECTED_COMPONENT_UPDATED = 32L;
+    static final public long ACTIVITY_TYPE_AFFECTED_COMPONENT_DELETED = 33L;
 
     static public void addActivity(Session session, Object ticket,
                                    Long userId, Date date, long type,

@@ -1,4 +1,5 @@
 import com.manydesigns.portofino.demott.TtUtils
+
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.portofino.di.Inject
@@ -46,7 +47,7 @@ class TicketsActivityAction extends CustomAction {
         Session session = persistence.getSession("tt");
         Object principal = SecurityUtils.subject.principal;
         Date now = new Date();
-        TtUtils.addActivity(session, ticket, principal.id, now, TtUtils.ACTIVITY_TYPE_COMMENTED, comment);
+        TtUtils.addActivity(session, ticket, principal.id, now, TtUtils.ACTIVITY_TYPE_COMMENT_CREATED, comment);
         session.getTransaction().commit();
         SessionMessages.addInfoMessage("Comment added successfully");
         return new RedirectResolution("/projects/$ticket.project/tickets/$ticket.project/$ticket.n")
