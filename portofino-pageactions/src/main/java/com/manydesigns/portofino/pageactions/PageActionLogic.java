@@ -111,8 +111,8 @@ public class PageActionLogic {
         if(parentActionBean == null) {
             return false;
         }
-        String parentPath = parentActionBean.getContext().getActualServletPath();
-        String myPath = pageAction.getContext().getActualServletPath();
+        String parentPath = parentActionBean.getContext().getActionPath();
+        String myPath = pageAction.getContext().getActionPath();
         return !StringUtils.equals(parentPath, myPath);
     }
 }

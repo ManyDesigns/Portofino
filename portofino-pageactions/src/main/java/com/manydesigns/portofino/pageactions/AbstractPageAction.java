@@ -173,7 +173,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             for(ChildPage childPage : layout.getChildPages()) {
                 String layoutContainerInParent = childPage.getContainer();
                 if(layoutContainerInParent != null) {
-                    String newPath = context.getActualServletPath() + "/" + childPage.getName();
+                    String newPath = context.getActionPath() + "/" + childPage.getName();
                     File pageDir = new File(pageInstance.getChildrenDirectory(), childPage.getName());
                     try {
                         Page page = DispatcherLogic.getPage(pageDir);
@@ -253,7 +253,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     }
 
     protected String getDefaultReturnUrl() {
-        return Util.getAbsoluteUrl(context.getActualServletPath());
+        return Util.getAbsoluteUrl(context.getActionPath());
     }
 
     public void setReturnUrl(String returnUrl) {

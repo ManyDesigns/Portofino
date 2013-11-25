@@ -15,7 +15,7 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <stripes:form action="${actionBean.context.actualServletPath}" method="post" enctype="multipart/form-data"
+        <stripes:form action="${actionBean.context.actionPath}" method="post" enctype="multipart/form-data"
                       class="form-inline">
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <c:if test="${not empty actionBean.textConfiguration.attachments}">
@@ -27,7 +27,7 @@
                             <td>
                                 <label class="checkbox">
                                     <stripes:checkbox name="selection" value="${attachment.id}"/>
-                                    <a href="<c:out value="${pageContext.request.contextPath}${actionBean.context.actualServletPath}?downloadAttachment=&id=${attachment.id}"/>"
+                                    <a href="<c:out value="${pageContext.request.contextPath}${actionBean.context.actionPath}?downloadAttachment=&id=${attachment.id}"/>"
                                             ><c:out value="${attachment.filename}"/></a>
                                 </label>
                             </td>

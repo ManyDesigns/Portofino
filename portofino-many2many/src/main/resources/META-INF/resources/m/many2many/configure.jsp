@@ -15,7 +15,7 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <stripes:form action="${actionBean.context.actualServletPath}" method="post" enctype="multipart/form-data"
+        <stripes:form action="${actionBean.context.actionPath}" method="post" enctype="multipart/form-data"
                       class="form-horizontal">
             <mde:write name="actionBean" property="pageConfigurationForm"/>
             <mde:write name="actionBean" property="configurationForm" />

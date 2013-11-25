@@ -12,21 +12,21 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form
-                action="${actionBean.context.actualServletPath}" method="post"
+                action="${actionBean.context.actionPath}" method="post"
                 class="form-inline crud-search-form dont-prompt-on-page-abandon">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <c:if test="${not empty actionBean.searchForm}">
                 <c:if test="${actionBean.searchVisible}">
-                    <a href="${pageContext.request.contextPath}${actionBean.context.actualServletPath}"
+                    <a href="${pageContext.request.contextPath}${actionBean.context.actionPath}"
                        class="search_form_toggle_link" data-search-visible="true">
                         <span><fmt:message key="hide.search<<" /></span>
                         <span style="display: none;"><fmt:message key="search>>" /></span>
                     </a>
                 </c:if>
                 <c:if test="${!actionBean.searchVisible}">
-                    <a href="${pageContext.request.contextPath}${actionBean.context.actualServletPath}?search="
+                    <a href="${pageContext.request.contextPath}${actionBean.context.actionPath}?search="
                        class="search_form_toggle_link" data-search-visible="false">
                         <span style="display: none;"><fmt:message key="hide.search<<" /></span>
                         <span><fmt:message key="search>>" /></span>

@@ -258,7 +258,7 @@ public abstract class LoginAction extends AbstractActionBean {
             logger.error("Error during password reset", e);
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("password.reset.failed"));
         }
-        return new RedirectResolution(context.getActualServletPath());
+        return new RedirectResolution(context.getActionPath());
     }
 
     protected String getResetPasswordEmailBody(String siteUrl, String changePasswordLink) throws IOException {

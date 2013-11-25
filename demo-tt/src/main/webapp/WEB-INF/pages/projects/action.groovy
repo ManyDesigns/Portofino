@@ -14,7 +14,7 @@ class ProjectsCrudAction extends CrudAction {
     //Write your code here
     @Override
     Resolution read() {
-        def path = getContext().actualServletPath
+        def path = getContext().actionPath
         while (path.endsWith("/")) {
             path = path.substring(0, path.length() -1 );
         }

@@ -405,7 +405,7 @@ public class TextAction extends AbstractPageAction {
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("text.attachment.uploadFailed"));
             }
         }
-        return new RedirectResolution(context.getActualServletPath())
+        return new RedirectResolution(context.getActionPath())
                 .addParameter("manageAttachments")
                 .addParameter("returnUrl", returnUrl);
     }
@@ -455,7 +455,7 @@ public class TextAction extends AbstractPageAction {
 
     protected String generateViewAttachmentUrl(String attachmentId) {
         return String.format("%s?viewAttachment=&id=%s",
-                Util.getAbsoluteUrl(context.getActualServletPath()),
+                Util.getAbsoluteUrl(context.getActionPath()),
                 attachmentId);
     }
 
@@ -581,7 +581,7 @@ public class TextAction extends AbstractPageAction {
                                 ElementsThreadLocals.getText("text.attachment.nDeleted", counter));
             }
         }
-        return new RedirectResolution(context.getActualServletPath())
+        return new RedirectResolution(context.getActionPath())
                 .addParameter("manageAttachments")
                 .addParameter("returnUrl", returnUrl);
     }

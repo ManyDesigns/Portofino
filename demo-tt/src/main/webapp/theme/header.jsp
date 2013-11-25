@@ -30,10 +30,10 @@
 
                 <c:if test="${not empty actionBean.pageInstance}">
                     <form id="pageAdminForm" action="${pageContext.request.contextPath}/actions/admin/page">
-                        <input type="hidden" name="originalPath" value="${actionBean.context.actualServletPath}" />
+                        <input type="hidden" name="originalPath" value="${actionBean.context.actionPath}" />
                     </form>
                 </c:if>
-                <c:set var="actionPath" value="${actionBean.context.actualServletPath}"/>
+                <c:set var="actionPath" value="${actionBean.context.actionPath}"/>
                 <ul id="app-menu" class="nav">
                     <shiro:authenticated>
                         <%
@@ -51,40 +51,40 @@
                                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">Page <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a href="javascript:portofino.enablePageActionDragAndDrop($(this), '${actionBean.context.actualServletPath}');">
+                                        <a href="javascript:portofino.enablePageActionDragAndDrop($(this), '${actionBean.context.actionPath}');">
                                             <i class="icon-file"></i> Edit layout
                                         </a>
                                     </li>
                                     <li>
                                         <stripes:link beanclass="com.manydesigns.portofino.actions.admin.page.PageAdminAction" event="pageChildren">
-                                            <stripes:param name="originalPath" value="${actionBean.context.actualServletPath}"/>
+                                            <stripes:param name="originalPath" value="${actionBean.context.actionPath}"/>
                                             <i class="icon-folder-open"></i> Page children
                                         </stripes:link>
                                     </li>
                                     <li>
                                         <stripes:link beanclass="com.manydesigns.portofino.actions.admin.page.PageAdminAction" event="newPage">
-                                            <stripes:param name="originalPath" value="${actionBean.context.actualServletPath}"/>
+                                            <stripes:param name="originalPath" value="${actionBean.context.actionPath}"/>
                                             <i class="icon-plus"></i> Add new page
                                         </stripes:link>
                                     </li>
                                     <li>
-                                        <a href="javascript:portofino.confirmDeletePage('<c:out value="${actionBean.context.actualServletPath}"/>','<c:out value="${pageContext.request.contextPath}"/>');">
+                                        <a href="javascript:portofino.confirmDeletePage('<c:out value="${actionBean.context.actionPath}"/>','<c:out value="${pageContext.request.contextPath}"/>');">
                                             <i class="icon-minus"></i> Delete page
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="javascript:portofino.showCopyPageDialog('<c:out value="${actionBean.context.actualServletPath}"/>','<c:out value="${pageContext.request.contextPath}"/>');">
+                                        <a href="javascript:portofino.showCopyPageDialog('<c:out value="${actionBean.context.actionPath}"/>','<c:out value="${pageContext.request.contextPath}"/>');">
                                             <i class="icon-file"></i> Copy page
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="javascript:portofino.showMovePageDialog('<c:out value="${actionBean.context.actualServletPath}"/>','<c:out value="${pageContext.request.contextPath}"/>');">
+                                        <a href="javascript:portofino.showMovePageDialog('<c:out value="${actionBean.context.actionPath}"/>','<c:out value="${pageContext.request.contextPath}"/>');">
                                             <i class="icon-share"></i> Move page
                                         </a>
                                     </li>
                                     <li>
                                         <stripes:link beanclass="com.manydesigns.portofino.actions.admin.page.PageAdminAction" event="pagePermissions">
-                                            <stripes:param name="originalPath" value="${actionBean.context.actualServletPath}"/>
+                                            <stripes:param name="originalPath" value="${actionBean.context.actionPath}"/>
                                             <i class="icon-user"></i> Page permissions
                                         </stripes:link>
                                     </li>

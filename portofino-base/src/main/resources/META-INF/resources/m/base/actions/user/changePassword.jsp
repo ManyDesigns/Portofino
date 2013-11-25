@@ -13,7 +13,7 @@
         Password change
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <stripes:form action="${actionBean.context.actualServletPath}" method="post">
+        <stripes:form action="${actionBean.context.actionPath}" method="post">
             <input type="password" name="pwd" id="pwd" class="input-block-level"
                    placeholder="<fmt:message key='current.password'/>" />
             <input type="password" name="newPassword" id="newPassword" class="input-block-level"

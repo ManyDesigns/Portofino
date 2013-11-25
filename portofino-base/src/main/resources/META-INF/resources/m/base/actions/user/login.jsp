@@ -18,7 +18,7 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <stripes:form action="${actionBean.context.actualServletPath}" method="post" class="dont-prompt-on-page-abandon">
+        <stripes:form action="${actionBean.context.actionPath}" method="post" class="dont-prompt-on-page-abandon">
             <input type="text" name="userName" id="userName" class="input-block-level"
                    placeholder="<fmt:message key='user.name'/>" />
             <input type="password" name="pwd" id="pwd" class="input-block-level"
@@ -35,7 +35,7 @@
         %>  <div class="login-links">
                 <hr />
                 <div class="login-link">
-                    <stripes:link href="${actionBean.context.actualServletPath}">
+                    <stripes:link href="${actionBean.context.actionPath}">
                         <stripes:param name="forgotPassword" value=""/>
                         <stripes:param name="returnUrl" value="${actionBean.returnUrl}"/>
                         <stripes:param name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
@@ -44,7 +44,7 @@
                 </div>
                 <div class="login-link">
                     Don't have an account?
-                    <stripes:link href="${actionBean.context.actualServletPath}">
+                    <stripes:link href="${actionBean.context.actionPath}">
                         <stripes:param name="signUp" value=""/>
                         <stripes:param name="returnUrl" value="/"/>
                         <stripes:param name="cancelReturnUrl" value="/"/>

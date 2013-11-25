@@ -10,7 +10,7 @@
         <fmt:message key="sign.up" />
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <stripes:form id="signUpForm" action="${actionBean.context.actualServletPath}" method="post">
+        <stripes:form id="signUpForm" action="${actionBean.context.actionPath}" method="post">
             <mde:write name="actionBean" property="signUpForm"/>
             <div class="control-group ${actionBean.captchaValidationFailed ? 'error' : ''}">
                 <label for="captcha" class="control-label required">
@@ -19,12 +19,12 @@
                 <div class="controls">
                     <div class="input-append" style="margin-top: 5px;">
                         <input id="captcha" name="captchaText" type="text" autocomplete="off" class="input-small" />
-                        <a onclick="$('#captcha-image').attr('src', '${pageContext.request.contextPath}${actionBean.context.actualServletPath}?captcha=' + Math.random());"
+                        <a onclick="$('#captcha-image').attr('src', '${pageContext.request.contextPath}${actionBean.context.actionPath}?captcha=' + Math.random());"
                            class="btn" >
                             <i class="icon-refresh"></i>
                         </a>
                     </div>
-                    <img alt="captcha image" id="captcha-image" src="${pageContext.request.contextPath}${actionBean.context.actualServletPath}?captcha=" />
+                    <img alt="captcha image" id="captcha-image" src="${pageContext.request.contextPath}${actionBean.context.actionPath}?captcha=" />
                     <c:if test="${actionBean.captchaValidationFailed}">
                         <span class="help-inline"><fmt:message key="wrong.text" /></span>
                     </c:if>

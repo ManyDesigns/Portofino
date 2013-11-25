@@ -12,7 +12,7 @@
     <jsp:param name="pageTitle" value="${pageTitle}" />
 </jsp:include>
 <body style="margin: 0 10px 0 10px; height: 100%; padding-top: 0;">
-<form action="${pageContext.request.contextPath}${actionBean.context.actualServletPath}" method="post" style="padding-top: 10px;">
+<form action="${pageContext.request.contextPath}${actionBean.context.actionPath}" method="post" style="padding-top: 10px;">
     Choose a page:
     <button onclick="window.opener.CKEDITOR.tools.callFunction(
                         <c:out value='${actionBean.CKEditorFuncNum}'/>,
@@ -26,10 +26,10 @@
         Cancel
     </button>
 </form>
-<iframe src="${pageContext.request.contextPath}${actionBean.context.actualServletPath}" id="iframe"
+<iframe src="${pageContext.request.contextPath}${actionBean.context.actionPath}" id="iframe"
         style="width: 100%; height: 85%; border: 1px dashed black; margin: 10px 0 10px 0;">
 </iframe>
-<form action="${pageContext.request.contextPath}${actionBean.context.actualServletPath}" method="post">
+<form action="${pageContext.request.contextPath}${actionBean.context.actionPath}" method="post">
     Choose a page:
     <button onclick="window.opener.CKEDITOR.tools.callFunction(
                         <c:out value='${actionBean.CKEditorFuncNum}'/>,

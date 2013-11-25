@@ -11,7 +11,7 @@
     response.setStatus(404);
     List<String> parameters = actionBean.getPageInstance().getParameters();
     String fragment = parameters.get(0);
-    String path = actionBean.getContext().getActualServletPath();
+    String path = actionBean.getContext().getActionPath();
     path = path.substring(0, path.length() - fragment.length());
 %><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
     <stripes:layout-component name="contentHeader" />
@@ -20,7 +20,7 @@
         <stripes:form action="/actions/admin/page" method="post">
             <input type="hidden" name="originalPath" value="<%= path %>" />
             <input type="hidden" name="fragment" value="<%= fragment%>" />
-            The page <%= actionBean.getContext().getActualServletPath() %> does not exist.
+            The page <%= actionBean.getContext().getActionPath() %> does not exist.
             <button type="submit" name="newPage" class="btn">
                 Create it.
             </button>

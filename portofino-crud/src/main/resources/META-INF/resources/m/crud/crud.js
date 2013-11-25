@@ -30,7 +30,6 @@ portofino.dataTable = function(elem) {
                         //Redirect to login page (link included in the response)
                         var loginUrl = xhr.responseText;
                         loginUrl = removeQueryStringArgument(loginUrl, "returnUrl");
-                        loginUrl = removeQueryStringArgument(loginUrl, "returnUrl");
                         window.location.href =
                                 loginUrl + (loginUrl.indexOf("?") > -1 ? "&" : "?") + "returnUrl=" +
                                 encodeURIComponent(window.location.href);
@@ -44,8 +43,9 @@ portofino.dataTable = function(elem) {
         }
     }
     function setupDataTable(elem) {
-        elem.find("a.paginator-link").click(makeLoaderFunction(elem));
-        elem.find("a.sort-link").click(makeLoaderFunction(elem));
+        var linkLoaderFunction = makeLoaderFunction(elem);
+        elem.find("a.paginator-link").click(linkLoaderFunction);
+        elem.find("a.sort-link").click(linkLoaderFunction);
         elem.find("button[name=bulkDelete]").click(function() {
             return confirm (elem.find(".crud-confirm-bulk-delete").html());
         });

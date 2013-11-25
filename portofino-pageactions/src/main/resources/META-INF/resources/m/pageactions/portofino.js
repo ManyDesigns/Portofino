@@ -46,9 +46,6 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, meth
     var selectFieldId = setupArguments[4 + selectionProviderIndex];
     var autocompleteObj = $(autocompleteId);
     var selectField = $(selectFieldId);
-    autocompleteObj.change(function() {
-        selectField.val(""); //Reset selected object when user types
-    });
     autocompleteObj.typeahead({
         source: function( request, response ) {
             var data = {
@@ -64,6 +61,7 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, meth
             }
 
             var postUrl = stripQueryString(location.href);
+            selectField.val(""); //Reset selected object when user types
             $.ajax({
                 type: 'POST',
                 dataType: 'json',
@@ -104,8 +102,10 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, meth
             if(item) {
                 item = JSON.parse(item);
                 selectField.val(item.optionValue);
+                selectField.data("itemLabel", item.label)
                 return item.label;
             } else {
+                selectField.data("itemLabel", "");
                 selectField.val("");
                 return "";
             }

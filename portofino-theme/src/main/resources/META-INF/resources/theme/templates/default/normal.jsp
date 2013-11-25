@@ -12,7 +12,7 @@
 --%><div class="pageHeader">
         <stripes:layout-component name="pageHeader">
             <div class="pull-right">
-                <stripes:form action="${actionBean.context.actualServletPath}" method="post">
+                <stripes:form action="${actionBean.context.actionPath}" method="post">
                     <input type="hidden" name="returnUrl"
                            value="<c:out value="${actionBean.returnUrl}"/>"/>
                     <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
@@ -57,7 +57,7 @@
                 <div class="pageHeader">
                     <stripes:layout-component name="pageHeader">
                         <div class="pull-right">
-                            <stripes:form action="${actionBean.context.actualServletPath}"
+                            <stripes:form action="${actionBean.context.actionPath}"
                                           method="post">
                                 <input type="hidden" name="returnUrl"
                                        value="<c:out value="${actionBean.returnUrl}"/>"/>
