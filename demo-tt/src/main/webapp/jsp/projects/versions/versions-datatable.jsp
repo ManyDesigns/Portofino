@@ -28,6 +28,7 @@
                         <stripes:link href="/projects/${project.id}/versions/${version.id}">
                             <c:out value="${version.title}"/>
                         </stripes:link>
+                        <span class="<c:out value="${version.fk_version_state.css_class}"/>"><c:out value="${version.fk_version_state.state}"/></span>
                     </h4>
                     <div>
                         <c:if test="${not empty version.planned_date}">

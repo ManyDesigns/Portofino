@@ -303,6 +303,9 @@
             <column name="state" type="varchar(50)">
                 <constraints nullable="false"/>
             </column>
+            <column name="css_class" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
 
@@ -382,14 +385,17 @@
         <insert tableName="version_states">
             <column name="id" valueNumeric="1"/>
             <column name="state" value="Planned"/>
+            <column name="css_class" value="label"/>
         </insert>
         <insert tableName="version_states">
             <column name="id" valueNumeric="2"/>
             <column name="state" value="Work in progress"/>
+            <column name="css_class" value="label label-info"/>
         </insert>
         <insert tableName="version_states">
             <column name="id" valueNumeric="3"/>
             <column name="state" value="Released"/>
+            <column name="css_class" value="label label-success"/>
         </insert>
     </changeSet>
     <changeSet id="tt-122" author="Giampiero Granatella">

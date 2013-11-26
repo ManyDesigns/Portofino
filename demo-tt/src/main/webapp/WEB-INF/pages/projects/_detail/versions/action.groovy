@@ -64,7 +64,7 @@ class MyCrudAction extends CrudAction {
     }
 
     protected Resolution getReadView() {
-        return super.getReadView();
+        return new ForwardResolution("/jsp/projects/versions/version-read.jsp");
     }
 
     protected Resolution getSearchView() {
