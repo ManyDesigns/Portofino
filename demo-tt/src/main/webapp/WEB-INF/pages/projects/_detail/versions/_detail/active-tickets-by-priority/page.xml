@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page title="Active tickets by priority" navigationRoot="INHERIT" id="3ov4ppu5btuid1hb6mqyjsfpv" description="Active tickets by priority">
+    <detailLayout>
+        <childPages/>
+    </detailLayout>
+    <layout template="default">
+        <childPages/>
+    </layout>
+    <permissions/>
+</page>

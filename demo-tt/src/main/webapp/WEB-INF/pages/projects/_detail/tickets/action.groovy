@@ -1,5 +1,7 @@
 package com.manydesigns.portofino.pageactions.crud
 
+import com.manydesigns.portofino.demott.TtUtils
+
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.forms.FormBuilder
@@ -8,7 +10,6 @@ import com.manydesigns.elements.util.Util
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.buttons.annotations.Guard
-import com.manydesigns.portofino.demott.TtUtils
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
@@ -197,14 +198,14 @@ class ProjectsTicketsAction extends CrudAction {
         object.assignee = principal.id;
         String message = TtUtils.createDiffMessage(classAccessor, old, object);
         if (message == null) {
-            return new RedirectResolution(context.getActionPath);
+            return new RedirectResolution(context.actionPath);
         }
         Date now = new Date();
         Session session = persistence.getSession("tt");
         TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_TICKET_UPDATED, message);
         session.getTransaction().commit();
         SessionMessages.addInfoMessage("Ticket assigned to you");
-        return new RedirectResolution(context.getActionPath);
+        return new RedirectResolution(context.actionPath);
     }
 
     public boolean canAssignToMe() {
@@ -220,7 +221,7 @@ class ProjectsTicketsAction extends CrudAction {
     public Resolution startWork() {
         changeState(TtUtils.TICKET_STATE_WORK_IN_PROGRESS);
         SessionMessages.addInfoMessage("Started work");
-        return new RedirectResolution(context.getActionPath)
+        return new RedirectResolution(context.actionPath)
     }
 
     public boolean canStartWork() {
@@ -248,7 +249,7 @@ class ProjectsTicketsAction extends CrudAction {
     public Resolution resolve() {
         changeState(TtUtils.TICKET_STATE_RESOLVED);
         SessionMessages.addInfoMessage("Ticket resolved");
-        return new RedirectResolution(context.getActionPath);
+        return new RedirectResolution(context.actionPath);
     }
 
     public boolean canResolve() {
@@ -263,7 +264,7 @@ class ProjectsTicketsAction extends CrudAction {
     public Resolution close() {
         changeState(TtUtils.TICKET_STATE_CLOSED);
         SessionMessages.addInfoMessage("Ticket closed");
-        return new RedirectResolution(context.getActionPath);
+        return new RedirectResolution(context.actionPath);
     }
 
     public boolean canClose() {
@@ -278,7 +279,7 @@ class ProjectsTicketsAction extends CrudAction {
     public Resolution reopen() {
         changeState(TtUtils.TICKET_STATE_OPEN);
         SessionMessages.addInfoMessage("Ticket reopened");
-        return new RedirectResolution(context.getActionPath);
+        return new RedirectResolution(context.actionPath);
     }
 
     public boolean canReopen() {

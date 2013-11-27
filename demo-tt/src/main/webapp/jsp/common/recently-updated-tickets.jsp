@@ -9,7 +9,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <c:if test="${empty actionBean.tickets}">
-            <p>There are no tickets in this project.</p>
+            <p>There are no tickets.</p>
         </c:if>
         <c:if test="${not empty actionBean.tickets}">
             <dl>
