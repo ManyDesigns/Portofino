@@ -185,7 +185,13 @@
                             <primaryKey>
 <column columnName="id"/>
                             </primaryKey>
-                            <selectionProviders/>
+                            <selectionProviders>
+<query toDatabase="tt" sql="select c.id, c.title, ac.id is null&#xD;&#xA;from components c&#xD;&#xA;left join affected_components ac on ac.component = c.id and ac.project = %{#ticket.project} and n=%{#ticket.n}" name="available_components" hql="">
+    <references>
+        <reference fromColumn="component"/>
+    </references>
+</query>
+                            </selectionProviders>
                         </table>
                         <table tableName="version_states" shortName="%{state}">
                             <annotations/>

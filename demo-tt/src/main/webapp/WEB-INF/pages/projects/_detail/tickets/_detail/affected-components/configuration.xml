@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <configuration variable="" searchTitle="" rowsPerPage="10" readTitle="" query="from affected_components where project = %{#ticket.project} and n = %{#ticket.n} order by id" name="Affected components" largeResultSet="false" editTitle="" database="tt" createTitle="">
     <properties>
-        <property updatable="false" searchable="false" name="id" label="" insertable="false" inSummary="false" enabled="false">
+        <property updatable="false" searchable="false" name="id" insertable="false" inSummary="false" enabled="false">
             <annotations/>
         </property>
-        <property updatable="false" searchable="false" name="project" label="" insertable="false" inSummary="false" enabled="false">
+        <property updatable="false" searchable="false" name="project" insertable="false" inSummary="false" enabled="false">
             <annotations/>
         </property>
         <property updatable="false" searchable="false" name="n" insertable="false" inSummary="false" enabled="false">
@@ -16,6 +16,6 @@
     </properties>
     <selectionProviders>
         <selectionProvider fk="fk_affected_component_ticket" enabled="false"/>
-        <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_affected_component_component" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
+        <selectionProvider selectionProvider="available_components" searchDisplayMode="DROPDOWN" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
     </selectionProviders>
 </configuration>
