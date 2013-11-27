@@ -252,7 +252,13 @@
                             <primaryKey>
 <column columnName="id"/>
                             </primaryKey>
-                            <selectionProviders/>
+                            <selectionProviders>
+<query toDatabase="tt" sql="select u.id, concat(u.first_name, ' ', u.last_name), m.id is null&#xD;&#xA;from users u&#xD;&#xA;left join members m on m.user = u.id and m.project = %{#project.id}" name="available_members" hql="">
+    <references>
+        <reference fromColumn="user"/>
+    </references>
+</query>
+                            </selectionProviders>
                         </table>
                         <table tableName="users" shortName="%{first_name} %{last_name}">
                             <annotations/>

@@ -586,6 +586,9 @@
     <changeSet id="tt-246" author="Paolo Predonzani">
         <addUniqueConstraint tableName="members" constraintName="members_unique_project_user" columnNames="project,user"/>
     </changeSet>
+    <changeSet id="tt-247" author="Paolo Predonzani">
+        <addUniqueConstraint tableName="affected_components" constraintName="affected_components_unique_project_n_component" columnNames="project,n,component"/>
+    </changeSet>
 
 
 </databaseChangeLog>

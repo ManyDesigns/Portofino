@@ -17,6 +17,6 @@
     <selectionProviders>
         <selectionProvider fk="fk_member_project" enabled="false"/>
         <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_member_role" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
-        <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_member_user" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
+        <selectionProvider selectionProvider="available_members" searchDisplayMode="DROPDOWN" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
     </selectionProviders>
 </configuration>
