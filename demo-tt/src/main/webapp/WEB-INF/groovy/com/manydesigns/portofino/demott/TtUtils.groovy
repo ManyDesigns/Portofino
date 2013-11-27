@@ -32,6 +32,11 @@ class TtUtils {
     static final public long ACTIVITY_TYPE_AFFECTED_COMPONENT_UPDATED = 32L;
     static final public long ACTIVITY_TYPE_AFFECTED_COMPONENT_DELETED = 33L;
 
+    static final public long ROLE_VIEWER = 1L;
+    static final public long ROLE_CONTRIBUTOR = 2L;
+    static final public long ROLE_EDITOR = 3L;
+    static final public long ROLE_MANAGER = 4L;
+
     static public void addActivity(Session session, Object ticket,
                                    Long userId, Date date, long type,
                                    String message) {

@@ -583,5 +583,9 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
+    <changeSet id="tt-246" author="Paolo Predonzani">
+        <addUniqueConstraint tableName="members" constraintName="members_unique_project_user" columnNames="project,user"/>
+    </changeSet>
+
 
 </databaseChangeLog>

@@ -6,14 +6,18 @@
             <schemas>
                 <schema schemaName="tt">
                     <tables>
-                        <table tableName="roles">
+                        <table tableName="roles" shortName="%{role}">
                             <annotations/>
                             <columns>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="role" autoincrement="false">
-    <annotations/>
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>50</value>
+        </annotation>
+    </annotations>
 </column>
                             </columns>
                             <foreignKeys/>

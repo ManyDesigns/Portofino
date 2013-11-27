@@ -1,10 +1,13 @@
 package com.manydesigns.portofino.pageactions.crud
 
+import com.manydesigns.portofino.demott.TtUtils
+
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
 import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
+import org.apache.shiro.SecurityUtils
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
@@ -33,7 +36,18 @@ class ProjectsCrudAction extends CrudAction {
         return true;
     }
 
-    protected void createPostProcess(Object object) {}
+    protected void createPostProcess(Object object) {
+        Object principal = SecurityUtils.subject.principal;
+        Map member = new HashMap();
+        member.project = object.id;
+        member.user = principal.id;
+        member.role = TtUtils.ROLE_MANAGER;
+        session.save("members", (Object)member);
+    }
+
+    protected Resolution getSuccessfulSaveView() {
+        return new RedirectResolution(context.getActionPath() + "/" + object.id);
+    }
 
 
     protected void editSetup(Object object) {}
