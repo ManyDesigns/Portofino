@@ -85,10 +85,14 @@ public class OgnlTextFormat
         for (int i = 0; i < args.length; i++) {
             Object arg = args[i];
             String argString = (String) OgnlUtils.convertValue(arg, String.class);
-            try {
-                argStrings[i] = url ? URLEncoder.encode(argString, encoding) : argString;
-            } catch (UnsupportedEncodingException e) {
-                throw new Error(e);
+            if (argString == null) {
+                argStrings[i] = null;
+            } else {
+                try {
+                    argStrings[i] = url ? URLEncoder.encode(argString, encoding) : argString;
+                } catch (UnsupportedEncodingException e) {
+                    throw new Error(e);
+                }
             }
         }
 

@@ -5,6 +5,7 @@ import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
 import net.sourceforge.stripes.action.Before
+import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.Resolution
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
@@ -49,32 +50,13 @@ class MyCrudAction extends CrudAction {
     protected void deletePostProcess(Object object) {}
 
 
-    protected Resolution getBulkEditView() {
-        return super.getBulkEditView();
-    }
-
-    protected Resolution getCreateView() {
-        return super.getCreateView();
-    }
-
-    protected Resolution getEditView() {
-        return super.getEditView();
-    }
-
     protected Resolution getReadView() {
-        return super.getReadView();
+        return new ForwardResolution("/jsp/projects/components/component-read.jsp");
     }
 
     protected Resolution getSearchView() {
-        return super.getSearchView();
+        return new ForwardResolution("/jsp/projects/components/components-search.jsp");
     }
 
-    protected Resolution getEmbeddedSearchView() {
-        return super.getEmbeddedSearchView();
-    }
-
-    protected Resolution getSearchResultsPageView() {
-        return super.getSearchResultsPageView()
-    }
 
 }

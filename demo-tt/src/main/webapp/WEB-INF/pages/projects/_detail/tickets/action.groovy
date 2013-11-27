@@ -5,7 +5,10 @@ import com.manydesigns.portofino.demott.TtUtils
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.forms.FormBuilder
+import com.manydesigns.elements.forms.TableForm
+import com.manydesigns.elements.forms.TableFormBuilder
 import com.manydesigns.elements.messages.SessionMessages
+import com.manydesigns.elements.text.OgnlTextFormat
 import com.manydesigns.elements.util.Util
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
@@ -52,6 +55,7 @@ class ProjectsTicketsAction extends CrudAction {
         return formBuilder;
     }
 
+    @Override
     protected Resolution getReadView() {
         String createdByUrl = "/users/$object.created_by";
         form.findFieldByPropertyName("created_by").href = Util.getAbsoluteUrl(createdByUrl);
@@ -73,6 +77,19 @@ class ProjectsTicketsAction extends CrudAction {
         }
 
         return new ForwardResolution("/jsp/projects/tickets/ticket-read.jsp")
+    }
+
+    @Override
+    protected TableForm buildTableForm(TableFormBuilder tableFormBuilder) {
+        OgnlTextFormat titleHrefFormat = new OgnlTextFormat("/projects/%{project}/tickets/%{project}/%{n}");
+        titleHrefFormat.url = true;
+        tableFormBuilder.configHrefTextFormat("title", titleHrefFormat)
+
+        OgnlTextFormat versionHrefFormat = new OgnlTextFormat("/projects/%{project}/versions/%{fix_version}");
+        versionHrefFormat.url = true;
+        tableFormBuilder.configHrefTextFormat("fix_version", versionHrefFormat)
+
+        return super.buildTableForm(tableFormBuilder);
     }
 
 
@@ -158,10 +175,6 @@ class ProjectsTicketsAction extends CrudAction {
         return super.getEditView();
     }
 
-
-    protected Resolution getSearchView() {
-        return super.getSearchView();
-    }
 
     protected Resolution getEmbeddedSearchView() {
         return super.getEmbeddedSearchView();
