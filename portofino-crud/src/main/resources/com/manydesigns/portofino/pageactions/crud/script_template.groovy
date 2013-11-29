@@ -1,5 +1,3 @@
-package com.manydesigns.portofino.pageactions.crud
-
 import javax.servlet.*
 
 import com.manydesigns.elements.messages.*

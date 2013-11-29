@@ -99,7 +99,9 @@
         <jsoup.version>1.7.1</jsoup.version>
         <groovy.version>2.0.6</groovy.version>
         <json.version>20090211</json.version>
+        <jxl.version>2.6.12</jxl.version>
         <liquibase.version>2.0.5</liquibase.version>
+        <fop.version>1.0</fop.version>
         <itext.version>2.1.7</itext.version>
         <quartz.version>2.1.6</quartz.version>
         <c3p0.version>0.9.1.2</c3p0.version> <!-- Hibernate uses 0.9.1, Quartz uses 0.9.1.1 -->
