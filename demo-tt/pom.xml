@@ -149,6 +149,7 @@
     </dependencies>
     <build>
         <plugins>
+                        <!-- Plugins for GAE
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -276,7 +277,7 @@
                     </jvmFlags>
                     <disableUpdateCheck>true</disableUpdateCheck>
                 </configuration>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 </project>

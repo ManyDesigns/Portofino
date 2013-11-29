@@ -167,7 +167,8 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
                 subject.login(new OpenIDToken(identifier, null));
                 String name = ShiroUtils.getPortofinoRealm().getUserPrettyName((Serializable) subject.getPrincipal());
                 logger.info("User {} login", identifier.getIdentifier());
-                String successMsg = MessageFormat.format(ElementsThreadLocals.getText("user._.logged.in.successfully"), name);
+                String successMsg = MessageFormat.format(
+                        ElementsThreadLocals.getText("user._.logged.in.successfully"), name);
                 SessionMessages.addInfoMessage(successMsg);
                 if (StringUtils.isEmpty(returnUrl)) {
                     returnUrl = "/";
@@ -180,18 +181,32 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
                 session.removeAttribute(OPENID_DISCOVERED);
                 session.removeAttribute(OPENID_CONSUMER_MANAGER);
                 session.setAttribute(OPENID_IDENTIFIER, identifier);
-                return signUp();
+                return handleUnknownAccount(e);
             } catch (AuthenticationException e) {
-                String errMsg = MessageFormat.format(ElementsThreadLocals.getText("login.failed.for.user._"), identifier.getIdentifier());
+                String errMsg = MessageFormat.format(
+                        ElementsThreadLocals.getText("login.failed.for.user._"), identifier.getIdentifier());
                 SessionMessages.addErrorMessage(errMsg);
                 logger.warn(errMsg, e);
                 return new ForwardResolution(getLoginPage());
             }
         } else {
-            String errMsg = MessageFormat.format(ElementsThreadLocals.getText("login.failed.for.user._"), "(failed OpenId authentication)");
+            String errMsg = MessageFormat.format(
+                    ElementsThreadLocals.getText("login.failed.for.user._"), "(failed OpenId authentication)");
             SessionMessages.addErrorMessage(errMsg);
             return new ForwardResolution(getLoginPage());
         }
+    }
+
+    /**
+     * Handles the case when a user has successfully completed their OpenID login, but was rejected by Security.groovy
+     * with UnknownAccountException, meaning that the user is not known to the application and cannot log in. By default,
+     * the user is redirected to a sign-up page; however, you may want to adopt a different behavior.
+     * @param e the exception thrown by Security.groovy (which may contain additional information).
+     * @return a Resolution that controls how the request should be handled.
+     */
+    protected Resolution handleUnknownAccount(UnknownAccountException e) {
+        logger.debug("Unkown user logged in with OpenID", e);
+        return signUp();
     }
 
     public Resolution signUp2() {
