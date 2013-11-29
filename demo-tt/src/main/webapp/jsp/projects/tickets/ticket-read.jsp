@@ -42,7 +42,7 @@
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post" class="ticket-read">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
-            <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
+            <div class="hidden-submit"><portofino:buttons list="crud-read-default-button" /></div>
             <div>
                 <portofino:buttons list="crud-read" />
             </div>

@@ -29,8 +29,6 @@
         </div>
         <div class="span10 calendar-view">
             <stripes:form action="${actionBean.context.actionPath}" method="post">
-                <%-- Hidden submit so that ENTER on a form executes the default action --%>
-                <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
                 <input type="hidden" name="referenceDateTimeLong" value="${actionBean.referenceDateTimeLong}" />
                 <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
                 <input type="hidden" name="calendarViewType" value="<c:out value="${actionBean.calendarViewType}"/>"/>

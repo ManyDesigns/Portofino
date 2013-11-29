@@ -21,7 +21,7 @@
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post" class="form-horizontal">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
-            <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
+            <div class="hidden-submit"><portofino:buttons list="crud-read-default-button" /></div>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <mde:write name="actionBean" property="form"/>
             <c:if test="${not empty actionBean.searchString}">

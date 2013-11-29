@@ -15,7 +15,7 @@
                 action="${actionBean.context.actionPath}" method="post"
                 class="form-inline crud-search-form dont-prompt-on-page-abandon">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
-            <div class="hidden-submit"><portofino:buttons list="portlet-default-button" /></div>
+            <div class="hidden-submit"><portofino:buttons list="crud-search-form-default-button" /></div>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <c:if test="${not empty actionBean.searchForm}">
                 <c:if test="${actionBean.searchVisible}">

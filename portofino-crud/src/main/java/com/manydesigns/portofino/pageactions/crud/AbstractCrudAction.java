@@ -273,7 +273,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     @Buttons({
         @Button(list = "crud-search-form", key = "search", order = 1, type = Button.TYPE_PRIMARY),
-        @Button(list = "portlet-default-button", key = "search") //XXX non va bene, posso avere diversi default su form diversi
+        @Button(list = "crud-search-form-default-button", key = "search")
     })
     public Resolution search() {
         searchVisible = true;
@@ -520,8 +520,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Edit/Update
     //**************************************************************************
 
-    @Button(list = "crud-read", key = "edit", order = 1, icon = Button.ICON_EDIT + Button.ICON_WHITE,
-            group = "crud", type = Button.TYPE_SUCCESS)
+    @Buttons({
+        @Button(list = "crud-read", key = "edit", order = 1, icon = Button.ICON_EDIT + Button.ICON_WHITE,
+                group = "crud", type = Button.TYPE_SUCCESS),
+        @Button(list = "crud-read-default-button", key = "search")
+    })
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution edit() {
         setupForm(Mode.EDIT);

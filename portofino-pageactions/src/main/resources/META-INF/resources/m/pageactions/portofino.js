@@ -231,7 +231,7 @@ portofino.enablePageActionDragAndDrop = function(button, originalPath) {
         connectWith: "div.embeddedPageActions",
         placeholder: "embeddedPageActionPlaceholder",
         cursor: "move", // cursor image
-        revert: true, // moves the portlet to its new position with a smooth transition
+        revert: true, // moves the page to its new position with a smooth transition
         tolerance: "pointer" // mouse pointer overlaps the droppable
     }).disableSelection().addClass("pageActionBox");
 
