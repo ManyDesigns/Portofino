@@ -1,7 +1,7 @@
 package com.manydesigns.portofino.pageactions.crud
 
 import com.manydesigns.elements.ElementsThreadLocals
-import com.manydesigns.portofino.demott.TtUtils
+import com.manydesigns.portofino.tt.TtUtils
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions

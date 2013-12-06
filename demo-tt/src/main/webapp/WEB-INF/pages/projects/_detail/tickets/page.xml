@@ -10,5 +10,10 @@
     <layout template="default">
         <childPages/>
     </layout>
-    <permissions/>
+    <permissions>
+        <group name="registered">
+            <permission>crud-create</permission>
+            <permission>crud-edit</permission>
+        </group>
+    </permissions>
 </page>

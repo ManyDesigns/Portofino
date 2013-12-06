@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <page title="Home" navigationRoot="INHERIT" id="tkwxs2rtbixy6c6hy2b3h3n0i" description="Home">
-    <detailLayout>
+    <detailLayout template="default">
         <childPages/>
     </detailLayout>
     <layout template="default">
@@ -10,5 +10,7 @@
             <childPage showInNavigation="false" order="0" name="activity" container="contentLayoutRight"/>
         </childPages>
     </layout>
-    <permissions/>
+    <permissions>
+        <group name="all" level="VIEW"/>
+    </permissions>
 </page>

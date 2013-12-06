@@ -1,4 +1,4 @@
-import com.manydesigns.portofino.demott.TtUtils
+import com.manydesigns.portofino.tt.TtUtils
 
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.messages.SessionMessages

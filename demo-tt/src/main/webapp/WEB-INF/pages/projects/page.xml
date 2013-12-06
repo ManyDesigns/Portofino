@@ -13,5 +13,12 @@
     <layout template="default">
         <childPages/>
     </layout>
-    <permissions/>
+    <permissions>
+        <group name="project-manager">
+            <permission>crud-create</permission>
+            <permission>crud-edit</permission>
+            <permission>crud-delete</permission>
+        </group>
+        <group name="all" level="VIEW"/>
+    </permissions>
 </page>

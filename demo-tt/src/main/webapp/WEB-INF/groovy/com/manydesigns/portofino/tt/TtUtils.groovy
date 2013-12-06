@@ -1,9 +1,10 @@
-package com.manydesigns.portofino.demott
+package com.manydesigns.portofino.tt
 
 import com.manydesigns.elements.reflection.ClassAccessor
 import com.manydesigns.elements.reflection.PropertyAccessor
 import org.apache.commons.lang.ObjectUtils
 import org.hibernate.Session
+import org.apache.shiro.SecurityUtils
 
 /**
  * Created by IntelliJ IDEA.
@@ -65,5 +66,15 @@ class TtUtils {
         } else {
             return sb.toString();
         }
+    }
+
+    static public boolean principalHasProjectRole(Object project, long minimumRole) {
+        long userId = SecurityUtils.subject.principal.id;
+        for (Object member : project.fk_member_project) {
+            if (member.user == userId && member.role >= minimumRole) {
+                return true;
+            }
+        }
+        return false;
     }
 }

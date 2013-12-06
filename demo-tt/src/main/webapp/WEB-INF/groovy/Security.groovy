@@ -29,6 +29,7 @@ import org.apache.shiro.authc.*
 class Security extends AbstractPortofinoRealm {
 
     public static final String ADMIN_GROUP_NAME = "admin";
+    public static final String PROJECT_MANAGER_GROUP_NAME = "project-manager";
 
     private static final Logger logger = LoggerFactory.getLogger(Security.class);
 
@@ -156,6 +157,9 @@ class Security extends AbstractPortofinoRealm {
                 result.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
             }
         }
+        if (principal.project_manager) {
+            result.add(PROJECT_MANAGER_GROUP_NAME);
+        }
         return result;
     }
 
@@ -186,6 +190,16 @@ class Security extends AbstractPortofinoRealm {
 
         return result;
     }
+
+    @Override
+    Set<String> getGroups() {
+        Set<String> result = super.getGroups();
+        result.add(ADMIN_GROUP_NAME);
+        result.add(PROJECT_MANAGER_GROUP_NAME);
+        return result;
+    }
+
+
 
     @Override
     Serializable getUserById(String encodedUserId) {

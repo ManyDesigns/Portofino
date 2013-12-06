@@ -1,5 +1,5 @@
 import com.manydesigns.elements.ElementsThreadLocals
-import com.manydesigns.portofino.demott.TicketGroup
+import com.manydesigns.portofino.tt.TicketGroup
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.pageactions.custom.CustomAction

@@ -13,6 +13,11 @@
         </childPages>
     </layout>
     <permissions>
-        <group name="all" level="VIEW"/>
+        <group name="anonymous" level="NONE"/>
+        <group name="admin" level="NONE"/>
+        <group name="registered" level="NONE"/>
+        <group name="administrators" level="NONE"/>
+        <group name="project-manager" level="NONE"/>
+        <group name="all" level="NONE"/>
     </permissions>
 </page>

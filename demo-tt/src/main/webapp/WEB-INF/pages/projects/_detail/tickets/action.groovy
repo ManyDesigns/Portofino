@@ -1,6 +1,6 @@
 package com.manydesigns.portofino.pageactions.crud
 
-import com.manydesigns.portofino.demott.TtUtils
+import com.manydesigns.portofino.tt.TtUtils
 
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.Mode
@@ -30,11 +30,16 @@ import org.hibernate.Session
 class ProjectsTicketsAction extends CrudAction {
 
     Serializable project;
+    Object old;
 
     @Before
     public void prepareProject() {
         project = ElementsThreadLocals.getOgnlContext().get("project");
     }
+
+    //**************************************************************************
+    // Read customizations
+    //**************************************************************************
 
     @Override
     protected FormBuilder configureFormBuilder(FormBuilder formBuilder, Mode mode) {
@@ -79,6 +84,10 @@ class ProjectsTicketsAction extends CrudAction {
         return new ForwardResolution("/jsp/projects/tickets/ticket-read.jsp")
     }
 
+    //**************************************************************************
+    // Search customizations
+    //**************************************************************************
+
     @Override
     protected TableForm buildTableForm(TableFormBuilder tableFormBuilder) {
         OgnlTextFormat titleHrefFormat = new OgnlTextFormat("/projects/%{project}/tickets/%{project}/%{n}");
@@ -93,12 +102,30 @@ class ProjectsTicketsAction extends CrudAction {
     }
 
 
-    //Automatically generated on Mon Oct 28 12:30:32 CET 2013 by ManyDesigns Portofino
-    //Write your code here
+    //**************************************************************************
+    // Create customizations
+    //**************************************************************************
+    @Override
+    @Button(list = "crud-search", key = "create.new", order = 1d, type = Button.TYPE_SUCCESS,
+            icon = "icon-plus icon-white", group = "crud")
+    @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_CREATE)
+    @Guard(test="canCreate()", type=GuardType.VISIBLE)
+    Resolution create() {
+        return super.create()    //To change body of overridden methods use File | Settings | File Templates.
+    }
 
-    //**************************************************************************
-    // Extension hooks
-    //**************************************************************************
+    @Override
+    @Button(list = "crud-create", key = "save", order = 1d, type = Button.TYPE_PRIMARY)
+    @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_CREATE)
+    @Guard(test="canCreate()", type=GuardType.VISIBLE)
+    Resolution save() {
+        return super.save()    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
+    public boolean canCreate() {
+        return TtUtils.principalHasProjectRole(project, TtUtils.ROLE_CONTRIBUTOR);
+    }
+
 
     protected void createSetup(Object object) {
         Object principal = ShiroUtils.getPrimaryPrincipal(SecurityUtils.getSubject());
@@ -125,29 +152,7 @@ class ProjectsTicketsAction extends CrudAction {
     protected void createPostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
         Date now = new Date();
-        Session session = persistence.getSession("tt");
         TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_TICKET_CREATED, null);
-    }
-
-    Object old;
-
-
-    protected void editSetup(Object object) {
-        old = object.clone();
-    }
-
-    protected boolean editValidate(Object object) {
-        return true;
-    }
-
-    protected void editPostProcess(Object object) {
-        Object principal = SecurityUtils.subject.principal;
-        String message = TtUtils.createDiffMessage(classAccessor, old, object);
-        if (message != null) {
-            Date now = new Date();
-            Session session = persistence.getSession("tt");
-            TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_TICKET_UPDATED, message);
-        }
     }
 
     @Override
@@ -156,50 +161,43 @@ class ProjectsTicketsAction extends CrudAction {
     }
 
 
-    protected boolean deleteValidate(Object object) {
+    //**************************************************************************
+    // Edit customizations
+    //**************************************************************************
+
+    protected void editSetup(Object object) {
+        old = object.clone();
+    }
+
+    protected boolean editValidate(Object object) {
+        Date now = new Date();
+        object.date_updated = now;
         return true;
     }
 
-    protected void deletePostProcess(Object object) {}
-
-
-    protected Resolution getBulkEditView() {
-        return super.getBulkEditView();
+    protected void editPostProcess(Object object) {
+        Object principal = SecurityUtils.subject.principal;
+        String message = TtUtils.createDiffMessage(classAccessor, old, object);
+        if (message != null) {
+            Date now = new Date();
+            TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_TICKET_UPDATED, message);
+        }
     }
 
-    protected Resolution getCreateView() {
-        return super.getCreateView();
-    }
+    //**************************************************************************
+    // Delete customizations
+    //**************************************************************************
 
-    protected Resolution getEditView() {
-        return super.getEditView();
-    }
-
-
-    protected Resolution getEmbeddedSearchView() {
-        return super.getEmbeddedSearchView();
-    }
-
-    protected Resolution getSearchResultsPageView() {
-        return super.getSearchResultsPageView()
-    }
 
     @Override
     public Resolution delete() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public Resolution exportReadPdf() {
-        throw new UnsupportedOperationException();
-    }
+    //**************************************************************************
+    // Assign to me
+    //**************************************************************************
 
-    @Override
-    public Resolution exportReadExcel() {
-        throw new UnsupportedOperationException();
-    }
-
-    // Workflow buttons
 
     @Button(list = "crud-read", key = "tt.assign.to.me", order = 2d, icon = "icon-hand-right",
             group = "crud", type = Button.TYPE_DEFAULT)
@@ -225,6 +223,10 @@ class ProjectsTicketsAction extends CrudAction {
         Object principal = SecurityUtils.subject.principal;
         return object.assignee != principal.id;
     }
+
+    //**************************************************************************
+    // Start work
+    //**************************************************************************
 
 
     @Button(list = "ticket-workflow1", key = "tt.start.work", order = 2d, icon = "icon-play icon-white",
@@ -255,6 +257,10 @@ class ProjectsTicketsAction extends CrudAction {
         session.getTransaction().commit();
     }
 
+    //**************************************************************************
+    // Resolve
+    //**************************************************************************
+
     @Button(list = "ticket-workflow2", key = "tt.resolve", order = 2d, icon = "icon-thumbs-up icon-white",
             group = "wf", type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_EDIT)
@@ -268,6 +274,10 @@ class ProjectsTicketsAction extends CrudAction {
     public boolean canResolve() {
         return object.state != TtUtils.TICKET_STATE_RESOLVED;
     }
+
+    //**************************************************************************
+    // Close
+    //**************************************************************************
 
 
     @Button(list = "ticket-workflow2", key = "tt.close", order = 3d, icon = "icon-thumbs-up icon-white",
@@ -283,6 +293,10 @@ class ProjectsTicketsAction extends CrudAction {
     public boolean canClose() {
         return object.state != TtUtils.TICKET_STATE_CLOSED;
     }
+
+    //**************************************************************************
+    // Reopen
+    //**************************************************************************
 
 
     @Button(list = "ticket-workflow1", key = "tt.reopen", order = 1d, icon = "icon-repeat icon-white",
