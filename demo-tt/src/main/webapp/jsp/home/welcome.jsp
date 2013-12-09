@@ -26,6 +26,26 @@
             Welcome to Portofino TT, an open-source, customizable ticket-tracker written in Java and Groovy.
         </p>
         <shiro:authenticated>
+            <shiro:hasRole name="admin">
+                <p>
+                    <stripes:link href="/admin" class="btn btn-success">
+                        <stripes:param name="create"/>
+                        Manage users
+                        <i class="icon-chevron-right icon-white"></i>
+                    </stripes:link>
+                </p>
+            </shiro:hasRole>
+            <shiro:hasRole name="project-manager">
+                <p>
+                    <stripes:link href="/projects" class="btn btn-success">
+                        <stripes:param name="create"/>
+                        Create a new project
+                        <i class="icon-chevron-right icon-white"></i>
+                    </stripes:link>
+                </p>
+            </shiro:hasRole>
+            <hr/>
+            To finish your session:
             <stripes:link href="/login" class="btn">
                 <stripes:param name="logout"/>
                 Log out
