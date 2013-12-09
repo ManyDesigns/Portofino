@@ -258,6 +258,11 @@
         <reference fromColumn="user"/>
     </references>
 </query>
+<query toDatabase="tt" sql="select id, role from roles order by id asc" name="sorted_roles" hql="">
+    <references>
+        <reference fromColumn="role"/>
+    </references>
+</query>
                             </selectionProviders>
                         </table>
                         <table tableName="users" shortName="%{first_name} %{last_name}">
@@ -607,10 +612,18 @@
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
-    <annotations/>
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.CssClass">
+            <value>input-xlarge</value>
+        </annotation>
+    </annotations>
 </column>
 <column scale="0" nullable="false" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
-    <annotations/>
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.CssClass">
+            <value>input-block-level</value>
+        </annotation>
+    </annotations>
 </column>
 <column scale="0" nullable="true" length="100" jdbcType="12" columnType="VARCHAR" columnName="url" autoincrement="false">
     <annotations/>

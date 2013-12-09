@@ -1,11 +1,12 @@
 import com.manydesigns.elements.ElementsThreadLocals
-import com.manydesigns.portofino.tt.TicketGroup
+import com.manydesigns.elements.fields.search.SelectSearchField
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.pageactions.custom.CustomAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
+import com.manydesigns.portofino.tt.TicketGroup
 import net.sourceforge.stripes.action.DefaultHandler
 import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.Resolution
@@ -41,10 +42,14 @@ class ActiveTicketsByVersionAction extends CustomAction {
                 Object transformTuple(Object[] tuple, String[] aliases) {
                     Integer groupId = tuple[0];
                     String groupName = tuple[1];
-                    if (groupName == null) {
+                    String groupCode;
+                    if (groupId == null) {
+                        groupCode = SelectSearchField.VALUE_NOT_SET;
                         groupName = "Unassigned"
+                    } else {
+                        groupCode = groupId.toString();
                     }
-                    String url = "/projects/$project.id/tickets?search_state=1&search_state=2&search_state=3&search_fix_version=$groupId";
+                    String url = "/projects/$project.id/tickets?search_state=1&search_state=2&search_state=3&search_fix_version=$groupCode";
                     int groupCount = (int)tuple[2];
                     return new TicketGroup(groupName, url, groupCount);
                 }

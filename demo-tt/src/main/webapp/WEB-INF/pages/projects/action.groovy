@@ -1,10 +1,13 @@
 package com.manydesigns.portofino.pageactions.crud
 
-import com.manydesigns.portofino.tt.TtUtils
-
+import com.manydesigns.portofino.buttons.GuardType
+import com.manydesigns.portofino.buttons.annotations.Button
+import com.manydesigns.portofino.buttons.annotations.Buttons
+import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
+import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
 import org.apache.shiro.SecurityUtils
@@ -13,8 +16,26 @@ import org.apache.shiro.SecurityUtils
 @RequiresPermissions(level = AccessLevel.VIEW)
 class ProjectsCrudAction extends CrudAction {
 
-    //Automatically generated on Mon Oct 28 12:15:50 CET 2013 by ManyDesigns Portofino
-    //Write your code here
+    //**************************************************************************
+    // Role checking
+    //**************************************************************************
+
+    public boolean isContributor() {
+        return TtUtils.principalHasProjectRole(object, TtUtils.ROLE_CONTRIBUTOR);
+    }
+
+    public boolean isEditor() {
+        return TtUtils.principalHasProjectRole(object, TtUtils.ROLE_EDITOR);
+    }
+
+    public boolean isManager() {
+        return TtUtils.principalHasProjectRole(object, TtUtils.ROLE_MANAGER);
+    }
+
+    //**************************************************************************
+    // Read customizations
+    //**************************************************************************
+
     @Override
     Resolution read() {
         def path = getContext().actionPath
@@ -49,49 +70,26 @@ class ProjectsCrudAction extends CrudAction {
         return new RedirectResolution(context.getActionPath() + "/" + object.id);
     }
 
-
-    protected void editSetup(Object object) {}
-
-    protected boolean editValidate(Object object) {
-        return true;
+    //**************************************************************************
+    // Edit customizations
+    //**************************************************************************
+    @Override
+    @Buttons([
+        @Button(list = "crud-read", key = "edit", order = 1d, icon = "icon-edit icon-white",
+                group = "crud", type = Button.TYPE_SUCCESS),
+        @Button(list = "crud-read-default-button", key = "search")
+    ])
+    @Guard(test="isManager()", type=GuardType.VISIBLE)
+    Resolution edit() {
+        return super.edit()
     }
 
-    protected void editPostProcess(Object object) {}
-
-
-    protected boolean deleteValidate(Object object) {
-        return true;
+    @Override
+    @Button(list = "crud-edit", key = "update", order = 1d, type = Button.TYPE_PRIMARY)
+    @Guard(test="isManager()", type=GuardType.VISIBLE)
+    Resolution update() {
+        return super.update()
     }
 
-    protected void deletePostProcess(Object object) {}
-
-
-    protected Resolution getBulkEditView() {
-        return super.getBulkEditView();
-    }
-
-    protected Resolution getCreateView() {
-        return super.getCreateView();
-    }
-
-    protected Resolution getEditView() {
-        return super.getEditView();
-    }
-
-    protected Resolution getReadView() {
-        return super.getReadView();
-    }
-
-    protected Resolution getSearchView() {
-        return super.getSearchView();
-    }
-
-    protected Resolution getEmbeddedSearchView() {
-        return super.getEmbeddedSearchView();
-    }
-
-    protected Resolution getSearchResultsPageView() {
-        return super.getSearchResultsPageView()
-    }
 
 }

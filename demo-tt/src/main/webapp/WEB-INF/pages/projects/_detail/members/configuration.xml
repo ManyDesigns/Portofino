@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration variable="" searchTitle="" rowsPerPage="10" readTitle="" query="from members where project = %{#project.id}" name="Members" largeResultSet="false" editTitle="" database="tt" createTitle="">
+<configuration variable="member" searchTitle="" rowsPerPage="10" readTitle="%{#member.fk_member_user.first_name} %{#member.fk_member_user.last_name}" query="from members where project = %{#project.id}" name="Members" largeResultSet="false" editTitle="" database="tt" createTitle="">
     <properties>
         <property updatable="false" searchable="false" name="id" insertable="false" inSummary="false" enabled="false">
             <annotations/>
@@ -16,7 +16,7 @@
     </properties>
     <selectionProviders>
         <selectionProvider fk="fk_member_project" enabled="false"/>
-        <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_member_role" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
+        <selectionProvider selectionProvider="sorted_roles" searchDisplayMode="DROPDOWN" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
         <selectionProvider selectionProvider="available_members" searchDisplayMode="DROPDOWN" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
     </selectionProviders>
 </configuration>

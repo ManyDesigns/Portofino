@@ -1,14 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
+<%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"%>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"/>
 <stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
     <stripes:layout-component name="pageHeader">
         <div class="pull-right">
-            <stripes:link class="btn btn-small" href="/projects/${actionBean.project.id}">
-                <stripes:param name="edit"/>
-                Edit project details
-            </stripes:link>
+            <stripes:form action="${actionBean.context.actionPath}" method="post">
+                <input type="hidden" name="returnUrl"
+                       value="<c:out value="${actionBean.returnUrl}"/>"/>
+                <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
+            </stripes:form>
         </div>
         <h3 class="pageTitle">
             <stripes:layout-component name="pageTitle">

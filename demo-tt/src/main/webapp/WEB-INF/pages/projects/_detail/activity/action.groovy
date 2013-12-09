@@ -36,6 +36,7 @@ class MyCustomAction extends CustomAction {
         activityItems = session.createCriteria("activity")
                 .add(Restrictions.eq("project", project.id))
                 .addOrder(Order.desc("id"))
+                .setMaxResults(30)
                 .list();
 
         return new ForwardResolution("/jsp/projects/activity.jsp");
