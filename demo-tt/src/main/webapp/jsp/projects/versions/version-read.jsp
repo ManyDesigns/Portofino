@@ -19,10 +19,11 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageHeader">
         <div class="pull-right">
-            <stripes:link class="btn btn-small" href="${actionBean.context.actionPath}">
-                <stripes:param name="edit"/>
-                Edit version
-            </stripes:link>
+            <stripes:form action="${actionBean.context.actionPath}" method="post">
+                <input type="hidden" name="returnUrl"
+                       value="<c:out value="${actionBean.returnUrl}"/>"/>
+                <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
+            </stripes:form>
         </div>
         <h3 class="pageTitle">
             <stripes:layout-component name="pageTitle">

@@ -35,7 +35,7 @@ class ProjectSummaryAction extends CustomAction {
         return new ForwardResolution("/jsp/projects/summary.jsp");
     }
 
-    @Button(list = "pageHeaderButtons", key = "edit.project.details", order = 1d)
+    @Button(list = "pageHeaderButtons", key = "edit.project.details", order = 1d, icon = "icon-edit")
     @Guard(test="isManager()", type=GuardType.VISIBLE)
     public Resolution editProjectDetails() {
         return new RedirectResolution("/projects/$project.id?edit=");
