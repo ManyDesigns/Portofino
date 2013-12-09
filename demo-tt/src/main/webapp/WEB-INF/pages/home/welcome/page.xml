@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<page title="Activity" navigationRoot="INHERIT" id="48o4vjuaqsmeglqi0jm9t56ro" description="Activity">
+<page title="Welcome" navigationRoot="INHERIT" id="cecu4bacghukpe7wxd6eu1r5c" description="Welcome">
     <detailLayout>
         <childPages/>
     </detailLayout>
-    <layout template="default">
+    <layout template="homepage">
         <childPages/>
     </layout>
     <permissions/>

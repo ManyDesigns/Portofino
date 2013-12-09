@@ -2,9 +2,11 @@ package com.manydesigns.portofino.modules
 
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.i18n.ResourceBundleManager
-import com.manydesigns.portofino.servlets.PortofinoListener
+import com.manydesigns.portofino.pageactions.registry.TemplateRegistry
 
 public class DemoTTModule implements Module {
+
+    public final static String TT_VERSION = "0.9"
 
     protected ModuleStatus status = ModuleStatus.CREATED;
 
@@ -14,8 +16,12 @@ public class DemoTTModule implements Module {
     @Inject(BaseModule.MODULE_REGISTRY)
     public ModuleRegistry moduleRegistry;
 
+    @Inject(PageactionsModule.TEMPLATES_REGISTRY)
+    public TemplateRegistry templates;
+
+
     String getModuleVersion() {
-        return ModuleRegistry.getPortofinoVersion();
+        return TT_VERSION;
     }
 
     int getMigrationVersion() {
@@ -39,15 +45,17 @@ public class DemoTTModule implements Module {
     }
 
     void init() {
-        for(Module module : moduleRegistry.getModules()) {
-            def classFileName = module.getClass().getSimpleName() + ".class";
-            def classUrl = module.getClass().getResource(classFileName);
-            if(classUrl != null) {
-                def path = classUrl.toString();
-                path = path.substring(0, path.length() - module.getClass().getName().length() - ".class".length());
-                resourceBundleManager.addSearchPath(path + PortofinoListener.PORTOFINO_MESSAGES_FILE_NAME);
-            }
-        }
+// Speed up for GAE
+//        for(Module module : moduleRegistry.getModules()) {
+//            def classFileName = module.getClass().getSimpleName() + ".class";
+//            def classUrl = module.getClass().getResource(classFileName);
+//            if(classUrl != null) {
+//                def path = classUrl.toString();
+//                path = path.substring(0, path.length() - module.getClass().getName().length() - ".class".length());
+//                resourceBundleManager.addSearchPath(path + PortofinoListener.PORTOFINO_MESSAGES_FILE_NAME);
+//            }
+//        }
+        templates.register("homepage");
         status = ModuleStatus.ACTIVE;
     }
 
