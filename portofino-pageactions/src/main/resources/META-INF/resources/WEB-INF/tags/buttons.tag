@@ -16,20 +16,25 @@
 %><%@ tag import="org.apache.shiro.SecurityUtils"
 %><%@ tag import="org.apache.shiro.subject.Subject"
 %><%@ tag import="org.jetbrains.annotations.NotNull"
+%><%@ tag import="org.slf4j.Logger"
+%><%@ tag import="org.slf4j.LoggerFactory"
 %><%@ tag import="javax.servlet.jsp.jstl.fmt.LocalizationContext"
-%><%@ tag import="java.lang.reflect.Method"
-%><%@ tag import="java.util.List"
 %>
+<%@ tag import="java.lang.reflect.Method" %>
+<%@ tag import="java.util.List" %>
 <%@ tag import="java.util.MissingResourceException" %>
 <%@ attribute name="list" required="true"
 %><%@ attribute name="cssClass" required="false"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%
+    Logger logger = LoggerFactory.getLogger("buttons.tag");
+    logger.debug("Button list: {}", list);
     ActionBean actionBean = (ActionBean) request.getAttribute("actionBean");
     Subject subject = SecurityUtils.getSubject();
 
     PageInstance currentPageInstance = null;
     if(actionBean instanceof PageAction) {
+        logger.trace("actionBean is instance of PageAction");
         currentPageInstance = ((PageAction) actionBean).getPageInstance();
     }
     List<ButtonInfo> buttons =
@@ -37,10 +42,14 @@
     ServletContext servletContext = ElementsThreadLocals.getServletContext();
     Configuration configuration =
             (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
-    if(buttons != null) {
+    if(buttons == null) {
+        logger.trace("buttons == null");
+    } else {
+        logger.trace("buttons != null");
         String group = null;
         XhtmlBuffer buffer = new XhtmlBuffer(out);
         for(ButtonInfo button : buttons) {
+            logger.trace("ButtonInfo: {}", button);
             Method handler = button.getMethod();
             boolean isAdmin = SecurityLogic.isAdministrator(request);
             if(!isAdmin &&
@@ -48,7 +57,10 @@
                 !SecurityLogic.satisfiesRequiresAdministrator(request, actionBean, handler))) {
                 continue;
             }
-            if(!ButtonsLogic.doGuardsPass(actionBean, handler, GuardType.VISIBLE)) {
+            if(ButtonsLogic.doGuardsPass(actionBean, handler, GuardType.VISIBLE)) {
+                logger.trace("Guards passed");
+            } else {
+                logger.trace("Guards do not pass");
                 continue;
             }
             Button theButton = button.getButton();

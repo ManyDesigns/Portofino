@@ -430,19 +430,23 @@
         </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="state" autoincrement="false">
-    <annotations/>
-</column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="priority" autoincrement="false">
     <annotations/>
 </column>
+<column scale="0" nullable="true" length="10" jdbcType="4" columnType="INT" columnName="affected_version" autoincrement="false">
+    <annotations/>
+</column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="created_by" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.FieldSet">
+            <value>Workflow</value>
+        </annotation>
+    </annotations>
+</column>
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="state" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="true" length="10" jdbcType="4" columnType="INT" columnName="assignee" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="true" length="10" jdbcType="4" columnType="INT" columnName="affected_version" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="true" length="10" jdbcType="4" columnType="INT" columnName="fix_version" autoincrement="false">

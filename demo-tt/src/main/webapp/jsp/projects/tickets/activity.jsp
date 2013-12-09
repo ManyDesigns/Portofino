@@ -1,10 +1,10 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
-%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
-%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
+<%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"
-/><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"/>
+<stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
@@ -37,12 +37,14 @@
                 </div>
             </div>
         </c:forEach>
-        <hr/>
-        <stripes:form action="${actionBean.context.actionPath}" method="post">
-            <label>Add a comment:
-            <textarea name="comment" class="input-block-level"></textarea>
-            </label>
-            <button name="addComment" class="btn">Post comment</button>
-        </stripes:form>
+        <c:if test="${actionBean.contributor}">
+            <hr/>
+            <stripes:form action="${actionBean.context.actionPath}" method="post">
+                <label>Add a comment:
+                <textarea name="comment" class="input-block-level"></textarea>
+                </label>
+                <portofino:buttons list="activity"/>
+            </stripes:form>
+        </c:if>
     </stripes:layout-component>
 </stripes:layout-render>

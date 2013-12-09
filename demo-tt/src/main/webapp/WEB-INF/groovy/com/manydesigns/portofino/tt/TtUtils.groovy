@@ -3,8 +3,11 @@ package com.manydesigns.portofino.tt
 import com.manydesigns.elements.reflection.ClassAccessor
 import com.manydesigns.elements.reflection.PropertyAccessor
 import org.apache.commons.lang.ObjectUtils
-import org.hibernate.Session
 import org.apache.shiro.SecurityUtils
+import org.apache.shiro.subject.Subject
+import org.hibernate.Session
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,6 +17,8 @@ import org.apache.shiro.SecurityUtils
  * To change this template use File | Settings | File Templates.
  */
 class TtUtils {
+
+    public static final Logger logger = LoggerFactory.getLogger(TtUtils.class);
 
     static final public long TICKET_STATE_OPEN = 1L;
     static final public long TICKET_STATE_WORK_IN_PROGRESS = 2L;
@@ -68,13 +73,25 @@ class TtUtils {
         }
     }
 
+
     static public boolean principalHasProjectRole(Object project, long minimumRole) {
-        long userId = SecurityUtils.subject.principal.id;
+        logger.debug("principalHasProjectRole() - project id: {} - minimum role : {}", project.id, minimumRole)
+        Subject subject = SecurityUtils.subject
+        if (!subject.isAuthenticated()) {
+            logger.debug("Subject not authenticated")
+            return false;
+        }
+        long userId = subject.principal.id;
         for (Object member : project.fk_member_project) {
-            if (member.user == userId && member.role >= minimumRole) {
+            def memberUser = member.user
+            def memberRole = member.role
+            logger.debug("Member user: {} - member role: {}", memberUser, memberRole)
+            if (memberUser == userId && memberRole >= minimumRole) {
+                logger.debug("Member found")
                 return true;
             }
         }
+        logger.debug("Member not found")
         return false;
     }
 }

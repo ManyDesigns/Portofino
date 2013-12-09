@@ -1,9 +1,9 @@
 package com.manydesigns.portofino.pageactions.crud
 
-import com.manydesigns.portofino.tt.TtUtils
-
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.Mode
+import com.manydesigns.elements.fields.Field
+import com.manydesigns.elements.forms.Form
 import com.manydesigns.elements.forms.FormBuilder
 import com.manydesigns.elements.forms.TableForm
 import com.manydesigns.elements.forms.TableFormBuilder
@@ -12,16 +12,19 @@ import com.manydesigns.elements.text.OgnlTextFormat
 import com.manydesigns.elements.util.Util
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
+import com.manydesigns.portofino.buttons.annotations.Buttons
 import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
 import com.manydesigns.portofino.shiro.ShiroUtils
+import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
 import org.apache.shiro.SecurityUtils
+import org.apache.shiro.subject.Subject
 import org.hibernate.LockOptions
 import org.hibernate.Session
 
@@ -38,8 +41,34 @@ class ProjectsTicketsAction extends CrudAction {
     }
 
     //**************************************************************************
+    // Role checking
+    //**************************************************************************
+
+    public boolean isContributor() {
+        return TtUtils.principalHasProjectRole(project, TtUtils.ROLE_CONTRIBUTOR);
+    }
+
+    public boolean isEditor() {
+        return TtUtils.principalHasProjectRole(project, TtUtils.ROLE_EDITOR);
+    }
+
+    public boolean isManager() {
+        return TtUtils.principalHasProjectRole(project, TtUtils.ROLE_MANAGER);
+    }
+
+    //**************************************************************************
     // Read customizations
     //**************************************************************************
+
+    public static final String[] VIEW_FIELDS = [
+            "affected_version",
+                    "created_by",
+                    "assignee",
+                    "fix_version",
+                    "resolution",
+                    "date_created",
+                    "date_updated",
+    ];
 
     @Override
     protected FormBuilder configureFormBuilder(FormBuilder formBuilder, Mode mode) {
@@ -47,18 +76,38 @@ class ProjectsTicketsAction extends CrudAction {
         configureFormSelectionProviders(formBuilder);
 
         if (mode == Mode.VIEW) {
-            formBuilder.configFields(
-                    "created_by",
-                    "assignee",
-                    "resolution",
-                    "affected_version",
-                    "fix_version",
-                    "date_created",
-                    "date_updated",
-            )
+            def viewFields = [];
+            for (String fieldName : VIEW_FIELDS) {
+                Object fieldValue = object.get(fieldName);
+                if (fieldValue != null) {
+                    viewFields.add(fieldName);
+                }
+            }
+            formBuilder.configFields((String[])viewFields);
         }
         return formBuilder;
     }
+
+    public static final String[] WORKFLOW_FIELDS = [
+            "state", "assignee", "fix_version", "resolution"
+    ];
+
+    @Override
+    protected Form buildForm(FormBuilder formBuilder) {
+        Form result = super.buildForm(formBuilder);
+        if (isEditor()) {
+            for (String fieldName : WORKFLOW_FIELDS) {
+                Field field = result.findFieldByPropertyName(fieldName);
+                if (field != null) {
+                    field.setUpdatable(true);
+                    field.setInsertable(true);
+                }
+            }
+        }
+        return result;
+    }
+
+
 
     @Override
     protected Resolution getReadView() {
@@ -109,7 +158,7 @@ class ProjectsTicketsAction extends CrudAction {
     @Button(list = "crud-search", key = "create.new", order = 1d, type = Button.TYPE_SUCCESS,
             icon = "icon-plus icon-white", group = "crud")
     @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_CREATE)
-    @Guard(test="canCreate()", type=GuardType.VISIBLE)
+    @Guard(test="isContributor()", type=GuardType.VISIBLE)
     Resolution create() {
         return super.create()    //To change body of overridden methods use File | Settings | File Templates.
     }
@@ -117,13 +166,9 @@ class ProjectsTicketsAction extends CrudAction {
     @Override
     @Button(list = "crud-create", key = "save", order = 1d, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_CREATE)
-    @Guard(test="canCreate()", type=GuardType.VISIBLE)
+    @Guard(test="isContributor()", type=GuardType.VISIBLE)
     Resolution save() {
         return super.save()    //To change body of overridden methods use File | Settings | File Templates.
-    }
-
-    public boolean canCreate() {
-        return TtUtils.principalHasProjectRole(project, TtUtils.ROLE_CONTRIBUTOR);
     }
 
 
@@ -164,6 +209,36 @@ class ProjectsTicketsAction extends CrudAction {
     //**************************************************************************
     // Edit customizations
     //**************************************************************************
+    @Override
+    @Buttons([
+        @Button(list = "crud-read", key = "edit", order = 1d, icon = "icon-edit icon-white",
+                group = "crud", type = Button.TYPE_SUCCESS),
+        @Button(list = "crud-read-default-button", key = "search")
+    ])
+    @Guard(test="canEdit()", type=GuardType.VISIBLE)
+    Resolution edit() {
+        return super.edit()    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
+    @Override
+    @Button(list = "crud-edit", key = "update", order = 1d, type = Button.TYPE_PRIMARY)
+    @Guard(test="canEdit()", type=GuardType.VISIBLE)
+    Resolution update() {
+        return super.update()    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
+    public boolean canEdit() {
+        return isEditor() || (myTicket() && isContributor());
+    }
+
+    public boolean myTicket() {
+        Subject subject = SecurityUtils.subject;
+        if (!subject.isAuthenticated()) {
+            return false;
+        }
+        return object.created_by == subject.principal.id;
+    }
+
 
     protected void editSetup(Object object) {
         old = object.clone();
@@ -185,13 +260,33 @@ class ProjectsTicketsAction extends CrudAction {
     }
 
     //**************************************************************************
+    // Bulk edit customizations
+    //**************************************************************************
+    Resolution bulkEdit() {
+        throw new UnsupportedOperationException("Bulk operations not supported on tickets");
+    }
+
+    Resolution bulkUpdate() {
+        throw new UnsupportedOperationException("Bulk operations not supported on tickets");
+    }
+
+    //**************************************************************************
     // Delete customizations
     //**************************************************************************
 
 
-    @Override
+    @Button(list = "crud-read", key = "delete", order = 2d, icon = Button.ICON_TRASH, group = "crud")
+    @Guard(test = "isManager()", type = GuardType.VISIBLE)
     public Resolution delete() {
-        throw new UnsupportedOperationException();
+        return super.delete();
+    }
+
+    //**************************************************************************
+    // Bulk delete customizations
+    //**************************************************************************
+
+    public Resolution bulkDelete() {
+        throw new UnsupportedOperationException("Bulk operations not supported on tickets");
     }
 
     //**************************************************************************
@@ -199,7 +294,7 @@ class ProjectsTicketsAction extends CrudAction {
     //**************************************************************************
 
 
-    @Button(list = "crud-read", key = "tt.assign.to.me", order = 2d, icon = "icon-hand-right",
+    @Button(list = "assign", key = "tt.assign.to.me", order = 2d, icon = "icon-hand-right",
             group = "crud", type = Button.TYPE_DEFAULT)
     @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_EDIT)
     @Guard(test="canAssignToMe()", type=GuardType.VISIBLE)
@@ -220,8 +315,14 @@ class ProjectsTicketsAction extends CrudAction {
     }
 
     public boolean canAssignToMe() {
-        Object principal = SecurityUtils.subject.principal;
-        return object.assignee != principal.id;
+        Subject subject = SecurityUtils.subject
+        if (!subject.isAuthenticated()) {
+            return false;
+        }
+        if (object.assignee == subject.principal.id) {
+            return false;
+        }
+        return isEditor();
     }
 
     //**************************************************************************
@@ -240,7 +341,10 @@ class ProjectsTicketsAction extends CrudAction {
     }
 
     public boolean canStartWork() {
-        return object.state != TtUtils.TICKET_STATE_WORK_IN_PROGRESS;
+        if (object.state == TtUtils.TICKET_STATE_WORK_IN_PROGRESS) {
+            return false;
+        }
+        return isEditor();
     }
 
     private void changeState(long newState) {
@@ -272,7 +376,10 @@ class ProjectsTicketsAction extends CrudAction {
     }
 
     public boolean canResolve() {
-        return object.state != TtUtils.TICKET_STATE_RESOLVED;
+        if (object.state == TtUtils.TICKET_STATE_RESOLVED) {
+            return false;
+        }
+        return isEditor();
     }
 
     //**************************************************************************
@@ -291,7 +398,10 @@ class ProjectsTicketsAction extends CrudAction {
     }
 
     public boolean canClose() {
-        return object.state != TtUtils.TICKET_STATE_CLOSED;
+        if (object.state == TtUtils.TICKET_STATE_CLOSED) {
+            return false;
+        }
+        return isEditor();
     }
 
     //**************************************************************************
@@ -310,7 +420,10 @@ class ProjectsTicketsAction extends CrudAction {
     }
 
     public boolean canReopen() {
-        return object.state != TtUtils.TICKET_STATE_OPEN;
+        if (object.state == TtUtils.TICKET_STATE_OPEN) {
+            return false;
+        }
+        return isEditor();
     }
 
 
