@@ -1,22 +1,19 @@
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.modules.DatabaseModule
-import com.manydesigns.portofino.pageactions.custom.CustomAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.tt.ActivityItem
 import com.manydesigns.portofino.tt.ActivityItem.Arg
+import com.manydesigns.portofino.tt.ActivityStreamAction
 import net.sourceforge.stripes.action.Before
-import net.sourceforge.stripes.action.DefaultHandler
-import net.sourceforge.stripes.action.ForwardResolution
-import net.sourceforge.stripes.action.Resolution
 import org.hibernate.Session
 import org.hibernate.criterion.Order
 import org.hibernate.criterion.Restrictions
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class MyCustomAction extends CustomAction {
+class MyCustomAction extends ActivityStreamAction {
 
     Serializable project;
 
@@ -28,21 +25,13 @@ class MyCustomAction extends CustomAction {
     @Inject(DatabaseModule.PERSISTENCE)
     private Persistence persistence;
 
-    List<ActivityItem> activityItems = new ArrayList<ActivityItem>();
-
-
-
-    @DefaultHandler
-    public Resolution execute() {
+    @Override
+    public void populateActivityItems() {
         Session session = persistence.getSession("tt");
-        List items = session.createCriteria("activity")
-                .add(Restrictions.eq("project", project.id))
-                .addOrder(Order.desc("id"))
-                .setMaxResults(30)
-                .list();
+        List items = session.createCriteria("activity").add(Restrictions.eq("project", project.id)).addOrder(Order.desc("id")).setMaxResults(30).list();
 
         Locale locale = context.request.locale;
-        for (Object item : items) {
+        for (Object item: items) {
             String userName = "$item.fk_activity_user.first_name $item.fk_activity_user.last_name"
 
             Object ticket = item.fk_activity_ticket;
@@ -52,6 +41,7 @@ class MyCustomAction extends CustomAction {
 
             Date timestamp = item.date;
             String imageSrc = "/images/user-placeholder-40x40.png";
+            String imageHref = null;
             String imageAlt = userName;
             String message = item.message;
             String key = "project." + item.fk_activity_type.type
@@ -59,6 +49,7 @@ class MyCustomAction extends CustomAction {
                     locale,
                     timestamp,
                     imageSrc,
+                    imageHref,
                     imageAlt,
                     message,
                     key,
@@ -68,8 +59,6 @@ class MyCustomAction extends CustomAction {
             );
             activityItems.add(activityItem)
         }
-
-        return new ForwardResolution("/jsp/projects/activity.jsp");
     }
 
 }

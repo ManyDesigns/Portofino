@@ -26,15 +26,17 @@ public class ActivityItem implements XhtmlFragment {
     final Locale locale;
     final Date timestamp;
     final String imageSrc;
+    final String imageHref;
     final String imageAlt;
     final String message;
     final String key;
     final Arg[] args;
 
-    public ActivityItem(Locale locale, Date timestamp, String imageSrc, String imageAlt, String message, String key, Arg... args) {
+    public ActivityItem(Locale locale, Date timestamp, String imageSrc, String imageHref, String imageAlt, String message, String key, Arg... args) {
         this.locale = locale;
         this.timestamp = timestamp;
         this.imageSrc = imageSrc;
+        this.imageHref = imageHref;
         this.imageAlt = imageAlt;
         this.message = message;
         this.key = key;
@@ -57,7 +59,12 @@ public class ActivityItem implements XhtmlFragment {
 
     public void renderImage(XhtmlBuffer xb) {
         String absoluteSrc = Util.getAbsoluteUrl(imageSrc);
-        xb.openElement("div");
+        if (imageHref == null) {
+            xb.openElement("div");
+        } else {
+            xb.openElement("a");
+            xb.addAttribute("href", imageHref);
+        }
         xb.addAttribute("class", "pull-left");
 
         xb.openElement("img");
@@ -66,7 +73,11 @@ public class ActivityItem implements XhtmlFragment {
         xb.addAttribute("src", absoluteSrc);
         xb.closeElement("img");
 
-        xb.closeElement("div");
+        if (imageHref == null) {
+            xb.closeElement("div");
+        } else {
+            xb.closeElement("a");
+        }
     }
 
     public void renderBody(XhtmlBuffer xb) {

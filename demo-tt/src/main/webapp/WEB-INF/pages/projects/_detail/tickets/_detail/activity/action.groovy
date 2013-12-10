@@ -65,6 +65,7 @@ class TicketsActivityAction extends CustomAction {
 
             Date timestamp = item.date;
             String imageSrc = "/images/user-placeholder-40x40.png";
+            String imageHref = null;
             String imageAlt = userName;
             String message = item.message;
             String key = "ticket." + item.fk_activity_type.type
@@ -72,6 +73,7 @@ class TicketsActivityAction extends CustomAction {
                     locale,
                     timestamp,
                     imageSrc,
+                    imageHref,
                     imageAlt,
                     message,
                     key,
