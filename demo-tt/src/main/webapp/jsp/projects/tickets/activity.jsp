@@ -3,6 +3,7 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="mde" uri="/manydesigns-elements" %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"/>
 <stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
     <stripes:layout-component name="pageTitle">
@@ -14,28 +15,7 @@
         </div>
         <div><c:out value="${actionBean.ticket.description}"/></div>
         <c:forEach var="activityItem" items="${actionBean.activityItems}">
-            <div class="media">
-                <stripes:link class="pull-left" href="/users/${activityItem.user}">
-                    <img class="media-object" alt="user" src="<stripes:url value="/images/user-placeholder-40x40.png"/>" />
-                </stripes:link>
-                <div class="media-body">
-                    <div>
-                        <strong>
-                        <stripes:link href="/users/${activityItem.user}"><c:out value="${activityItem.fk_activity_user.first_name} ${activityItem.fk_activity_user.last_name}"/></stripes:link>
-                        </strong>
-                    </div>
-                    <div>
-                        <strong>
-                        <small class="muted">
-                            <fmt:message key="${activityItem.fk_activity_type.type}">
-                                <fmt:param value="${activityItem.date}"/>
-                            </fmt:message>
-                        </small>
-                        </strong>
-                    </div>
-                    <div><c:out value="${activityItem.message}"/></div>
-                </div>
-            </div>
+            <mde:write name="activityItem"/>
         </c:forEach>
         <c:if test="${actionBean.contributor}">
             <hr/>

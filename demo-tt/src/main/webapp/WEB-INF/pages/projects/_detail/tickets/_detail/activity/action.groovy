@@ -1,3 +1,5 @@
+import com.manydesigns.portofino.tt.TtUtils
+
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.portofino.buttons.GuardType
@@ -9,7 +11,8 @@ import com.manydesigns.portofino.pageactions.custom.CustomAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
-import com.manydesigns.portofino.tt.TtUtils
+import com.manydesigns.portofino.tt.ActivityItem
+import com.manydesigns.portofino.tt.ActivityItem.Arg
 import org.apache.shiro.SecurityUtils
 import org.hibernate.Session
 import org.hibernate.criterion.Order
@@ -33,7 +36,7 @@ class TicketsActivityAction extends CustomAction {
     @Inject(DatabaseModule.PERSISTENCE)
     private Persistence persistence;
 
-    List activityItems;
+    List<ActivityItem> activityItems = new ArrayList<ActivityItem>();
 
     //**************************************************************************
     // Role checking
@@ -50,11 +53,34 @@ class TicketsActivityAction extends CustomAction {
     @DefaultHandler
     public Resolution execute() {
         Session session = persistence.getSession("tt");
-        activityItems = session.createCriteria("activity")
+        List items = session.createCriteria("activity")
                 .add(Restrictions.eq("project", ticket.project))
                 .add(Restrictions.eq("n", ticket.n))
                 .addOrder(Order.asc("id"))
                 .list();
+
+        Locale locale = context.request.locale;
+        for (Object item : items) {
+            String userName = "$item.fk_activity_user.first_name $item.fk_activity_user.last_name"
+
+            Date timestamp = item.date;
+            String imageSrc = "/images/user-placeholder-40x40.png";
+            String imageAlt = userName;
+            String message = item.message;
+            String key = "ticket." + item.fk_activity_type.type
+            ActivityItem activityItem = new ActivityItem(
+                    locale,
+                    timestamp,
+                    imageSrc,
+                    imageAlt,
+                    message,
+                    key,
+                    new Arg(userName, null),
+            );
+            activityItems.add(activityItem)
+        }
+
+
 
         return new ForwardResolution("/jsp/projects/tickets/activity.jsp");
     }
