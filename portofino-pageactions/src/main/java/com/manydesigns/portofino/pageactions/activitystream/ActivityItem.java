@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.tt;
+package com.manydesigns.portofino.pageactions.activitystream;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.util.Util;

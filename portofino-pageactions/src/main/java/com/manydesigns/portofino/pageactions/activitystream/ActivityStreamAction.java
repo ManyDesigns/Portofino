@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.tt;
+package com.manydesigns.portofino.pageactions.activitystream;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.messages.SessionMessages;
@@ -45,35 +45,58 @@ import java.util.List;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresPermissions(level = AccessLevel.VIEW)
-@PageActionName("Custom")
+@PageActionName("Activity stream")
 @ScriptTemplate("script_template.groovy")
 public class ActivityStreamAction extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
+    //--------------------------------------------------------------------------
+    // Logging
+    //--------------------------------------------------------------------------
 
     public static final Logger logger =
             LoggerFactory.getLogger(ActivityStreamAction.class);
 
+    //--------------------------------------------------------------------------
+    // Fields
+    //--------------------------------------------------------------------------
+
     final List<ActivityItem> activityItems = new ArrayList<ActivityItem>();
+
+    //--------------------------------------------------------------------------
+    // Web methods
+    //--------------------------------------------------------------------------
 
     @DefaultHandler
     public Resolution execute() {
         populateActivityItems();
 
-        return new ForwardResolution("/jsp/projects/activity.jsp");
+        return getViewResolution();
     }
+
+    //--------------------------------------------------------------------------
+    // Hooks
+    //--------------------------------------------------------------------------
 
     public void populateActivityItems() {
         logger.info("Default populateActivityItems()");
     }
 
+    protected Resolution getViewResolution() {
+        return new ForwardResolution("/m/pageactions/pageactions/activitystream/view.jsp");
+    }
+
+
+    //--------------------------------------------------------------------------
+    // Configuration
+    //--------------------------------------------------------------------------
 
     @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();
-        return new ForwardResolution("/m/pageactions/pageactions/custom/configure.jsp");
+        return new ForwardResolution("/m/pageactions/pageactions/activitystream/configure.jsp");
     }
 
     @Button(list = "configuration", key = "update.configuration", order = 1, type = Button.TYPE_PRIMARY)
@@ -89,12 +112,20 @@ public class ActivityStreamAction extends AbstractPageAction {
         return cancel();
     }
 
+    //--------------------------------------------------------------------------
+    // PageAction implementation
+    //--------------------------------------------------------------------------
+
     public Resolution preparePage() {
         if(!pageInstance.getParameters().isEmpty()) {
             return new ErrorResolution(404);
         }
         return null;
     }
+
+    //--------------------------------------------------------------------------
+    // Getters/setters
+    //--------------------------------------------------------------------------
 
     public List<ActivityItem> getActivityItems() {
         return activityItems;

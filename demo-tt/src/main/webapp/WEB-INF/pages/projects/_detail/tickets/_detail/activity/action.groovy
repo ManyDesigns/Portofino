@@ -7,20 +7,23 @@ import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.modules.DatabaseModule
-import com.manydesigns.portofino.pageactions.custom.CustomAction
+import com.manydesigns.portofino.pageactions.activitystream.ActivityItem
+import com.manydesigns.portofino.pageactions.activitystream.ActivityItem.Arg
+import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
-import com.manydesigns.portofino.tt.ActivityItem
-import com.manydesigns.portofino.tt.ActivityItem.Arg
+import net.sourceforge.stripes.action.Before
+import net.sourceforge.stripes.action.ForwardResolution
+import net.sourceforge.stripes.action.RedirectResolution
+import net.sourceforge.stripes.action.Resolution
 import org.apache.shiro.SecurityUtils
 import org.hibernate.Session
 import org.hibernate.criterion.Order
 import org.hibernate.criterion.Restrictions
-import net.sourceforge.stripes.action.*
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class TicketsActivityAction extends CustomAction {
+class TicketActivityAction extends ActivityStreamAction {
 
     Serializable project;
     Serializable ticket;
@@ -36,8 +39,6 @@ class TicketsActivityAction extends CustomAction {
     @Inject(DatabaseModule.PERSISTENCE)
     private Persistence persistence;
 
-    List<ActivityItem> activityItems = new ArrayList<ActivityItem>();
-
     //**************************************************************************
     // Role checking
     //**************************************************************************
@@ -49,9 +50,8 @@ class TicketsActivityAction extends CustomAction {
     //**************************************************************************
     // View
     //**************************************************************************
-
-    @DefaultHandler
-    public Resolution execute() {
+    @Override
+    void populateActivityItems() {
         Session session = persistence.getSession("tt");
         List items = session.createCriteria("activity")
                 .add(Restrictions.eq("project", ticket.project))
@@ -81,11 +81,13 @@ class TicketsActivityAction extends CustomAction {
             );
             activityItems.add(activityItem)
         }
+    }
 
-
-
+    @Override
+    protected Resolution getViewResolution() {
         return new ForwardResolution("/jsp/projects/tickets/activity.jsp");
     }
+
 
     @Button(list = "activity", key = "post.comment")
     @Guard(test="isContributor()", type=GuardType.VISIBLE)

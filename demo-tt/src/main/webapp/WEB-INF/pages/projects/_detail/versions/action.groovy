@@ -1,5 +1,7 @@
 package com.manydesigns.portofino.pageactions.crud
 
+import com.manydesigns.portofino.tt.TtUtils
+
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
@@ -8,7 +10,6 @@ import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
-import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.Resolution
@@ -79,7 +80,7 @@ class ProjectVersionsAction extends CrudAction {
 
     @Override
     @Buttons([
-        @Button(list = "pageHeaderButtons", key = "edit.component.details", order = 1d, icon = "icon-edit", group = "crud"),
+        @Button(list = "pageHeaderButtons", key = "edit.version.details", order = 1d, icon = "icon-edit", group = "crud"),
         @Button(list = "crud-read-default-button", key = "search")
     ])
     @Guard(test="object != null && isManager()", type=GuardType.VISIBLE)

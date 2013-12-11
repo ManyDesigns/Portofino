@@ -1,19 +1,19 @@
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.modules.DatabaseModule
+import com.manydesigns.portofino.pageactions.activitystream.ActivityItem
+import com.manydesigns.portofino.pageactions.activitystream.ActivityItem.Arg
+import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
-import com.manydesigns.portofino.tt.ActivityItem
-import com.manydesigns.portofino.tt.ActivityItem.Arg
-import com.manydesigns.portofino.tt.ActivityStreamAction
 import net.sourceforge.stripes.action.Before
 import org.hibernate.Session
 import org.hibernate.criterion.Order
 import org.hibernate.criterion.Restrictions
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class MyCustomAction extends ActivityStreamAction {
+class ProjectActivityAction extends ActivityStreamAction {
 
     Serializable project;
 
