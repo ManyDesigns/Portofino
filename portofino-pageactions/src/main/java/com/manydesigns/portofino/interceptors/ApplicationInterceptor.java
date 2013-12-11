@@ -38,6 +38,7 @@ import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBException;
@@ -67,11 +68,13 @@ public class ApplicationInterceptor implements Interceptor {
         logger.debug("Retrieving Servlet API objects");
         HttpServletRequest request = actionContext.getRequest();
 
-        logger.debug("Starting page response timer");
-        StopWatch stopWatch = new StopWatch();
-        // There is no need to stop this timer.
-        stopWatch.start();
-        request.setAttribute(RequestAttributes.STOP_WATCH, stopWatch);
+        if (request.getDispatcherType() == DispatcherType.REQUEST) {
+            logger.debug("Starting page response timer");
+            StopWatch stopWatch = new StopWatch();
+            // There is no need to stop this timer.
+            stopWatch.start();
+            request.setAttribute(RequestAttributes.STOP_WATCH, stopWatch);
+        }
 
         Dispatch dispatch = DispatcherUtil.getDispatch(request);
         if (dispatch != null) {
