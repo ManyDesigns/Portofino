@@ -17,6 +17,7 @@ import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
+import org.apache.commons.lang.StringEscapeUtils
 import org.apache.shiro.SecurityUtils
 import org.hibernate.Session
 import org.hibernate.criterion.Order
@@ -95,7 +96,8 @@ class TicketActivityAction extends ActivityStreamAction {
         Session session = persistence.getSession("tt");
         Object principal = SecurityUtils.subject.principal;
         Date now = new Date();
-        TtUtils.addActivity(session, ticket, principal.id, now, TtUtils.ACTIVITY_TYPE_COMMENT_CREATED, comment);
+        String message = StringEscapeUtils.escapeHtml(comment);
+        TtUtils.addActivity(session, ticket, principal.id, now, TtUtils.ACTIVITY_TYPE_COMMENT_CREATED, message);
         session.getTransaction().commit();
         SessionMessages.addInfoMessage("Comment posted successfully");
         return new RedirectResolution("/projects/$ticket.project/tickets/$ticket.project/$ticket.n")

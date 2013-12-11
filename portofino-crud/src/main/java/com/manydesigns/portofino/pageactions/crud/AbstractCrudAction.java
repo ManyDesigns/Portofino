@@ -169,6 +169,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public SearchForm searchForm;
     public TableForm tableForm;
+    public FormBuilder formBuilder;
     public Form form;
 
     //--------------------------------------------------------------------------
@@ -1222,7 +1223,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected void setupForm(Mode mode) {
-        FormBuilder formBuilder = createFormBuilder();
+        formBuilder = createFormBuilder();
         configureFormBuilder(formBuilder, mode);
         form = buildForm(formBuilder);
     }

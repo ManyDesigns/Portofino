@@ -23,6 +23,7 @@ package com.manydesigns.elements.util;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -345,4 +346,104 @@ public class Util {
     public static String replaceBadUnicodeCharactersWithHtmlEntities(String source) {
         return replaceBadUnicodeCharactersWithHtmlEntities(source, new StringBuilder()).toString();
     }
+
+    public static String writeFormattedText(String str, boolean highlightLinks) {
+        XhtmlBuffer xb = new XhtmlBuffer();
+        writeFormattedText(xb, str, highlightLinks);
+        return xb.toString();
+    }
+
+    public static void writeFormattedText(XhtmlBuffer xb, String str, boolean highlightLinks) {
+        if (str == null) {
+            return;
+        }
+
+        String[] lines = StringUtils.split(str, "\r\n");
+
+        boolean first = true;
+        for (String line : lines) {
+            if (first) {
+                first = false;
+            } else {
+                xb.writeBr();
+            }
+            if (highlightLinks) {
+                xb.writeNoHtmlEscape(highlightLinks(line));
+            } else {
+                xb.write(line);
+            }
+        }
+    }
+
+    public final static Pattern linkPattern =
+            Pattern.compile("(http://|https://|ftp://|www\\.)\\S+", Pattern.CASE_INSENSITIVE);
+    public final static Pattern emailPattern =
+            Pattern.compile("[a-z0-9\\-_]++(\\.[a-z0-9\\-_]++)*@[a-z0-9\\-_]++" +
+                    "(\\.[a-z0-9\\-_]++)++", Pattern.CASE_INSENSITIVE);
+
+
+    public static String highlightLinks(String str) {
+        if (str == null) {
+            return null;
+        }
+        // Pattern Matching will be case insensitive.
+        Matcher linkMatcher = linkPattern.matcher(str);
+
+        boolean linkTrovato = false;
+        StringBuffer sb = new StringBuffer();
+        while (linkMatcher.find()) {
+            String text = shortenEscaped(linkMatcher.group(0), 22);
+            if (linkMatcher.group(1).equalsIgnoreCase("www.")) {
+                linkMatcher.appendReplacement(sb, "<a href=\"http://" +
+                        linkMatcher.group(0) + "\">" + text + "</a>");
+            } else {
+                linkMatcher.appendReplacement(sb, "<a href=\"" + linkMatcher.group(0) +
+                        "\">" + text + "</a>");
+            }
+            linkTrovato = true;
+        }
+        if (linkTrovato) {
+            linkMatcher.appendTail(sb);
+            str = sb.toString();
+            linkTrovato = false;
+            sb = new StringBuffer();
+        }
+
+        //mail
+        Matcher emailMatcher = emailPattern.matcher(str);
+        while (emailMatcher.find()) {
+            emailMatcher.appendReplacement(sb, "<a href=\"mailto:" +
+                    emailMatcher.group(0) + "\">" + emailMatcher.group(0) + "</a>");
+            linkTrovato = true;
+        }
+        if (linkTrovato) {
+            emailMatcher.appendTail(sb);
+            str = sb.toString();
+        }
+        return str;
+    }
+
+    public static String shortenEscaped(String text, int maxlen) {
+        StringBuilder sb = new StringBuilder();
+        int pos = 0;
+        int count = 0;
+        boolean inEntity = false;
+        while (pos < text.length()) {
+            char c = text.charAt(pos);
+            if (c == '&')
+                inEntity = true;
+            if (c == ';')
+                inEntity = false;
+            sb.append(c);
+            if (!inEntity)
+                count = count + 1;
+            pos = pos + 1;
+            if (count >= maxlen)
+                break;
+        }
+        if (pos < text.length())
+            sb.append("...");
+        return sb.toString();
+    }
+
 }

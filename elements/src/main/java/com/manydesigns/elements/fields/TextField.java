@@ -33,8 +33,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -45,12 +43,6 @@ import java.util.regex.Pattern;
 public class TextField extends AbstractTextField {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
-
-    public final static Pattern linkPattern =
-            Pattern.compile("(http://|https://|ftp://|www\\.)\\S+", Pattern.CASE_INSENSITIVE);
-    public final static Pattern emailPattern =
-            Pattern.compile("[a-z0-9\\-_]++(\\.[a-z0-9\\-_]++)*@[a-z0-9\\-_]++" +
-                    "(\\.[a-z0-9\\-_]++)++", Pattern.CASE_INSENSITIVE);
 
     protected boolean highlightLinks = false;
     protected boolean multiline = false;
@@ -182,13 +174,16 @@ public class TextField extends AbstractTextField {
         }
         xb.addAttribute("class", cssClass);
         xb.addAttribute("id", id);
-        String escapedText = getDisplayValue();
         if (href != null) {
             xb.openElement("a");
             xb.addAttribute("href", href);
             xb.addAttribute("alt", title);
         }
-        xb.writeNoHtmlEscape(escapedText);
+        if(richText) {
+            xb.writeNoHtmlEscape(stringValue);
+        } else {
+            Util.writeFormattedText(xb, stringValue, href == null && highlightLinks);
+        }
         if (href != null) {
             xb.closeElement("a");
         }
@@ -201,10 +196,6 @@ public class TextField extends AbstractTextField {
             escapedText = stringValue;
         } else {
             escapedText = StringEscapeUtils.escapeHtml(stringValue);
-            if(href == null && highlightLinks) {
-                escapedText = highlightLinks(escapedText);
-            }
-            escapedText = adjustText(escapedText);
         }
         return escapedText;
     }
@@ -217,93 +208,6 @@ public class TextField extends AbstractTextField {
     // Other methods
     //**************************************************************************
 
-    public static String adjustText(String str) {
-        if (str == null) {
-            return null;
-        }
-
-        StringBuilder buf = new StringBuilder();
-        int i;
-        for (i = 0; i < str.length(); i++) {
-            char ch = str.charAt(i);
-            if (ch == '\n') {
-                buf.append("<br />");
-// commentate le due righe successive perche' creavano troppe righe che
-// eccedevano in lunghezza dal lato destro della pagina.
-//            } else if ( ch == ' ' ){
-//                buf.append("&nbsp;");
-            } else if (ch == '\t') {
-                buf.append("&nbsp;&nbsp;&nbsp;&nbsp;");
-            } else {
-                buf.append(ch);
-            }
-        }
-        return buf.toString();
-    }
-
-    public static String highlightLinks(String str) {
-        if (str == null) {
-            return null;
-        }
-        // Pattern Matching will be case insensitive.
-        Matcher linkMatcher = linkPattern.matcher(str);
-
-        boolean linkTrovato = false;
-        StringBuffer sb = new StringBuffer();
-        while (linkMatcher.find()) {
-            String text = shortenEscaped(linkMatcher.group(0), 22);
-            if (linkMatcher.group(1).equalsIgnoreCase("www.")) {
-                linkMatcher.appendReplacement(sb, "<a href=\"http://" +
-                        linkMatcher.group(0) + "\">" + text + "</a>");
-            } else {
-                linkMatcher.appendReplacement(sb, "<a href=\"" + linkMatcher.group(0) +
-                        "\">" + text + "</a>");
-            }
-            linkTrovato = true;
-        }
-        if (linkTrovato) {
-            linkMatcher.appendTail(sb);
-            str = sb.toString();
-            linkTrovato = false;
-            sb = new StringBuffer();
-        }
-
-        //mail
-        Matcher emailMatcher = emailPattern.matcher(str);
-        while (emailMatcher.find()) {
-            emailMatcher.appendReplacement(sb, "<a href=\"mailto:" +
-                    emailMatcher.group(0) + "\">" + emailMatcher.group(0) + "</a>");
-            linkTrovato = true;
-        }
-        if (linkTrovato) {
-            emailMatcher.appendTail(sb);
-            str = sb.toString();
-        }
-        return str;
-    }
-
-    public static String shortenEscaped(String text, int maxlen) {
-        StringBuilder sb = new StringBuilder();
-        int pos = 0;
-        int count = 0;
-        boolean inEntity = false;
-        while (pos < text.length()) {
-            char c = text.charAt(pos);
-            if (c == '&')
-                inEntity = true;
-            if (c == ';')
-                inEntity = false;
-            sb.append(c);
-            if (!inEntity)
-                count = count + 1;
-            pos = pos + 1;
-            if (count >= maxlen)
-                break;
-        }
-        if (pos < text.length())
-            sb.append("...");
-        return sb.toString();
-    }
 
     private int numRowTextArea(String stringValue, int cols) {
         if (stringValue == null)

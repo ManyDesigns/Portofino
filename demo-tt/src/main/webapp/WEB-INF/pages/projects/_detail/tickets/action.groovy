@@ -1,5 +1,7 @@
 package com.manydesigns.portofino.pageactions.crud
 
+import com.manydesigns.portofino.tt.TtUtils
+
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.fields.Field
@@ -18,7 +20,6 @@ import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
 import com.manydesigns.portofino.shiro.ShiroUtils
-import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.RedirectResolution
@@ -26,7 +27,6 @@ import net.sourceforge.stripes.action.Resolution
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.subject.Subject
 import org.hibernate.LockOptions
-import org.hibernate.Session
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
@@ -252,7 +252,10 @@ class ProjectsTicketsAction extends CrudAction {
 
     protected void editPostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
-        String message = TtUtils.createDiffMessage(classAccessor, old, object);
+        Form newForm = form;
+        form = buildForm(formBuilder);
+        form.readFromObject(old);
+        String message = TtUtils.createDiffMessage(form, newForm);
         if (message != null) {
             Date now = new Date();
             TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_TICKET_UPDATED, message);
@@ -299,16 +302,14 @@ class ProjectsTicketsAction extends CrudAction {
     @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_EDIT)
     @Guard(test="canAssignToMe()", type=GuardType.VISIBLE)
     public Resolution assignToMe() {
-        old = object.clone();
         Object principal = SecurityUtils.subject.principal;
+        setupForm(Mode.EDIT);
+        editSetup(object);
         object.assignee = principal.id;
-        String message = TtUtils.createDiffMessage(classAccessor, old, object);
-        if (message == null) {
-            return new RedirectResolution(context.actionPath);
-        }
-        Date now = new Date();
-        Session session = persistence.getSession("tt");
-        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_TICKET_UPDATED, message);
+        form.readFromObject(object);
+        editValidate(object);
+        doUpdate(object);
+        editPostProcess(object);
         session.getTransaction().commit();
         SessionMessages.addInfoMessage("Ticket assigned to you");
         return new RedirectResolution(context.actionPath);
@@ -348,16 +349,13 @@ class ProjectsTicketsAction extends CrudAction {
     }
 
     private void changeState(long newState) {
-        old = object.clone();
-        Session session = persistence.getSession("tt");
-        Object principal = SecurityUtils.subject.principal;
+        setupForm(Mode.EDIT);
+        editSetup(object);
         object.state = newState;
-        Date now = new Date();
-        String message = TtUtils.createDiffMessage(classAccessor, old, object);
-        if (message == null) {
-            return;
-        }
-        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_TICKET_UPDATED, message);
+        form.readFromObject(object);
+        editValidate(object);
+        doUpdate(object);
+        editPostProcess(object);
         session.getTransaction().commit();
     }
 

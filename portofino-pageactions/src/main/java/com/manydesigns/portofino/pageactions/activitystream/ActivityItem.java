@@ -1,3 +1,23 @@
+/*
+ * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
+ * http://www.manydesigns.com/
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
 package com.manydesigns.portofino.pageactions.activitystream;
 
 import com.manydesigns.elements.ElementsThreadLocals;
@@ -13,13 +33,14 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Created by IntelliJ IDEA.
- * User: predo
- * Date: 12/10/13
- * Time: 4:23 PM
- * To change this template use File | Settings | File Templates.
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public class ActivityItem implements XhtmlFragment {
+    public static final String copyright =
+            "Copyright (c) 2005-2013, ManyDesigns srl";
 
     FastDateFormat dateFormat;
 
@@ -50,14 +71,14 @@ public class ActivityItem implements XhtmlFragment {
         xb.openElement("div");
         xb.addAttribute("class", "media");
 
-        renderImage(xb);
+        writeImage(xb);
 
-        renderBody(xb);
+        writeBody(xb);
 
         xb.closeElement("div");
     }
 
-    public void renderImage(XhtmlBuffer xb) {
+    public void writeImage(XhtmlBuffer xb) {
         String absoluteSrc = Util.getAbsoluteUrl(imageSrc);
         if (imageHref == null) {
             xb.openElement("div");
@@ -80,18 +101,18 @@ public class ActivityItem implements XhtmlFragment {
         }
     }
 
-    public void renderBody(XhtmlBuffer xb) {
+    public void writeBody(XhtmlBuffer xb) {
         xb.openElement("div");
         xb.addAttribute("class", "media-body");
 
-        renderData(xb);
-        renderTimestamp(xb);
-        renderMessage(xb);
+        writeData(xb);
+        writeTimestamp(xb);
+        writeMessage(xb);
 
         xb.closeElement("div");
     }
 
-    public void renderData(XhtmlBuffer xb) {
+    public void writeData(XhtmlBuffer xb) {
 
         List<String> formattedArgs = new ArrayList<String>(args.length);
         for (Arg arg : args) {
@@ -108,7 +129,7 @@ public class ActivityItem implements XhtmlFragment {
 
 
 
-    public void renderTimestamp(XhtmlBuffer xb) {
+    public void writeTimestamp(XhtmlBuffer xb) {
         xb.openElement("div");
         xb.openElement("small");
         xb.addAttribute("class", "muted");
@@ -119,10 +140,10 @@ public class ActivityItem implements XhtmlFragment {
         xb.closeElement("div");
     }
 
-    public void renderMessage(XhtmlBuffer xb) {
+    public void writeMessage(XhtmlBuffer xb) {
         if (message != null) {
             xb.openElement("div");
-            xb.write(message);
+            xb.writeNoHtmlEscape(message);
             xb.closeElement("div");
         }
     }

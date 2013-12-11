@@ -30,6 +30,7 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.menu.SimpleMenuAppender;
+import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.pageactions.login.DefaultLoginAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
@@ -167,6 +168,7 @@ public class PageactionsModule implements Module {
 
         logger.debug("Creating pageactions registry");
         PageActionRegistry pageActionRegistry = new PageActionRegistry();
+        pageActionRegistry.register(ActivityStreamAction.class);
         pageActionRegistry.register(CustomAction.class);
         pageActionRegistry.register(DefaultLoginAction.class);
         servletContext.setAttribute(PAGE_ACTIONS_REGISTRY, pageActionRegistry);

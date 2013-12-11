@@ -4,7 +4,7 @@
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="mde" uri="/manydesigns-elements" %>
-<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"/>
+<jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction"/>
 <stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.page.title}"/>
@@ -13,7 +13,7 @@
         <div>
             <strong><i class="icon-tag"></i> Ticket description:</strong>
         </div>
-        <div><c:out value="${actionBean.ticket.description}"/></div>
+        <div><c:out value="${mde:formattedText(actionBean.ticket.description, false)}" escapeXml="false"/></div>
         <c:forEach var="activityItem" items="${actionBean.activityItems}">
             <mde:write name="activityItem"/>
         </c:forEach>

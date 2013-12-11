@@ -1,5 +1,7 @@
 package com.manydesigns.portofino.pageactions.crud
 
+import com.manydesigns.portofino.tt.TtUtils
+
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
@@ -8,9 +10,9 @@ import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
-import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.Resolution
+import org.apache.commons.lang.StringEscapeUtils
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.subject.Subject
 
@@ -78,7 +80,7 @@ class TicketAttachementsCrudAction extends CrudAction {
 
     protected void createPostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
-        String message = object.title;
+        String message = StringEscapeUtils.escapeHtml(object.title);
         Date now = new Date();
         TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_ATTACHMENT_CREATED, message);
     }
@@ -107,7 +109,7 @@ class TicketAttachementsCrudAction extends CrudAction {
 
     protected void editPostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
-        String message = object.title;
+        String message = StringEscapeUtils.escapeHtml(object.title);
         Date now = new Date();
         TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_ATTACHMENT_UPDATED, message);
     }
@@ -125,7 +127,7 @@ class TicketAttachementsCrudAction extends CrudAction {
     protected void deletePostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
         Date now = new Date();
-        String message = object.title;
+        String message = StringEscapeUtils.escapeHtml(object.title);
         TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_ATTACHMENT_DELETED, message);
     }
 

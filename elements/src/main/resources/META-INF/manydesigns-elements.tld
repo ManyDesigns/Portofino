@@ -108,4 +108,9 @@
         <function-class>com.manydesigns.elements.util.MemoryUtil</function-class>
         <function-signature>java.lang.String bytesToHumanString(long)</function-signature>
     </function>
+    <function>
+        <name>formattedText</name>
+        <function-class>com.manydesigns.elements.util.Util</function-class>
+        <function-signature>java.lang.String writeFormattedText(java.lang.String,boolean))</function-signature>
+    </function>
 </taglib>

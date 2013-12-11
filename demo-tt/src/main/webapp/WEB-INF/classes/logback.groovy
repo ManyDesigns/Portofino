@@ -22,6 +22,7 @@ logger("com.manydesigns.portofino.servlets.PortofinoListener", WARN)
 
 logger("com.manydesigns.portofino.tt.TtUtils", INFO)
 logger("buttons.tag", INFO)
+//logger("com.manydesigns.elements.fields.AbstractField", INFO)
 
 
 scan("30 seconds")

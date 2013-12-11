@@ -476,7 +476,9 @@ public class SelectField extends AbstractField {
 
     public String getStringValue() {
         Object value = selectionModel.getValue(selectionModelIndex);
-        return selectionModel.getOption(selectionModelIndex, value, true);
+        String result = selectionModel.getOption(selectionModelIndex, value, true);
+        logger.trace("getStringValue() - name: {} - value: {} - result: {}", new Object[] {getPropertyAccessor().getName(), value, result});
+        return result;
     }
 
     public String jsonSelectFieldOptions(boolean includeSelectPrompt) {
