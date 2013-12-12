@@ -111,14 +111,6 @@ class ProjectsTicketsAction extends CrudAction {
 
     @Override
     protected Resolution getReadView() {
-        String createdByUrl = "/users/$object.created_by";
-        form.findFieldByPropertyName("created_by").href = Util.getAbsoluteUrl(createdByUrl);
-
-        if (object.assignee != null) {
-            String assigneeUrl = "/users/$object.assignee";
-            form.findFieldByPropertyName("assignee").href = Util.getAbsoluteUrl(assigneeUrl);
-        }
-
         if (object.fix_version != null) {
             String fixVersionUrl = "/projects/$object.project/versions/$object.fix_version";
             form.findFieldByPropertyName("fix_version").href = Util.getAbsoluteUrl(fixVersionUrl);
