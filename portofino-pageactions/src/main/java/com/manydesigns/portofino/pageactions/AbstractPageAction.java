@@ -482,17 +482,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     }
 
     /**
-     * Returns the path to a jsp file inside the current application's web directory.
-     * @param jsp the relative path to the file, starting from the web directory. Must start with a slash.
-     * @return the path.
-     * @deprecated use jsp directly.
-     */
-    @Deprecated
-    public String getAppJsp(String jsp) {
-        return jsp;
-    }
-
-    /**
      * Returns a ForwardResolution to the given page, and sets up internal parameters that need to be propagated in case
      * of embedding.
      * @param page the path to the page, from the root of the webapp.

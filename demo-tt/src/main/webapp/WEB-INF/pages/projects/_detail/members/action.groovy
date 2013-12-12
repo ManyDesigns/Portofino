@@ -1,5 +1,7 @@
 package com.manydesigns.portofino.pageactions.crud
 
+import com.manydesigns.portofino.tt.TtUtils
+
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
@@ -8,8 +10,7 @@ import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
-import com.manydesigns.portofino.tt.TtUtils
-import net.sourceforge.stripes.action.Before
+import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.Resolution
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
@@ -18,14 +19,22 @@ class ProjectMembersAction extends CrudAction {
 
     Serializable project;
 
-    @Before
-    public void prepareProject() {
+    @Override
+    Resolution preparePage() {
         project = ElementsThreadLocals.getOgnlContext().get("project");
+        if (!isViewer()) {
+            return new ForwardResolution("/jsp/projects/members-not-available.jsp")
+        }
+        return super.preparePage();
     }
 
     //**************************************************************************
     // Role checking
     //**************************************************************************
+
+    public boolean isViewer() {
+        return TtUtils.principalHasProjectRole(project, TtUtils.ROLE_VIEWER);
+    }
 
     public boolean isManager() {
         return TtUtils.principalHasProjectRole(project, TtUtils.ROLE_MANAGER);
