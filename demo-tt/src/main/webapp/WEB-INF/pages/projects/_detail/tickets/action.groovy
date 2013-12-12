@@ -143,9 +143,15 @@ class ProjectsTicketsAction extends CrudAction {
         titleHrefFormat.url = true;
         tableFormBuilder.configHrefTextFormat("title", titleHrefFormat)
 
-        OgnlTextFormat versionHrefFormat = new OgnlTextFormat("/projects/%{project}/versions/%{fix_version}");
-        versionHrefFormat.url = true;
-        tableFormBuilder.configHrefTextFormat("fix_version", versionHrefFormat)
+        OgnlTextFormat fixVersionHrefFormat =
+                new OgnlTextFormat("/projects/%{project}/versions/%{fix_version}");
+        fixVersionHrefFormat.url = true;
+        tableFormBuilder.configHrefTextFormat("fix_version", fixVersionHrefFormat)
+
+        OgnlTextFormat affectedVersionHrefFormat =
+                new OgnlTextFormat("/projects/%{project}/versions/%{affected_version}");
+        affectedVersionHrefFormat.url = true;
+        tableFormBuilder.configHrefTextFormat("affected_version", affectedVersionHrefFormat)
 
         return super.buildTableForm(tableFormBuilder);
     }

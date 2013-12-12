@@ -4,3 +4,11 @@
 .ticket-read .controls .value {
     padding-top: 0;
 }
+
+.padding-bottom-20 {
+    padding-bottom: 20px;
+}
+
+.activity-item-message dl {
+    margin: 0
+}

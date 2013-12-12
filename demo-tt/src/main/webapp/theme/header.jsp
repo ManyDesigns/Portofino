@@ -1,15 +1,14 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
-%><%@ page import="com.manydesigns.portofino.PortofinoProperties"
-%><%@ page import="org.apache.shiro.SecurityUtils"
-%><%@ page import="org.apache.shiro.subject.Subject"
-%>
-<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags"
-%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
-%><%@ taglib prefix="mde" uri="/manydesigns-elements"
-%><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
-%><stripes:url var="profileUrl" value="/actions/profile"/>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
+<%@ page import="com.manydesigns.portofino.PortofinoProperties"%>
+<%@ page import="org.apache.shiro.SecurityUtils"%>
+<%@ page import="org.apache.shiro.subject.Subject"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
+<%@ taglib prefix="mde" uri="/manydesigns-elements"%>
+<%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"%>
+<stripes:url var="profileUrl" value="/actions/profile"/>
 <jsp:useBean id="portofinoConfiguration" scope="application"
              type="org.apache.commons.configuration.Configuration"/>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.stripes.AbstractActionBean"/>

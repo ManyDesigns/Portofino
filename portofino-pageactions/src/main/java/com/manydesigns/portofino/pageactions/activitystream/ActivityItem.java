@@ -143,6 +143,7 @@ public class ActivityItem implements XhtmlFragment {
     public void writeMessage(XhtmlBuffer xb) {
         if (message != null) {
             xb.openElement("div");
+            xb.addAttribute("class", "activity-item-message");
             xb.writeNoHtmlEscape(message);
             xb.closeElement("div");
         }

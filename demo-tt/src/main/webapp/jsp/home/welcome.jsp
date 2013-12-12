@@ -22,10 +22,13 @@
         </shiro:notAuthenticated>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <p>
-            Welcome to Portofino TT, an open-source, customizable ticket-tracker written in Java and Groovy.
-        </p>
         <shiro:authenticated>
+            <p>
+                <stripes:link href="/profile" class="btn btn-success">
+                    Edit your profile
+                    <i class="icon-chevron-right icon-white"></i>
+                </stripes:link>
+            </p>
             <shiro:hasRole name="admin">
                 <p>
                     <stripes:link href="/admin" class="btn btn-success">
@@ -53,7 +56,32 @@
             </stripes:link>
         </shiro:authenticated>
         <shiro:notAuthenticated>
-            <stripes:link href="/login" class="btn btn-success">Log in <i class="icon-chevron-right icon-white"></i></stripes:link>
+            <p>
+                <strong>Portofino TT</strong> is a modern, customizable ticket-tracker written in Java and Groovy,
+                distributed under the LGPL open source license.
+            </p>
+            <p>
+                Among its features:
+            </p>
+            <ul>
+                <li>A clean, web-responsive user interface</li>
+                <li>Public and private projects</li>
+                <li>Tickets, versions and components</li>
+                <li>Intuitive dashboards</li>
+                <li>Activity streams</li>
+                <li>Ticket and version workflows</li>
+                <li>Ticket attachments</li>
+                <li>Two system-level roles</li>
+                <li>Four project-level roles</li>
+                <li>Email notifications</li>
+                <li>User management and self-registration</li>
+            </ul>
+            <p>
+                To start using the system, please log in:
+            </p>
+            <p>
+                <stripes:link href="/login" class="btn btn-success">Log in <i class="icon-chevron-right icon-white"></i></stripes:link>
+            </p>
         </shiro:notAuthenticated>
     </stripes:layout-component>
 </stripes:layout-render>

@@ -50,12 +50,14 @@
             <scope>compile</scope>
         </dependency>
         -->
+        <!-- No support for OpedID for now
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-openid</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>

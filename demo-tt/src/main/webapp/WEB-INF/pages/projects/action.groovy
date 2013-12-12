@@ -1,5 +1,7 @@
 package com.manydesigns.portofino.pageactions.crud
 
+import com.manydesigns.portofino.tt.TtUtils
+
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.buttons.annotations.Buttons
@@ -7,7 +9,6 @@ import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
-import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
 import org.apache.shiro.SecurityUtils
@@ -30,6 +31,15 @@ class ProjectsCrudAction extends CrudAction {
 
     public boolean isManager() {
         return TtUtils.principalHasProjectRole(object, TtUtils.ROLE_MANAGER);
+    }
+
+
+    //**************************************************************************
+    // Search customizations
+    //**************************************************************************
+
+    protected Resolution doSearch() {
+        return new RedirectResolution("/home")
     }
 
     //**************************************************************************
