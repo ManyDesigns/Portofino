@@ -248,4 +248,20 @@ class Security extends AbstractPortofinoRealm {
         return new TableAccessor(table);
     }
 
+    @Override
+    void changePassword(Serializable user, String oldPassword, String newPassword) {
+        String encryptedOldPassword = encryptPassword(oldPassword);
+        String encryptedNewPassword = encryptPassword(newPassword);
+        def session = persistence.getSession("tt");
+        def q = session.createQuery(
+                "update users set password = :newPassword where id = :id and password = :oldPassword");
+        q.setParameter("newPassword", encryptedNewPassword);
+        q.setParameter("oldPassword", encryptedOldPassword);
+        q.setParameter("id", user.id);
+        if(q.executeUpdate() != 1) {
+            throw new RuntimeException("Password not changed");
+        }
+    }
+
+
 }

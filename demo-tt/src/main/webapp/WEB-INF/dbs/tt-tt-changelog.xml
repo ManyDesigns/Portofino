@@ -589,6 +589,13 @@
     <changeSet id="tt-247" author="Paolo Predonzani">
         <addUniqueConstraint tableName="affected_components" constraintName="affected_components_unique_project_n_component" columnNames="project,n,component"/>
     </changeSet>
+    <changeSet id="tt-248" author="Alessio Stalla">
+        <addColumn tableName="users">
+            <column name="avatar" type="char(25)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 
 
 </databaseChangeLog>

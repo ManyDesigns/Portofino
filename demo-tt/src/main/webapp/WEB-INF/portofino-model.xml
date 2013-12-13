@@ -335,6 +335,14 @@
 <column scale="0" nullable="false" length="0" jdbcType="-7" columnType="BIT" columnName="project_manager" autoincrement="false">
     <annotations/>
 </column>
+<column scale="0" nullable="true" length="25" jdbcType="1" columnType="CHAR" columnName="avatar" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>25</value>
+        </annotation>
+        <annotation type="com.manydesigns.elements.annotations.FileBlob"/>
+    </annotations>
+</column>
                             </columns>
                             <foreignKeys/>
                             <primaryKey>

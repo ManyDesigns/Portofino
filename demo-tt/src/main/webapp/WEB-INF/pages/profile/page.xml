@@ -1,0 +1,9 @@
+<page description="Profile" id="jhj83u2qepjouflwmicxnzusg" title="Profile">
+    <permissions>
+        <group name="all" level="NONE"/>
+        <group name="registered" level="VIEW"/>
+    </permissions>
+    <layout>
+        <childPages />
+    </layout>
+</page>
