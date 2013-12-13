@@ -8,12 +8,14 @@ import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import net.sourceforge.stripes.action.Before
+import net.sourceforge.stripes.util.UrlBuilder
 import org.hibernate.Session
 import org.hibernate.criterion.Order
 import org.hibernate.criterion.Restrictions
+import com.manydesigns.portofino.tt.ActivityStreamWithUserImageAction
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class ProjectActivityAction extends ActivityStreamAction {
+class ProjectActivityAction extends ActivityStreamWithUserImageAction {
 
     Serializable project;
 
@@ -40,7 +42,11 @@ class ProjectActivityAction extends ActivityStreamAction {
             String ticketTitle = ticket.title;
 
             Date timestamp = item.date;
-            String imageSrc = "/images/user-placeholder-40x40.png";
+            String imageSrc =
+                new UrlBuilder(Locale.getDefault(), context.actionPath, false).
+                    setEvent("userImage").
+                    addParameter("userId", item.fk_activity_user.id).
+                    toString();
             String imageHref = null;
             String imageAlt = userName;
             String message = item.message;

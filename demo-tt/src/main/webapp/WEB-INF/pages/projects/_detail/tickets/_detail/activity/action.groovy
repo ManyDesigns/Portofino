@@ -22,9 +22,11 @@ import org.apache.shiro.SecurityUtils
 import org.hibernate.Session
 import org.hibernate.criterion.Order
 import org.hibernate.criterion.Restrictions
+import com.manydesigns.portofino.tt.ActivityStreamWithUserImageAction
+import net.sourceforge.stripes.util.UrlBuilder
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class TicketActivityAction extends ActivityStreamAction {
+class TicketActivityAction extends ActivityStreamWithUserImageAction {
 
     Serializable project;
     Serializable ticket;
@@ -65,7 +67,11 @@ class TicketActivityAction extends ActivityStreamAction {
             String userName = "$item.fk_activity_user.first_name $item.fk_activity_user.last_name"
 
             Date timestamp = item.date;
-            String imageSrc = "/images/user-placeholder-40x40.png";
+            String imageSrc =
+                new UrlBuilder(Locale.getDefault(), context.actionPath, false).
+                    setEvent("userImage").
+                    addParameter("userId", item.fk_activity_user.id).
+                    toString();
             String imageHref = null;
             String imageAlt = userName;
             String message = item.message;
