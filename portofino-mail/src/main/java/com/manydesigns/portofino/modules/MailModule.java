@@ -27,10 +27,7 @@ import com.manydesigns.portofino.actions.admin.mail.MailSettingsAction;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.menu.SimpleMenuAppender;
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +66,6 @@ public class MailModule implements Module {
 
     public final static String MAIL_QUEUE = "com.manydesigns.mail.queue";
     public final static String MAIL_SENDER = "com.manydesigns.mail.sender";
-    public final static String MAIL_CONFIGURATION = "com.manydesigns.mail.configuration";
 
     //**************************************************************************
     // Logging
@@ -110,14 +106,7 @@ public class MailModule implements Module {
 
     @Override
     public void init() {
-        CompositeConfiguration mailConfiguration = new CompositeConfiguration();
-        mailConfiguration.addConfiguration(configuration);
-        try {
-            mailConfiguration.addConfiguration(new PropertiesConfiguration(getClass().getResource("mail.properties")));
-        } catch (ConfigurationException e) {
-            logger.error("Could not load mail configuration defaults");
-        }
-        mailQueueSetup = new MailQueueSetup(mailConfiguration);
+        mailQueueSetup = new MailQueueSetup(configuration);
         mailQueueSetup.setup();
 
         SimpleMenuAppender group = SimpleMenuAppender.group("mail", null, "Mail", 4.0);
@@ -126,8 +115,6 @@ public class MailModule implements Module {
         SimpleMenuAppender link = SimpleMenuAppender.link(
                 "mail", "Mail", null, "Mail", MailSettingsAction.URL_BINDING, 1.0);
         adminMenu.menuAppenders.add(link);
-
-        servletContext.setAttribute(MAIL_CONFIGURATION, mailQueueSetup.getMailConfiguration());
 
         MailQueue mailQueue = mailQueueSetup.getMailQueue();
         if(mailQueue == null) {

@@ -29,13 +29,10 @@ import com.manydesigns.mail.setup.MailProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.modules.BaseModule;
-import com.manydesigns.portofino.modules.MailModule;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
-import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.FileConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,11 +50,8 @@ public class MailSettingsAction extends AbstractActionBean {
 
     public static final String URL_BINDING = "/actions/admin/mail/settings";
 
-    @Inject(MailModule.MAIL_CONFIGURATION)
-    public Configuration configuration;
-
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
-    public Configuration portofinoConfiguration;
+    public Configuration configuration;
 
     Form form;
 
@@ -85,22 +79,19 @@ public class MailSettingsAction extends AbstractActionBean {
         if (form.validate()) {
             logger.debug("Applying settings to app configuration");
             try {
-                //mail configuration = portofino configuration + mail.properties defaults
-                CompositeConfiguration compositeConfiguration = (CompositeConfiguration) portofinoConfiguration;
-                FileConfiguration fileConfiguration = (FileConfiguration) compositeConfiguration.getConfiguration(0);
                 MailSettingsForm bean = new MailSettingsForm();
                 form.writeToObject(bean);
-                fileConfiguration.setProperty(MailProperties.MAIL_ENABLED, bean.mailEnabled);
-                fileConfiguration.setProperty(MailProperties.MAIL_KEEP_SENT, bean.keepSent);
-                fileConfiguration.setProperty(MailProperties.MAIL_QUEUE_LOCATION, bean.queueLocation);
-                fileConfiguration.setProperty(MailProperties.MAIL_SMTP_HOST, bean.smtpHost);
-                fileConfiguration.setProperty(MailProperties.MAIL_SMTP_PORT, bean.smtpPort);
-                fileConfiguration.setProperty(MailProperties.MAIL_SMTP_SSL_ENABLED, bean.smtpSSL);
-                fileConfiguration.setProperty(MailProperties.MAIL_SMTP_TLS_ENABLED, bean.smtpTLS);
-                fileConfiguration.setProperty(MailProperties.MAIL_SMTP_LOGIN, bean.smtpLogin);
-                fileConfiguration.setProperty(MailProperties.MAIL_SMTP_PASSWORD, bean.smtpPassword);
-                fileConfiguration.save();
-                logger.info("Configuration saved to " + fileConfiguration.getFile().getAbsolutePath());
+                configuration.setProperty(MailProperties.MAIL_ENABLED, bean.mailEnabled);
+                configuration.setProperty(MailProperties.MAIL_KEEP_SENT, bean.keepSent);
+                configuration.setProperty(MailProperties.MAIL_QUEUE_LOCATION, bean.queueLocation);
+                configuration.setProperty(MailProperties.MAIL_SMTP_HOST, bean.smtpHost);
+                configuration.setProperty(MailProperties.MAIL_SMTP_PORT, bean.smtpPort);
+                configuration.setProperty(MailProperties.MAIL_SMTP_SSL_ENABLED, bean.smtpSSL);
+                configuration.setProperty(MailProperties.MAIL_SMTP_TLS_ENABLED, bean.smtpTLS);
+                configuration.setProperty(MailProperties.MAIL_SMTP_LOGIN, bean.smtpLogin);
+                configuration.setProperty(MailProperties.MAIL_SMTP_PASSWORD, bean.smtpPassword);
+                //TODO configuration.save();
+                //logger.info("Configuration saved to " + configuration.getFile().getAbsolutePath());
             } catch (Exception e) {
                 logger.error("Configuration not saved", e);
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("the.configuration.could.not.be.saved"));
