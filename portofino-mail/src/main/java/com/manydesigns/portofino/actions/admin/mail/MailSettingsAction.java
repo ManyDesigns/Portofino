@@ -22,6 +22,7 @@ package com.manydesigns.portofino.actions.admin.mail;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.configuration.CommonsConfigurationUtils;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
@@ -90,8 +91,8 @@ public class MailSettingsAction extends AbstractActionBean {
                 configuration.setProperty(MailProperties.MAIL_SMTP_TLS_ENABLED, bean.smtpTLS);
                 configuration.setProperty(MailProperties.MAIL_SMTP_LOGIN, bean.smtpLogin);
                 configuration.setProperty(MailProperties.MAIL_SMTP_PASSWORD, bean.smtpPassword);
-                //TODO configuration.save();
-                //logger.info("Configuration saved to " + configuration.getFile().getAbsolutePath());
+                CommonsConfigurationUtils.save(configuration);
+                logger.info("Configuration saved");
             } catch (Exception e) {
                 logger.error("Configuration not saved", e);
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("the.configuration.could.not.be.saved"));

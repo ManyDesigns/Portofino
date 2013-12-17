@@ -35,7 +35,6 @@ import com.manydesigns.portofino.stripes.ResolverUtil;
 import groovy.util.GroovyScriptEngine;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.FileConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
 import org.codehaus.groovy.control.CompilerConfiguration;
@@ -81,7 +80,7 @@ public class PortofinoListener
     //**************************************************************************
 
     protected Configuration elementsConfiguration;
-    protected FileConfiguration configuration;
+    protected Configuration configuration;
 
     protected File applicationDirectory;
 
@@ -286,6 +285,7 @@ public class PortofinoListener
     protected void loadConfiguration() throws ConfigurationException {
         applicationDirectory = new File(serverInfo.getRealPath(), "WEB-INF");
         logger.info("Application directory: {}", applicationDirectory.getAbsolutePath());
+
         File appConfigurationFile = new File(applicationDirectory, "portofino.properties");
         configuration = new PropertiesConfiguration(appConfigurationFile);
     }

@@ -24,6 +24,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.annotations.CssClass;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.elements.configuration.CommonsConfigurationUtils;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
@@ -39,7 +40,6 @@ import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.FileConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,22 +110,21 @@ public class SettingsAction extends AbstractActionBean {
         if (form.validate()) {
             logger.debug("Applying settings to model");
             try {
-                FileConfiguration fileConfiguration = (FileConfiguration) configuration;
                 Settings settings = new Settings();
                 form.writeToObject(settings);
-                fileConfiguration.setProperty(PortofinoProperties.APP_NAME, settings.appName);
-                fileConfiguration.setProperty(PortofinoProperties.LANDING_PAGE, settings.landingPage);
-                fileConfiguration.setProperty(PortofinoProperties.LOGIN_PAGE, settings.loginPage);
+                configuration.setProperty(PortofinoProperties.APP_NAME, settings.appName);
+                configuration.setProperty(PortofinoProperties.LANDING_PAGE, settings.landingPage);
+                configuration.setProperty(PortofinoProperties.LOGIN_PAGE, settings.loginPage);
                 if(!settings.preloadGroovyPages ||
-                   fileConfiguration.getProperty(PortofinoProperties.GROOVY_PRELOAD_PAGES) != null) {
-                    fileConfiguration.setProperty(PortofinoProperties.GROOVY_PRELOAD_PAGES, settings.preloadGroovyPages);
+                   configuration.getProperty(PortofinoProperties.GROOVY_PRELOAD_PAGES) != null) {
+                    configuration.setProperty(PortofinoProperties.GROOVY_PRELOAD_PAGES, settings.preloadGroovyPages);
                 }
                 if(!settings.preloadGroovyClasses ||
-                   fileConfiguration.getProperty(PortofinoProperties.GROOVY_PRELOAD_CLASSES) != null) {
-                    fileConfiguration.setProperty(PortofinoProperties.GROOVY_PRELOAD_CLASSES, settings.preloadGroovyClasses);
+                   configuration.getProperty(PortofinoProperties.GROOVY_PRELOAD_CLASSES) != null) {
+                    configuration.setProperty(PortofinoProperties.GROOVY_PRELOAD_CLASSES, settings.preloadGroovyClasses);
                 }
-                fileConfiguration.save();
-                logger.info("Configuration saved to " + fileConfiguration.getFile().getAbsolutePath());
+                CommonsConfigurationUtils.save(configuration);
+                logger.info("Configuration saved");
             } catch (Exception e) {
                 logger.error("Configuration not saved", e);
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("the.configuration.could.not.be.saved"));

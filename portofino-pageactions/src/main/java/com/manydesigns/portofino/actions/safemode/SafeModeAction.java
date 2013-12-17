@@ -23,7 +23,6 @@ package com.manydesigns.portofino.actions.safemode;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.UrlBinding;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -31,7 +30,6 @@ import net.sourceforge.stripes.action.UrlBinding;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@UrlBinding("/actions/safemode.action")
 public class SafeModeAction extends CustomAction {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";

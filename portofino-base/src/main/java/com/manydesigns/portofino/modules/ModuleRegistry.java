@@ -29,8 +29,9 @@
 
 package com.manydesigns.portofino.modules;
 
+import com.manydesigns.elements.configuration.CommonsConfigurationUtils;
 import com.manydesigns.portofino.di.Injections;
-import org.apache.commons.configuration.FileConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,11 +54,11 @@ public class ModuleRegistry {
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
     protected final NavigableSet<Module> modules =  new TreeSet<Module>(new ModuleComparator());
-    protected final FileConfiguration configuration;
+    protected final Configuration configuration;
 
     public static final Logger logger = LoggerFactory.getLogger(ModuleRegistry.class);
 
-    public ModuleRegistry(FileConfiguration configuration) {
+    public ModuleRegistry(Configuration configuration) {
         this.configuration = configuration;
     }
 
@@ -78,7 +79,7 @@ public class ModuleRegistry {
                 logger.info("Installing module " + printModule(module) + "...");
                 installedVersion = module.install();
                 configuration.setProperty(key, installedVersion);
-                configuration.save();
+                CommonsConfigurationUtils.save(configuration);
                 logger.info("Installed module " + printModule(module));
             } catch (Throwable e) {
                 logger.error(
@@ -97,7 +98,7 @@ public class ModuleRegistry {
                     if(result > installedVersion) {
                         installedVersion = result;
                         configuration.setProperty(key, result);
-                        configuration.save();
+                        CommonsConfigurationUtils.save(configuration);
                         logger.info("Migrated module " + printModule(module));
                     } else {
                         throw new RuntimeException(

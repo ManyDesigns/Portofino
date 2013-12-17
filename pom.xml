@@ -90,7 +90,7 @@
         <commons.io.version>2.0.1</commons.io.version>
         <commons.logging.version>1.1.1</commons.logging.version>
         <commons.email.version>1.2</commons.email.version>
-        <commons.configuration.version>1.6</commons.configuration.version>
+        <commons.configuration.version>1.10</commons.configuration.version>
         <slf4j.version>1.6.1</slf4j.version><!--Hibernate uses 1.5.8-->
         <logback.version>0.9.26</logback.version>
         <jasperreports.version>3.5.0</jasperreports.version>

@@ -76,7 +76,6 @@ import java.util.*;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-@UrlBinding("/actions/m2m")
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ScriptTemplate("script_template.groovy")
 @ConfigurationClass(ManyToManyConfiguration.class)

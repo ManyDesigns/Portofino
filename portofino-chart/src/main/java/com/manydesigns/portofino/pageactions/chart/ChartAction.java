@@ -61,7 +61,6 @@ import java.util.Properties;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-@UrlBinding("/actions/chart")
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ScriptTemplate("script_template.groovy")
 @ConfigurationClass(ChartConfiguration.class)
