@@ -9,6 +9,7 @@
 ^oneclick/local.pyc$
 ^oneclick/build/
 derby.log
+portofino-local.properties
 syntax: glob
 *.DS_Store
 *.iml

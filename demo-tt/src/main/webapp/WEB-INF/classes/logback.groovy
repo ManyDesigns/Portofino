@@ -17,12 +17,11 @@ appenders.add("PORTOFINO-CONSOLE");
 root(INFO, appenders)
 logger("org.hibernate", WARN)
 logger("org.hibernate.connection.C3P0ConnectionProvider", INFO)
-logger("com.manydesigns.portofino.i18n.ResourceBundleManager", WARN)
-logger("com.manydesigns.portofino.servlets.PortofinoListener", WARN)
 
+logger("com.manydesigns.portofino.i18n.ResourceBundleManager", WARN)
+logger("com.manydesigns.portofino.servlets.PortofinoListener", INFO)
 logger("com.manydesigns.portofino.tt.TtUtils", INFO)
 logger("buttons.tag", INFO)
-//logger("com.manydesigns.elements.fields.AbstractField", INFO)
 
 
 scan("30 seconds")

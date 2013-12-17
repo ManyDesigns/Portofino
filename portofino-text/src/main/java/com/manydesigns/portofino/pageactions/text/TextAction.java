@@ -241,7 +241,7 @@ public class TextAction extends AbstractPageAction {
         List<String> hosts = new ArrayList<String>();
         hosts.add(context.getRequest().getLocalAddr());
         hosts.add(context.getRequest().getLocalName());
-        hosts.addAll(portofinoConfiguration.getList(PortofinoProperties.HOSTNAMES));
+        hosts.addAll((List)portofinoConfiguration.getList(PortofinoProperties.HOSTNAMES));
         String patternString = BASE_USER_URL_PATTERN.replace("HOSTS", "(" + StringUtils.join(hosts, ")|(") + ")");
         Pattern pattern = Pattern.compile(patternString, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(content);

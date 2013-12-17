@@ -33,6 +33,7 @@ import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleRegistry;
 import com.manydesigns.portofino.stripes.ResolverUtil;
 import groovy.util.GroovyScriptEngine;
+import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -286,8 +287,21 @@ public class PortofinoListener
         applicationDirectory = new File(serverInfo.getRealPath(), "WEB-INF");
         logger.info("Application directory: {}", applicationDirectory.getAbsolutePath());
 
-        File appConfigurationFile = new File(applicationDirectory, "portofino.properties");
-        configuration = new PropertiesConfiguration(appConfigurationFile);
+        File configurationFile = new File(applicationDirectory, "portofino.properties");
+        configuration =  new PropertiesConfiguration(configurationFile);
+
+        File localConfigurationFile =
+                new File(applicationDirectory, "portofino-local.properties");
+        if (localConfigurationFile.exists()) {
+            logger.info("Local configuration found: {}", localConfigurationFile);
+            PropertiesConfiguration localConfiguration =
+                    new PropertiesConfiguration(localConfigurationFile);
+            CompositeConfiguration compositeConfiguration =
+                    new CompositeConfiguration();
+            compositeConfiguration.addConfiguration(localConfiguration, true);
+            compositeConfiguration.addConfiguration(configuration);
+            configuration = compositeConfiguration;
+        }
     }
 
     public void setupCommonsConfiguration() {
