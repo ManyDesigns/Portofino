@@ -7,31 +7,31 @@
             <column name="id" autoIncrement="true" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="email" type="varchar(150)">
+            <column name="email" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="password" type="varchar(50)">
+            <column name="password" type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
-            <column name="first_name" type="varchar(50)">
+            <column name="first_name" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_name" type="varchar(50)">
+            <column name="last_name" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="creation_date" type="datetime">
+            <column name="registration" type="timestamp">
                 <constraints nullable="false"/>
             </column>
-            <column name="creation_ip" type="varchar(45)">
+            <column name="registration_ip" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_access" type="datetime">
+            <column name="last_access" type="timestamp">
                 <constraints nullable="true"/>
             </column>
-            <column name="access_ip" type="varchar(45)">
+            <column name="access_ip" type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
-            <column name="validated" type="boolean">
+            <column name="validated" type="timestamp">
                 <constraints nullable="true"/>
             </column>
             <column name="admin" type="boolean">
@@ -40,13 +40,18 @@
             <column name="project_manager" type="boolean">
                 <constraints nullable="false"/>
             </column>
-            <column name="token" type="varchar(50)"/>
+            <column name="token" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="avatar" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
         </createTable>
     </changeSet>
 
     <changeSet id="tt-002" author="Giampiero Granatella">
         <createTable tableName="projects">
-            <column name="id" type="varchar(100)">
+            <column name="id" type="varchar(10)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="title" type="varchar(255)">
@@ -55,19 +60,25 @@
             <column name="description" type="varchar(4000)">
                 <constraints nullable="false"/>
             </column>
-            <column name="url" type="varchar(100)"/>
-            <column name="public" type="boolean"
+            <column name="url" type="varchar(255)"/>
+            <column name="public_" type="boolean"
                     defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
             <column name="last_ticket" type="int">
                 <constraints nullable="false"/>
             </column>
+            <column name="created" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
     <changeSet id="tt-003" author="Giampiero Granatella">
         <createTable tableName="tickets">
-            <column name="project" type="varchar(100)">
+            <column name="project" type="varchar(10)">
                 <constraints nullable="false"/>
             </column>
             <column name="n" type="int">
@@ -76,7 +87,7 @@
             <column name="title" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="varchar(21000)">
+            <column name="description" type="varchar(4000)">
                 <constraints nullable="false"/>
             </column>
             <column name="assignee" type="int">
@@ -103,10 +114,10 @@
             <column name="resolution" type="int">
                 <constraints nullable="true"/>
             </column>
-            <column name="date_created" type="timestamp">
+            <column name="created" type="timestamp">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_updated" type="timestamp">
+            <column name="last_updated" type="timestamp">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -124,11 +135,17 @@
                 <constraints nullable="false"/>
             </column>
             <column name="planned_date" type="date"/>
-            <column name="released_date" type="date"/>
-            <column name="project" type="varchar(100)">
+            <column name="release_date" type="date"/>
+            <column name="project" type="varchar(10)">
                 <constraints nullable="false"/>
             </column>
             <column name="state" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="timestamp">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -144,7 +161,13 @@
             <column name="description" type="varchar(4000)">
                 <constraints nullable="false"/>
             </column>
-            <column name="project" type="varchar(100)">
+            <column name="project" type="varchar(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="timestamp">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -154,7 +177,7 @@
             <column name="id" autoIncrement="true" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="project" type="varchar(100)">
+            <column name="project" type="varchar(10)">
                 <constraints nullable="false"/>
             </column>
             <column name="n" type="int">
@@ -170,7 +193,7 @@
             <column name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="role" type="varchar(50)">
+            <column name="role" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -180,13 +203,16 @@
             <column name="id" autoIncrement="true" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="project" type="varchar(100)">
+            <column name="project" type="varchar(10)">
                 <constraints nullable="false"/>
             </column>
-            <column name="user" type="int">
+            <column name="user_" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="role" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notifications" type="boolean">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -202,7 +228,7 @@
             <column name="file" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="project" type="varchar(100)">
+            <column name="project" type="varchar(10)">
                 <constraints nullable="false"/>
             </column>
             <column name="n" type="int">
@@ -215,23 +241,26 @@
             <column name="id" autoIncrement="true" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="project" type="varchar(255)">
+            <column name="project" type="varchar(10)">
                 <constraints nullable="false"/>
             </column>
             <column name="n" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="date" type="timestamp">
+            <column name="timestamp_" type="timestamp">
                 <constraints nullable="false"/>
             </column>
             <column name="message" type="varchar(4000)">
                 <constraints nullable="true"/>
             </column>
-            <column name="user" type="int">
+            <column name="user_" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="type" type="int">
                 <constraints nullable="false"/>
+            </column>
+            <column name="notifications_sent" type="timestamp">
+                <constraints nullable="true"/>
             </column>
         </createTable>
     </changeSet>
@@ -240,7 +269,7 @@
             <column name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="type" type="varchar(50)">
+            <column name="type" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -251,10 +280,10 @@
             <column name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="state" type="varchar(50)">
+            <column name="state" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="css_class" type="varchar(50)">
+            <column name="css_class" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -264,10 +293,10 @@
             <column name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="priority" type="varchar(50)">
+            <column name="priority" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="css_class" type="varchar(50)">
+            <column name="css_class" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -277,10 +306,10 @@
             <column name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="type" type="varchar(50)">
+            <column name="type" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="css_class" type="varchar(50)">
+            <column name="css_class" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -290,7 +319,7 @@
             <column name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="resolution" type="varchar(50)">
+            <column name="resolution" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -300,10 +329,10 @@
             <column name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="state" type="varchar(50)">
+            <column name="state" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="css_class" type="varchar(50)">
+            <column name="css_class" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -519,7 +548,7 @@
                                  referencedColumnNames="project, n"/>
     </changeSet>
     <changeSet id="tt-233" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="activity" baseColumnNames="user"
+        <addForeignKeyConstraint baseTableName="activity" baseColumnNames="user_"
                                  constraintName="fk_activity_user" referencedTableName="users"
                                  referencedColumnNames="id"/>
     </changeSet>
@@ -539,7 +568,7 @@
                                  referencedColumnNames="project, n"/>
     </changeSet>
     <changeSet id="tt-238" author="Giampiero Granatella">
-        <addForeignKeyConstraint baseTableName="members" baseColumnNames="user"
+        <addForeignKeyConstraint baseTableName="members" baseColumnNames="user_"
                                  constraintName="fk_member_user" referencedTableName="users"
                                  referencedColumnNames="id"/>
     </changeSet>
@@ -584,18 +613,9 @@
     </changeSet>
 
     <changeSet id="tt-246" author="Paolo Predonzani">
-        <addUniqueConstraint tableName="members" constraintName="members_unique_project_user" columnNames="project,user"/>
+        <addUniqueConstraint tableName="members" constraintName="members_unique_project_user" columnNames="project,user_"/>
     </changeSet>
     <changeSet id="tt-247" author="Paolo Predonzani">
         <addUniqueConstraint tableName="affected_components" constraintName="affected_components_unique_project_n_component" columnNames="project,n,component"/>
     </changeSet>
-    <changeSet id="tt-248" author="Alessio Stalla">
-        <addColumn tableName="users">
-            <column name="avatar" type="char(25)">
-                <constraints nullable="true"/>
-            </column>
-        </addColumn>
-    </changeSet>
-
-
 </databaseChangeLog>

@@ -61,13 +61,13 @@
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="n" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="date" autoincrement="false">
+<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="timestamp_" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="message" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="user" autoincrement="false">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="user_" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="type" autoincrement="false">
@@ -82,7 +82,7 @@
 </foreignKey>
 <foreignKey toTable="users" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_activity_user" hql="from users">
     <references>
-        <reference toColumn="id" fromColumn="user"/>
+        <reference toColumn="id" fromColumn="user_"/>
     </references>
 </foreignKey>
 <foreignKey toTable="tickets" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_activity_ticket" hql="from tickets">
@@ -225,7 +225,7 @@
 <column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="user" autoincrement="false">
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="user_" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="role" autoincrement="false">
@@ -235,7 +235,7 @@
                             <foreignKeys>
 <foreignKey toTable="users" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_member_user" hql="from users">
     <references>
-        <reference toColumn="id" fromColumn="user"/>
+        <reference toColumn="id" fromColumn="user_"/>
     </references>
 </foreignKey>
 <foreignKey toTable="roles" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_member_role" hql="from roles">
@@ -255,7 +255,7 @@
                             <selectionProviders>
 <query toDatabase="tt" sql="select u.id, concat(u.first_name, ' ', u.last_name), m.id is null&#xD;&#xA;from users u&#xD;&#xA;left join members m on m.user = u.id and m.project = %{#project.id}" name="available_members" hql="">
     <references>
-        <reference fromColumn="user"/>
+        <reference fromColumn="user_"/>
     </references>
 </query>
 <query toDatabase="tt" sql="select id, role from roles order by id asc" name="sorted_roles" hql="">
@@ -299,10 +299,10 @@
         </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="19" jdbcType="93" columnType="DATETIME" columnName="creation_date" autoincrement="false">
+<column scale="0" nullable="false" length="19" jdbcType="93" columnType="DATETIME" columnName="registration" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="45" jdbcType="12" columnType="VARCHAR" columnName="creation_ip" autoincrement="false">
+<column scale="0" nullable="false" length="45" jdbcType="12" columnType="VARCHAR" columnName="registration_ip" autoincrement="false">
     <annotations>
         <annotation type="com.manydesigns.elements.annotations.MaxLength">
             <value>45</value>
@@ -312,7 +312,7 @@
 <column scale="0" nullable="true" length="19" jdbcType="93" columnType="DATETIME" columnName="last_access" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="true" length="45" jdbcType="12" columnType="VARCHAR" columnName="access_ip" autoincrement="false">
+<column scale="0" nullable="true" length="45" jdbcType="12" columnType="VARCHAR" columnName="last_access_ip" autoincrement="false">
     <annotations>
         <annotation type="com.manydesigns.elements.annotations.MaxLength">
             <value>45</value>
@@ -468,14 +468,14 @@
 <column scale="0" nullable="true" length="10" jdbcType="4" columnType="INT" columnName="resolution" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="date_created" autoincrement="false">
+<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="created" autoincrement="false">
     <annotations>
         <annotation type="com.manydesigns.elements.annotations.DateFormat">
             <value>yyyy-MM-dd HH:mm:ss z</value>
         </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="date_updated" autoincrement="false">
+<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="last_updated" autoincrement="false">
     <annotations>
         <annotation type="com.manydesigns.elements.annotations.DateFormat">
             <value>yyyy-MM-dd HH:mm:ss z</value>
@@ -582,7 +582,7 @@
 <column scale="0" nullable="true" length="10" jdbcType="91" columnType="DATE" columnName="planned_date" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="true" length="10" jdbcType="91" columnType="DATE" columnName="released_date" autoincrement="false">
+<column scale="0" nullable="true" length="10" jdbcType="91" columnType="DATE" columnName="release_date" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
@@ -636,7 +636,7 @@
 <column scale="0" nullable="true" length="100" jdbcType="12" columnType="VARCHAR" columnName="url" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="0" jdbcType="-7" columnType="BIT" columnName="public" autoincrement="false">
+<column scale="0" nullable="false" length="0" jdbcType="-7" columnType="BIT" columnName="public_" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="last_ticket" autoincrement="false">
