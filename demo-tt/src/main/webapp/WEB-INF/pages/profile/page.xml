@@ -1,9 +1,13 @@
-<page description="Profile" id="jhj83u2qepjouflwmicxnzusg" title="Profile">
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page title="Profile" navigationRoot="INHERIT" id="jhj83u2qepjouflwmicxnzusg" description="Profile">
+    <detailLayout>
+        <childPages/>
+    </detailLayout>
+    <layout template="full-width">
+        <childPages/>
+    </layout>
     <permissions>
         <group name="all" level="NONE"/>
         <group name="registered" level="VIEW"/>
     </permissions>
-    <layout>
-        <childPages />
-    </layout>
 </page>

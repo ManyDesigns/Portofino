@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration variable="" searchTitle="" rowsPerPage="10" readTitle="" query="from ticket_resolutions order by id" name="" largeResultSet="false" editTitle="" database="tt" createTitle="">
+    <properties>
+        <property updatable="false" searchable="false" name="id" label="" insertable="false" inSummary="false" enabled="false">
+            <annotations/>
+        </property>
+        <property updatable="true" searchable="false" name="resolution" label="" insertable="true" inSummary="true" enabled="true">
+            <annotations/>
+        </property>
+    </properties>
+    <selectionProviders/>
+</configuration>

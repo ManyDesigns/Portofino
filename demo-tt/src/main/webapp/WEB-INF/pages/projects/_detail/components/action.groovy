@@ -54,8 +54,17 @@ class MyCrudAction extends CrudAction {
     }
 
 
+    @Override
     protected void createSetup(Object object) {
         object.project = project.id;
+    }
+
+    @Override
+    protected boolean createValidate(Object object) {
+        Date now = new Date();
+        object.created = now;
+        object.last_updated = now;
+        return true;
     }
 
     //**************************************************************************
@@ -94,6 +103,14 @@ class MyCrudAction extends CrudAction {
     Resolution update() {
         return super.update()    //To change body of overridden methods use File | Settings | File Templates.
     }
+
+    @Override
+    protected boolean editValidate(Object object) {
+        Date now = new Date();
+        object.last_updated = now;
+        return true;
+    }
+
 
     //**************************************************************************
     // Delete customizations

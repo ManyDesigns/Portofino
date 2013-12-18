@@ -25,13 +25,13 @@
             <column name="registration_ip" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_access" type="timestamp">
+            <column name="last_access" type="timestamp" defaultValue="null">
                 <constraints nullable="true"/>
             </column>
             <column name="last_access_ip" type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
-            <column name="validated" type="timestamp">
+            <column name="validated" type="timestamp" defaultValue="null">
                 <constraints nullable="true"/>
             </column>
             <column name="admin" type="boolean">
@@ -58,7 +58,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="varchar(4000)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="url" type="varchar(255)"/>
             <column name="public_" type="boolean"
@@ -88,7 +88,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="varchar(4000)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="assignee" type="int">
                 <constraints nullable="true"/>
@@ -132,7 +132,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="varchar(4000)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="planned_date" type="date"/>
             <column name="release_date" type="date"/>
@@ -159,7 +159,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="description" type="varchar(4000)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="project" type="varchar(10)">
                 <constraints nullable="false"/>
@@ -259,7 +259,7 @@
             <column name="type" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="notifications_sent" type="timestamp">
+            <column name="notifications_sent" type="timestamp" defaultValue="null">
                 <constraints nullable="true"/>
             </column>
         </createTable>

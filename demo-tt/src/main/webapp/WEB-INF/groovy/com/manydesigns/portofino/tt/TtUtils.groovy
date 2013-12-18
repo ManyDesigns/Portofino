@@ -57,8 +57,8 @@ class TtUtils {
         newActivity.n = ticket.n;
         newActivity.message = message;
         newActivity.type = type;
-        newActivity.date = date;
-        newActivity.user = userId;
+        newActivity.timestamp_ = date;
+        newActivity.user_ = userId;
         session.save("activity", (Object)newActivity);
     }
 
@@ -149,7 +149,7 @@ class TtUtils {
         }
         long userId = subject.principal.id;
         for (Object member : project.fk_member_project) {
-            def memberUser = member.user
+            def memberUser = member.user_
             def memberRole = member.role
             logger.debug("Member user: {} - member role: {}", memberUser, memberRole)
             if (memberUser == userId && memberRole >= minimumRole) {

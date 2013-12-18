@@ -59,20 +59,27 @@ class ProjectsCrudAction extends CrudAction {
     // Extension hooks
     //**************************************************************************
 
+    @Override
     protected void createSetup(Object object) {
         object.last_ticket = 0L;
     }
 
+    @Override
     protected boolean createValidate(Object object) {
+        Date now = new Date();
+        object.created = now;
+        object.last_updated = now;
         return true;
     }
 
+    @Override
     protected void createPostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
         Map member = new HashMap();
         member.project = object.id;
         member.user_ = principal.id;
         member.role = TtUtils.ROLE_MANAGER;
+        member.notifications = false;
         session.save("members", (Object)member);
     }
 
@@ -98,7 +105,16 @@ class ProjectsCrudAction extends CrudAction {
     @Button(list = "crud-edit", key = "update", order = 1d, type = Button.TYPE_PRIMARY)
     @Guard(test="isManager()", type=GuardType.VISIBLE)
     Resolution update() {
+        Date now = new Date();
+        object.last_updated = now;
         return super.update()
+    }
+
+    @Override
+    protected boolean editValidate(Object object) {
+        Date now = new Date();
+        object.last_updated = now;
+        return true;
     }
 
 

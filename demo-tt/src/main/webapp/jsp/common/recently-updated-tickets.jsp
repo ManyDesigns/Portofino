@@ -21,7 +21,7 @@
                     </dt>
                     <dd>
                         <small class="muted">
-                            updated on <fmt:formatDate value="${ticket.date_updated}" pattern="yyyy-MM-dd HH:mm:ss z"/>
+                            updated on <fmt:formatDate value="${ticket.last_updated}" pattern="yyyy-MM-dd HH:mm:ss z"/>
                         </small>
                         <div>
                             <c:out value="${ticket.title}"/>

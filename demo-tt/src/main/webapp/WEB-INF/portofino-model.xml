@@ -12,11 +12,8 @@
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="role" autoincrement="false">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="role" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>50</value>
-        </annotation>
     </annotations>
 </column>
                             </columns>
@@ -32,14 +29,11 @@
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="type" autoincrement="false">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="type" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>50</value>
-        </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="css_class" autoincrement="false">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="css_class" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
@@ -55,7 +49,7 @@
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="true">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
+<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="n" autoincrement="false">
@@ -71,6 +65,9 @@
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="type" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="true" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="notifications_sent" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
@@ -105,24 +102,30 @@
 </column>
 <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>255</value>
+        <annotation type="com.manydesigns.elements.annotations.CssClass">
+            <value>input-xxlarge</value>
         </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
+<column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>4000</value>
+        <annotation type="com.manydesigns.elements.annotations.Multiline">
+            <value>true</value>
+        </annotation>
+        <annotation type="com.manydesigns.elements.annotations.CssClass">
+            <value>input-block-level</value>
         </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
+<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>100</value>
-        </annotation>
     </annotations>
+</column>
+<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="created" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="last_updated" autoincrement="false">
+    <annotations/>
 </column>
                             </columns>
                             <foreignKeys>
@@ -143,7 +146,7 @@
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="type" autoincrement="false">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="type" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
@@ -159,7 +162,7 @@
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="true">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
+<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="n" autoincrement="false">
@@ -199,14 +202,11 @@
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="state" autoincrement="false">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="state" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>50</value>
-        </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="css_class" autoincrement="false">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="css_class" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
@@ -222,13 +222,16 @@
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="true">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
+<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="user_" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="role" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="false" length="0" jdbcType="-7" columnType="BIT" columnName="notifications" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
@@ -271,75 +274,54 @@
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="true">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="150" jdbcType="12" columnType="VARCHAR" columnName="email" autoincrement="false">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="email" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>150</value>
+        <annotation type="com.manydesigns.elements.annotations.CssClass">
+            <value>input-xxlarge</value>
         </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="true" length="50" jdbcType="12" columnType="VARCHAR" columnName="password" autoincrement="false">
+<column scale="0" nullable="true" length="255" jdbcType="12" columnType="VARCHAR" columnName="password" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>50</value>
-        </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="first_name" autoincrement="false">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="first_name" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>50</value>
-        </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="last_name" autoincrement="false">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="last_name" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>50</value>
-        </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="19" jdbcType="93" columnType="DATETIME" columnName="registration" autoincrement="false">
+<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="registration" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="45" jdbcType="12" columnType="VARCHAR" columnName="registration_ip" autoincrement="false">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="registration_ip" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>45</value>
-        </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="true" length="19" jdbcType="93" columnType="DATETIME" columnName="last_access" autoincrement="false">
+<column scale="0" nullable="true" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="last_access" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="true" length="45" jdbcType="12" columnType="VARCHAR" columnName="last_access_ip" autoincrement="false">
+<column scale="0" nullable="true" length="255" jdbcType="12" columnType="VARCHAR" columnName="last_access_ip" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>45</value>
-        </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="true" length="0" jdbcType="-7" columnType="BIT" columnName="validated" autoincrement="false">
+<column scale="0" nullable="true" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="validated" autoincrement="false">
     <annotations/>
+</column>
+<column scale="0" nullable="true" length="255" jdbcType="12" columnType="VARCHAR" columnName="token" autoincrement="false">
+    <annotations>
+    </annotations>
 </column>
 <column scale="0" nullable="false" length="0" jdbcType="-7" columnType="BIT" columnName="admin" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="true" length="50" jdbcType="12" columnType="VARCHAR" columnName="token" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>50</value>
-        </annotation>
-    </annotations>
-</column>
 <column scale="0" nullable="false" length="0" jdbcType="-7" columnType="BIT" columnName="project_manager" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="true" length="25" jdbcType="1" columnType="CHAR" columnName="avatar" autoincrement="false">
+<column scale="0" nullable="true" length="255" jdbcType="12" columnType="VARCHAR" columnName="avatar" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>25</value>
-        </annotation>
         <annotation type="com.manydesigns.elements.annotations.FileBlob"/>
     </annotations>
 </column>
@@ -356,14 +338,11 @@
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="state" autoincrement="false">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="state" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>50</value>
-        </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="css_class" autoincrement="false">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="css_class" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
@@ -380,14 +359,18 @@
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
-    <annotations/>
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.CssClass">
+            <value>input-xxlarge</value>
+        </annotation>
+    </annotations>
 </column>
 <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="file" autoincrement="false">
     <annotations>
         <annotation type="com.manydesigns.elements.annotations.FileBlob"/>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
+<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="n" autoincrement="false">
@@ -410,11 +393,8 @@
                         <table tableName="tickets" shortName="%{project}-%{n}">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
+<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>100</value>
-        </annotation>
     </annotations>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="n" autoincrement="false">
@@ -425,16 +405,13 @@
 </column>
 <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>255</value>
+        <annotation type="com.manydesigns.elements.annotations.CssClass">
+            <value>input-xxlarge</value>
         </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="21000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
+<column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>21000</value>
-        </annotation>
         <annotation type="com.manydesigns.elements.annotations.Multiline">
             <value>true</value>
         </annotation>
@@ -469,18 +446,10 @@
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="created" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.DateFormat">
-            <value>yyyy-MM-dd HH:mm:ss z</value>
-        </annotation>
-    </annotations>
+    <annotations/>
 </column>
 <column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="last_updated" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.DateFormat">
-            <value>yyyy-MM-dd HH:mm:ss z</value>
-        </annotation>
-    </annotations>
+    <annotations/>
 </column>
                             </columns>
                             <foreignKeys>
@@ -542,14 +511,11 @@
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="priority" autoincrement="false">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="priority" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>50</value>
-        </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="css_class" autoincrement="false">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="css_class" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
@@ -567,32 +533,46 @@
 </column>
 <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>255</value>
+        <annotation type="com.manydesigns.elements.annotations.CssClass">
+            <value>input-xxlarge</value>
         </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
+<column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>4000</value>
+        <annotation type="com.manydesigns.elements.annotations.Multiline">
+            <value>true</value>
+        </annotation>
+        <annotation type="com.manydesigns.elements.annotations.CssClass">
+            <value>input-block-level</value>
         </annotation>
     </annotations>
 </column>
 <column scale="0" nullable="true" length="10" jdbcType="91" columnType="DATE" columnName="planned_date" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="true" length="10" jdbcType="91" columnType="DATE" columnName="release_date" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>100</value>
+        <annotation type="com.manydesigns.elements.annotations.DateFormat">
+            <value>yyyy-MM-dd</value>
         </annotation>
     </annotations>
 </column>
+<column scale="0" nullable="true" length="10" jdbcType="91" columnType="DATE" columnName="release_date" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.DateFormat">
+            <value>yyyy-MM-dd</value>
+        </annotation>
+    </annotations>
+</column>
+<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
+    <annotations>
+    </annotations>
+</column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="state" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="created" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="last_updated" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
@@ -616,30 +596,47 @@
                         <table tableName="projects" shortName="%{id} - %{title}">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="100" jdbcType="12" columnType="VARCHAR" columnName="id" autoincrement="false">
-    <annotations/>
+<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="id" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.CssClass">
+            <value>input-medium</value>
+        </annotation>
+    </annotations>
 </column>
 <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
     <annotations>
         <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-xlarge</value>
+            <value>input-xxlarge</value>
         </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="false" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
+<column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
     <annotations>
+        <annotation type="com.manydesigns.elements.annotations.Multiline">
+            <value>true</value>
+        </annotation>
         <annotation type="com.manydesigns.elements.annotations.CssClass">
             <value>input-block-level</value>
         </annotation>
     </annotations>
 </column>
-<column scale="0" nullable="true" length="100" jdbcType="12" columnType="VARCHAR" columnName="url" autoincrement="false">
-    <annotations/>
+<column scale="0" nullable="true" length="255" jdbcType="12" columnType="VARCHAR" columnName="url" autoincrement="false">
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.CssClass">
+            <value>input-xxlarge</value>
+        </annotation>
+    </annotations>
 </column>
 <column scale="0" nullable="false" length="0" jdbcType="-7" columnType="BIT" columnName="public_" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="last_ticket" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="created" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="last_updated" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
@@ -655,11 +652,8 @@
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="false">
     <annotations/>
 </column>
-<column scale="0" nullable="false" length="50" jdbcType="12" columnType="VARCHAR" columnName="resolution" autoincrement="false">
+<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="resolution" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.MaxLength">
-            <value>50</value>
-        </annotation>
     </annotations>
 </column>
                             </columns>

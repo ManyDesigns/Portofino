@@ -13,13 +13,19 @@
         <property updatable="true" searchable="false" name="planned_date" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
-        <property updatable="true" searchable="false" name="released_date" label="" insertable="true" inSummary="true" enabled="true">
+        <property updatable="true" searchable="false" name="release_date" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
         <property updatable="false" searchable="false" name="project" insertable="false" inSummary="false" enabled="false">
             <annotations/>
         </property>
         <property updatable="true" searchable="false" name="state" label="" insertable="true" inSummary="true" enabled="true">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="created" label="" insertable="false" inSummary="false" enabled="true">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="last_updated" label="" insertable="false" inSummary="false" enabled="true">
             <annotations/>
         </property>
     </properties>

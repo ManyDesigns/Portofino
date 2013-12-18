@@ -57,6 +57,13 @@ class ProjectVersionsAction extends CrudAction {
         object.state = 1L;
     }
 
+    @Override
+    protected boolean createValidate(Object object) {
+        Date now = new Date();
+        object.created = now;
+        object.last_updated = now;
+        return true;
+    }
 
     //**************************************************************************
     // Read customizations
@@ -93,6 +100,13 @@ class ProjectVersionsAction extends CrudAction {
     @Guard(test="isManager()", type=GuardType.VISIBLE)
     Resolution update() {
         return super.update()    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
+    @Override
+    protected boolean editValidate(Object object) {
+        Date now = new Date();
+        object.last_updated = now;
+        return true;
     }
 
     //**************************************************************************

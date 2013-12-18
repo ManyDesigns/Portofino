@@ -7,16 +7,19 @@
         <property updatable="false" searchable="false" name="project" insertable="false" inSummary="false" enabled="false">
             <annotations/>
         </property>
-        <property updatable="false" searchable="false" name="user" label="" insertable="true" inSummary="true" enabled="true">
+        <property updatable="false" searchable="false" name="user_" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
         <property updatable="true" searchable="false" name="role" label="" insertable="true" inSummary="true" enabled="true">
+            <annotations/>
+        </property>
+        <property updatable="true" searchable="false" name="notifications" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
     </properties>
     <selectionProviders>
         <selectionProvider fk="fk_member_project" enabled="false"/>
         <selectionProvider selectionProvider="sorted_roles" searchDisplayMode="DROPDOWN" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
-        <selectionProvider selectionProvider="available_members" searchDisplayMode="DROPDOWN" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
+        <selectionProvider selectionProvider="available_members" searchDisplayMode="DROPDOWN" enabled="true" displayMode="AUTOCOMPLETE" createNewValueText=""/>
     </selectionProviders>
 </configuration>

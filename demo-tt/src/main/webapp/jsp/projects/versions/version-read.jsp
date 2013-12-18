@@ -74,12 +74,12 @@
                 <fmt:message key="progress.no.tickets.in.this.version"/>
                 </c:if>
             </div>
-            <c:if test="${not empty version.released_date}">
+            <c:if test="${not empty version.release_date}">
                 <fmt:message key="release.date._">
-                    <fmt:param value="${version.released_date}"/>
+                    <fmt:param value="${version.release_date}"/>
                 </fmt:message>
             </c:if>
-            <c:if test="${empty version.released_date}">
+            <c:if test="${empty version.release_date}">
                 <fmt:message key="no.release.date"/>
             </c:if>
         </div>

@@ -43,13 +43,29 @@ public class Profile extends CustomAction {
 
     public int MAX_WIDTH = 40, MAX_HEIGHT = 40;
 
+    public static String[] VIEW_FIELDS = [
+            "email",
+            "registration",
+            "registration_ip",
+            "last_access",
+            "last_access_ip",
+            "validated",
+            "admin",
+            "project_manager",
+    ]
+
+    public static String[] EDIT_FIELDS = [
+            "first_name",
+            "last_name"
+    ]
+
     @DefaultHandler
     public Resolution view() {
         //Setup form for view
         Table usersTable = DatabaseLogic.findTableByEntityName(getDatabase(), "users");
         TableAccessor tableAccessor = new TableAccessor(usersTable);
         form = new FormBuilder(tableAccessor).
-                configFields("email", "creation_date", "last_access").
+                configFields(VIEW_FIELDS).
                 configMode(Mode.VIEW).
                 build();
         loadUser();
@@ -96,7 +112,7 @@ public class Profile extends CustomAction {
         Table usersTable = DatabaseLogic.findTableByEntityName(getDatabase(), "users");
         TableAccessor tableAccessor = new TableAccessor(usersTable);
         form = new FormBuilder(tableAccessor).
-                configFields("first_name", "last_name").
+                configFields(EDIT_FIELDS).
                 configMode(Mode.EDIT).
                 build();
         loadUser();

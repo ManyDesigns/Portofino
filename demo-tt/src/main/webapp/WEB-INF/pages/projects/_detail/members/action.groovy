@@ -61,6 +61,7 @@ class ProjectMembersAction extends CrudAction {
 
     protected void createSetup(Object object) {
         object.project = project.id;
+        object.notifications = false;
     }
 
     //**************************************************************************

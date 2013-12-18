@@ -33,7 +33,7 @@
                 <p>
                     <stripes:link href="/admin" class="btn btn-success">
                         <stripes:param name="create"/>
-                        Manage users
+                        Manage users and settings
                         <i class="icon-chevron-right icon-white"></i>
                     </stripes:link>
                 </p>

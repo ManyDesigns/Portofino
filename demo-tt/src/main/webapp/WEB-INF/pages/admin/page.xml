@@ -6,6 +6,12 @@
     <layout template="default">
         <childPages>
             <childPage showInNavigation="true" name="users"/>
+            <childPage showInNavigation="true" name="ticket-resolutions"/>
+            <childPage showInNavigation="true" name="ticket-priorities"/>
+            <childPage showInNavigation="true" name="ticket-types"/>
+            <childPage showInNavigation="true" name="ticket-states"/>
+            <childPage showInNavigation="true" name="version-states"/>
+            <childPage showInNavigation="true" name="roles"/>
         </childPages>
     </layout>
     <permissions/>

@@ -66,8 +66,8 @@ class ProjectsTicketsAction extends CrudAction {
                     "assignee",
                     "fix_version",
                     "resolution",
-                    "date_created",
-                    "date_updated",
+                    "created",
+                    "last_updated",
     ];
 
     @Override
@@ -180,8 +180,8 @@ class ProjectsTicketsAction extends CrudAction {
 
     protected boolean createValidate(Object object) {
         Date now = new Date();
-        object.date_created = now;
-        object.date_updated = now;
+        object.created = now;
+        object.last_updated = now;
 
         session.buildLockRequest(LockOptions.UPGRADE).lock("project", project);
         long number = project.last_ticket + 1L;
@@ -244,7 +244,7 @@ class ProjectsTicketsAction extends CrudAction {
 
     protected boolean editValidate(Object object) {
         Date now = new Date();
-        object.date_updated = now;
+        object.last_updated = now;
         return true;
     }
 

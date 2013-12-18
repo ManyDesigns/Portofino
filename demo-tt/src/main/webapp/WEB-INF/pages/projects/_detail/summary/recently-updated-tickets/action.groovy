@@ -27,7 +27,7 @@ class ProjectsRecentlyUpdatedTicketsAction extends CustomAction {
         Session session = persistence.getSession("tt");
         tickets = session.createCriteria("tickets")
                 .add(Restrictions.eq("project", project.id))
-                .addOrder(Order.desc("date_updated"))
+                .addOrder(Order.desc("last_updated"))
                 .setMaxResults(10)
                 .list();
 

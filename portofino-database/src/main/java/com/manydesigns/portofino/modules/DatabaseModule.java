@@ -26,6 +26,8 @@ import com.manydesigns.portofino.actions.admin.TablesAction;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.di.Injections;
+import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoAddColumnGenerator;
+import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoCreateTableGenerator;
 import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoSelectFromDatabaseChangeLogLockGenerator;
 import com.manydesigns.portofino.menu.MenuBuilder;
 import com.manydesigns.portofino.menu.SimpleMenuAppender;
@@ -131,6 +133,8 @@ public class DatabaseModule implements Module {
             List<DatabaseSnapshotGenerator> registry = DatabaseSnapshotGeneratorFactory.getInstance().getRegistry();
             registry.clear();
             SqlGeneratorFactory.getInstance().register(new PortofinoSelectFromDatabaseChangeLogLockGenerator());
+            SqlGeneratorFactory.getInstance().register(new PortofinoCreateTableGenerator());
+            SqlGeneratorFactory.getInstance().register(new PortofinoAddColumnGenerator());
         } else {
             logger.info("Liquibase is disabled");
         }

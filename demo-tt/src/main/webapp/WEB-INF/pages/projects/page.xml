@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <page title="Projects" navigationRoot="INHERIT" id="r17f638d7h39zpyypd6x3ioo8" description="Projects">
-    <detailLayout template="default">
+    <detailLayout template="full-width">
         <childPages>
             <childPage showInNavigation="true" name="summary"/>
             <childPage showInNavigation="true" name="activity"/>
@@ -10,7 +10,7 @@
             <childPage showInNavigation="true" name="members"/>
         </childPages>
     </detailLayout>
-    <layout template="default">
+    <layout template="full-width">
         <childPages/>
     </layout>
     <permissions>

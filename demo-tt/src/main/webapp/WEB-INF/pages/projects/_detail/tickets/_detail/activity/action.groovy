@@ -1,5 +1,7 @@
 import com.manydesigns.portofino.tt.TtUtils
 
+import com.manydesigns.portofino.tt.ActivityStreamWithUserImageAction
+
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.portofino.buttons.GuardType
@@ -9,7 +11,6 @@ import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.pageactions.activitystream.ActivityItem
 import com.manydesigns.portofino.pageactions.activitystream.ActivityItem.Arg
-import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
@@ -17,13 +18,12 @@ import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
+import net.sourceforge.stripes.util.UrlBuilder
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.shiro.SecurityUtils
 import org.hibernate.Session
 import org.hibernate.criterion.Order
 import org.hibernate.criterion.Restrictions
-import com.manydesigns.portofino.tt.ActivityStreamWithUserImageAction
-import net.sourceforge.stripes.util.UrlBuilder
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class TicketActivityAction extends ActivityStreamWithUserImageAction {
@@ -66,7 +66,7 @@ class TicketActivityAction extends ActivityStreamWithUserImageAction {
         for (Object item : items) {
             String userName = "$item.fk_activity_user.first_name $item.fk_activity_user.last_name"
 
-            Date timestamp = item.date;
+            Date timestamp = item.timestamp_;
             String imageSrc =
                 new UrlBuilder(Locale.getDefault(), context.actionPath, false).
                     setEvent("userImage").

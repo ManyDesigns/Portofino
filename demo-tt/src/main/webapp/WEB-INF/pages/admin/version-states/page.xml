@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<page title="Support" navigationRoot="INHERIT" id="fih38mr4t90ewf9a958g6pidw" description="Documentation">
+<page title="Version states" navigationRoot="INHERIT" id="hbuki9hpblj4cuhqyacoxgori" description="Version states">
     <detailLayout template="default">
         <childPages/>
     </detailLayout>
-    <layout template="homepage">
+    <layout template="default">
         <childPages/>
     </layout>
     <permissions/>

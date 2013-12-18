@@ -1,9 +1,9 @@
+import com.manydesigns.portofino.tt.ActivityStreamWithUserImageAction
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.pageactions.activitystream.ActivityItem
 import com.manydesigns.portofino.pageactions.activitystream.ActivityItem.Arg
-import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
@@ -12,7 +12,6 @@ import net.sourceforge.stripes.util.UrlBuilder
 import org.hibernate.Session
 import org.hibernate.criterion.Order
 import org.hibernate.criterion.Restrictions
-import com.manydesigns.portofino.tt.ActivityStreamWithUserImageAction
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class ProjectActivityAction extends ActivityStreamWithUserImageAction {
@@ -41,7 +40,7 @@ class ProjectActivityAction extends ActivityStreamWithUserImageAction {
             String ticketHref = "/projects/$item.project/tickets/$item.project/$item.n"
             String ticketTitle = ticket.title;
 
-            Date timestamp = item.date;
+            Date timestamp = item.timestamp_;
             String imageSrc =
                 new UrlBuilder(Locale.getDefault(), context.actionPath, false).
                     setEvent("userImage").
