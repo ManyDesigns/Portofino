@@ -95,7 +95,7 @@ class Security extends AbstractPortofinoRealm {
             throw new UnknownAccountException("Unknown user");
         } else if (!encryptedPassword.equals(principal.password)) {
             throw new IncorrectCredentialsException("Wrong password");
-        } else if (!principal.validated) {
+        } else if (principal.validated == null) {
             throw new DisabledAccountException("User not validated");
         } else {
             logger.debug("Aggiorno i campi accesso.");
@@ -113,7 +113,7 @@ class Security extends AbstractPortofinoRealm {
     private void updateAccess(Object principal, Date now) {
         def request = ElementsThreadLocals.getHttpServletRequest();
         principal.last_access = now;
-        principal.access_ip = request.getRemoteAddr();
+        principal.last_access_ip = request.getRemoteAddr();
     }
 
 

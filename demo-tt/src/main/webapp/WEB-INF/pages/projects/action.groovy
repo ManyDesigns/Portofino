@@ -71,7 +71,7 @@ class ProjectsCrudAction extends CrudAction {
         Object principal = SecurityUtils.subject.principal;
         Map member = new HashMap();
         member.project = object.id;
-        member.user = principal.id;
+        member.user_ = principal.id;
         member.role = TtUtils.ROLE_MANAGER;
         session.save("members", (Object)member);
     }

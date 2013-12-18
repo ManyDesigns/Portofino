@@ -15,36 +15,36 @@ import org.hibernate.Session
 class HomeProjectsAction extends CustomAction {
 
     public final static String ANONYMOUS_SQL = """
-    select p.id, p.title, p.description, count(t.n) as c, p.public
+    select p.id, p.title, p.description, count(t.n) as c, p.public_
     from projects p
     left join tickets t on (t.project = p.id and t.state <>4)
-    where p.public
+    where p.public_
     group by p.id, p.title, p.description
     order by p.id
     """;
 
     public final static String LOGGED_SQL = """
-    select p.id, p.title, p.description, count(t.n) as c, p.public
+    select p.id, p.title, p.description, count(t.n) as c, p.public_
     from projects p
     left join members m on m.project = p.id
     left join tickets t on (t.project = p.id and t.state <>4)
-    where p.public = true
-    or m.user = :user
+    where p.public_ = true
+    or m.user_ = :user
     group by p.id, p.title, p.description
     order by id
     """;
 
     public final static String LOGGED_SQL2 = """
-    select p.id, p.title, p.description, count(t.n) as c, p.public
+    select p.id, p.title, p.description, count(t.n) as c, p.public_
     from projects p
     left join tickets t on (t.project = p.id and t.state <>4)
-    where p.public = true
+    where p.public_ = true
     union select p.id, p.title, p.description, count(t.n) as c
     from projects p
     join members m on m.project = p.id
     left join tickets t on (t.project = p.id and t.state <>4)
-    where p.public = false
-    and m.user = :user
+    where p.public_ = false
+    and m.user_ = :user
     group by p.id, p.title, p.description
     order by id
     """;

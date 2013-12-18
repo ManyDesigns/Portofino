@@ -28,7 +28,7 @@
             <column name="last_access" type="timestamp">
                 <constraints nullable="true"/>
             </column>
-            <column name="access_ip" type="varchar(255)">
+            <column name="last_access_ip" type="varchar(255)">
                 <constraints nullable="true"/>
             </column>
             <column name="validated" type="timestamp">
