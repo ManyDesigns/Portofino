@@ -1,7 +1,3 @@
-import com.manydesigns.portofino.tt.TtUtils
-
-import com.manydesigns.portofino.tt.ActivityStreamWithUserImageAction
-
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.portofino.buttons.GuardType
@@ -9,24 +5,25 @@ import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.modules.DatabaseModule
-import com.manydesigns.portofino.pageactions.activitystream.ActivityItem
-import com.manydesigns.portofino.pageactions.activitystream.ActivityItem.Arg
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
+import com.manydesigns.portofino.tt.ActivityStreamWithUserImageAction
+import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
-import net.sourceforge.stripes.util.UrlBuilder
 import org.apache.commons.lang.StringEscapeUtils
 import org.apache.shiro.SecurityUtils
 import org.hibernate.Session
-import org.hibernate.criterion.Order
-import org.hibernate.criterion.Restrictions
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class TicketActivityAction extends ActivityStreamWithUserImageAction {
+
+    public static String TICKET_ACTIVTY_SQL = TtUtils.ACTIVITY_SQL +
+            "WHERE act.project = :project_id AND act.n = :ticket_n ORDER BY act.id";
+
 
     Serializable project;
     Serializable ticket;
@@ -55,39 +52,13 @@ class TicketActivityAction extends ActivityStreamWithUserImageAction {
     //**************************************************************************
     @Override
     void populateActivityItems() {
-        Session session = persistence.getSession("tt");
-        List items = session.createCriteria("activity")
-                .add(Restrictions.eq("project", ticket.project))
-                .add(Restrictions.eq("n", ticket.n))
-                .addOrder(Order.asc("id"))
-                .list();
-
         Locale locale = context.request.locale;
-        for (Object item : items) {
-            String userName = "$item.fk_activity_user.first_name $item.fk_activity_user.last_name"
+        Session session = persistence.getSession("tt");
+        List items = session.createSQLQuery(TICKET_ACTIVTY_SQL).setString("project_id", project.id).setLong("ticket_n", ticket.n).setMaxResults(30).list();
 
-            Date timestamp = item.timestamp_;
-            String imageSrc =
-                new UrlBuilder(Locale.getDefault(), context.actionPath, false).
-                    setEvent("userImage").
-                    addParameter("userId", item.fk_activity_user.id).
-                    toString();
-            String imageHref = null;
-            String imageAlt = userName;
-            String message = item.message;
-            String key = "ticket." + item.fk_activity_type.type
-            ActivityItem activityItem = new ActivityItem(
-                    locale,
-                    timestamp,
-                    imageSrc,
-                    imageHref,
-                    imageAlt,
-                    message,
-                    key,
-                    new Arg(userName, null),
-            );
-            activityItems.add(activityItem)
-        }
+        String keyPrefix = "ticket.";
+
+        TtUtils.populateActivityItems(items, activityItems, keyPrefix, locale, context);
     }
 
     @Override
@@ -97,7 +68,7 @@ class TicketActivityAction extends ActivityStreamWithUserImageAction {
 
 
     @Button(list = "activity", key = "post.comment")
-    @Guard(test="isContributor()", type=GuardType.VISIBLE)
+    @Guard(test = "isContributor()", type = GuardType.VISIBLE)
     public Resolution postComment() {
         Session session = persistence.getSession("tt");
         Object principal = SecurityUtils.subject.principal;

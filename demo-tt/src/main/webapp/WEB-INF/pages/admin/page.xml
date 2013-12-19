@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<page title="Admin" navigationRoot="INHERIT" id="fdna5k8iaxxkbach3p9r7uoad" description="Admin">
+<page title="Admin" navigationRoot="INHERIT" id="fdna5k8iaxxkbach3p9r7uoad"
+      description="Admin">
     <detailLayout template="default">
         <childPages/>
     </detailLayout>
@@ -12,6 +13,7 @@
             <childPage showInNavigation="true" name="ticket-states"/>
             <childPage showInNavigation="true" name="version-states"/>
             <childPage showInNavigation="true" name="roles"/>
+            <childPage showInNavigation="true" name="activity"/>
         </childPages>
     </layout>
     <permissions/>

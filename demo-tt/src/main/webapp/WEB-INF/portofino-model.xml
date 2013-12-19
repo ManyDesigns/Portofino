@@ -2,664 +2,1095 @@
 <model>
     <databases>
         <database databaseName="tt">
-            <jdbcConnection username="tt" url="jdbc:mysql://localhost/tt?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI" password="tt" driver="com.mysql.jdbc.Driver"/>
+            <jdbcConnection username="tt"
+                            url="jdbc:mysql://localhost/tt?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI"
+                            password="tt" driver="com.mysql.jdbc.Driver"/>
             <schemas>
                 <schema schemaName="tt">
                     <tables>
                         <table tableName="roles" shortName="%{role}">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="role" autoincrement="false">
-    <annotations>
-    </annotations>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="id" autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="role" autoincrement="false">
+                                    <annotations/>
+                                </column>
                             </columns>
                             <foreignKeys/>
                             <primaryKey>
-<column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
                         <table tableName="ticket_types" shortName="%{type}">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="type" autoincrement="false">
-    <annotations>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="css_class" autoincrement="false">
-    <annotations/>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="id" autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="type" autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="css_class"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
                             </columns>
                             <foreignKeys/>
                             <primaryKey>
-<column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
                         <table tableName="activity">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="true">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="n" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="timestamp_" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="message" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="user_" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="type" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="true" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="notifications_sent" autoincrement="false">
-    <annotations/>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="id" autoincrement="true">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="project"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="n" autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="19"
+                                        jdbcType="93" columnType="TIMESTAMP"
+                                        columnName="timestamp_"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="4000"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="message"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="user_"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="type" autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="19"
+                                        jdbcType="93" columnType="TIMESTAMP"
+                                        columnName="notifications_sent"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="user2"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="attachment"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="version"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="component"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="role" autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="ticket_resolution"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="ticket_priority"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="ticket_type"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="ticket_state"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="version_state"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
                             </columns>
                             <foreignKeys>
-<foreignKey toTable="activity_types" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_activity_type" hql="from activity_types">
-    <references>
-        <reference toColumn="id" fromColumn="type"/>
-    </references>
-</foreignKey>
-<foreignKey toTable="users" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_activity_user" hql="from users">
-    <references>
-        <reference toColumn="id" fromColumn="user_"/>
-    </references>
-</foreignKey>
-<foreignKey toTable="tickets" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_activity_ticket" hql="from tickets">
-    <references>
-        <reference toColumn="project" fromColumn="project"/>
-        <reference toColumn="n" fromColumn="n"/>
-    </references>
-</foreignKey>
+                                <foreignKey toTable="activity_types"
+                                            toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_activity_type"
+                                            hql="from activity_types">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="type"/>
+                                    </references>
+                                </foreignKey>
                             </foreignKeys>
                             <primaryKey>
-<column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
                         <table tableName="components" shortName="%{title}">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="true">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-xxlarge</value>
-        </annotation>
-    </annotations>
-</column>
-<column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.Multiline">
-            <value>true</value>
-        </annotation>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-block-level</value>
-        </annotation>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
-    <annotations>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="created" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="last_updated" autoincrement="false">
-    <annotations/>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="id" autoincrement="true">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="title"
+                                        autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.CssClass">
+                                            <value>input-xxlarge</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="true" length="4000"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="description"
+                                        autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Multiline">
+                                            <value>true</value>
+                                        </annotation>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.CssClass">
+                                            <value>input-block-level</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="project"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="19"
+                                        jdbcType="93" columnType="TIMESTAMP"
+                                        columnName="created"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="19"
+                                        jdbcType="93" columnType="TIMESTAMP"
+                                        columnName="last_updated"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
                             </columns>
                             <foreignKeys>
-<foreignKey toTable="projects" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_component_project" hql="from projects">
-    <references>
-        <reference toColumn="id" fromColumn="project"/>
-    </references>
-</foreignKey>
+                                <foreignKey toTable="projects" toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_component_project"
+                                            hql="from projects">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="project"/>
+                                    </references>
+                                </foreignKey>
                             </foreignKeys>
                             <primaryKey>
-<column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
                         <table tableName="activity_types">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="type" autoincrement="false">
-    <annotations/>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="id" autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="type" autoincrement="false">
+                                    <annotations/>
+                                </column>
                             </columns>
                             <foreignKeys/>
                             <primaryKey>
-<column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
                         <table tableName="affected_components">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="true">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="n" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="component" autoincrement="false">
-    <annotations/>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="id" autoincrement="true">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="project"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="n" autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="component"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
                             </columns>
                             <foreignKeys>
-<foreignKey toTable="components" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_affected_component_component" hql="from components">
-    <references>
-        <reference toColumn="id" fromColumn="component"/>
-    </references>
-</foreignKey>
-<foreignKey toTable="tickets" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_affected_component_ticket" hql="from tickets">
-    <references>
-        <reference toColumn="project" fromColumn="project"/>
-        <reference toColumn="n" fromColumn="n"/>
-    </references>
-</foreignKey>
+                                <foreignKey toTable="components" toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_affected_component_component"
+                                            hql="from components">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="component"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey toTable="tickets" toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_affected_component_ticket"
+                                            hql="from tickets">
+                                    <references>
+                                        <reference toColumn="project"
+                                                   fromColumn="project"/>
+                                        <reference toColumn="n" fromColumn="n"/>
+                                    </references>
+                                </foreignKey>
                             </foreignKeys>
                             <primaryKey>
-<column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders>
-<query toDatabase="tt" sql="select c.id, c.title, ac.id is null&#xD;&#xA;from components c&#xD;&#xA;left join affected_components ac on ac.component = c.id and ac.project = %{#ticket.project} and n=%{#ticket.n}" name="available_components" hql="">
-    <references>
-        <reference fromColumn="component"/>
-    </references>
-</query>
+                                <query toDatabase="tt"
+                                       sql="select c.id, c.title, ac.id is null&#xD;&#xA;from components c&#xD;&#xA;left join affected_components ac on ac.component = c.id and ac.project = %{#ticket.project} and n=%{#ticket.n}"
+                                       name="available_components" hql="">
+                                    <references>
+                                        <reference fromColumn="component"/>
+                                    </references>
+                                </query>
                             </selectionProviders>
                         </table>
                         <table tableName="version_states" shortName="%{state}">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="state" autoincrement="false">
-    <annotations>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="css_class" autoincrement="false">
-    <annotations/>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="id" autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="state"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="css_class"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
                             </columns>
                             <foreignKeys/>
                             <primaryKey>
-<column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
                         <table tableName="members">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="true">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="user_" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="role" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="0" jdbcType="-7" columnType="BIT" columnName="notifications" autoincrement="false">
-    <annotations/>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="id" autoincrement="true">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="project"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="user_"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="role" autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="0"
+                                        jdbcType="-7" columnType="BIT"
+                                        columnName="notifications"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
                             </columns>
                             <foreignKeys>
-<foreignKey toTable="users" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_member_user" hql="from users">
-    <references>
-        <reference toColumn="id" fromColumn="user_"/>
-    </references>
-</foreignKey>
-<foreignKey toTable="roles" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_member_role" hql="from roles">
-    <references>
-        <reference toColumn="id" fromColumn="role"/>
-    </references>
-</foreignKey>
-<foreignKey toTable="projects" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_member_project" hql="from projects">
-    <references>
-        <reference toColumn="id" fromColumn="project"/>
-    </references>
-</foreignKey>
+                                <foreignKey toTable="users" toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_member_user"
+                                            hql="from users">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="user_"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey toTable="roles" toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_member_role"
+                                            hql="from roles">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="role"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey toTable="projects" toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_member_project"
+                                            hql="from projects">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="project"/>
+                                    </references>
+                                </foreignKey>
                             </foreignKeys>
                             <primaryKey>
-<column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders>
-<query toDatabase="tt" sql="select u.id, concat(u.first_name, ' ', u.last_name), m.id is null&#xD;&#xA;from users u&#xD;&#xA;left join members m on m.user_ = u.id and m.project = %{#project.id}" name="available_members" hql="">
-    <references>
-        <reference fromColumn="user_"/>
-    </references>
-</query>
-<query toDatabase="tt" sql="select id, role from roles order by id asc" name="sorted_roles" hql="">
-    <references>
-        <reference fromColumn="role"/>
-    </references>
-</query>
+                                <query toDatabase="tt"
+                                       sql="select u.id, concat(u.first_name, ' ', u.last_name), m.id is null&#xD;&#xA;from users u&#xD;&#xA;left join members m on m.user_ = u.id and m.project = %{#project.id}"
+                                       name="available_members" hql="">
+                                    <references>
+                                        <reference fromColumn="user_"/>
+                                    </references>
+                                </query>
+                                <query toDatabase="tt"
+                                       sql="select id, role from roles order by id asc"
+                                       name="sorted_roles" hql="">
+                                    <references>
+                                        <reference fromColumn="role"/>
+                                    </references>
+                                </query>
                             </selectionProviders>
                         </table>
-                        <table tableName="users" shortName="%{first_name} %{last_name}">
+                        <table tableName="users"
+                               shortName="%{first_name} %{last_name}">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="true">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="email" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-xxlarge</value>
-        </annotation>
-    </annotations>
-</column>
-<column scale="0" nullable="true" length="255" jdbcType="12" columnType="VARCHAR" columnName="password" autoincrement="false">
-    <annotations>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="first_name" autoincrement="false">
-    <annotations>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="last_name" autoincrement="false">
-    <annotations>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="registration" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="registration_ip" autoincrement="false">
-    <annotations>
-    </annotations>
-</column>
-<column scale="0" nullable="true" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="last_access" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="true" length="255" jdbcType="12" columnType="VARCHAR" columnName="last_access_ip" autoincrement="false">
-    <annotations>
-    </annotations>
-</column>
-<column scale="0" nullable="true" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="validated" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="true" length="255" jdbcType="12" columnType="VARCHAR" columnName="token" autoincrement="false">
-    <annotations>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="0" jdbcType="-7" columnType="BIT" columnName="admin" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="0" jdbcType="-7" columnType="BIT" columnName="project_manager" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="true" length="255" jdbcType="12" columnType="VARCHAR" columnName="avatar" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.FileBlob"/>
-    </annotations>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="id" autoincrement="true">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="email"
+                                        autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.CssClass">
+                                            <value>input-xxlarge</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="true" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="password"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="first_name"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="last_name"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="19"
+                                        jdbcType="93" columnType="TIMESTAMP"
+                                        columnName="registration"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="registration_ip"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="19"
+                                        jdbcType="93" columnType="TIMESTAMP"
+                                        columnName="last_access"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="last_access_ip"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="19"
+                                        jdbcType="93" columnType="TIMESTAMP"
+                                        columnName="validated"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="token"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="0"
+                                        jdbcType="-7" columnType="BIT"
+                                        columnName="admin"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="0"
+                                        jdbcType="-7" columnType="BIT"
+                                        columnName="project_manager"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="avatar"
+                                        autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.FileBlob"/>
+                                    </annotations>
+                                </column>
                             </columns>
                             <foreignKeys/>
                             <primaryKey>
-<column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
                         <table tableName="ticket_states" shortName="%{state}">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="state" autoincrement="false">
-    <annotations>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="css_class" autoincrement="false">
-    <annotations/>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="id" autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="state"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="css_class"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
                             </columns>
                             <foreignKeys/>
                             <primaryKey>
-<column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
                         <table tableName="attachments">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="true">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-xxlarge</value>
-        </annotation>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="file" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.FileBlob"/>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="n" autoincrement="false">
-    <annotations/>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="id" autoincrement="true">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="title"
+                                        autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.CssClass">
+                                            <value>input-xxlarge</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="file" autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.FileBlob"/>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="project"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="n" autoincrement="false">
+                                    <annotations/>
+                                </column>
                             </columns>
                             <foreignKeys>
-<foreignKey toTable="tickets" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_attachment_ticket" hql="from tickets">
-    <references>
-        <reference toColumn="project" fromColumn="project"/>
-        <reference toColumn="n" fromColumn="n"/>
-    </references>
-</foreignKey>
+                                <foreignKey toTable="tickets" toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_attachment_ticket"
+                                            hql="from tickets">
+                                    <references>
+                                        <reference toColumn="project"
+                                                   fromColumn="project"/>
+                                        <reference toColumn="n" fromColumn="n"/>
+                                    </references>
+                                </foreignKey>
                             </foreignKeys>
                             <primaryKey>
-<column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
                         <table tableName="tickets" shortName="%{project}-%{n}">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
-    <annotations>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="n" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="type" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-xxlarge</value>
-        </annotation>
-    </annotations>
-</column>
-<column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.Multiline">
-            <value>true</value>
-        </annotation>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-block-level</value>
-        </annotation>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="priority" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="true" length="10" jdbcType="4" columnType="INT" columnName="affected_version" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="created_by" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.FieldSet">
-            <value>Workflow</value>
-        </annotation>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="state" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="true" length="10" jdbcType="4" columnType="INT" columnName="assignee" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="true" length="10" jdbcType="4" columnType="INT" columnName="fix_version" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="true" length="10" jdbcType="4" columnType="INT" columnName="resolution" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="created" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="last_updated" autoincrement="false">
-    <annotations/>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="project"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="n" autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="type" autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="title"
+                                        autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.CssClass">
+                                            <value>input-xxlarge</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="true" length="4000"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="description"
+                                        autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Multiline">
+                                            <value>true</value>
+                                        </annotation>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.CssClass">
+                                            <value>input-block-level</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="priority"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="affected_version"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="created_by"
+                                        autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.FieldSet">
+                                            <value>Workflow</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="state"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="assignee"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="fix_version"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="resolution"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="19"
+                                        jdbcType="93" columnType="TIMESTAMP"
+                                        columnName="created"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="19"
+                                        jdbcType="93" columnType="TIMESTAMP"
+                                        columnName="last_updated"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
                             </columns>
                             <foreignKeys>
-<foreignKey toTable="versions" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_fix_version" hql="from versions">
-    <references>
-        <reference toColumn="id" fromColumn="fix_version"/>
-    </references>
-</foreignKey>
-<foreignKey toTable="users" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_assignee" hql="from users">
-    <references>
-        <reference toColumn="id" fromColumn="assignee"/>
-    </references>
-</foreignKey>
-<foreignKey toTable="ticket_resolutions" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_resolution" hql="from ticket_resolutions">
-    <references>
-        <reference toColumn="id" fromColumn="resolution"/>
-    </references>
-</foreignKey>
-<foreignKey toTable="ticket_states" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_state" hql="from ticket_states">
-    <references>
-        <reference toColumn="id" fromColumn="state"/>
-    </references>
-</foreignKey>
-<foreignKey toTable="projects" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_project" hql="from projects">
-    <references>
-        <reference toColumn="id" fromColumn="project"/>
-    </references>
-</foreignKey>
-<foreignKey toTable="ticket_types" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_type" hql="from ticket_types">
-    <references>
-        <reference toColumn="id" fromColumn="type"/>
-    </references>
-</foreignKey>
-<foreignKey toTable="ticket_priorities" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_priority" hql="from ticket_priorities">
-    <references>
-        <reference toColumn="id" fromColumn="priority"/>
-    </references>
-</foreignKey>
-<foreignKey toTable="versions" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_affected_version" hql="from versions">
-    <references>
-        <reference toColumn="id" fromColumn="affected_version"/>
-    </references>
-</foreignKey>
-<foreignKey toTable="users" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_creator" hql="from users">
-    <references>
-        <reference toColumn="id" fromColumn="created_by"/>
-    </references>
-</foreignKey>
+                                <foreignKey toTable="versions" toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_ticket_fix_version"
+                                            hql="from versions">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="fix_version"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey toTable="users" toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_ticket_assignee"
+                                            hql="from users">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="assignee"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey toTable="ticket_resolutions"
+                                            toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_ticket_resolution"
+                                            hql="from ticket_resolutions">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="resolution"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey toTable="ticket_states"
+                                            toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_ticket_state"
+                                            hql="from ticket_states">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="state"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey toTable="projects" toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_ticket_project"
+                                            hql="from projects">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="project"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey toTable="ticket_types" toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_ticket_type"
+                                            hql="from ticket_types">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="type"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey toTable="ticket_priorities"
+                                            toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_ticket_priority"
+                                            hql="from ticket_priorities">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="priority"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey toTable="versions" toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_ticket_affected_version"
+                                            hql="from versions">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="affected_version"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey toTable="users" toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_ticket_creator"
+                                            hql="from users">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="created_by"/>
+                                    </references>
+                                </foreignKey>
                             </foreignKeys>
                             <primaryKey>
-<column columnName="project"/>
-<column columnName="n"/>
+                                <column columnName="project"/>
+                                <column columnName="n"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="ticket_priorities" shortName="%{priority}">
+                        <table tableName="ticket_priorities"
+                               shortName="%{priority}">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="priority" autoincrement="false">
-    <annotations>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="css_class" autoincrement="false">
-    <annotations/>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="id" autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="priority"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="css_class"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
                             </columns>
                             <foreignKeys/>
                             <primaryKey>
-<column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
                         <table tableName="versions" shortName="%{title}">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="true">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-xxlarge</value>
-        </annotation>
-    </annotations>
-</column>
-<column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.Multiline">
-            <value>true</value>
-        </annotation>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-block-level</value>
-        </annotation>
-    </annotations>
-</column>
-<column scale="0" nullable="true" length="10" jdbcType="91" columnType="DATE" columnName="planned_date" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.DateFormat">
-            <value>yyyy-MM-dd</value>
-        </annotation>
-    </annotations>
-</column>
-<column scale="0" nullable="true" length="10" jdbcType="91" columnType="DATE" columnName="release_date" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.DateFormat">
-            <value>yyyy-MM-dd</value>
-        </annotation>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
-    <annotations>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="state" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="created" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="last_updated" autoincrement="false">
-    <annotations/>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="id" autoincrement="true">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="title"
+                                        autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.CssClass">
+                                            <value>input-xxlarge</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="true" length="4000"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="description"
+                                        autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Multiline">
+                                            <value>true</value>
+                                        </annotation>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.CssClass">
+                                            <value>input-block-level</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="91" columnType="DATE"
+                                        columnName="planned_date"
+                                        autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.DateFormat">
+                                            <value>yyyy-MM-dd</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="true" length="10"
+                                        jdbcType="91" columnType="DATE"
+                                        columnName="release_date"
+                                        autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.DateFormat">
+                                            <value>yyyy-MM-dd</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="project"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="state"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="19"
+                                        jdbcType="93" columnType="TIMESTAMP"
+                                        columnName="created"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="19"
+                                        jdbcType="93" columnType="TIMESTAMP"
+                                        columnName="last_updated"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
                             </columns>
                             <foreignKeys>
-<foreignKey toTable="projects" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_version_project" hql="from projects">
-    <references>
-        <reference toColumn="id" fromColumn="project"/>
-    </references>
-</foreignKey>
-<foreignKey toTable="version_states" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_version_state" hql="from version_states">
-    <references>
-        <reference toColumn="id" fromColumn="state"/>
-    </references>
-</foreignKey>
+                                <foreignKey toTable="projects" toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_version_project"
+                                            hql="from projects">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="project"/>
+                                    </references>
+                                </foreignKey>
+                                <foreignKey toTable="version_states"
+                                            toSchema="tt"
+                                            onUpdate="importedKeyNoAction"
+                                            onDelete="importedKeyNoAction"
+                                            toDatabase="tt"
+                                            name="fk_version_state"
+                                            hql="from version_states">
+                                    <references>
+                                        <reference toColumn="id"
+                                                   fromColumn="state"/>
+                                    </references>
+                                </foreignKey>
                             </foreignKeys>
                             <primaryKey>
-<column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="projects" shortName="%{id} - %{title}">
+                        <table tableName="projects"
+                               shortName="%{id} - %{title}">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="id" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-medium</value>
-        </annotation>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-xxlarge</value>
-        </annotation>
-    </annotations>
-</column>
-<column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.Multiline">
-            <value>true</value>
-        </annotation>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-block-level</value>
-        </annotation>
-    </annotations>
-</column>
-<column scale="0" nullable="true" length="255" jdbcType="12" columnType="VARCHAR" columnName="url" autoincrement="false">
-    <annotations>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-xxlarge</value>
-        </annotation>
-    </annotations>
-</column>
-<column scale="0" nullable="false" length="0" jdbcType="-7" columnType="BIT" columnName="public_" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="last_ticket" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="created" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="last_updated" autoincrement="false">
-    <annotations/>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="id" autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.CssClass">
+                                            <value>input-medium</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="title"
+                                        autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.CssClass">
+                                            <value>input-xxlarge</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="true" length="4000"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="description"
+                                        autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.Multiline">
+                                            <value>true</value>
+                                        </annotation>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.CssClass">
+                                            <value>input-block-level</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="true" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="url" autoincrement="false">
+                                    <annotations>
+                                        <annotation
+                                                type="com.manydesigns.elements.annotations.CssClass">
+                                            <value>input-xxlarge</value>
+                                        </annotation>
+                                    </annotations>
+                                </column>
+                                <column scale="0" nullable="false" length="0"
+                                        jdbcType="-7" columnType="BIT"
+                                        columnName="public_"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="last_ticket"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="19"
+                                        jdbcType="93" columnType="TIMESTAMP"
+                                        columnName="created"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="19"
+                                        jdbcType="93" columnType="TIMESTAMP"
+                                        columnName="last_updated"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
                             </columns>
                             <foreignKeys/>
                             <primaryKey>
-<column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
-                        <table tableName="ticket_resolutions" shortName="%{resolution}">
+                        <table tableName="ticket_resolutions"
+                               shortName="%{resolution}">
                             <annotations/>
                             <columns>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="id" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="resolution" autoincrement="false">
-    <annotations>
-    </annotations>
-</column>
+                                <column scale="0" nullable="false" length="10"
+                                        jdbcType="4" columnType="INT"
+                                        columnName="id" autoincrement="false">
+                                    <annotations/>
+                                </column>
+                                <column scale="0" nullable="false" length="255"
+                                        jdbcType="12" columnType="VARCHAR"
+                                        columnName="resolution"
+                                        autoincrement="false">
+                                    <annotations/>
+                                </column>
                             </columns>
                             <foreignKeys/>
                             <primaryKey>
-<column columnName="id"/>
+                                <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders/>
                         </table>
