@@ -23,10 +23,7 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.mail.quartz.MailScheduler;
 import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.setup.MailQueueSetup;
-import com.manydesigns.portofino.actions.admin.mail.MailSettingsAction;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.menu.MenuBuilder;
-import com.manydesigns.portofino.menu.SimpleMenuAppender;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,9 +49,6 @@ public class MailModule implements Module {
 
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration configuration;
-
-    @Inject(BaseModule.ADMIN_MENU)
-    public MenuBuilder adminMenu;
 
     protected MailQueueSetup mailQueueSetup;
 
@@ -108,13 +102,6 @@ public class MailModule implements Module {
     public void init() {
         mailQueueSetup = new MailQueueSetup(configuration);
         mailQueueSetup.setup();
-
-        SimpleMenuAppender group = SimpleMenuAppender.group("mail", null, "Mail", 4.0);
-        adminMenu.menuAppenders.add(group);
-
-        SimpleMenuAppender link = SimpleMenuAppender.link(
-                "mail", "Mail", null, "Mail", MailSettingsAction.URL_BINDING, 1.0);
-        adminMenu.menuAppenders.add(link);
 
         MailQueue mailQueue = mailQueueSetup.getMailQueue();
         if(mailQueue == null) {

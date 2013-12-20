@@ -30,13 +30,9 @@
 package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.admin.modules.ModulesAction;
-import com.manydesigns.portofino.actions.admin.servletcontext.ServletContextAction;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.files.TempFileService;
-import com.manydesigns.portofino.menu.MenuBuilder;
-import com.manydesigns.portofino.menu.SimpleMenuAppender;
 import ognl.OgnlRuntime;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
@@ -73,7 +69,6 @@ public class BaseModule implements Module {
     public final static String CLASS_LOADER = "com.manydesigns.portofino.application.classLoader";
     public final static String MODULE_REGISTRY = "com.manydesigns.portofino.modules.ModuleRegistry";
     public final static String CACHE_RESET_LISTENER_REGISTRY = "com.manydesigns.portofino.cache.CacheResetListenerRegistry";
-    public final static String ADMIN_MENU = "com.manydesigns.portofino.menu.Menu.admin";
 
     //**************************************************************************
     // Injected objects
@@ -138,22 +133,6 @@ public class BaseModule implements Module {
         //espressioni OGNL arbitrarie, pertanto il security manager può essere disabilitato in sicurezza.
         logger.info("Disabling OGNL security manager");
         OgnlRuntime.setSecurityManager(null);
-
-        logger.debug("Installing standard menu builders");
-        MenuBuilder adminMenu = new MenuBuilder();
-
-        SimpleMenuAppender group = SimpleMenuAppender.group("configuration", null, "Configuration", 1.0);
-        adminMenu.menuAppenders.add(group);
-
-        SimpleMenuAppender link = SimpleMenuAppender.link(
-                "configuration", "modules", null, "Modules", ModulesAction.URL_BINDING, 1.0);
-        adminMenu.menuAppenders.add(link);
-
-        link = SimpleMenuAppender.link(
-                "configuration", "servlet-context", null, "Servlet Context", ServletContextAction.URL_BINDING, 2.0);
-        adminMenu.menuAppenders.add(link);
-
-        servletContext.setAttribute(ADMIN_MENU, adminMenu);
 
         logger.debug("Installing cache reset listener registry");
         CacheResetListenerRegistry cacheResetListenerRegistry = new CacheResetListenerRegistry();
