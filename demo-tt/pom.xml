@@ -32,12 +32,6 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-text</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
             <artifactId>portofino-crud</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
@@ -178,15 +172,6 @@
                         <artifactItem>
                             <groupId>com.manydesigns</groupId>
                             <artifactId>portofino-admin</artifactId>
-                            <version>${project.version}</version>
-                            <type>jar</type>
-                            <overWrite>true</overWrite>
-                            <outputDirectory>${project.build.directory}/tmp</outputDirectory>
-                            <includes>META-INF/resources/**</includes>
-                        </artifactItem>
-                        <artifactItem>
-                            <groupId>com.manydesigns</groupId>
-                            <artifactId>portofino-text</artifactId>
                             <version>${project.version}</version>
                             <type>jar</type>
                             <overWrite>true</overWrite>

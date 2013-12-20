@@ -128,7 +128,6 @@
         <module>portofino-postgresql</module>
         <!-- Pages -->
         <module>portofino-pageactions</module>
-        <module>portofino-text</module>
         <module>portofino-calendar</module>
         <module>portofino-chart</module>
         <module>portofino-crud</module>

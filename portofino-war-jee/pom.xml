@@ -76,13 +76,6 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- Text pages. Remove to disable this feature. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-text</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- CRUD pages. Remove to disable this feature. -->
         <dependency>
             <groupId>com.manydesigns</groupId>

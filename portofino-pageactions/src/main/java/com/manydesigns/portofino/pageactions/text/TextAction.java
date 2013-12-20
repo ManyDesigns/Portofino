@@ -117,7 +117,7 @@ public class TextAction extends AbstractPageAction {
             if(pageInstance.getParameters().size() == 1 &&
                SecurityLogic.hasPermissions(
                        portofinoConfiguration, pageInstance, SecurityUtils.getSubject(), AccessLevel.EDIT)) {
-                return new ForwardResolution("/m/text/create-page.jsp");
+                return new ForwardResolution("/m/pageactions/text/create-page.jsp");
             } else {
                 return new ErrorResolution(404);
             }
@@ -136,7 +136,7 @@ public class TextAction extends AbstractPageAction {
         if (StringUtils.isEmpty(content)) {
             content = "<em>Empty content. To add content, configure this page.</em>";
         }
-        return forwardTo("/m/text/read.jsp");
+        return forwardTo("/m/pageactions/text/read.jsp");
     }
 
     /**
@@ -365,7 +365,7 @@ public class TextAction extends AbstractPageAction {
             logger.error("Could not load content", e);
             SessionMessages.addErrorMessage("Could not load content: " + e);
         }
-        return new ForwardResolution("/m/text/edit-content.jsp");
+        return new ForwardResolution("/m/pageactions/text/edit-content.jsp");
     }
 
     @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH,
@@ -373,7 +373,7 @@ public class TextAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution configurePage() {
         prepareConfigurationForms();
-        return new ForwardResolution("/m/text/configure.jsp");
+        return new ForwardResolution("/m/pageactions/text/configure.jsp");
     }
 
     @Button(list = "configuration", key = "update.configuration", order = 1, type = Button.TYPE_PRIMARY)
@@ -387,7 +387,7 @@ public class TextAction extends AbstractPageAction {
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("configuration.updated.successfully"));
             return cancel();
         } else {
-            return new ForwardResolution("/m/text/configure.jsp");
+            return new ForwardResolution("/m/pageactions/text/configure.jsp");
         }
     }
 
@@ -421,7 +421,7 @@ public class TextAction extends AbstractPageAction {
             logger.error("Upload failed", e);
         }
         return new ForwardResolution(
-                "/m/text/upload-attachment.jsp");
+                "/m/pageactions/text/upload-attachment.jsp");
     }
 
     protected void commonUploadAttachment() throws IOException {
@@ -513,13 +513,13 @@ public class TextAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution browse() {
         logger.debug("Browse");
-        return new ForwardResolution("/m/text/browse.jsp");
+        return new ForwardResolution("/m/pageactions/text/browse.jsp");
     }
 
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution browsePages() {
         logger.debug("Browse Pages");
-        return new ForwardResolution("/m/text/browsePages.jsp");
+        return new ForwardResolution("/m/pageactions/text/browsePages.jsp");
     }
 
     @Button(list = "pageHeaderButtons", titleKey = "manage.attachments", order = 3,
@@ -527,7 +527,7 @@ public class TextAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
     public Resolution manageAttachments() {
         logger.debug("Manage attachments");
-        return new ForwardResolution("/m/text/manage-attachments.jsp");
+        return new ForwardResolution("/m/pageactions/text/manage-attachments.jsp");
     }
 
     @Button(list = "edit-content", key = "update", order = 1, type = Button.TYPE_PRIMARY)
@@ -537,7 +537,7 @@ public class TextAction extends AbstractPageAction {
         title = StringUtils.trimToNull(title);
         if (title == null) {
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("title.cannot.be.empty"));
-            return new ForwardResolution("/m/text/edit-content.jsp");
+            return new ForwardResolution("/m/pageactions/text/edit-content.jsp");
         }
         Page page = pageInstance.getPage();
         page.setTitle(title);
