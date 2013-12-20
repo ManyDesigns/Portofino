@@ -660,6 +660,8 @@
                 constraintName="pk_ticket"
                 tableName="tickets"/>
     </changeSet>
+
+
     <changeSet id="tt-224" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="tickets"
                                  baseColumnNames="project"
@@ -667,82 +669,153 @@
                                  referencedTableName="projects"
                                  referencedColumnNames="id"/>
     </changeSet>
-    <changeSet id="tt-225" author="Giampiero Granatella">
+
+    <changeSet id="tt-225-idx" author="Paolo Predonzani">
+        <createIndex tableName="tickets" indexName="idx_ticket_state">
+            <column name="state"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-225-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="tickets" baseColumnNames="state"
                                  constraintName="fk_ticket_state"
                                  referencedTableName="ticket_states"
                                  referencedColumnNames="id"/>
     </changeSet>
-    <changeSet id="tt-226" author="Giampiero Granatella">
+
+    <changeSet id="tt-226-idx" author="Paolo Predonzani">
+        <createIndex tableName="tickets" indexName="idx_ticket_priority">
+            <column name="priority"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-226-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="tickets"
                                  baseColumnNames="priority"
                                  constraintName="fk_ticket_priority"
                                  referencedTableName="ticket_priorities"
                                  referencedColumnNames="id"/>
     </changeSet>
-    <changeSet id="tt-227" author="Giampiero Granatella">
+
+    <changeSet id="tt-227-idx" author="Paolo Predonzani">
+        <createIndex tableName="tickets" indexName="idx_ticket_assignee">
+            <column name="assignee"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-227-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="tickets"
                                  baseColumnNames="assignee"
                                  constraintName="fk_ticket_assignee"
                                  referencedTableName="users"
                                  referencedColumnNames="id"/>
     </changeSet>
-    <changeSet id="tt-228" author="Giampiero Granatella">
+
+    <changeSet id="tt-228-idx" author="Paolo Predonzani">
+        <createIndex tableName="tickets" indexName="idx_ticket_created_by">
+            <column name="created_by"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-228-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="tickets"
                                  baseColumnNames="created_by"
-                                 constraintName="fk_ticket_creator"
+                                 constraintName="fk_ticket_created_by"
                                  referencedTableName="users"
                                  referencedColumnNames="id"/>
     </changeSet>
-    <changeSet id="tt-229" author="Giampiero Granatella">
+
+    <changeSet id="tt-229-idx" author="Paolo Predonzani">
+        <createIndex tableName="tickets" indexName="idx_ticket_type">
+            <column name="type"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-229-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="tickets" baseColumnNames="type"
                                  constraintName="fk_ticket_type"
                                  referencedTableName="ticket_types"
                                  referencedColumnNames="id"/>
     </changeSet>
-    <changeSet id="tt-230" author="Giampiero Granatella">
+
+    <changeSet id="tt-230-idx" author="Paolo Predonzani">
+        <createIndex tableName="tickets" indexName="idx_ticket_affected_version">
+            <column name="affected_version"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-230-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="tickets"
                                  baseColumnNames="affected_version"
                                  constraintName="fk_ticket_affected_version"
                                  referencedTableName="versions"
                                  referencedColumnNames="id"/>
     </changeSet>
-    <changeSet id="tt-231" author="Giampiero Granatella">
+
+    <changeSet id="tt-231-idx" author="Paolo Predonzani">
+        <createIndex tableName="tickets" indexName="idx_ticket_fix_version">
+            <column name="fix_version"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-231-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="tickets"
                                  baseColumnNames="fix_version"
                                  constraintName="fk_ticket_fix_version"
                                  referencedTableName="versions"
                                  referencedColumnNames="id"/>
     </changeSet>
-    <changeSet id="tt-234" author="Giampiero Granatella">
+
+    <changeSet id="tt-234-idx" author="Paolo Predonzani">
+        <createIndex tableName="versions" indexName="idx_version_state">
+            <column name="state"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-234-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="versions"
                                  baseColumnNames="state"
                                  constraintName="fk_version_state"
                                  referencedTableName="version_states"
                                  referencedColumnNames="id"/>
     </changeSet>
-    <changeSet id="tt-235" author="Giampiero Granatella">
+
+    <changeSet id="tt-235-idx" author="Paolo Predonzani">
+        <createIndex tableName="affected_components" indexName="idx_affected_component_component">
+            <column name="component"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-235-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="affected_components"
                                  baseColumnNames="component"
                                  constraintName="fk_affected_component_component"
                                  referencedTableName="components"
                                  referencedColumnNames="id"/>
     </changeSet>
-    <changeSet id="tt-236" author="Giampiero Granatella">
+
+    <changeSet id="tt-236-unique" author="Paolo Predonzani">
+        <addUniqueConstraint tableName="affected_components"
+                             constraintName="affected_components_unique_project_n_component"
+                             columnNames="project,n,component"/>
+    </changeSet>
+    <changeSet id="tt-236-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="affected_components"
                                  baseColumnNames="project, n"
                                  constraintName="fk_affected_component_ticket"
                                  referencedTableName="tickets"
                                  referencedColumnNames="project, n"/>
     </changeSet>
-    <changeSet id="tt-238" author="Giampiero Granatella">
+
+    <changeSet id="tt-238-idx" author="Paolo Predonzani">
+        <createIndex tableName="members" indexName="idx_member_user">
+            <column name="user_"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-238-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="members" baseColumnNames="user_"
                                  constraintName="fk_member_user"
                                  referencedTableName="users"
                                  referencedColumnNames="id"/>
     </changeSet>
 
-    <changeSet id="tt-239" author="Giampiero Granatella">
+    <changeSet id="tt-239-unique" author="Paolo Predonzani">
+        <addUniqueConstraint tableName="members"
+                             constraintName="members_unique_project_user"
+                             columnNames="project,user_"/>
+    </changeSet>
+    <changeSet id="tt-239-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="members"
                                  baseColumnNames="project"
                                  constraintName="fk_member_project"
@@ -750,7 +823,12 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
-    <changeSet id="tt-240" author="Giampiero Granatella">
+    <changeSet id="tt-240-idx" author="Paolo Predonzani">
+        <createIndex tableName="components" indexName="idx_component_project">
+            <column name="project"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-240-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="components"
                                  baseColumnNames="project"
                                  constraintName="fk_component_project"
@@ -758,49 +836,68 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
-    <changeSet id="tt-241" author="Giampiero Granatella">
+    <changeSet id="tt-241-idx" author="Paolo Predonzani">
+        <createIndex tableName="members" indexName="idx_member_role">
+            <column name="role"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-241-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="members" baseColumnNames="role"
                                  constraintName="fk_member_role"
                                  referencedTableName="roles"
                                  referencedColumnNames="id"/>
     </changeSet>
 
-    <changeSet id="tt-242" author="Giampiero Granatella">
+    <changeSet id="tt-242-idx" author="Paolo Predonzani">
+        <createIndex tableName="tickets" indexName="idx_ticket_resolution">
+            <column name="resolution"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-242-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="tickets"
                                  baseColumnNames="resolution"
                                  constraintName="fk_ticket_resolution"
                                  referencedTableName="ticket_resolutions"
                                  referencedColumnNames="id"/>
     </changeSet>
-    <changeSet id="tt-243" author="Giampiero Granatella">
+
+    <changeSet id="tt-243-idx" author="Paolo Predonzani">
+        <createIndex tableName="attachments" indexName="idx_attachment_ticket">
+            <column name="project"/>
+            <column name="n"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-243-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="attachments"
                                  baseColumnNames="project, n"
                                  constraintName="fk_attachment_ticket"
                                  referencedTableName="tickets"
                                  referencedColumnNames="project, n"/>
     </changeSet>
-    <changeSet id="tt-244" author="Giampiero Granatella">
+
+    <changeSet id="tt-244-idx" author="Paolo Predonzani">
+        <createIndex tableName="versions" indexName="idx_version_project">
+            <column name="project"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-244-fk" author="Giampiero Granatella">
         <addForeignKeyConstraint baseTableName="versions"
                                  baseColumnNames="project"
                                  constraintName="fk_version_project"
                                  referencedTableName="projects"
                                  referencedColumnNames="id"/>
     </changeSet>
-    <changeSet id="tt-245" author="Paolo Predonzani">
+    
+    <changeSet id="tt-245-idx" author="Paolo Predonzani">
+        <createIndex tableName="activity" indexName="idx_activity_type">
+            <column name="type"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="tt-245-fk" author="Paolo Predonzani">
         <addForeignKeyConstraint baseTableName="activity" baseColumnNames="type"
                                  constraintName="fk_activity_type"
                                  referencedTableName="activity_types"
                                  referencedColumnNames="id"/>
     </changeSet>
 
-    <changeSet id="tt-246" author="Paolo Predonzani">
-        <addUniqueConstraint tableName="members"
-                             constraintName="members_unique_project_user"
-                             columnNames="project,user_"/>
-    </changeSet>
-    <changeSet id="tt-247" author="Paolo Predonzani">
-        <addUniqueConstraint tableName="affected_components"
-                             constraintName="affected_components_unique_project_n_component"
-                             columnNames="project,n,component"/>
-    </changeSet>
 </databaseChangeLog>

@@ -46,7 +46,7 @@
     </properties>
     <selectionProviders>
         <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_fix_version" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
-        <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_creator" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
+        <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_created_by" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
         <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_project" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
         <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_affected_version" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
         <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_priority" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>

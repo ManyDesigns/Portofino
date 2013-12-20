@@ -500,7 +500,7 @@
         <reference toColumn="id" fromColumn="affected_version"/>
     </references>
 </foreignKey>
-<foreignKey toTable="users" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_creator" hql="from users">
+<foreignKey toTable="users" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_created_by" hql="from users">
     <references>
         <reference toColumn="id" fromColumn="created_by"/>
     </references>
