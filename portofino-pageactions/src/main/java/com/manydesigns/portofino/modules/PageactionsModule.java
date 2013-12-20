@@ -22,19 +22,17 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.portofino.PortofinoProperties;
-import com.manydesigns.portofino.actions.admin.SettingsAction;
 import com.manydesigns.portofino.cache.CacheResetEvent;
 import com.manydesigns.portofino.cache.CacheResetListener;
 import com.manydesigns.portofino.cache.CacheResetListenerRegistry;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
-import com.manydesigns.portofino.menu.MenuBuilder;
-import com.manydesigns.portofino.menu.SimpleMenuAppender;
 import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
 import com.manydesigns.portofino.pageactions.login.DefaultLoginAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
+import com.manydesigns.portofino.pageactions.text.TextAction;
 import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
 import groovy.lang.GroovyClassLoader;
 import net.sf.ehcache.CacheManager;
@@ -71,9 +69,6 @@ public class PageactionsModule implements Module {
 
     @Inject(BaseModule.APPLICATION_DIRECTORY)
     public File applicationDirectory;
-
-    @Inject(BaseModule.ADMIN_MENU)
-    public MenuBuilder adminMenu;
 
     @Inject(BaseModule.CLASS_LOADER)
     public GroovyClassLoader classLoader;
@@ -171,15 +166,12 @@ public class PageactionsModule implements Module {
         pageActionRegistry.register(ActivityStreamAction.class);
         pageActionRegistry.register(CustomAction.class);
         pageActionRegistry.register(DefaultLoginAction.class);
+        pageActionRegistry.register(TextAction.class);
         servletContext.setAttribute(PAGE_ACTIONS_REGISTRY, pageActionRegistry);
 
         servletContext.setAttribute(TEMPLATES_REGISTRY, new TemplateRegistry());
 
         cacheResetListenerRegistry.getCacheResetListeners().add(new ConfigurationCacheResetListener());
-
-        SimpleMenuAppender link = SimpleMenuAppender.link(
-                "configuration", "settings", null, "Settings", SettingsAction.URL_BINDING, 0.5);
-        adminMenu.menuAppenders.add(link);
 
         logger.debug("Creating SecurityGroovyRealm");
         try {

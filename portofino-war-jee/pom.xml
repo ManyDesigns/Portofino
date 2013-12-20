@@ -26,10 +26,10 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- Page administration (CMS). Remove to disable this feature. -->
+        <!-- Administration (CMS, database, wizard). Remove to disable this feature. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-pageactionsadmin</artifactId>
+            <artifactId>portofino-admin</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -76,13 +76,6 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- Text pages. Remove to disable this feature. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-text</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- CRUD pages. Remove to disable this feature. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
@@ -108,13 +101,6 @@
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-many2many</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Wizard to generate an application from an existing database. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-wizard</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>

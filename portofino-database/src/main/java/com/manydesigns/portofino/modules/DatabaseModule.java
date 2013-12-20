@@ -20,17 +20,12 @@
 
 package com.manydesigns.portofino.modules;
 
-import com.manydesigns.portofino.actions.admin.ConnectionProvidersAction;
-import com.manydesigns.portofino.actions.admin.ReloadModelAction;
-import com.manydesigns.portofino.actions.admin.TablesAction;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoAddColumnGenerator;
 import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoCreateTableGenerator;
 import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoSelectFromDatabaseChangeLogLockGenerator;
-import com.manydesigns.portofino.menu.MenuBuilder;
-import com.manydesigns.portofino.menu.SimpleMenuAppender;
 import com.manydesigns.portofino.persistence.Persistence;
 import liquibase.database.DatabaseFactory;
 import liquibase.snapshot.DatabaseSnapshotGenerator;
@@ -66,9 +61,6 @@ public class DatabaseModule implements Module {
 
     @Inject(BaseModule.APPLICATION_DIRECTORY)
     public File applicationDirectory;
-
-    @Inject(BaseModule.ADMIN_MENU)
-    public MenuBuilder adminMenu;
 
     protected Persistence persistence;
 
@@ -147,27 +139,7 @@ public class DatabaseModule implements Module {
         servletContext.setAttribute(DATABASE_PLATFORMS_REGISTRY, databasePlatformsRegistry);
         servletContext.setAttribute(PERSISTENCE, persistence);
 
-        appendToAdminMenu();
-
         status = ModuleStatus.ACTIVE;
-    }
-
-    protected void appendToAdminMenu() {
-        SimpleMenuAppender group;
-        SimpleMenuAppender link;
-
-        group = SimpleMenuAppender.group("dataModeling", null, "Data modeling", 3.0);
-        adminMenu.menuAppenders.add(group);
-
-        link = SimpleMenuAppender.link(
-                "dataModeling", "connectionProviders", null, "Connection providers", ConnectionProvidersAction.URL_BINDING, 1.0);
-        adminMenu.menuAppenders.add(link);
-        link = SimpleMenuAppender.link(
-                "dataModeling", "tables", null, "Tables", TablesAction.BASE_ACTION_PATH, 2.0);
-        adminMenu.menuAppenders.add(link);
-        link = SimpleMenuAppender.link(
-                "dataModeling", "reloadModel", null, "Reload model", ReloadModelAction.URL_BINDING, 3.0);
-        adminMenu.menuAppenders.add(link);
     }
 
     @Override
