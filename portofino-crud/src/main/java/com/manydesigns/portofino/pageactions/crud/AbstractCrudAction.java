@@ -1353,6 +1353,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                             .addParameter("downloadBlob", "")
                             .addParameter("propertyName", field.getPropertyAccessor().getName())
                             .addParameter("code", blob.getCode());
+                        // although unused, the code parameter makes the url change if the
+                        // blob changes. In this way we can ask the browser to cache the url
+                        // indefinitely.
 
                         field.setHref(urlBuilder.toString());
                     }
@@ -1367,6 +1370,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 .addParameter("downloadBlob","")
                 .addParameter("propertyName", field.getPropertyAccessor().getName())
                 .addParameter("code", field.getValue().getCode());
+        // The code parameter must be kept. See not in refreshTableBlobDownloadHref
         return urlBuilder.toString();
     }
 

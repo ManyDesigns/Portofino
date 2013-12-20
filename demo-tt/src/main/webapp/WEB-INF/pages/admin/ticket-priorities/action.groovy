@@ -1,71 +1,97 @@
+import com.manydesigns.elements.forms.Form
 import com.manydesigns.portofino.pageactions.crud.CrudAction
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
-import net.sourceforge.stripes.action.Resolution
+import com.manydesigns.portofino.tt.TtUtils
+import org.apache.shiro.SecurityUtils
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
-class MyCrudAction extends CrudAction {
+class AdminTicketPrioritiesCrudAction extends CrudAction {
+    Object old;
 
-    //Automatically generated on Wed Dec 18 12:17:45 CET 2013 by ManyDesigns Portofino
-    //Write your code here
-
-    //**************************************************************************
-    // Extension hooks
-    //**************************************************************************
-
-    protected void createSetup(Object object) {}
-
-    protected boolean createValidate(Object object) {
-        return true;
+    @Override
+    protected void createPostProcess(Object object) {
+        Object principal = SecurityUtils.subject.principal;
+        Date now = new Date();
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_TICKET_PRIORITY_CREATED,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                object,
+                null,
+                null,
+                null
+        );
     }
 
-    protected void createPostProcess(Object object) {}
-
-
-    protected void editSetup(Object object) {}
-
-    protected boolean editValidate(Object object) {
-        return true;
+    @Override
+    protected void editSetup(Object object) {
+        old = object.clone();
     }
 
-    protected void editPostProcess(Object object) {}
-
-
-    protected boolean deleteValidate(Object object) {
-        return true;
+    @Override
+    protected void editPostProcess(Object object) {
+        Object principal = SecurityUtils.subject.principal;
+        Form newForm = form;
+        form = buildForm(formBuilder);
+        form.readFromObject(old);
+        String message = TtUtils.createDiffMessage(form, newForm);
+        if (message != null) {
+            Date now = new Date();
+            TtUtils.addActivity(session,
+                    principal,
+                    now,
+                    TtUtils.ACTIVITY_TYPE_TICKET_PRIORITY_UPDATED,
+                    message,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    object,
+                    null,
+                    null,
+                    null
+            );
+        }
     }
 
-    protected void deletePostProcess(Object object) {}
-
-
-    protected Resolution getBulkEditView() {
-        return super.getBulkEditView();
-    }
-
-    protected Resolution getCreateView() {
-        return super.getCreateView();
-    }
-
-    protected Resolution getEditView() {
-        return super.getEditView();
-    }
-
-    protected Resolution getReadView() {
-        return super.getReadView();
-    }
-
-    protected Resolution getSearchView() {
-        return super.getSearchView();
-    }
-
-    protected Resolution getEmbeddedSearchView() {
-        return super.getEmbeddedSearchView();
-    }
-
-    protected Resolution getSearchResultsPageView() {
-        return super.getSearchResultsPageView()
+    @Override
+    protected void deletePostProcess(Object object) {
+        Object principal = SecurityUtils.subject.principal;
+        Date now = new Date();
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_TICKET_PRIORITY_DELETED,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                object,
+                null,
+                null,
+                null
+        );
     }
 
 }

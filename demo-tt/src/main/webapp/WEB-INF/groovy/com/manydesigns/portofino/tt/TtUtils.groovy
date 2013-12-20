@@ -35,18 +35,75 @@ class TtUtils {
     static final public long TICKET_STATE_RESOLVED = 3L;
     static final public long TICKET_STATE_CLOSED = 4L;
 
+    //--------------------------------------------------------------------------
+    // activity_types hardwired values
+    //--------------------------------------------------------------------------
+
     static final public long ACTIVITY_TYPE_TICKET_CREATED = 1L;
     static final public long ACTIVITY_TYPE_TICKET_UPDATED = 2L;
     static final public long ACTIVITY_TYPE_TICKET_DELETED = 3L;
+
     static final public long ACTIVITY_TYPE_COMMENT_CREATED = 11L;
     static final public long ACTIVITY_TYPE_COMMENT_UPDATED = 12L;
     static final public long ACTIVITY_TYPE_COMMENT_DELETED = 13L;
+
     static final public long ACTIVITY_TYPE_ATTACHMENT_CREATED = 21L;
     static final public long ACTIVITY_TYPE_ATTACHMENT_UPDATED = 22L;
     static final public long ACTIVITY_TYPE_ATTACHMENT_DELETED = 23L;
+
     static final public long ACTIVITY_TYPE_AFFECTED_COMPONENT_CREATED = 31L;
     static final public long ACTIVITY_TYPE_AFFECTED_COMPONENT_UPDATED = 32L;
     static final public long ACTIVITY_TYPE_AFFECTED_COMPONENT_DELETED = 33L;
+
+    static final public long ACTIVITY_TYPE_PROJECT_CREATED = 41L;
+    static final public long ACTIVITY_TYPE_PROJECT_UPDATED = 42L;
+    static final public long ACTIVITY_TYPE_PROJECT_DELETED = 43L;
+
+    static final public long ACTIVITY_TYPE_USER_CREATED = 51L;
+    static final public long ACTIVITY_TYPE_USER_UPDATED = 52L;
+    static final public long ACTIVITY_TYPE_USER_DELETED = 53L;
+
+    static final public long ACTIVITY_TYPE_VERSION_CREATED = 61L;
+    static final public long ACTIVITY_TYPE_VERSION_UPDATED = 62L;
+    static final public long ACTIVITY_TYPE_VERSION_DELETED = 63L;
+
+    static final public long ACTIVITY_TYPE_COMPONENT_CREATED = 71L;
+    static final public long ACTIVITY_TYPE_COMPONENT_UPDATED = 72L;
+    static final public long ACTIVITY_TYPE_COMPONENT_DELETED = 73L;
+
+    static final public long ACTIVITY_TYPE_ROLE_CREATED = 81L;
+    static final public long ACTIVITY_TYPE_ROLE_UPDATED = 82L;
+    static final public long ACTIVITY_TYPE_ROLE_DELETED = 83L;
+
+    static final public long ACTIVITY_TYPE_TICKET_RESOLUTION_CREATED = 91L;
+    static final public long ACTIVITY_TYPE_TICKET_RESOLUTION_UPDATED = 92L;
+    static final public long ACTIVITY_TYPE_TICKET_RESOLUTION_DELETED = 93L;
+
+    static final public long ACTIVITY_TYPE_TICKET_PRIORITY_CREATED = 101L;
+    static final public long ACTIVITY_TYPE_TICKET_PRIORITY_UPDATED = 102L;
+    static final public long ACTIVITY_TYPE_TICKET_PRIORITY_DELETED = 103L;
+
+    static final public long ACTIVITY_TYPE_TICKET_TYPE_CREATED = 111L;
+    static final public long ACTIVITY_TYPE_TICKET_TYPE_UPDATED = 112L;
+    static final public long ACTIVITY_TYPE_TICKET_TYPE_DELETED = 113L;
+
+    static final public long ACTIVITY_TYPE_TICKET_STATE_CREATED = 121L;
+    static final public long ACTIVITY_TYPE_TICKET_STATE_UPDATED = 122L;
+    static final public long ACTIVITY_TYPE_TICKET_STATE_DELETED = 123L;
+
+    static final public long ACTIVITY_TYPE_VERSION_STATE_CREATED = 131L;
+    static final public long ACTIVITY_TYPE_VERSION_STATE_UPDATED = 132L;
+    static final public long ACTIVITY_TYPE_VERSION_STATE_DELETED = 133L;
+
+    static final public long ACTIVITY_TYPE_MEMBER_CREATED = 141L;
+    static final public long ACTIVITY_TYPE_MEMBER_UPDATED = 142L;
+    static final public long ACTIVITY_TYPE_MEMBER_DELETED = 143L;
+
+    static final public long ACTIVITY_TYPE_SYSTEM_INSTALLED_SUCCESSFULLY = 151L;
+
+    //--------------------------------------------------------------------------
+    // roles hardwired values
+    //--------------------------------------------------------------------------
 
     static final public long ROLE_VIEWER = 1L;
     static final public long ROLE_CONTRIBUTOR = 2L;
@@ -73,6 +130,7 @@ select
     t.title as ticket_title,
     act.attachment,
     a.title as attachment_title,
+    a.file as attachment_file,
     act.version,
     v.title as version_title,
     act.component,
@@ -106,16 +164,68 @@ left join ticket_states ts on ts.id = act.ticket_state
 left join version_states vs on vs.id = act.version_state
     """
 
-    static public void addActivity(Session session, Object ticket,
-                                   Long userId, Date date, long type,
-                                   String message) {
+    static public void addActivity(Session session,
+                                   Object user,
+                                   Date date,
+                                   long type,
+                                   String message,
+                                   Object user2,
+                                   Object project,
+                                   Object ticket,
+                                   Object attachment,
+                                   Object version,
+                                   Object component,
+                                   Object role,
+                                   Object ticketResolution,
+                                   Object ticketPriority,
+                                   Object ticketType,
+                                   Object ticketState,
+                                   Object versionState
+    ) {
         Map<String, Object> newActivity = new HashMap<String, Object>();
-        newActivity.project = ticket.project;
-        newActivity.n = ticket.n;
         newActivity.message = message;
         newActivity.type = type;
         newActivity.timestamp_ = date;
-        newActivity.user_ = userId;
+        if (user != null) {
+            newActivity.user_ = user.id;
+        }
+        if (user2 != null) {
+            newActivity.user2 = user2.id;
+        }
+        if (project != null) {
+            newActivity.project = project.id;
+        }
+        if (ticket != null) {
+            newActivity.project = ticket.project;
+            newActivity.n = ticket.n;
+        }
+        if (attachment != null) {
+            newActivity.attachment = attachment.id;
+        }
+        if (version != null) {
+            newActivity.version = version.id;
+        }
+        if (component != null) {
+            newActivity.component = component.id;
+        }
+        if (role != null) {
+            newActivity.role = role.id;
+        }
+        if (ticketResolution != null) {
+            newActivity.ticket_resolution = ticketResolution.id;
+        }
+        if (ticketPriority != null) {
+            newActivity.ticket_priority = ticketPriority.id;
+        }
+        if (ticketType != null) {
+            newActivity.ticket_type = ticketType.id;
+        }
+        if (ticketState != null) {
+            newActivity.ticket_state = ticketState.id;
+        }
+        if (versionState != null) {
+            newActivity.version_state = versionState.id;
+        }
         session.save("activity", (Object) newActivity);
     }
 
@@ -221,11 +331,96 @@ left join version_states vs on vs.id = act.version_state
     public static populateActivityItems(List items, List<ActivityItem> activityItems,
                                         String keyPrefix, Locale locale, ElementsActionBeanContext context) {
         for (Object[] item: items) {
+            Long userId = item[4];
             String userName = "${item[5]} ${item[6]}"
+            if (item[5] == null) {
+                userName = "<deleted id ${userId}>";
+            }
+
+            Long userId2 = item[9];
+            String userName2 = "${item[10]} ${item[11]}"
+            if (item[10] == null) {
+                userName2 = "<deleted id ${userId2}>";
+            }
+
+            String projectId = item[12];
+            String projectTitle = item[13]
+            String projectName = "${projectId} ${projectTitle}"
+            String projectHref = "/projects/${projectId}/tickets/${item[12]}/${item[14]}"
+            if (projectTitle == null) {
+                projectName = "<deleted id ${projectId}>";
+                projectHref = null;
+            }
 
             String ticketCode = "${item[12]}-${item[14]}"
             String ticketHref = "/projects/${item[12]}/tickets/${item[12]}/${item[14]}"
-            String ticketTitle = "${item[15]}";
+            String ticketTitle = item[15];
+            if (ticketTitle == null) {
+                ticketCode = "<deleted id ${ticketCode}>";
+                ticketHref = null;
+                ticketTitle = null;
+            }
+
+            Long attachmentId = item[16];
+            String attachmentTitle = item[17];
+            String attachmentCode = item[18];
+            String attachmentHref = "${ticketHref}/attachments/${attachmentId}?downloadBlob=&propertyName=file&code=${attachmentCode}";
+            if (attachmentTitle == null) {
+                attachmentTitle = "<deleted id ${attachmentId}>";
+                attachmentHref = null;
+            }
+
+            Long versionId = item[19];
+            String versionTitle = item[20];
+            String versionHref = "/projects/${projectId}/versions/${versionId}"
+            if (versionTitle == null) {
+                versionTitle = "<deleted id ${versionId}>";
+                versionHref = null;
+            }
+
+            Long componentId = item[21];
+            String componentTitle = item[22];
+            String componentHref = "/projects/${item[12]}/components/${componentId}";
+            if (componentTitle == null) {
+                componentTitle = "<deleted id ${componentId}>";
+                componentHref = null;
+            }
+
+            Long roleId = item[23];
+            String roleTitle = item[24];
+            if (roleTitle == null) {
+                roleTitle = "<deleted id ${roleId}>";
+            }
+
+            Long ticketResolutionId = item[25];
+            String ticketResolutionTitle = item[26];
+            if (ticketResolutionTitle == null) {
+                ticketResolutionTitle = "<deleted id ${ticketResolutionId}>";
+            }
+
+            Long ticketPriorityId = item[27];
+            String ticketPriorityTitle = item[28];
+            if (ticketPriorityTitle == null) {
+                ticketPriorityTitle = "<deleted id ${ticketPriorityId}>";
+            }
+
+            Long ticketTypeId = item[29];
+            String ticketTypeTitle = item[30];
+            if (ticketTypeTitle == null) {
+                ticketTypeTitle = "<deleted id ${ticketTypeId}>";
+            }
+
+            Long ticketStateId = item[31];
+            String ticketStateTitle = item[32];
+            if (ticketStateTitle == null) {
+                ticketStateTitle = "<deleted id ${ticketStateId}>";
+            }
+
+            Long versionStateId = item[33];
+            String versionStateTitle = item[34];
+            if (versionStateTitle == null) {
+                versionStateTitle = "<deleted id ${versionStateId}>";
+            }
 
             Date timestamp = (Date) item[1];
             String imageSrc =
@@ -249,8 +444,19 @@ left join version_states vs on vs.id = act.version_state
                     message,
                     key,
                     new Arg(userName, null),
+                    new Arg(userName2, null),
+                    new Arg(projectName, projectHref),
                     new Arg(ticketCode, ticketHref),
                     new Arg(ticketTitle, null),
+                    new Arg(attachmentTitle, attachmentHref),
+                    new Arg(versionTitle, versionHref),
+                    new Arg(componentTitle, componentHref),
+                    new Arg(roleTitle, null),
+                    new Arg(ticketResolutionTitle, null),
+                    new Arg(ticketPriorityTitle, null),
+                    new Arg(ticketTypeTitle, null),
+                    new Arg(ticketStateTitle, null),
+                    new Arg(versionStateTitle, null),
             );
             activityItems.add(activityItem)
         }

@@ -74,7 +74,19 @@ class TicketActivityAction extends ActivityStreamWithUserImageAction {
         Object principal = SecurityUtils.subject.principal;
         Date now = new Date();
         String message = StringEscapeUtils.escapeHtml(comment);
-        TtUtils.addActivity(session, ticket, principal.id, now, TtUtils.ACTIVITY_TYPE_COMMENT_CREATED, message);
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_COMMENT_CREATED,
+                message,
+                null,
+                null,
+                object,
+                null,
+                null,
+                null
+        );
+
         session.getTransaction().commit();
         SessionMessages.addInfoMessage("Comment posted successfully");
         return new RedirectResolution("/projects/$ticket.project/tickets/$ticket.project/$ticket.n")

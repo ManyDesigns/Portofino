@@ -1,7 +1,6 @@
 package com.manydesigns.portofino.pageactions.crud
 
-import com.manydesigns.portofino.tt.TtUtils
-
+import com.manydesigns.elements.forms.Form
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.buttons.annotations.Buttons
@@ -9,6 +8,7 @@ import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
+import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
 import org.apache.shiro.SecurityUtils
@@ -16,6 +16,8 @@ import org.apache.shiro.SecurityUtils
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
 class ProjectsCrudAction extends CrudAction {
+
+    Object old;
 
     //**************************************************************************
     // Role checking
@@ -75,12 +77,52 @@ class ProjectsCrudAction extends CrudAction {
     @Override
     protected void createPostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
+        Date now = new Date();
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_PROJECT_CREATED,
+                null,
+                null,
+                object,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
         Map member = new HashMap();
         member.project = object.id;
         member.user_ = principal.id;
         member.role = TtUtils.ROLE_MANAGER;
         member.notifications = false;
         session.save("members", (Object)member);
+
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_MEMBER_CREATED,
+                null,
+                principal,
+                object,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
     }
 
     protected Resolution getSuccessfulSaveView() {
@@ -115,6 +157,76 @@ class ProjectsCrudAction extends CrudAction {
         Date now = new Date();
         object.last_updated = now;
         return true;
+    }
+
+    protected void editSetup(Object object) {
+        old = object.clone();
+    }
+
+
+    @Override
+    protected void editPostProcess(Object object) {
+        Object principal = SecurityUtils.subject.principal;
+        Form newForm = form;
+        form = buildForm(formBuilder);
+        form.readFromObject(old);
+        String message = TtUtils.createDiffMessage(form, newForm);
+        if (message != null) {
+            Date now = new Date();
+            TtUtils.addActivity(session,
+                    principal,
+                    now,
+                    TtUtils.ACTIVITY_TYPE_PROJECT_UPDATED,
+                    message,
+                    null,
+                    object,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+        }
+    }
+
+    //**************************************************************************
+    // Delete customizations
+    //**************************************************************************
+
+
+    @Button(list = "crud-read", key = "delete", order = 2d, icon = Button.ICON_TRASH, group = "crud")
+    @Guard(test = "isManager()", type = GuardType.VISIBLE)
+    public Resolution delete() {
+        return super.delete();
+    }
+
+    @Override
+    protected void deletePostProcess(Object object) {
+        Object principal = SecurityUtils.subject.principal;
+        Date now = new Date();
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_PROJECT_DELETED,
+                null,
+                null,
+                object,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
     }
 
 

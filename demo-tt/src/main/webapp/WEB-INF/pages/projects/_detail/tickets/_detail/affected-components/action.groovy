@@ -1,7 +1,5 @@
 package com.manydesigns.portofino.pageactions.crud
 
-import com.manydesigns.portofino.tt.TtUtils
-
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
@@ -10,9 +8,9 @@ import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
+import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.Resolution
-import org.apache.commons.lang.StringEscapeUtils
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.subject.Subject
 
@@ -84,10 +82,25 @@ class TicketAffectedComponentsCrudAction extends CrudAction {
 
     protected void createPostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
-        Object component = session.load("components", object.component);
-        String message = StringEscapeUtils.escapeHtml(component.title);
         Date now = new Date();
-        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_AFFECTED_COMPONENT_CREATED, message);
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_AFFECTED_COMPONENT_CREATED,
+                null,
+                null,
+                null,
+                ticket,
+                null,
+                null,
+                object,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
     }
 
     //**************************************************************************
@@ -114,9 +127,26 @@ class TicketAffectedComponentsCrudAction extends CrudAction {
 
     protected void editPostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
-        String message = StringEscapeUtils.escapeHtml(object.fk_affected_component_component.title);
         Date now = new Date();
-        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_AFFECTED_COMPONENT_UPDATED, message);
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_AFFECTED_COMPONENT_UPDATED,
+                null,
+                null,
+                null,
+                ticket,
+                null,
+                null,
+                object,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
     }
 
 
@@ -132,9 +162,26 @@ class TicketAffectedComponentsCrudAction extends CrudAction {
 
     protected void deletePostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
-        String message = StringEscapeUtils.escapeHtml(object.fk_affected_component_component.title);
         Date now = new Date();
-        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_AFFECTED_COMPONENT_DELETED, message);
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_AFFECTED_COMPONENT_DELETED,
+                null,
+                null,
+                null,
+                ticket,
+                null,
+                null,
+                object,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
     }
 
     //**************************************************************************
@@ -153,8 +200,10 @@ class TicketAffectedComponentsCrudAction extends CrudAction {
     // Bulk delete customizations
     //**************************************************************************
 
+    @Button(list = "crud-search", key = "delete", order = 3d, icon = Button.ICON_TRASH, group = "crud")
+    @Guard(test = "isBulkOperationsEnabled() && canEditTicket()", type = GuardType.VISIBLE)
     public Resolution bulkDelete() {
-        throw new UnsupportedOperationException("Bulk operations not supported on tickets");
+        return super.bulkDelete()
     }
 
 }

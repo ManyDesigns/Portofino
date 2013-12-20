@@ -1,7 +1,5 @@
 package com.manydesigns.portofino.pageactions.crud
 
-import com.manydesigns.portofino.tt.TtUtils
-
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.fields.Field
@@ -20,6 +18,7 @@ import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
 import com.manydesigns.portofino.shiro.ShiroUtils
+import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.RedirectResolution
@@ -192,10 +191,28 @@ class ProjectsTicketsAction extends CrudAction {
         return true;
     }
 
+    @Override
     protected void createPostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
         Date now = new Date();
-        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_TICKET_CREATED, null);
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_TICKET_CREATED,
+                null,
+                null,
+                null,
+                object,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
     }
 
     @Override
@@ -238,16 +255,19 @@ class ProjectsTicketsAction extends CrudAction {
     }
 
 
-    protected void editSetup(Object object) {
-        old = object.clone();
-    }
-
+    @Override
     protected boolean editValidate(Object object) {
         Date now = new Date();
         object.last_updated = now;
         return true;
     }
 
+    @Override
+    protected void editSetup(Object object) {
+        old = object.clone();
+    }
+
+    @Override
     protected void editPostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
         Form newForm = form;
@@ -256,7 +276,24 @@ class ProjectsTicketsAction extends CrudAction {
         String message = TtUtils.createDiffMessage(form, newForm);
         if (message != null) {
             Date now = new Date();
-            TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_TICKET_UPDATED, message);
+            TtUtils.addActivity(session,
+                    principal,
+                    now,
+                    TtUtils.ACTIVITY_TYPE_TICKET_UPDATED,
+                    message,
+                    null,
+                    null,
+                    object,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
         }
     }
 
@@ -280,6 +317,30 @@ class ProjectsTicketsAction extends CrudAction {
     @Guard(test = "isManager()", type = GuardType.VISIBLE)
     public Resolution delete() {
         return super.delete();
+    }
+
+    @Override
+    protected void deletePostProcess(Object object) {
+        Object principal = SecurityUtils.subject.principal;
+        Date now = new Date();
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_TICKET_DELETED,
+                null,
+                null,
+                null,
+                object,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
     }
 
     //**************************************************************************

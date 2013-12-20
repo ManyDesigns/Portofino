@@ -315,39 +315,39 @@
                 <constraints nullable="false"/>
             </column>
             <column name="css_class" type="varchar(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
         </createTable>
     </changeSet>
     <changeSet id="tt-013" author="Giampiero Granatella">
         <createTable tableName="ticket_priorities">
-            <column name="id" type="int">
+            <column name="id" autoIncrement="true" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="priority" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="css_class" type="varchar(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
         </createTable>
     </changeSet>
     <changeSet id="tt-014" author="Giampiero Granatella">
         <createTable tableName="ticket_types">
-            <column name="id" type="int">
+            <column name="id" autoIncrement="true" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="type" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="css_class" type="varchar(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
         </createTable>
     </changeSet>
     <changeSet id="tt-015" author="Giampiero Granatella">
         <createTable tableName="ticket_resolutions">
-            <column name="id" type="int">
+            <column name="id" autoIncrement="true" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="resolution" type="varchar(255)">
@@ -364,7 +364,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="css_class" type="varchar(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
         </createTable>
     </changeSet>
@@ -373,17 +373,14 @@
 
     <changeSet id="tt-117" author="Giampiero Granatella">
         <insert tableName="ticket_types">
-            <column name="id" valueNumeric="1"/>
             <column name="type" value="Improvement"/>
             <column name="css_class" value="label label-info"/>
         </insert>
         <insert tableName="ticket_types">
-            <column name="id" valueNumeric="2"/>
             <column name="type" value="Bug"/>
             <column name="css_class" value="label label-important"/>
         </insert>
         <insert tableName="ticket_types">
-            <column name="id" valueNumeric="3"/>
             <column name="type" value="Feature"/>
             <column name="css_class" value="label label-success"/>
         </insert>
@@ -412,31 +409,25 @@
     </changeSet>
     <changeSet id="tt-119" author="Giampiero Granatella">
         <insert tableName="ticket_resolutions">
-            <column name="id" valueNumeric="1"/>
             <column name="resolution" value="Resolved"/>
         </insert>
         <insert tableName="ticket_resolutions">
-            <column name="id" valueNumeric="2"/>
             <column name="resolution" value="Not to be solved"/>
         </insert>
         <insert tableName="ticket_resolutions">
-            <column name="id" valueNumeric="3"/>
             <column name="resolution" value="Duplicate"/>
         </insert>
     </changeSet>
     <changeSet id="tt-120" author="Giampiero Granatella">
         <insert tableName="ticket_priorities">
-            <column name="id" valueNumeric="1"/>
             <column name="priority" value="Low"/>
             <column name="css_class" value="label"/>
         </insert>
         <insert tableName="ticket_priorities">
-            <column name="id" valueNumeric="2"/>
             <column name="priority" value="Medium"/>
             <column name="css_class" value="label label-warning"/>
         </insert>
         <insert tableName="ticket_priorities">
-            <column name="id" valueNumeric="3"/>
             <column name="priority" value="High"/>
             <column name="css_class" value="label label-important"/>
         </insert>
@@ -524,6 +515,142 @@
         <insert tableName="activity_types">
             <column name="id" valueNumeric="33"/>
             <column name="type" value="affected.component.deleted"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="41"/>
+            <column name="type" value="project.created"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="42"/>
+            <column name="type" value="project.updated"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="43"/>
+            <column name="type" value="project.deleted"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="51"/>
+            <column name="type" value="user.created"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="52"/>
+            <column name="type" value="user.updated"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="53"/>
+            <column name="type" value="user.deleted"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="61"/>
+            <column name="type" value="version.created"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="62"/>
+            <column name="type" value="version.updated"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="63"/>
+            <column name="type" value="version.deleted"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="71"/>
+            <column name="type" value="component.created"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="72"/>
+            <column name="type" value="component.updated"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="73"/>
+            <column name="type" value="component.deleted"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="81"/>
+            <column name="type" value="role.created"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="82"/>
+            <column name="type" value="role.updated"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="83"/>
+            <column name="type" value="role.deleted"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="91"/>
+            <column name="type" value="ticket.resolution.created"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="92"/>
+            <column name="type" value="ticket.resolution.updated"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="93"/>
+            <column name="type" value="ticket.resolution.deleted"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="101"/>
+            <column name="type" value="ticket.priority.created"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="102"/>
+            <column name="type" value="ticket.priority.updated"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="103"/>
+            <column name="type" value="ticket.priority.deleted"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="111"/>
+            <column name="type" value="ticket.type.created"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="112"/>
+            <column name="type" value="ticket.type.updated"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="113"/>
+            <column name="type" value="ticket.type.deleted"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="121"/>
+            <column name="type" value="ticket.state.created"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="122"/>
+            <column name="type" value="ticket.state.updated"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="123"/>
+            <column name="type" value="ticket.state.deleted"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="131"/>
+            <column name="type" value="version.state.created"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="132"/>
+            <column name="type" value="version.state.updated"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="133"/>
+            <column name="type" value="version.state.deleted"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="141"/>
+            <column name="type" value="member.created"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="142"/>
+            <column name="type" value="member.updated"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="143"/>
+            <column name="type" value="member.deleted"/>
+        </insert>
+        <insert tableName="activity_types">
+            <column name="id" valueNumeric="151"/>
+            <column name="type" value="system.installed.successfully"/>
         </insert>
     </changeSet>
 

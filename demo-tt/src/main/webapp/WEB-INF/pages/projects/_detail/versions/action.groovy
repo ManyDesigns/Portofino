@@ -1,8 +1,7 @@
 package com.manydesigns.portofino.pageactions.crud
 
-import com.manydesigns.portofino.tt.TtUtils
-
 import com.manydesigns.elements.ElementsThreadLocals
+import com.manydesigns.elements.forms.Form
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.buttons.annotations.Buttons
@@ -10,15 +9,18 @@ import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
+import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.Resolution
+import org.apache.shiro.SecurityUtils
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
 class ProjectVersionsAction extends CrudAction {
 
     Serializable project;
+    Object old;
 
     @Before
     public void prepareProject() {
@@ -65,6 +67,30 @@ class ProjectVersionsAction extends CrudAction {
         return true;
     }
 
+    @Override
+    protected void createPostProcess(Object object) {
+        Object principal = SecurityUtils.subject.principal;
+        Date now = new Date();
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_VERSION_CREATED,
+                null,
+                null,
+                project,
+                null,
+                null,
+                object,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+    }
+
     //**************************************************************************
     // Read customizations
     //**************************************************************************
@@ -109,6 +135,42 @@ class ProjectVersionsAction extends CrudAction {
         return true;
     }
 
+    @Override
+    protected void editSetup(Object object) {
+        old = object.clone();
+    }
+
+    @Override
+    protected void editPostProcess(Object object) {
+        Object principal = SecurityUtils.subject.principal;
+        Form newForm = form;
+        form = buildForm(formBuilder);
+        form.readFromObject(old);
+        String message = TtUtils.createDiffMessage(form, newForm);
+        if (message != null) {
+            Date now = new Date();
+            TtUtils.addActivity(session,
+                    principal,
+                    now,
+                    TtUtils.ACTIVITY_TYPE_VERSION_UPDATED,
+                    message,
+                    null,
+                    project,
+                    null,
+                    null,
+                    object,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+        }
+    }
+
+
     //**************************************************************************
     // Delete customizations
     //**************************************************************************
@@ -117,6 +179,30 @@ class ProjectVersionsAction extends CrudAction {
     @Guard(test = "object != null && isManager()", type = GuardType.VISIBLE)
     public Resolution delete() {
         return super.delete();
+    }
+
+    @Override
+    protected void deletePostProcess(Object object) {
+        Object principal = SecurityUtils.subject.principal;
+        Date now = new Date();
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_VERSION_DELETED,
+                null,
+                null,
+                project,
+                null,
+                null,
+                object,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
     }
 
     //**************************************************************************

@@ -1,7 +1,5 @@
 package com.manydesigns.portofino.pageactions.crud
 
-import com.manydesigns.portofino.tt.TtUtils
-
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
@@ -10,9 +8,9 @@ import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
+import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.Resolution
-import org.apache.commons.lang.StringEscapeUtils
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.subject.Subject
 
@@ -80,9 +78,25 @@ class TicketAttachementsCrudAction extends CrudAction {
 
     protected void createPostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
-        String message = StringEscapeUtils.escapeHtml(object.title);
         Date now = new Date();
-        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_ATTACHMENT_CREATED, message);
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_ATTACHMENT_CREATED,
+                null,
+                null,
+                null,
+                ticket,
+                object,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
     }
 
     //**************************************************************************
@@ -109,9 +123,26 @@ class TicketAttachementsCrudAction extends CrudAction {
 
     protected void editPostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
-        String message = StringEscapeUtils.escapeHtml(object.title);
         Date now = new Date();
-        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_ATTACHMENT_UPDATED, message);
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_ATTACHMENT_UPDATED,
+                null,
+                null,
+                null,
+                ticket,
+                object,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
     }
 
     //**************************************************************************
@@ -127,28 +158,51 @@ class TicketAttachementsCrudAction extends CrudAction {
     protected void deletePostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
         Date now = new Date();
-        String message = StringEscapeUtils.escapeHtml(object.title);
-        TtUtils.addActivity(session, object, principal.id, now, TtUtils.ACTIVITY_TYPE_ATTACHMENT_DELETED, message);
+        TtUtils.addActivity(session,
+                principal,
+                now,
+                TtUtils.ACTIVITY_TYPE_ATTACHMENT_DELETED,
+                null,
+                null,
+                null,
+                ticket,
+                object,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
     }
 
     //**************************************************************************
     // Bulk edit customizations
     //**************************************************************************
 
+    @Button(list = "crud-search", key = "edit", order = 2d, icon = Button.ICON_EDIT, group = "crud")
+    @Guard(test = "isBulkOperationsEnabled() && canEditTicket()", type = GuardType.VISIBLE)
     Resolution bulkEdit() {
-        throw new UnsupportedOperationException("Bulk operations not supported on attachments");
+        return super.bulkEdit()
     }
 
+    @Button(list = "crud-bulk-edit", key = "update", order = 1d, type = Button.TYPE_PRIMARY)
+    @Guard(test = "canEditTicket()", type = GuardType.VISIBLE)
     Resolution bulkUpdate() {
-        throw new UnsupportedOperationException("Bulk operations not supported on attachments");
+        return super.bulkUpdate()
     }
 
     //**************************************************************************
     // Bulk delete customizations
     //**************************************************************************
 
+    @Button(list = "crud-search", key = "delete", order = 3d, icon = Button.ICON_TRASH, group = "crud")
+    @Guard(test = "isBulkOperationsEnabled() && canEditTicket()", type = GuardType.VISIBLE)
     public Resolution bulkDelete() {
-        throw new UnsupportedOperationException("Bulk operations not supported on tickets");
+        return super.bulkDelete()
     }
 
 }

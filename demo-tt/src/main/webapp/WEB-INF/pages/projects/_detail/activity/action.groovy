@@ -13,7 +13,7 @@ import org.hibernate.Session
 class ProjectActivityAction extends ActivityStreamWithUserImageAction {
 
     public static String PROJECT_ACTIVTY_SQL = TtUtils.ACTIVITY_SQL +
-            "WHERE act.project = :project_id ORDER BY act.id";
+            "WHERE act.project = :project_id ORDER BY act.id DESC";
 
     Serializable project;
 

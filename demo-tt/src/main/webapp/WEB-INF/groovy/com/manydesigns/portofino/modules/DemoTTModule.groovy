@@ -3,6 +3,9 @@ package com.manydesigns.portofino.modules
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.i18n.ResourceBundleManager
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry
+import com.manydesigns.portofino.persistence.Persistence
+import com.manydesigns.portofino.tt.TtUtils
+import org.hibernate.Session
 
 public class DemoTTModule implements Module {
 
@@ -19,6 +22,10 @@ public class DemoTTModule implements Module {
     @Inject(PageactionsModule.TEMPLATES_REGISTRY)
     public TemplateRegistry templates;
 
+    @Inject(DatabaseModule.PERSISTENCE)
+    public Persistence persistence;
+
+    public boolean installationMode = false;
 
     String getModuleVersion() {
         return TT_VERSION;
@@ -41,6 +48,7 @@ public class DemoTTModule implements Module {
     }
 
     int install() {
+        installationMode = true;
         return 1;
     }
 
@@ -55,11 +63,36 @@ public class DemoTTModule implements Module {
 //                resourceBundleManager.addSearchPath(path + PortofinoListener.PORTOFINO_MESSAGES_FILE_NAME);
 //            }
 //        }
+
         templates.register("homepage");
         status = ModuleStatus.ACTIVE;
     }
 
     void start() {
+        if (installationMode) {
+            Session session = persistence.getSession("tt");
+            Date now = new Date();
+            TtUtils.addActivity(session,
+                    null,
+                    now,
+                    TtUtils.ACTIVITY_TYPE_SYSTEM_INSTALLED_SUCCESSFULLY,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+            session.getTransaction().commit();
+        }
+
         status = ModuleStatus.STARTED;
     }
 
