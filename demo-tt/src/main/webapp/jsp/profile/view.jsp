@@ -38,6 +38,13 @@
                 <stripes:form action="${actionBean.context.actionPath}">
                     <portofino:buttons list="view" cssClass="btn-block" />
                 </stripes:form>
+                <hr/>
+                To finish your session:
+                <stripes:link href="/login" class="btn">
+                    <stripes:param name="logout"/>
+                    Log out
+                    <i class="icon-chevron-right"></i>
+                </stripes:link>
             </div>
         </div>
     </stripes:layout-component>

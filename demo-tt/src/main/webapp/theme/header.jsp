@@ -103,14 +103,6 @@
                                 </li>
                                 <li>
                                     <stripes:link href="/login">
-                                        <stripes:param name="changePassword"/>
-                                        <stripes:param name="returnUrl" value="${actionPath}"/>
-                                        <stripes:param name="cancelReturnUrl" value="${actionPath}"/>
-                                        <fmt:message key="change.password" />
-                                    </stripes:link>
-                                </li>
-                                <li>
-                                    <stripes:link href="/login">
 <%--                                    <stripes:link href="/actions/user/login">--%>
                                         <stripes:param name="logout"/>
                                         <stripes:param name="returnUrl" value="${actionPath}"/>

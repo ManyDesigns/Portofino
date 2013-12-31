@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration variable="" searchTitle="" rowsPerPage="10" readTitle="" query="from members where user_ = %{#securityUtils.subject.principal.id}" name="" largeResultSet="false" editTitle="" database="tt" createTitle="">
+    <properties>
+        <property updatable="false" searchable="false" name="id" insertable="false" inSummary="false" enabled="false">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="project" label="" insertable="false" inSummary="true" enabled="true">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="user_" insertable="false" inSummary="false" enabled="false">
+            <annotations/>
+        </property>
+        <property updatable="false" searchable="false" name="role" label="" insertable="false" inSummary="true" enabled="true">
+            <annotations/>
+        </property>
+        <property updatable="true" searchable="false" name="notifications" label="" insertable="false" inSummary="true" enabled="true">
+            <annotations/>
+        </property>
+    </properties>
+    <selectionProviders>
+        <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_member_project" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
+        <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_member_role" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
+        <selectionProvider fk="fk_member_user" enabled="false"/>
+    </selectionProviders>
+</configuration>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<page title="Notifications" navigationRoot="INHERIT" id="wq02kq88xmio3ojdkn2s7vnh7" description="Notifications">
+    <detailLayout template="full-width">
+        <childPages/>
+    </detailLayout>
+    <layout template="full-width">
+        <childPages/>
+    </layout>
+    <permissions/>
+</page>

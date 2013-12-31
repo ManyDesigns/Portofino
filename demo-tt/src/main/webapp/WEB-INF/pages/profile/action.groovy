@@ -77,7 +77,6 @@ public class Profile extends CustomAction {
         def userId = ShiroUtils.getUserId(SecurityUtils.subject);
         user = (Map) persistence.getSession("tt").get("users", userId);
         avatar = user.avatar;
-        System.out.println("Avatar: " + avatar);
         return user;
     }
 
@@ -227,6 +226,13 @@ public class Profile extends CustomAction {
             return forwardTo("/jsp/profile/update-data.jsp");
         }
     }
+
+    @Button(list = "view", order = 4D, type = Button.TYPE_SUCCESS, key = "notifications")
+    public Resolution notifications() {
+        return new RedirectResolution("/profile/notifications");
+    }
+
+
 
     @Buttons([
         @Button(list = "upload-photo", order = 3D, key = "cancel"),
