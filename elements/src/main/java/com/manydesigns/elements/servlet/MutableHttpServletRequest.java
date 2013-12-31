@@ -49,14 +49,18 @@ public class MutableHttpServletRequest implements HttpServletRequest {
 
     public final Map<String, Object> attributeMap;
     public final Map<String, String[]> parameterMap;
+    public final Map<String, String[]> headerMap;
     public final Map<String, FileItem[]> fileItemMap;
+    public final List<Locale> locales;
 
     private String method;
     private String contextPath;
     private String servletPath;
     private String requestURI;
+    private String queryString;
 
     private String contentType;
+    private String characterEncoding;
 
     private MockServletContext servletContext;
     private MockHttpSession session;
@@ -67,8 +71,11 @@ public class MutableHttpServletRequest implements HttpServletRequest {
 
     public MutableHttpServletRequest() {
         attributeMap= new HashMap<String, Object>();
+        headerMap = new HashMap<String, String[]>();
         parameterMap = new HashMap<String, String[]>();
         fileItemMap = new HashMap<String, FileItem[]>();
+        locales = new ArrayList<Locale>();
+        locales.add(Locale.getDefault());
     }
 
     public MutableHttpServletRequest(MockServletContext servletContext) {
@@ -193,15 +200,23 @@ public class MutableHttpServletRequest implements HttpServletRequest {
     }
 
     public String getHeader(String s) {
-        throw new UnsupportedOperationException();
+        String[] values = headerMap.get(s);
+        if (values == null || values.length == 0) {
+            return null;
+        }
+        return values[0];
     }
 
-    public Enumeration getHeaders(String s) {
-        throw new UnsupportedOperationException();
+    public Enumeration<String> getHeaders(String s) {
+        String[] values = headerMap.get(s);
+        if (values == null) {
+            return null;
+        }
+        return Collections.enumeration(Arrays.asList(values));
     }
 
-    public Enumeration getHeaderNames() {
-        throw new UnsupportedOperationException();
+    public Enumeration<String> getHeaderNames() {
+        return Collections.enumeration(headerMap.keySet());
     }
 
     public int getIntHeader(String s) {
@@ -217,7 +232,7 @@ public class MutableHttpServletRequest implements HttpServletRequest {
     }
 
     public String getQueryString() {
-        throw new UnsupportedOperationException();
+        return queryString;
     }
 
     public String getRemoteUser() {
@@ -285,11 +300,11 @@ public class MutableHttpServletRequest implements HttpServletRequest {
     }
 
     public String getCharacterEncoding() {
-        throw new UnsupportedOperationException();
+        return characterEncoding;
     }
 
     public void setCharacterEncoding(String s) throws UnsupportedEncodingException {
-        throw new UnsupportedOperationException();
+        characterEncoding = s;
     }
 
     public int getContentLength() {
@@ -337,11 +352,11 @@ public class MutableHttpServletRequest implements HttpServletRequest {
     }
 
     public Locale getLocale() {
-        return Locale.getDefault();
+        return locales.get(0);
     }
 
-    public Enumeration getLocales() {
-        throw new UnsupportedOperationException();
+    public Enumeration<Locale> getLocales() {
+        return Collections.enumeration(locales);
     }
 
     public boolean isSecure() {

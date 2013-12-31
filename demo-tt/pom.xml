@@ -90,8 +90,21 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-mail</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
             <artifactId>portofino-theme</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Quartz support. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-quartz</artifactId>
+            <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

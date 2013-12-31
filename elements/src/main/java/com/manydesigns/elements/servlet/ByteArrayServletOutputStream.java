@@ -27,11 +27,13 @@
 *
 */
 
-package com.manydesigns.portofino.servlets;
+package com.manydesigns.elements.servlet;
 
-import com.manydesigns.portofino.i18n.I18nUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.servlet.*;
+import javax.servlet.ServletOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
@@ -40,28 +42,29 @@ import java.io.IOException;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class I18nFilter implements Filter {
+public class ByteArrayServletOutputStream extends ServletOutputStream {
     public static final String copyright =
             "Copyright (c) 2005-2013, ManyDesigns srl";
 
-    protected ServletContext servletContext;
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        servletContext = filterConfig.getServletContext();
+    public final static Logger logger =
+            LoggerFactory.getLogger(ByteArrayServletOutputStream.class);
+
+    final ByteArrayOutputStream byteArrayOutputStream;
+
+    public ByteArrayServletOutputStream() {
+        byteArrayOutputStream = new ByteArrayOutputStream();
     }
 
-    @Override
-    public void doFilter(
-            ServletRequest request, ServletResponse response, FilterChain filterChain)
-            throws IOException, ServletException {
-        //I18n
-        I18nUtils.setupTextProvider(servletContext, request);
-        filterChain.doFilter(request, response);
-    }
 
     @Override
-    public void destroy() {
-        servletContext = null;
+    public void write(int i) throws IOException {
+        logger.debug("write: {}", i);
+        byteArrayOutputStream.write(i);
+    }
+
+    public ByteArrayOutputStream getByteArrayOutputStream() {
+        return byteArrayOutputStream;
     }
 }
+
