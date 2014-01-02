@@ -36,7 +36,6 @@ import com.manydesigns.elements.reflection.PropertyAccessor
 import com.manydesigns.elements.stripes.ElementsActionBeanContext
 import com.manydesigns.elements.xml.XhtmlBuffer
 import com.manydesigns.portofino.pageactions.activitystream.ActivityItem
-import com.manydesigns.portofino.pageactions.activitystream.ActivityItem.Arg
 import com.sksamuel.diffpatch.DiffMatchPatch
 import com.sksamuel.diffpatch.DiffMatchPatch.Diff
 import net.sourceforge.stripes.util.UrlBuilder
@@ -140,6 +139,20 @@ class TtUtils {
     static final public long ROLE_CONTRIBUTOR = 2L;
     static final public long ROLE_EDITOR = 3L;
     static final public long ROLE_MANAGER = 4L;
+
+    //--------------------------------------------------------------------------
+    // Base url properties
+    //--------------------------------------------------------------------------
+
+    static final public String BASE_URL_SCHEME_PROPERTY = "base.url.scheme";
+    static final public String BASE_URL_SERVER_NAME_PROPERTY = "base.url.server.name";
+    static final public String BASE_URL_SERVER_PORT_PROPERTY = "base.url.server.port";
+    static final public String BASE_URL_CONTEXT_PATH_PROPERTY = "base.url.context.path";
+
+    //--------------------------------------------------------------------------
+    // SQL
+    //--------------------------------------------------------------------------
+
 
     public static String ACTIVITY_SQL = """
 select
@@ -377,7 +390,7 @@ left join version_states vs on vs.id = act.version_state
             String projectId = item[12];
             String projectTitle = item[13]
             String projectName = "${projectId} ${projectTitle}"
-            String projectHref = "/projects/${projectId}/tickets/${item[12]}/${item[14]}"
+            String projectHref = "/projects/${projectId}"
             if (projectTitle == null) {
                 projectName = "<deleted id ${projectId}>";
                 projectHref = null;
@@ -476,21 +489,22 @@ left join version_states vs on vs.id = act.version_state
                     imageAlt,
                     message,
                     key,
-                    new Arg(userName, null),
-                    new Arg(userName2, null),
-                    new Arg(projectName, projectHref),
-                    new Arg(ticketCode, ticketHref),
-                    new Arg(ticketTitle, null),
-                    new Arg(attachmentTitle, attachmentHref),
-                    new Arg(versionTitle, versionHref),
-                    new Arg(componentTitle, componentHref),
-                    new Arg(roleTitle, null),
-                    new Arg(ticketResolutionTitle, null),
-                    new Arg(ticketPriorityTitle, null),
-                    new Arg(ticketTypeTitle, null),
-                    new Arg(ticketStateTitle, null),
-                    new Arg(versionStateTitle, null),
             );
+            activityItem.addArg(userName, null);
+            activityItem.addArg(userName2, null);
+            activityItem.addArg(projectName, projectHref);
+            activityItem.addArg(ticketCode, ticketHref);
+            activityItem.addArg(ticketTitle, null);
+            activityItem.addArg(attachmentTitle, attachmentHref);
+            activityItem.addArg(versionTitle, versionHref);
+            activityItem.addArg(componentTitle, componentHref);
+            activityItem.addArg(roleTitle, null);
+            activityItem.addArg(ticketResolutionTitle, null);
+            activityItem.addArg(ticketPriorityTitle, null);
+            activityItem.addArg(ticketTypeTitle, null);
+            activityItem.addArg(ticketStateTitle, null);
+            activityItem.addArg(versionStateTitle, null);
+
             activityItems.add(activityItem)
         }
     }

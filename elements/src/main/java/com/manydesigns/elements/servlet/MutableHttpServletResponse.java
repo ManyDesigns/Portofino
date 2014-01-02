@@ -70,88 +70,88 @@ public class MutableHttpServletResponse implements HttpServletResponse {
 
     @Override
     public void addCookie(Cookie cookie) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean containsHeader(String s) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String encodeURL(String s) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return s;
     }
 
     @Override
     public String encodeRedirectURL(String s) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return s;
     }
 
     @Override
     public String encodeUrl(String s) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return encodeURL(s);
     }
 
     @Override
     public String encodeRedirectUrl(String s) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return encodeRedirectURL(s);
     }
 
     @Override
     public void sendError(int i, String s) throws IOException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void sendError(int i) throws IOException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void sendRedirect(String s) throws IOException {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setDateHeader(String s, long l) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void addDateHeader(String s, long l) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setHeader(String s, String s1) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void addHeader(String s, String s1) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setIntHeader(String s, int i) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void addIntHeader(String s, int i) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setStatus(int i) {
-        logger.info("Setting status to: {}", i);
+        logger.debug("Setting status to: {}", i);
         status = i;
     }
 
     @Override
     public void setStatus(int i, String s) {
-        logger.info("Setting status and message to: {} - {}", i, s);
+        logger.debug("Setting status and message to: {} - {}", i, s);
         status = i;
         statusMessage = s;
     }
@@ -163,17 +163,17 @@ public class MutableHttpServletResponse implements HttpServletResponse {
 
     @Override
     public String getHeader(String s) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Collection<String> getHeaders(String s) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Collection<String> getHeaderNames() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -196,10 +196,10 @@ public class MutableHttpServletResponse implements HttpServletResponse {
         if (writer == null) {
             OutputStreamWriter osw;
             if (characterEncoding == null) {
-                logger.info("Creating writer with default encoding");
+                logger.debug("Creating writer with default encoding");
                 osw = new OutputStreamWriter(outputStream);
             } else {
-                logger.info("Creating writer with encoding: {}", characterEncoding);
+                logger.debug("Creating writer with encoding: {}", characterEncoding);
                 osw = new OutputStreamWriter(outputStream, characterEncoding);
             }
             writer = new PrintWriter(osw);
@@ -209,60 +209,61 @@ public class MutableHttpServletResponse implements HttpServletResponse {
 
     @Override
     public void setCharacterEncoding(String s) {
-        logger.info("Setting encoding to: {}", s);
+        logger.debug("Setting encoding to: {}", s);
         characterEncoding = s;
     }
 
     @Override
     public void setContentLength(int i) {
-        logger.info("Setting content length to: {}", i);
+        logger.debug("Setting content length to: {}", i);
         contentLength = i;
     }
 
     @Override
     public void setContentType(String s) {
-        logger.info("Setting content type to: {}", s);
+        logger.debug("Setting content type to: {}", s);
         contentType = s;
     }
 
     @Override
     public void setBufferSize(int i) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int getBufferSize() {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void flushBuffer() throws IOException {
         if (writer == null) {
-            logger.info("Flushing output stream");
+            logger.debug("Flushing output stream");
             outputStream.flush();
         } else {
-            logger.info("Flushing writer");
+            logger.debug("Flushing writer");
             writer.flush();
         }
     }
 
     @Override
     public void resetBuffer() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isCommitted() {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return true;
     }
 
     @Override
     public void reset() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setLocale(Locale locale) {
-        logger.info("Setting locale to: {}", locale);
+        logger.debug("Setting locale to: {}", locale);
         this.locale = locale;
     }
 

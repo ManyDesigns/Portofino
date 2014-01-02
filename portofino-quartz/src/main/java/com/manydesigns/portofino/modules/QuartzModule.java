@@ -156,7 +156,13 @@ public class QuartzModule implements Module {
 
     @Override
     public void stop() {
-        status = ModuleStatus.STOPPED;
+        try {
+            scheduler.pauseAll();
+        } catch (SchedulerException e) {
+            logger.warn("Cannot pause scheduler", e);
+        } finally {
+            status = ModuleStatus.STOPPED;
+        }
     }
 
     @Override

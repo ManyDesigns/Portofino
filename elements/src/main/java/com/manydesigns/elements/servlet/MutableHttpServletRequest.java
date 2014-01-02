@@ -58,6 +58,9 @@ public class MutableHttpServletRequest implements HttpServletRequest {
     private String servletPath;
     private String requestURI;
     private String queryString;
+    private String scheme;
+    private String serverName;
+    private int serverPort;
 
     private String contentType;
     private String characterEncoding;
@@ -132,6 +135,18 @@ public class MutableHttpServletRequest implements HttpServletRequest {
     public void makeMultipart() {
         setMethod("POST");
         setContentType("multipart/form-data");
+    }
+
+    public void setScheme(String scheme) {
+        this.scheme = scheme;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
     }
 
     //**************************************************************************
@@ -328,15 +343,15 @@ public class MutableHttpServletRequest implements HttpServletRequest {
     }
 
     public String getScheme() {
-        throw new UnsupportedOperationException();
+        return scheme;
     }
 
     public String getServerName() {
-        throw new UnsupportedOperationException();
+        return serverName;
     }
 
     public int getServerPort() {
-        throw new UnsupportedOperationException();
+        return serverPort;
     }
 
     public BufferedReader getReader() throws IOException {

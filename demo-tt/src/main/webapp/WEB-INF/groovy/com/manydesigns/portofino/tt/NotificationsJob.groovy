@@ -79,7 +79,7 @@ public class NotificationsJob implements Job {
     public ServletContext servletContext;
 
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
-    public Configuration portofinoConfiguration;
+    public Configuration configuration;
 
     @Inject(DatabaseModule.PERSISTENCE)
     Persistence persistence;
@@ -96,21 +96,23 @@ public class NotificationsJob implements Job {
                 new MutableHttpServletRequest();
             ElementsThreadLocals.setHttpServletRequest(request);
             I18nUtils.setupTextProvider(servletContext, request);
-            request.setRequestURI("http://localhost:8080/demo-tt/");
-            request.setContextPath("/demo-tt");
+            request.setScheme(configuration.getString(TtUtils.BASE_URL_SCHEME_PROPERTY, "http"));
+            request.setServerName(configuration.getString(TtUtils.BASE_URL_SERVER_NAME_PROPERTY, "localhost"));
+            request.setServerPort(configuration.getInt(TtUtils.BASE_URL_SERVER_PORT_PROPERTY, 8080));
+            request.setContextPath(configuration.getString(TtUtils.BASE_URL_CONTEXT_PATH_PROPERTY, "/demo-tt"));
 
             Session session = persistence.getSession("tt");
 
             logger.debug("Find project activities to be notified");
             List items = session.createSQLQuery(PROJECT_ACTIVTY_SQL).list();
-            String keyPrefix = "project.";
+            String keyPrefix = "system.";
             Locale locale = Locale.getDefault();
 
             TtUtils.populateActivityItems(items, activityItems, keyPrefix, locale, null);
 
             int i = 0;
             for (Object current : items) {
-                logger.info("Notifying activity #{}", current[0]);
+                logger.debug("Notifying activity #{}", current[0]);
 
                 request.setAttribute("activityItem", activityItems.get(i));
 
@@ -126,7 +128,7 @@ public class NotificationsJob implements Job {
 
                 ByteArrayOutputStream baos = stream.getByteArrayOutputStream();
                 String htmlBody = baos.toString(response.getCharacterEncoding());
-                logger.info("Html body: {}", htmlBody);
+                logger.debug("Html body: {}", htmlBody);
 
                 String subject;
                 if (current[14] == null) {
@@ -155,11 +157,11 @@ public class NotificationsJob implements Job {
         Criteria criteria = session.createCriteria("members");
         criteria.add(Restrictions.eq("project", activity[12]));
         criteria.add(Restrictions.eq("notifications", true));
-//        criteria.add(Restrictions.ne("user_", activity.user_));
+        criteria.add(Restrictions.ne("user_", (Long)activity[4]));
         List membersToBeNotified = criteria.list();
         for (Object current : membersToBeNotified) {
             Object user = current.fk_member_user;
-            logger.info("Notifying user {}", user.email);
+            logger.debug("Notifying user {}", user.email);
 
             Email email = new Email();
 
@@ -167,7 +169,7 @@ public class NotificationsJob implements Job {
             email.htmlBody = htmlBody;
             Recipient recipient = new Recipient(Type.TO, user.email);
             email.recipients.add(recipient);
-            String sender = portofinoConfiguration.getString(MailProperties.MAIL_SMTP_LOGIN);
+            String sender = configuration.getString(MailProperties.MAIL_SMTP_LOGIN);
             email.from = sender;
             mailQueue.enqueue(email);
         }

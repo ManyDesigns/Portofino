@@ -51,9 +51,11 @@ public class ActivityItem implements XhtmlFragment {
     final String imageAlt;
     final String message;
     final String key;
-    final Arg[] args;
+    final List<Arg> args = new ArrayList<Arg>();
 
-    public ActivityItem(Locale locale, Date timestamp, String imageSrc, String imageHref, String imageAlt, String message, String key, Arg... args) {
+    boolean fullUrls = false;
+
+    public ActivityItem(Locale locale, Date timestamp, String imageSrc, String imageHref, String imageAlt, String message, String key) {
         this.locale = locale;
         this.timestamp = timestamp;
         this.imageSrc = imageSrc;
@@ -61,7 +63,6 @@ public class ActivityItem implements XhtmlFragment {
         this.imageAlt = imageAlt;
         this.message = message;
         this.key = key;
-        this.args = args;
 
         dateFormat = FastDateFormat.getDateTimeInstance(FastDateFormat.FULL, FastDateFormat.FULL, locale);
     }
@@ -79,7 +80,7 @@ public class ActivityItem implements XhtmlFragment {
     }
 
     public void writeImage(XhtmlBuffer xb) {
-        String absoluteSrc = Util.getAbsoluteUrl(imageSrc);
+        String absoluteSrc = Util.getAbsoluteUrl(imageSrc, fullUrls);
         if (imageHref == null) {
             xb.openElement("div");
         } else {
@@ -114,7 +115,7 @@ public class ActivityItem implements XhtmlFragment {
 
     public void writeData(XhtmlBuffer xb) {
 
-        List<String> formattedArgs = new ArrayList<String>(args.length);
+        List<String> formattedArgs = new ArrayList<String>(args.size());
         for (Arg arg : args) {
             String formattedArg = arg.format();
             formattedArgs.add(formattedArg);
@@ -149,7 +150,24 @@ public class ActivityItem implements XhtmlFragment {
         }
     }
 
-    static public class Arg {
+    public boolean isFullUrls() {
+        return fullUrls;
+    }
+
+    public void setFullUrls(boolean fullUrls) {
+        this.fullUrls = fullUrls;
+    }
+
+    public void addArg(String text, String url) {
+        Arg arg = new Arg(text, url);
+        args.add(arg);
+    }
+
+    public List<Arg> getArgs() {
+        return args;
+    }
+
+    public class Arg {
         final String text;
         final String href;
 
@@ -172,11 +190,12 @@ public class ActivityItem implements XhtmlFragment {
             if (href == null) {
                 argXb.write(text);
             } else {
-                String absoluteHref = Util.getAbsoluteUrl(href);
+                String absoluteHref = Util.getAbsoluteUrl(href, fullUrls);
                 argXb.writeAnchor(absoluteHref, text);
             }
             argXb.closeElement("strong");
             return argXb.toString();
         }
     }
+
 }

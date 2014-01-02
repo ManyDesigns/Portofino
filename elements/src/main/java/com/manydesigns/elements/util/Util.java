@@ -63,7 +63,7 @@ public class Util {
     public static final Logger logger = LoggerFactory.getLogger(Util.class);
 
     public static String getAbsoluteUrl(HttpServletRequest req,
-                                        String url) {
+                                        String url, boolean full) {
         StringBuilder sb = new StringBuilder();
 
         Matcher matcher = pattern.matcher(url);
@@ -81,14 +81,37 @@ public class Util {
 
         sb.append(url);
 
+        if (full) {
+            logger.debug("Building full url including scheme and port");
+            StringBuilder tsb = new StringBuilder();
+            String scheme = req.getScheme();
+            int serverPort = req.getServerPort();
+            tsb.append(scheme);
+            tsb.append("://");
+            tsb.append(req.getServerName());
+            if ("http".equals(scheme) && serverPort == 80 ||
+                    "https".equals(scheme) && serverPort == 443) {
+                logger.debug("Skipping default port for scheme: {}", scheme);
+            } else {
+                logger.debug("Adding port number: {}", serverPort);
+                tsb.append(":");
+                tsb.append(serverPort);
+            }
+            sb.insert(0, tsb);
+        }
+
         return sb.toString();
     }
 
     public static String getAbsoluteUrl(String url) {
+        return getAbsoluteUrl(url, false);
+    }
+
+    public static String getAbsoluteUrl(String url, boolean full) {
         HttpServletRequest req =
                 ElementsThreadLocals.getHttpServletRequest();
 
-        return getAbsoluteUrl(req, url);
+        return getAbsoluteUrl(req, url, full);
     }
 
     public static String camelCaseToWords(String s) {
