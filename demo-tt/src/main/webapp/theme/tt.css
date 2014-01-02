@@ -12,3 +12,12 @@
 .activity-item-message dl {
     margin: 0
 }
+
+ul.ticket-list {
+    margin: 0 0 10px;
+}
+
+li.ticket-list-item {
+    display: block;
+    margin: 0 0 10px;
+}

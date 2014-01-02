@@ -134,9 +134,7 @@ public class ActivityItem implements XhtmlFragment {
         xb.openElement("div");
         xb.openElement("small");
         xb.addAttribute("class", "muted");
-        xb.openElement("strong");
         xb.write(dateFormat.format(timestamp));
-        xb.closeElement("strong");
         xb.closeElement("small");
         xb.closeElement("div");
     }

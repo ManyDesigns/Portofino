@@ -12,23 +12,19 @@
             <p>There are no tickets.</p>
         </c:if>
         <c:if test="${not empty actionBean.tickets}">
-            <dl>
+            <ul class="ticket-list">
                 <c:forEach items="${actionBean.tickets}" var="ticket">
-                    <dt>
-                        <stripes:link href="/projects/${ticket.project}/tickets/${ticket.project}/${ticket.n}">
-                            <c:out value="${ticket.project}-${ticket.n}"/>
-                        </stripes:link>
-                    </dt>
-                    <dd>
-                        <small class="muted">
-                            updated on <fmt:formatDate value="${ticket.last_updated}" pattern="yyyy-MM-dd HH:mm:ss z"/>
-                        </small>
+                    <li class="ticket-list-item">
                         <div>
-                            <c:out value="${ticket.title}"/>
+                            <strong><stripes:link href="/projects/${ticket.project}/tickets/${ticket.project}/${ticket.n}"><c:out value="${ticket.project}-${ticket.n}"/></stripes:link></strong>
+                            <strong><c:out value="${ticket.title}"/></strong>
                         </div>
-                    </dd>
+                        <div>
+                            <small class="muted">Updated on <fmt:formatDate value="${ticket.last_updated}" pattern="yyyy-MM-dd HH:mm:ss z"/></small>
+                        </div>
+                    </li>
                 </c:forEach>
-            </dl>
+            </ul>
         </c:if>
     </stripes:layout-component>
 </stripes:layout-render>
