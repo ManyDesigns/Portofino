@@ -29,8 +29,10 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleRegistry;
+import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,8 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+@RequiresAuthentication
+@RequiresAdministrator
 @UrlBinding(ModulesAction.URL_BINDING)
 public class ModulesAction extends AbstractActionBean {
     public static final String copyright =

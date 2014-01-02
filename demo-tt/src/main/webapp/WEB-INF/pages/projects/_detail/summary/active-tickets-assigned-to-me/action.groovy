@@ -28,15 +28,16 @@ class ProjectsActiveTicketsAssignedToMeAction extends CustomAction {
 
         Session session = persistence.getSession("tt");
         Subject subject = SecurityUtils.getSubject();
-        if (subject.isAuthenticated()) {
+        Object principal = subject.getPrincipal();
+        if (principal == null) {
+            tickets = Collections.EMPTY_LIST;
+        } else {
             tickets = session.createCriteria("tickets")
                     .add(Restrictions.eq("project", project.id))
-                    .add(Restrictions.eq("assignee", subject.getPrincipal().id))
+                    .add(Restrictions.eq("assignee", principal.id))
                     .add(Restrictions.ne("state", 4L))
                     .addOrder(Order.asc("n"))
                     .list();
-        } else {
-            tickets = Collections.EMPTY_LIST;
         }
 
         return new ForwardResolution("/jsp/common/active-tickets-assigned-to-me.jsp");

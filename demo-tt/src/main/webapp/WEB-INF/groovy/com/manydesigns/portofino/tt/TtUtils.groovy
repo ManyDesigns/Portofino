@@ -354,11 +354,12 @@ left join version_states vs on vs.id = act.version_state
     static public boolean principalHasProjectRole(Object project, long minimumRole) {
         logger.debug("principalHasProjectRole() - project id: {} - minimum role : {}", project.id, minimumRole)
         Subject subject = SecurityUtils.subject
-        if (!subject.isAuthenticated()) {
-            logger.debug("Subject not authenticated")
+        Object principal = subject.getPrincipal();
+        if (principal == null) {
+            logger.debug("No principal")
             return false;
         }
-        long userId = subject.principal.id;
+        long userId = principal.id;
         for (Object member: project.fk_member_project) {
             def memberUser = member.user_
             def memberRole = member.role

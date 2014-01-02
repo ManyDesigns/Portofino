@@ -45,6 +45,7 @@ import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +61,7 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@RequiresAuthentication
 @RequiresAdministrator
 @UrlBinding(ConnectionProvidersAction.URL_BINDING)
 public class ConnectionProvidersAction extends AbstractActionBean {

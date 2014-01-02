@@ -50,8 +50,9 @@ public class ServletContainerSecurityFilter extends PathMatchingFilter {
     @Override
     protected boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
         Subject subject = SecurityUtils.getSubject();
+        Object principal = subject.getPrincipal();
         HttpServletRequest req = (HttpServletRequest) request;
-        boolean shiroAuthenticated = subject.isAuthenticated();
+        boolean shiroAuthenticated = principal != null;
         //Returns: a java.security.Principal containing the name of the user making this request;
         //null if the user has not been authenticated
         boolean containerAuthenticated = req.getUserPrincipal() != null;

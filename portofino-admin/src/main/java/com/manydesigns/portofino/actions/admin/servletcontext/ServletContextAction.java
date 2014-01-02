@@ -25,9 +25,11 @@ import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.ognl.OgnlUtils;
 import com.manydesigns.portofino.buttons.annotations.Button;
+import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,8 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+@RequiresAuthentication
+@RequiresAdministrator
 @UrlBinding(ServletContextAction.URL_BINDING)
 public class ServletContextAction extends AbstractActionBean {
     public static final String copyright =

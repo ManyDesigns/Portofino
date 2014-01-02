@@ -9,7 +9,7 @@
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <shiro:authenticated>
+        <shiro:user>
             <c:if test="${empty actionBean.tickets}">
                 <p>There are no tickets assigned to you.</p>
             </c:if>
@@ -28,9 +28,9 @@
                     </c:forEach>
                 </ul>
             </c:if>
-        </shiro:authenticated>
-        <shiro:notAuthenticated>
+        </shiro:user>
+        <shiro:guest>
             <p>You must be logged in to view tickets assigned to you.</p>
-        </shiro:notAuthenticated>
+        </shiro:guest>
     </stripes:layout-component>
 </stripes:layout-render>

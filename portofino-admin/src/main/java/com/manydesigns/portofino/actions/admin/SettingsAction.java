@@ -40,6 +40,7 @@ import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
 import org.apache.commons.configuration.Configuration;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +52,7 @@ import java.io.File;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+@RequiresAuthentication
 @RequiresAdministrator
 @UrlBinding(SettingsAction.URL_BINDING)
 public class SettingsAction extends AbstractActionBean {

@@ -34,7 +34,7 @@
                 </c:if>
                 <c:set var="actionPath" value="${actionBean.context.actionPath}"/>
                 <ul id="app-menu" class="nav">
-                    <shiro:authenticated>
+                    <shiro:user>
                         <%
                             Subject subject = SecurityUtils.getSubject();
                             Object principal = subject.getPrincipal();
@@ -112,8 +112,8 @@
                                 </li>
                             </ul>
                         </li>
-                    </shiro:authenticated>
-                    <shiro:notAuthenticated>
+                    </shiro:user>
+                    <shiro:guest>
                         <li>
                             <stripes:link href="/login">
 <%--                            <stripes:link href="/actions/user/login">--%>
@@ -122,7 +122,7 @@
                                 <fmt:message key="log.in" />
                             </stripes:link>
                         </li>
-                    </shiro:notAuthenticated>
+                    </shiro:guest>
                 </ul>
                 </div>
             </div>

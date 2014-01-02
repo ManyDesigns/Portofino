@@ -29,6 +29,7 @@ import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+@RequiresAuthentication
 @RequiresAdministrator
 @UrlBinding(ReloadModelAction.URL_BINDING)
 public class ReloadModelAction extends AbstractActionBean {
@@ -66,7 +68,6 @@ public class ReloadModelAction extends AbstractActionBean {
     }
 
     @Button(list = "reload-model", key = "reload", order = 1, type = Button.TYPE_PRIMARY)
-    @RequiresAdministrator
     public Resolution reloadModel() {
         synchronized (persistence) {
             persistence.loadXmlModel();

@@ -1,13 +1,16 @@
 package com.manydesigns.portofino.pageactions.crud
 
+import com.manydesigns.portofino.tt.TtUtils
+
 import com.manydesigns.elements.forms.Form
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
-import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.Resolution
 import org.apache.shiro.SecurityUtils
+import org.apache.shiro.authz.annotation.RequiresAuthentication
 
+@RequiresAuthentication
 @SupportsPermissions([CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE])
 @RequiresPermissions(level = AccessLevel.VIEW)
 class AdminUsersCrudAction extends CrudAction {

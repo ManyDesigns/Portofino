@@ -23,6 +23,9 @@
                    placeholder="<fmt:message key='user.name'/>" />
             <input type="password" name="pwd" id="pwd" class="input-block-level"
                    placeholder="<fmt:message key='password'/>" />
+            <label class="checkbox">
+                <input type="checkbox" name="rememberMe" id="rememberMe"/> <fmt:message key='remember.me.on.this.computer'/>
+            </label>
             <div class="login-buttons">
                 <button type="submit" name="login" class="btn btn-primary">Log in</button>
             </div>

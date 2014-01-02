@@ -23,6 +23,7 @@ package com.manydesigns.portofino.interceptors;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.shiro.SecurityUtilsBean;
 import com.manydesigns.portofino.shiro.ShiroUtils;
+import com.manydesigns.portofino.stripes.AuthenticationRequiredResolution;
 import com.manydesigns.portofino.stripes.ForbiddenAccessResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
@@ -33,6 +34,7 @@ import ognl.OgnlContext;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.aop.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.authz.aop.AnnotationsAuthorizingMethodInterceptor;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -60,11 +62,12 @@ public class ShiroInterceptor implements Interceptor {
         logger.debug("Retrieving user");
         Serializable userId = null;
         Subject subject = SecurityUtils.getSubject();
-        if (subject.isAuthenticated()) {
+        Object principal = subject.getPrincipal();
+        if (principal == null) {
+            logger.debug("No user found");
+        } else {
             userId = ShiroUtils.getUserId(subject);
             logger.debug("Retrieved userId={}", userId);
-        } else {
-            logger.debug("No user found");
         }
 
         logger.debug("Publishing securityUtils in OGNL context");
@@ -81,6 +84,9 @@ public class ShiroInterceptor implements Interceptor {
             AUTH_CHECKER.assertAuthorized(context);
             logger.debug("Security check passed.");
             return context.proceed();
+        } catch (UnauthenticatedException e) {
+            logger.debug("Method required authentication", e);
+            return new AuthenticationRequiredResolution();
         } catch (AuthorizationException e) {
             logger.warn("Method invocation not authorized", e);
             return new ForbiddenAccessResolution(e.getMessage());

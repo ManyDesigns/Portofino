@@ -169,7 +169,8 @@ public class SecurityLogic {
 
     public static boolean hasPermissions
             (Configuration conf, Permissions configuration, Subject subject, AccessLevel level, String... permissions) {
-        if(subject.isAuthenticated()) {
+        Object principal = subject.getPrincipal();
+        if(principal != null) {
             String administratorsGroup = getAdministratorsGroup(conf);
             if(isUserInGroup(administratorsGroup)) {
                 return true;

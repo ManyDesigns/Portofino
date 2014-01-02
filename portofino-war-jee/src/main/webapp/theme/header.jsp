@@ -44,10 +44,10 @@
                 <ul class="nav">
                     <%
                         Subject subject = SecurityUtils.getSubject();
+                        Object principal = subject.getPrincipal();
                         String actionPath = actionBean.getContext().getActionPath();
                         String loginPage = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PAGE);
-                        if(subject.isAuthenticated()) {
-                            Object principal = subject.getPrincipal();
+                        if(principal != null) {
                             String prettyName = ShiroUtils.getPortofinoRealm().getUserPrettyName((Serializable) principal);
                     %>
                     <li class="dropdown">

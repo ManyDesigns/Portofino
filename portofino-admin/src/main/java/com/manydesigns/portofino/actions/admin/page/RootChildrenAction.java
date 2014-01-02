@@ -28,6 +28,7 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 
 import java.io.File;
 
@@ -37,6 +38,8 @@ import java.io.File;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+@RequiresAuthentication
+@RequiresAdministrator
 @UrlBinding(RootChildrenAction.URL_BINDING)
 public class RootChildrenAction extends RootConfigurationAction {
     public static final String copyright =
@@ -49,7 +52,6 @@ public class RootChildrenAction extends RootConfigurationAction {
 
     @Override
     @DefaultHandler
-    @RequiresAdministrator
     public Resolution pageChildren() {
         return super.pageChildren();
     }

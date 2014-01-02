@@ -1,5 +1,7 @@
 package com.manydesigns.portofino.pageactions.crud
 
+import com.manydesigns.portofino.tt.TtUtils
+
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
@@ -8,7 +10,6 @@ import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
-import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.Resolution
 import org.apache.shiro.SecurityUtils
@@ -45,10 +46,11 @@ class TicketAffectedComponentsCrudAction extends CrudAction {
 
     public boolean myTicket() {
         Subject subject = SecurityUtils.subject;
-        if (!subject.isAuthenticated()) {
+        Object principal = subject.principal;
+        if (principal == null) {
             return false;
         }
-        return ticket.created_by == subject.principal.id;
+        return ticket.created_by == principal.id;
     }
 
     //**************************************************************************

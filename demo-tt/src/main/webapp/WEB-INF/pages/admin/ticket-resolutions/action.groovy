@@ -1,11 +1,14 @@
+import com.manydesigns.portofino.tt.TtUtils
+
 import com.manydesigns.elements.forms.Form
 import com.manydesigns.portofino.pageactions.crud.CrudAction
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
-import com.manydesigns.portofino.tt.TtUtils
 import org.apache.shiro.SecurityUtils
+import org.apache.shiro.authz.annotation.RequiresAuthentication
 
+@RequiresAuthentication
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
 @RequiresPermissions(level = AccessLevel.VIEW)
 class AdminTicketResolutionsCrudAction extends CrudAction {

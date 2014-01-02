@@ -23,11 +23,13 @@ package com.manydesigns.portofino.actions.admin;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.menu.*;
 import com.manydesigns.portofino.modules.AdminModule;
+import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +41,8 @@ import java.util.List;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+@RequiresAuthentication
+@RequiresAdministrator
 @UrlBinding(AdminAction.URL_BINDING)
 public class AdminAction extends AbstractActionBean {
     public static final String copyright =

@@ -26,6 +26,7 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 
 /**
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -33,6 +34,8 @@ import net.sourceforge.stripes.action.UrlBinding;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+@RequiresAuthentication
+@RequiresAdministrator
 @UrlBinding(RootPermissionsAction.URL_BINDING)
 public class RootPermissionsAction extends RootConfigurationAction {
     public static final String copyright =
@@ -42,7 +45,6 @@ public class RootPermissionsAction extends RootConfigurationAction {
 
     @Override
     @DefaultHandler
-    @RequiresAdministrator
     public Resolution pagePermissions() {
         return super.pagePermissions();
     }

@@ -9,20 +9,20 @@
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"/>
 <stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
     <stripes:layout-component name="pageTitle">
-        <shiro:authenticated>
+        <shiro:user>
             <%
                 Subject subject = SecurityUtils.getSubject();
                 Map principal = (Map) ShiroUtils.getPrimaryPrincipal(subject);
                 pageContext.setAttribute("principal", principal);
             %>
             Welcome <c:out value="${principal['first_name']} ${principal['last_name']}"/>
-        </shiro:authenticated>
-        <shiro:notAuthenticated>
+        </shiro:user>
+        <shiro:guest>
             <c:out value="${actionBean.page.title}"/>
-        </shiro:notAuthenticated>
+        </shiro:guest>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <shiro:authenticated>
+        <shiro:user>
             <p>
                 <stripes:link href="/profile" class="btn btn-success">
                     Edit your profile
@@ -54,8 +54,8 @@
                 Log out
                 <i class="icon-chevron-right"></i>
             </stripes:link>
-        </shiro:authenticated>
-        <shiro:notAuthenticated>
+        </shiro:user>
+        <shiro:guest>
             <p>
                 <strong>Portofino TT</strong> is a modern, customizable ticket-tracker written in Java and Groovy,
                 distributed under the LGPL open source license.
@@ -82,6 +82,6 @@
             <p>
                 <stripes:link href="/login" class="btn btn-success">Log in <i class="icon-chevron-right icon-white"></i></stripes:link>
             </p>
-        </shiro:notAuthenticated>
+        </shiro:guest>
     </stripes:layout-component>
 </stripes:layout-render>

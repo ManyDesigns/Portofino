@@ -4,7 +4,9 @@ import com.manydesigns.portofino.security.RequiresPermissions
 import net.sourceforge.stripes.action.DefaultHandler
 import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
+import org.apache.shiro.authz.annotation.RequiresAuthentication
 
+@RequiresAuthentication
 @RequiresPermissions(level = AccessLevel.VIEW)
 class MyCustomAction extends CustomAction {
 

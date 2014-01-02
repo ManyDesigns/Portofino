@@ -1,13 +1,16 @@
 package com.manydesigns.portofino.pageactions.activitystream
 
+import com.manydesigns.portofino.tt.TtUtils
+
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
-import com.manydesigns.portofino.tt.TtUtils
+import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.hibernate.Session
 
+@RequiresAuthentication
 @RequiresPermissions(level = AccessLevel.VIEW)
 class MyActivityStreamAction extends ActivityStreamAction {
 

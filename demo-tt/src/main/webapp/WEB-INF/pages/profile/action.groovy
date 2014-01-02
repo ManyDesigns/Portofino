@@ -30,6 +30,7 @@ import net.sourceforge.stripes.action.Resolution
 import net.sourceforge.stripes.action.StreamingResolution
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.SecurityUtils
+import org.apache.shiro.authz.annotation.RequiresAuthentication
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 public class Profile extends CustomAction {
@@ -101,6 +102,7 @@ public class Profile extends CustomAction {
                 addParameter("cancelReturnUrl", context.actionPath);
     }
 
+    @RequiresAuthentication
     @Button(list = "view", order = 2D, type = Button.TYPE_SUCCESS, key = "update.your.data")
     public Resolution editData() {
         setupEditForm();
@@ -118,6 +120,7 @@ public class Profile extends CustomAction {
         form.readFromObject(user)
     }
 
+    @RequiresAuthentication
     @Button(list = "view", order = 3D, type = Button.TYPE_SUCCESS, key = "change.your.photo")
     public Resolution changePhoto() {
         loadUser();
@@ -125,6 +128,7 @@ public class Profile extends CustomAction {
         return forwardTo("/jsp/profile/upload-photo.jsp");
     }
 
+    @RequiresAuthentication
     @Button(list = "upload-photo", order = 1D, type = Button.TYPE_PRIMARY, key = "upload")
     public Resolution uploadPhoto() {
         setupPhotoForm();
@@ -198,6 +202,7 @@ public class Profile extends CustomAction {
         return imageBuff;
     }
 
+    @RequiresAuthentication
     @Button(list = "upload-photo", order = 2D, key = "delete.current.photo")
     public Resolution deletePhoto() {
         loadUser();
@@ -212,6 +217,7 @@ public class Profile extends CustomAction {
         return new RedirectResolution(context.actionPath);
     }
 
+    @RequiresAuthentication
     @Button(list = "update-data", order = 1D, key = "update", type = Button.TYPE_PRIMARY)
     public Resolution updateData() {
         setupEditForm();

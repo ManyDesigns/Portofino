@@ -1,5 +1,7 @@
 package com.manydesigns.portofino.pageactions.crud
 
+import com.manydesigns.portofino.tt.TtUtils
+
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.Mode
 import com.manydesigns.elements.fields.Field
@@ -18,7 +20,6 @@ import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
 import com.manydesigns.portofino.shiro.ShiroUtils
-import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.RedirectResolution
@@ -248,10 +249,11 @@ class ProjectsTicketsAction extends CrudAction {
 
     public boolean myTicket() {
         Subject subject = SecurityUtils.subject;
-        if (!subject.isAuthenticated()) {
+        Object principal = subject.principal;
+        if (principal == null) {
             return false;
         }
-        return object.created_by == subject.principal.id;
+        return object.created_by == principal.id;
     }
 
 
@@ -376,10 +378,11 @@ class ProjectsTicketsAction extends CrudAction {
 
     public boolean canAssignToMe() {
         Subject subject = SecurityUtils.subject
-        if (!subject.isAuthenticated()) {
+        Object principal = subject.principal;
+        if (principal == null) {
             return false;
         }
-        if (object.assignee == subject.principal.id) {
+        if (object.assignee == principal.id) {
             return false;
         }
         return isEditor();

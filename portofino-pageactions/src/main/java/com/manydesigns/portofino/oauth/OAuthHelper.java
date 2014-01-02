@@ -163,11 +163,12 @@ public class OAuthHelper {
     public Credential authorize() throws IOException {
         HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
         Subject subject = SecurityUtils.getSubject();
+        Object principal = subject.getPrincipal();
         String userId;
-        if(subject.isAuthenticated()) {
-            userId = OgnlUtils.convertValueToString(ShiroUtils.getUserId(subject));
-        } else {
+        if(principal == null) {
             throw new IllegalStateException("User is not logged in, can not determine the user id");
+        } else {
+            userId = OgnlUtils.convertValueToString(ShiroUtils.getUserId(subject));
         }
         return authorize(request, userId);
     }
@@ -198,11 +199,12 @@ public class OAuthHelper {
      */
     public Resolution doWithCredential(Callable<Resolution> action) {
         Subject subject = SecurityUtils.getSubject();
+        Object principal = subject.getPrincipal();
         String userId;
-        if(subject.isAuthenticated()) {
-            userId = OgnlUtils.convertValueToString(ShiroUtils.getUserId(subject));
-        } else {
+        if(principal == null) {
             throw new IllegalStateException("User is not logged in, can not determine the user id");
+        } else {
+            userId = OgnlUtils.convertValueToString(ShiroUtils.getUserId(subject));
         }
         return doWithCredential(userId, action);
     }

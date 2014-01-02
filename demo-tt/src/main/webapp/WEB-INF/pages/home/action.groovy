@@ -58,12 +58,13 @@ class HomeProjectsAction extends CustomAction {
     public Resolution execute() {
         Session session = persistence.getSession("tt");
         Subject subject = SecurityUtils.getSubject();
-        if (subject.isAuthenticated()) {
-            projects = session.createSQLQuery(LOGGED_SQL)
-                    .setParameter("user", subject.getPrincipal().id)
-                    .list();
-        } else {
+        Object principal = subject.getPrincipal();
+        if (principal == null) {
             projects = session.createSQLQuery(ANONYMOUS_SQL).list();
+        } else {
+            projects = session.createSQLQuery(LOGGED_SQL)
+                    .setParameter("user", principal.id)
+                    .list();
         }
 
         return new ForwardResolution("/jsp/home/projects.jsp");

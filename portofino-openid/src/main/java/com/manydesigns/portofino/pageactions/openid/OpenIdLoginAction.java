@@ -211,7 +211,7 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
 
     public Resolution signUp2() {
         Subject subject = SecurityUtils.getSubject();
-        if (subject.isAuthenticated()) {
+        if (subject.getPrincipal() != null) {
             logger.debug("Already logged in");
             return redirectToReturnUrl();
         }

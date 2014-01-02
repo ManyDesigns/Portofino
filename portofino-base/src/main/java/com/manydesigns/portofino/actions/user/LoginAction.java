@@ -81,6 +81,7 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public String userName;
     public String pwd;
+    public boolean rememberMe;
 
     public String email;
 
@@ -146,7 +147,7 @@ public abstract class LoginAction extends AbstractActionBean {
         try {
             UsernamePasswordToken usernamePasswordToken =
                     new UsernamePasswordToken(userName, pwd);
-            usernamePasswordToken.setRememberMe(false);
+            usernamePasswordToken.setRememberMe(rememberMe);
             subject.login(usernamePasswordToken);
             logger.info("User {} login", ShiroUtils.getUserId(subject));
             String successMsg = ElementsThreadLocals.getText("user._.logged.in.successfully", userName);
@@ -347,7 +348,7 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public Resolution signUp() {
         Subject subject = SecurityUtils.getSubject();
-        if (subject.isAuthenticated()) {
+        if (subject.getPrincipal() != null) {
             logger.debug("Already logged in");
             return redirectToReturnUrl();
         }
@@ -358,7 +359,7 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public Resolution signUp2() {
         Subject subject = SecurityUtils.getSubject();
-        if (subject.isAuthenticated()) {
+        if (subject.getPrincipal() != null) {
             logger.debug("Already logged in");
             return redirectToReturnUrl();
         }
@@ -428,7 +429,7 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public Resolution confirmSignUp() {
         Subject subject = SecurityUtils.getSubject();
-        if (subject.isAuthenticated()) {
+        if (subject.getPrincipal() != null) {
             logger.debug("Already logged in");
             return redirectToReturnUrl();
         }
@@ -466,8 +467,8 @@ public abstract class LoginAction extends AbstractActionBean {
         return new ForwardResolution("/m/base/actions/user/changePassword.jsp");
     }
 
-    @Button(list = "changepassword", key = "ok", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresAuthentication
+    @Button(list = "changepassword", key = "ok", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution changePassword2() throws Exception {
         Subject subject = SecurityUtils.getSubject();
 
