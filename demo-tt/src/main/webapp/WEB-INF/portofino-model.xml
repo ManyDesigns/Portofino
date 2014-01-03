@@ -606,6 +606,10 @@
         <annotation type="com.manydesigns.elements.annotations.CssClass">
             <value>input-medium</value>
         </annotation>
+        <annotation type="com.manydesigns.elements.annotations.RegExp">
+            <value>[a-zA-Z0-9]+</value>
+            <value>only.simple.letters.or.numbers.allowed</value>
+        </annotation>
     </annotations>
 </column>
 <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
@@ -642,6 +646,9 @@
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="last_updated" autoincrement="false">
+    <annotations/>
+</column>
+<column scale="0" nullable="true" length="255" jdbcType="12" columnType="VARCHAR" columnName="logo" autoincrement="false">
     <annotations/>
 </column>
                             </columns>
