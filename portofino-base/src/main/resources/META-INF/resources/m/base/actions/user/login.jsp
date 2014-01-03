@@ -1,11 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"
-         pageEncoding="UTF-8"
-%><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
-%><%@ taglib prefix="mde" uri="/manydesigns-elements"
-%><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-%><%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"
-%><stripes:layout-render name="/theme/templates/dialog/modal.jsp">
+         pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"%>
+<%@ taglib prefix="mde" uri="/manydesigns-elements"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"%>
+<stripes:layout-render name="/theme/templates/dialog/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
     <stripes:layout-component name="pageTitle">
         <fmt:message key="login.to">
@@ -19,12 +19,12 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post" class="dont-prompt-on-page-abandon">
-            <input type="text" name="userName" id="userName" class="input-block-level"
-                   placeholder="<fmt:message key='user.name'/>" />
-            <input type="password" name="pwd" id="pwd" class="input-block-level"
-                   placeholder="<fmt:message key='password'/>" />
+            <label for="userName"><fmt:message key='user.name'/></label>
+            <stripes:text name="userName" id="userName" class="input-block-level"/>
+            <label for="pwd"><fmt:message key='password'/></label>
+            <stripes:password name="pwd" id="pwd" class="input-block-level"/>
             <label class="checkbox">
-                <input type="checkbox" name="rememberMe" id="rememberMe"/> <fmt:message key='remember.me.on.this.computer'/>
+                <stripes:checkbox name="rememberMe" id="rememberMe"/> <fmt:message key='remember.me.on.this.computer'/>
             </label>
             <div class="login-buttons">
                 <button type="submit" name="login" class="btn btn-primary">Log in</button>
