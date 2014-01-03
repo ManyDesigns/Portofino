@@ -21,3 +21,11 @@ li.ticket-list-item {
     display: block;
     margin: 0 0 10px;
 }
+
+.activity-item-message ins {
+    background:#e6ffe6;
+}
+
+.activity-item-message ins {
+    background:#ffe6e6;
+}

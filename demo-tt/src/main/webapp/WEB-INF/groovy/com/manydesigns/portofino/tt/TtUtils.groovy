@@ -355,13 +355,11 @@ left join version_states vs on vs.id = act.version_state
             switch (aDiff.operation) {
                 case DiffMatchPatch.Operation.INSERT:
                     xb.openElement("ins")
-                    xb.addAttribute("style", "background:#e6ffe6;");
                     writeTextWithParagraphs(xb, text);
                     xb.closeElement("ins")
                     break;
                 case DiffMatchPatch.Operation.DELETE:
                     xb.openElement("del")
-                    xb.addAttribute("style", "background:#ffe6e6;");
                     writeTextWithParagraphs(xb, text);
                     xb.closeElement("del")
                     break;

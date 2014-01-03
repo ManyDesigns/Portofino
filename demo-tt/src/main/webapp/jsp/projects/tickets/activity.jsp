@@ -13,7 +13,12 @@
         <div>
             <strong><i class="icon-tag"></i> Ticket description:</strong>
         </div>
-        <div><c:out value="${mde:formattedText(actionBean.ticket.description, false)}" escapeXml="false"/></div>
+        <c:if test="${not empty actionBean.ticket.description}">
+            <div><c:out value="${mde:formattedText(actionBean.ticket.description, false)}" escapeXml="false"/></div>
+        </c:if>
+        <c:if test="${empty actionBean.ticket.description}">
+            <div><em>&lt;No description provided&gt;</em></div>
+        </c:if>
         <c:forEach var="activityItem" items="${actionBean.activityItems}">
             <mde:write name="activityItem"/>
         </c:forEach>
@@ -21,7 +26,7 @@
             <hr/>
             <stripes:form action="${actionBean.context.actionPath}" method="post">
                 <label>Add a comment:
-                <textarea name="comment" class="input-block-level"></textarea>
+                <textarea maxlength="4000" name="comment" class="input-block-level"></textarea>
                 </label>
                 <portofino:buttons list="activity"/>
             </stripes:form>
