@@ -19,7 +19,6 @@ import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.reflection.TableAccessor
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
-import com.manydesigns.portofino.shiro.ShiroUtils
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
@@ -75,8 +74,7 @@ public class Profile extends CustomAction {
     }
 
     protected Map loadUser() {
-        def userId = ShiroUtils.getUserId(SecurityUtils.subject);
-        user = (Map) persistence.getSession("tt").get("users", userId);
+        user = SecurityUtils.subject.principal;
         avatar = user.avatar;
         return user;
     }

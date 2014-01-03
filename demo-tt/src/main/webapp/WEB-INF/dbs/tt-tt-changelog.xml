@@ -74,6 +74,9 @@
             <column name="last_updated" type="timestamp">
                 <constraints nullable="false"/>
             </column>
+            <column name="logo" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
         </createTable>
     </changeSet>
     <changeSet id="tt-003" author="Giampiero Granatella">
