@@ -1,3 +1,5 @@
+import com.manydesigns.portofino.tt.TtUtils
+
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.portofino.buttons.GuardType
@@ -5,11 +7,10 @@ import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.modules.DatabaseModule
+import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
-import com.manydesigns.portofino.tt.ActivityStreamWithUserImageAction
-import com.manydesigns.portofino.tt.TtUtils
 import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.RedirectResolution
@@ -19,7 +20,7 @@ import org.apache.shiro.SecurityUtils
 import org.hibernate.Session
 
 @RequiresPermissions(level = AccessLevel.VIEW)
-class TicketActivityAction extends ActivityStreamWithUserImageAction {
+class TicketActivityAction extends ActivityStreamAction {
 
     public static String TICKET_ACTIVTY_SQL = TtUtils.ACTIVITY_SQL +
             "WHERE act.project = :project_id AND act.n = :ticket_n ORDER BY act.id";
@@ -58,7 +59,9 @@ class TicketActivityAction extends ActivityStreamWithUserImageAction {
 
         String keyPrefix = "ticket.";
 
-        TtUtils.populateActivityItems(items, activityItems, keyPrefix, locale, context);
+        String memberImageFormat = String.format("/projects/%s/members?userImage=&userId=%%s&code=%%s", project.id);
+
+        TtUtils.populateActivityItems(items, activityItems, keyPrefix, locale, memberImageFormat);
     }
 
     @Override

@@ -33,12 +33,10 @@ import com.manydesigns.elements.fields.Field
 import com.manydesigns.elements.forms.FieldSet
 import com.manydesigns.elements.forms.Form
 import com.manydesigns.elements.reflection.PropertyAccessor
-import com.manydesigns.elements.stripes.ElementsActionBeanContext
 import com.manydesigns.elements.xml.XhtmlBuffer
 import com.manydesigns.portofino.pageactions.activitystream.ActivityItem
 import com.sksamuel.diffpatch.DiffMatchPatch
 import com.sksamuel.diffpatch.DiffMatchPatch.Diff
-import net.sourceforge.stripes.util.UrlBuilder
 import org.apache.commons.lang.ObjectUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.SecurityUtils
@@ -163,6 +161,7 @@ select
     act.user_,
     u.first_name,
     u.last_name,
+    u.avatar,
     act.notifications_sent,
     act.message,
     act.user2,
@@ -207,6 +206,44 @@ left join ticket_types tt on tt.id = act.ticket_type
 left join ticket_states ts on ts.id = act.ticket_state
 left join version_states vs on vs.id = act.version_state
     """
+
+    public final static int ACTIVITY_SQL_ACTIVITY_ID = 0;
+    public final static int ACTIVITY_SQL_ACTIVITY_TIMESTAMP = 1;
+    public final static int ACTIVITY_SQL_ACTIVITY_TYPE_ID = 2;
+    public final static int ACTIVITY_SQL_ACTIVITY_TYPE_TYPE = 3;
+    public final static int ACTIVITY_SQL_USER_ID = 4;
+    public final static int ACTIVITY_SQL_USER_FIRST_NAME = 5;
+    public final static int ACTIVITY_SQL_USER_LAST_NAME = 6;
+    public final static int ACTIVITY_SQL_USER_AVATAR = 7;
+    public final static int ACTIVITY_SQL_ACTIVITY_NOTIFICATIONS_SENT = 8;
+    public final static int ACTIVITY_SQL_ACTIVITY_MESSAGE = 9;
+    public final static int ACTIVITY_SQL_USER2_ID = 10;
+    public final static int ACTIVITY_SQL_USER2_FIRST_NAME = 11;
+    public final static int ACTIVITY_SQL_USER2_LAST_NAME = 12;
+    public final static int ACTIVITY_SQL_PROJECT_ID = 13;
+    public final static int ACTIVITY_SQL_PROJECT_TITLE = 14;
+    public final static int ACTIVITY_SQL_TICKET_N = 15;
+    public final static int ACTIVITY_SQL_TICKET_TITLE = 16;
+    public final static int ACTIVITY_SQL_ATTACHMENT_ID = 17;
+    public final static int ACTIVITY_SQL_ATTACHMENT_TITLE = 18;
+    public final static int ACTIVITY_SQL_ATTACHMENT_FILE = 19;
+    public final static int ACTIVITY_SQL_VERSION_ID = 20;
+    public final static int ACTIVITY_SQL_VERSION_TITLE = 21;
+    public final static int ACTIVITY_SQL_COMPONENT_ID = 22;
+    public final static int ACTIVITY_SQL_COMPONENT_TITLE = 23;
+    public final static int ACTIVITY_SQL_ROLE_ID = 24;
+    public final static int ACTIVITY_SQL_ROLE_TITLE = 25;
+    public final static int ACTIVITY_SQL_RESOLUTION_ID = 26;
+    public final static int ACTIVITY_SQL_RESOLUTION_TITLE = 27;
+    public final static int ACTIVITY_SQL_TICKET_PRIORITY_ID = 28;
+    public final static int ACTIVITY_SQL_TICKET_PRIORITY_TITLE = 29;
+    public final static int ACTIVITY_SQL_TICKET_TYPE_ID = 30;
+    public final static int ACTIVITY_SQL_TICKET_TYPE_TITLE = 31;
+    public final static int ACTIVITY_SQL_TICKET_STATE_ID = 32;
+    public final static int ACTIVITY_SQL_TICKET_STATE_TITLE = 33;
+    public final static int ACTIVITY_SQL_VERSION_STATE_ID = 34;
+    public final static int ACTIVITY_SQL_VERSION_STATE_TITLE = 35;
+
 
     static public void addActivity(Session session,
                                    Object user,
@@ -374,22 +411,22 @@ left join version_states vs on vs.id = act.version_state
     }
 
     public static populateActivityItems(List items, List<ActivityItem> activityItems,
-                                        String keyPrefix, Locale locale, ElementsActionBeanContext context) {
+                                        String keyPrefix, Locale locale, String imageSrcFormat) {
         for (Object[] item: items) {
-            Long userId = item[4];
-            String userName = "${item[5]} ${item[6]}"
-            if (item[5] == null) {
+            Long userId = item[ACTIVITY_SQL_USER_ID];
+            String userName = "${item[ACTIVITY_SQL_USER_FIRST_NAME]} ${item[ACTIVITY_SQL_USER_LAST_NAME]}"
+            if (item[ACTIVITY_SQL_USER_FIRST_NAME] == null) {
                 userName = "<deleted id ${userId}>";
             }
 
-            Long userId2 = item[9];
-            String userName2 = "${item[10]} ${item[11]}"
-            if (item[10] == null) {
+            Long userId2 = item[ACTIVITY_SQL_USER2_ID];
+            String userName2 = "${item[ACTIVITY_SQL_USER2_FIRST_NAME]} ${item[ACTIVITY_SQL_USER2_LAST_NAME]}"
+            if (item[ACTIVITY_SQL_USER2_FIRST_NAME] == null) {
                 userName2 = "<deleted id ${userId2}>";
             }
 
-            String projectId = item[12];
-            String projectTitle = item[13]
+            String projectId = item[ACTIVITY_SQL_PROJECT_ID];
+            String projectTitle = item[ACTIVITY_SQL_PROJECT_TITLE]
             String projectName = "${projectId} ${projectTitle}"
             String projectHref = "/projects/${projectId}"
             if (projectTitle == null) {
@@ -397,88 +434,85 @@ left join version_states vs on vs.id = act.version_state
                 projectHref = null;
             }
 
-            String ticketCode = "${item[12]}-${item[14]}"
-            String ticketHref = "/projects/${item[12]}/tickets/${item[12]}/${item[14]}"
-            String ticketTitle = item[15];
+            String ticketCode = "${projectId}-${item[ACTIVITY_SQL_TICKET_N]}"
+            String ticketHref = "/projects/${projectId}/tickets/${projectId}/${item[ACTIVITY_SQL_TICKET_N]}"
+            String ticketTitle = item[ACTIVITY_SQL_TICKET_TITLE];
             if (ticketTitle == null) {
                 ticketCode = "<deleted id ${ticketCode}>";
                 ticketHref = null;
                 ticketTitle = null;
             }
 
-            Long attachmentId = item[16];
-            String attachmentTitle = item[17];
-            String attachmentCode = item[18];
+            Long attachmentId = item[ACTIVITY_SQL_ATTACHMENT_ID];
+            String attachmentTitle = item[ACTIVITY_SQL_ATTACHMENT_TITLE];
+            String attachmentCode = item[ACTIVITY_SQL_ATTACHMENT_FILE];
             String attachmentHref = "${ticketHref}/attachments/${attachmentId}?downloadBlob=&propertyName=file&code=${attachmentCode}";
             if (attachmentTitle == null) {
                 attachmentTitle = "<deleted id ${attachmentId}>";
                 attachmentHref = null;
             }
 
-            Long versionId = item[19];
-            String versionTitle = item[20];
+            Long versionId = item[ACTIVITY_SQL_VERSION_ID];
+            String versionTitle = item[ACTIVITY_SQL_VERSION_TITLE];
             String versionHref = "/projects/${projectId}/versions/${versionId}"
             if (versionTitle == null) {
                 versionTitle = "<deleted id ${versionId}>";
                 versionHref = null;
             }
 
-            Long componentId = item[21];
-            String componentTitle = item[22];
-            String componentHref = "/projects/${item[12]}/components/${componentId}";
+            Long componentId = item[ACTIVITY_SQL_COMPONENT_ID];
+            String componentTitle = item[ACTIVITY_SQL_COMPONENT_TITLE];
+            String componentHref = "/projects/${projectId}/components/${componentId}";
             if (componentTitle == null) {
                 componentTitle = "<deleted id ${componentId}>";
                 componentHref = null;
             }
 
-            Long roleId = item[23];
-            String roleTitle = item[24];
+            Long roleId = item[ACTIVITY_SQL_ROLE_ID];
+            String roleTitle = item[ACTIVITY_SQL_ROLE_TITLE];
             if (roleTitle == null) {
                 roleTitle = "<deleted id ${roleId}>";
             }
 
-            Long ticketResolutionId = item[25];
-            String ticketResolutionTitle = item[26];
+            Long ticketResolutionId = item[ACTIVITY_SQL_RESOLUTION_ID];
+            String ticketResolutionTitle = item[ACTIVITY_SQL_RESOLUTION_TITLE];
             if (ticketResolutionTitle == null) {
                 ticketResolutionTitle = "<deleted id ${ticketResolutionId}>";
             }
 
-            Long ticketPriorityId = item[27];
-            String ticketPriorityTitle = item[28];
+            Long ticketPriorityId = item[ACTIVITY_SQL_TICKET_PRIORITY_ID];
+            String ticketPriorityTitle = item[ACTIVITY_SQL_TICKET_PRIORITY_TITLE];
             if (ticketPriorityTitle == null) {
                 ticketPriorityTitle = "<deleted id ${ticketPriorityId}>";
             }
 
-            Long ticketTypeId = item[29];
-            String ticketTypeTitle = item[30];
+            Long ticketTypeId = item[ACTIVITY_SQL_TICKET_TYPE_ID];
+            String ticketTypeTitle = item[ACTIVITY_SQL_TICKET_TYPE_TITLE];
             if (ticketTypeTitle == null) {
                 ticketTypeTitle = "<deleted id ${ticketTypeId}>";
             }
 
-            Long ticketStateId = item[31];
-            String ticketStateTitle = item[32];
+            Long ticketStateId = item[ACTIVITY_SQL_TICKET_STATE_ID];
+            String ticketStateTitle = item[ACTIVITY_SQL_TICKET_STATE_TITLE];
             if (ticketStateTitle == null) {
                 ticketStateTitle = "<deleted id ${ticketStateId}>";
             }
 
-            Long versionStateId = item[33];
-            String versionStateTitle = item[34];
+            Long versionStateId = item[ACTIVITY_SQL_VERSION_STATE_ID];
+            String versionStateTitle = item[ACTIVITY_SQL_VERSION_STATE_TITLE];
             if (versionStateTitle == null) {
                 versionStateTitle = "<deleted id ${versionStateId}>";
             }
 
-            Date timestamp = (Date) item[1];
+            Date timestamp = (Date) item[ACTIVITY_SQL_ACTIVITY_TIMESTAMP];
             String imageSrc = null;
-            if (context != null) {
-                imageSrc = new UrlBuilder(Locale.getDefault(), context.actionPath, false).
-                        setEvent("userImage").
-                        addParameter("userId", item[4]).
-                        toString();
+            if (imageSrcFormat != null) {
+                imageSrc = String.format(imageSrcFormat, item[ACTIVITY_SQL_USER_ID], item[ACTIVITY_SQL_USER_AVATAR]);
             }
             String imageHref = null;
             String imageAlt = userName;
-            String message = item[8];
-            String key = item[3];
+            String message = item[ACTIVITY_SQL_ACTIVITY_MESSAGE];
+            String key = item[ACTIVITY_SQL_ACTIVITY_TYPE_TYPE];
             if (keyPrefix != null) {
                 key = keyPrefix + key;
             }

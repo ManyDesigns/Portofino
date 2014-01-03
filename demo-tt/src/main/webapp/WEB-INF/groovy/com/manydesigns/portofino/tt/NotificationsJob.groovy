@@ -112,7 +112,8 @@ public class NotificationsJob implements Job {
 
             int i = 0;
             for (Object current : items) {
-                logger.debug("Notifying activity #{}", current[0]);
+                long activityId = current[TtUtils.ACTIVITY_SQL_ACTIVITY_ID];
+                logger.debug("Notifying activity #{}", activityId);
 
                 request.setAttribute("activityItem", activityItems.get(i));
 
@@ -131,15 +132,15 @@ public class NotificationsJob implements Job {
                 logger.debug("Html body: {}", htmlBody);
 
                 String subject;
-                if (current[14] == null) {
-                    subject = "${current[12]}: ${current[13]}";
+                if (current[TtUtils.ACTIVITY_SQL_TICKET_N] == null) {
+                    subject = "${current[TtUtils.ACTIVITY_SQL_PROJECT_ID]}: ${current[TtUtils.ACTIVITY_SQL_PROJECT_TITLE]}";
                 } else {
-                    subject = "${current[12]}-${current[14]}: ${current[15]}";
+                    subject = "${current[TtUtils.ACTIVITY_SQL_PROJECT_ID]}-${current[TtUtils.ACTIVITY_SQL_TICKET_N]}: ${current[TtUtils.ACTIVITY_SQL_TICKET_TITLE]}";
                 }
 
                 notifyActivity(session, current, subject, htmlBody);
                 Date now = new Date();
-                Object activity = session.load("activity", (Long)current[0]);
+                Object activity = session.load("activity", activityId);
                 activity.notifications_sent = now;
                 session.update("activity", (Object)activity);
                 i++;
@@ -155,9 +156,9 @@ public class NotificationsJob implements Job {
     void notifyActivity(Session session, Object activity, String subject, String htmlBody) {
 
         Criteria criteria = session.createCriteria("members");
-        criteria.add(Restrictions.eq("project", activity[12]));
+        criteria.add(Restrictions.eq("project", activity[TtUtils.ACTIVITY_SQL_PROJECT_ID]));
         criteria.add(Restrictions.eq("notifications", true));
-        criteria.add(Restrictions.ne("user_", (Long)activity[4]));
+        criteria.add(Restrictions.ne("user_", (Long)activity[TtUtils.ACTIVITY_SQL_USER_ID]));
         List membersToBeNotified = criteria.list();
         for (Object current : membersToBeNotified) {
             Object user = current.fk_member_user;

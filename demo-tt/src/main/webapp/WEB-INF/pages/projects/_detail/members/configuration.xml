@@ -13,7 +13,7 @@
         <property updatable="true" searchable="false" name="role" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
-        <property updatable="true" searchable="false" name="notifications" label="" insertable="true" inSummary="true" enabled="true">
+        <property updatable="false" searchable="false" name="notifications" label="" insertable="false" inSummary="false" enabled="false">
             <annotations/>
         </property>
     </properties>

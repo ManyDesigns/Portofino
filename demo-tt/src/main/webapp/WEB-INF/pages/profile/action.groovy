@@ -181,7 +181,7 @@ public class Profile extends CustomAction {
             writer.output = stream;
             writer.write(imageBuff);
             writer.dispose();
-            field.getValue().setSize(file.getTotalSpace());
+            field.getValue().setSize(file.length());
             field.getValue().saveMetaProperties();
             stream.close();
         }
@@ -197,7 +197,8 @@ public class Profile extends CustomAction {
         int newHeight = image.height * scaleFactor;
         BufferedImage imageBuff = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
         def g2d = imageBuff.createGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g2d.drawImage(image, 0, 0, newWidth, newHeight, null);
         return imageBuff;
     }

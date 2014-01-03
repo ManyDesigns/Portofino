@@ -1,7 +1,12 @@
 package com.manydesigns.portofino.pageactions.crud
 
+import com.manydesigns.portofino.tt.TtUtils
+
 import com.manydesigns.elements.ElementsThreadLocals
+import com.manydesigns.elements.blobs.Blob
+import com.manydesigns.elements.blobs.BlobManager
 import com.manydesigns.elements.forms.Form
+import com.manydesigns.elements.servlet.ServletUtils
 import com.manydesigns.portofino.buttons.GuardType
 import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.buttons.annotations.Buttons
@@ -9,9 +14,11 @@ import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
-import com.manydesigns.portofino.tt.TtUtils
-import net.sourceforge.stripes.action.ForwardResolution
+import javax.servlet.http.HttpServletResponse
+import net.sourceforge.stripes.action.Before
+import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
+import net.sourceforge.stripes.action.StreamingResolution
 import org.apache.shiro.SecurityUtils
 
 @SupportsPermissions([ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE ])
@@ -21,13 +28,9 @@ class ProjectMembersAction extends CrudAction {
     Serializable project;
     Object old;
 
-    @Override
-    Resolution preparePage() {
+    @Before
+    public void prepareProject() {
         project = ElementsThreadLocals.getOgnlContext().get("project");
-        if (!isViewer()) {
-            return new ForwardResolution("/jsp/projects/members-not-available.jsp")
-        }
-        return super.preparePage();
     }
 
     //**************************************************************************
@@ -207,5 +210,54 @@ class ProjectMembersAction extends CrudAction {
         return super.bulkDelete();
     }
 
+
+    //**************************************************************************
+    // member image
+    //**************************************************************************
+
+    private final static MEMBER_HQL = """
+    select u
+    from users u
+    join u.fk_member_user m
+    where m.project = :project_id
+    and u.id = :user_id
+    """;
+
+    private Long userId;
+
+    public Resolution userImage() {
+        if(userId == null) {
+            return new RedirectResolution("/images/user-placeholder-40x40.png");
+        }
+        Map user = (Map) session.createQuery(MEMBER_HQL)
+                .setString("project_id", project.id)
+                .setLong("user_id", userId)
+                .uniqueResult();
+        if(user == null || user.avatar == null) {
+            return new RedirectResolution("/images/user-placeholder-40x40.png");
+        } else {
+            BlobManager mgr = ElementsThreadLocals.blobManager;
+            Blob blob = mgr.loadBlob(user.avatar);
+            long contentLength = blob.getSize();
+            String contentType = blob.getContentType();
+            InputStream inputStream = new FileInputStream(blob.getDataFile());
+
+            //Cache blobs (they're immutable)
+            HttpServletResponse response = context.getResponse();
+            ServletUtils.markCacheableForever(response);
+
+            return new StreamingResolution(contentType, inputStream)
+                    .setLength(contentLength)
+                    .setLastModified(blob.getCreateTimestamp().getMillis());
+        }
+    }
+
+    Long getUserId() {
+        return userId
+    }
+
+    void setUserId(Long userId) {
+        this.userId = userId
+    }
 
 }

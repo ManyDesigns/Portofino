@@ -77,21 +77,22 @@ public class ServletUtils {
         return scheme + "://" + req.getServerName() + portString + req.getContextPath();
     }
 
+    public final static long ONE_YEAR_MILLIS = 365l * 24l * 60l * 60l * 1000l;
+
     /**
      * Marks the resource returned to a web client to be stored in cache for a very long time.
      * The resource is marked to be cached privately, i.e. on the client only, not in intermediate caches like proxies.
      * @param response the HTTP response whose headers are set.
      */
     public static void markCacheableForever(HttpServletResponse response) {
-        int expiresAfter = 365 * 24 * 60 * 60; //1 year
+        long expiresAfterMillis = System.currentTimeMillis() + ONE_YEAR_MILLIS;
         response.setHeader(ServletConstants.HTTP_PRAGMA, "");
-        response.setDateHeader(ServletConstants.HTTP_EXPIRES, expiresAfter);
-        response.setHeader(ServletConstants.HTTP_CACHE_CONTROL, "");
+        response.setDateHeader(ServletConstants.HTTP_EXPIRES, expiresAfterMillis);
         //Private - only authorized users can cache the content
-        response.addHeader(ServletConstants.HTTP_CACHE_CONTROL, ServletConstants.HTTP_CACHE_CONTROL_PRIVATE);
-        response.addHeader(
-                ServletConstants.HTTP_CACHE_CONTROL,
-                ServletConstants.HTTP_CACHE_CONTROL_MAX_AGE + expiresAfter);
+        response.setHeader(ServletConstants.HTTP_CACHE_CONTROL,
+                ServletConstants.HTTP_CACHE_CONTROL_PRIVATE);
+        response.addHeader(ServletConstants.HTTP_CACHE_CONTROL,
+                ServletConstants.HTTP_CACHE_CONTROL_MAX_AGE + ONE_YEAR_MILLIS);
     }
 
 }
