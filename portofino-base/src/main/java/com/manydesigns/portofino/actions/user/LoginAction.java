@@ -41,7 +41,6 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -482,12 +481,10 @@ public abstract class LoginAction extends AbstractActionBean {
     // Change password
     //**************************************************************************
 
-    @RequiresAuthentication
     public Resolution changePassword() throws Exception {
         return new ForwardResolution("/m/base/actions/user/changePassword.jsp");
     }
 
-    @RequiresAuthentication
     @Button(list = "changepassword", key = "ok", order = 1, type = Button.TYPE_PRIMARY)
     public Resolution changePassword2() throws Exception {
         Subject subject = SecurityUtils.getSubject();
@@ -498,6 +495,18 @@ public abstract class LoginAction extends AbstractActionBean {
                     ShiroUtils.getPortofinoRealm();
             try {
                 portofinoRealm.changePassword(principal, pwd, newPassword);
+                if(subject.isRemembered()) {
+                    UsernamePasswordToken usernamePasswordToken =
+                            new UsernamePasswordToken(getRememberedUserName(principal), newPassword);
+                    usernamePasswordToken.setRememberMe(true);
+                    try {
+                        subject.login(usernamePasswordToken);
+                    } catch (Exception e) {
+                        logger.warn(
+                                "User {} changed password but could not be subsequently authenticated",
+                                portofinoRealm.getUserId(principal));
+                    }
+                }
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("password.changed.successfully"));
             } catch (IncorrectCredentialsException e) {
                 logger.error("Password update failed", e);

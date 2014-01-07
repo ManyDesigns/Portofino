@@ -57,7 +57,6 @@
                         </a>
                         <ul class="dropdown-menu">
                             <%
-
                                 UrlBuilder changePasswordUrlBuilder =
                                         new UrlBuilder(request.getLocale(), loginPage, true);
                                 changePasswordUrlBuilder.addParameter("returnUrl", actionPath);
