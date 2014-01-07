@@ -15,7 +15,7 @@ import org.hibernate.Session
 class HomeProjectsAction extends CustomAction {
 
     public final static String ANONYMOUS_SQL = """
-    select p.id, p.title, p.description, count(t.n) as c, p.public_
+    select p.id, p.title, p.description, count(t.n) as c, true
     from projects p
     left join tickets t on (t.project = p.id and t.state <>4)
     where p.public_
@@ -24,7 +24,7 @@ class HomeProjectsAction extends CustomAction {
     """;
 
     public final static String LOGGED_SQL = """
-    select p.id, p.title, p.description, count(t.n) as c, p.public_
+    select p.id, p.title, p.description, count(t.n) as c, true
     from projects p
     left join members m on m.project = p.id
     left join tickets t on (t.project = p.id and t.state <>4)
@@ -35,11 +35,11 @@ class HomeProjectsAction extends CustomAction {
     """;
 
     public final static String LOGGED_SQL2 = """
-    select p.id, p.title, p.description, count(t.n) as c, p.public_
+    select p.id, p.title, p.description, count(t.n) as c, true
     from projects p
     left join tickets t on (t.project = p.id and t.state <>4)
     where p.public_ = true
-    union select p.id, p.title, p.description, count(t.n) as c
+    union select p.id, p.title, p.description, count(t.n) as c, false
     from projects p
     join members m on m.project = p.id
     left join tickets t on (t.project = p.id and t.state <>4)

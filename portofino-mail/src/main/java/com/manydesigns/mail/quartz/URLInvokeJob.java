@@ -47,6 +47,8 @@ public class URLInvokeJob implements Job {
             urlToInvoke = jobExecutionContext.getMergedJobDataMap().get(URL_KEY).toString();
             logger.debug("URL to invoke: " + urlToInvoke);
             HttpURLConnection urlConnection = (HttpURLConnection) new URL(urlToInvoke).openConnection();
+            urlConnection.setConnectTimeout(30000);
+            urlConnection.setReadTimeout(30000);
             urlConnection.connect();
             int responseCode = urlConnection.getResponseCode();
             if(responseCode != 200) {
