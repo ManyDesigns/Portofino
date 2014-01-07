@@ -5,7 +5,9 @@
 
 
 import com.manydesigns.elements.ElementsThreadLocals
+import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.elements.reflection.ClassAccessor
+import com.manydesigns.elements.util.RandomUtil
 import com.manydesigns.mail.stripes.SendMailAction
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.logic.SecurityLogic
@@ -16,16 +18,15 @@ import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.reflection.TableAccessor
 import com.manydesigns.portofino.shiro.AbstractPortofinoRealm
-import com.manydesigns.portofino.shiro.ServletContainerToken
-import java.security.MessageDigest
-import org.apache.shiro.crypto.hash.Md5Hash
+import com.manydesigns.portofino.shiro.PasswordResetToken
+import org.apache.commons.lang.StringUtils
+import org.apache.shiro.crypto.hash.Sha1Hash
 import org.hibernate.Criteria
 import org.hibernate.Session
 import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.apache.shiro.authc.*
-import org.apache.shiro.crypto.hash.Sha1Hash
 
 class Security extends AbstractPortofinoRealm {
 
@@ -95,7 +96,6 @@ class Security extends AbstractPortofinoRealm {
         if (principal == null) {
             throw new UnknownAccountException("Unknown user");
         } else if (!encryptedPassword.equals(principal.password)) {
-            logger.warn("DB pwd: {}", principal.password)
             throw new IncorrectCredentialsException("Wrong password");
         } else if (principal.validated == null) {
             throw new DisabledAccountException("User not validated");
@@ -112,6 +112,47 @@ class Security extends AbstractPortofinoRealm {
         return info;
     }
 
+    public AuthenticationInfo loadAuthenticationInfo(
+            PasswordResetToken passwordResetToken) {
+        String token = passwordResetToken.token;
+        String newPassword = passwordResetToken.newPassword;
+        if (!checkPasswordStrength(newPassword)) {
+            SessionMessages.addErrorMessage("The password is not strong enough");
+            throw new Exception();
+        }
+
+        String encryptedPassword = encryptPassword(newPassword);
+        Session session = persistence.getSession("tt");
+        Criteria criteria = session.createCriteria("users");
+        criteria.add(Restrictions.eq("token", token));
+
+        Serializable principal = (Serializable)criteria.uniqueResult();
+
+        if (principal == null) {
+            throw new IncorrectCredentialsException();
+        } else {
+            logger.debug("Updating fields.");
+            updateAccess(principal, new Date());
+            principal.token = null;
+            if (principal.validated == null) {
+                principal.validated = new Date();
+            }
+            principal.password = encryptedPassword;
+            session.update("users", (Object)principal);
+            session.getTransaction().commit();
+        }
+
+        SimpleAuthenticationInfo info =
+                new SimpleAuthenticationInfo(
+                        principal, token, getName());
+        return info;
+    }
+
+    boolean checkPasswordStrength(String password) {
+        return StringUtils.length(password) >= 8;
+    }
+
+
     private void updateAccess(Object principal, Date now) {
         def request = ElementsThreadLocals.getHttpServletRequest();
         principal.last_access = now;
@@ -127,7 +168,7 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     public boolean supports(AuthenticationToken token) {
-        return token instanceof ServletContainerToken ||
+        return token instanceof PasswordResetToken ||
                token instanceof UsernamePasswordToken;
     }
 
@@ -250,6 +291,18 @@ class Security extends AbstractPortofinoRealm {
         if(q.executeUpdate() != 1) {
             throw new RuntimeException("Password not changed");
         }
+        session.getTransaction().commit();
+    }
+
+    @Override
+    String generateOneTimeToken(Serializable principal) {
+        Session session = persistence.getSession("tt");
+        String token = RandomUtil.createRandomId();
+        principal.token = token;
+        session.save("users", (Object)principal);
+        session.getTransaction().commit();
+
+        return token;
     }
 
 
