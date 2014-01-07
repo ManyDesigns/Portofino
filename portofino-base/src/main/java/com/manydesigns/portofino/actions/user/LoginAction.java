@@ -131,8 +131,7 @@ public abstract class LoginAction extends AbstractActionBean {
             logger.debug("Already logged in");
             return redirectToReturnUrl();
         }
-
-        return new ForwardResolution(getLoginPage());
+        return authenticate();
     }
 
     @Button(list = "login-buttons", key = "login", order = 1, type = Button.TYPE_PRIMARY)
@@ -170,11 +169,32 @@ public abstract class LoginAction extends AbstractActionBean {
             SessionMessages.addErrorMessage(errMsg);
             logger.warn("Login failed for '" + userName + "': " + e.getMessage(), e);
         }
-        return new ForwardResolution(getLoginPage());
+        return authenticate();
+    }
+
+    public Resolution authenticate() {
+        Subject subject = SecurityUtils.getSubject();
+        if(subject.isRemembered()) {
+            Serializable principal = (Serializable) ShiroUtils.getPrimaryPrincipal(subject);
+            userName = getRememberedUserName(principal);
+            rememberMe = true;
+            return new ForwardResolution(getAuthenticationPage());
+        } else {
+            return new ForwardResolution(getLoginPage());
+        }
     }
 
     protected String getLoginPage() {
         return "/m/base/actions/user/login.jsp";
+    }
+
+    protected String getAuthenticationPage() {
+        return "/m/base/actions/user/authenticate.jsp";
+    }
+
+    protected String getRememberedUserName(Serializable principal) {
+        PortofinoRealm realm = ShiroUtils.getPortofinoRealm();
+        return realm.getUserPrettyName(principal);
     }
 
     //**************************************************************************
@@ -301,7 +321,7 @@ public abstract class LoginAction extends AbstractActionBean {
                 String errMsg = ElementsThreadLocals.getText("the.password.reset.link.is.no.longer.active");
                 SessionMessages.addErrorMessage(errMsg);
                 logger.warn(errMsg, e);
-                return new ForwardResolution(getLoginPage());
+                return authenticate();
             }
         } else {
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("password.reset.failed.passwordsDontMatch"));
@@ -389,7 +409,7 @@ public abstract class LoginAction extends AbstractActionBean {
                 sendSignupConfirmationEmail(
                         from, email, ElementsThreadLocals.getText("confirm.signup"), body);
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("check.your.mailbox.and.follow.the.instructions"));
-                return new ForwardResolution(getLoginPage());
+                return authenticate();
             } catch (ExistingUserException e) {
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("an.user.with.the.same.username.already.exists"));
             } catch (Exception e) {
@@ -595,6 +615,14 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public boolean isRememberMe() {
+        return rememberMe;
+    }
+
+    public void setRememberMe(boolean rememberMe) {
+        this.rememberMe = rememberMe;
     }
 
     public boolean isCaptchaValidationFailed() {

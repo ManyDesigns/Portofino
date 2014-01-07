@@ -33,7 +33,6 @@ import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +71,6 @@ public class ModulesAction extends AbstractActionBean {
     //--------------------------------------------------------------------------
 
     @DefaultHandler
-    @RequiresPermissions("com.manydesigns.portofino.modules:list")
     public Resolution execute() {
         setupForm();
         return new ForwardResolution("/m/admin/modules/list.jsp");

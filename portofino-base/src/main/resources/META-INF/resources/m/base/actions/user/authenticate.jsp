@@ -5,7 +5,6 @@
 <%@ taglib prefix="mde" uri="/manydesigns-elements"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino" %>
-<%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"%>
 <stripes:layout-render name="/theme/templates/dialog/modal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.actions.user.LoginAction"/>
     <stripes:layout-component name="pageTitle">
@@ -20,13 +19,11 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post" class="dont-prompt-on-page-abandon">
-            <label for="userName"><fmt:message key='user.name'/></label>
-            <stripes:text name="userName" id="userName" class="input-block-level"/>
+            <div id="userName" class="input-block-level value"><c:out value="${actionBean.userName}" /></div>
+            <input type="hidden" name="userName" value="${actionBean.userName}" />
             <label for="pwd"><fmt:message key='password'/></label>
             <stripes:password name="pwd" id="pwd" class="input-block-level"/>
-            <label class="checkbox">
-                <stripes:checkbox name="rememberMe" id="rememberMe"/> <fmt:message key='remember.me.on.this.computer'/>
-            </label>
+            <input type="hidden" name="rememberMe" value="${actionBean.rememberMe}" />
             <div class="login-buttons">
                 <button type="submit" name="login" class="btn btn-primary">
                     <fmt:message key="login" />
@@ -35,35 +32,8 @@
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
         </stripes:form>
-        <%
-        try {
-            ShiroUtils.getPortofinoRealm();
-        %>  <div class="login-links">
-                <hr />
-                <div class="login-link">
-                    <stripes:link href="${actionBean.context.actionPath}">
-                        <stripes:param name="forgotPassword" value=""/>
-                        <stripes:param name="returnUrl" value="${actionBean.returnUrl}"/>
-                        <stripes:param name="cancelReturnUrl" value="${actionBean.cancelReturnUrl}"/>
-                        <fmt:message key='forgot.your.password'/>
-                    </stripes:link>
-                </div>
-                <div class="login-link">
-                    Don't have an account?
-                    <stripes:link href="${actionBean.context.actionPath}">
-                        <stripes:param name="signUp" value=""/>
-                        <stripes:param name="returnUrl" value="/"/>
-                        <stripes:param name="cancelReturnUrl" value="/"/>
-                        Sign up now
-                    </stripes:link>
-                </div>
-            </div><%
-        } catch (ClassCastException e) {
-            //Portofino realm not available; don't show sign up and change password links.
-        }
-        %>
         <script type="text/javascript">
-            $('#userName').focus();
+            $('#pwd').focus();
         </script>
     </stripes:layout-component>
 </stripes:layout-render>

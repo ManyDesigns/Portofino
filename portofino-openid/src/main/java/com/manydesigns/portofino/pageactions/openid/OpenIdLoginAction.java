@@ -88,6 +88,16 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
         return "/m/openid/pageactions/openid/openIdLogin.jsp";
     }
 
+    @Override
+    protected String getAuthenticationPage() {
+        return getLoginPage();
+    }
+
+    @Override
+    protected String getRememberedUserName(Serializable principal) {
+        return null;
+    }
+
     public Resolution showOpenIDForm()
             throws ConsumerException, MessageException, DiscoveryException, MalformedURLException {
         ConsumerManager manager = new ConsumerManager();
