@@ -7,28 +7,28 @@
         <property updatable="false" searchable="false" name="n" label="" insertable="false" inSummary="true" enabled="true">
             <annotations/>
         </property>
-        <property updatable="true" searchable="false" name="type" label="" insertable="true" inSummary="false" enabled="true">
-            <annotations/>
-        </property>
         <property updatable="true" searchable="true" name="title" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
         <property updatable="true" searchable="false" name="description" label="" insertable="true" inSummary="false" enabled="true">
             <annotations/>
         </property>
-        <property updatable="false" searchable="true" name="state" label="" insertable="false" inSummary="true" enabled="true">
+        <property updatable="true" searchable="true" name="type" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
         <property updatable="true" searchable="true" name="priority" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
+        <property updatable="true" searchable="true" name="affected_version" label="" insertable="true" inSummary="true" enabled="true">
+            <annotations/>
+        </property>
         <property updatable="false" searchable="true" name="created_by" label="" insertable="false" inSummary="true" enabled="true">
             <annotations/>
         </property>
-        <property updatable="false" searchable="true" name="assignee" label="" insertable="false" inSummary="true" enabled="true">
+        <property updatable="false" searchable="true" name="state" label="" insertable="false" inSummary="true" enabled="true">
             <annotations/>
         </property>
-        <property updatable="true" searchable="true" name="affected_version" label="" insertable="true" inSummary="true" enabled="true">
+        <property updatable="false" searchable="true" name="assignee" label="" insertable="false" inSummary="true" enabled="true">
             <annotations/>
         </property>
         <property updatable="false" searchable="true" name="fix_version" label="" insertable="false" inSummary="true" enabled="true">
@@ -45,14 +45,14 @@
         </property>
     </properties>
     <selectionProviders>
-        <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_fix_version" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
-        <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_created_by" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
-        <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_project" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
-        <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_affected_version" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
-        <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_priority" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
-        <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_type" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
+        <selectionProvider selectionProvider="ticket_fix_version" searchDisplayMode="DROPDOWN" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
+        <selectionProvider selectionProvider="ticket_created_by" searchDisplayMode="DROPDOWN" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
+        <selectionProvider fk="fk_ticket_project" enabled="false"/>
+        <selectionProvider selectionProvider="ticket_affected_version" searchDisplayMode="DROPDOWN" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
+        <selectionProvider selectionProvider="ticket_priorities" searchDisplayMode="DROPDOWN" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
+        <selectionProvider selectionProvider="ticket_types" searchDisplayMode="DROPDOWN" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
         <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_resolution" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
-        <selectionProvider searchDisplayMode="DROPDOWN" fk="fk_ticket_assignee" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
-        <selectionProvider searchDisplayMode="CHECKBOX" fk="fk_ticket_state" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
+        <selectionProvider selectionProvider="ticket_assignee" searchDisplayMode="DROPDOWN" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
+        <selectionProvider selectionProvider="ticket_states" searchDisplayMode="CHECKBOX" enabled="true" displayMode="DROPDOWN" createNewValueText=""/>
     </selectionProviders>
 </configuration>

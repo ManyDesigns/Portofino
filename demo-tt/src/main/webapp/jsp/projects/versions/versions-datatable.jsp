@@ -31,13 +31,25 @@
                         <span class="<c:out value="${version.fk_version_state.css_class}"/>"><c:out value="${version.fk_version_state.state}"/></span>
                     </h4>
                     <div>
-                        <c:if test="${not empty version.planned_date}">
-                            <fmt:message key="planned.date._">
-                                <fmt:param value="${version.planned_date}"/>
-                            </fmt:message>
+                        <c:if test="${version.state < 3}">
+                            <c:if test="${not empty version.planned_date}">
+                                <fmt:message key="planned.date._">
+                                    <fmt:param value="${version.planned_date}"/>
+                                </fmt:message>
+                            </c:if>
+                            <c:if test="${empty version.planned_date}">
+                                <fmt:message key="no.planned.date"/>
+                            </c:if>
                         </c:if>
-                        <c:if test="${empty version.planned_date}">
-                            <fmt:message key="no.planned.date"/>
+                        <c:if test="${version.state >= 3}">
+                            <c:if test="${not empty version.release_date}">
+                                <fmt:message key="release.date._">
+                                    <fmt:param value="${version.release_date}"/>
+                                </fmt:message>
+                            </c:if>
+                            <c:if test="${empty version.release_date}">
+                                <fmt:message key="no.release.date"/>
+                            </c:if>
                         </c:if>
                     </div>
                     <%

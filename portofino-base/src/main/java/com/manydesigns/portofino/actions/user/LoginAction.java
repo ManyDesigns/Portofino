@@ -270,7 +270,7 @@ public abstract class LoginAction extends AbstractActionBean {
                 String from = portofinoConfiguration.getString(
                         PortofinoProperties.MAIL_FROM, "example@example.com");
                 sendForgotPasswordEmail(
-                        from, email, ElementsThreadLocals.getText("user.passwordReset.emailSubject"), body);
+                        from, email, ElementsThreadLocals.getText("password.reset.confirmation.required"), body);
             }
 
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("check.your.mailbox.and.follow.the.instructions"));
@@ -410,7 +410,7 @@ public abstract class LoginAction extends AbstractActionBean {
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("check.your.mailbox.and.follow.the.instructions"));
                 return authenticate();
             } catch (ExistingUserException e) {
-                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("an.user.with.the.same.username.already.exists"));
+                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("a.user.with.the.same.username.already.exists"));
             } catch (Exception e) {
                 logger.error("Error during sign-up", e);
                 SessionMessages.addErrorMessage(ElementsThreadLocals.getText("signup.failed"));

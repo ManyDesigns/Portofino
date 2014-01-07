@@ -2,7 +2,6 @@
 <model>
     <databases>
         <database databaseName="tt">
-<!--            <jdbcConnection username="tt" url="jdbc:mysql://localhost/tt?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI" password="tt" driver="com.mysql.jdbc.Driver"/>-->
             <jdbcConnection username="tt" url="jdbc:postgresql:tt" password="tt" driver="org.postgresql.Driver"/>
             <schemas>
                 <schema schemaName="tt">
@@ -403,12 +402,13 @@
                             <annotations/>
                             <columns>
 <column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
-    <annotations/>
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>10</value>
+        </annotation>
+    </annotations>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="n" autoincrement="false">
-    <annotations/>
-</column>
-<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="type" autoincrement="false">
     <annotations/>
 </column>
 <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title" autoincrement="false">
@@ -416,17 +416,26 @@
         <annotation type="com.manydesigns.elements.annotations.CssClass">
             <value>input-xxlarge</value>
         </annotation>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>255</value>
+        </annotation>
     </annotations>
 </column>
 <column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.Multiline">
-            <value>true</value>
-        </annotation>
         <annotation type="com.manydesigns.elements.annotations.CssClass">
             <value>input-block-level</value>
         </annotation>
+        <annotation type="com.manydesigns.elements.annotations.MaxLength">
+            <value>4000</value>
+        </annotation>
+        <annotation type="com.manydesigns.elements.annotations.Multiline">
+            <value>true</value>
+        </annotation>
     </annotations>
+</column>
+<column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="type" autoincrement="false">
+    <annotations/>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="priority" autoincrement="false">
     <annotations/>
@@ -511,7 +520,43 @@
 <column columnName="project"/>
 <column columnName="n"/>
                             </primaryKey>
-                            <selectionProviders/>
+                            <selectionProviders>
+<query toDatabase="tt" sql="" name="ticket_types" hql="from ticket_types order by id">
+    <references>
+        <reference fromColumn="type"/>
+    </references>
+</query>
+<query toDatabase="tt" sql="" name="ticket_priorities" hql="from ticket_priorities order by id">
+    <references>
+        <reference fromColumn="priority"/>
+    </references>
+</query>
+<query toDatabase="tt" sql="" name="ticket_states" hql="from ticket_states order by id">
+    <references>
+        <reference fromColumn="state"/>
+    </references>
+</query>
+<query toDatabase="tt" sql="select u.id, concat(u.first_name, ' ', u.last_name), m.id is not null&#xD;&#xA;from users u&#xD;&#xA;left join members m on m.user_ = u.id&#xD;&#xA;where m.project = %{#project.id}&#xD;&#xA;order by u.first_name, u.last_name" name="ticket_assignee" hql="">
+    <references>
+        <reference fromColumn="assignee"/>
+    </references>
+</query>
+<query toDatabase="tt" sql="" name="ticket_fix_version" hql="from versions&#xD;&#xA;where project = %{#project.id}&#xD;&#xA;order by state, release_date desc, planned_date desc, id desc">
+    <references>
+        <reference fromColumn="fix_version"/>
+    </references>
+</query>
+<query toDatabase="tt" sql="" name="ticket_affected_version" hql="from versions&#xD;&#xA;where project = %{#project.id}&#xD;&#xA;order by state, release_date desc, planned_date desc, id desc">
+    <references>
+        <reference fromColumn="affected_version"/>
+    </references>
+</query>
+<query toDatabase="tt" sql="select u.id, concat(u.first_name, ' ', u.last_name), m.id is not null&#xD;&#xA;from users u&#xD;&#xA;left join members m on m.user_ = u.id&#xD;&#xA;where m.project = %{#project.id}&#xD;&#xA;order by u.first_name, u.last_name" name="ticket_created_by" hql="">
+    <references>
+        <reference fromColumn="created_by"/>
+    </references>
+</query>
+                            </selectionProviders>
                         </table>
                         <table tableName="ticket_priorities" shortName="%{priority}">
                             <annotations/>
@@ -597,7 +642,13 @@
                             <primaryKey>
 <column columnName="id"/>
                             </primaryKey>
-                            <selectionProviders/>
+                            <selectionProviders>
+<query toDatabase="tt" sql="" name="version_state" hql="from version_states order by id">
+    <references>
+        <reference fromColumn="state"/>
+    </references>
+</query>
+                            </selectionProviders>
                         </table>
                         <table tableName="projects" shortName="%{id} - %{title}">
                             <annotations/>
