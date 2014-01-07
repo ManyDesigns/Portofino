@@ -25,6 +25,7 @@ import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.apache.shiro.authc.*
+import org.apache.shiro.crypto.hash.Sha1Hash
 
 class Security extends AbstractPortofinoRealm {
 
@@ -94,6 +95,7 @@ class Security extends AbstractPortofinoRealm {
         if (principal == null) {
             throw new UnknownAccountException("Unknown user");
         } else if (!encryptedPassword.equals(principal.password)) {
+            logger.warn("DB pwd: {}", principal.password)
             throw new IncorrectCredentialsException("Wrong password");
         } else if (principal.validated == null) {
             throw new DisabledAccountException("User not validated");
@@ -118,22 +120,9 @@ class Security extends AbstractPortofinoRealm {
 
 
     public String encryptPassword(String plainText) {
-        Md5Hash md5Hash = new Md5Hash(plainText);
-        String encrypted = md5Hash.toBase64();
+        Sha1Hash sha1Hash = new Sha1Hash(plainText);
+        String encrypted = sha1Hash.toHex();
         return encrypted;
-    }
-
-
-    protected String hashPassword(String password) {
-        MessageDigest md = MessageDigest.getInstance("SHA-1");
-        md.update(password.getBytes("UTF-8"));
-        byte[] raw = md.digest();
-        StringBuilder sb = new StringBuilder();
-        for (byte b: raw) {
-            sb.append(String.format("%02X", b));
-        }
-        String hashedPassword = sb.toString().toLowerCase()
-        return hashedPassword
     }
 
     @Override
