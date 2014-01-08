@@ -24,7 +24,7 @@ class HomeProjectsAction extends CustomAction {
     """;
 
     public final static String LOGGED_SQL = """
-    select p.id, p.title, p.description, count(t.n) as c, true
+    select p.id, p.title, p.description, count(t.n) as c, p.public_
     from projects p
     left join members m on m.project = p.id
     left join tickets t on (t.project = p.id and t.state <>4)
