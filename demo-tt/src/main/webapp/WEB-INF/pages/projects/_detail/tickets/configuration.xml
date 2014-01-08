@@ -10,7 +10,7 @@
         <property updatable="true" searchable="true" name="title" label="" insertable="true" inSummary="true" enabled="true">
             <annotations/>
         </property>
-        <property updatable="true" searchable="false" name="description" label="" insertable="true" inSummary="false" enabled="true">
+        <property updatable="true" searchable="true" name="description" label="" insertable="true" inSummary="false" enabled="true">
             <annotations/>
         </property>
         <property updatable="true" searchable="true" name="type" label="" insertable="true" inSummary="true" enabled="true">
