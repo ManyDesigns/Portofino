@@ -45,9 +45,9 @@
                     <%
                         Subject subject = SecurityUtils.getSubject();
                         Object principal = subject.getPrincipal();
-                        String actionPath = actionBean.getContext().getactionPath();
+                        String actionPath = actionBean.getContext().getActionPath();
                         String loginPage = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PAGE);
-                        if(princiapl != null) {
+                        if(principal != null) {
                             String prettyName = ShiroUtils.getPortofinoRealm().getUserPrettyName((Serializable) principal);
                     %>
                     <li class="dropdown">
@@ -57,7 +57,6 @@
                         </a>
                         <ul class="dropdown-menu">
                             <%
-
                                 UrlBuilder changePasswordUrlBuilder =
                                         new UrlBuilder(request.getLocale(), loginPage, true);
                                 changePasswordUrlBuilder.addParameter("returnUrl", actionPath);
@@ -110,7 +109,7 @@
                             <li>
                                 <%
                                     UrlBuilder urlBuilder = new UrlBuilder(request.getLocale(), PageAdminAction.class, true);
-                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getactionPath());
+                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getActionPath());
                                     urlBuilder.setEvent("pageChildren");
                                 %>
                                 <a href="<%= request.getContextPath() + urlBuilder %>">
@@ -120,7 +119,7 @@
                             <li>
                                 <%
                                     urlBuilder = new UrlBuilder(request.getLocale(), PageAdminAction.class, true);
-                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getactionPath());
+                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getActionPath());
                                     urlBuilder.setEvent("newPage");
                                 %>
                                 <a href="<%= request.getContextPath() + urlBuilder %>">
@@ -129,7 +128,7 @@
                             </li>
                             <%
                                 String jsArgs = "('" +
-                                        pageAction.getContext().getactionPath() + "', '" +
+                                        pageAction.getContext().getActionPath() + "', '" +
                                         request.getContextPath() + "');";
 
                             %>
@@ -153,7 +152,7 @@
                                         portofinoConfiguration, pageAction.getPageInstance(),
                                         subject, AccessLevel.DEVELOP)) {
                                     urlBuilder = new UrlBuilder(Locale.getDefault(), PageAdminAction.class, true);
-                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getactionPath());
+                                    urlBuilder.addParameter("originalPath", pageAction.getContext().getActionPath());
                                     urlBuilder.setEvent("pagePermissions");
                             %>
                             <li>
