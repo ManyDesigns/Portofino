@@ -259,7 +259,7 @@ public class ManyToManyAction extends AbstractPageAction {
                         booleanRelation.put(o, !availableAssociations.contains(o));
                     }
                 }
-                return forwardTo("/m/many2many/checkboxes.jsp");
+                return forwardTo("/m/crud/many2many/checkboxes.jsp");
             default:
                 return forwardToPageActionNotConfigured();
         }
@@ -396,7 +396,7 @@ public class ManyToManyAction extends AbstractPageAction {
     @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution configure() {
         prepareConfigurationForms();
-        return new ForwardResolution("/m/many2many/configure.jsp");
+        return new ForwardResolution("/m/crud/many2many/configure.jsp");
     }
 
     @Button(list = "configuration", key = "update.configuration", order = 1, type = Button.TYPE_PRIMARY)
@@ -418,7 +418,7 @@ public class ManyToManyAction extends AbstractPageAction {
             return cancel();
         } else {
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("the.configuration.could.not.be.saved"));
-            return new ForwardResolution("/m/many2many/configure.jsp");
+            return new ForwardResolution("/m/crud/many2many/configure.jsp");
         }
     }
 

@@ -49,7 +49,7 @@ public class LocalePicker extends DefaultLocalePicker {
         super.init(configuration);
 
         for(Locale locale : locales) {
-            //Set UTF-8 as the default locale
+            //Set UTF-8 as the default encoding
             if(!encodings.containsKey(locale)) {
                 encodings.put(locale, "UTF-8");
             }

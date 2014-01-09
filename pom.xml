@@ -131,7 +131,6 @@
         <module>portofino-calendar</module>
         <module>portofino-chart</module>
         <module>portofino-crud</module>
-        <module>portofino-many2many</module>
         <module>portofino-admin</module>
         <module>portofino-theme</module>
         <!-- Optional services -->

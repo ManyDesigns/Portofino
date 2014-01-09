@@ -1,5 +1,4 @@
-package com.manydesigns.portofino.pageactions.activitystream
-
+import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import net.sourceforge.stripes.action.Resolution
