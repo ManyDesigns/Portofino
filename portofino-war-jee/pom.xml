@@ -97,13 +97,6 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- Many-to-many pages. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-many2many</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
-        </dependency>
         <!-- Reliable mail sender. Remove to disable this feature. -->
         <dependency>
             <groupId>com.manydesigns</groupId>

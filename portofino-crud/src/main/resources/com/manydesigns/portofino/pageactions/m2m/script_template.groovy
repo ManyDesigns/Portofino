@@ -1,5 +1,3 @@
-package com.manydesigns.portofino.pageactions.m2m
-
 import javax.servlet.*
 
 import com.manydesigns.elements.messages.*
