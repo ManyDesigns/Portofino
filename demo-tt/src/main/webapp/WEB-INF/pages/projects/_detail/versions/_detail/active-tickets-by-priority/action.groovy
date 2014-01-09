@@ -1,11 +1,11 @@
 import com.manydesigns.elements.ElementsThreadLocals
-import com.manydesigns.portofino.tt.TicketGroup
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.pageactions.custom.CustomAction
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
+import com.manydesigns.portofino.tt.TicketGroup
 import net.sourceforge.stripes.action.DefaultHandler
 import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.Resolution
@@ -39,7 +39,7 @@ class ActiveTicketsByPriorityAction extends CustomAction {
                 Object transformTuple(Object[] tuple, String[] aliases) {
                     int groupId = tuple[0];
                     String groupName = tuple[1];
-                    String url = "/projects/$version.project/tickets?search_state=1&search_state=2&search_state=3&search_priority=$groupId";
+                    String url = "/projects/$version.project/tickets?search_state=1&search_state=2&search_state=3&search_priority=${groupId}&search_fix_version=${version.id}";
                     int groupCount = (int)tuple[2];
                     return new TicketGroup(groupName, url, groupCount);
                 }

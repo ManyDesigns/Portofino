@@ -34,7 +34,6 @@ import com.manydesigns.portofino.tt.NotificationsJob
 
 import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.i18n.ResourceBundleManager
-import com.manydesigns.portofino.pageactions.registry.TemplateRegistry
 import com.manydesigns.portofino.persistence.Persistence
 import org.hibernate.Session
 import org.quartz.DateBuilder.IntervalUnit
@@ -66,9 +65,6 @@ public class DemoTTModule implements Module {
 
     @Inject(BaseModule.MODULE_REGISTRY)
     public ModuleRegistry moduleRegistry;
-
-    @Inject(PageactionsModule.TEMPLATES_REGISTRY)
-    public TemplateRegistry templates;
 
     @Inject(DatabaseModule.PERSISTENCE)
     public Persistence persistence;
@@ -115,7 +111,6 @@ public class DemoTTModule implements Module {
 //            }
 //        }
 
-        templates.register("homepage");
         status = ModuleStatus.ACTIVE;
     }
 

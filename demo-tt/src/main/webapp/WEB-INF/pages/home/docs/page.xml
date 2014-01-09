@@ -3,7 +3,7 @@
     <detailLayout template="default">
         <childPages/>
     </detailLayout>
-    <layout template="homepage">
+    <layout template="default">
         <childPages/>
     </layout>
     <permissions/>

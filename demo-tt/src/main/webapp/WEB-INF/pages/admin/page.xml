@@ -12,5 +12,7 @@
             <childPage showInNavigation="true" name="activity"/>
         </childPages>
     </layout>
-    <permissions/>
+    <permissions>
+        <group name="admin" level="VIEW"/>
+    </permissions>
 </page>

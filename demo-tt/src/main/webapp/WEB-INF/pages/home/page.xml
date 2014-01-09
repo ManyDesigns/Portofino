@@ -3,7 +3,7 @@
     <detailLayout template="default">
         <childPages/>
     </detailLayout>
-    <layout template="homepage">
+    <layout template="main-with-wells">
         <childPages>
             <childPage showInNavigation="false" order="1" name="docs" container="default"/>
             <childPage showInNavigation="false" order="0" name="welcome" container="default"/>

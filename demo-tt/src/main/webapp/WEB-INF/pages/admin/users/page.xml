@@ -6,7 +6,5 @@
     <layout template="default">
         <childPages/>
     </layout>
-    <permissions>
-        <group name="admin" level="VIEW"/>
-    </permissions>
+    <permissions/>
 </page>
