@@ -30,7 +30,7 @@ class HomeProjectsAction extends CustomAction {
     left join tickets t on (t.project = p.id and t.state <>4)
     where p.public_ = true
     or m.user_ = :user
-    group by p.id, p.title, p.description
+    group by p.id, p.title, p.description, p.public_
     order by id
     """;
 

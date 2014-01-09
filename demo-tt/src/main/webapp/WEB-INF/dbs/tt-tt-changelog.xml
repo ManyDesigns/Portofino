@@ -903,4 +903,10 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
+    <changeSet id="tt-246-idx" author="Paolo Predonzani">
+        <createIndex tableName="activity" indexName="idx_activity_project_n">
+            <column name="project"/>
+            <column name="n"/>
+        </createIndex>
+    </changeSet>
 </databaseChangeLog>
