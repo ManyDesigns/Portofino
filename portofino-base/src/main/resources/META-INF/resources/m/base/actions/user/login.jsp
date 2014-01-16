@@ -49,12 +49,12 @@
                     </stripes:link>
                 </div>
                 <div class="login-link">
-                    Don't have an account?
+                    <fmt:message key='dont.have.an.account'/>
                     <stripes:link href="${actionBean.context.actionPath}">
                         <stripes:param name="signUp" value=""/>
                         <stripes:param name="returnUrl" value="/"/>
                         <stripes:param name="cancelReturnUrl" value="/"/>
-                        Sign up now
+                        <fmt:message key='sign.up.now'/>
                     </stripes:link>
                 </div>
             </div><%
