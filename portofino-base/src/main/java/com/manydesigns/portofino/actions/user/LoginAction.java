@@ -53,6 +53,8 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -310,21 +312,29 @@ public abstract class LoginAction extends AbstractActionBean {
             return redirectToReturnUrl();
         }
 
-        if (ObjectUtils.equals(newPassword, confirmNewPassword)) {
-            PasswordResetToken token = new PasswordResetToken(this.token, newPassword);
-            try {
-                subject.login(token);
-                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("password.successfully.reset"));
-                return redirectToReturnUrl();
-            } catch (AuthenticationException e) {
-                String errMsg = ElementsThreadLocals.getText("the.password.reset.link.is.no.longer.active");
-                SessionMessages.addErrorMessage(errMsg);
-                logger.warn(errMsg, e);
-                return authenticate();
+        if (!ObjectUtils.equals(newPassword, confirmNewPassword)) {
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("passwords.dont.match"));
+            return new ForwardResolution("/m/base/actions/user/resetPassword.jsp");
+        }
+
+        List<String> errorMessages = new ArrayList<String>();
+        if (!checkPasswordStrength(newPassword, errorMessages)) {
+            for (String current : errorMessages) {
+                SessionMessages.addErrorMessage(current);
             }
-        } else {
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("password.reset.failed.passwordsDontMatch"));
-            return resetPassword();
+            return new ForwardResolution("/m/base/actions/user/resetPassword.jsp");
+        }
+
+        PasswordResetToken token = new PasswordResetToken(this.token, newPassword);
+        try {
+            subject.login(token);
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("password.successfully.reset"));
+            return redirectToReturnUrl();
+        } catch (AuthenticationException e) {
+            String errMsg = ElementsThreadLocals.getText("the.password.reset.link.is.no.longer.active");
+            SessionMessages.addErrorMessage(errMsg);
+            logger.warn(errMsg, e);
+            return authenticate();
         }
     }
 
@@ -373,7 +383,7 @@ public abstract class LoginAction extends AbstractActionBean {
         }
 
         setupSignUpForm(ShiroUtils.getPortofinoRealm());
-        return new ForwardResolution(getSignUpPage());
+        return getSignUpView();
     }
 
     public Resolution signUp2() {
@@ -418,7 +428,7 @@ public abstract class LoginAction extends AbstractActionBean {
         } else {
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("please.correct.the.errors.before.proceeding"));
         }
-        return new ForwardResolution(getSignUpPage());
+        return getSignUpView();
     }
 
     protected boolean validateCaptcha() {
@@ -466,8 +476,8 @@ public abstract class LoginAction extends AbstractActionBean {
         }
     }
 
-    protected String getSignUpPage() {
-        return "/m/base/actions/user/signUp.jsp";
+    protected Resolution getSignUpView() {
+        return new ForwardResolution("/m/base/actions/user/signUp.jsp");
     }
 
     protected void setupSignUpForm(PortofinoRealm realm) {
@@ -490,43 +500,67 @@ public abstract class LoginAction extends AbstractActionBean {
         Subject subject = SecurityUtils.getSubject();
 
         Serializable principal = (Serializable) subject.getPrincipal();
-        if (ObjectUtils.equals(newPassword, confirmNewPassword)) {
-            PortofinoRealm portofinoRealm =
-                    ShiroUtils.getPortofinoRealm();
-            try {
-                portofinoRealm.changePassword(principal, pwd, newPassword);
-                if(subject.isRemembered()) {
-                    UsernamePasswordToken usernamePasswordToken =
-                            new UsernamePasswordToken(getRememberedUserName(principal), newPassword);
-                    usernamePasswordToken.setRememberMe(true);
-                    try {
-                        subject.login(usernamePasswordToken);
-                    } catch (Exception e) {
-                        logger.warn(
-                                "User {} changed password but could not be subsequently authenticated",
-                                portofinoRealm.getUserId(principal));
-                    }
-                }
-                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("password.changed.successfully"));
-            } catch (IncorrectCredentialsException e) {
-                logger.error("Password update failed", e);
-                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("wrong.password"));
-                return new ForwardResolution("/m/base/actions/user/changePassword.jsp");
-            } catch (Exception e) {
-                logger.error("Password update failed", e);
-                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("password.change.failed"));
-                return new ForwardResolution("/m/base/actions/user/changePassword.jsp");
-            }
-            return redirectToReturnUrl();
-        } else {
+        if (!ObjectUtils.equals(newPassword, confirmNewPassword)) {
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("passwords.dont.match"));
             return new ForwardResolution("/m/base/actions/user/changePassword.jsp");
         }
+
+        List<String> errorMessages = new ArrayList<String>();
+        if (!checkPasswordStrength(newPassword, errorMessages)) {
+            for (String current : errorMessages) {
+                SessionMessages.addErrorMessage(current);
+            }
+            return new ForwardResolution("/m/base/actions/user/changePassword.jsp");
+        }
+
+        PortofinoRealm portofinoRealm =
+                ShiroUtils.getPortofinoRealm();
+        try {
+            portofinoRealm.changePassword(principal, pwd, newPassword);
+            if(subject.isRemembered()) {
+                UsernamePasswordToken usernamePasswordToken =
+                        new UsernamePasswordToken(getRememberedUserName(principal), newPassword);
+                usernamePasswordToken.setRememberMe(true);
+                try {
+                    subject.login(usernamePasswordToken);
+                } catch (Exception e) {
+                    logger.warn(
+                            "User {} changed password but could not be subsequently authenticated",
+                            portofinoRealm.getUserId(principal));
+                }
+            }
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("password.changed.successfully"));
+        } catch (IncorrectCredentialsException e) {
+            logger.warn("User {} password change: Incorrect credentials", portofinoRealm.getUserId(principal));
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("wrong.password"));
+            return new ForwardResolution("/m/base/actions/user/changePassword.jsp");
+        } catch (Exception e) {
+            logger.error("Password update failed for user " + portofinoRealm.getUserId(principal), e);
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("password.change.failed"));
+            return new ForwardResolution("/m/base/actions/user/changePassword.jsp");
+        }
+        return redirectToReturnUrl();
     }
 
     //**************************************************************************
     // Utility methods
     //**************************************************************************
+
+    protected boolean checkPasswordStrength(String password, List<String> errorMessages) {
+        if (password == null) {
+            logger.debug("Null password");
+            return false;
+        }
+        if (password.length() < 8) {
+            logger.debug("Password too short");
+            return false;
+        }
+        if (StringUtils.isAlpha(password)) {
+            logger.debug("Password only alpha chars");
+            return false;
+        }
+        return true;
+    }
 
     protected Resolution redirectToReturnUrl() {
         return redirectToReturnUrl(returnUrl);

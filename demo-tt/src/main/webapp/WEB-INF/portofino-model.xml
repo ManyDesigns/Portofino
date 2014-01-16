@@ -292,12 +292,16 @@
 <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="email" autoincrement="false">
     <annotations>
         <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-xxlarge</value>
+            <value>input-xlarge</value>
         </annotation>
     </annotations>
 </column>
 <column scale="0" nullable="true" length="255" jdbcType="12" columnType="VARCHAR" columnName="password" autoincrement="false">
-    <annotations/>
+    <annotations>
+        <annotation type="com.manydesigns.elements.annotations.Password">
+            <value>true</value>
+        </annotation>
+    </annotations>
 </column>
 <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="first_name" autoincrement="false">
     <annotations/>
