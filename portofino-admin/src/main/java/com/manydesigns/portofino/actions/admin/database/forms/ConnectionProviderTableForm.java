@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -31,7 +31,7 @@ import com.manydesigns.portofino.model.database.ConnectionProvider;
  */
 public class ConnectionProviderTableForm {
     public static final String copyright =
-            "Copyright (c) 2005-2013, ManyDesigns srl";
+            "Copyright (c) 2005-2014, ManyDesigns srl";
 
     public String databaseName;
     @Status(red={ConnectionProvider.STATUS_ERROR},

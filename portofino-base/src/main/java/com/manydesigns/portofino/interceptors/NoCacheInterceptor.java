@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -38,7 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 @Intercepts(LifecycleStage.RequestInit)
 public class NoCacheInterceptor implements Interceptor {
     public static final String copyright =
-            "Copyright (c) 2005-2013, ManyDesigns srl";
+            "Copyright (c) 2005-2014, ManyDesigns srl";
 
     public Resolution intercept(ExecutionContext context) throws Exception {
         HttpServletResponse response = context.getActionBeanContext().getResponse();

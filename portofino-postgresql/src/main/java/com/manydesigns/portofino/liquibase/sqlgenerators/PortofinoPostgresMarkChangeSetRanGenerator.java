@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -50,7 +50,7 @@ import java.util.List;
  */
 public class PortofinoPostgresMarkChangeSetRanGenerator extends AbstractSqlGenerator<MarkChangeSetRanStatement> {
     public static final String copyright =
-            "Copyright (c) 2005-2013, ManyDesigns srl";
+            "Copyright (c) 2005-2014, ManyDesigns srl";
 
     @Override
     public int getPriority() {

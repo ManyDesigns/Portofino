@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -35,7 +35,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface Help {
     public static final String copyright =
-            "Copyright (c) 2005-2013, ManyDesigns srl";
+            "Copyright (c) 2005-2014, ManyDesigns srl";
 
     String value();
 }

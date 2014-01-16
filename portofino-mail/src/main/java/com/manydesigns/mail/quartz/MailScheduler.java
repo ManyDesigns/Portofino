@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MailScheduler {
     public static final String copyright =
-            "Copyright (c) 2005-2013, ManyDesigns srl";
+            "Copyright (c) 2005-2014, ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(MailScheduler.class);
     public static final int DEFAULT_POLL_INTERVAL = 1000;

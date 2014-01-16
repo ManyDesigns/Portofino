@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -28,7 +28,7 @@ package com.manydesigns.elements.servlet;
  */
 public class ServletConstants {
     public static final String copyright =
-            "Copyright (c) 2005-2013, ManyDesigns srl";
+            "Copyright (c) 2005-2014, ManyDesigns srl";
 
     public static final String HTTP_PRAGMA = "Pragma";
     public static final String HTTP_CACHE_CONTROL = "Cache-Control";

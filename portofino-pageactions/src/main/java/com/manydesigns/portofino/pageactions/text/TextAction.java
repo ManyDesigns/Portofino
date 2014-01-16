@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -71,7 +71,7 @@ import java.util.regex.Pattern;
 @SupportsPermissions({ TextAction.PERMISSION_EDIT })
 public class TextAction extends AbstractPageAction {
     public static final String copyright =
-            "Copyright (c) 2005-2013, ManyDesigns srl";
+            "Copyright (c) 2005-2014, ManyDesigns srl";
     public static final String CONTENT_ENCODING = "UTF-8";
     public static final String EMPTY_STRING = "";
     public static final String TEXT_FILE_NAME_PATTERN = "{0}.html";

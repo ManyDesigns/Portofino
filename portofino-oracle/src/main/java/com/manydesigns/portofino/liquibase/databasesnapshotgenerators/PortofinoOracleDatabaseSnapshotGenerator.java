@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -30,7 +30,7 @@ import liquibase.snapshot.jvm.OracleDatabaseSnapshotGenerator;
 */
 public class PortofinoOracleDatabaseSnapshotGenerator extends OracleDatabaseSnapshotGenerator {
     public static final String copyright =
-            "Copyright (c) 2005-2013, ManyDesigns srl";
+            "Copyright (c) 2005-2014, ManyDesigns srl";
 
     @Override
     protected String convertTableNameToDatabaseTableName(String tableName) {

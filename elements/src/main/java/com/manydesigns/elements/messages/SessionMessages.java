@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2013 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -45,7 +45,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class SessionMessages {
     public static final String copyright =
-            "Copyright (c) 2005-2013, ManyDesigns srl";
+            "Copyright (c) 2005-2014, ManyDesigns srl";
     public static final String INFO_MESSAGES_KEY = "info_messages_key";
     public static final String WARNING_MESSAGES_KEY = "warning_messages_key";
     public static final String ERROR_MESSAGES_KEY = "error_messages_key";
