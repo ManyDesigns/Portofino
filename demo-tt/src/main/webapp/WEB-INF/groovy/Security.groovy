@@ -10,7 +10,6 @@ import com.manydesigns.elements.reflection.ClassAccessor
 import com.manydesigns.elements.util.RandomUtil
 import com.manydesigns.mail.stripes.SendMailAction
 import com.manydesigns.portofino.di.Inject
-import com.manydesigns.portofino.logic.SecurityLogic
 import com.manydesigns.portofino.model.database.Database
 import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.model.database.Table
@@ -89,7 +88,7 @@ class Security extends AbstractPortofinoRealm {
         Session session = persistence.getSession("tt");
 
         Criteria criteria = session.createCriteria("users");
-        criteria.add(Restrictions.eq("email", login));
+        criteria.add(Restrictions.eq("email", login).ignoreCase());
 
         Serializable principal = (Serializable)criteria.uniqueResult();
 
