@@ -188,26 +188,21 @@ class ProjectMembersAction extends CrudAction {
     //**************************************************************************
 
     @Override
-    @Button(list = "crud-search", key = "edit", order = 2d, icon = Button.ICON_EDIT, group = "crud")
-    @Guard(test = "isBulkOperationsEnabled() && isManager()", type = GuardType.VISIBLE)
     Resolution bulkEdit() {
-        return super.bulkEdit();
+        throw new UnsupportedOperationException("bulk edit")
     }
 
-    @Button(list = "crud-bulk-edit", key = "update", order = 1d, type = Button.TYPE_PRIMARY)
-    @Guard(test = "isManager()", type = GuardType.VISIBLE)
+    @Override
     Resolution bulkUpdate() {
-        return super.bulkUpdate();
+        throw new UnsupportedOperationException("bulk update")
     }
 
     //**************************************************************************
     // Bulk delete customizations
     //**************************************************************************
 
-    @Button(list = "crud-search", key = "delete", order = 3d, icon = Button.ICON_TRASH, group = "crud")
-    @Guard(test = "isBulkOperationsEnabled() && isManager()", type = GuardType.VISIBLE)
     public Resolution bulkDelete() {
-        return super.bulkDelete();
+        throw new UnsupportedOperationException("bulk delete")
     }
 
 
