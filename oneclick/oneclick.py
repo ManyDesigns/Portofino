@@ -1,8 +1,7 @@
 #! /usr/bin/env python
 
 '''
-E' necessario che questo file sia accompagnato da un file local.py
-Template del contenuto di local.py:
+You must create a "local.py" using the following template:
 
 #! /usr/bin/env python
 
@@ -10,7 +9,7 @@ portofino_version = "4.1"
 tomcat_dir = "apache-tomcat-7.0.42"
 portofino_path = "~/projects/portofino4"
 tomcat_url = "http://mirror.nohup.it/apache/tomcat/tomcat-7/v7.0.42/bin/apache-tomcat-7.0.42.zip"
-drivers = [["postgresql/postgresql/9.2-1003-jdbc4/", "postgresql-9.2-1003-jdbc4.jar"],
+drivers = [["org/postgresql/postgresql/9.2-1004-jdbc4/", "postgresql-9.2-1004-jdbc4.jar"],
            ["mysql/mysql-connector-java/5.1.25/", "mysql-connector-java-5.1.25.jar"],
            ["net/sourceforge/jtds/jtds/1.2.8/", "jtds-1.2.8.jar"]]
 
@@ -26,6 +25,7 @@ import os
 build_path = "build"
 portofino_dir = "portofino-" + local.portofino_version;
 base_path = build_path + "/" + portofino_dir
+oneclick_path = build_path + "/portofino-oneclick"
 portofino_path = os.path.expanduser(local.portofino_path)
 tomcat_path = base_path + "/" + local.tomcat_dir
 tomcat_zip = build_path + "/" + local.tomcat_dir + ".zip"
@@ -57,9 +57,17 @@ print "Downloading JDBC drivers..."
 for driver in local.drivers:
     urllib.urlretrieve("http://repo1.maven.org/maven2/" + driver[0] + driver[1], tomcat_path + "/lib/" + driver[1])
 
+print "Building Portofino..."
 os.system("pushd " + portofino_path + "; mvn clean install -Dmaven.test.skip=true; popd")
 
-shutil.copy(portofino_path + "/portofino-war-jee/target/portofino-war-jee-" + local.portofino_version + ".war", tomcat_path + "/webapps/ROOT.war")
+print "Generating oneclick from archetype..."
+os.system("pushd " + build_path + "; mvn archetype:generate -DarchetypeArtifactId=portofino-war-archetype -DarchetypeGroupId=com.manydesigns -DarchetypeVersion=" + local.portofino_version + " -DinteractiveMode=false -DgroupId=com.manydesigns -DartifactId=portofino-oneclick -Dversion=" + local.portofino_version + "; popd")
+
+print "Building oneclick..."
+os.system("pushd " + oneclick_path + "; mvn clean install -Dmaven.test.skip=true; popd")
+
+
+shutil.copy(oneclick_path + "/target/portofino-oneclick-" + local.portofino_version + ".war", tomcat_path + "/webapps/ROOT.war")
 
 shutil.copy("setenv.sh", tomcat_path + "/bin")
 shutil.copy("setenv.bat", tomcat_path + "/bin")

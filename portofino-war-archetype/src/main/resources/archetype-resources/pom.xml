@@ -43,6 +43,12 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-db2</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
             <artifactId>portofino-googlecloudsql</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>

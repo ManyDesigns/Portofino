@@ -244,11 +244,11 @@ public class OpenIdLoginAction extends DefaultLoginAction implements PageAction 
             } catch (Exception e) {
                 logger.error("Error during sign-up", e);
                 SessionMessages.addErrorMessage("Sign-up failed.");
-                return new ForwardResolution(getSignUpPage());
+                return getSignUpView();
             }
         } else {
             SessionMessages.addErrorMessage("Correct the errors before proceding");
-            return new ForwardResolution(getSignUpPage());
+            return getSignUpView();
         }
     }
 

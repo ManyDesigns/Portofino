@@ -139,7 +139,6 @@
         <module>portofino-quartz</module>
         <!-- Applications -->
         <module>portofino-war-archetype</module>
-        <module>portofino-war-jee</module>
         <module>portofino-war-gae</module>
         <module>demo-tt</module>
     </modules>
