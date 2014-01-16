@@ -183,9 +183,9 @@ class Security extends AbstractPortofinoRealm {
             result.add(ADMIN_GROUP_NAME);
 //            UserService userService = UserServiceFactory.getUserService();
 //            if (userService.isUserAdmin()) {
-            if (isLocalUser()) {
-                result.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
-            }
+//            if (isLocalUser()) {
+//                result.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
+//            }
         }
         if (principal.project_manager) {
             result.add(PROJECT_MANAGER_GROUP_NAME);

@@ -6,5 +6,9 @@
     <layout template="full-width">
         <childPages/>
     </layout>
-    <permissions/>
+    <permissions>
+        <group name="registered">
+            <permission>crud-edit</permission>
+        </group>
+    </permissions>
 </page>

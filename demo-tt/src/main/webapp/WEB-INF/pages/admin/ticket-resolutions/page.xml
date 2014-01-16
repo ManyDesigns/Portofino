@@ -6,5 +6,11 @@
     <layout template="default">
         <childPages/>
     </layout>
-    <permissions/>
+    <permissions>
+        <group name="admin">
+            <permission>crud-create</permission>
+            <permission>crud-edit</permission>
+            <permission>crud-delete</permission>
+        </group>
+    </permissions>
 </page>
