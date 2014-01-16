@@ -193,13 +193,6 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <fileSet>
-      <directory>portofino-war-jee/target/apidocs</directory>
-      <outputDirectory>javadocs/portofino-war-jee</outputDirectory>
-      <useDefaultExcludes>true</useDefaultExcludes>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
   </fileSets>
 </assembly>
 
