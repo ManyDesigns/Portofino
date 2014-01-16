@@ -54,14 +54,92 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
+      <source>portofino-admin/pom.xml</source>
+      <outputDirectory>portofino-admin</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>portofino-base/pom.xml</source>
       <outputDirectory>portofino-base</outputDirectory>
       <destName>pom.xml</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>portofino-core/pom.xml</source>
-      <outputDirectory>portofino-core</outputDirectory>
+      <source>portofino-calendar/pom.xml</source>
+      <outputDirectory>portofino-calendar</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-chart/pom.xml</source>
+      <outputDirectory>portofino-chart</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-crud/pom.xml</source>
+      <outputDirectory>portofino-crud</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-database/pom.xml</source>
+      <outputDirectory>portofino-database</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-db2/pom.xml</source>
+      <outputDirectory>portofino-db2</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-derby/pom.xml</source>
+      <outputDirectory>portofino-derby</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-googlecloudsql/pom.xml</source>
+      <outputDirectory>portofino-googlecloudsql</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-h2/pom.xml</source>
+      <outputDirectory>portofino-h2</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-mail/pom.xml</source>
+      <outputDirectory>portofino-mail</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-mssql/pom.xml</source>
+      <outputDirectory>portofino-mssql</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-mysql/pom.xml</source>
+      <outputDirectory>portofino-mysql</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-openid/pom.xml</source>
+      <outputDirectory>portofino-openid</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-oracle/pom.xml</source>
+      <outputDirectory>portofino-oracle</outputDirectory>
       <destName>pom.xml</destName>
       <fileMode>0644</fileMode>
     </file>
@@ -72,14 +150,32 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>mail/pom.xml</source>
-      <outputDirectory>mail</outputDirectory>
+      <source>portofino-postgresql/pom.xml</source>
+      <outputDirectory>portofino-postgresql</outputDirectory>
       <destName>pom.xml</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>portofino-war/pom.xml</source>
-      <outputDirectory>portofino-war</outputDirectory>
+      <source>portofino-quartz/pom.xml</source>
+      <outputDirectory>portofino-quartz</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-stripes/pom.xml</source>
+      <outputDirectory>portofino-stripes</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-theme/pom.xml</source>
+      <outputDirectory>portofino-theme</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>portofino-war-archetype/pom.xml</source>
+      <outputDirectory>portofino-war-archetype</outputDirectory>
       <destName>pom.xml</destName>
       <fileMode>0644</fileMode>
     </file>
@@ -106,8 +202,106 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>portofino-core/src/main</directory>
-      <outputDirectory>portofino-core/src/main</outputDirectory>
+      <directory>portofino-admin/src/main</directory>
+      <outputDirectory>portofino-admin/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-base/src/main</directory>
+      <outputDirectory>portofino-base/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-calendar/src/main</directory>
+      <outputDirectory>portofino-calendar/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-chart/src/main</directory>
+      <outputDirectory>portofino-chart/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-crud/src/main</directory>
+      <outputDirectory>portofino-crud/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-database/src/main</directory>
+      <outputDirectory>portofino-database/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-db2/src/main</directory>
+      <outputDirectory>portofino-db2/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-derby/src/main</directory>
+      <outputDirectory>portofino-derby/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-googlecloudsql/src/main</directory>
+      <outputDirectory>portofino-googlecloudsql/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-h2/src/main</directory>
+      <outputDirectory>portofino-h2/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-mail/src/main</directory>
+      <outputDirectory>portofino-mail/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-mssql/src/main</directory>
+      <outputDirectory>portofino-mssql/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-mysql/src/main</directory>
+      <outputDirectory>portofino-mysql/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-openid/src/main</directory>
+      <outputDirectory>portofino-openid/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-oracle/src/main</directory>
+      <outputDirectory>portofino-oracle/src/main</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -120,22 +314,36 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>portofino-war/src/main</directory>
-      <outputDirectory>portofino-war/src/main</outputDirectory>
+      <directory>portofino-postgresql/src/main</directory>
+      <outputDirectory>portofino-postgresql/src/main</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>mail/src/main</directory>
-      <outputDirectory>mail/src/main</outputDirectory>
+      <directory>portofino-quartz/src/main</directory>
+      <outputDirectory>portofino-quartz/src/main</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>portofino-war-jee/src/main</directory>
-      <outputDirectory>portofino-war-jee/src/main</outputDirectory>
+      <directory>portofino-stripes/src/main</directory>
+      <outputDirectory>portofino-stripes/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-theme/src/main</directory>
+      <outputDirectory>portofino-theme/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-war-archetype/src/main</directory>
+      <outputDirectory>portofino-war-archetype/src/main</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -143,6 +351,13 @@
     <fileSet>
       <directory>portofino-war-gae/src/main</directory>
       <outputDirectory>portofino-war-gae/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-war-jee/src/main</directory>
+      <outputDirectory>portofino-war-jee/src/main</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -156,8 +371,106 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>portofino-core/target/apidocs</directory>
-      <outputDirectory>javadocs/portofino-core</outputDirectory>
+      <directory>portofino-admin/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-admin</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-base/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-base</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-calendar/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-calendar</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-chart/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-chart</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-crud/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-crud</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-database/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-database</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-db2/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-db2</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-derby/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-derby</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-googlecloudsql/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-googlecloudsql</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-h2/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-h2</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-mail/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-mail</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-mssql/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-mssql</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-mysql/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-mysql</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-openid/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-openid</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-oracle/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-oracle</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -170,8 +483,50 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>mail/target/apidocs</directory>
-      <outputDirectory>javadocs/mail</outputDirectory>
+      <directory>portofino-postgresql/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-postgresql</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-quartz/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-quartz</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-stripes/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-stripes</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-theme/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-theme</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-war-archetype/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-war-archetype</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-war-gae/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-war-gae</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-war-jee/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-war-jee</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>

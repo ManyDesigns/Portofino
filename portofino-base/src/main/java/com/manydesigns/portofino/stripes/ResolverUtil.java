@@ -39,7 +39,7 @@ public class ResolverUtil<T> extends net.sourceforge.stripes.util.ResolverUtil<T
                 }
             }
         } catch (IOException ioe) {
-            logger.warn("Could not read package: " + packageName + " -- " + ioe);
+            logger.warn("Could not read package: " + packageName, ioe);
         } finally {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
         }
