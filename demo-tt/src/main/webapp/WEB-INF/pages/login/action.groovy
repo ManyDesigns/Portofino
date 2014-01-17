@@ -31,6 +31,13 @@ class MyLogin extends DefaultLoginAction {
                 .configMode(Mode.CREATE)
                 .configFields("email", "password", "first_name", "last_name");
         signUpForm = formBuilder.build();
+        signUpForm.findFieldByPropertyName("password").setRequired(true);
+    }
+
+    @Override
+    protected boolean validateSignUpPassword(List<String> errorMessages) {
+        String password = signUpForm.findFieldByPropertyName("password").getValue();
+        return checkPasswordStrength(password, errorMessages);
     }
 
 

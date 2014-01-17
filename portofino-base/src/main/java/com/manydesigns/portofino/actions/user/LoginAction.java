@@ -396,39 +396,49 @@ public abstract class LoginAction extends AbstractActionBean {
         PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
         setupSignUpForm(portofinoRealm);
         signUpForm.readFromRequest(context.getRequest());
-        if (signUpForm.validate() && validateCaptcha()) {
-            try {
-                Object user = portofinoRealm.getSelfRegisteredUserClassAccessor().newInstance();
-                signUpForm.writeToObject(user);
-                String token = portofinoRealm.saveSelfRegisteredUser(user);
-
-                HttpServletRequest req = context.getRequest();
-                String url = req.getRequestURL().toString();
-                UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), url, true);
-                urlBuilder.setEvent("confirmSignUp");
-                urlBuilder.addParameter("token", token);
-
-                String siteUrl = ServletUtils.getApplicationBaseUrl(req);
-                String changePasswordLink = urlBuilder.toString();
-
-                String body = getConfirmSignUpEmailBody(siteUrl, changePasswordLink);
-
-                String from = portofinoConfiguration.getString(
-                        PortofinoProperties.MAIL_FROM, "example@example.com");
-                sendSignupConfirmationEmail(
-                        from, email, ElementsThreadLocals.getText("confirm.signup"), body);
-                SessionMessages.addInfoMessage(ElementsThreadLocals.getText("check.your.mailbox.and.follow.the.instructions"));
-                return authenticate();
-            } catch (ExistingUserException e) {
-                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("a.user.with.the.same.username.already.exists"));
-            } catch (Exception e) {
-                logger.error("Error during sign-up", e);
-                SessionMessages.addErrorMessage(ElementsThreadLocals.getText("signup.failed"));
-            }
-        } else {
+        if (!signUpForm.validate() || !validateCaptcha()) {
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("please.correct.the.errors.before.proceeding"));
+            return getSignUpView();
         }
-        return getSignUpView();
+
+        List<String> errorMessages = new ArrayList<String>();
+        if (!validateSignUpPassword(errorMessages)) {
+            for (String current : errorMessages) {
+                SessionMessages.addErrorMessage(current);
+            }
+            return getSignUpView();
+        }
+
+        try {
+            Object user = portofinoRealm.getSelfRegisteredUserClassAccessor().newInstance();
+            signUpForm.writeToObject(user);
+            String token = portofinoRealm.saveSelfRegisteredUser(user);
+
+            HttpServletRequest req = context.getRequest();
+            String url = req.getRequestURL().toString();
+            UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), url, true);
+            urlBuilder.setEvent("confirmSignUp");
+            urlBuilder.addParameter("token", token);
+
+            String siteUrl = ServletUtils.getApplicationBaseUrl(req);
+            String changePasswordLink = urlBuilder.toString();
+
+            String body = getConfirmSignUpEmailBody(siteUrl, changePasswordLink);
+
+            String from = portofinoConfiguration.getString(
+                    PortofinoProperties.MAIL_FROM, "example@example.com");
+            sendSignupConfirmationEmail(
+                    from, email, ElementsThreadLocals.getText("confirm.signup"), body);
+            SessionMessages.addInfoMessage(ElementsThreadLocals.getText("check.your.mailbox.and.follow.the.instructions"));
+            return authenticate();
+        } catch (ExistingUserException e) {
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("a.user.with.the.same.username.already.exists"));
+            return getSignUpView();
+        } catch (Exception e) {
+            logger.error("Error during sign-up", e);
+            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("signup.failed"));
+            return getSignUpView();
+        }
     }
 
     protected boolean validateCaptcha() {
@@ -485,6 +495,10 @@ public abstract class LoginAction extends AbstractActionBean {
                 .configMode(Mode.CREATE)
                 .configReflectiveFields();
         signUpForm = formBuilder.build();
+    }
+
+    protected boolean validateSignUpPassword(List<String> errorMessages) {
+        return true;
     }
 
     //**************************************************************************
