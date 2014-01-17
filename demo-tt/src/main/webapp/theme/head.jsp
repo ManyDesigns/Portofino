@@ -35,12 +35,5 @@
 <%
     BaseHref.emit(request, new XhtmlBuffer(out));
 %>
-<style type="text/css">
-@media (min-width: 980px) {
-    body {
-        padding-top: 50px;
-    }
-}
-</style>
 <title><c:out value='<%= request.getParameter("pageTitle") %>' /></title>
 </head>
