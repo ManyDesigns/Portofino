@@ -252,11 +252,11 @@ public class TextField extends AbstractTextField {
         this.richText = richText;
     }
 
-    public int getTextAreaWidth() {
+    public Integer getTextAreaWidth() {
         return textAreaWidth;
     }
 
-    public void setTextAreaWidth(int textAreaWidth) {
+    public void setTextAreaWidth(Integer textAreaWidth) {
         this.textAreaWidth = textAreaWidth;
     }
 

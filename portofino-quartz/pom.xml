@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.1.beta5-SNAPSHOT</version>
+        <version>4.1.beta5</version>
     </parent>
     <artifactId>portofino-quartz</artifactId>
     <packaging>jar</packaging>
@@ -24,7 +24,6 @@
             <version>${javaee-web-api.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Quartz integration (optional) -->
         <dependency>
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>

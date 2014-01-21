@@ -248,14 +248,13 @@ class Security extends AbstractPortofinoRealm {
         return result;
     }
 
-
-
     @Override
     Serializable getUserById(String encodedUserId) {
         Session session = persistence.getSession("tt");
         return (Serializable) session.get("users", Long.parseLong(encodedUserId));
     }
 
+    @Override
     Serializable getUserByEmail(String email) {
         Session session = persistence.getSession("tt");
         def criteria = session.createCriteria("users");
@@ -268,6 +267,7 @@ class Security extends AbstractPortofinoRealm {
         return "${user.first_name} ${user.last_name}";
     }
 
+    @Override
     Serializable getUserId(Serializable user) {
         return user.id
     }
