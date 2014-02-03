@@ -37,6 +37,8 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -88,12 +90,17 @@ public class DateField extends AbstractTextField {
             datePattern = elementsConfiguration.getString(
                     ElementsProperties.FIELDS_DATE_FORMAT);
         }
-        dateTimeFormatter = DateTimeFormat.forPattern(datePattern);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(datePattern);
         setMaxLength(dateTimeFormatter.getParser().estimateParsedLength());
 
         containsTime = datePattern.contains("HH")
                 || datePattern.contains("mm")
                 || datePattern.contains("ss");
+
+        if(!containsTime) {
+            dateTimeFormatter = dateTimeFormatter.withZone(DateTimeZone.UTC);
+        }
+        this.dateTimeFormatter = dateTimeFormatter;
 
         String tmpPattern = datePattern;
         if (tmpPattern.contains("yyyy")) {
@@ -134,8 +141,14 @@ public class DateField extends AbstractTextField {
         }
 
         try {
-            DateTime dateTime = dateTimeFormatter.parseDateTime(stringValue);
-            dateValue = new Date(dateTime.getMillis());
+            if(containsTime) {
+                DateTime dateTime = dateTimeFormatter.parseDateTime(stringValue);
+                dateValue = new Date(dateTime.getMillis());
+            } else {
+                long millis = dateTimeFormatter.parseMillis(stringValue);
+                LocalDate localDate = new LocalDate(millis);
+                dateValue = localDate.toDateTimeAtStartOfDay().toDate();
+            }
         } catch (Throwable e) {
             dateFormatError = true;
             logger.debug("Cannot parse date: {}", stringValue);
