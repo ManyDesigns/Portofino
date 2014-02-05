@@ -81,17 +81,12 @@ public class DateField extends AbstractTextField {
             datePattern = elementsConfiguration.getString(
                     ElementsProperties.FIELDS_DATE_FORMAT);
         }
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern(datePattern);
+        dateTimeFormatter = DateTimeFormat.forPattern(datePattern);
         setMaxLength(dateTimeFormatter.getParser().estimateParsedLength());
 
         containsTime = datePattern.contains("HH")
                 || datePattern.contains("mm")
                 || datePattern.contains("ss");
-
-        if(!containsTime) {
-            dateTimeFormatter = dateTimeFormatter.withZone(DateTimeZone.UTC);
-        }
-        this.dateTimeFormatter = dateTimeFormatter;
 
         String tmpPattern = datePattern;
         if (tmpPattern.contains("MM")) {
@@ -130,7 +125,7 @@ public class DateField extends AbstractTextField {
                 DateTime dateTime = dateTimeFormatter.parseDateTime(stringValue);
                 dateValue = new Date(dateTime.getMillis());
             } else {
-                long millis = dateTimeFormatter.parseMillis(stringValue);
+                long millis = dateTimeFormatter.withZone(DateTimeZone.UTC).parseMillis(stringValue);
                 LocalDate localDate = new LocalDate(millis);
                 dateValue = localDate.toDateTimeAtStartOfDay().toDate();
             }
