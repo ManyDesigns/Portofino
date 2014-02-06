@@ -5,7 +5,7 @@ You must create a "local.py" using the following template:
 
 #! /usr/bin/env python
 
-portofino_version = "4.1.beta5"
+portofino_version = "4.1.beta6"
 tomcat_dir = "apache-tomcat-7.0.50"
 portofino_path = "~/projects/portofino4"
 tomcat_url = "http://apache.fis.uniroma2.it/tomcat/tomcat-7/v7.0.50/bin/apache-tomcat-7.0.50.zip"
