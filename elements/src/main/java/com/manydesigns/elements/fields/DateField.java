@@ -24,12 +24,11 @@ import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.DateFormat;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -121,14 +120,7 @@ public class DateField extends AbstractTextField {
         }
 
         try {
-            if(containsTime) {
-                DateTime dateTime = dateTimeFormatter.parseDateTime(stringValue);
-                dateValue = new Date(dateTime.getMillis());
-            } else {
-                long millis = dateTimeFormatter.withZone(DateTimeZone.UTC).parseMillis(stringValue);
-                LocalDate localDate = new LocalDate(millis);
-                dateValue = localDate.toDateTimeAtStartOfDay().toDate();
-            }
+            dateValue = Util.parseDateTime(dateTimeFormatter, stringValue, containsTime);
         } catch (Throwable e) {
             dateFormatError = true;
             logger.debug("Cannot parse date: {}", stringValue);

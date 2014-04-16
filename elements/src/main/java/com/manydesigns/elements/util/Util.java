@@ -25,6 +25,9 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.elements.xml.XhtmlFragment;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -467,6 +471,16 @@ public class Util {
         if (pos < text.length())
             sb.append("...");
         return sb.toString();
+    }
+
+    public static Date parseDateTime(DateTimeFormatter dateTimeFormatter, String input, boolean withTime) {
+        if(withTime) {
+            DateTime dateTime = dateTimeFormatter.parseDateTime(input);
+            return new Date(dateTime.getMillis());
+        } else {
+            LocalDate localDate = dateTimeFormatter.parseLocalDate(input);
+            return localDate.toDateTimeAtStartOfDay().toDate();
+        }
     }
 
 }

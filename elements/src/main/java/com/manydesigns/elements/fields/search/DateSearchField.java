@@ -23,17 +23,16 @@ package com.manydesigns.elements.fields.search;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.annotations.DateFormat;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
-import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
-import java.util.Date;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -121,16 +120,14 @@ public class DateSearchField extends RangeSearchField {
     public void readFromRequest(HttpServletRequest req) {
         minStringValue = StringUtils.trimToNull(req.getParameter(minInputName));
         try {
-            DateTime dateTime = dateTimeFormatter.parseDateTime(minStringValue);
-            minValue = new Date(dateTime.getMillis());
+            minValue = Util.parseDateTime(dateTimeFormatter, minStringValue, containsTime);
         } catch (Throwable e) {
             minValue = null;
         }
 
         maxStringValue = StringUtils.trimToNull(req.getParameter(maxInputName));
         try {
-            DateTime dateTime = dateTimeFormatter.parseDateTime(maxStringValue);
-            maxValue = new Date(dateTime.getMillis());
+            maxValue = Util.parseDateTime(dateTimeFormatter, maxStringValue, containsTime);
         } catch (Throwable e) {
             maxValue = null;
         }

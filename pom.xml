@@ -87,7 +87,7 @@
         <fop.version>1.0</fop.version>
         <google.appengine.sdk.version>1.7.7.1</google.appengine.sdk.version> <!-- Last version supporting Java 6 -->
         <groovy.version>2.0.6</groovy.version>
-        <guava.version>14.0.1</guava.version> <!-- Following GAE dependency -->
+        <guava.version>16.0.1</guava.version> <!-- Following GAE dependency -->
         <hibernate.version>3.6.9.Final</hibernate.version>
         <itext.version>2.1.7</itext.version>
         <jasperreports.version>3.5.0</jasperreports.version>
@@ -95,7 +95,7 @@
         <javassist.version>3.8.0.GA</javassist.version>
         <javax.mail.version>1.4.1</javax.mail.version> <!-- According to commons-email -->
         <jfreechart.version>1.0.12</jfreechart.version>
-        <joda-time.version>1.6.2</joda-time.version>
+        <joda-time.version>2.3</joda-time.version>
         <json.version>20090211</json.version>
         <jsoup.version>1.7.1</jsoup.version>
         <jstl.version>1.1.2</jstl.version>

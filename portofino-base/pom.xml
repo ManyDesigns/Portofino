@@ -42,7 +42,7 @@
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
-            <artifactId>guava-jdk5</artifactId> <!-- Used also by google OAuth client -->
+            <artifactId>guava</artifactId> <!-- Used also by google OAuth client -->
             <version>${guava.version}</version>
             <scope>compile</scope>
         </dependency>
