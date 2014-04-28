@@ -81,7 +81,7 @@ public class DateField extends AbstractTextField {
                     ElementsProperties.FIELDS_DATE_FORMAT);
         }
         dateTimeFormatter = DateTimeFormat.forPattern(datePattern);
-        setMaxLength(dateTimeFormatter.getParser().estimateParsedLength());
+        setSize(dateTimeFormatter.getParser().estimateParsedLength());
 
         containsTime = datePattern.contains("HH")
                 || datePattern.contains("mm")

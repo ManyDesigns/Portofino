@@ -130,7 +130,7 @@
             <value>true</value>
         </annotation>
         <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-block-level</value>
+            <value>form-control</value>
         </annotation>
     </annotations>
 </column>
@@ -428,7 +428,7 @@
 <column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
     <annotations>
         <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-block-level</value>
+            <value>form-control</value>
         </annotation>
         <annotation type="com.manydesigns.elements.annotations.MaxLength">
             <value>4000</value>
@@ -600,7 +600,7 @@
             <value>true</value>
         </annotation>
         <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-block-level</value>
+            <value>form-control</value>
         </annotation>
     </annotations>
 </column>
@@ -681,7 +681,7 @@
             <value>true</value>
         </annotation>
         <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-block-level</value>
+            <value>form-control</value>
         </annotation>
     </annotations>
 </column>

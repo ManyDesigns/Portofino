@@ -164,7 +164,7 @@ public class TextField extends AbstractTextField {
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
         xb.openElement("div");
-        String cssClass = "value";
+        String cssClass = fieldCssClass + " value";
         if (ArrayUtils.contains(red, stringValue)) {
             cssClass += " status_red";
         } else if (ArrayUtils.contains(amber, stringValue)) {

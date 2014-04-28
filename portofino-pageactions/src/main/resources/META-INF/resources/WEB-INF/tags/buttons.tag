@@ -107,7 +107,7 @@
             buffer.addAttribute("class", actualCssClass);
             if(hasIcon) {
                 buffer.openElement("i");
-                buffer.addAttribute("class", theButton.icon());
+                buffer.addAttribute("class", "glyphicon " + theButton.icon());
                 buffer.closeElement("i");
             }
             if(hasText) {

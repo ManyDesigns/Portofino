@@ -244,8 +244,10 @@
                     </div>
                 </div>
             </div>
-            <div class="form-actions">
-                <portofino:buttons list="table-edit" />
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <portofino:buttons list="table-edit" />
+                </div>
             </div>
         </stripes:form>
     </stripes:layout-component>

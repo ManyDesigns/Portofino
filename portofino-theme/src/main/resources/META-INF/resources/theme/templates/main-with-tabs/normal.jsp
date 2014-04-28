@@ -16,7 +16,7 @@
                 <stripes:form action="${actionBean.context.actionPath}" method="post">
                     <input type="hidden" name="returnUrl"
                            value="<c:out value="${actionBean.returnUrl}"/>"/>
-                    <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
+                    <portofino:buttons list="pageHeaderButtons" cssClass="btn-xs" />
                 </stripes:form>
             </div>
             <h4 class="pageTitle">
@@ -43,12 +43,12 @@
     <jsp:include page="/theme/header.jsp"/>
     <div class="container">
         <div class="row">
-            <div class="span2">
+            <div class="col-md-2">
                 <portofino:embedded-page-actions list="aboveNavigation" />
                 <jsp:include page="/theme/navigation.jsp" />
                 <portofino:embedded-page-actions list="belowNavigation" />
             </div>
-            <div class="content span10">
+            <div class="content col-md-10">
                 <div class="contentHeader">
                     <stripes:layout-component name="contentHeader">
                         <mde:sessionMessages />
@@ -62,7 +62,7 @@
                                           method="post">
                                 <input type="hidden" name="returnUrl"
                                        value="<c:out value="${actionBean.returnUrl}"/>"/>
-                                <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
+                                <portofino:buttons list="pageHeaderButtons" cssClass="btn-xs" />
                             </stripes:form>
                         </div>
                         <h3 class="pageTitle">
@@ -72,15 +72,15 @@
                         </h3>
                     </stripes:layout-component>
                 </div>
-                <div class="row-fluid">
-                    <div class="span12">
+                <div class="row">
+                    <div class="col-md-12">
                         <div class="pageBody">
                             <stripes:layout-component name="pageBody" />
                         </div>
                     </div>
                 </div>
-                <div class="row-fluid">
-                    <div class="span12">
+                <div class="row">
+                    <div class="col-md-12">
                         <ul class="nav nav-tabs tabs-header">
                             <% actionBean.initEmbeddedPageActions(); %>
                             <c:forEach var="embeddedPageAction" items="${ actionBean.embeddedPageActions['default'] }">

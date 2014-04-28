@@ -16,7 +16,7 @@
             <mde:write name="actionBean" property="tableForm"/>
             <h4><fmt:message key="available.database.platforms"/></h4>
             <mde:write name="actionBean" property="databasePlatformsTableForm"/>
-            <div class="form-actions">
+            <div class="form-group">
                 <portofino:buttons list="connectionProviders-search" />
             </div>
             <script type="text/javascript">

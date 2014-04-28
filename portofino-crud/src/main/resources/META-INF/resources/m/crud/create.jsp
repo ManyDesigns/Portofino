@@ -30,8 +30,10 @@
                       enctype="multipart/form-data" class="form-horizontal">
             <mde:write name="actionBean" property="form"/>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
-            <div class="form-actions">
-                <portofino:buttons list="crud-create" />
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <portofino:buttons list="crud-create" />
+                </div>
             </div>
         </stripes:form>
     </stripes:layout-component>

@@ -15,7 +15,7 @@
                 <stripes:form action="${actionBean.context.actionPath}" method="post">
                     <input type="hidden" name="returnUrl"
                            value="<c:out value="${actionBean.returnUrl}"/>"/>
-                    <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
+                    <portofino:buttons list="pageHeaderButtons" cssClass="btn-xs" />
                 </stripes:form>
             </div>
             <h4 class="pageTitle">
@@ -42,7 +42,7 @@
     <jsp:include page="/theme/header.jsp"/>
     <div class="container">
         <div class="row">
-            <div class="content span12">
+            <div class="content col-md-12">
                 <div class="contentHeader">
                     <stripes:layout-component name="contentHeader">
                         <mde:sessionMessages />
@@ -56,7 +56,7 @@
                                           method="post">
                                 <input type="hidden" name="returnUrl"
                                        value="<c:out value="${actionBean.returnUrl}"/>"/>
-                                <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
+                                <portofino:buttons list="pageHeaderButtons" cssClass="btn-xs" />
                             </stripes:form>
                         </div>
                         <h3 class="pageTitle">
@@ -73,12 +73,12 @@
                     <stripes:layout-component name="pageFooter" />
                 </div>
                 <div class="embeddedPages">
-                    <portofino:embedded-page-actions list="default" cssClass="row-fluid" />
-                    <div class="row-fluid">
-                        <portofino:embedded-page-actions list="contentLayoutLeft" cssClass="span6" />
-                        <portofino:embedded-page-actions list="contentLayoutRight" cssClass="span6" />
+                    <portofino:embedded-page-actions list="default" cssClass="row" />
+                    <div class="row">
+                        <portofino:embedded-page-actions list="contentLayoutLeft" cssClass="col-md-6" />
+                        <portofino:embedded-page-actions list="contentLayoutRight" cssClass="col-md-6" />
                     </div>
-                    <portofino:embedded-page-actions list="contentLayoutBottom" cssClass="row-fluid" />
+                    <portofino:embedded-page-actions list="contentLayoutBottom" cssClass="row" />
                 </div>
                 <div class="contentFooter">
                     <stripes:layout-component name="contentFooter" />

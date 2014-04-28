@@ -52,7 +52,6 @@ public class DateSearchField extends RangeSearchField {
     protected DateTimeFormatter dateTimeFormatter;
     protected boolean containsTime;
     protected String jsDatePattern;
-    protected int maxLength;
 
 
     //**************************************************************************
@@ -77,7 +76,7 @@ public class DateSearchField extends RangeSearchField {
                     ElementsProperties.FIELDS_DATE_FORMAT);
         }
         dateTimeFormatter = DateTimeFormat.forPattern(datePattern);
-        maxLength = dateTimeFormatter.getParser().estimateParsedLength();
+        setSize(dateTimeFormatter.getParser().estimateParsedLength());
 
         containsTime = datePattern.contains("HH")
                 || datePattern.contains("mm")
@@ -97,23 +96,14 @@ public class DateSearchField extends RangeSearchField {
     @Override
     public void rangeEndToXhtml(XhtmlBuffer xb, String id,
                                 String inputName, String stringValue, String label) {
-        xb.openElement("div");
-        xb.addAttribute("class", "input-prepend");
-        xb.openElement("label");
-        xb.addAttribute("class", "add-on");
-        xb.addAttribute("for", id);
-        xb.write(label);
-        xb.closeElement("label");
-        xb.writeInputText(id, inputName, stringValue, "text", null, null);
+        super.rangeEndToXhtml(xb, id, inputName, stringValue, label);
         if (!containsTime) {
             String js = MessageFormat.format(
                     "setupDatePicker(''#{0}'', ''{1}'');",
                     StringEscapeUtils.escapeJavaScript(id),
                     StringEscapeUtils.escapeJavaScript(jsDatePattern));
             xb.writeJavaScript(js);
-        }        
-        xb.closeElement("div");
-        xb.write(" ");
+        }
     }
 
     @Override
@@ -173,11 +163,4 @@ public class DateSearchField extends RangeSearchField {
         this.jsDatePattern = jsDatePattern;
     }
 
-    public int getMaxLength() {
-        return maxLength;
-    }
-
-    public void setMaxLength(int maxLength) {
-        this.maxLength = maxLength;
-    }
 }

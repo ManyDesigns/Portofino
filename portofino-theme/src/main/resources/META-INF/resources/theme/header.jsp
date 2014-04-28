@@ -12,15 +12,13 @@
              type="org.apache.commons.configuration.Configuration"/>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.stripes.AbstractActionBean"/>
 <fmt:setLocale value="${pageContext.request.locale}"/>
-<div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="container">
-            <h4 class="pull-left">
-                <stripes:link href="/">
-                    <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
-                </stripes:link>
-            </h4>
-            This is the default header. You should customize it including a /theme/header.jsp page in your application.
-        </div>
+<header class="navbar navbar-inverse navbar-static-top">
+    <div class="container">
+        <h4 class="pull-left">
+            <stripes:link href="/">
+                <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
+            </stripes:link>
+        </h4>
+        This is the default header. You should customize it including a /theme/header.jsp page in your application.
     </div>
-</div>
+</header>

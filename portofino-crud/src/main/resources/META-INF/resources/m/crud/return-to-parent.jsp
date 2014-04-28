@@ -15,7 +15,7 @@
         }
         urlBuilder.setEvent("returnToSearch");
     %>
-    <stripes:link href="<%= urlBuilder.toString() %>" class="btn btn-small">
+    <stripes:link href="<%= urlBuilder.toString() %>" class="btn btn-default btn-sm">
         <fmt:message key="return.to.search" />
     </stripes:link>
 </c:if>

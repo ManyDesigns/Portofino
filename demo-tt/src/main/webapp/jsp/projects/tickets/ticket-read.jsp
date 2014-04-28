@@ -21,7 +21,7 @@
                           method="post">
                 <input type="hidden" name="returnUrl"
                        value="<c:out value="${actionBean.returnUrl}"/>"/>
-                <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
+                <portofino:buttons list="pageHeaderButtons" cssClass="btn-xs" />
             </stripes:form>
         </div>
         <div>

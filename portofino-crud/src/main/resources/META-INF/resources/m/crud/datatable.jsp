@@ -23,11 +23,9 @@
         Integer rowsPerPage = actionBean.getCrudConfiguration().getRowsPerPage();
         long totalSearchRecords = rowsPerPage != null ? actionBean.getTotalSearchRecords() : 0;
         if(rowsPerPage != null && totalSearchRecords > rowsPerPage) { %>
-            <div class="pagination pagination-right">
-                <ul>
-                    <% writePaginator(out, actionBean, rowsPerPage, totalSearchRecords); %>
-                </ul>
-            </div>
+            <ul class="pagination">
+                <% writePaginator(out, actionBean, rowsPerPage, totalSearchRecords); %>
+            </ul>
     <%  } %>
     <input type="hidden" name="sortProperty" value="${actionBean.sortProperty}" />
     <input type="hidden" name="sortDirection" value="${actionBean.sortDirection}" />

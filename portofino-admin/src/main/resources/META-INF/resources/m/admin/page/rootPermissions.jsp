@@ -88,7 +88,7 @@
                     </tr>
                 </c:forEach>
             </table>
-            <div class="form-actions">
+            <div class="form-group">
                 <portofino:buttons list="root-permissions" />
             </div>
         </stripes:form>

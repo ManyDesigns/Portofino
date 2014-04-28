@@ -19,10 +19,10 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post" class="dont-prompt-on-page-abandon">
-            <div id="userName" class="input-block-level value"><c:out value="${actionBean.userName}" /></div>
+            <div id="userName" class="form-control value"><c:out value="${actionBean.userName}" /></div>
             <input type="hidden" name="userName" value="${actionBean.userName}" />
             <label for="pwd"><fmt:message key='password'/></label>
-            <stripes:password name="pwd" id="pwd" class="input-block-level"/>
+            <stripes:password name="pwd" id="pwd" class="form-control"/>
             <input type="hidden" name="rememberMe" value="${actionBean.rememberMe}" />
             <div class="login-buttons">
                 <button type="submit" name="login" class="btn btn-primary">

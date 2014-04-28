@@ -24,7 +24,7 @@
     <%} catch (Throwable t) {
         LoggerFactory.getLogger(PageAction.class).error("Error in included page", t);
     %>
-        <div class="alert alert-error">
+        <div class="alert alert-danger">
             <button data-dismiss="alert" class="close" type="button">&times;</button>
             <ul class="errorMessages">
                 <li>

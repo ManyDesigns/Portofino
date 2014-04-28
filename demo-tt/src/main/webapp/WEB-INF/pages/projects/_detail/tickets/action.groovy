@@ -154,7 +154,7 @@ class ProjectsTicketsAction extends CrudAction {
     //**************************************************************************
     @Override
     @Button(list = "crud-search", key = "create.new", order = 1d, type = Button.TYPE_SUCCESS,
-            icon = "icon-plus icon-white", group = "crud")
+            icon = "glyphicon-plus white", group = "crud")
     @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_CREATE)
     @Guard(test="isContributor()", type=GuardType.VISIBLE)
     Resolution create() {
@@ -227,7 +227,7 @@ class ProjectsTicketsAction extends CrudAction {
     //**************************************************************************
     @Override
     @Buttons([
-        @Button(list = "crud-read", key = "edit", order = 1d, icon = "icon-edit icon-white",
+        @Button(list = "crud-read", key = "edit", order = 1d, icon = "glyphicon-edit white",
                 group = "crud", type = Button.TYPE_SUCCESS),
         @Button(list = "crud-read-default-button", key = "search")
     ])
@@ -358,7 +358,7 @@ class ProjectsTicketsAction extends CrudAction {
     //**************************************************************************
 
 
-    @Button(list = "assign", key = "tt.assign.to.me", order = 2d, icon = "icon-hand-right",
+    @Button(list = "assign", key = "tt.assign.to.me", order = 2d, icon = "glyphicon-hand-right",
             group = "crud", type = Button.TYPE_DEFAULT)
     @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_EDIT)
     @Guard(test="canAssignToMe()", type=GuardType.VISIBLE)
@@ -393,7 +393,7 @@ class ProjectsTicketsAction extends CrudAction {
     //**************************************************************************
 
 
-    @Button(list = "ticket-workflow1", key = "tt.start.work", order = 2d, icon = "icon-play icon-white",
+    @Button(list = "ticket-workflow1", key = "tt.start.work", order = 2d, icon = "glyphicon-play white",
             group = "wf", type = Button.TYPE_INFO)
     @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_EDIT)
     @Guard(test="canStartWork()", type=GuardType.VISIBLE)
@@ -425,7 +425,7 @@ class ProjectsTicketsAction extends CrudAction {
     // Resolve
     //**************************************************************************
 
-    @Button(list = "ticket-workflow2", key = "tt.resolve", order = 2d, icon = "icon-thumbs-up icon-white",
+    @Button(list = "ticket-workflow2", key = "tt.resolve", order = 2d, icon = "glyphicon-thumbs-up white",
             group = "wf", type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_EDIT)
     @Guard(test="canResolve()", type=GuardType.VISIBLE)
@@ -447,7 +447,7 @@ class ProjectsTicketsAction extends CrudAction {
     //**************************************************************************
 
 
-    @Button(list = "ticket-workflow2", key = "tt.close", order = 3d, icon = "icon-thumbs-up icon-white",
+    @Button(list = "ticket-workflow2", key = "tt.close", order = 3d, icon = "glyphicon-thumbs-up white",
             group = "wf", type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_EDIT)
     @Guard(test="canClose()", type=GuardType.VISIBLE)
@@ -469,7 +469,7 @@ class ProjectsTicketsAction extends CrudAction {
     //**************************************************************************
 
 
-    @Button(list = "ticket-workflow1", key = "tt.reopen", order = 1d, icon = "icon-repeat icon-white",
+    @Button(list = "ticket-workflow1", key = "tt.reopen", order = 1d, icon = "glyphicon-repeat white",
             group = "wf", type = Button.TYPE_INFO)
     @RequiresPermissions(permissions = AbstractCrudAction.PERMISSION_EDIT)
     @Guard(test="canReopen()", type=GuardType.VISIBLE)

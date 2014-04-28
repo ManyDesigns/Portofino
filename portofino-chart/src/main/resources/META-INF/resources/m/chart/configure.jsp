@@ -15,8 +15,7 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <stripes:form action="${actionBean.context.actionPath}" method="post"
-                      class="form-horizontal">
+        <stripes:form action="${actionBean.context.actionPath}" method="post" class="form-horizontal">
             <mde:write name="actionBean" property="pageConfigurationForm"/>
             <mde:write name="actionBean" property="form" />
             <br />
@@ -29,8 +28,10 @@
             </ul>
             <jsp:include page="/m/pageactions/script-configuration.jsp" />
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
-            <div class="form-actions">
-                <portofino:buttons list="configuration" />
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <portofino:buttons list="configuration" />
+                </div>
             </div>
         </stripes:form>
     </stripes:layout-component>

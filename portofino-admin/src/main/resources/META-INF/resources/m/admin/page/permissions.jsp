@@ -27,9 +27,9 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form action="/actions/admin/page" method="post" enctype="multipart/form-data">
-            <div class="row-fluid">
+            <div class="row">
                 <input type="hidden" name="originalPath" value="${actionBean.originalPath}" />
-                <div class="span9" style="margin-left: 0;">
+                <div class="col-md-9" style="margin-left: 0;">
                     <table class="table table-condensed">
                     <%
                         PageInstance currentPageInstance = actionBean.getPageInstance();
@@ -154,7 +154,7 @@
                         </c:forEach>
                     </table>
                 </div>
-                <div class="span3">
+                <div class="col-md-3">
                     <h4 style="margin-top: 0;"><fmt:message key="test.a.user" /></h4>
                     <label for="testUserIdSelect"><fmt:message key="select.a.user.and.view.its.permissions" /></label>
                     <c:if test="${actionBean.users != null}">
@@ -195,8 +195,10 @@
                 </div>
             </div>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
-            <div class="form-actions">
-                <portofino:buttons list="page-permissions-edit" />
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <portofino:buttons list="page-permissions-edit" />
+                </div>
             </div>
         </stripes:form>
     </stripes:layout-component>

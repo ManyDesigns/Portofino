@@ -77,12 +77,12 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
 
                 if (currentColumn == 0) {
                     xb.openElement("div");
-                    xb.addAttribute("class", "row-fluid");
+                    xb.addAttribute("class", "row");
                     rowOpened = true;
                 }
 
                 xb.openElement("div");
-                xb.addAttribute("class", "span" + (colSpan * (12 / nColumns)));
+                xb.addAttribute("class", "col-md-" + (colSpan * (12 / nColumns)));
                 current.toXhtml(xb);
                 xb.closeElement("div");
 
@@ -104,7 +104,7 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
         }
         if (currentColumn < nColumns) {
             xb.openElement("div");
-            xb.addAttribute("class", "span" + ((nColumns - currentColumn) * (12 / nColumns)));
+            xb.addAttribute("class", "col-md-" + ((nColumns - currentColumn) * (12 / nColumns)));
             xb.closeElement("div");
         }
         xb.closeElement("div");

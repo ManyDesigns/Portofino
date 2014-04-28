@@ -133,7 +133,7 @@ public class ActivityItem implements XhtmlFragment {
     public void writeTimestamp(XhtmlBuffer xb) {
         xb.openElement("div");
         xb.openElement("small");
-        xb.addAttribute("class", "muted");
+        xb.addAttribute("class", "text-muted");
         xb.write(dateFormat.format(timestamp));
         xb.closeElement("small");
         xb.closeElement("div");

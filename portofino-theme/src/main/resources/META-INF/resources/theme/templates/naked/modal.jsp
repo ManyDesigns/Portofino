@@ -13,7 +13,7 @@
     <body style="padding-top: 0;">
     <div class="container">
         <div class="row">
-            <div class="span12">
+            <div class="col-md-12">
                 <div class="contentHeader">
                     <stripes:layout-component name="contentHeader">
                         <mde:sessionMessages />
@@ -26,7 +26,7 @@
                                           method="post">
                                 <input type="hidden" name="returnUrl"
                                        value="<c:out value="${actionBean.returnUrl}"/>"/>
-                                <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
+                                <portofino:buttons list="pageHeaderButtons" cssClass="btn-xs" />
                             </stripes:form>
                         </div>
                         <h3 class="pageTitle">

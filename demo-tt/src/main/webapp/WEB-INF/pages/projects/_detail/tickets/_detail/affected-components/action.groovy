@@ -59,7 +59,7 @@ class TicketAffectedComponentsCrudAction extends CrudAction {
 
     @Override
     @Button(list = "crud-search", key = "create.new", order = 1d, type = Button.TYPE_SUCCESS,
-            icon = "icon-plus icon-white", group = "crud")
+            icon = "glyphicon-plus white", group = "crud")
     @Guard(test="canEditTicket()", type=GuardType.VISIBLE)
     Resolution create() {
         return super.create()    //To change body of overridden methods use File | Settings | File Templates.
@@ -111,7 +111,7 @@ class TicketAffectedComponentsCrudAction extends CrudAction {
 
     @Override
     @Buttons([
-        @Button(list = "crud-read", key = "edit", order = 1d, icon = "icon-edit icon-white",
+        @Button(list = "crud-read", key = "edit", order = 1d, icon = "glyphicon-edit white",
                 group = "crud", type = Button.TYPE_SUCCESS),
         @Button(list = "crud-read-default-button", key = "search")
     ])

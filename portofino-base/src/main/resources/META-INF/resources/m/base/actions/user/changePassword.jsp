@@ -15,11 +15,11 @@
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post">
             <label for="pwd"><fmt:message key='current.password'/></label>
-            <stripes:password name="pwd" id="pwd" class="input-block-level"/>
+            <stripes:password name="pwd" id="pwd" class="form-control"/>
             <label for="newPassword"><fmt:message key='new.password'/></label>
-            <stripes:password name="newPassword" id="newPassword" class="input-block-level"/>
+            <stripes:password name="newPassword" id="newPassword" class="form-control"/>
             <label for="confirmNewPassword"><fmt:message key='confirm.new.password'/></label>
-            <stripes:password name="confirmNewPassword" id="confirmNewPassword" class="input-block-level"/>
+            <stripes:password name="confirmNewPassword" id="confirmNewPassword" class="form-control"/>
             <div class="login-buttons spacingTop">
                 <button type="submit" id="changePassword2" name="changePassword2" class="btn btn-primary">Change password</button>
                 <button type="submit" name="cancel" class="btn btn-link">Cancel</button>

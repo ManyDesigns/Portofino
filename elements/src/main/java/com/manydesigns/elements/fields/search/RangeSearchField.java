@@ -53,6 +53,9 @@ public class RangeSearchField extends AbstractSearchField {
     protected String maxStringValue;
     protected Object maxValue;
 
+    protected Integer size = 4;
+    protected Integer maxLength = null;
+
     protected boolean searchNullValue;
 
     //**************************************************************************
@@ -80,15 +83,14 @@ public class RangeSearchField extends AbstractSearchField {
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("div");
-        xb.addAttribute("class", "control-group");
+        xb.addAttribute("class", "form-group");
+        xb.openElement("div");
+        xb.addAttribute("class", "input-group");
         xb.openElement("label");
         xb.addAttribute("for", minId);
-        xb.addAttribute("class", ATTR_NAME_HTML_CLASS);
+        xb.addAttribute("class", ATTR_NAME_HTML_CLASS + " input-group-addon");
         xb.write(StringUtils.capitalize(label));
         xb.closeElement("label");
-
-        xb.openElement("div");
-        xb.addAttribute("class", "controls");
         rangeEndToXhtml(xb, minId, minInputName, minStringValue,
                 getText("elements.search.range.from"));
         rangeEndToXhtml(xb, maxId, maxInputName, maxStringValue,
@@ -100,15 +102,12 @@ public class RangeSearchField extends AbstractSearchField {
     public void rangeEndToXhtml(XhtmlBuffer xb, String id,
                                 String inputName, String stringValue,
                                 String label) {
-        xb.openElement("div");
-        xb.addAttribute("class", "input-prepend");
         xb.openElement("label");
-        xb.addAttribute("class", "add-on");
+        xb.addAttribute("class", "input-group-addon");
         xb.addAttribute("for", id);
         xb.write(label);
         xb.closeElement("label");
-        xb.writeInputText(id, inputName, stringValue, "text", null, null);
-        xb.closeElement("div");
+        xb.writeInputText(id, inputName, stringValue, FORM_CONTROL_CSS_CLASS, size, maxLength);
         xb.write(" ");
     }
 
@@ -233,5 +232,21 @@ public class RangeSearchField extends AbstractSearchField {
 
     public void setSearchNullValue(boolean searchNullValue) {
         this.searchNullValue = searchNullValue;
+    }
+
+    public Integer getSize() {
+        return size;
+    }
+
+    public void setSize(Integer size) {
+        this.size = size;
+    }
+
+    public Integer getMaxLength() {
+        return maxLength;
+    }
+
+    public void setMaxLength(Integer maxLength) {
+        this.maxLength = maxLength;
     }
 }

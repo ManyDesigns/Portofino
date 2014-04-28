@@ -108,13 +108,13 @@ public class BooleanSearchField extends AbstractSearchField {
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("div");
-        xb.addAttribute("class", "control-group ");
+        xb.addAttribute("class", "form-group ");
         xb.openElement("label");
         xb.addAttribute("class", ATTR_NAME_HTML_CLASS);
         xb.write(StringUtils.capitalize(label));
         xb.closeElement("label");
         xb.openElement("div");
-        xb.addAttribute("class", "controls");
+        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
 
         for (BooleanSearchValue current : BooleanSearchValue.values()) {
             // don't print null if the attribute is required

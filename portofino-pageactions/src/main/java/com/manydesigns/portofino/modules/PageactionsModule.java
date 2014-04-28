@@ -151,11 +151,11 @@ public class PageactionsModule implements Module {
         logger.info("Pages directory: " + pagesDirectory);
         ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(pagesDirectory);
 
-        if(configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_PAGES, true)) {
+        if(configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_PAGES, false)) {
             logger.info("Preloading pages");
             preloadPageActions(pagesDirectory);
         }
-        if(configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_CLASSES, true)) {
+        if(configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_CLASSES, false)) {
             logger.info("Preloading Groovy classes");
             preloadGroovyClasses(groovyClasspath);
         }

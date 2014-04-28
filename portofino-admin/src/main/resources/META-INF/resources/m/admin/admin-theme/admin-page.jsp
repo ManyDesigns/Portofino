@@ -17,20 +17,18 @@
     </jsp:include>
     <body>
     <jsp:useBean id="portofinoConfiguration" scope="application" type="org.apache.commons.configuration.Configuration"/>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container">
-                <h4 class="pull-left">
-                    <stripes:link href="/">
-                        <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
-                    </stripes:link>
-                </h4>
-            </div>
+    <header class="navbar navbar-inverse navbar-static-top">
+        <div class="container">
+            <h4 class="pull-left">
+                <stripes:link href="/">
+                    <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
+                </stripes:link>
+            </h4>
         </div>
-    </div>
+    </header>
     <div class="container">
         <div class="row">
-            <div class="span2">
+            <div class="col-md-2">
                 <div class="navigation">
                     <ul class="nav nav-list portofino-sidenav">
                         <%
@@ -67,8 +65,8 @@
                     </ul>
                 </div>
             </div>
-            <div class="content span10">
-                <div class="row-fluid">
+            <div class="content col-md-10">
+                <div class="row">
                     <mde:sessionMessages/>
                     <stripes:layout-component name="pageHeader">
                         <h3 style="border-bottom: 1px solid #E5E5E5">

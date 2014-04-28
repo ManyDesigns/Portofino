@@ -14,8 +14,10 @@
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.SettingsAction"
                       method="post" enctype="multipart/form-data" class="form-horizontal">
             <mde:write name="actionBean" property="form"/>
-            <div class="form-actions">
-                <portofino:buttons list="settings" />
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <portofino:buttons list="settings" />
+                </div>
             </div>
         </stripes:form>
     </stripes:layout-component>

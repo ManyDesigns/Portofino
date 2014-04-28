@@ -40,7 +40,7 @@ public @interface Button {
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
     public static final String
-        TYPE_DEFAULT = "",
+        TYPE_DEFAULT = " btn-default ",
         TYPE_PRIMARY = " btn-primary ",
         TYPE_INFO = " btn-info ",
         TYPE_SUCCESS = " btn-success ",
@@ -51,13 +51,13 @@ public @interface Button {
         TYPE_NO_UI_BLOCK = " no-ui-block ";
 
     public static final String
-        ICON_WHITE = " icon-white ",
-        ICON_EDIT = " icon-edit ",
-        ICON_PLUS = " icon-plus ",
-        ICON_MINUS = " icon-minus ",
-        ICON_TRASH = " icon-trash ",
-        ICON_WRENCH = " icon-wrench ",
-        ICON_PICTURE = " icon-picture ";
+        ICON_WHITE = " white ",
+        ICON_EDIT = " glyphicon-edit ",
+        ICON_PLUS = " glyphicon-plus ",
+        ICON_MINUS = " glyphicon-minus ",
+        ICON_TRASH = " glyphicon-trash ",
+        ICON_WRENCH = " glyphicon-wrench ",
+        ICON_PICTURE = " glyphicon-picture ";
     
     /**
      * The list where this button is to be placed. Web pages will include lists of buttons by name.
@@ -80,7 +80,7 @@ public @interface Button {
     String titleKey() default "";
 
     /**
-     * The name of the button's icon. You can add " icon-white" after the name to produce a white icon instead of
+     * The name of the button's icon. You can add " white" after the name to produce a white icon instead of
      * a black one.
      */
     String icon() default "";

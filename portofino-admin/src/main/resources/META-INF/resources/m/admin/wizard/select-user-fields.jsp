@@ -27,8 +27,10 @@
                 <mde:write name="actionBean" property="jndiCPForm"/>
                 <mde:write name="actionBean" property="jdbcCPForm"/>
             </div>
-            <div class="form-actions" style="padding-left: 20px;">
-                <portofino:buttons list="select-user-fields" />
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <portofino:buttons list="select-user-fields" />
+                </div>
             </div>
         </stripes:form>
     </stripes:layout-component>

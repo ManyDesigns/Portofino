@@ -86,7 +86,7 @@
         <ehcache.version>2.5.2</ehcache.version>
         <fop.version>1.0</fop.version>
         <google.appengine.sdk.version>1.7.7.1</google.appengine.sdk.version> <!-- Last version supporting Java 6 -->
-        <groovy.version>2.0.6</groovy.version>
+        <groovy.version>2.3.0-beta-2</groovy.version>
         <guava.version>16.0.1</guava.version> <!-- Following GAE dependency -->
         <hibernate.version>3.6.9.Final</hibernate.version>
         <itext.version>2.1.7</itext.version>
@@ -214,7 +214,7 @@
                 <configuration>
                     <links>
                         <link>http://shiro.apache.org/static/1.2.2/apidocs/</link>
-                        <link>http://stripes.sourceforge.net/docs/current/javadoc/</link>
+                        <!--<link>http://stripes.sourceforge.net/docs/current/javadoc/</link>-->
                         <link>http://commons.apache.org/configuration/apidocs/</link>
                         <link>http://docs.jboss.org/hibernate/core/3.6/javadocs/</link>
                         <link>http://groovy.codehaus.org/api/</link>
@@ -224,6 +224,7 @@
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
+                        <phase>install</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>

@@ -26,7 +26,7 @@
                 <mde:write name="actionBean" property="jndiCPForm"/>
                 <mde:write name="actionBean" property="jdbcCPForm"/>
             </div>
-            <div class="form-actions" style="padding-left: 20px;">
+            <div>
                 <portofino:buttons list="user-management" />
             </div>
         </stripes:form>

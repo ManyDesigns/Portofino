@@ -14,8 +14,8 @@
             margin:  0;
         }
     </style>
-    <div class="row-fluid">
-        <div class="span2 calendar-calendars">
+    <div class="row">
+        <div class="col-md-2 calendar-calendars">
             <strong><fmt:message key="calendars" /></strong>
             <ul class="calendars">
                 <c:forEach var="calendar" items="${actionBean.calendars}">
@@ -27,7 +27,7 @@
                 </c:forEach>
             </ul>
         </div>
-        <div class="span10 calendar-view">
+        <div class="col-md-10 calendar-view">
             <stripes:form action="${actionBean.context.actionPath}" method="post">
                 <input type="hidden" name="referenceDateTimeLong" value="${actionBean.referenceDateTimeLong}" />
                 <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
@@ -47,15 +47,15 @@
                 if (hide) {
                     calendarsDiv.insertBefore(viewDiv);
                     calendarsDiv.show();
-                    viewDiv.removeClass("span12");
-                    viewDiv.addClass("span10");
+                    viewDiv.removeClass("col-md-12");
+                    viewDiv.addClass("col-md-10");
                     link.text('<fmt:message key="hide.calendars" />');
                     link.data("hide", false);
                 } else {
                     calendarsDiv.hide();
                     calendarsDiv.insertAfter(viewDiv);
-                    viewDiv.removeClass("span10");
-                    viewDiv.addClass("span12");
+                    viewDiv.removeClass("col-md-10");
+                    viewDiv.addClass("col-md-12");
                     link.text('<fmt:message key="show.calendars" />');
                     link.data("hide", true);
                 }

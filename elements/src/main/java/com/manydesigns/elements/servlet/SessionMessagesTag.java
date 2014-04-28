@@ -49,7 +49,7 @@ public class SessionMessagesTag extends TagSupport {
 
         if(!errorMessages.isEmpty()) {
             xb.openElement("div");
-            xb.addAttribute("class", "alert alert-error fade in");
+            xb.addAttribute("class", "alert alert-danger fade in");
             writeCloseButton(xb);
             writeList(xb, errorMessages, "errorMessages");
             xb.closeElement("div");

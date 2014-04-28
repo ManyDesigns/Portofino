@@ -15,9 +15,9 @@
                       method="post">
             <p>
                 <fmt:message key="layouts.admin.reload-model.text"/>
-                <portofino:buttons list="reload-model" />
             </p>
-            <div class="form-actions">
+            <div class="form-group">
+                <portofino:buttons list="reload-model" />
                 <portofino:buttons list="reload-model-bar" />
             </div>
         </stripes:form>

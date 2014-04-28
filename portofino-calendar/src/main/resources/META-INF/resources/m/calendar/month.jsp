@@ -52,7 +52,7 @@
         margin: 0; padding: 0 0 0 10px; border: none; text-align: left;
     }
     .calendar-table {
-        position: absolute; width: 100%; margin-top: 10px; height: 100%;
+        position: absolute; width: 100%; margin-top: 10px; height: 90%;
         border-right: 1px solid #DDDDDD;
         border-bottom: 1px solid #DDDDDD;
     }
@@ -103,7 +103,7 @@
 <h3><%= StringUtils.capitalize(monthFormatter.print(monthView.getReferenceDateTime())) %></h3>
 <div>
     <div class="pull-right" >
-        <button type="submit" name="agendaView" class="btn btn-small">
+        <button type="submit" name="agendaView" class="btn btn-default btn-sm">
             <fmt:message key="agenda" />
         </button>
     </div>
@@ -112,16 +112,16 @@
             Interval monthInterval = monthView.getMonthInterval();
             boolean todayDisabled = monthInterval.contains(new DateTime());
         %>
-        <button type="submit" name="today" class="btn btn-small"<%= todayDisabled ? " disabled='true'" : "" %>>
+        <button type="submit" name="today" class="btn btn-default btn-sm"<%= todayDisabled ? " disabled='true'" : "" %>>
             <fmt:message key="current.month" />
         </button>
-        <button type="submit" name="prevMonth" class="btn btn-small">
-            <i class="icon-chevron-left"></i>
+        <button type="submit" name="prevMonth" class="btn btn-default btn-sm">
+            <i class="glyphicon glyphicon-chevron-left"></i>
             <fmt:message key="previous" />
         </button>
-        <button type="submit" name="nextMonth" class="btn btn-small">
+        <button type="submit" name="nextMonth" class="btn btn-default btn-sm">
             <fmt:message key="next" />
-            <i class="icon-chevron-right"></i>
+            <i class="glyphicon glyphicon-chevron-right"></i>
         </button>
     </div>
 </div>

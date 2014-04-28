@@ -23,7 +23,7 @@
                 pageContext.setAttribute("exceptionString", "unknown");
             }
         %>
-        <div class="alert alert-error">
+        <div class="alert alert-danger">
             <button data-dismiss="alert" class="close" type="button">&times;</button>
             <ul class="errorMessages">
                 <li>

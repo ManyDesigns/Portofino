@@ -192,7 +192,7 @@ public class SelectSearchField extends AbstractSearchField {
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("div");
-        xb.addAttribute("class", "control-group");
+        xb.addAttribute("class", "form-group");
         switch (displayMode) {
             case DROPDOWN:
                 valueToXhtmlDropDown(xb);
@@ -219,14 +219,13 @@ public class SelectSearchField extends AbstractSearchField {
     private void valueToXhtmlDropDown(XhtmlBuffer xb) {
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
 
-        xb.openElement("div");
-        xb.addAttribute("class", "controls");
         Object[] values = getValues();
         Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
         xb.openElement("select");
         xb.addAttribute("id", id);
         xb.addAttribute("name", inputName);
+        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
 
         boolean selected = (values == null && !notSet);
         if (!options.isEmpty()) {
@@ -252,8 +251,6 @@ public class SelectSearchField extends AbstractSearchField {
             String js = composeDropDownJs();
             xb.writeJavaScript(js);
         }
-
-        xb.closeElement("div");
     }
 
     public String composeDropDownJs() {
@@ -279,7 +276,7 @@ public class SelectSearchField extends AbstractSearchField {
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
 
         xb.openElement("div");
-        xb.addAttribute("class", "controls");
+        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
 
         int counter = 0;
 
@@ -332,7 +329,7 @@ public class SelectSearchField extends AbstractSearchField {
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
 
         xb.openElement("div");
-        xb.addAttribute("class", "controls");
+        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
 
         Object value = selectionModel.getValue(selectionModelIndex);
         String stringValue = OgnlUtils.convertValueToString(value);
@@ -357,7 +354,7 @@ public class SelectSearchField extends AbstractSearchField {
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
 
         xb.openElement("div");
-        xb.addAttribute("class", "controls");
+        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
 
         Object[] values = getValues();
         Map<Object, SelectionModel.Option> options =
@@ -391,7 +388,7 @@ public class SelectSearchField extends AbstractSearchField {
     private void valueToXhtmlMultipleSelection(XhtmlBuffer xb) {
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
         xb.openElement("div");
-        xb.addAttribute("class", "controls");
+        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
 
         Object[] values = getValues();
         Map<Object, SelectionModel.Option> options =

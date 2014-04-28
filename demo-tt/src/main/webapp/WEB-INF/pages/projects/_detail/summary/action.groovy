@@ -40,13 +40,13 @@ class ProjectSummaryAction extends CustomAction {
         return new ForwardResolution("/jsp/projects/summary.jsp");
     }
 
-    @Button(list = "pageHeaderButtons", key = "create.new.ticket", order = 0.5d, icon = "icon-plus icon-white", type=Button.TYPE_SUCCESS)
+    @Button(list = "pageHeaderButtons", key = "create.new.ticket", order = 0.5d, icon = "glyphicon-plus white", type=Button.TYPE_SUCCESS)
     @Guard(test="isContributor()", type=GuardType.VISIBLE)
     public Resolution createNewTicket() {
         return new RedirectResolution("/projects/$project.id/tickets?create=");
     }
 
-    @Button(list = "pageHeaderButtons", key = "edit.project.details", order = 1d, icon = "icon-edit")
+    @Button(list = "pageHeaderButtons", key = "edit.project.details", order = 1d, icon = "glyphicon-edit")
     @Guard(test="isManager()", type=GuardType.VISIBLE)
     public Resolution editProjectDetails() {
         return new RedirectResolution("/projects/$project.id?edit=");

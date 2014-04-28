@@ -15,7 +15,7 @@
                 <stripes:form action="${actionBean.context.actionPath}" method="post">
                     <input type="hidden" name="returnUrl"
                            value="<c:out value="${actionBean.returnUrl}"/>"/>
-                    <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
+                    <portofino:buttons list="pageHeaderButtons" cssClass="btn-xs" />
                 </stripes:form>
             </div>
             <h4 class="pageTitle">
@@ -42,7 +42,7 @@
     <jsp:include page="/theme/header.jsp"/>
     <div class="container">
         <div class="row">
-            <div class="content span12">
+            <div class="content col-md-12">
                 <div class="contentHeader">
                     <stripes:layout-component name="contentHeader">
                         <mde:sessionMessages />
@@ -56,7 +56,7 @@
                                           method="post">
                                 <input type="hidden" name="returnUrl"
                                        value="<c:out value="${actionBean.returnUrl}"/>"/>
-                                <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
+                                <portofino:buttons list="pageHeaderButtons" cssClass="btn-xs" />
                             </stripes:form>
                         </div>
                         <h3 class="pageTitle">
@@ -66,13 +66,13 @@
                         </h3>
                     </stripes:layout-component>
                 </div>
-                <div class="row-fluid">
-                    <div class="span8">
+                <div class="row">
+                    <div class="col-md-8">
                         <div class="pageBody">
                             <stripes:layout-component name="pageBody" />
                         </div>
                     </div>
-                    <div class="span4">
+                    <div class="col-md-4">
                         <div class="embeddedPages">
                             <div class="${cssClass} embeddedPageActions" data-page-action-list="default">
                                 <% actionBean.initEmbeddedPageActions(); %>

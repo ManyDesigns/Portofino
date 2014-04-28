@@ -15,7 +15,7 @@
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.page.RootChildrenAction"
                       method="post" enctype="multipart/form-data">
             <%@include file="children-tables.jsp"%>
-            <div class="form-actions">
+            <div class="form-group">
                 <portofino:buttons list="root-children" />
             </div>
         </stripes:form>

@@ -40,7 +40,7 @@ class MyCrudAction extends CrudAction {
 
     @Override
     @Button(list = "crud-search", key = "create.new", order = 1d, type = Button.TYPE_SUCCESS,
-            icon = "icon-plus icon-white", group = "crud")
+            icon = "glyphicon-plus white", group = "crud")
     @Guard(test="isManager()", type=GuardType.VISIBLE)
     Resolution create() {
         return super.create()    //To change body of overridden methods use File | Settings | File Templates.
@@ -89,7 +89,7 @@ class MyCrudAction extends CrudAction {
 
     @Override
     @Buttons([
-        @Button(list = "pageHeaderButtons", key = "edit.component.details", order = 1d, icon = "icon-edit", group = "crud"),
+        @Button(list = "pageHeaderButtons", key = "edit.component.details", order = 1d, icon = "glyphicon-edit", group = "crud"),
         @Button(list = "crud-read-default-button", key = "search")
     ])
     @Guard(test="object != null && isManager()", type=GuardType.VISIBLE)

@@ -34,7 +34,7 @@
                 <mde:write name="actionBean" property="jndiCPForm"/>
                 <mde:write name="actionBean" property="jdbcCPForm"/>
             </div>
-            <div class="form-actions">
+            <div>
                 <portofino:buttons list="build-app" />
             </div>
         </stripes:form>

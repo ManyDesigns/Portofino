@@ -58,13 +58,13 @@ for driver in local.drivers:
     urllib.urlretrieve("http://repo1.maven.org/maven2/" + driver[0] + driver[1], tomcat_path + "/lib/" + driver[1])
 
 print "Building Portofino..."
-os.system("pushd " + portofino_path + "; mvn clean install -Dmaven.test.skip=true; popd")
+os.system("pushd " + portofino_path + "; mvn clean install; popd")
 
 print "Generating oneclick from archetype..."
 os.system("pushd " + build_path + "; mvn archetype:generate -DarchetypeArtifactId=portofino-war-archetype -DarchetypeGroupId=com.manydesigns -DarchetypeVersion=" + local.portofino_version + " -DinteractiveMode=false -DgroupId=com.manydesigns -DartifactId=portofino-oneclick -Dversion=" + local.portofino_version + "; popd")
 
 print "Building oneclick..."
-os.system("pushd " + oneclick_path + "; mvn clean install -Dmaven.test.skip=true; popd")
+os.system("pushd " + oneclick_path + "; mvn clean package; popd")
 
 
 shutil.copy(oneclick_path + "/target/portofino-oneclick-" + local.portofino_version + ".war", tomcat_path + "/webapps/ROOT.war")

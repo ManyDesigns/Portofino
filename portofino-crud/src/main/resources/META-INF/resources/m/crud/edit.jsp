@@ -35,8 +35,10 @@
                 <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
             </c:if>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
-            <div class="form-actions">
-                <portofino:buttons list="crud-edit" />
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <portofino:buttons list="crud-edit" />
+                </div>
             </div>
         </stripes:form>
     </stripes:layout-component>

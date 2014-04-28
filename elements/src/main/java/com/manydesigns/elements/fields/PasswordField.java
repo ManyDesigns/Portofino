@@ -125,7 +125,7 @@ public class PasswordField extends TextField {
                 closeVisibleField(xb);
                 //Open another input
                 xb.openElement("div");
-                String cssClass = "control-group readwrite required";
+                String cssClass = "form-group readwrite required";
                 if(errors.size() > 0) {
                     cssClass += " error";
                 }
@@ -143,7 +143,7 @@ public class PasswordField extends TextField {
                 }
                 xb.writeLabel(actualLabel, confirmationHtmlId, FORM_LABEL_CLASS);
                 xb.openElement("div");
-                xb.addAttribute("class", "controls");
+                xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
                 // print out confirmation input field
                 valueToXhtml(xb, confirmationHtmlId, confirmationInputName, confirmationValue);
             }
@@ -197,7 +197,7 @@ public class PasswordField extends TextField {
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
         xb.openElement("div");
-        xb.addAttribute("class", "value");
+        xb.addAttribute("class", fieldCssClass + " value");
         xb.addAttribute("id", id);
         xb.write(PASSWORD_PLACEHOLDER);
         xb.closeElement("div");
@@ -206,7 +206,7 @@ public class PasswordField extends TextField {
     protected void valueToXhtmlEdit(XhtmlBuffer xb, String actualHtmlId, String actualInputName, String actualStringValue) {
         xb.openElement("input");
         xb.addAttribute("type", "password");
-        xb.addAttribute("class", "text");
+        xb.addAttribute("class", fieldCssClass + " text");
         xb.addAttribute("id", actualHtmlId);
         xb.addAttribute("name", actualInputName);
         xb.addAttribute("value", actualStringValue);

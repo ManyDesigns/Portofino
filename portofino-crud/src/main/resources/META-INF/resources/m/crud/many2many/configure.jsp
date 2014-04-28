@@ -37,8 +37,10 @@
 
             <jsp:include page="/m/pageactions/script-configuration.jsp" />
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
-            <div class="form-actions">
-                <portofino:buttons list="configuration" />
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <portofino:buttons list="configuration" />
+                </div>
             </div>
         </stripes:form>
     </stripes:layout-component>

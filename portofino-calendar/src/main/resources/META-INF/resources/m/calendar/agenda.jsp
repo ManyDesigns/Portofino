@@ -62,7 +62,7 @@
 <h3><%= StringUtils.capitalize(dateFormatter.print(referenceDateTime)) %></h3>
 <div>
     <div class="pull-right" >
-        <button type="submit" name="monthView" class="btn btn-small">
+        <button type="submit" name="monthView" class="btn btn-default btn-sm">
             <fmt:message key="month" />
         </button>
     </div>
@@ -72,16 +72,16 @@
             boolean todayDisabled =
                     referenceDateTime.getYear() == today.getYear() && referenceDateTime.getDayOfYear() == today.getDayOfYear();
         %>
-        <button type="submit" name="today" class="btn btn-small"<%= todayDisabled ? " disabled='true'" : "" %>>
+        <button type="submit" name="today" class="btn btn-default btn-sm"<%= todayDisabled ? " disabled='true'" : "" %>>
             <fmt:message key="today" />
         </button>
-        <button type="submit" name="prevDay" class="btn btn-small">
-            <i class="icon-chevron-left"></i>
+        <button type="submit" name="prevDay" class="btn btn-default btn-sm">
+            <i class="glyphicon glyphicon-chevron-left"></i>
             <fmt:message key="previous" />
         </button>
-        <button type="submit" name="nextDay" class="btn btn-small">
+        <button type="submit" name="nextDay" class="btn btn-default btn-sm">
             <fmt:message key="next" />
-            <i class="icon-chevron-right"></i>
+            <i class="glyphicon glyphicon-chevron-right"></i>
         </button>
     </div>
 </div>

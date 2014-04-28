@@ -69,7 +69,7 @@
                     $("input[name=generationStrategy]").change(toggleRootsForm);
                 });
             </script>
-            <div class="form-actions" style="padding-left: 20px;">
+            <div>
                 <portofino:buttons list="select-tables" />
             </div>
         </stripes:form>

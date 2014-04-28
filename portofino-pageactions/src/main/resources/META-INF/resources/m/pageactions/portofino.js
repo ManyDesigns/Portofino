@@ -282,7 +282,7 @@ portofino.confirmDeletePage = function(pagePath, contextPath) {
             dialog.modal("hide");
             dialog.remove();
         });
-        dialog.modal({ backdrop: 'static'});
+        dialog.modal({ backdrop: 'static', show: true });
     });
 };
 
@@ -300,7 +300,7 @@ portofino.showMovePageDialog = function(pagePath, contextPath) {
             dialog.modal("hide");
             dialog.remove();
         });
-        dialog.modal({ backdrop: 'static'});
+        dialog.modal({ backdrop: 'static', show: true });
     });
 };
 
@@ -318,7 +318,7 @@ portofino.showCopyPageDialog = function(pagePath, contextPath) {
             dialog.modal("hide");
             dialog.remove();
         });
-        dialog.modal({ backdrop: 'static'});
+        dialog.modal({ backdrop: 'static', show: true });
     });
 };
 

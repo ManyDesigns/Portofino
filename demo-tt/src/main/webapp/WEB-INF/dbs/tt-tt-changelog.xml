@@ -424,7 +424,7 @@
     <changeSet id="tt-120" author="Giampiero Granatella">
         <insert tableName="ticket_priorities">
             <column name="priority" value="Low"/>
-            <column name="css_class" value="label"/>
+            <column name="css_class" value="label label-default"/>
         </insert>
         <insert tableName="ticket_priorities">
             <column name="priority" value="Medium"/>
@@ -439,7 +439,7 @@
         <insert tableName="version_states">
             <column name="id" valueNumeric="1"/>
             <column name="state" value="Planned"/>
-            <column name="css_class" value="label"/>
+            <column name="css_class" value="label label-default"/>
         </insert>
         <insert tableName="version_states">
             <column name="id" valueNumeric="2"/>

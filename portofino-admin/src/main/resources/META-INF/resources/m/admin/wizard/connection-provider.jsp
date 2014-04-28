@@ -92,8 +92,10 @@
                     toggleNewSPForm();
                 });
             </script>
-            <div class="form-actions" style="padding-left: 20px;">
-                <portofino:buttons list="connection-provider" />
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <portofino:buttons list="connection-provider" />
+                </div>
             </div>
         </stripes:form>
     </stripes:layout-component>

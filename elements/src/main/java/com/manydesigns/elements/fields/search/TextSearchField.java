@@ -74,16 +74,16 @@ public class TextSearchField extends AbstractSearchField {
 
     public void toXhtml(@NotNull XhtmlBuffer xb) {
         xb.openElement("div");
-        xb.addAttribute("class", "control-group");
+        xb.addAttribute("class", "form-group");
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
         xb.openElement("div");
-        xb.addAttribute("class", "controls");
+        xb.addAttribute("class", "text-search-form-control");
         if (showMatchMode) {
             xb.writeLabel(MATCH_MODE_LABEL, matchModeId, "match_mode");
             xb.openElement("select");
             xb.addAttribute("id", matchModeId);
             xb.addAttribute("name", matchModeParam);
-            xb.addAttribute("class", "match_mode");
+            xb.addAttribute("class", FORM_CONTROL_CSS_CLASS + " match_mode");
             for (TextMatchMode m : TextMatchMode.values()) {
                 boolean checked = matchMode == m;
                 String option = m.getStringValue();
@@ -92,7 +92,7 @@ public class TextSearchField extends AbstractSearchField {
             xb.closeElement("select");
             xb.write(" ");
         }
-        xb.writeInputText(id, inputName, value, "text", 18, maxLength);
+        xb.writeInputText(id, inputName, value, FORM_CONTROL_CSS_CLASS, 18, maxLength);
         xb.closeElement("div");
         xb.closeElement("div");
     }

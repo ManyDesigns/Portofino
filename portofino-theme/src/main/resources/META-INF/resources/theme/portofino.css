@@ -19,15 +19,6 @@ footer {
 }
 
 /*******************************************************************************
-Fix for Bootstrap bug on mobile browsers:
-https://github.com/twbs/bootstrap/issues/7968
-*******************************************************************************/
-
-.dropdown-backdrop {
-    position: static;
-}
-
-/*******************************************************************************
 Error/warning/info messages (Elements)
 *******************************************************************************/
 
@@ -74,12 +65,21 @@ Forms (Elements)
     overflow: hidden;
 }
 
-.controls .value {
-    padding-top: 5px;
+.form-control.value {
+    border: none;
+    box-shadow: none;
 }
 
-.form-horizontal .control-group.readonly {
+.form-horizontal .form-group.readonly {
     margin-bottom: 10px;
+}
+
+tbody div.form-control {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+    border-radius: 0;
+    height: auto;
+    margin: auto;
+    padding: 0;
 }
 
 input.mde-text-field-with-explicit-size, textarea.mde-text-field-with-explicit-size {
@@ -108,8 +108,13 @@ label.control-label:after {
     content: ":";
 }
 
-.control-group.readwrite.required label.control-label:before {
+.form-group.readwrite.required label.control-label:before {
     content: "* ";
+}
+
+.portofino-datatable ul.pagination {
+    float: right;
+    margin: 0;
 }
 
 /*******************************************************************************
@@ -137,6 +142,10 @@ General
     font-weight: bold;
 }
 
+.white {
+    color: #ffffff;
+}
+
 /*******************************************************************************
 Dialog (e.g., login)
 *******************************************************************************/
@@ -148,7 +157,7 @@ body.dialog {
 }
 
 .dialog-container {
-    max-width: 360px;
+    max-width: 400px;
     padding: 19px 29px 29px;
     margin: 0 auto 20px;
     background-color: #ffffff;
@@ -199,6 +208,21 @@ Content
     margin-bottom: 1em;
 }
 
+.navbar-inverse .navbar-btn {
+  background-color: #222222;
+  border-color: #333333;
+  color: #999999;
+}
+.navbar-inverse .navbar-btn:hover {
+  color: #ffffff;
+  background-color: #333333;
+}
+
+.navbar-inverse .nav > li > a:hover,
+.navbar-inverse .nav > li > a:focus {
+    background-color: transparent;
+}
+
 /*******************************************************************************
 PageActions
 *******************************************************************************/
@@ -243,15 +267,6 @@ Search form
     margin-top: 1em;
 }
 
-.searchform select, .searchform input {
-    width: auto;
-}
-
-.searchform .control-group {
-    display: inline-block;
-    margin-right: 1em;
-}
-
 .searchform label.match_mode {
     display: none;
 }
@@ -270,6 +285,25 @@ Search form
     margin: 0;
     padding: 0;
     border: 0 none;
+}
+
+.searchform .form-group {
+    margin-bottom: 15px;
+}
+
+.searchform .form-group > .control-label {
+    padding: 6px 12px;
+}
+
+.text-search-form-control {
+    display: inline-block;
+}
+
+.searchform .control-label.input-group-addon {
+    background: none;
+    border: none;
+    color: #000000;
+    font-weight: bold;
 }
 
 .search_results {

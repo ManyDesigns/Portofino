@@ -17,8 +17,10 @@
                       method="post" class="form-horizontal">
             <mde:write name="actionBean" property="columnForm" />
             <mde:write name="actionBean" property="tableForm" />
-            <div class="form-actions">
-                <portofino:buttons list="column-edit" />
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <portofino:buttons list="column-edit" />
+                </div>
             </div>
         </stripes:form>
     </stripes:layout-component>

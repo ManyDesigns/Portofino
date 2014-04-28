@@ -13,8 +13,8 @@
         <mde:write name="actionBean" property="form"/>
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.modules.ModulesAction"
                       method="post">
-            <div class="form-actions">
-                <button name="returnToPages" type="submit" class="btn">Return to pages</button>
+            <div class="form-group">
+                <button name="returnToPages" type="submit" class="btn btn-default">Return to pages</button>
             </div>
         </stripes:form>
     </stripes:layout-component>

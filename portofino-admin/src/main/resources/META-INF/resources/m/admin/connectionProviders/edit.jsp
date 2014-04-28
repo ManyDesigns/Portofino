@@ -23,8 +23,10 @@
                 <mde:write name="actionBean" property="schemasForm"/>
             </c:if>
             <stripes:hidden name="databaseName" value="${actionBean.databaseName}"/>
-            <div class="form-action">
-                <portofino:buttons list="connectionProviders-edit" />
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <portofino:buttons list="connectionProviders-edit" />
+                </div>
             </div>
         </stripes:form>
     </stripes:layout-component>

@@ -14,7 +14,7 @@
                           method="post">
                 <input type="hidden" name="returnUrl"
                        value="<c:out value="${actionBean.returnUrl}"/>"/>
-                <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
+                <portofino:buttons list="pageHeaderButtons" cssClass="btn-xs" />
             </stripes:form>
         </div>
         <h3 class="pageTitle">
@@ -29,8 +29,10 @@
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" class="form-horizontal">
             <mde:write name="actionBean" property="form" />
-            <div class="form-actions">
-                <portofino:buttons list="update-data" />
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <portofino:buttons list="update-data" />
+                </div>
             </div>
         </stripes:form>
     </stripes:layout-component>

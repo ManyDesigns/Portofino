@@ -12,7 +12,7 @@
     <stripes:layout-component name="pageBody">
         <stripes:form id="signUpForm" action="${actionBean.context.actionPath}" method="post">
             <mde:write name="actionBean" property="signUpForm"/>
-            <div class="control-group ${actionBean.captchaValidationFailed ? 'error' : ''}">
+            <div class="form-group ${actionBean.captchaValidationFailed ? 'error' : ''}">
                 <label for="captcha" class="control-label required">
                     <fmt:message key="please.type.the.text.shown.in.the.image" />
                 </label>
@@ -21,7 +21,7 @@
                         <input id="captcha" name="captchaText" type="text" autocomplete="off" class="input-small" />
                         <a onclick="$('#captcha-image').attr('src', '${pageContext.request.contextPath}${actionBean.context.actionPath}?captcha=' + Math.random());"
                            class="btn" >
-                            <i class="icon-refresh"></i>
+                            <i class="glyphicon glyphicon-refresh"></i>
                         </a>
                     </div>
                     <img alt="captcha image" id="captcha-image" src="${pageContext.request.contextPath}${actionBean.context.actionPath}?captcha=" />

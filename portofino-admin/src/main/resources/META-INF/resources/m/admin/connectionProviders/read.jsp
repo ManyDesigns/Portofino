@@ -23,14 +23,6 @@
                 </c:forEach>
             </c:if>
             <c:if test="${actionBean.detectedValuesForm != null}">
-                <style type="text/css">
-                    #detectedValuesForm label {
-                        width: 200px;
-                    }
-                    #detectedValuesForm .controls {
-                        margin-left: 220px;
-                    }
-                </style>
                 <div class="horizontalSeparator"></div>
                 <h4><fmt:message key="detected.values"/></h4>
                 <div id="detectedValuesForm">
@@ -38,7 +30,7 @@
                 </div>
             </c:if>
             <stripes:hidden name="databaseName" value="${actionBean.databaseName}"/>
-            <div class="form-actions">
+            <div class="form-group">
                 <portofino:buttons list="connectionProviders-read" />
             </div>
             <script type="text/javascript">

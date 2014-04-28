@@ -26,17 +26,19 @@
                 });
             });
         </script>
-        <stripes:form action="${actionBean.context.actionPath}" method="post" enctype="multipart/form-data">
+        <stripes:form action="${actionBean.context.actionPath}" method="post" enctype="multipart/form-data" class="form-horizontal">
             <!-- Content editor -->
             <fieldset style="margin-bottom: 2em;">
                 <legend><fmt:message key="edit.content"/></legend>
                 <input type="text" name="title" value="<c:out value="${actionBean.title}"/>"
-                       class="input-block-level"/>
+                       class="form-control"/>
                 <stripes:textarea class="mde-form-rich-text" name="content" value="${actionBean.content}"/>
                 <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             </fieldset>
-            <div class="form-actions">
-                <portofino:buttons list="edit-content" />
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <portofino:buttons list="edit-content" />
+                </div>
             </div>
         </stripes:form>
     </stripes:layout-component>

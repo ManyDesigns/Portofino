@@ -21,9 +21,9 @@
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post" class="dont-prompt-on-page-abandon">
             <label for="userName"><fmt:message key='user.name'/></label>
-            <stripes:text name="userName" id="userName" class="input-block-level"/>
+            <stripes:text name="userName" id="userName" class="form-control"/>
             <label for="pwd"><fmt:message key='password'/></label>
-            <stripes:password name="pwd" id="pwd" class="input-block-level"/>
+            <stripes:password name="pwd" id="pwd" class="form-control"/>
             <label class="checkbox">
                 <stripes:checkbox name="rememberMe" id="rememberMe"/> <fmt:message key='remember.me.on.this.computer'/>
             </label>

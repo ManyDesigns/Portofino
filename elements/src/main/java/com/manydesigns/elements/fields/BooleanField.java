@@ -138,9 +138,12 @@ public class BooleanField extends AbstractField {
 
     protected void valueToXhtmlEdit(XhtmlBuffer xb) {
         if (required) {
+            xb.openElement("label");
+            xb.addAttribute("class", "checkbox-inline");
             xb.writeInputCheckbox(id, inputName, TRUE_VALUE,
                     BooleanUtils.isTrue(booleanValue), false, null);
             xb.writeInputHidden(checkInputName, CHECK_VALUE);
+            xb.closeElement("label");
         } else {
             xb.openElement("select");
             xb.addAttribute("id", id);

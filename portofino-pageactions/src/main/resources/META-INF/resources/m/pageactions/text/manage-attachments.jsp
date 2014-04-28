@@ -55,19 +55,19 @@
             </c:if>
             <div class="horizontalSeparator"></div>
             <fmt:message key="upload.a.new.file"/>:
-            <stripes:file name="upload"/>
-            <label class="checkbox">
-                <stripes:checkbox name="uploadDownloadable" checked="checked" />
-                <fmt:message key="downloadable" />
-            </label>
+            <div class="form-group">
+                <stripes:file name="upload"/>
+                <label class="checkbox">
+                    <stripes:checkbox name="uploadDownloadable" checked="checked" />
+                    <fmt:message key="downloadable" />
+                </label>
+            </div>
             <br/>
             <br/>
             <portofino:buttons list="manage-attachments-upload" />
             <br/>
             <br/>
-            <div class="form-actions">
-                <portofino:buttons list="manage-attachments" />
-            </div>
+            <portofino:buttons list="manage-attachments" />
         </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

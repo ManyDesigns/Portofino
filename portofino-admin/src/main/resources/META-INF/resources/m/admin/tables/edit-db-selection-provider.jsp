@@ -34,8 +34,10 @@
             <mde:write name="actionBean" property="tableForm" />
             <input name="selectionProviderName" type="hidden" value="${actionBean.selectionProviderName}" />
             <input name="selectedTabId" type="hidden" value="tab-fk-sp" />
-            <div class="form-actions">
-                <portofino:buttons list="table-selection-provider" />
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <portofino:buttons list="table-selection-provider" />
+                </div>
             </div>
         </stripes:form>
     </stripes:layout-component>

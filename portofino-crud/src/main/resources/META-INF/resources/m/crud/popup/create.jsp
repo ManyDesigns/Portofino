@@ -32,8 +32,10 @@
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <input type="hidden" name="popup" value="true" />
             <input type="hidden" name="popupCloseCallback" value="${actionBean.popupCloseCallback}" />
-            <div class="form-actions">
-                <portofino:buttons list="crud-create" />
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <portofino:buttons list="crud-create" />
+                </div>
             </div>
         </stripes:form>
     </stripes:layout-component>

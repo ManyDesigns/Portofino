@@ -11,7 +11,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <div>
-            <strong><i class="icon-tag"></i> Ticket description:</strong>
+            <strong><i class="glyphicon glyphicon-tag"></i> Ticket description:</strong>
         </div>
         <c:if test="${not empty actionBean.ticket.description}">
             <div><c:out value="${mde:formattedText(actionBean.ticket.description, false)}" escapeXml="false"/></div>
@@ -26,7 +26,7 @@
             <hr/>
             <stripes:form action="${actionBean.context.actionPath}" method="post">
                 <label>Add a comment:
-                <textarea maxlength="4000" name="comment" class="input-block-level"></textarea>
+                <textarea maxlength="4000" name="comment" class="form-control"></textarea>
                 </label>
                 <portofino:buttons list="activity"/>
             </stripes:form>

@@ -42,9 +42,9 @@ public class BootstrapSizes {
     public static final String
         MINI = "input-mini", SMALL = "input-small", MEDIUM = "input-medium",
         LARGE = "input-large", XLARGE = "input-xlarge", XXLARGE = "input-xxlarge",
-        BLOCK_LEVEL = "input-block-level",
+        BLOCK_LEVEL = "form-control", //TODO check
 
-        SPAN1 = "span1", SPAN2 = "span2", SPAN3 = "span3", SPAN4 = "span4",
-        SPAN5 = "span5", SPAN6 = "span6", SPAN7 = "span7", SPAN8 = "span8",
-        SPAN9 = "span9", SPAN10 = "span10", SPAN11 = "span11", SPAN12 = "span12";
+        SPAN1 = "col-md-1", SPAN2 = "col-md-2", SPAN3 = "col-md-3", SPAN4 = "col-md-4",
+        SPAN5 = "col-md-5", SPAN6 = "col-md-6", SPAN7 = "col-md-7", SPAN8 = "col-md-8",
+        SPAN9 = "col-md-9", SPAN10 = "col-md-10", SPAN11 = "col-md-11", SPAN12 = "col-md-12";
 }

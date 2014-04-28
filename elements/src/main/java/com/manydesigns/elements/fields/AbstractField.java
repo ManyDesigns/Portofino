@@ -48,8 +48,9 @@ public abstract class AbstractField implements Field {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
-    public static final String FORM_LABEL_CLASS = "control-label";
-    public static final String DEFAULT_FIELD_CSS_CLASS = "";
+    public static final String FORM_LABEL_CLASS = "control-label col-sm-2";
+    public static final String DEFAULT_FIELD_CSS_CLASS = "form-control";
+    public static final String FORM_CONTROL_CSS_CLASS = "col-sm-10";
 
     protected final Configuration elementsConfiguration;
 
@@ -164,7 +165,7 @@ public abstract class AbstractField implements Field {
 
         if (accessor.isAnnotationPresent(CssClass.class)) {
             String[] cssClasses = accessor.getAnnotation(CssClass.class).value();
-            fieldCssClass = StringUtils.join(cssClasses, " ");
+            fieldCssClass = DEFAULT_FIELD_CSS_CLASS + " " + StringUtils.join(cssClasses, " ");
         } else {
             fieldCssClass = DEFAULT_FIELD_CSS_CLASS;
         }
@@ -203,7 +204,7 @@ public abstract class AbstractField implements Field {
      */
     protected void openVisibleField(XhtmlBuffer xb) {
         xb.openElement("div");
-        String cssClass = "control-group";
+        String cssClass = "form-group";
         if(mode.isView(insertable, updatable)) {
             cssClass += " readonly";
         } else {
@@ -218,7 +219,7 @@ public abstract class AbstractField implements Field {
         xb.addAttribute("class", cssClass);
         labelToXhtml(xb);
         xb.openElement("div");
-        xb.addAttribute("class", "controls");
+        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
     }
 
     /**

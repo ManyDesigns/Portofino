@@ -15,7 +15,7 @@
   <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 <![endif]-->
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/bootstrap/css/bootstrap.min.css' />">
-<link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/bootstrap/css/bootstrap-responsive.min.css' />">
+<link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/bootstrap/css/bootstrap-theme.min.css' />">
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/datepicker/css/datepicker.css' />">
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css' />">
 <script type="text/javascript" src="<stripes:url value='/theme/jquery/jquery.min.js' />" ></script>
@@ -40,14 +40,5 @@
 <%
     BaseHref.emit(request, new XhtmlBuffer(out));
 %>
-<style type="text/css">
-    body {
-        padding-top: 50px;
-    }
-    @media screen and (max-width: 979px){
-        body {
-            padding-top: 0;
-        }
-    }
-</style><title><c:out value='<%= request.getParameter("pageTitle") %>' /></title>
+<title><c:out value='<%= request.getParameter("pageTitle") %>' /></title>
 </head>

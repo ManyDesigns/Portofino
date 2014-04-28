@@ -14,10 +14,10 @@
     <jsp:include page="/theme/header.jsp"/>
     <div class="container">
         <div class="row">
-            <div class="span2">
+            <div class="col-md-2">
                 <jsp:include page="/theme/navigation.jsp" />
             </div>
-            <div class="span10">
+            <div class="col-md-10">
                 <div class="contentHeader">
                     <stripes:layout-component name="contentHeader">
                         <mde:sessionMessages />
@@ -31,7 +31,7 @@
                                           method="post">
                                 <input type="hidden" name="returnUrl"
                                        value="<c:out value="${actionBean.returnUrl}"/>"/>
-                                <portofino:buttons list="pageHeaderButtons" cssClass="btn-mini" />
+                                <portofino:buttons list="pageHeaderButtons" cssClass="btn-xs" />
                             </stripes:form>
                         </div>
                         <h3 class="pageTitle">

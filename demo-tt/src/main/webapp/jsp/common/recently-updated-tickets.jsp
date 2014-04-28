@@ -20,7 +20,7 @@
                             <strong><c:out value="${ticket.title}"/></strong>
                         </div>
                         <div>
-                            <small class="muted">Updated on <fmt:formatDate value="${ticket.last_updated}" pattern="yyyy-MM-dd HH:mm:ss z"/></small>
+                            <small class="text-muted">Updated on <fmt:formatDate value="${ticket.last_updated}" pattern="yyyy-MM-dd HH:mm:ss z"/></small>
                         </div>
                     </li>
                 </c:forEach>
