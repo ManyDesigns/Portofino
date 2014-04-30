@@ -170,7 +170,7 @@
                         <input name="testUserId" id="testUserIdSelect" type="text" value="${actionBean.testUserId}" />
                     </c:if>
                     <input type="hidden" name="originalPath" value="${actionBean.originalPath}" />
-                    <portofino:buttons list="testUserPermissions" cssClass="btn-block"/>
+                    <portofino:buttons list="testUserPermissions" cssClass=""/>
                     <br /><br />
                     <table id="userPermissionTestResults">
                         <c:if test="${not empty actionBean.testedAccessLevel}">
@@ -196,9 +196,7 @@
             </div>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
-                    <portofino:buttons list="page-permissions-edit" />
-                </div>
+                <portofino:buttons list="page-permissions-edit" />
             </div>
         </stripes:form>
     </stripes:layout-component>

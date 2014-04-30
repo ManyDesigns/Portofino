@@ -176,23 +176,15 @@ public class DateField extends AbstractTextField {
 
     @Override
     public void valueToXhtmlEdit(XhtmlBuffer xb) {
-        xb.openElement("input");
-        xb.addAttribute("type", "text");
-        xb.addAttribute("class", fieldCssClass + " " + EDITABLE_FIELD_CSS_CLASS);
-        xb.addAttribute("id", id);
-        xb.addAttribute("name", inputName);
-        if (stringValue != null) {
-            xb.addAttribute("value", stringValue);
-        }
-        if (maxLength != null) {
-            xb.addAttribute("maxlength", Integer.toString(maxLength));
-            xb.addAttribute("size", Integer.toString(maxLength));
-        }
+        xb.writeInputText(id, inputName, stringValue, labelPlaceholder ? label : null,
+                          fieldCssClass + " " + EDITABLE_FIELD_CSS_CLASS, size, maxLength);
 
-        xb.closeElement("input");
-        xb.write(" (");
+        xb.openElement("span");
+        xb.addAttribute("class", "help-block");
+        xb.write("(");
         xb.write(datePattern);
         xb.write(") ");
+        xb.closeElement("span");
 
         if (!containsTime) {
             String js = MessageFormat.format(

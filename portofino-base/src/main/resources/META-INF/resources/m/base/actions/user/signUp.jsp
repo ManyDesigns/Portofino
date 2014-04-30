@@ -14,7 +14,7 @@
             /* TODO this is a temporary fix because Elements generates markup for form-horizontal forms. We should
                find a way to generate markup that works will all form types with the appropriate CSS.
             */
-            .col-sm-2, .col-sm-10 {
+            .col-sm-2, .col-sm-4 {
                 float: none;
                 padding: 0;
                 width: 100%;

@@ -188,9 +188,7 @@
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.database.TablesAction"
                       method="post">
             <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
-                    <portofino:buttons list="tables-list" />
-                </div>
+                <portofino:buttons list="tables-list" />
             </div>
         </stripes:form>
     </stripes:layout-component>

@@ -49,7 +49,7 @@ public class SessionMessagesTag extends TagSupport {
 
         if(!errorMessages.isEmpty()) {
             xb.openElement("div");
-            xb.addAttribute("class", "alert alert-danger fade in");
+            xb.addAttribute("class", "alert alert-danger alert-dismissable fade in");
             writeCloseButton(xb);
             writeList(xb, errorMessages, "errorMessages");
             xb.closeElement("div");
@@ -57,7 +57,7 @@ public class SessionMessagesTag extends TagSupport {
 
         if(!warningMessages.isEmpty()) {
             xb.openElement("div");
-            xb.addAttribute("class", "alert fade in");
+            xb.addAttribute("class", "alert alert-warning alert-dismissable fade in");
             writeCloseButton(xb);
             writeList(xb, warningMessages, "warningMessages");
             xb.closeElement("div");
@@ -65,7 +65,7 @@ public class SessionMessagesTag extends TagSupport {
 
         if(!infoMessages.isEmpty()) {
             xb.openElement("div");
-            xb.addAttribute("class", "alert alert-success fade in");
+            xb.addAttribute("class", "alert alert-success alert-dismissable fade in");
             writeCloseButton(xb);
             writeList(xb, infoMessages, "infoMessages");
             xb.closeElement("div");

@@ -93,7 +93,7 @@
                 });
             </script>
             <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
+                <div class="align-with-input col-sm-10">
                     <portofino:buttons list="connection-provider" />
                 </div>
             </div>

@@ -18,7 +18,7 @@
             <mde:write name="actionBean" property="columnForm" />
             <mde:write name="actionBean" property="tableForm" />
             <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
+                <div class="align-with-input col-sm-10">
                     <portofino:buttons list="column-edit" />
                 </div>
             </div>

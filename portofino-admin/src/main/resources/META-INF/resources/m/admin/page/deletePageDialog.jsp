@@ -6,33 +6,36 @@
 <%@ page import="java.util.List" %>
 <jsp:useBean id="actionBean" scope="request"
              type="com.manydesigns.portofino.actions.admin.page.PageAdminAction"/>
-<div class="dialog-confirm-delete-page modal hide">
-    <div class="modal-header">
-        <button name="closeDeletePageButton" type="button" class="close" aria-hidden="true">&times;</button>
-        <h4><fmt:message key="really.delete"/></h4>
+<div class="dialog-confirm-delete-page modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button name="closeDeletePageButton" type="button" class="close" aria-hidden="true">&times;</button>
+                <h4 class="modal-title"><fmt:message key="really.delete"/></h4>
+            </div>
+            <div class="modal-body">
+                <p><fmt:message key="are.you.sure.you.want.to.delete.this.page"/></p>
+                <%
+                    PageInstance pageInstance = actionBean.getPageInstance();
+                    Page pg = pageInstance.getPage();
+                    if(!pg.getLayout().getChildPages().isEmpty() ||
+                       !pg.getDetailLayout().getChildPages().isEmpty()) { %>
+                        <p><fmt:message key="deleting.it.will.also.delete.its.children"/></p><%
+                        out.print(displayPageChildrenAsList(pg));
+                    }
+                %>
+                <input type="hidden" name="deletePage" value="action" />
+            </div>
+            <div class="modal-footer">
+                <button name="cancelDeletePageButton" type="button" class="btn btn-default">
+                    <fmt:message key="cancel" />
+                </button>
+                <button name="confirmDeletePageButton" type="button" class="btn btn-warning">
+                    <fmt:message key="delete" />
+                </button>
+            </div>
+        </div>
     </div>
-    <div class="modal-body">
-        <p><fmt:message key="are.you.sure.you.want.to.delete.this.page"/></p>
-        <%
-            PageInstance pageInstance = actionBean.getPageInstance();
-            Page pg = pageInstance.getPage();
-            if(!pg.getLayout().getChildPages().isEmpty() ||
-               !pg.getDetailLayout().getChildPages().isEmpty()) { %>
-                <p><fmt:message key="deleting.it.will.also.delete.its.children"/></p><%
-                out.print(displayPageChildrenAsList(pg));
-            }
-        %>
-        <input type="hidden" name="deletePage" value="action" />
-    </div>
-    <div class="modal-footer">
-        <button name="cancelDeletePageButton" type="button" class="btn">
-            <fmt:message key="cancel" />
-        </button>
-        <button name="confirmDeletePageButton" type="button" class="btn btn-warning">
-            <fmt:message key="delete" />
-        </button>
-    </div>
-
 </div><%!
     private void displayPageChildrenAsList(Page page, XhtmlBuffer buf) {
         List<ChildPage> childPages = page.getLayout().getChildPages();

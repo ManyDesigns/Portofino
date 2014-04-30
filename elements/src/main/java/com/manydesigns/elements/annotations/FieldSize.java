@@ -37,5 +37,8 @@ public @interface FieldSize {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
+    /**
+     * The estimated size of the field in characters.
+     */
     int value();
 }

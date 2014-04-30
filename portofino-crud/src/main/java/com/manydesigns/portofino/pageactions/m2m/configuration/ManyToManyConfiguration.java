@@ -175,7 +175,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
 
     @Required
     @Multiline
-    @CssClass(BootstrapSizes.BLOCK_LEVEL)
+    @CssClass(BootstrapSizes.SPAN10)
     @XmlAttribute(required = true)
     public String getQuery() {
         return query;

@@ -25,7 +25,7 @@
                     width: auto; margin-right: 20px;
                 }
 
-                #calendarField .col-sm-10 {
+                #calendarField .col-sm-4 {
                     float: none;
                 }
             </style>

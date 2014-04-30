@@ -21,7 +21,7 @@
             </c:if>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
+                <div class="align-with-input col-sm-10">
                     <portofino:buttons list="crud-bulk-edit" />
                 </div>
             </div>

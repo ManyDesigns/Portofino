@@ -20,7 +20,6 @@
 
 package com.manydesigns.elements.annotations.impl;
 
-import com.manydesigns.elements.annotations.ColSpan;
 import com.manydesigns.elements.annotations.CssClass;
 
 import java.lang.annotation.Annotation;

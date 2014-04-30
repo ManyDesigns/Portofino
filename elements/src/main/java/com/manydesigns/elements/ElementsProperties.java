@@ -72,9 +72,6 @@ public final class ElementsProperties {
     public static final String BLOBS_DATA_FILENAME_PATTERN =
             "blobs.data.filename.pattern";
 
-    public static final String FORM_LABEL_CLASS = "form.label.class";
-    public static final String FORM_CONTROL_CLASS = "form.control.class";
-
     //**************************************************************************
     // Static fields, singleton initialization and retrieval
     //**************************************************************************

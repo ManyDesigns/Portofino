@@ -127,7 +127,7 @@ public class PasswordField extends TextField {
                 xb.openElement("div");
                 String cssClass = "form-group readwrite required";
                 if(errors.size() > 0) {
-                    cssClass += " error";
+                    cssClass += " has-error";
                 }
                 xb.addAttribute("class", cssClass);
                 String confirmationHtmlId = id + "_confirm";
@@ -141,10 +141,9 @@ public class PasswordField extends TextField {
                 } else {
                     actualLabel = confirmLabel;
                 }
-                xb.writeLabel(actualLabel, confirmationHtmlId,
-                              elementsConfiguration.getString(ElementsProperties.FORM_LABEL_CLASS));
+                xb.writeLabel(actualLabel, confirmationHtmlId, FORM_LABEL_CLASS);
                 xb.openElement("div");
-                xb.addAttribute("class", elementsConfiguration.getString(ElementsProperties.FORM_CONTROL_CLASS));
+                xb.addAttribute("class", "input-container");
                 // print out confirmation input field
                 valueToXhtml(xb, confirmationHtmlId, confirmationInputName, confirmationValue);
             }
@@ -164,7 +163,7 @@ public class PasswordField extends TextField {
                              String actualLabel) {
         xb.openElement("label");
         xb.addAttribute("for", actualHtmlId);
-        xb.addAttribute("class", elementsConfiguration.getString(ElementsProperties.FORM_LABEL_CLASS));
+        xb.addAttribute("class", FORM_LABEL_CLASS);
         xb.write(StringUtils.capitalize(actualLabel));
         xb.closeElement("label");
     }

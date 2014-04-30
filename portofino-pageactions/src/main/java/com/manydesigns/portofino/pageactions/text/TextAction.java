@@ -47,6 +47,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,7 +131,6 @@ public class TextAction extends AbstractPageAction {
     //**************************************************************************
 
     @DefaultHandler
-    @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution execute() throws IOException {
         loadContent();
         if (StringUtils.isEmpty(content)) {
@@ -356,6 +356,7 @@ public class TextAction extends AbstractPageAction {
     @Button(list = "pageHeaderButtons", titleKey = "edit", order = 2, icon = Button.ICON_EDIT,
             group = "pageHeaderButtons")
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
+    @RequiresAuthentication
     public Resolution configure() {
         title = pageInstance.getPage().getTitle();
         try {
@@ -371,6 +372,7 @@ public class TextAction extends AbstractPageAction {
     @Button(list = "pageHeaderButtons", titleKey = "configure", order = 1, icon = Button.ICON_WRENCH,
             group = "pageHeaderButtons")
     @RequiresPermissions(level = AccessLevel.EDIT)
+    @RequiresAuthentication
     public Resolution configurePage() {
         prepareConfigurationForms();
         return new ForwardResolution("/m/pageactions/text/configure.jsp");
@@ -378,6 +380,7 @@ public class TextAction extends AbstractPageAction {
 
     @Button(list = "configuration", key = "update.configuration", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(level = AccessLevel.DEVELOP)
+    @RequiresAuthentication
     public Resolution updateConfiguration() throws IOException {
         prepareConfigurationForms();
         readPageConfigurationFromRequest();
@@ -393,6 +396,7 @@ public class TextAction extends AbstractPageAction {
 
     @Button(list = "manage-attachments-upload", key = "text.attachment.upload", order = 1)
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
+    @RequiresAuthentication
     public Resolution uploadAttachment() {
         if (upload == null) {
             SessionMessages.addWarningMessage(ElementsThreadLocals.getText("text.attachment.noFileSelected"));
@@ -411,6 +415,7 @@ public class TextAction extends AbstractPageAction {
     }
 
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
+    @RequiresAuthentication
     public Resolution uploadAttachmentFromCKEditor() {
         try {
             uploadDownloadable = false;
@@ -459,12 +464,10 @@ public class TextAction extends AbstractPageAction {
                 attachmentId);
     }
 
-    @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution viewAttachment() {
         return streamAttachment(false);
     }
 
-    @RequiresPermissions(level = AccessLevel.VIEW)
     public Resolution downloadAttachment() {
         return streamAttachment(true);
     }
@@ -554,6 +557,7 @@ public class TextAction extends AbstractPageAction {
 
     @Button(list = "manage-attachments-delete", key = "delete", order = 1)
     @RequiresPermissions(level = AccessLevel.VIEW, permissions = { PERMISSION_EDIT })
+    @RequiresAuthentication
     public Resolution deleteAttachments() {
         if (selection == null || selection.length == 0) {
             SessionMessages.addWarningMessage(ElementsThreadLocals.getText("text.attachment.noAttachmentSelected"));

@@ -15,8 +15,7 @@
         </fmt:message>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <stripes:form action="${actionBean.context.actionPath}" method="post" enctype="multipart/form-data"
-                      class="form-inline">
+        <stripes:form action="${actionBean.context.actionPath}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <c:if test="${not empty actionBean.textConfiguration.attachments}">
                 <fmt:message key="attachments"/>:
@@ -41,7 +40,6 @@
                         </tr>
                     </c:forEach>
                 </table>
-                <br/>
                 <portofino:buttons list="manage-attachments-delete" cssClass="manage-attachments-delete" />
                 <script type="text/javascript">
                     $(function() {
@@ -62,12 +60,12 @@
                     <fmt:message key="downloadable" />
                 </label>
             </div>
-            <br/>
-            <br/>
-            <portofino:buttons list="manage-attachments-upload" />
-            <br/>
-            <br/>
-            <portofino:buttons list="manage-attachments" />
+            <div class="form-group">
+                <portofino:buttons list="manage-attachments-upload" />
+            </div>
+            <div class="form-group">
+                <portofino:buttons list="manage-attachments" />
+            </div>
         </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

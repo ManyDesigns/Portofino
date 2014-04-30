@@ -65,8 +65,27 @@ Forms (Elements)
     overflow: hidden;
 }
 
-.form-horizontal .form-group.readonly {
-    margin-bottom: 10px;
+.form-horizontal .control-label {
+    width: 160px;
+    min-height: 1px;
+    padding-left: 15px;
+    padding-right: 15px;
+    position: relative;
+    float: left;
+}
+
+.form-horizontal div.input-container {
+    min-height: 1px;
+    padding-left: 15px;
+    padding-right: 15px;
+    position: relative;
+    float: left;
+}
+
+@media (min-width: 768px) {
+    .form-horizontal .align-with-input {
+        margin-left: 160px;
+    }
 }
 
 tbody div.form-control {
@@ -91,19 +110,19 @@ fieldset.radio {
     clear: both;
 }
 
-.mde-table-form input[type='checkbox'] {
+table.mde-table-form input[type='checkbox'] {
     margin: 0;
 }
 
-.table.mde-table-form th, .table.mde-table-form td {
+table.mde-table-form th, table.mde-table-form td {
     vertical-align: middle;
 }
 
-.mde-table-form div.checkbox {
+table.mde-table-form div.checkbox {
     margin: 0;
 }
 
-.mde-table-form div.checkbox label.checkbox-inline {
+table.mde-table-form div.checkbox label.checkbox-inline {
     vertical-align: inherit;
 }
 

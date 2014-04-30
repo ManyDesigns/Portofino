@@ -164,7 +164,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
     }
 
     @Multiline
-    @CssClass(BootstrapSizes.BLOCK_LEVEL)
+    @CssClass(BootstrapSizes.SPAN10)
     @XmlAttribute(required = true)
     public String getQuery() {
         return query;
@@ -184,7 +184,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         this.searchTitle = searchTitle;
     }
 
-    @CssClass(BootstrapSizes.BLOCK_LEVEL)
+    @CssClass(BootstrapSizes.SPAN10)
     @XmlAttribute(required = false)
     public String getCreateTitle() {
         return createTitle;
@@ -194,7 +194,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         this.createTitle = createTitle;
     }
 
-    @CssClass(BootstrapSizes.BLOCK_LEVEL)
+    @CssClass(BootstrapSizes.SPAN10)
     @XmlAttribute(required = false)
     public String getReadTitle() {
         return readTitle;
@@ -204,7 +204,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         this.readTitle = readTitle;
     }
 
-    @CssClass(BootstrapSizes.BLOCK_LEVEL)
+    @CssClass(BootstrapSizes.SPAN10)
     @XmlAttribute(required = false)
     public String getEditTitle() {
         return editTitle;
@@ -248,7 +248,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         return actualTable;
     }
 
-    @CssClass(BootstrapSizes.SMALL)
+    @CssClass(BootstrapSizes.SPAN1)
     @XmlAttribute(required = false)
     public Integer getRowsPerPage() {
         return rowsPerPage;

@@ -25,22 +25,22 @@
             <mde:write name="actionBean" property="newPageForm"/>
             <fieldset>
                 <legend><fmt:message key="preview"/></legend>
-                <table>
-                    <tbody>
-                    <tr>
-                        <th><label class="control-label" for="url">Url</label></th>
-                        <td><span id="url"></span></td>
-                    </tr>
-                    <tr>
-                        <th><label class="control-label" for="breadcrumbs">Breadcrumbs</label></th>
-                        <td><span id="breadcrumbs"></span></td>
-                    </tr>
-                    </tbody>
-                </table>
+                <div class="form-group readonly">
+                    <label class="control-label col-sm-2" for="url">Url</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static" id="url"></p>
+                    </div>
+                </div>
+                <div class="form-group readonly">
+                    <label class="control-label col-sm-2" for="breadcrumbs">Breadcrumbs</label>
+                    <div class="col-sm-10">
+                        <p class="form-control-static" id="breadcrumbs"></p>
+                    </div>
+                </div>
             </fieldset>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
+                <div class="col-sm-12">
                     <portofino:buttons list="page-create" />
                 </div>
             </div>

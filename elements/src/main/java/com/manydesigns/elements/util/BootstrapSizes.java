@@ -41,12 +41,12 @@ public class BootstrapSizes {
 
     public static final String //TODO update
         MINI = "input-mini", SMALL = "input-sm", MEDIUM = "input-medium",
-        LARGE = "input-large", XLARGE = "input-xlarge", XXLARGE = "input-xxlarge";
+        LARGE = "input-lg", XLARGE = "input-xlarge", XXLARGE = "input-xxlarge";
 
-    @Deprecated public static final String BLOCK_LEVEL = "";
+    @Deprecated public static final String BLOCK_LEVEL = "col-md-10";
 
     public static final String
-        SPAN1 = "col-md-1", SPAN2 = "col-md-2", SPAN3 = "col-md-3", SPAN4 = "col-md-4",
-        SPAN5 = "col-md-5", SPAN6 = "col-md-6", SPAN7 = "col-md-7", SPAN8 = "col-md-8",
-        SPAN9 = "col-md-9", SPAN10 = "col-md-10", SPAN11 = "col-md-11", SPAN12 = "col-md-12";
+        SPAN1 = "col-sm-1", SPAN2 = "col-sm-2", SPAN3 = "col-sm-3", SPAN4 = "col-sm-4",
+        SPAN5 = "col-sm-5", SPAN6 = "col-sm-6", SPAN7 = "col-sm-7", SPAN8 = "col-sm-8",
+        SPAN9 = "col-sm-9", SPAN10 = "col-sm-10", SPAN11 = "col-sm-11", SPAN12 = "col-sm-12";
 }

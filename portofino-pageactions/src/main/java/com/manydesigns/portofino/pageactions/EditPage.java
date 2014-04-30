@@ -40,12 +40,12 @@ public class EditPage {
 
     @LabelI18N("title")
     @Required
-    @CssClass(BootstrapSizes.BLOCK_LEVEL)
+    @CssClass(BootstrapSizes.SPAN10)
     public String title;
 
     @LabelI18N("description")
     @Required
-    @CssClass(BootstrapSizes.BLOCK_LEVEL)
+    @CssClass(BootstrapSizes.SPAN10)
     public String description;
 
     @LabelI18N("navigation.root")

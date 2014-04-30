@@ -48,6 +48,7 @@ public abstract class AbstractField implements Field {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
+    public static final String FORM_LABEL_CLASS = "control-label";
     public static final String EDITABLE_FIELD_CSS_CLASS = "form-control";
     public static final String STATIC_VALUE_CSS_CLASS = "form-control-static";
 
@@ -210,7 +211,7 @@ public abstract class AbstractField implements Field {
             cssClass += " readwrite";
         }
         if(errors.size() > 0) {
-            cssClass += " error";
+            cssClass += " has-error";
         }
         if(hasRequiredFields()) {
             cssClass += " required";
@@ -218,7 +219,7 @@ public abstract class AbstractField implements Field {
         xb.addAttribute("class", cssClass);
         labelToXhtml(xb);
         xb.openElement("div");
-        xb.addAttribute("class", elementsConfiguration.getString(ElementsProperties.FORM_CONTROL_CLASS));
+        xb.addAttribute("class", "input-container");
     }
 
     /**
@@ -240,7 +241,7 @@ public abstract class AbstractField implements Field {
         if(!mode.isView(insertable, updatable)) {
             xb.addAttribute("for", id); //HTML5 validation
         }
-        xb.addAttribute("class", elementsConfiguration.getString(ElementsProperties.FORM_LABEL_CLASS));
+        xb.addAttribute("class", FORM_LABEL_CLASS);
         if (mode.isBulk() && mode.isEdit() && !mode.isView(insertable, updatable)) {
             xb.writeInputCheckbox(null, bulkCheckboxName, "checked", bulkChecked, false, "pull-left");
         }
@@ -258,17 +259,17 @@ public abstract class AbstractField implements Field {
 
     public void helpToXhtml(XhtmlBuffer xb) {
         if (help != null) {
-            xb.openElement("div");
-            xb.addAttribute("class", "inputdescription");
+            xb.openElement("span");
+            xb.addAttribute("class", "help-block");
             xb.write(help);
-            xb.closeElement("div");
+            xb.closeElement("span");
         }
     }
 
     public void errorsToXhtml(XhtmlBuffer xb) {
         if (errors.size() > 0) {
             xb.openElement("span");
-            xb.addAttribute("class", "help-inline");
+            xb.addAttribute("class", "help-block");
             for (String error : errors) {
                 xb.write(error);
                 xb.writeBr();

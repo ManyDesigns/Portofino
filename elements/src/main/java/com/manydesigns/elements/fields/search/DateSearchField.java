@@ -99,7 +99,7 @@ public class DateSearchField extends RangeSearchField {
         if (!containsTime) {
             //Must be before to avoid breaking Bootstrap input-group
             String js = MessageFormat.format(
-                    "$(function() '{ setupDatePicker(''#{0}'', ''{1}''); '});",
+                    "$(function() '{' setupDatePicker(''#{0}'', ''{1}''); '}');",
                     StringEscapeUtils.escapeJavaScript(id),
                     StringEscapeUtils.escapeJavaScript(jsDatePattern));
             xb.writeJavaScript(js);

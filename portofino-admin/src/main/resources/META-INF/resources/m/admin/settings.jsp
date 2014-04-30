@@ -15,7 +15,7 @@
                       method="post" enctype="multipart/form-data" class="form-horizontal">
             <mde:write name="actionBean" property="form"/>
             <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
+                <div class="align-with-input col-sm-10">
                     <portofino:buttons list="settings" />
                 </div>
             </div>

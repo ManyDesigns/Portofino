@@ -37,5 +37,8 @@ public @interface CssClass {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
+    /**
+     * The classes applied to the input field.
+     */
     String[] value();
 }

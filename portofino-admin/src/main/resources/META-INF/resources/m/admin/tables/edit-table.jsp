@@ -15,10 +15,6 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <style type="text/css">
-            .tableForm {
-                overflow-x: auto;
-            }
-
             #sortable {
                 margin-left: 0;
                 width: 30%;
@@ -67,7 +63,7 @@
                 });
             });
         </script>
-        <stripes:form action="${actionBean.actionPath}" method="post">
+        <stripes:form action="${actionBean.actionPath}" method="post" class="form-horizontal">
             <ul id="tabs" class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#tab-table-columns">
                     <fmt:message key="table.and.columns" />
@@ -81,30 +77,29 @@
                     <div style="visibility: hidden; min-height: 0; max-height: 0;">
                         <portofino:buttons list="table-edit" /><%-- So pressing Enter calls Save--%>
                     </div>
-                    <div class="controls-row">
-                        <mde:write name="actionBean" property="tableForm" />
-                    </div>
+                    <br />
+                    <mde:write name="actionBean" property="tableForm" />
                     <div class="tableForm">
                         <fieldset>
                             <legend>
                                 <fmt:message key="columns" />
-                                <button class="btn sortButton"
+                                <button class="btn btn-default btn-sm sortButton"
                                     type="button" role="button" aria-disabled="false">
                                     <fmt:message key="change.order" />
                                 </button>
                             </legend>
-                            <div style="margin-top: 1em;">
+                            <div style="margin-top: 1em; margin-bottom: 2em;">
                                 <div id="columns">
                                     <mde:write name="actionBean" property="columnsTableForm" />
                                 </div>
                                 <div id="sortableContainer">
                                     <fmt:message key="drag.the.columns.to.change.their.order.then.push.ok" />
                                     <br /><br />
-                                    <button class="btn confirmSortButton"
+                                    <button class="btn btn-default btn-sm confirmSortButton"
                                             type="button" role="button" aria-disabled="false">
                                         <fmt:message key="ok" />
                                     </button>
-                                    <button class="btn cancelSortButton"
+                                    <button class="btn  btn-default btn-sm cancelSortButton"
                                             type="button" role="button" aria-disabled="false">
                                         <fmt:message key="cancel" />
                                     </button>
@@ -125,9 +120,9 @@
                     <div class="tableForm">
                         <fieldset>
                             <legend><fmt:message key="foreign.keys" /></legend>
-                            <div style="margin-top: 1em;">
+                            <div>
                                 <c:if test="${not empty actionBean.table.foreignKeys}">
-                                    <table>
+                                    <table class="table">
                                         <tr>
                                             <th><fmt:message key="name" /></th>
                                             <th><fmt:message key="property.name.one.side" /></th>
@@ -181,7 +176,7 @@
                                     </table>
                                 </c:if>
                                 <c:if test="${empty actionBean.table.foreignKeys}">
-                                    <fmt:message key="none.available" />
+                                    <p><fmt:message key="none.available" /></p>
                                 </c:if>
                             </div>
                         </fieldset>
@@ -189,9 +184,9 @@
                     <div class="tableForm">
                         <fieldset>
                             <legend><fmt:message key="selection.providers" /></legend>
-                            <div style="margin-top: 1em;">
+                            <div>
                                 <c:if test="${not empty actionBean.table.selectionProviders}">
-                                    <table>
+                                    <table class="table">
                                         <tr>
                                             <th><fmt:message key="name" /></th>
                                             <th><fmt:message key="columns" /></th>
@@ -235,17 +230,20 @@
                                     </table>
                                 </c:if>
                                 <c:if test="${empty actionBean.table.selectionProviders}">
-                                    <fmt:message key="none.available" /><br />
+                                    <p><fmt:message key="none.available" /></p>
                                 </c:if>
-                                <br />
-                                <portofino:buttons list="table-selection-providers" />
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <portofino:buttons list="table-selection-providers" />
+                                    </div>
+                                </div>
                             </div>
                         </fieldset>
                     </div>
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
+                <div class="col-sm-12">
                     <portofino:buttons list="table-edit" />
                 </div>
             </div>

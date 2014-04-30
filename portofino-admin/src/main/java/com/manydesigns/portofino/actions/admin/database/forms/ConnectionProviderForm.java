@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.actions.admin.database.forms;
 
 import com.manydesigns.elements.annotations.*;
+import com.manydesigns.elements.util.BootstrapSizes;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.JdbcConnectionProvider;
 import com.manydesigns.portofino.model.database.JndiConnectionProvider;
@@ -81,6 +82,7 @@ public class ConnectionProviderForm {
 
     @FieldSize(50)
     @Required
+    @CssClass(BootstrapSizes.SPAN10)
     public String getDriver() {
         return jdbcConnectionProvider.getDriver();
     }
