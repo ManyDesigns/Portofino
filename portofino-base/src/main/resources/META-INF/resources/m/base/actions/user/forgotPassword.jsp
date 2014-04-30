@@ -15,9 +15,11 @@
     <stripes:layout-component name="pageBody">
         Enter your email address below and we'll send you password reset instructions.
         <stripes:form action="${actionBean.context.actionPath}" method="post" class="spacingTop">
-            <input type="text" name="email" id="email" class="form-control"
-                   placeholder="<fmt:message key='email'/>" />
-            <div class="login-buttons marginTop20px">
+            <div class="form-group">
+                <input type="text" name="email" id="email" class="form-control"
+                       placeholder="<fmt:message key='email'/>" />
+            </div>
+            <div class="marginTop20px">
                 <button type="submit" name="forgotPassword2" class="btn btn-primary">Next</button>
                 <button type="submit" name="cancel" class="btn btn-link">Cancel</button>
             </div>

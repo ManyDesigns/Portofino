@@ -151,7 +151,6 @@ public class ChartConfiguration implements PageActionConfiguration, ChartDefinit
     //**************************************************************************
     @Required
     @XmlAttribute(required = true)
-    @CssClass(BootstrapSizes.BLOCK_LEVEL)
     public String getName() {
         return name;
     }
@@ -177,7 +176,6 @@ public class ChartConfiguration implements PageActionConfiguration, ChartDefinit
 
     @Required
     @XmlAttribute(required = true)
-    @CssClass(BootstrapSizes.BLOCK_LEVEL)
     public String getLegend() {
         return legend;
     }
@@ -199,7 +197,6 @@ public class ChartConfiguration implements PageActionConfiguration, ChartDefinit
     @Required
     @Label("SQL Query")
     @Multiline
-    @CssClass(BootstrapSizes.BLOCK_LEVEL)
     @XmlAttribute(required = true)
     public String getQuery() {
         return query;
@@ -211,7 +208,6 @@ public class ChartConfiguration implements PageActionConfiguration, ChartDefinit
 
     @Label("URL expression")
     @XmlAttribute(required = true)
-    @CssClass(BootstrapSizes.BLOCK_LEVEL)
     public String getUrlExpression() {
         return urlExpression;
     }

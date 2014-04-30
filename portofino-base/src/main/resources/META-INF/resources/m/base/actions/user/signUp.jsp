@@ -10,27 +10,39 @@
         <fmt:message key="sign.up" />
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
+        <style type="text/css">
+            /* TODO this is a temporary fix because Elements generates markup for form-horizontal forms. We should
+               find a way to generate markup that works will all form types with the appropriate CSS.
+            */
+            .col-sm-2, .col-sm-10 {
+                float: none;
+                padding: 0;
+                width: 100%;
+            }
+        </style>
         <stripes:form id="signUpForm" action="${actionBean.context.actionPath}" method="post">
             <mde:write name="actionBean" property="signUpForm"/>
             <div class="form-group ${actionBean.captchaValidationFailed ? 'error' : ''}">
                 <label for="captcha" class="control-label required">
                     <fmt:message key="please.type.the.text.shown.in.the.image" />
                 </label>
-                <div class="controls">
-                    <div class="input-append" style="margin-top: 5px;">
-                        <input id="captcha" name="captchaText" type="text" autocomplete="off" class="input-small" />
+                <div class="input-group" >
+                    <input id="captcha" name="captchaText" type="text" autocomplete="off" class="form-control input-sm" />
+                    <span class="input-group-btn">
                         <a onclick="$('#captcha-image').attr('src', '${pageContext.request.contextPath}${actionBean.context.actionPath}?captcha=' + Math.random());"
-                           class="btn" >
+                           class="btn btn-default btn-sm" >
                             <i class="glyphicon glyphicon-refresh"></i>
                         </a>
-                    </div>
-                    <img alt="captcha image" id="captcha-image" src="${pageContext.request.contextPath}${actionBean.context.actionPath}?captcha=" />
-                    <c:if test="${actionBean.captchaValidationFailed}">
-                        <span class="help-inline"><fmt:message key="wrong.text" /></span>
-                    </c:if>
+                    </span>
                 </div>
             </div>
-            <div class="login-buttons" style="margin-top: 10px;">
+            <div class="form-group">
+                <img alt="captcha image" id="captcha-image" src="${pageContext.request.contextPath}${actionBean.context.actionPath}?captcha=" />
+                <c:if test="${actionBean.captchaValidationFailed}">
+                    <span class="help-inline"><fmt:message key="wrong.text" /></span>
+                </c:if>
+            </div>
+            <div style="margin-top: 10px;">
                 <button type="submit" name="signUp2" class="btn btn-primary">
                     <fmt:message key="sign.up" />
                 </button>

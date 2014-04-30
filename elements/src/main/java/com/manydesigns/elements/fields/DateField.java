@@ -178,7 +178,7 @@ public class DateField extends AbstractTextField {
     public void valueToXhtmlEdit(XhtmlBuffer xb) {
         xb.openElement("input");
         xb.addAttribute("type", "text");
-        xb.addAttribute("class", fieldCssClass);
+        xb.addAttribute("class", fieldCssClass + " " + EDITABLE_FIELD_CSS_CLASS);
         xb.addAttribute("id", id);
         xb.addAttribute("name", inputName);
         if (stringValue != null) {

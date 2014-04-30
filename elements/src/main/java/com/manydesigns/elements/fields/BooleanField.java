@@ -138,12 +138,15 @@ public class BooleanField extends AbstractField {
 
     protected void valueToXhtmlEdit(XhtmlBuffer xb) {
         if (required) {
+            xb.openElement("div");
+            xb.addAttribute("class", "checkbox");
             xb.openElement("label");
             xb.addAttribute("class", "checkbox-inline");
             xb.writeInputCheckbox(id, inputName, TRUE_VALUE,
                     BooleanUtils.isTrue(booleanValue), false, null);
             xb.writeInputHidden(checkInputName, CHECK_VALUE);
             xb.closeElement("label");
+            xb.closeElement("div");
         } else {
             xb.openElement("select");
             xb.addAttribute("id", id);
@@ -175,8 +178,8 @@ public class BooleanField extends AbstractField {
     }
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
-        xb.openElement("div");
-        xb.addAttribute("class", "value");
+        xb.openElement("p");
+        xb.addAttribute("class", STATIC_VALUE_CSS_CLASS);
         xb.addAttribute("id", id);
         if (href != null) {
             xb.openElement("a");
@@ -186,7 +189,7 @@ public class BooleanField extends AbstractField {
         if (href != null) {
             xb.closeElement("a");
         }
-        xb.closeElement("div");
+        xb.closeElement("p");
     }
 
     public String getStringValue() {

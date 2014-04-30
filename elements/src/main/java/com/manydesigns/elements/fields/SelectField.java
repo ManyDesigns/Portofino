@@ -308,7 +308,7 @@ public class SelectField extends AbstractField {
         xb.openElement("select");
         xb.addAttribute("id", id);
         xb.addAttribute("name", inputName);
-        xb.addAttribute("class", fieldCssClass);
+        xb.addAttribute("class", fieldCssClass + " " + EDITABLE_FIELD_CSS_CLASS);
 
         boolean checked = (value == null);
         if (comboLabel != null && !options.isEmpty()) {
@@ -440,7 +440,7 @@ public class SelectField extends AbstractField {
         xb.addAttribute("name", autocompleteInputName);
         xb.addAttribute("autocomplete", "off");
         xb.addAttribute("value", getStringValue());
-        xb.addAttribute("class", fieldCssClass);
+        xb.addAttribute("class", fieldCssClass + " " + EDITABLE_FIELD_CSS_CLASS);
         xb.closeElement("input");
 
         String js = composeAutocompleteJs();
@@ -460,8 +460,8 @@ public class SelectField extends AbstractField {
     }
 
     public void valueToXhtmlView(XhtmlBuffer xb) {
-        xb.openElement("div");
-        xb.addAttribute("class", "value");
+        xb.openElement("p");
+        xb.addAttribute("class", STATIC_VALUE_CSS_CLASS);
         xb.addAttribute("id", id);
         if (href != null) {
             xb.openElement("a");
@@ -471,7 +471,7 @@ public class SelectField extends AbstractField {
         if (href != null) {
             xb.closeElement("a");
         }
-        xb.closeElement("div");
+        xb.closeElement("p");
     }
 
     public String getStringValue() {

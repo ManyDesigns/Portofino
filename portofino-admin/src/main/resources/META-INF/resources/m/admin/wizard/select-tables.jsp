@@ -16,31 +16,37 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"
-                      method="post" class="form-horizontal">
+                      method="post">
             <style type="text/css">
                 ul li {
                     list-style-type: none;
                 }
-                #calendarField label {
+                #calendarField label.control-label {
                     width: auto; margin-right: 20px;
+                }
+
+                #calendarField .col-sm-10 {
+                    float: none;
                 }
             </style>
             <p><fmt:message key="select.the.generation.strategy" /></p>
-            <label class="radio">
-                <input type="radio" name="generationStrategy" value="AUTO" id="generationStrategy_auto"
-                       ${actionBean.generationStrategy eq 'AUTO' ? 'checked="checked"' : ''} />
-                <fmt:message key="automatic" />
-            </label>
-            <label class="radio">
-                <input type="radio" name="generationStrategy" value="MANUAL" id="generationStrategy_manual"
-                       ${actionBean.generationStrategy eq 'MANUAL' ? 'checked="checked"' : ''} />
-                <fmt:message key="manual.choose.which.pages.will.be.created" />
-            </label>
-            <label class="radio">
-                <input type="radio" name="generationStrategy" value="NO" id="generationStrategy_no"
-                       ${actionBean.generationStrategy eq 'NO' ? 'checked="checked"' : ''} />
-                <fmt:message key="dont.generate.anything" />
-            </label>
+            <div class="form-group">
+                <label class="radio">
+                    <input type="radio" name="generationStrategy" value="AUTO" id="generationStrategy_auto"
+                           ${actionBean.generationStrategy eq 'AUTO' ? 'checked="checked"' : ''} />
+                    <fmt:message key="automatic" />
+                </label>
+                <label class="radio">
+                    <input type="radio" name="generationStrategy" value="MANUAL" id="generationStrategy_manual"
+                           ${actionBean.generationStrategy eq 'MANUAL' ? 'checked="checked"' : ''} />
+                    <fmt:message key="manual.choose.which.pages.will.be.created" />
+                </label>
+                <label class="radio">
+                    <input type="radio" name="generationStrategy" value="NO" id="generationStrategy_no"
+                           ${actionBean.generationStrategy eq 'NO' ? 'checked="checked"' : ''} />
+                    <fmt:message key="dont.generate.anything" />
+                </label>
+            </div>
             <div id="rootsFormContainer">
                 <span id="calendarField"><mde:write name="actionBean" property="generateCalendarField" /></span>
                 <h4><fmt:message key="select.root.tables" /></h4>

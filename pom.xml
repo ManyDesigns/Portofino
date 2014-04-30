@@ -86,7 +86,7 @@
         <ehcache.version>2.5.2</ehcache.version>
         <fop.version>1.0</fop.version>
         <google.appengine.sdk.version>1.7.7.1</google.appengine.sdk.version> <!-- Last version supporting Java 6 -->
-        <groovy.version>2.3.0-beta-2</groovy.version>
+        <groovy.version>2.3.0-rc-2</groovy.version>
         <guava.version>16.0.1</guava.version> <!-- Following GAE dependency -->
         <hibernate.version>3.6.9.Final</hibernate.version>
         <itext.version>2.1.7</itext.version>
@@ -96,7 +96,7 @@
         <javax.mail.version>1.4.1</javax.mail.version> <!-- According to commons-email -->
         <jfreechart.version>1.0.12</jfreechart.version>
         <joda-time.version>2.3</joda-time.version>
-        <json.version>20090211</json.version>
+        <json.version>20140107</json.version>
         <jsoup.version>1.7.1</jsoup.version>
         <jstl.version>1.1.2</jstl.version>
         <jxl.version>2.6.12</jxl.version>
@@ -106,7 +106,7 @@
         <shiro.version>1.2.2</shiro.version>
         <slf4j.version>1.6.1</slf4j.version><!--Hibernate uses 1.5.8-->
         <stax.version>1.2.0</stax.version>
-        <stripes.version>1.5.7</stripes.version>
+        <stripes.version>1.5.7-classloaderfix</stripes.version>
         <quartz.version>2.1.6</quartz.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -261,31 +261,32 @@
         </pluginManagement>
     </build>
     <profiles>
-      <profile>
-	<activation>
-	  <property>
-	    <name>performRelease</name>
-	    <value>true</value>
-	  </property>
-	</activation>
-	<build>
-	  <plugins>
-	    <plugin>
-	      <groupId>org.apache.maven.plugins</groupId>
-	      <artifactId>maven-gpg-plugin</artifactId>
-	      <version>1.4</version>
-	      <executions>
-		<execution>
-		  <phase>verify</phase>
-		  <goals>
-		    <goal>sign</goal>
-		  </goals>
-		</execution>
-	      </executions>
-	    </plugin>
-	  </plugins>
-	</build>
-      </profile>
+        <profile>
+            <id>portofino-release</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
 </project>

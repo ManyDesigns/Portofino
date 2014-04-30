@@ -15,11 +15,15 @@
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post">
             <input type="hidden" name="token" id="token" value="${actionBean.token}" />
-            <input type="password" name="newPassword" id="newPassword" class="form-control"
-                   placeholder="<fmt:message key='new.password'/>" />
-            <input type="password" name="confirmNewPassword" id="confirmNewPassword" class="form-control"
-                   placeholder="<fmt:message key='confirm.new.password'/>" />
-            <div class="login-buttons spacingTop">
+            <div class="form-group">
+                <input type="password" name="newPassword" id="newPassword" class="form-control"
+                       placeholder="<fmt:message key='new.password'/>" />
+            </div>
+            <div class="form-group">
+                <input type="password" name="confirmNewPassword" id="confirmNewPassword" class="form-control"
+                       placeholder="<fmt:message key='confirm.new.password'/>" />
+            </div>
+            <div class="spacingTop">
                 <button type="submit" id="resetPassword2" name="resetPassword2" class="btn btn-primary">Reset password</button>
             </div>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>

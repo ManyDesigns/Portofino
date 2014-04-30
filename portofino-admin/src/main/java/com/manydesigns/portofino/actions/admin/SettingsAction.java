@@ -21,7 +21,6 @@
 package com.manydesigns.portofino.actions.admin;
 
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.annotations.CssClass;
 import com.manydesigns.elements.annotations.Label;
 import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.configuration.CommonsConfigurationUtils;
@@ -29,7 +28,6 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.SelectionProvider;
-import com.manydesigns.elements.util.BootstrapSizes;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
@@ -160,7 +158,6 @@ public class SettingsAction extends AbstractActionBean {
 
         @Required
         @Label("Application name")
-        @CssClass(BootstrapSizes.BLOCK_LEVEL)
         public String appName;
         @Required
         public String landingPage;

@@ -20,18 +20,22 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post" class="dont-prompt-on-page-abandon">
-            <label for="userName"><fmt:message key='user.name'/></label>
-            <stripes:text name="userName" id="userName" class="form-control"/>
-            <label for="pwd"><fmt:message key='password'/></label>
-            <stripes:password name="pwd" id="pwd" class="form-control"/>
-            <label class="checkbox">
-                <stripes:checkbox name="rememberMe" id="rememberMe"/> <fmt:message key='remember.me.on.this.computer'/>
-            </label>
-            <div class="login-buttons">
-                <button type="submit" name="login" class="btn btn-primary">
-                    <fmt:message key="login" />
-                </button>
+            <div class="form-group">
+                <label for="userName"><fmt:message key='user.name'/></label>
+                <stripes:text name="userName" id="userName" class="form-control"/>
             </div>
+            <div class="form-group">
+                <label for="pwd"><fmt:message key='password'/></label>
+                <stripes:password name="pwd" id="pwd" class="form-control"/>
+            </div>
+            <div class="form-group">
+                <label class="checkbox">
+                    <stripes:checkbox name="rememberMe" id="rememberMe"/> <fmt:message key='remember.me.on.this.computer'/>
+                </label>
+            </div>
+            <button type="submit" name="login" class="btn btn-primary">
+                <fmt:message key="login" />
+            </button>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
         </stripes:form>

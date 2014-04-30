@@ -141,9 +141,10 @@ public class PasswordField extends TextField {
                 } else {
                     actualLabel = confirmLabel;
                 }
-                xb.writeLabel(actualLabel, confirmationHtmlId, FORM_LABEL_CLASS);
+                xb.writeLabel(actualLabel, confirmationHtmlId,
+                              elementsConfiguration.getString(ElementsProperties.FORM_LABEL_CLASS));
                 xb.openElement("div");
-                xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
+                xb.addAttribute("class", elementsConfiguration.getString(ElementsProperties.FORM_CONTROL_CLASS));
                 // print out confirmation input field
                 valueToXhtml(xb, confirmationHtmlId, confirmationInputName, confirmationValue);
             }
@@ -163,7 +164,7 @@ public class PasswordField extends TextField {
                              String actualLabel) {
         xb.openElement("label");
         xb.addAttribute("for", actualHtmlId);
-        xb.addAttribute("class", FORM_LABEL_CLASS);
+        xb.addAttribute("class", elementsConfiguration.getString(ElementsProperties.FORM_LABEL_CLASS));
         xb.write(StringUtils.capitalize(actualLabel));
         xb.closeElement("label");
     }
@@ -196,17 +197,17 @@ public class PasswordField extends TextField {
     }
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
-        xb.openElement("div");
-        xb.addAttribute("class", fieldCssClass + " value");
+        xb.openElement("p");
+        xb.addAttribute("class", fieldCssClass + " " + STATIC_VALUE_CSS_CLASS);
         xb.addAttribute("id", id);
         xb.write(PASSWORD_PLACEHOLDER);
-        xb.closeElement("div");
+        xb.closeElement("p");
     }
 
     protected void valueToXhtmlEdit(XhtmlBuffer xb, String actualHtmlId, String actualInputName, String actualStringValue) {
         xb.openElement("input");
         xb.addAttribute("type", "password");
-        xb.addAttribute("class", fieldCssClass + " text");
+        xb.addAttribute("class", fieldCssClass + " " + EDITABLE_FIELD_CSS_CLASS);
         xb.addAttribute("id", actualHtmlId);
         xb.addAttribute("name", actualInputName);
         xb.addAttribute("value", actualStringValue);

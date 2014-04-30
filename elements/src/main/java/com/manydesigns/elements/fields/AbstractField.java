@@ -48,9 +48,8 @@ public abstract class AbstractField implements Field {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
-    public static final String FORM_LABEL_CLASS = "control-label col-sm-2";
-    public static final String DEFAULT_FIELD_CSS_CLASS = "form-control";
-    public static final String FORM_CONTROL_CSS_CLASS = "col-sm-10";
+    public static final String EDITABLE_FIELD_CSS_CLASS = "form-control";
+    public static final String STATIC_VALUE_CSS_CLASS = "form-control-static";
 
     protected final Configuration elementsConfiguration;
 
@@ -73,7 +72,7 @@ public abstract class AbstractField implements Field {
     protected boolean forceNewRow = false;
     protected int colSpan = 1;
     protected String help;
-    protected String fieldCssClass;
+    protected @NotNull String fieldCssClass;
 
     protected List<String> errors = new ArrayList<String>();
 
@@ -165,9 +164,9 @@ public abstract class AbstractField implements Field {
 
         if (accessor.isAnnotationPresent(CssClass.class)) {
             String[] cssClasses = accessor.getAnnotation(CssClass.class).value();
-            fieldCssClass = DEFAULT_FIELD_CSS_CLASS + " " + StringUtils.join(cssClasses, " ");
+            fieldCssClass = StringUtils.join(cssClasses, " ");
         } else {
-            fieldCssClass = DEFAULT_FIELD_CSS_CLASS;
+            fieldCssClass = "";
         }
     }
 
@@ -219,7 +218,7 @@ public abstract class AbstractField implements Field {
         xb.addAttribute("class", cssClass);
         labelToXhtml(xb);
         xb.openElement("div");
-        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
+        xb.addAttribute("class", elementsConfiguration.getString(ElementsProperties.FORM_CONTROL_CLASS));
     }
 
     /**
@@ -241,7 +240,7 @@ public abstract class AbstractField implements Field {
         if(!mode.isView(insertable, updatable)) {
             xb.addAttribute("for", id); //HTML5 validation
         }
-        xb.addAttribute("class", FORM_LABEL_CLASS);
+        xb.addAttribute("class", elementsConfiguration.getString(ElementsProperties.FORM_LABEL_CLASS));
         if (mode.isBulk() && mode.isEdit() && !mode.isView(insertable, updatable)) {
             xb.writeInputCheckbox(null, bulkCheckboxName, "checked", bulkChecked, false, "pull-left");
         }
@@ -389,11 +388,11 @@ public abstract class AbstractField implements Field {
         return required && !mode.isView(insertable, updatable);
     }
 
-    public String getFieldCssClass() {
+    public @NotNull String getFieldCssClass() {
         return fieldCssClass;
     }
 
-    public void setFieldCssClass(String fieldCssClass) {
+    public void setFieldCssClass(@NotNull String fieldCssClass) {
         this.fieldCssClass = fieldCssClass;
     }
 

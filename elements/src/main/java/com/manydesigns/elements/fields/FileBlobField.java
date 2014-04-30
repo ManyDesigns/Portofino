@@ -118,9 +118,9 @@ public class FileBlobField extends AbstractField
     }
 
     public void valueToXhtmlView(XhtmlBuffer xb) {
-        xb.openElement("div");
+        xb.openElement("p");
         xb.addAttribute("id", id);
-        xb.addAttribute("class", "value");
+        xb.addAttribute("class", STATIC_VALUE_CSS_CLASS);
         if (blobError != null) {
             xb.openElement("div");
             xb.addAttribute("class", "blob-error");
@@ -129,7 +129,7 @@ public class FileBlobField extends AbstractField
         } else if (blob != null) {
             writeBlobFilenameAndSize(xb);
         }
-        xb.closeElement("div");
+        xb.closeElement("p");
     }
 
     public void writeBlobFilenameAndSize(XhtmlBuffer xb) {
@@ -151,8 +151,8 @@ public class FileBlobField extends AbstractField
             xb.writeInputHidden(operationInputName, UPLOAD_MODIFY);
             xb.writeInputFile(id, inputName, false);
         } else {
-            xb.openElement("div");
-            xb.addAttribute("class", "value");
+            xb.openElement("p");
+            xb.addAttribute("class", STATIC_VALUE_CSS_CLASS);
             xb.addAttribute("id", id);
 
             xb.openElement("div");
@@ -185,7 +185,7 @@ public class FileBlobField extends AbstractField
             xb.writeInputFile(innerId, inputName, true);
             xb.writeInputHidden(codeInputName, blob.getCode());
 
-            xb.closeElement("div");
+            xb.closeElement("p");
         }
     }
 

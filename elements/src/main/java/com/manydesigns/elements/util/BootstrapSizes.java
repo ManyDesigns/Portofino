@@ -39,11 +39,13 @@ public class BootstrapSizes {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
-    public static final String
-        MINI = "input-mini", SMALL = "input-small", MEDIUM = "input-medium",
-        LARGE = "input-large", XLARGE = "input-xlarge", XXLARGE = "input-xxlarge",
-        BLOCK_LEVEL = "form-control", //TODO check
+    public static final String //TODO update
+        MINI = "input-mini", SMALL = "input-sm", MEDIUM = "input-medium",
+        LARGE = "input-large", XLARGE = "input-xlarge", XXLARGE = "input-xxlarge";
 
+    @Deprecated public static final String BLOCK_LEVEL = "";
+
+    public static final String
         SPAN1 = "col-md-1", SPAN2 = "col-md-2", SPAN3 = "col-md-3", SPAN4 = "col-md-4",
         SPAN5 = "col-md-5", SPAN6 = "col-md-6", SPAN7 = "col-md-7", SPAN8 = "col-md-8",
         SPAN9 = "col-md-9", SPAN10 = "col-md-10", SPAN11 = "col-md-11", SPAN12 = "col-md-12";
