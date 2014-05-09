@@ -144,6 +144,10 @@ label.control-label:after {
     content: "* ";
 }
 
+.portofino-datatable {
+    margin-bottom: 15px;
+}
+
 .portofino-datatable ul.pagination {
     float: right;
     margin: 0;
@@ -308,9 +312,9 @@ Search form
     margin-left: 20px;
 }
 
-.searchform .controls label.checkbox {
-    margin-bottom: 5px;
-    padding: 0;
+.form-inline .searchform div.form-control.checkbox {
+    border: medium none;
+    box-shadow: none;
 }
 
 .searchform fieldset {
@@ -366,16 +370,25 @@ table.treetable span.indenter {
     margin: 0;
     padding: 0;
     text-align: right;
+
+    /* Disable text selection of nodes (for better D&D UX) */
     user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;
     -o-user-select: none;
     -webkit-user-select: none;
+
+    /* Force content-box box model for indenter (Bootstrap compatibility) */
+    -webkit-box-sizing: content-box;
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+
     width: 19px;
 }
 
 table.treetable span.indenter a {
-    background: no-repeat left center;
+    background-position: left center;
+    background-repeat: no-repeat;
     display: inline-block;
     text-decoration: none;
     width: 19px;

@@ -354,7 +354,7 @@ public class SelectSearchField extends AbstractSearchField {
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
 
         xb.openElement("div");
-        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
+        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS + " checkbox");
 
         Object[] values = getValues();
         Map<Object, SelectionModel.Option> options =
