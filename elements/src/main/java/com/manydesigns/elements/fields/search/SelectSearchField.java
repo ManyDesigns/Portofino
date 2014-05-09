@@ -276,7 +276,7 @@ public class SelectSearchField extends AbstractSearchField {
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
 
         xb.openElement("div");
-        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
+        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS + " radio");
 
         int counter = 0;
 
@@ -303,8 +303,7 @@ public class SelectSearchField extends AbstractSearchField {
             String optionLabel = option.getValue().label;
             String radioId = id + "_" + counter;
             boolean checked =  ArrayUtils.contains(values, optionValue);
-            writeRadioWithLabel(xb, radioId, optionLabel,
-                    optionStringValue, checked);
+            writeRadioWithLabel(xb, radioId, optionLabel, optionStringValue, checked);
             counter++;
         }
         xb.closeElement("div");
@@ -318,18 +317,18 @@ public class SelectSearchField extends AbstractSearchField {
                                        String stringValue,
                                        boolean checked) {
         xb.openElement("label");
-        xb.addAttribute("class", "radio inline");
+        xb.addAttribute("class", "radio");
         xb.addAttribute("for", radioId);
+        xb.writeNbsp();
         xb.write(label);
+        xb.writeNbsp();
         xb.writeInputRadio(radioId, inputName, stringValue, checked);
+        xb.writeNbsp();
         xb.closeElement("label");
     }
 
     public void valueToXhtmlAutocomplete(XhtmlBuffer xb) {
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
-
-        xb.openElement("div");
-        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
 
         Object value = selectionModel.getValue(selectionModelIndex);
         String stringValue = OgnlUtils.convertValueToString(value);
@@ -341,13 +340,12 @@ public class SelectSearchField extends AbstractSearchField {
         xb.addAttribute("type", "text");
         xb.addAttribute("name", autocompleteInputName);
         xb.addAttribute("value", label);
-        xb.addAttribute("class", null);
+        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
         xb.addAttribute("size", null);
         xb.closeElement("input");
 
         String js = composeAutocompleteJs();
         xb.writeJavaScript(js);
-        xb.closeElement("div");
     }
 
     private void valueToXhtmlCheckbox(XhtmlBuffer xb) {
@@ -388,7 +386,7 @@ public class SelectSearchField extends AbstractSearchField {
     private void valueToXhtmlMultipleSelection(XhtmlBuffer xb) {
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
         xb.openElement("div");
-        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
+        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS + " multiple-select");
 
         Object[] values = getValues();
         Map<Object, SelectionModel.Option> options =

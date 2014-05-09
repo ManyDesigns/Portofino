@@ -297,24 +297,23 @@ Search form
 *******************************************************************************/
 
 .search_form {
-    overflow: hidden;
-    padding-bottom: 0.5em;
-    margin-bottom: 0.5em;
-    margin-top: 1em;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .searchform label.match_mode {
     display: none;
 }
 
-.form-inline .searchform .controls {
-    display: inline-block;
-    margin-left: 20px;
-}
-
-.form-inline .searchform div.form-control.checkbox {
+.form-inline .searchform div.form-control.checkbox,
+.form-inline .searchform div.form-control.radio,
+.form-inline .searchform div.form-control.multiple-select {
     border: medium none;
     box-shadow: none;
+}
+
+.form-inline .searchform div.form-control.multiple-select {
+    height: auto;
 }
 
 .searchform fieldset {
@@ -624,6 +623,10 @@ Typeahead
      -moz-border-radius: 8px;
           border-radius: 8px;
   outline: none;
+}
+
+input.tt-input {
+    vertical-align: middle !important;
 }
 
 .typeahead {
