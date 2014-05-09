@@ -6,7 +6,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button name="closeDeletePageButton" type="button" class="close" aria-hidden="true">&times;</button>
+                <button name="closeCopyPageButton" type="button" class="close" aria-hidden="true">&times;</button>
                 <h4 class="modal-title"><fmt:message key="copy.to"/></h4>
             </div>
             <div class="modal-body form-horizontal">
@@ -14,7 +14,7 @@
                 <mde:write name="actionBean" property="copyForm"/>
             </div>
             <div class="modal-footer">
-                <button name="cancelCopyPageButton" type="button" class="btn">
+                <button name="cancelCopyPageButton" type="button" class="btn btn-default">
                     <fmt:message key="cancel" />
                 </button>
                 <button name="confirmCopyPageButton" type="button" class="btn btn-primary">

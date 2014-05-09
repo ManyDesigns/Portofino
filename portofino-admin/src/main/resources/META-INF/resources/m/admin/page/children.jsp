@@ -21,9 +21,7 @@
         <stripes:form action="/actions/admin/page" method="post" enctype="multipart/form-data">
             <%@include file="children-tables.jsp"%>
             <div class="form-group">
-                <div class="align-with-input col-sm-10">
-                    <portofino:buttons list="page-children-edit" />
-                </div>
+                <portofino:buttons list="page-children-edit" />
             </div>
         </stripes:form>
     </stripes:layout-component>
