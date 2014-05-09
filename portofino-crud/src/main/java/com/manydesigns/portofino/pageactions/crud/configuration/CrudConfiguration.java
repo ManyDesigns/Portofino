@@ -164,7 +164,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
     }
 
     @Multiline
-    @CssClass(BootstrapSizes.SPAN10)
+    @CssClass(BootstrapSizes.FILL_ROW)
     @XmlAttribute(required = true)
     public String getQuery() {
         return query;
@@ -174,7 +174,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         this.query = query;
     }
 
-    @CssClass(BootstrapSizes.BLOCK_LEVEL)
+    @CssClass(BootstrapSizes.FILL_ROW)
     @XmlAttribute(required = false)
     public String getSearchTitle() {
         return searchTitle;
@@ -184,7 +184,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         this.searchTitle = searchTitle;
     }
 
-    @CssClass(BootstrapSizes.SPAN10)
+    @CssClass(BootstrapSizes.FILL_ROW)
     @XmlAttribute(required = false)
     public String getCreateTitle() {
         return createTitle;
@@ -194,7 +194,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         this.createTitle = createTitle;
     }
 
-    @CssClass(BootstrapSizes.SPAN10)
+    @CssClass(BootstrapSizes.FILL_ROW)
     @XmlAttribute(required = false)
     public String getReadTitle() {
         return readTitle;
@@ -204,7 +204,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         this.readTitle = readTitle;
     }
 
-    @CssClass(BootstrapSizes.SPAN10)
+    @CssClass(BootstrapSizes.FILL_ROW)
     @XmlAttribute(required = false)
     public String getEditTitle() {
         return editTitle;

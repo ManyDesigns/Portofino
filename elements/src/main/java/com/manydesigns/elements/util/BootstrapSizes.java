@@ -43,7 +43,8 @@ public class BootstrapSizes {
         MINI = "input-mini", SMALL = "input-sm", MEDIUM = "input-medium",
         LARGE = "input-lg", XLARGE = "input-xlarge", XXLARGE = "input-xxlarge";
 
-    @Deprecated public static final String BLOCK_LEVEL = "col-md-10";
+    public static final String FILL_ROW = "fill-row";
+    @Deprecated public static final String BLOCK_LEVEL = FILL_ROW;
 
     public static final String
         SPAN1 = "col-sm-1", SPAN2 = "col-sm-2", SPAN3 = "col-sm-3", SPAN4 = "col-sm-4",

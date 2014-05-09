@@ -143,7 +143,7 @@ public class PasswordField extends TextField {
                 }
                 xb.writeLabel(actualLabel, confirmationHtmlId, FORM_LABEL_CLASS);
                 xb.openElement("div");
-                xb.addAttribute("class", "input-container");
+                xb.addAttribute("class", "input-container " + fieldCssClass);
                 // print out confirmation input field
                 valueToXhtml(xb, confirmationHtmlId, confirmationInputName, confirmationValue);
             }
@@ -197,7 +197,7 @@ public class PasswordField extends TextField {
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
         xb.openElement("p");
-        xb.addAttribute("class", fieldCssClass + " " + STATIC_VALUE_CSS_CLASS);
+        xb.addAttribute("class", STATIC_VALUE_CSS_CLASS);
         xb.addAttribute("id", id);
         xb.write(PASSWORD_PLACEHOLDER);
         xb.closeElement("p");
@@ -206,7 +206,7 @@ public class PasswordField extends TextField {
     protected void valueToXhtmlEdit(XhtmlBuffer xb, String actualHtmlId, String actualInputName, String actualStringValue) {
         xb.openElement("input");
         xb.addAttribute("type", "password");
-        xb.addAttribute("class", fieldCssClass + " " + EDITABLE_FIELD_CSS_CLASS);
+        xb.addAttribute("class", EDITABLE_FIELD_CSS_CLASS);
         xb.addAttribute("id", actualHtmlId);
         xb.addAttribute("name", actualInputName);
         xb.addAttribute("value", actualStringValue);

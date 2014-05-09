@@ -136,7 +136,7 @@ public class TextField extends AbstractTextField {
             xb.openElement("textarea");
             xb.addAttribute("id", id);
             xb.addAttribute("name", inputName);
-            String htmlClass = fieldCssClass + " " + EDITABLE_FIELD_CSS_CLASS;
+            String htmlClass = EDITABLE_FIELD_CSS_CLASS;
             if(textAreaWidth != null) {
                 xb.addAttribute("cols", Integer.toString(textAreaWidth));
                 xb.addAttribute("rows", Integer.toString(numRowTextArea(stringValue, textAreaWidth)));
@@ -164,7 +164,7 @@ public class TextField extends AbstractTextField {
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
         xb.openElement("p");
-        String cssClass = fieldCssClass + " " + STATIC_VALUE_CSS_CLASS;
+        String cssClass = STATIC_VALUE_CSS_CLASS;
         if (ArrayUtils.contains(red, stringValue)) {
             cssClass += " status_red";
         } else if (ArrayUtils.contains(amber, stringValue)) {

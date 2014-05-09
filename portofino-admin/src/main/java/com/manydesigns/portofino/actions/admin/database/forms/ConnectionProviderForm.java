@@ -82,7 +82,7 @@ public class ConnectionProviderForm {
 
     @FieldSize(50)
     @Required
-    @CssClass(BootstrapSizes.SPAN10)
+    @CssClass(BootstrapSizes.FILL_ROW)
     public String getDriver() {
         return jdbcConnectionProvider.getDriver();
     }

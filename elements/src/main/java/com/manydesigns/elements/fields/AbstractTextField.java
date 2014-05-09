@@ -109,7 +109,7 @@ public abstract class AbstractTextField extends AbstractField {
 
     protected void valueToXhtmlEdit(XhtmlBuffer xb) {
         xb.writeInputText(id, inputName, stringValue, labelPlaceholder ? label : null,
-                fieldCssClass + " " + EDITABLE_FIELD_CSS_CLASS, size, maxLength);
+                EDITABLE_FIELD_CSS_CLASS, size, maxLength);
         if(mode.isBulk()) {
             xb.writeJavaScript(
                     "$(function() { " +
@@ -125,7 +125,7 @@ public abstract class AbstractTextField extends AbstractField {
 
     protected void valueToXhtmlView(XhtmlBuffer xb) {
         xb.openElement("p");
-        xb.addAttribute("class", fieldCssClass + " " + STATIC_VALUE_CSS_CLASS);
+        xb.addAttribute("class", STATIC_VALUE_CSS_CLASS);
         xb.addAttribute("id", id);
         if (href == null) {
             xb.write(stringValue);

@@ -177,7 +177,7 @@ public class DateField extends AbstractTextField {
     @Override
     public void valueToXhtmlEdit(XhtmlBuffer xb) {
         xb.writeInputText(id, inputName, stringValue, labelPlaceholder ? label : null,
-                          fieldCssClass + " " + EDITABLE_FIELD_CSS_CLASS, size, maxLength);
+                          EDITABLE_FIELD_CSS_CLASS, size, maxLength);
 
         xb.openElement("span");
         xb.addAttribute("class", "help-block");

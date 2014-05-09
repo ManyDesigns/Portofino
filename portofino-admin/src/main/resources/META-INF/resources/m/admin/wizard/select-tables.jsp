@@ -22,11 +22,9 @@
                     list-style-type: none;
                 }
                 #calendarField label.control-label {
-                    width: auto; margin-right: 20px;
-                }
-
-                #calendarField .col-sm-4 {
-                    float: none;
+                    width: auto;
+                    float: left;
+                    padding-right: 30px;
                 }
             </style>
             <p><fmt:message key="select.the.generation.strategy" /></p>

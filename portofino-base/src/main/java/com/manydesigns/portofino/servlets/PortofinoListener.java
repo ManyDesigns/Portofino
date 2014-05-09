@@ -192,8 +192,9 @@ public class PortofinoListener
         discoverModules(moduleRegistry, classLoader);
         servletContext.setAttribute(BaseModule.MODULE_REGISTRY, moduleRegistry);
         moduleRegistry.migrateAndInit(servletContext);
-        logger.info("All modules loaded.");
+        logger.info("Starting modules...");
         moduleRegistry.start();
+        logger.info("Modules initialization terminated.");
 
         String encoding = configuration.getString(
                 PortofinoProperties.URL_ENCODING, PortofinoProperties.URL_ENCODING_DEFAULT);

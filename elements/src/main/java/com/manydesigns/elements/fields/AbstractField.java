@@ -219,7 +219,7 @@ public abstract class AbstractField implements Field {
         xb.addAttribute("class", cssClass);
         labelToXhtml(xb);
         xb.openElement("div");
-        xb.addAttribute("class", "input-container");
+        xb.addAttribute("class", "input-container " + fieldCssClass);
     }
 
     /**

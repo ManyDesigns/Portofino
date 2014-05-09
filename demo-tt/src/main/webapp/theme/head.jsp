@@ -22,6 +22,7 @@
 <script type="text/javascript" src="<stripes:url value='/theme/jquery/jquery.min.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/theme/bootstrap/js/bootstrap.min.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/theme/datepicker/js/bootstrap-datepicker.js' />" ></script>
+<script type="text/javascript" src="<stripes:url value='/theme/typeahead/typeahead.bundle.min.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/theme/jquery-ui/js/jquery-ui-1.10.3.custom.min.js' />" ></script>
 
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/portofino.css' />">

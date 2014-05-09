@@ -46,71 +46,58 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, meth
     var selectFieldId = setupArguments[4 + selectionProviderIndex];
     var autocompleteObj = $(autocompleteId);
     var selectField = $(selectFieldId);
-    autocompleteObj.typeahead({
-        source: function( request, response ) {
-            var data = {
-                relName : relName,
-                selectionProviderIndex : selectionProviderIndex,
-                labelSearch : request
-            };
-            data[methodName] = '';
-            for (var i = 4; i < setupArguments.length; i++ ) {
-                var currentId = setupArguments[i];
-                var current = $(currentId);
-                data[current.attr('name')] = current.attr('value');
-            }
-
-            var postUrl = stripQueryString(location.href);
-            selectField.val(""); //Reset selected object when user types
-            $.ajax({
-                type: 'POST',
-                dataType: 'json',
-                url: postUrl,
-                data: data,
-                success: function( responseData ) {
-                    response( $.map( responseData, function( item ) {
-                        var obj = {
-                            label: item.l,
-                            value: item.l,
-                            optionValue: item.v
-                        };
-                        obj.toString = function() {
-                            return JSON.stringify(obj);
-                        };
-                        return obj;
-                    }));
-                },
-                error: function(request, textStatus) {
-                    alert(textStatus);
+    autocompleteObj.typeahead(
+        {
+            minLength: 1,
+            highlight: true,
+            hint: false
+        },
+        {
+            source: function( request, response ) {
+                var data = {
+                    relName : relName,
+                    selectionProviderIndex : selectionProviderIndex,
+                    labelSearch : request
+                };
+                data[methodName] = '';
+                for (var i = 4; i < setupArguments.length; i++ ) {
+                    var currentId = setupArguments[i];
+                    var current = $(currentId);
+                    data[current.attr('name')] = current.attr('value');
                 }
-            });
-        },
-        minLength: 1,
-        matcher: function(item) {
-            return true;
-        },
-        sorter: function(items) {
-            return items;
-        },
-        highlighter: function (item) {
-            var query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
-            return item.label.replace(new RegExp('(' + query + ')', 'ig'), function ($1, match) {
-                return '<strong>' + match + '</strong>'
-            });
-        },
-        updater: function(item) {
-            if(item) {
-                item = JSON.parse(item);
-                selectField.val(item.optionValue);
-                selectField.data("itemLabel", item.label)
-                return item.label;
-            } else {
-                selectField.data("itemLabel", "");
-                selectField.val("");
-                return "";
+
+                var postUrl = stripQueryString(location.href);
+                selectField.val(""); //Reset selected object when user types
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: postUrl,
+                    data: data,
+                    success: function( responseData ) {
+                        response( $.map( responseData, function( item ) {
+                            var obj = {
+                                label: item.l,
+                                value: item.l,
+                                optionValue: item.v
+                            };
+                            obj.toString = function() {
+                                return JSON.stringify(obj);
+                            };
+                            return obj;
+                        }));
+                    },
+                    error: function(request, textStatus) {
+                        alert(textStatus);
+                    }
+                });
             }
-        }
-    });
+        }).bind("typeahead:selected", function(obj, datum, name) {
+            if(datum && datum.optionValue) {
+                selectField.val(datum.optionValue);
+            } else {
+                selectField.val("");
+            }
+        });
 }
 
 function setupDatePicker(dateFieldId, dateFormat) {
