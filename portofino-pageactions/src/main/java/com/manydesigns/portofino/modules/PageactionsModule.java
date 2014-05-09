@@ -38,6 +38,7 @@ import groovy.lang.GroovyClassLoader;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.realm.SimpleAccountRealm;
 import org.apache.shiro.util.LifecycleUtils;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.WebEnvironment;
@@ -142,11 +143,6 @@ public class PageactionsModule implements Module {
         cacheManager = CacheManager.newInstance();
         servletContext.setAttribute(EHCACHE_MANAGER, cacheManager);
 
-        logger.info("Initializing Shiro environment");
-        WebEnvironment environment = environmentLoader.initEnvironment(servletContext);
-        logger.debug("Publishing the Application Realm in the servlet context");
-        RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
-
         File pagesDirectory = new File(applicationDirectory, "pages");
         logger.info("Pages directory: " + pagesDirectory);
         ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(pagesDirectory);
@@ -173,16 +169,7 @@ public class PageactionsModule implements Module {
 
         cacheResetListenerRegistry.getCacheResetListeners().add(new ConfigurationCacheResetListener());
 
-        logger.debug("Creating SecurityGroovyRealm");
-        try {
-            SecurityGroovyRealm realm = new SecurityGroovyRealm(classLoader, servletContext);
-            LifecycleUtils.init(realm);
-            rsm.setRealm(realm);
-            status = ModuleStatus.ACTIVE;
-        } catch (Exception  e) {
-            logger.error("Security.groovy not found or invalid", e);
-            status = ModuleStatus.FAILED;
-        }
+        status = ModuleStatus.ACTIVE;
     }
 
     protected void preloadPageActions(File directory) {
@@ -230,7 +217,22 @@ public class PageactionsModule implements Module {
 
     @Override
     public void start() {
-        status = ModuleStatus.STARTED;
+        logger.info("Initializing Shiro environment");
+        WebEnvironment environment = environmentLoader.initEnvironment(servletContext);
+        RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
+        logger.debug("Creating SecurityGroovyRealm");
+        try {
+            SecurityGroovyRealm realm = new SecurityGroovyRealm(classLoader, servletContext);
+            LifecycleUtils.init(realm);
+            rsm.setRealm(realm);
+            status = ModuleStatus.STARTED;
+        } catch (Exception  e) {
+            logger.error("Security.groovy not found or invalid; installing dummy realm", e);
+            SimpleAccountRealm realm = new SimpleAccountRealm();
+            LifecycleUtils.init(realm);
+            rsm.setRealm(realm);
+            status = ModuleStatus.FAILED;
+        }
     }
 
     @Override

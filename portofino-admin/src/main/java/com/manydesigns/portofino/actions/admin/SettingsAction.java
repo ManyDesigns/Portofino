@@ -94,8 +94,8 @@ public class SettingsAction extends AbstractActionBean {
         settings.appName = configuration.getString(PortofinoProperties.APP_NAME);
         settings.landingPage = configuration.getString(PortofinoProperties.LANDING_PAGE);
         settings.loginPage = configuration.getString(PortofinoProperties.LOGIN_PAGE);
-        settings.preloadGroovyPages = configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_PAGES, true);
-        settings.preloadGroovyClasses = configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_CLASSES, true);
+        settings.preloadGroovyPages = configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_PAGES, false);
+        settings.preloadGroovyClasses = configuration.getBoolean(PortofinoProperties.GROOVY_PRELOAD_CLASSES, false);
 
         form = new FormBuilder(Settings.class)
                 .configSelectionProvider(pagesSelectionProvider, "landingPage")
@@ -160,7 +160,7 @@ public class SettingsAction extends AbstractActionBean {
 
         @Required
         @Label("Application name")
-        @CssClass(BootstrapSizes.SPAN10)
+        @CssClass(BootstrapSizes.FILL_ROW)
         public String appName;
         @Required
         public String landingPage;

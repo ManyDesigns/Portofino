@@ -1,9 +1,3 @@
-//import com.google.appengine.api.users.User
-
-
-//import com.manydesigns.portofino.shiro.GAEPortofinoRealm
-
-
 import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.reflection.ClassAccessor
 import com.manydesigns.elements.util.RandomUtil
@@ -45,35 +39,6 @@ class Security extends AbstractPortofinoRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
         return loadAuthenticationInfo(token);
     }
-
-// 
-//    protected AuthenticationInfo loadAuthenticationInfo(ServletContainerToken token) {
-//        def info = super.doGetAuthenticationInfo(token);
-//        User user = (User) info.principals.asList()[0];
-//
-//        Session session = persistence.getSession("tt");
-//        Criteria criteria = session.createCriteria("users");
-//        criteria.add(Restrictions.eq("email", user.email));
-//
-//        Serializable principal = (Serializable)criteria.uniqueResult();
-//
-//        if (principal == null) {
-//            throw new UnknownAccountException("Unknown user");
-//        } else if (!principal.validated) {
-//            throw new DisabledAccountException("User not validated");
-//        } else {
-//            logger.debug("Aggiorno i campi accesso.");
-//            updateAccess(principal, new Date());
-//            session.update("users", (Object)principal);
-//            session.getTransaction().commit();
-//        }
-//
-//        /*def pc = new SimplePrincipalCollection([principal, user], getName());
-//        SimpleAuthenticationInfo infoEx =
-//                new SimpleAuthenticationInfo(pc, "", getName());
-//        return infoEx;*/
-//        return new SimpleAuthenticationInfo(principal, "", getName());
-//    }
 
     public AuthenticationInfo loadAuthenticationInfo(UsernamePasswordToken usernamePasswordToken) {
         String login = usernamePasswordToken.username;
@@ -200,11 +165,6 @@ class Security extends AbstractPortofinoRealm {
         List<String> result = new ArrayList<String>()
         if (principal.admin) {
             result.add(ADMIN_GROUP_NAME);
-//            UserService userService = UserServiceFactory.getUserService();
-//            if (userService.isUserAdmin()) {
-//            if (isLocalUser()) {
-//                result.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
-//            }
         }
         if (principal.project_manager) {
             result.add(PROJECT_MANAGER_GROUP_NAME);
@@ -330,9 +290,6 @@ class Security extends AbstractPortofinoRealm {
         return token;
 
     }
-
-
-
 
     @Override
     void changePassword(Serializable user, String oldPassword, String newPassword) {
