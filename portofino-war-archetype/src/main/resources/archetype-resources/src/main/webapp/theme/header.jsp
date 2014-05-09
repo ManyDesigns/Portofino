@@ -14,6 +14,7 @@
 %><%@ page import="java.util.Locale"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
+%><%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
@@ -22,32 +23,35 @@
              type="org.apache.commons.configuration.Configuration"/>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.stripes.AbstractActionBean"/>
 <fmt:setLocale value="${pageContext.request.locale}"/>
-<header class="navbar navbar-inverse navbar-static-top">
+<header class="navbar navbar-inverse navbar-static-top" role="banner">
     <div class="container">
-        <h4 class="pull-left">
-            <stripes:link href="/">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <stripes:link href="/" class="navbar-brand">
                 <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
             </stripes:link>
-        </h4>
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
-        <div class="header-menu navbar-collapse collapse">
+        </div>
+        <nav id="header-menu" class="navbar-collapse collapse" role="navigation">
             <c:if test="${not empty actionBean.pageInstance}">
                 <form id="pageAdminForm" action="${pageContext.request.contextPath}/actions/admin/page">
                     <input type="hidden" name="originalPath" value="${actionBean.context.actionPath}" />
                 </form>
             </c:if>
-            <ul class="nav">
+            <ul class="nav navbar-nav navbar-right">
+                <%
+                    String loginPage = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PAGE);
+                    String actionPath = actionBean.getContext().getActionPath();
+                %>
+                <shiro:user>
                 <%
                     Subject subject = SecurityUtils.getSubject();
                     Object principal = subject.getPrincipal();
-                    String actionPath = actionBean.getContext().getActionPath();
-                    String loginPage = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PAGE);
-                    if(principal != null) {
-                        String prettyName = ShiroUtils.getPortofinoRealm().getUserPrettyName((Serializable) principal);
+                    String prettyName = ShiroUtils.getPortofinoRealm().getUserPrettyName((Serializable) principal);
                 %>
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -162,7 +166,9 @@
                         <% }}} %>
                     </ul>
                 </li>
-                <% } else {
+                </shiro:user>
+                <shiro:guest>
+                <%
                     UrlBuilder loginUrlBuilder =
                             new UrlBuilder(request.getLocale(), loginPage, false);
                     loginUrlBuilder.addParameter("returnUrl", actionPath);
@@ -174,8 +180,8 @@
                             <fmt:message key="log.in" />
                         </a>
                     </li>
-                <% } %>
+                </shiro:guest>
             </ul>
-        </div>
+        </nav>
     </div>
 </header>

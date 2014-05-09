@@ -15,24 +15,25 @@
 <fmt:setLocale value="${pageContext.request.locale}"/>
 <header class="navbar navbar-inverse navbar-static-top" role="banner">
     <div class="container">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
-        <stripes:link href="/" class="brand">
-            <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
-        </stripes:link>
-        <nav id="header-menu" class="navbar-collapse collapse pull-right">
-            <div class="navbar-text pull-right">
-
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <stripes:link href="/" class="navbar-brand">
+                <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
+            </stripes:link>
+        </div>
+        <nav id="header-menu" class="navbar-collapse collapse" role="navigation">
             <c:if test="${not empty actionBean.pageInstance}">
                 <form id="pageAdminForm" action="${pageContext.request.contextPath}/actions/admin/page">
                     <input type="hidden" name="originalPath" value="${actionBean.context.actionPath}" />
                 </form>
             </c:if>
             <c:set var="actionPath" value="${actionBean.context.actionPath}"/>
-            <ul id="app-menu" class="nav">
+            <ul class="nav navbar-nav navbar-right">
                 <shiro:user>
                     <%
                         Subject subject = SecurityUtils.getSubject();
@@ -123,7 +124,6 @@
                     </li>
                 </shiro:guest>
             </ul>
-            </div>
         </nav>
     </div>
 </header>
