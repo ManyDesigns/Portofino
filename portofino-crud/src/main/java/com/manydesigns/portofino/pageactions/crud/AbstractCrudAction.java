@@ -1010,23 +1010,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected void setupSearchForm() {
-        SearchFormBuilder searchFormBuilder =
-                new SearchFormBuilder(classAccessor);
-
-        // setup option providers
-        for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
-            SelectionProvider selectionProvider =
-                    current.getSelectionProvider();
-            if(selectionProvider == null) {
-                continue;
-            }
-            String[] fieldNames = current.getFieldNames();
-            searchFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
-        }
-
-        searchForm = searchFormBuilder
-                .configPrefix(searchPrefix)
-                .build();
+        SearchFormBuilder searchFormBuilder = createSearchFormBuilder();
+        searchForm = buildSearchForm(configureSearchFormBuilder(searchFormBuilder));
 
         if(!PageActionLogic.isEmbedded(this)) {
             logger.debug("Search form not embedded, no risk of clashes - reading parameters from request");
@@ -1063,17 +1048,35 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    protected void setupTableForm(Mode mode) {
-        TableFormBuilder tableFormBuilder = createTableFormBuilder();
-        configureTableFormSelectionProviders(tableFormBuilder);
+    protected SearchFormBuilder createSearchFormBuilder() {
+        return new SearchFormBuilder(classAccessor);
+    }
 
+    protected SearchFormBuilder configureSearchFormBuilder(SearchFormBuilder searchFormBuilder) {
+        // setup option providers
+        for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
+            SelectionProvider selectionProvider = current.getSelectionProvider();
+            if(selectionProvider == null) {
+                continue;
+            }
+            String[] fieldNames = current.getFieldNames();
+            searchFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
+        }
+        return searchFormBuilder.configPrefix(searchPrefix);
+    }
+
+    protected SearchForm buildSearchForm(SearchFormBuilder searchFormBuilder) {
+        return searchFormBuilder.build();
+    }
+
+    protected void setupTableForm(Mode mode) {
         int nRows;
         if (objects == null) {
             nRows = 0;
         } else {
             nRows = objects.size();
         }
-
+        TableFormBuilder tableFormBuilder = createTableFormBuilder();
         configureTableFormBuilder(tableFormBuilder, mode, nRows);
         tableForm = buildTableForm(tableFormBuilder);
 
@@ -1211,6 +1214,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @return the table form builder.
      */
     protected TableFormBuilder configureTableFormBuilder(TableFormBuilder tableFormBuilder, Mode mode, int nRows) {
+        configureTableFormSelectionProviders(tableFormBuilder);
         tableFormBuilder.configPrefix(prefix).configNRows(nRows).configMode(mode);
         if(tableFormBuilder.getPropertyAccessors() == null) {
             tableFormBuilder.configReflectiveFields();
