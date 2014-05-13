@@ -22,6 +22,7 @@ package com.manydesigns.elements.reflection;
 
 import com.manydesigns.elements.annotations.Key;
 import com.manydesigns.elements.util.ReflectionUtil;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 /*
@@ -43,6 +45,12 @@ import java.util.*;
 public class JavaClassAccessor implements ClassAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
+
+    //**************************************************************************
+    // Constants
+    //**************************************************************************
+
+    public final static String[] PROPERTY_NAME_BLACKLIST = {"class"};
 
     //**************************************************************************
     // Fields
@@ -105,7 +113,10 @@ public class JavaClassAccessor implements ClassAccessor {
             PropertyDescriptor[] propertyDescriptors =
                     beanInfo.getPropertyDescriptors();
             for (PropertyDescriptor current : propertyDescriptors) {
-                accessorList.add(new JavaPropertyAccessor(current));
+                JavaPropertyAccessor accessor = new JavaPropertyAccessor(current);
+                if(isValidProperty(accessor)) {
+                    accessorList.add(accessor);
+                }
             }
         } catch (IntrospectionException e) {
             logger.error(e.getMessage(), e);
@@ -116,10 +127,25 @@ public class JavaClassAccessor implements ClassAccessor {
             if (isPropertyPresent(accessorList, field.getName())) {
                 continue;
             }
-            accessorList.add(new JavaFieldAccessor(field));
+            JavaFieldAccessor accessor = new JavaFieldAccessor(field);
+            if(isValidProperty(accessor)) {
+                accessorList.add(accessor);
+            }
         }
 
         return accessorList;
+    }
+
+    protected boolean isValidProperty(PropertyAccessor propertyAccessor) {
+        // static field?
+        if (Modifier.isStatic(propertyAccessor.getModifiers())) {
+            return false;
+        }
+        // blacklisted?
+        if (ArrayUtils.contains(PROPERTY_NAME_BLACKLIST, propertyAccessor.getName())) {
+            return false;
+        }
+        return true;
     }
 
     protected List<PropertyAccessor> setupKeyPropertyAccessors() {

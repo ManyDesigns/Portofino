@@ -25,11 +25,9 @@ import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 /*
@@ -41,12 +39,6 @@ import java.util.*;
 public class AbstractFormBuilder {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
-
-    //**************************************************************************
-    // Constants
-    //**************************************************************************
-
-    public final static String[] PROPERTY_NAME_BLACKLIST = {"class"};
 
     //**************************************************************************
     // Fields
@@ -82,20 +74,6 @@ public class AbstractFormBuilder {
     //**************************************************************************
     // Utility methods
     //**************************************************************************
-
-    protected boolean skippableProperty(PropertyAccessor propertyAccessor) {
-        // static field?
-        if (Modifier.isStatic(propertyAccessor.getModifiers())) {
-            return true;
-        }
-        // blacklisted?
-        if (ArrayUtils.contains(PROPERTY_NAME_BLACKLIST,
-                propertyAccessor.getName())) {
-            return true;
-        }
-        return false;
-    }
-
 
     protected void removeUnusedSelectionProviders(
             Collection<PropertyAccessor> propertyAccessors) {

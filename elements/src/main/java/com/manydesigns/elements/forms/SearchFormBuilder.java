@@ -103,10 +103,6 @@ public class SearchFormBuilder extends AbstractFormBuilder {
         propertyAccessors = new ArrayList<PropertyAccessor>();
 
         for (PropertyAccessor current : classAccessor.getProperties()) {
-            if (skippableProperty(current)) {
-                continue;
-            }
-
             if(!isPropertyEnabled(current)) {
                 continue;
             }

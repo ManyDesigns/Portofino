@@ -144,10 +144,6 @@ public class TableFormBuilder extends AbstractFormBuilder {
     }
 
     public boolean isPropertyVisible(PropertyAccessor current) {
-        if (skippableProperty(current)) {
-            return false;
-        }
-
         if (!isPropertyEnabled(current)) {
             return false;
         }
@@ -236,9 +232,9 @@ public class TableFormBuilder extends AbstractFormBuilder {
                 if (field == null) {
                     logger.warn("Cannot instanciate field for property {}",
                             propertyAccessor);
-                    break;
+                } else {
+                    row.add(field);
                 }
-                row.add(field);
             }
 
             // handle cascaded select fields

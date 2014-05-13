@@ -148,10 +148,6 @@ public class FormBuilder extends AbstractFormBuilder {
         ArrayList<PropertyAccessor> currentGroup = null;
         String currentGroupName = null;
         for (PropertyAccessor current : classAccessor.getProperties()) {
-            if (skippableProperty(current)) {
-                continue;
-            }
-
             // check if field is enabled
             Enabled enabled = current.getAnnotation(Enabled.class);
             if(enabled != null && !enabled.value()) {

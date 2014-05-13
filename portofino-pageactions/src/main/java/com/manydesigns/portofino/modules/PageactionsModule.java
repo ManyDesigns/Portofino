@@ -29,6 +29,8 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.DispatcherLogic;
 import com.manydesigns.portofino.pageactions.activitystream.ActivityStreamAction;
 import com.manydesigns.portofino.pageactions.custom.CustomAction;
+import com.manydesigns.portofino.pageactions.form.FormAction;
+import com.manydesigns.portofino.pageactions.form.TableFormAction;
 import com.manydesigns.portofino.pageactions.login.DefaultLoginAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
@@ -162,6 +164,8 @@ public class PageactionsModule implements Module {
         pageActionRegistry.register(ActivityStreamAction.class);
         pageActionRegistry.register(CustomAction.class);
         pageActionRegistry.register(DefaultLoginAction.class);
+        pageActionRegistry.register(FormAction.class);
+        pageActionRegistry.register(TableFormAction.class);
         pageActionRegistry.register(TextAction.class);
         servletContext.setAttribute(PAGE_ACTIONS_REGISTRY, pageActionRegistry);
 

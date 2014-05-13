@@ -310,7 +310,7 @@ public class TableForm implements Element {
             for (Field current : this) {
                 xb.openElement("td");
                 if (!current.getErrors().isEmpty()) {
-                    xb.addAttribute("class", "tableform-error");
+                    xb.addAttribute("class", "has-error");
                 }
                 current.valueToXhtml(xb);
                 current.errorsToXhtml(xb);

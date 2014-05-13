@@ -27,6 +27,8 @@ import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 
@@ -37,8 +39,9 @@ import java.io.InputStream;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public class PageActionLogic {
-    public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+    public static final String copyright = "Copyright (c) 2005-2014, ManyDesigns srl";
+
+    public static final Logger logger = LoggerFactory.getLogger(PageActionLogic.class);
 
     public static boolean supportsDetail(Class<?> actionClass) {
         if(!PageAction.class.isAssignableFrom(actionClass)) {
@@ -74,22 +77,22 @@ public class PageActionLogic {
             try {
                 return IOUtils.toString(actionClass.getResourceAsStream(templateLocation));
             } catch (Exception e) {
-                throw new Error("Can't load script template: " + templateLocation + " for class: " + actionClass.getName(), e);
+                logger.error("Can't load script template: " + templateLocation + " for class: " + actionClass.getName(), e);
             }
         } else {
             String template = getScriptTemplate(actionClass.getSuperclass());
             if(template != null) {
                 return template;
-            } else {
-                try {
-                    InputStream stream =
-                            PageActionLogic.class.getResourceAsStream
-                                    ("/com/manydesigns/portofino/pageactions/default_script_template.txt");
-                    return IOUtils.toString(stream);
-                } catch (Exception e) {
-                    throw new Error("Can't load script template", e);
-                }
             }
+        }
+        logger.debug("Falling back to default template for {}", actionClass);
+        try {
+            InputStream stream =
+                    PageActionLogic.class.getResourceAsStream
+                            ("/com/manydesigns/portofino/pageactions/default_script_template.txt");
+            return IOUtils.toString(stream);
+        } catch (Exception e) {
+            throw new Error("Can't load script template", e);
         }
     }
 
