@@ -10,19 +10,9 @@
         <fmt:message key="sign.up" />
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <style type="text/css">
-            /* TODO this is a temporary fix because Elements generates markup for form-horizontal forms. We should
-               find a way to generate markup that works will all form types with the appropriate CSS.
-            */
-            .col-sm-2, .col-sm-4 {
-                float: none;
-                padding: 0;
-                width: 100%;
-            }
-        </style>
         <stripes:form id="signUpForm" action="${actionBean.context.actionPath}" method="post">
             <mde:write name="actionBean" property="signUpForm"/>
-            <div class="form-group ${actionBean.captchaValidationFailed ? 'error' : ''}">
+            <div class="form-group ${actionBean.captchaValidationFailed ? 'has-error' : ''}">
                 <label for="captcha" class="control-label required">
                     <fmt:message key="please.type.the.text.shown.in.the.image" />
                 </label>

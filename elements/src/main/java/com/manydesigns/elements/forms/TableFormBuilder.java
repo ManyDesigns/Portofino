@@ -148,7 +148,6 @@ public class TableFormBuilder extends AbstractFormBuilder {
             return false;
         }
 
-
         // check if field is in summary
         InSummary inSummaryAnnotation =
                 current.getAnnotation(InSummary.class);

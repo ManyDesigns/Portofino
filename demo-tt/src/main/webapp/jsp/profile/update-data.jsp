@@ -30,9 +30,7 @@
         <stripes:form action="${actionBean.context.actionPath}" class="form-horizontal">
             <mde:write name="actionBean" property="form" />
             <div class="form-group">
-                <div class="align-with-input col-sm-10">
-                    <portofino:buttons list="update-data" />
-                </div>
+                <portofino:buttons list="update-data" />
             </div>
         </stripes:form>
     </stripes:layout-component>
