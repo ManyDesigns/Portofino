@@ -25,10 +25,11 @@
         <c:if test="${actionBean.contributor}">
             <hr/>
             <stripes:form action="${actionBean.context.actionPath}" method="post">
-                <label>Add a comment:
+                <label>Add a comment:</label>
                 <textarea maxlength="4000" name="comment" class="form-control"></textarea>
-                </label>
-                <portofino:buttons list="activity"/>
+                <div>
+                    <portofino:buttons list="activity"/>
+                </div>
             </stripes:form>
         </c:if>
     </stripes:layout-component>

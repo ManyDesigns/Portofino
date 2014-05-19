@@ -129,9 +129,6 @@
         <annotation type="com.manydesigns.elements.annotations.Multiline">
             <value>true</value>
         </annotation>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>form-control</value>
-        </annotation>
     </annotations>
 </column>
 <column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project" autoincrement="false">
@@ -205,7 +202,7 @@
 <column columnName="id"/>
                             </primaryKey>
                             <selectionProviders>
-<query toDatabase="tt" sql="select c.id, c.title, ac.id is null&#xD;&#xA;from components c&#xD;&#xA;left join affected_components ac on ac.component = c.id and ac.project = %{#ticket.project} and n=%{#ticket.n}" name="available_components" hql="">
+<query toDatabase="tt" sql="select c.id, c.title, ac.id is null&#xD;&#xA;from components c&#xD;&#xA;left join affected_components ac on ac.component = c.id and ac.project = %{#ticket.project} and n=%{#ticket.n} where c.project = %{#ticket.project}" name="available_components" hql="">
     <references>
         <reference fromColumn="component"/>
     </references>
@@ -427,9 +424,6 @@
 </column>
 <column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>form-control</value>
-        </annotation>
         <annotation type="com.manydesigns.elements.annotations.MaxLength">
             <value>4000</value>
         </annotation>
@@ -599,9 +593,6 @@
         <annotation type="com.manydesigns.elements.annotations.Multiline">
             <value>true</value>
         </annotation>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>form-control</value>
-        </annotation>
     </annotations>
 </column>
 <column scale="0" nullable="true" length="10" jdbcType="91" columnType="DATE" columnName="planned_date" autoincrement="false">
@@ -679,9 +670,6 @@
     <annotations>
         <annotation type="com.manydesigns.elements.annotations.Multiline">
             <value>true</value>
-        </annotation>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>form-control</value>
         </annotation>
     </annotations>
 </column>

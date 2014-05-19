@@ -381,7 +381,7 @@
         </insert>
         <insert tableName="ticket_types">
             <column name="type" value="Bug"/>
-            <column name="css_class" value="label label-important"/>
+            <column name="css_class" value="label label-danger"/>
         </insert>
         <insert tableName="ticket_types">
             <column name="type" value="Feature"/>
@@ -432,7 +432,7 @@
         </insert>
         <insert tableName="ticket_priorities">
             <column name="priority" value="High"/>
-            <column name="css_class" value="label label-important"/>
+            <column name="css_class" value="label label-danger"/>
         </insert>
     </changeSet>
     <changeSet id="tt-121" author="Giampiero Granatella">
