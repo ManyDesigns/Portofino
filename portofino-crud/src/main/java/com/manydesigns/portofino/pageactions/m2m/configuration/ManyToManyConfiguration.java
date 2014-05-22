@@ -144,7 +144,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
                 logger.error("Relation database " + database + " not found");
             }
 
-            if(StringUtils.isBlank(oneExpression)) {
+            if(StringUtils.isBlank(oneExpression) && getOneSelectionProvider() != null) {
                 //TODO chiave multipla
                 try {
                     actualOnePropertyName =

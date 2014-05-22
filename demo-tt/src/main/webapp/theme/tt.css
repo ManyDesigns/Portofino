@@ -29,3 +29,7 @@ li.ticket-list-item {
 .activity-item-message ins {
     background:#ffe6e6;
 }
+
+h3.pageTitle span.label {
+    font-size: 50%;
+}

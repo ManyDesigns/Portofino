@@ -24,7 +24,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post" enctype="multipart/form-data"
-                      class="form-inline">
+                      class="form-inline dont-prompt-on-page-abandon">
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <c:if test="${not empty actionBean.oneSelectField}">
                 <span class="onePkContainer"><mde:write name="actionBean" property="oneSelectField" /></span>

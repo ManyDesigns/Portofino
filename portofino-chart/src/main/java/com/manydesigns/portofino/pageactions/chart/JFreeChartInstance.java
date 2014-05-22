@@ -71,6 +71,7 @@ public class JFreeChartInstance implements XhtmlFragment {
         xb.addAttribute("alt", alt);
         xb.addAttribute("usemap", "#" + mapId);
         xb.addAttribute("style", "border: none;");
+        xb.addAttribute("class", "img-responsive");
         xb.closeElement("img");
 
         xb.openElement("map");

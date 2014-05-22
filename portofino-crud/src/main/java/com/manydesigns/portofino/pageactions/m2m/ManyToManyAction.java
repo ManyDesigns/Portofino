@@ -319,7 +319,7 @@ public class ManyToManyAction extends AbstractPageAction {
         return existing;
     }
 
-    @Button(list = "m2m-checkboxes-edit", key = "update")
+    @Button(list = "m2m-checkboxes-edit", key = "save", type = Button.TYPE_PRIMARY)
     @Guard(test = "onePk != null", type = GuardType.VISIBLE)
     @RequiresPermissions(permissions = ManyToManyAction.PERMISSION_UPDATE)
     public Resolution saveCheckboxes() throws Exception {

@@ -198,6 +198,7 @@ public class ChartConfiguration implements PageActionConfiguration, ChartDefinit
     @Label("SQL Query")
     @Multiline
     @XmlAttribute(required = true)
+    @CssClass(BootstrapSizes.FILL_ROW)
     public String getQuery() {
         return query;
     }
