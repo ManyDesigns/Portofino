@@ -22,7 +22,9 @@ package com.manydesigns.portofino.shiro;
 
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.di.Injections;
-import groovy.lang.GroovyClassLoader;
+import groovy.util.GroovyScriptEngine;
+import groovy.util.ResourceException;
+import groovy.util.ScriptException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -59,7 +61,8 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     // Properties
     //--------------------------------------------------------------------------
 
-    protected final GroovyClassLoader classLoader;
+    protected final GroovyScriptEngine groovyScriptEngine;
+    protected final String scriptUrl;
     protected final ServletContext servletContext;
     protected volatile PortofinoRealm security;
     protected volatile boolean destroyed = false;
@@ -70,9 +73,10 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     // Constructors
     //--------------------------------------------------------------------------
 
-    public SecurityGroovyRealm(GroovyClassLoader classLoader, ServletContext servletContext)
-            throws ClassNotFoundException, IllegalAccessException, InstantiationException, ClassCastException {
-        this.classLoader = classLoader;
+    public SecurityGroovyRealm(GroovyScriptEngine groovyScriptEngine, String scriptUrl, ServletContext servletContext)
+            throws ScriptException, ResourceException, InstantiationException, IllegalAccessException {
+        this.groovyScriptEngine = groovyScriptEngine;
+        this.scriptUrl = scriptUrl;
         this.servletContext = servletContext;
         doEnsureDelegate();
     }
@@ -93,8 +97,8 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     }
 
     private PortofinoRealm doEnsureDelegate()
-            throws ClassNotFoundException, InstantiationException, IllegalAccessException, ClassCastException {
-        Class<?> scriptClass = classLoader.loadClass("Security", true, false, true);
+            throws ScriptException, ResourceException, IllegalAccessException, InstantiationException {
+        Class<?> scriptClass = groovyScriptEngine.loadScriptByName(scriptUrl);
         if(scriptClass.isInstance(security)) { //Class did not change
             return security;
         } else {

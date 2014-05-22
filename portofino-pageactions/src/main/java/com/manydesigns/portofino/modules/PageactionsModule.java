@@ -36,7 +36,7 @@ import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
 import com.manydesigns.portofino.pageactions.text.TextAction;
 import com.manydesigns.portofino.shiro.SecurityGroovyRealm;
-import groovy.lang.GroovyClassLoader;
+import groovy.util.GroovyScriptEngine;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.configuration.Configuration;
 import org.apache.shiro.mgt.RealmSecurityManager;
@@ -73,8 +73,8 @@ public class PageactionsModule implements Module {
     @Inject(BaseModule.APPLICATION_DIRECTORY)
     public File applicationDirectory;
 
-    @Inject(BaseModule.CLASS_LOADER)
-    public GroovyClassLoader classLoader;
+    @Inject(BaseModule.GROOVY_SCRIPT_ENGINE)
+    public GroovyScriptEngine groovyScriptEngine;
 
     @Inject(BaseModule.GROOVY_CLASS_PATH)
     public File groovyClasspath;
@@ -196,24 +196,19 @@ public class PageactionsModule implements Module {
     }
 
     protected void preloadGroovyClasses(File directory) {
-        preloadGroovyClasses(directory, "");
-    }
-
-    protected void preloadGroovyClasses(File directory, String pkg) {
         for(File file : directory.listFiles()) {
             logger.debug("visit {}", file);
             if(file.isDirectory()) {
                 if(!file.equals(directory) && !file.equals(directory.getParentFile())) {
-                    preloadGroovyClasses(file, pkg + file.getName() + ".");
+                    preloadGroovyClasses(file);
                 }
             } else {
-                String name = file.getName();
-                String className = pkg + name.substring(0, name.length() - ".groovy".length());
-                logger.debug("Preloading " + className);
+                String scriptName = file.toURI().toString();
+                logger.debug("Preloading " + scriptName);
                 try {
-                    classLoader.loadClass(className, true, false, true);
+                    groovyScriptEngine.loadScriptByName(scriptName);
                 } catch(Throwable t) {
-                    logger.warn("Groovy class preload failed for class " + className, t);
+                    logger.warn("Groovy class preload failed for " + scriptName, t);
                 }
             }
         }
@@ -226,7 +221,9 @@ public class PageactionsModule implements Module {
         RealmSecurityManager rsm = (RealmSecurityManager) environment.getWebSecurityManager();
         logger.debug("Creating SecurityGroovyRealm");
         try {
-            SecurityGroovyRealm realm = new SecurityGroovyRealm(classLoader, servletContext);
+            String securityGroovy = new File(groovyClasspath, "Security.groovy").toURI().toString();
+            logger.debug("Security.groovy URL: {}", securityGroovy);
+            SecurityGroovyRealm realm = new SecurityGroovyRealm(groovyScriptEngine, securityGroovy, servletContext);
             LifecycleUtils.init(realm);
             rsm.setRealm(realm);
             status = ModuleStatus.STARTED;
