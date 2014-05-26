@@ -73,7 +73,6 @@
         </developer>
     </developers>
     <properties>
-        <antlr.version>2.7.7</antlr.version><!-- Groovy uses 2.7.7, Hibernate uses 2.7.6 -->
         <c3p0.version>0.9.1.2</c3p0.version> <!-- Hibernate uses 0.9.1, Quartz uses 0.9.1.1 -->
         <commons.collections.version>3.1</commons.collections.version><!--Hibernate uses 3.1, Commons-configuration uses 3.2.1-->
         <commons.configuration.version>1.10</commons.configuration.version>
@@ -86,7 +85,7 @@
         <ehcache.version>2.5.2</ehcache.version>
         <fop.version>1.0</fop.version>
         <google.appengine.sdk.version>1.7.7.1</google.appengine.sdk.version> <!-- Last version supporting Java 6 -->
-        <groovy.version>2.3.0</groovy.version>
+        <groovy.version>2.3.1</groovy.version>
         <guava.version>16.0.1</guava.version> <!-- Following GAE dependency -->
         <hibernate.version>3.6.9.Final</hibernate.version>
         <itext.version>2.1.7</itext.version>
