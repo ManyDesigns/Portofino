@@ -87,7 +87,7 @@
         <google.appengine.sdk.version>1.7.7.1</google.appengine.sdk.version> <!-- Last version supporting Java 6 -->
         <groovy.version>2.3.1</groovy.version>
         <guava.version>16.0.1</guava.version> <!-- Following GAE dependency -->
-        <hibernate.version>3.6.9.Final</hibernate.version>
+        <hibernate.version>3.6.10.Final</hibernate.version>
         <itext.version>2.1.7</itext.version>
         <jasperreports.version>3.5.0</jasperreports.version>
         <javaee-web-api.version>6.0</javaee-web-api.version>

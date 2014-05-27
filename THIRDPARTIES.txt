@@ -23,7 +23,7 @@ License: Mozilla Public License
 
 ANTLR Parser Generator
 Site: http://www.antlr.org/
-File: antlr-2.7.7.jar
+File: antlr-2.7.6.jar
 License: BSD
 
 Apache Avalon
@@ -51,7 +51,7 @@ License: Apache License v2.0
 
 Apache Shiro
 Site: http://shiro.apache.org
-Files: shiro-core-1.2.0.jar, shiro-web-1.2.0.jar
+Files: shiro-core-1.2.3.jar, shiro-web-1.2.3.jar
 License: Apache License v2.0
 
 Apache Xerces
@@ -69,19 +69,14 @@ Site: http://xmlgraphics.apache.org/commons/
 File: xmlgraphics-commons-1.4.jar
 License: Apache License v2.0
 
-ASM
-Site: http://asm.ow2.org/
-Files: asm-3.2.jar, asm-analysis-3.2.jar, asm-commons-3.2.jar, asm-tree-3.2.jar, asm-util-3.2.jar
-License: BSD
-
 Bootstrap
 Site: http://twitter.github.io/bootstrap/index.html
-Files: elements/src/main/resources/META-INF/resources/elements/bootstrap/
+Files: portofino-theme/src/main/resources/META-INF/resources/theme/bootstrap/
 License: Apache License v2.0
 
-Bootstrap Datepicker
+Bootstrap Datepicker (1.3.0)
 Site: https://github.com/eternicode/bootstrap-datepicker
-Files: elements/src/main/resources/META-INF/resources/elements/datepicker/
+Files: portofino-theme/src/main/resources/META-INF/resources/theme/datepicker/
 License: Apache License v2.0
 
 Bouncy Castle
@@ -116,17 +111,12 @@ License: Apache License v2
 
 Commons Configuration
 Site: http://commons.apache.org/configuration/
-File: commons-configuration-1.6.jar
+File: commons-configuration-1.10.jar
 License: Apache License v2
 
 Commons DbUtils
 Site: http://commons.apache.org/dbutils/
 File: commons-dbutils-1.3.jar
-License: Apache License v2
-
-Commons Digester
-Site: http://commons.apache.org/digester/
-File: commons-digester-1.8.jar
 License: Apache License v2
 
 Commons Email
@@ -136,7 +126,7 @@ License: Apache License v2
 
 Commons FileUpload
 Site: http://commons.apache.org/fileupload/
-File: commons-fileupload-1.2.1.jar
+File: commons-fileupload-1.3.jar
 License: Apache License v2
 
 Commons IO
@@ -176,20 +166,20 @@ License: Apache License v2
 
 Groovy
 Site: http://groovy.codehaus.org/
-File: groovy-all-2.0.6.jar
+File: groovy-all-2.3.1.jar
 License: Apache License v2
 
 H2 Database Engine
 Site: http://www.h2database.com
-File: h2-1.2.126.jar
+File: h2-1.3.170.jar
 License: Eclipse Public License v1.0
 
 Hibernate ORM
 Site: http://www.hibernate.org/
-Files: hibernate-core-3.6.9.Final.jar,
+Files: hibernate-core-3.6.10.Final.jar,
        hibernate-commons-annotations-3.2.0.Final.jar,
        hibernate-jpa-2.0-api-1.0.1.Final.jar,
-       hibernate-c3p0-3.6.9.Final.jar
+       hibernate-c3p0-3.6.10.Final.jar
 License: LGPL v2.1
 
 Intellij Annotations
@@ -204,7 +194,7 @@ License: LGPL
 
 Java Excel API
 Site: http://jexcelapi.sourceforge.net/
-File: jxl-2.6.10.jar
+File: jxl-2.6.12.jar
 License: LGPLv2
 
 Java Standard Tag Library (JSTL)
@@ -224,23 +214,13 @@ License: Oracle Binary Code License Agreement for Java SE
 
 JavaMail API 1.4.1
 http://java.sun.com/products/javamail/
-File: mail-1.4.jar
+File: mail-1.4.1.jar
 License: Sun Microsystems JavaBeans Activation Framework 1.1.1 license
 
 Javassist
 Site: http://www.csg.ci.i.u-tokyo.ac.jp/~chiba/javassist/
 File: javassist-3.8.0.GA.jar
 License: Apache License
-
-JAXB API
-Site: http://jaxb.java.net/
-Files: jaxb-api-2.1.jar, jaxb-impl-2.1.13.jar
-License: CDDL v1.1 and GPL v2
-
-JCiP Annotations
-Site: http://jcip.net
-File: jcip-annotations-1.0.jar
-License: Creative Commons Attribution License 2.5
 
 Jcommon
 Site: http://www.jfree.org/jcommon/index.php
@@ -254,7 +234,7 @@ License: LGPL
 
 Joda Time
 Site: http://joda-time.sourceforge.net/
-File: joda-time-1.6.2.jar
+File: joda-time-2.3.jar
 License: Apache License v2
 
 JQuery UI
@@ -329,7 +309,7 @@ License: Apache License v2
 
 Stripes
 Site: http://www.stripesframework.org
-File: stripes-1.5.7.jar
+File: stripes-1.5.7-classloaderfix.jar
 License: Apache License v2.0
 
 SweetiePlus Icon Set
