@@ -5,10 +5,10 @@ You must create a "local.py" using the following template:
 
 #! /usr/bin/env python
 
-portofino_version = "4.1.beta6"
-tomcat_dir = "apache-tomcat-7.0.50"
+portofino_version = "4.1.rc1-SNAPSHOT"
+tomcat_dir = "apache-tomcat-7.0.54"
 portofino_path = "~/projects/portofino4"
-tomcat_url = "http://apache.fis.uniroma2.it/tomcat/tomcat-7/v7.0.50/bin/apache-tomcat-7.0.50.zip"
+tomcat_url = "http://apache.fis.uniroma2.it/tomcat/tomcat-7/v7.0.54/bin/apache-tomcat-7.0.54.zip"
 drivers = [["org/postgresql/postgresql/9.2-1003-jdbc4/", "postgresql-9.2-1003-jdbc4.jar"],
            ["mysql/mysql-connector-java/5.1.25/", "mysql-connector-java-5.1.25.jar"],
            ["net/sourceforge/jtds/jtds/1.2.8/", "jtds-1.2.8.jar"]]

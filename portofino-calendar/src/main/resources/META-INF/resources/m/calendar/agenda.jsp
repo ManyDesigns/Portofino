@@ -8,6 +8,7 @@
 <%@ page import="org.joda.time.format.DateTimeFormatterBuilder" %>
 <%@ page import="java.text.MessageFormat" %>
 <%@ page import="java.util.Locale" %>
+<%@ page import="com.manydesigns.portofino.calendar.PresentationHelper" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -148,27 +149,16 @@
              DateTime start, DateTime end) {
         String dialogId = "event-dialog-" + event.getId() + "-" + day.getDay().getMillis();
 
-        // modal
-        xhtmlBuffer.openElement("div");
-        xhtmlBuffer.addAttribute("id", dialogId);
-        xhtmlBuffer.addAttribute("class", "modal hide");
-        xhtmlBuffer.addAttribute("tabindex", "-1");
-        xhtmlBuffer.addAttribute("role", "dialog");
-        xhtmlBuffer.addAttribute("aria-hidden", "true");
+        PresentationHelper.openDialog(xhtmlBuffer, dialogId, null);
 
         // modal-header
         xhtmlBuffer.openElement("div");
         xhtmlBuffer.addAttribute("class", "modal-header");
 
-        xhtmlBuffer.openElement("button");
-        xhtmlBuffer.addAttribute("type", "button");
-        xhtmlBuffer.addAttribute("class", "close");
-        xhtmlBuffer.addAttribute("data-dismiss", "modal");
-        xhtmlBuffer.addAttribute("aria-hidden", "true");
-        xhtmlBuffer.writeNoHtmlEscape("&times;");
-        xhtmlBuffer.closeElement("button");
+        PresentationHelper.writeDialogCloseButtonInHeader(xhtmlBuffer);
 
         xhtmlBuffer.openElement("h3");
+        xhtmlBuffer.addAttribute("class", "modal-title");
         if(event.getReadUrl() != null) {
             xhtmlBuffer.writeAnchor(event.getReadUrl(), event.getDescription());
         } else {
@@ -210,15 +200,10 @@
         // modal-footer
         xhtmlBuffer.openElement("div");
         xhtmlBuffer.addAttribute("class", "modal-footer");
-        xhtmlBuffer.openElement("button");
-        xhtmlBuffer.addAttribute("class", "btn btn-primary");
-        xhtmlBuffer.addAttribute("data-dismiss", "modal");
-        xhtmlBuffer.addAttribute("aria-hidden", "true");
-        xhtmlBuffer.write(ElementsThreadLocals.getText("close"));
-        xhtmlBuffer.closeElement("button");
+        PresentationHelper.writeDialogCloseButtonInFooter(xhtmlBuffer);
         xhtmlBuffer.closeElement("div"); // modal-footer
 
-        xhtmlBuffer.closeElement("div"); // modal
+        PresentationHelper.closeDialog(xhtmlBuffer);
         return dialogId;
     }
 

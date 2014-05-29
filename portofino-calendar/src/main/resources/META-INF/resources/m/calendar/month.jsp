@@ -12,6 +12,7 @@
 <%@ page import="java.text.MessageFormat" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Locale" %>
+<%@ page import="com.manydesigns.portofino.calendar.PresentationHelper" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java"
          pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -46,7 +47,7 @@
 %>
 <style type="text/css">
     .calendar-container {
-        position: relative; height: <%= ((maxEventsPerCell + 1) * 22) * 6 %>px;
+        position: relative; height: <%= ((maxEventsPerCell + 1) * 24) * 6 %>px;
     }
     .days-table td, .days-table th {
         margin: 0; padding: 0 0 0 10px; border: none; text-align: left;
@@ -246,26 +247,16 @@
         String dialogId = null;
         if(more > 1) {
             dialogId = "more-events-dialog-" + day.getDayStart().getMillis();
-            xhtmlBuffer.openElement("div");
-            xhtmlBuffer.addAttribute("id", dialogId);
-            xhtmlBuffer.addAttribute("class", "modal hide");
-            xhtmlBuffer.addAttribute("tabindex", "-1");
-            xhtmlBuffer.addAttribute("role", "dialog");
-            xhtmlBuffer.addAttribute("aria-hidden", "true");
+            PresentationHelper.openDialog(xhtmlBuffer, dialogId, null);
 
             // modal-header
             xhtmlBuffer.openElement("div");
             xhtmlBuffer.addAttribute("class", "modal-header");
 
-            xhtmlBuffer.openElement("button");
-            xhtmlBuffer.addAttribute("type", "button");
-            xhtmlBuffer.addAttribute("class", "close");
-            xhtmlBuffer.addAttribute("data-dismiss", "modal");
-            xhtmlBuffer.addAttribute("aria-hidden", "true");
-            xhtmlBuffer.writeNoHtmlEscape("&times;");
-            xhtmlBuffer.closeElement("button");
+            PresentationHelper.writeDialogCloseButtonInHeader(xhtmlBuffer);
 
             xhtmlBuffer.openElement("h3");
+            xhtmlBuffer.addAttribute("class", "modal-title");
             xhtmlBuffer.write(ElementsThreadLocals.getText("more.events"));
             xhtmlBuffer.closeElement("h3");
             xhtmlBuffer.closeElement("div"); // modal-header
@@ -283,15 +274,10 @@
             // modal-footer
             xhtmlBuffer.openElement("div");
             xhtmlBuffer.addAttribute("class", "modal-footer");
-            xhtmlBuffer.openElement("button");
-            xhtmlBuffer.addAttribute("class", "btn btn-primary");
-            xhtmlBuffer.addAttribute("data-dismiss", "modal");
-            xhtmlBuffer.addAttribute("aria-hidden", "true");
-            xhtmlBuffer.write(ElementsThreadLocals.getText("close"));
-            xhtmlBuffer.closeElement("button");
+            PresentationHelper.writeDialogCloseButtonInFooter(xhtmlBuffer);
             xhtmlBuffer.closeElement("div"); // modal-footer
 
-            xhtmlBuffer.closeElement("div"); // modal
+            PresentationHelper.closeDialog(xhtmlBuffer);
         } else if(more == 1) {
             EventWeek eventWeek = eventsOfTheDay.get(eventsOfTheDay.size() - 1);
             //Event content
@@ -322,29 +308,17 @@
         String dialogId = "event-dialog-" + event.getId();
         String dialogLabelId = "event-dialog-label-" + event.getId();
 
-        // modal
-        xhtmlBuffer.openElement("div");
-        xhtmlBuffer.addAttribute("id", dialogId);
-        xhtmlBuffer.addAttribute("class", "modal hide");
-        xhtmlBuffer.addAttribute("tabindex", "-1");
-        xhtmlBuffer.addAttribute("role", "dialog");
-        xhtmlBuffer.addAttribute("aria-hidden", "true");
-        xhtmlBuffer.addAttribute("aria-labelledby", dialogLabelId);
+        PresentationHelper.openDialog(xhtmlBuffer, dialogId, dialogLabelId);
 
         // modal-header
         xhtmlBuffer.openElement("div");
         xhtmlBuffer.addAttribute("class", "modal-header");
 
-        xhtmlBuffer.openElement("button");
-        xhtmlBuffer.addAttribute("type", "button");
-        xhtmlBuffer.addAttribute("class", "close");
-        xhtmlBuffer.addAttribute("data-dismiss", "modal");
-        xhtmlBuffer.addAttribute("aria-hidden", "true");
-        xhtmlBuffer.writeNoHtmlEscape("&times;");
-        xhtmlBuffer.closeElement("button");
+        PresentationHelper.writeDialogCloseButtonInHeader(xhtmlBuffer);
 
         xhtmlBuffer.openElement("h3");
         xhtmlBuffer.addAttribute("id", dialogLabelId);
+        xhtmlBuffer.addAttribute("class", "modal-title");
         if(event.getReadUrl() != null) {
             xhtmlBuffer.writeAnchor(event.getReadUrl(), event.getDescription());
         } else {
@@ -396,15 +370,10 @@
         // modal-footer
         xhtmlBuffer.openElement("div");
         xhtmlBuffer.addAttribute("class", "modal-footer");
-        xhtmlBuffer.openElement("button");
-        xhtmlBuffer.addAttribute("class", "btn btn-primary");
-        xhtmlBuffer.addAttribute("data-dismiss", "modal");
-        xhtmlBuffer.addAttribute("aria-hidden", "true");
-        xhtmlBuffer.write(ElementsThreadLocals.getText("close"));
-        xhtmlBuffer.closeElement("button");
+        PresentationHelper.writeDialogCloseButtonInFooter(xhtmlBuffer);
         xhtmlBuffer.closeElement("div"); // modal-footer
 
-        xhtmlBuffer.closeElement("div"); // modal
+        PresentationHelper.closeDialog(xhtmlBuffer);
         return dialogId;
     }
 
