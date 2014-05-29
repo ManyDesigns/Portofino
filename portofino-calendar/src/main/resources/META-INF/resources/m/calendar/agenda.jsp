@@ -136,7 +136,8 @@
 
         xhtmlBuffer.openElement("a");
         xhtmlBuffer.addAttribute("style", "color: " + event.getCalendar().getForegroundHtmlColor() + ";");
-        xhtmlBuffer.addAttribute("href", "#" + dialogId);
+        xhtmlBuffer.addAttribute("href", "#");
+        xhtmlBuffer.addAttribute("data-target", "#" + dialogId);
         xhtmlBuffer.addAttribute("data-toggle", "modal");
         xhtmlBuffer.write(event.getDescription());
         xhtmlBuffer.closeElement("a");

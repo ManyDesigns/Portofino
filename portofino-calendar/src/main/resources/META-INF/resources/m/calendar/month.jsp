@@ -246,6 +246,28 @@
         }
         String dialogId = null;
         if(more > 1) {
+            int howMany = Math.min(eventsOfTheDay.size(), maxExtraEvents);
+            String[] dialogIds = new String[howMany];
+            DateTimeFormatter hhmmFormatter = getHoursMinutesFormatter();
+            for(int i = maxEventsPerCell - 1; i < howMany; i++) {
+                if(i >= eventsOfTheDay.size()) {
+                    continue;
+                }
+
+                EventWeek eventWeek = eventsOfTheDay.get(i);
+                if(eventWeek == null) {
+                    continue;
+                }
+                Event event = eventWeek.getEvent();
+                DateTime start = event.getInterval().getStart();
+                if(day.getDayStart().isAfter(start)) {
+                    start = day.getDayStart().toDateTime();
+                }
+                DateTime end = event.getInterval().getEnd();
+                dialogIds[i] = writeEventDialog(
+                    monthView, day, xhtmlBuffer, eventWeek, start, end, hhmmFormatter);
+            }
+
             dialogId = "more-events-dialog-" + day.getDayStart().getMillis();
             PresentationHelper.openDialog(xhtmlBuffer, dialogId, null);
 
@@ -265,9 +287,11 @@
             // modal-body
             xhtmlBuffer.openElement("div");
             xhtmlBuffer.addAttribute("class", "modal-body");
-            int howMany = Math.min(eventsOfTheDay.size(), maxExtraEvents);
-            for(int i = maxEventsPerCell - 1; i < howMany; i++) {
-                writeEventDiv(monthView, day, dayOfWeek, i, xhtmlBuffer);
+
+            for(int i = 0; i < dialogIds.length; i++) {
+                if(dialogIds[i] != null) {
+                    writeEventDiv(dialogIds[i], monthView, day, dayOfWeek, i, xhtmlBuffer);
+                }
             }
             xhtmlBuffer.closeElement("div"); // modal-body
 
@@ -291,7 +315,8 @@
         }
         if(dialogId != null) {
             xhtmlBuffer.openElement("a");
-            xhtmlBuffer.addAttribute("href", "#" + dialogId);
+            xhtmlBuffer.addAttribute("href", "#");
+            xhtmlBuffer.addAttribute("data-target", "#" + dialogId);
             xhtmlBuffer.addAttribute("data-toggle", "modal");
             xhtmlBuffer.write(MessageFormat.format(ElementsThreadLocals.getText("_.more"), more));
             xhtmlBuffer.closeElement("a");
@@ -449,7 +474,8 @@
         } else {
             xhtmlBuffer.addAttribute("style", "float: left;");
         }
-        xhtmlBuffer.addAttribute("href", "#" + dialogId);
+        xhtmlBuffer.addAttribute("href", "#");
+        xhtmlBuffer.addAttribute("data-target", "#" + dialogId);
         xhtmlBuffer.addAttribute("data-toggle", "modal");
 //        xhtmlBuffer.addAttribute("onclick", "$('#" + dialogId + "').modal(); return false;");
         if(start.getMillisOfDay() > 0) {
@@ -469,7 +495,7 @@
     }
 
     private void writeEventDiv(
-            MonthView monthView, MonthView.MonthViewDay day, int dayOfWeek, int index, XhtmlBuffer xhtmlBuffer) {
+            String dialogId, MonthView monthView, MonthView.MonthViewDay day, int dayOfWeek, int index, XhtmlBuffer xhtmlBuffer) {
         String enclosingTag = "div";
         List<EventWeek> eventsOfTheDay = day.getSlots();
         if(index >= eventsOfTheDay.size()) {
@@ -488,21 +514,17 @@
         if(day.getDayStart().isAfter(start)) {
             start = day.getDayStart().toDateTime();
         }
-        DateTime end = event.getInterval().getEnd();
 
         DateTimeFormatter hhmmFormatter = getHoursMinutesFormatter();
-
-        //Dialog
-        String dialogId = writeEventDialog(
-                monthView, day, xhtmlBuffer, eventWeek, start, end, hhmmFormatter);
 
         //Cell contents
         xhtmlBuffer.openElement("div");
         xhtmlBuffer.openElement("a");
         xhtmlBuffer.addAttribute("style", "font-weight: bold; color: " + event.getCalendar().getForegroundHtmlColor());
-        xhtmlBuffer.addAttribute("href", "#" + dialogId);
+        xhtmlBuffer.addAttribute("href", "#");
+        xhtmlBuffer.addAttribute("data-target", "#" + dialogId);
+        xhtmlBuffer.addAttribute("data-dismiss", "modal"); //Dismiss parent dialog
         xhtmlBuffer.addAttribute("data-toggle", "modal");
-//        xhtmlBuffer.addAttribute("onclick", "$('#" + dialogId + "').modal(); return false;");
         if(start.getMillisOfDay() > 0) {
             xhtmlBuffer.write(hhmmFormatter.print(start) + " ");
         }
