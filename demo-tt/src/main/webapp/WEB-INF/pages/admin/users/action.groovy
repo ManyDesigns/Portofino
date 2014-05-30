@@ -2,6 +2,7 @@ package com.manydesigns.portofino.pageactions.crud
 
 import com.manydesigns.portofino.tt.TtUtils
 
+import com.manydesigns.elements.Mode
 import com.manydesigns.elements.forms.Form
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
@@ -61,7 +62,7 @@ class AdminUsersCrudAction extends CrudAction {
     protected void editPostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
         Form newForm = form;
-        form = buildForm(formBuilder);
+        setupForm(Mode.EDIT);
         form.readFromObject(old);
         String message = TtUtils.createDiffMessage(form, newForm);
         if (message != null) {

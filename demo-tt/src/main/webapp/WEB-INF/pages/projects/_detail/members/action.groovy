@@ -3,6 +3,7 @@ package com.manydesigns.portofino.pageactions.crud
 import com.manydesigns.portofino.tt.TtUtils
 
 import com.manydesigns.elements.ElementsThreadLocals
+import com.manydesigns.elements.Mode
 import com.manydesigns.elements.blobs.Blob
 import com.manydesigns.elements.blobs.BlobManager
 import com.manydesigns.elements.forms.Form
@@ -122,7 +123,7 @@ class ProjectMembersAction extends CrudAction {
     protected void editPostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
         Form newForm = form;
-        form = buildForm(formBuilder);
+        setupForm(Mode.EDIT);
         form.readFromObject(old);
         String message = TtUtils.createDiffMessage(form, newForm);
         if (message != null) {
