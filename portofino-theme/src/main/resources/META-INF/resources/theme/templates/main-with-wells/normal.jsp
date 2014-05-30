@@ -39,7 +39,9 @@
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>
     <body>
-    <jsp:include page="/theme/header.jsp"/>
+    <jsp:include page="/theme/header.jsp">
+        <jsp:param name="pageTitle" value="${pageTitle}" />
+    </jsp:include>
     <div class="container">
         <div class="row">
             <div class="content col-md-12">
@@ -96,7 +98,9 @@
             </div>
         </div>
     </div>
-    <jsp:include page="/theme/footer.jsp"/>
+    <jsp:include page="/theme/footer.jsp">
+        <jsp:param name="pageTitle" value="${pageTitle}" />
+    </jsp:include>
     </body>
 </html>
 </c:if>
