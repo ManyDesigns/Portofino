@@ -273,7 +273,7 @@ class ProjectsTicketsAction extends CrudAction {
     protected void editPostProcess(Object object) {
         Object principal = SecurityUtils.subject.principal;
         Form newForm = form;
-        form = buildForm(formBuilder);
+        form = buildForm(createFormBuilder());
         form.readFromObject(old);
         String message = TtUtils.createDiffMessage(form, newForm);
         if (message != null) {
