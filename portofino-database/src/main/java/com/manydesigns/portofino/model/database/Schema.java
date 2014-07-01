@@ -112,7 +112,7 @@ public class Schema implements ModelObject {
     }
 
     public String getDatabaseName() {
-        return database.getDatabaseName();
+        return database != null ? database.getDatabaseName() : "(no database!)";
     }
 
     @XmlAttribute(required = true)

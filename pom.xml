@@ -73,7 +73,7 @@
         </developer>
     </developers>
     <properties>
-        <c3p0.version>0.9.1.2</c3p0.version> <!-- Hibernate uses 0.9.1, Quartz uses 0.9.1.1 -->
+        <!--<c3p0.version>0.9.1.2</c3p0.version> --><!-- Hibernate uses 0.9.1, Quartz uses 0.9.1.1 -->
         <commons.collections.version>3.1</commons.collections.version><!--Hibernate uses 3.1, Commons-configuration uses 3.2.1-->
         <commons.configuration.version>1.10</commons.configuration.version>
         <commons.dbutils.version>1.3</commons.dbutils.version>
@@ -87,7 +87,7 @@
         <google.appengine.sdk.version>1.7.7.1</google.appengine.sdk.version> <!-- Last version supporting Java 6 -->
         <groovy.version>2.3.2</groovy.version>
         <guava.version>16.0.1</guava.version> <!-- Following GAE dependency -->
-        <hibernate.version>3.6.9.Final</hibernate.version>
+        <hibernate.version>4.3.5.Final</hibernate.version>
         <itext.version>2.1.7</itext.version>
         <jasperreports.version>3.5.0</jasperreports.version>
         <javaee-web-api.version>6.0</javaee-web-api.version>

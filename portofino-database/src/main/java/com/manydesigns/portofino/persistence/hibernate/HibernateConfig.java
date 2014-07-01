@@ -101,8 +101,7 @@ public class HibernateConfig {
 
     protected void setupConfigurationProperties(Configuration configuration) {
         configuration
-                .setProperty("hibernate.current_session_context_class",
-                        "org.hibernate.context.ThreadLocalSessionContext") //hb4: "org.hibernate.context.internal.ThreadLocalSessionContext"
+                .setProperty("hibernate.current_session_context_class", "org.hibernate.context.internal.ThreadLocalSessionContext")
                 .setProperty("org.hibernate.hql.ast.AST", "true")
                 .setProperty("hibernate.globally_quoted_identifiers", "false");
         // mettendo la modalità dynamic map, non funzionano le entità mappate su bean.
@@ -192,8 +191,8 @@ public class HibernateConfig {
                                            com.manydesigns.portofino.model.database.Table aTable) {
 
 
-        Table tab = mappings.addTable(escapeName(aTable.getSchemaName()), null,
-                escapeName(aTable.getTableName()), null, false);
+        Table tab = mappings.addTable(quoteIdentifier(aTable.getSchemaName()), null,
+                quoteIdentifier(aTable.getTableName()), null, false);
         //tab.setName(escapeName(aTable.getTableName()));
         //tab.setSchema(escapeName(aTable.getSchemaName()));
         mappings.addTableBinding(aTable.getSchemaName(), null,
@@ -268,7 +267,7 @@ public class HibernateConfig {
                                 Table tab,
                                 com.manydesigns.portofino.model.database.Column column) {
         Column col = new Column();
-        col.setName(escapeName(column.getColumnName()));
+        col.setName(quoteIdentifier(column.getColumnName()));
         col.setLength(column.getLength());
         col.setPrecision(column.getLength());
         col.setScale(column.getScale());
@@ -381,11 +380,10 @@ public class HibernateConfig {
                                   String pkName, RootClass clazz,
                                   Table tab,
                                   List<com.manydesigns.portofino.model.database.Column> columnPKList) {
-        PrimaryKeyColumn pkcol =mdTable.getPrimaryKey().getPrimaryKeyColumns().get(0);
-        com.manydesigns.portofino.model.database.Column
-                column = columnPKList.get(0);
+        PrimaryKeyColumn pkcol = mdTable.getPrimaryKey().getPrimaryKeyColumns().get(0);
+        com.manydesigns.portofino.model.database.Column column = columnPKList.get(0);
         final PrimaryKey primaryKey = new PrimaryKey();
-        primaryKey.setName(pkName);
+        primaryKey.setName(pkName); //TODO quote?
         primaryKey.setTable(tab);
         tab.setPrimaryKey(primaryKey);
 
@@ -408,8 +406,6 @@ public class HibernateConfig {
         Property prop = createProperty(column, id);
         clazz.addProperty(prop);
         prop.setPropertyAccessorName(mappings.getDefaultAccess());
-        //PropertyGeneration generation = PropertyGeneration.parse(null);
-        //prop.setGeneration(generation);
 
         prop.setInsertable(false);
         prop.setUpdateable(false);
@@ -442,16 +438,21 @@ public class HibernateConfig {
         }
     }
 
-    private void manageIdentityGenerator(Mappings mappings, Table tab,
-                                          SimpleValue id) {
-        id.setIdentifierGeneratorStrategy("identity");
+    private void manageIdentityGenerator(Mappings mappings, Table tab, SimpleValue id) {
+        id.setIdentifierGeneratorStrategy(PortofinoIdentityGenerator.class.getName()); //"identity");
         Properties params = new Properties();
-        params.put(PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER,
-                    mappings.getObjectNameNormalizer());
+        params.put(PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER, mappings.getObjectNameNormalizer());
 
-        params.setProperty(
+        if (mappings.getSchemaName() != null) {
+            params.setProperty(
                     PersistentIdentifierGenerator.SCHEMA,
-                    escapeName(tab.getSchema()));
+                    mappings.getObjectNameNormalizer().normalizeIdentifierQuoting(mappings.getSchemaName()));
+        }
+        if (mappings.getCatalogName() != null) {
+            params.setProperty(
+                    PersistentIdentifierGenerator.CATALOG,
+                    mappings.getObjectNameNormalizer().normalizeIdentifierQuoting(mappings.getCatalogName()));
+        }
         id.setIdentifierGeneratorProperties(params);
         id.setNullValue(null);
     }
@@ -464,10 +465,10 @@ public class HibernateConfig {
         params.put(PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER,
                     mappings.getObjectNameNormalizer());
         params.put(SequenceStyleGenerator.SEQUENCE_PARAM,
-                    escapeName(generator.getName()));
+                    quoteIdentifier(generator.getName()));
         params.setProperty(
                 SequenceStyleGenerator.SCHEMA,
-                escapeName(tab.getSchema()));
+                quoteIdentifier(tab.getSchema()));
         id.setIdentifierGeneratorProperties(params);
         id.setNullValue(null);
     }
@@ -479,14 +480,14 @@ public class HibernateConfig {
         params.put(TableGenerator.TABLE,
                     tab);
         params.put(TableGenerator.TABLE_PARAM,
-                    escapeName(generator.getTable()));
+                    quoteIdentifier(generator.getTable()));
         params.put(PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER,
                     mappings.getObjectNameNormalizer());
-        params.put(TableGenerator.SEGMENT_COLUMN_PARAM, escapeName(generator.getKeyColumn()));
+        params.put(TableGenerator.SEGMENT_COLUMN_PARAM, quoteIdentifier(generator.getKeyColumn()));
         params.put(TableGenerator.SEGMENT_VALUE_PARAM, generator.getKeyValue());
-        params.put(TableGenerator.VALUE_COLUMN_PARAM,escapeName(generator.getValueColumn()));
+        params.put(TableGenerator.VALUE_COLUMN_PARAM, quoteIdentifier(generator.getValueColumn()));
         params.setProperty(
-                    TableGenerator.SCHEMA,escapeName(tab.getSchema()));
+                    TableGenerator.SCHEMA, quoteIdentifier(tab.getSchema()));
         id.setIdentifierGeneratorProperties(params);
         id.setNullValue(null);
     }
@@ -496,7 +497,7 @@ public class HibernateConfig {
         Properties params = new Properties();
         params.put(PersistentIdentifierGenerator.IDENTIFIER_NORMALIZER,
                 mappings.getObjectNameNormalizer());
-        params.setProperty(PersistentIdentifierGenerator.SCHEMA, escapeName(tab.getSchema()));
+        params.setProperty(PersistentIdentifierGenerator.SCHEMA, quoteIdentifier(tab.getSchema()));
         params.put(IncrementGenerator.ENTITY_NAME,
                 entityName);
         id.setIdentifierGeneratorProperties(params);
@@ -752,7 +753,7 @@ public class HibernateConfig {
         PersistentClass manyClass = config.getClassMapping(manyMDQualifiedTableName);
         for (String columnName : columnNames) {
             Column col = new Column();
-            col.setName(escapeName(columnName));
+            col.setName(quoteIdentifier(columnName));
             //Recupero la colonna precedentemente associata alla tabella:
             //essa ha uno uniqueIdentifier generato al momento dell'associazione alla tabella;
             //questo viene utilizzato per disambiguare l'alias della colonna nelle query
@@ -790,7 +791,7 @@ public class HibernateConfig {
         return refProp;
     }
 
-    private String escapeName(String name) {
+    private String quoteIdentifier(String name) {
         // Portofino handles all tables in a case-sensitive way
         return "`"+name+"`";
     }
