@@ -226,7 +226,7 @@ public class QueryUtils {
                 TableCriteria.EqCriterion eqCriterion =
                         (TableCriteria.EqCriterion) criterion;
                 Object value = eqCriterion.getValue();
-                hqlFormat = "{0} = ?";
+                hqlFormat = "{0} = ?" + parametersList.size();
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.InCriterion) {
                 TableCriteria.InCriterion inCriterion =
@@ -237,9 +237,9 @@ public class QueryUtils {
                     boolean first = true;
                     for (Object value : values){
                         if (!first){
-                            params.append(", ?");
+                            params.append(", ?" + parametersList.size());
                         } else {
-                            params.append("?");
+                            params.append("?" + parametersList.size());
                             first = false;
                         }
                         parametersList.add(value);
@@ -252,39 +252,39 @@ public class QueryUtils {
                 TableCriteria.NeCriterion neCriterion =
                         (TableCriteria.NeCriterion) criterion;
                 Object value = neCriterion.getValue();
-                hqlFormat = "{0} <> ?";
+                hqlFormat = "{0} <> ?" + parametersList.size();
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.BetweenCriterion) {
                 TableCriteria.BetweenCriterion betweenCriterion =
                         (TableCriteria.BetweenCriterion) criterion;
                 Object min = betweenCriterion.getMin();
                 Object max = betweenCriterion.getMax();
-                hqlFormat = "{0} >= ? AND {0} <= ?";
+                hqlFormat = "{0} >= ?" + parametersList.size() + " AND {0} <= ?" + (parametersList.size() + 1);
                 parametersList.add(min);
                 parametersList.add(max);
             } else if (criterion instanceof TableCriteria.GtCriterion) {
                 TableCriteria.GtCriterion gtCriterion =
                         (TableCriteria.GtCriterion) criterion;
                 Object value = gtCriterion.getValue();
-                hqlFormat = "{0} > ?";
+                hqlFormat = "{0} > ?" + parametersList.size();
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.GeCriterion) {
                 TableCriteria.GeCriterion gtCriterion =
                         (TableCriteria.GeCriterion) criterion;
                 Object value = gtCriterion.getValue();
-                hqlFormat = "{0} >= ?";
+                hqlFormat = "{0} >= ?" + parametersList.size();
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.LtCriterion) {
                 TableCriteria.LtCriterion ltCriterion =
                         (TableCriteria.LtCriterion) criterion;
                 Object value = ltCriterion.getValue();
-                hqlFormat = "{0} < ?";
+                hqlFormat = "{0} < ?" + parametersList.size();
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.LeCriterion) {
                 TableCriteria.LeCriterion leCriterion =
                         (TableCriteria.LeCriterion) criterion;
                 Object value = leCriterion.getValue();
-                hqlFormat = "{0} <= ?";
+                hqlFormat = "{0} <= ?" + parametersList.size();
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.LikeCriterion) {
                 TableCriteria.LikeCriterion likeCriterion =
@@ -292,7 +292,7 @@ public class QueryUtils {
                 String value = (String) likeCriterion.getValue();
                 String pattern = processTextMatchMode(
                         likeCriterion.getTextMatchMode(), value);
-                hqlFormat = "{0} like ?";
+                hqlFormat = "{0} like ?" + parametersList.size();
                 parametersList.add(pattern);
             } else if (criterion instanceof TableCriteria.IlikeCriterion) {
                 TableCriteria.IlikeCriterion ilikeCriterion =
@@ -300,7 +300,7 @@ public class QueryUtils {
                 String value = (String) ilikeCriterion.getValue();
                 String pattern = processTextMatchMode(
                         ilikeCriterion.getTextMatchMode(), value);
-                hqlFormat = "lower({0}) like lower(?)";
+                hqlFormat = "lower({0}) like lower(?" + parametersList.size() + ")";
                 parametersList.add(pattern);
             } else if (criterion instanceof TableCriteria.IsNullCriterion) {
                 hqlFormat = "{0} is null";
