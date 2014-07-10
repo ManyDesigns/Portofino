@@ -31,6 +31,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.expression.Parenthesis;
@@ -226,7 +227,7 @@ public class QueryUtils {
                 TableCriteria.EqCriterion eqCriterion =
                         (TableCriteria.EqCriterion) criterion;
                 Object value = eqCriterion.getValue();
-                hqlFormat = "{0} = ?" + parametersList.size();
+                hqlFormat = "{0} = ?";
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.InCriterion) {
                 TableCriteria.InCriterion inCriterion =
@@ -237,9 +238,9 @@ public class QueryUtils {
                     boolean first = true;
                     for (Object value : values){
                         if (!first){
-                            params.append(", ?" + parametersList.size());
+                            params.append(", ?");
                         } else {
-                            params.append("?" + parametersList.size());
+                            params.append("?");
                             first = false;
                         }
                         parametersList.add(value);
@@ -252,39 +253,39 @@ public class QueryUtils {
                 TableCriteria.NeCriterion neCriterion =
                         (TableCriteria.NeCriterion) criterion;
                 Object value = neCriterion.getValue();
-                hqlFormat = "{0} <> ?" + parametersList.size();
+                hqlFormat = "{0} <> ?";
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.BetweenCriterion) {
                 TableCriteria.BetweenCriterion betweenCriterion =
                         (TableCriteria.BetweenCriterion) criterion;
                 Object min = betweenCriterion.getMin();
                 Object max = betweenCriterion.getMax();
-                hqlFormat = "{0} >= ?" + parametersList.size() + " AND {0} <= ?" + (parametersList.size() + 1);
+                hqlFormat = "{0} >= ? AND {0} <= ?";
                 parametersList.add(min);
                 parametersList.add(max);
             } else if (criterion instanceof TableCriteria.GtCriterion) {
                 TableCriteria.GtCriterion gtCriterion =
                         (TableCriteria.GtCriterion) criterion;
                 Object value = gtCriterion.getValue();
-                hqlFormat = "{0} > ?" + parametersList.size();
+                hqlFormat = "{0} > ?";
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.GeCriterion) {
                 TableCriteria.GeCriterion gtCriterion =
                         (TableCriteria.GeCriterion) criterion;
                 Object value = gtCriterion.getValue();
-                hqlFormat = "{0} >= ?" + parametersList.size();
+                hqlFormat = "{0} >= ?";
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.LtCriterion) {
                 TableCriteria.LtCriterion ltCriterion =
                         (TableCriteria.LtCriterion) criterion;
                 Object value = ltCriterion.getValue();
-                hqlFormat = "{0} < ?" + parametersList.size();
+                hqlFormat = "{0} < ?";
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.LeCriterion) {
                 TableCriteria.LeCriterion leCriterion =
                         (TableCriteria.LeCriterion) criterion;
                 Object value = leCriterion.getValue();
-                hqlFormat = "{0} <= ?" + parametersList.size();
+                hqlFormat = "{0} <= ?";
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.LikeCriterion) {
                 TableCriteria.LikeCriterion likeCriterion =
@@ -292,7 +293,7 @@ public class QueryUtils {
                 String value = (String) likeCriterion.getValue();
                 String pattern = processTextMatchMode(
                         likeCriterion.getTextMatchMode(), value);
-                hqlFormat = "{0} like ?" + parametersList.size();
+                hqlFormat = "{0} like ?";
                 parametersList.add(pattern);
             } else if (criterion instanceof TableCriteria.IlikeCriterion) {
                 TableCriteria.IlikeCriterion ilikeCriterion =
@@ -300,7 +301,7 @@ public class QueryUtils {
                 String value = (String) ilikeCriterion.getValue();
                 String pattern = processTextMatchMode(
                         ilikeCriterion.getTextMatchMode(), value);
-                hqlFormat = "lower({0}) like lower(?" + parametersList.size() + ")";
+                hqlFormat = "lower({0}) like lower(?)";
                 parametersList.add(pattern);
             } else if (criterion instanceof TableCriteria.IsNullCriterion) {
                 hqlFormat = "{0} is null";
@@ -444,13 +445,13 @@ public class QueryUtils {
             throw new RuntimeException("Couldn't merge query", e);
         }
 
-        String mainEntityAlias = null;
+        Alias mainEntityAlias = null;
         if(criteria != null) {
             mainEntityAlias = getEntityAlias(criteria.getTable().getActualEntityName(), parsedQueryString);
         }
 
         QueryStringWithParameters criteriaQuery =
-                getQueryStringWithParametersForCriteria(criteria, mainEntityAlias);
+                getQueryStringWithParametersForCriteria(criteria, mainEntityAlias != null ? mainEntityAlias.getName() : null);
         String criteriaQueryString = criteriaQuery.getQueryString();
         Object[] criteriaParameters = criteriaQuery.getParameters();
 
@@ -687,10 +688,10 @@ public class QueryUtils {
                 return getObjectByPk(persistence, database, entityName, pk);
             }
 
-            String mainEntityAlias = getEntityAlias(entityName, parsedQuery);
+            Alias mainEntityAlias = getEntityAlias(entityName, parsedQuery);
             net.sf.jsqlparser.schema.Table mainEntityTable;
             if(mainEntityAlias != null) {
-                mainEntityTable = new net.sf.jsqlparser.schema.Table(null, mainEntityAlias);
+                mainEntityTable = new net.sf.jsqlparser.schema.Table(null, mainEntityAlias.getName());
             } else {
                 mainEntityTable = new net.sf.jsqlparser.schema.Table();
             }
@@ -723,7 +724,7 @@ public class QueryUtils {
         }
     }
 
-    protected static String getEntityAlias(String entityName, PlainSelect query) {
+    protected static Alias getEntityAlias(String entityName, PlainSelect query) {
         FromItem fromItem = query.getFromItem();
         if (hasEntityAlias(entityName, fromItem)) {
             return fromItem.getAlias();
@@ -743,7 +744,8 @@ public class QueryUtils {
     private static boolean hasEntityAlias(String entityName, FromItem fromItem) {
         return fromItem instanceof net.sf.jsqlparser.schema.Table &&
                ((net.sf.jsqlparser.schema.Table) fromItem).getName().equals(entityName) &&
-               !StringUtils.isBlank(fromItem.getAlias());
+               fromItem.getAlias() != null &&
+               !StringUtils.isBlank(fromItem.getAlias().getName());
     }
 
     /**
