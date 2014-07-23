@@ -37,5 +37,5 @@
 <%
     BaseHref.emit(request, new XhtmlBuffer(out));
 %>
-<title><c:out value='<%= request.getParameter("pageTitle") %>' /></title>
+<title><c:out value='<%= request.getParameter("pageTitle") %>' escapeXml="false" /></title>
 </head>
