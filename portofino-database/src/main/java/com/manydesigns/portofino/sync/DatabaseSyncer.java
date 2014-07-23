@@ -298,7 +298,14 @@ public class DatabaseSyncer {
         String fkTableName = tableName;
         //Work around MySQL & case-insensitive dbs
         liquibase.database.structure.Table fkTable = databaseSnapshot.getTable(fkTableName);
-        fkTableName = fkTable.getName();
+
+        if(fkTable!=null){
+            fkTableName = fkTable.getName();
+        }else{
+            logger.warn("");
+            fkTableName=null;
+        }
+
         return fkTableName;
     }
 
