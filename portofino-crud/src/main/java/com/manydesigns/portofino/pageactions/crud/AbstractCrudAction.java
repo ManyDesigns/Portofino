@@ -1919,8 +1919,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public String getEditTitle() {
         String title = crudConfiguration.getEditTitle();
-        OgnlTextFormat textFormat = OgnlTextFormat.create(StringUtils.defaultString(title));
-        return textFormat.format(this);
+        if(StringUtils.isEmpty(title)) {
+            return ShortNameUtils.getName(getClassAccessor(), object);
+        } else {
+            OgnlTextFormat textFormat = OgnlTextFormat.create(StringUtils.defaultString(title));
+            return textFormat.format(this);
+        }
     }
 
     public String getCreateTitle() {
