@@ -133,8 +133,54 @@ function setupRichTextEditors() {
     });
 }
 
+function setupSelectFieldLinks() {
+    $("a.mde-select-field-create-new-link").click(function(event) {
+        var href = $(event.target).attr("href");
+        //window.open(href, '_blank', 'width=700, height=500, location=0, scrollbars=1');
+        var dialogDiv = $('<div></div>').appendTo($("body"));
+        function setupDialogContents(dialog) {
+            function submitForm(form, event, action) {
+                var data = form.serializeArray();
+                if(action) {
+                    data[action] = "";
+                }
+                $.ajax({
+                    type: form.attr('method'),
+                    url: form.attr('action'),
+                    data: data
+                }).done(function(data) {
+                    dialogDiv.html(data);
+                    //TODO setupDialogContents
+                }).fail(function() {
+                    alert("Form submission failed!"); //TODO
+                });
+                event.preventDefault(); // Prevent the form from submitting via the browser.
+            }
+
+            dialog.find("form").submit(function(event) {
+                submitForm($(this), event, null)
+            });
+
+            //TODO submitForm sui bottoni
+
+            dialog.find("button.close").click(function() {
+                dialog.modal("hide");
+                dialogDiv.remove();
+            });
+        }
+
+        dialogDiv.load(href, function() {
+            var dialog = $(this);
+            setupDialogContents(dialog);
+            dialog.modal({ backdrop: 'static', show: true });
+        });
+        return false;
+    });
+}
+
 $(function() {
     setupRichTextEditors();
+    setupSelectFieldLinks();
 });
 
 function configureBulkEditTextField(id, checkboxName) {

@@ -267,19 +267,17 @@ public class SelectField extends AbstractField {
 
     protected void addCreateNewLink(XhtmlBuffer xb) {
         if (createNewValueHref != null) {
-            String onclick = createNewValueHref;
-            if(onclick.contains("?")) {
-                onclick += "&";
+            String href = createNewValueHref;
+            if(href.contains("?")) {
+                href += "&";
             } else {
-                onclick += "?";
+                href += "?";
             }
-            onclick += "popupCloseCallback=popupCloseCallback_" + id;
-            onclick = "window.open('" + StringEscapeUtils.escapeJavaScript(onclick) + "', '_blank', " +
-                      "'width=700, height=500, location=0, scrollbars=1'); return false;";
+            href += "popupCloseCallback=popupCloseCallback_" + id;
             xb.write(" ");
             xb.openElement("a");
-            xb.addAttribute("href", "#");
-            xb.addAttribute("onclick", onclick);
+            xb.addAttribute("href", href);
+            xb.addAttribute("class", "mde-select-field-create-new-link");
             xb.write(createNewValueText);
             xb.closeElement("a");
             String js = composeCreateNewJs();
