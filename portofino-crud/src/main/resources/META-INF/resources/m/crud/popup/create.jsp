@@ -11,6 +11,7 @@
         <c:out value="${actionBean.createTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
+        <mde:sessionMessages />
         <c:if test="${actionBean.formWithRichTextFields}">
             <script type="text/javascript" src="<stripes:url value="/theme/ckeditor/ckeditor.js"/>"></script>
             <script type="text/javascript" src="<stripes:url value="/theme/ckeditor/adapters/jquery.js"/>"></script>

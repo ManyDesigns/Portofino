@@ -142,15 +142,21 @@ function setupSelectFieldLinks() {
             function submitForm(form, event, action) {
                 var data = form.serializeArray();
                 if(action) {
-                    data[action] = "";
+                    var datum = new Object();
+                    datum.name = action;
+                    datum.value = "";
+                    data.push(datum);
                 }
                 $.ajax({
                     type: form.attr('method'),
                     url: form.attr('action'),
                     data: data
                 }).done(function(data) {
+                    dialog.modal("hide");
                     dialogDiv.html(data);
-                    //TODO setupDialogContents
+                    var newDialog = dialogDiv.find("div.modal");
+                    setupDialogContents(newDialog);
+                    newDialog.modal({ backdrop: 'static', show: true });
                 }).fail(function() {
                     alert("Form submission failed!"); //TODO
                 });
@@ -158,19 +164,23 @@ function setupSelectFieldLinks() {
             }
 
             dialog.find("form").submit(function(event) {
-                submitForm($(this), event, null)
+                var form = $(this);
+                submitForm(form, event, form.find("button[type=submit]").first().attr("name"));
             });
 
-            //TODO submitForm sui bottoni
+            dialog.find("form button[type=submit]").click(function(event) {
+                var button = $(this);
+                submitForm(button.closest("form"), event, button.attr("name"));
+            });
 
-            dialog.find("button.close").click(function() {
+            dialog.find(".modal-header button.close").click(function() {
                 dialog.modal("hide");
                 dialogDiv.remove();
             });
         }
 
         dialogDiv.load(href, function() {
-            var dialog = $(this);
+            var dialog = $(this).find("div.modal");
             setupDialogContents(dialog);
             dialog.modal({ backdrop: 'static', show: true });
         });
