@@ -109,13 +109,13 @@ public class DefaultMailSender implements MailSender {
                        cause instanceof MethodNotSupportedException) {
                         markFailed(id, cause);
                     } else if(cause instanceof MessagingException) {
-                        if( e.getCause() != null && e.getCause() instanceof SendFailedException && e.getCause().getCause()  != null && e.getCause().getCause() instanceof SMTPAddressFailedException) {
+                        if(e.getCause() instanceof SendFailedException && e.getCause().getCause() instanceof SMTPAddressFailedException) {
                             logger.warn("Mail not sent due to known server error, marking as failed");
                             markFailed(id, e);
-                        } else{
+                        } else {
                             logger.warn("Mail not sent due to known server error, NOT marking as failed", e);
+                            serverErrors++;
                         }
-                        serverErrors++;
                     } else {
                         markFailed(id, e);
                     }
