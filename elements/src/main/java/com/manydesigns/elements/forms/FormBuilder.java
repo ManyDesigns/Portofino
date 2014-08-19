@@ -24,6 +24,7 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Enabled;
 import com.manydesigns.elements.annotations.FieldSet;
+import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.options.SelectionModel;
@@ -57,9 +58,7 @@ public class FormBuilder extends AbstractFormBuilder {
 
     protected List<ArrayList<PropertyAccessor>> groupedPropertyAccessors;
     protected List<String> fieldSetNames;
-    protected String prefix;
     protected int nColumns = DEFAULT_N_COLUMNS;
-    protected Mode mode = Mode.EDIT;
 
     //**************************************************************************
     // Constructors
@@ -136,6 +135,11 @@ public class FormBuilder extends AbstractFormBuilder {
 
     public FormBuilder configMode(Mode mode) {
         this.mode = mode;
+        return this;
+    }
+
+    public FormBuilder configBlobManager(BlobManager blobManager) {
+        this.blobManager = blobManager;
         return this;
     }
 
@@ -266,21 +270,11 @@ public class FormBuilder extends AbstractFormBuilder {
             String[] fieldNames = current.getKey();
             int index = ArrayUtils.indexOf(fieldNames, fieldName);
             if (index >= 0) {
-                field = new SelectField
-                        (propertyAccessor, current.getValue(), mode, prefix);
+                field = buildSelectField(propertyAccessor, current.getValue(), prefix);
                 break;
             }
         }
-        if (field == null) {
-            field = manager.tryToInstantiateField(
-                    classAccessor, propertyAccessor, mode, prefix);
-        }
-
-        if (field == null) {
-            logger.warn("Cannot instanciate field for property {}",
-                    propertyAccessor);
-        }
-        return field;
+        return buildField(propertyAccessor, field, prefix);
     }
 
     public String getText(String key, Object... args) {

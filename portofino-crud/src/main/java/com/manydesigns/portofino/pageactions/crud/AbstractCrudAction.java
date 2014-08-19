@@ -26,8 +26,8 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
+import com.manydesigns.elements.fields.BlobField;
 import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.FileBlobField;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.TextField;
 import com.manydesigns.elements.forms.FieldSet;
@@ -50,7 +50,9 @@ import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.buttons.annotations.Guard;
+import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
@@ -58,7 +60,6 @@ import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
-import com.manydesigns.portofino.servlets.BlobCleanupListener;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.*;
@@ -75,7 +76,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.*;
@@ -191,6 +195,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public T object;
     public List<? extends T> objects;
+
+    @Inject(BaseModule.DEFAULT_BLOB_MANAGER)
+    protected BlobManager blobManager;
 
     //--------------------------------------------------------------------------
     // Configuration
@@ -481,17 +488,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         createSetup(object);
         form.readFromObject(object);
         form.readFromRequest(context.getRequest());
-        List<Blob> blobs = getBlobs();
         if (form.validate()) {
             writeFormToObject();
             if(createValidate(object)) {
                 try {
                     doSave(object);
                     createPostProcess(object);
-                    //Before commit, worst case: blobs leak. After commit, worst case: corrupt data (missing blobs).
-                    for(Blob blob : blobs) {
-                        BlobCleanupListener.forgetBlob(blob);
-                    }
                     commitTransaction();
                 } catch (Throwable e) {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
@@ -506,10 +508,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     addSuccessfulSaveInfoMessage();
                     return getSuccessfulSaveView();
                 }
-            }
-        } else {
-            for(Blob blob : blobs) {
-                BlobCleanupListener.recordBlob(blob);
             }
         }
 
@@ -539,29 +537,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         setupForm(Mode.EDIT);
         editSetup(object);
         form.readFromObject(object);
-        List<Blob> blobsBefore = getBlobs();
         form.readFromRequest(context.getRequest());
-        List<Blob> blobsAfter = getBlobs();
         if (form.validate()) {
             writeFormToObject();
             if(editValidate(object)) {
                 try {
                     doUpdate(object);
                     editPostProcess(object);
-                    //Before commit, worst case: blobs leak. After commit, worst case: corrupt data (missing blobs).
-                    for(Blob blob : blobsAfter) {
-                        BlobCleanupListener.forgetBlob(blob);
-                    }
                     commitTransaction();
-                    //Physically delete overwritten or deleted blobs
-                    //(after commit to avoid losing data in case of exception)
-                    for(int i = 0; i < blobsBefore.size(); i++) {
-                        Blob before = blobsBefore.get(i);
-                        Blob after = blobsAfter.get(i);
-                        if(before != null && !before.equals(after)) {
-                            ElementsThreadLocals.getBlobManager().deleteBlob(before.getCode());
-                        }
-                    }
                 } catch (Throwable e) {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
@@ -571,15 +554,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.updated.successfully"));
                 return new RedirectResolution(
                         appendSearchStringParamIfNecessary(context.getActionPath()));
-            }
-        } else {
-            //Mark new blobs as to be deleted (GC)
-            for(int i = 0; i < blobsBefore.size(); i++) {
-                Blob before = blobsBefore.get(i);
-                Blob after = blobsAfter.get(i);
-                if(before != null && !before.equals(after)) {
-                    BlobCleanupListener.recordBlob(after);
-                }
             }
         }
         return getEditView();
@@ -665,7 +639,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             try {
                 deletePostProcess(object);
                 commitTransaction();
-                deleteFileBlobs(object);
+                deleteBlobs(object);
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.deleted.successfully"));
 
                 // invalidate the pk on this crud
@@ -703,7 +677,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         try {
             commitTransaction();
             for(T obj : objects) {
-                deleteFileBlobs(obj);
+                deleteBlobs(obj);
             }
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("_.objects.deleted.successfully", deleted));
         } catch (Exception e) {
@@ -1095,6 +1069,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             String[] fieldNames = current.getFieldNames();
             tableFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
+        tableFormBuilder.configBlobManager(getBlobManager());
     }
 
     protected void configureDetailLink(TableFormBuilder tableFormBuilder) {
@@ -1278,7 +1253,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @return the form builder.
      */
     protected FormBuilder configureFormBuilder(FormBuilder formBuilder, Mode mode) {
-        formBuilder.configPrefix(prefix).configMode(mode);
+        formBuilder.configPrefix(prefix).configMode(mode).configBlobManager(getBlobManager());
         configureFormSelectionProviders(formBuilder);
         return formBuilder;
     }
@@ -1319,8 +1294,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected void refreshBlobDownloadHref() {
         for (FieldSet fieldSet : form) {
             for (Field field : fieldSet.fields()) {
-                if (field instanceof FileBlobField) {
-                    FileBlobField fileBlobField = (FileBlobField) field;
+                if (field instanceof BlobField) {
+                    BlobField fileBlobField = (BlobField) field;
                     Blob blob = fileBlobField.getValue();
                     if (blob != null) {
                         String url = getBlobDownloadUrl(fileBlobField);
@@ -1339,7 +1314,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             String baseUrl = null;
             while (fieldIterator.hasNext()) {
                 Field field = fieldIterator.next();
-                if (field instanceof FileBlobField) {
+                if (field instanceof BlobField) {
                     if(baseUrl == null) {
                         String readLinkExpression = getReadLinkExpression();
                         String encoding = getUrlEncoding();
@@ -1350,7 +1325,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                         baseUrl = hrefFormat.format(obj);
                     }
 
-                    Blob blob = ((FileBlobField) field).getValue();
+                    Blob blob = ((BlobField) field).getValue();
                     if(blob != null) {
                         UrlBuilder urlBuilder = new UrlBuilder(Locale.getDefault(), baseUrl, false)
                             .addParameter("downloadBlob", "")
@@ -1367,7 +1342,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    public String getBlobDownloadUrl(FileBlobField field) {
+    public String getBlobDownloadUrl(BlobField field) {
         UrlBuilder urlBuilder = new UrlBuilder(
                 Locale.getDefault(), Util.getAbsoluteUrl(context.getActionPath()), false)
                 .addParameter("downloadBlob","")
@@ -1382,11 +1357,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 classAccessor.getProperty(propertyName);
         String code = (String) propertyAccessor.get(object);
 
-        BlobManager blobManager = ElementsThreadLocals.getBlobManager();
-        Blob blob = blobManager.loadBlob(code);
+        BlobManager blobManager = getBlobManager();
+        Blob blob = blobManager.load(code);
         long contentLength = blob.getSize();
         String contentType = blob.getContentType();
-        InputStream inputStream = new FileInputStream(blob.getDataFile());
+        InputStream inputStream = blob.getInputStream();
         String fileName = blob.getFilename();
 
         //Cache blobs (they're immutable)
@@ -1399,44 +1374,30 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 .setLastModified(blob.getCreateTimestamp().getMillis());
     }
 
+    protected BlobManager getBlobManager() {
+        return blobManager;
+    }
+
     /**
      * Removes all the file blobs associated with the object from the file system.
      * @param object the persistent object.
      */
-    protected void deleteFileBlobs(T object) {
+    protected void deleteBlobs(T object) {
         setupForm(Mode.VIEW);
         form.readFromObject(object);
-        BlobManager blobManager = ElementsThreadLocals.getBlobManager();
+        BlobManager blobManager = getBlobManager();
         for(FieldSet fieldSet : form) {
             for(FormElement field : fieldSet) {
-                if(field instanceof FileBlobField) {
-                    Blob blob = ((FileBlobField) field).getValue();
+                if(field instanceof BlobField) {
+                    Blob blob = ((BlobField) field).getValue();
                     if(blob != null) {
-                        if(!blobManager.deleteBlob(blob.getCode())) {
+                        if(!blobManager.delete(blob.getCode())) {
                             logger.warn("Could not delete blob: " + blob.getCode());
                         }
                     }
                 }
             }
         }
-    }
-
-    /**
-     * Returns a list of the blobs loaded by the form.
-     * @return the list of blobs.
-     */
-    protected List<Blob> getBlobs() {
-        List<Blob> blobs = new ArrayList<Blob>();
-        for(FieldSet fieldSet : form) {
-            for(FormElement field : fieldSet) {
-                if(field instanceof FileBlobField) {
-                    FileBlobField fileBlobField = (FileBlobField) field;
-                    Blob blob = fileBlobField.getValue();
-                    blobs.add(blob);
-                }
-            }
-        }
-        return blobs;
     }
 
     //**************************************************************************

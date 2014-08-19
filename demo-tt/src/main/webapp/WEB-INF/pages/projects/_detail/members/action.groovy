@@ -232,15 +232,13 @@ class ProjectMembersAction extends CrudAction {
         if(user == null || user.avatar == null) {
             return new RedirectResolution("/images/user-placeholder-40x40.png");
         } else {
-            BlobManager mgr = ElementsThreadLocals.blobManager;
-            Blob blob = mgr.loadBlob(user.avatar);
-            long contentLength = blob.getSize();
-            String contentType = blob.getContentType();
-            InputStream inputStream = new FileInputStream(blob.getDataFile());
+            Blob blob = blobManager.load(user.avatar);
+            long contentLength = blob.size;
+            String contentType = blob.contentType;
+            InputStream inputStream = blob.inputStream;
 
             //Cache blobs (they're immutable)
-            HttpServletResponse response = context.getResponse();
-            ServletUtils.markCacheableForever(response);
+            ServletUtils.markCacheableForever(context.response);
 
             return new StreamingResolution(contentType, inputStream)
                     .setLength(contentLength)

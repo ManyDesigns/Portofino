@@ -2,11 +2,11 @@ package com.manydesigns.portofino.pageactions.activitystream
 
 import com.manydesigns.portofino.tt.TtUtils
 
-import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.blobs.Blob
 import com.manydesigns.elements.blobs.BlobManager
 import com.manydesigns.elements.servlet.ServletUtils
 import com.manydesigns.portofino.di.Inject
+import com.manydesigns.portofino.modules.BaseModule
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
@@ -27,6 +27,9 @@ class MyActivityStreamAction extends ActivityStreamAction {
 
     @Inject(DatabaseModule.PERSISTENCE)
     private Persistence persistence;
+
+    @Inject(BaseModule.DEFAULT_BLOB_MANAGER)
+    protected BlobManager blobManager;
 
     @Override
     public void populateActivityItems() {
@@ -55,8 +58,7 @@ class MyActivityStreamAction extends ActivityStreamAction {
         if(user.avatar == null) {
             return new RedirectResolution("/images/user-placeholder-40x40.png");
         } else {
-            BlobManager mgr = ElementsThreadLocals.blobManager;
-            Blob blob = mgr.loadBlob(user.avatar);
+            Blob blob = blobManager.load(user.avatar);
             long contentLength = blob.getSize();
             String contentType = blob.getContentType();
             InputStream inputStream = new FileInputStream(blob.getDataFile());

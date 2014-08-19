@@ -4,7 +4,7 @@ import com.manydesigns.elements.annotations.FileBlob
 import com.manydesigns.elements.annotations.LabelI18N
 import com.manydesigns.elements.blobs.Blob
 import com.manydesigns.elements.blobs.BlobManager
-import com.manydesigns.elements.fields.FileBlobField
+import com.manydesigns.elements.fields.BlobField
 import com.manydesigns.elements.forms.Form
 import com.manydesigns.elements.forms.FormBuilder
 import com.manydesigns.portofino.buttons.annotations.Button
@@ -13,6 +13,7 @@ import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.model.database.Database
 import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.model.database.Table
+import com.manydesigns.portofino.modules.BaseModule
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.pageactions.custom.CustomAction
 import com.manydesigns.portofino.persistence.Persistence
@@ -36,6 +37,9 @@ public class Profile extends CustomAction {
 
     @Inject(DatabaseModule.PERSISTENCE)
     public Persistence persistence;
+
+    @Inject(BaseModule.DEFAULT_BLOB_MANAGER)
+    protected BlobManager blobManager;
 
     protected Form form;
     protected Map user;
@@ -87,7 +91,7 @@ public class Profile extends CustomAction {
         if(StringUtils.isEmpty(avatar)) {
             return new RedirectResolution("/images/user-placeholder-40x40.png");
         } else {
-            def blob = ElementsThreadLocals.blobManager.loadBlob(avatar);
+            def blob = blobManager.load(avatar);
             return new StreamingResolution(blob.contentType, new FileInputStream(blob.dataFile));
         }
     }
@@ -136,8 +140,7 @@ public class Profile extends CustomAction {
             Blob blob = scaleAndCropAvatar();
             loadUser();
             if(user.avatar != null) {
-                BlobManager mgr = ElementsThreadLocals.blobManager;
-                mgr.deleteBlob(user.avatar);
+                blobManager.delete(user.avatar);
             }
             user.avatar = blob.code;
             def session = persistence.getSession("tt")
@@ -149,9 +152,9 @@ public class Profile extends CustomAction {
     }
 
     protected Blob scaleAndCropAvatar() {
-        FileBlobField field = (FileBlobField) form.findFieldByPropertyName("avatar");
+        BlobField field = (BlobField) form.findFieldByPropertyName("avatar");
         def blob = field.getValue()
-        File file = blob.dataFile;
+        File file = blob.dataFile; //TODO use proper blob API
         def image = ImageIO.read(file);
         double scaleXFactor = ((double) MAX_WIDTH) / image.width;
         double scaleYFactor = ((double) MAX_HEIGHT) / image.height;
@@ -206,8 +209,7 @@ public class Profile extends CustomAction {
     public Resolution deletePhoto() {
         loadUser();
         if(user.avatar != null) {
-            BlobManager mgr = ElementsThreadLocals.blobManager;
-            mgr.deleteBlob(user.avatar);
+            blobManager.delete(user.avatar);
             user.avatar = null;
             def session = persistence.getSession("tt")
             session.update("users", (Object) user);

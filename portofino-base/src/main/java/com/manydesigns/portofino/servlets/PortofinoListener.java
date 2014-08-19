@@ -22,6 +22,8 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.blobs.BlobManager;
+import com.manydesigns.elements.blobs.SimpleFileBlobManager;
 import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.elements.servlet.AttributeMap;
 import com.manydesigns.elements.servlet.ElementsFilter;
@@ -90,6 +92,8 @@ public class PortofinoListener
 
     protected ModuleRegistry moduleRegistry;
 
+    protected BlobManager defaultBlobManager;
+
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -152,9 +156,16 @@ public class PortofinoListener
             File appDir = (File) servletContext.getAttribute(BaseModule.APPLICATION_DIRECTORY);
             appBlobsDir = new File(appDir, "blobs");
         }
-        String blobsDirPath = appBlobsDir.getAbsolutePath();
-        elementsConfiguration.setProperty(ElementsProperties.BLOBS_DIR, blobsDirPath);
-        logger.info("Blobs directory: " + blobsDirPath);
+        logger.info("Blobs directory: " + appBlobsDir.getAbsolutePath());
+        File tempBlobsDir = new File(new File(System.getProperty("java.io.tmpdir")), "portofino-blobs-" + servletContext.getContextPath());
+        logger.info("Temporary blobs directory: " + tempBlobsDir.getAbsolutePath());
+
+        String metaFilenamePattern = "blob-{0}.properties";
+        String dataFilenamePattern = "blob-{0}.data";
+        BlobManager tempBlobManager = new SimpleFileBlobManager(tempBlobsDir, metaFilenamePattern, dataFilenamePattern);
+        defaultBlobManager = new SimpleFileBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
+        defaultBlobManager.setTemporaryBlobManager(tempBlobManager);
+        servletContext.setAttribute(BaseModule.DEFAULT_BLOB_MANAGER, defaultBlobManager);
 
         File groovyClasspath = new File(applicationDirectory, "groovy");
         logger.info("Initializing Groovy script engine with classpath: " + groovyClasspath.getAbsolutePath());

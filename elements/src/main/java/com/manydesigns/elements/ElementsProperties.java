@@ -65,13 +65,6 @@ public final class ElementsProperties {
     public static final String FIELDS_DATE_FORMAT =
             "fields.date.format";
 
-    public static final String BLOBS_DIR =
-            "blobs.dir";
-    public static final String BLOBS_META_FILENAME_PATTERN =
-            "blobs.meta.filename.pattern";
-    public static final String BLOBS_DATA_FILENAME_PATTERN =
-            "blobs.data.filename.pattern";
-
     //**************************************************************************
     // Static fields, singleton initialization and retrieval
     //**************************************************************************

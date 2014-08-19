@@ -20,7 +20,12 @@
 
 package com.manydesigns.elements.forms;
 
+import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Enabled;
+import com.manydesigns.elements.blobs.BlobManager;
+import com.manydesigns.elements.blobs.HasBlobManager;
+import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.helpers.FieldsManager;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
@@ -49,6 +54,8 @@ public class AbstractFormBuilder {
     protected final Map<String[], SelectionProvider> selectionProviders;
 
     protected String prefix;
+    protected Mode mode = Mode.EDIT;
+    protected BlobManager blobManager;
 
     //**************************************************************************
     // Logging
@@ -102,5 +109,23 @@ public class AbstractFormBuilder {
             return false;
     }
         return true;
+    }
+
+    protected Field buildField(PropertyAccessor propertyAccessor, Field field, String prefix) {
+        if (field == null) {
+            field = manager.tryToInstantiateField(classAccessor, propertyAccessor, mode, prefix);
+        }
+        if (field == null) {
+            logger.warn("Cannot instantiate field for property {}", propertyAccessor);
+        }
+        if(field instanceof HasBlobManager) {
+            logger.debug("Injecting blob manager in field {}", propertyAccessor);
+            ((HasBlobManager) field).setBlobManager(blobManager);
+        }
+        return field;
+    }
+
+    protected SelectField buildSelectField(PropertyAccessor propertyAccessor, SelectionProvider selectionProvider, String prefix) {
+        return new SelectField(propertyAccessor, selectionProvider, mode, prefix);
     }
 }
