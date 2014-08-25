@@ -38,7 +38,7 @@ import java.io.InputStream;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class SimpleFileBlobManager implements BlobManager {
+public class FileBlobManager implements BlobManager {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
@@ -47,7 +47,7 @@ public class SimpleFileBlobManager implements BlobManager {
     //**************************************************************************
 
     public static final Logger logger =
-            LoggerFactory.getLogger(SimpleFileBlobManager.class);
+            LoggerFactory.getLogger(FileBlobManager.class);
 
     //**************************************************************************
     // Fields
@@ -62,12 +62,9 @@ public class SimpleFileBlobManager implements BlobManager {
     // Constructors and initialization
     //**************************************************************************
 
-
-    public SimpleFileBlobManager() {}
-
-    public SimpleFileBlobManager(File blobsDir,
-                                 String metaFileNamePattern,
-                                 String dataFileNamePattern) {
+    public FileBlobManager(File blobsDir,
+                           String metaFileNamePattern,
+                           String dataFileNamePattern) {
         this.blobsDir = blobsDir;
         if(!blobsDir.isDirectory() && !blobsDir.mkdirs()) {
             logger.warn("Invalid blobs directory: {}", blobsDir.getAbsolutePath());
@@ -81,18 +78,16 @@ public class SimpleFileBlobManager implements BlobManager {
     //**************************************************************************
 
     @Override
-    public SimpleFileBlob save(String code,
+    public FileBlob save(String code,
                                InputStream sourceStream,
                                String fileName,
                                String contentType,
                                @Nullable String characterEncoding
     ) throws IOException {
         ensureValidCode(code);
-        File metaFile =
-                RandomUtil.getCodeFile(blobsDir, metaFileNamePattern, code);
-        File dataFile =
-                RandomUtil.getCodeFile(blobsDir, dataFileNamePattern, code);
-        SimpleFileBlob blob = new SimpleFileBlob(code, metaFile, dataFile);
+        File metaFile = getMetaFile(code);
+        File dataFile = getDataFile(code);
+        FileBlob blob = new FileBlob(code, metaFile, dataFile);
 
         // copy the data
         long size = IOUtils.copyLarge(
@@ -107,6 +102,14 @@ public class SimpleFileBlobManager implements BlobManager {
         return blob;
     }
 
+    protected File getMetaFile(String code) {
+        return RandomUtil.getCodeFile(blobsDir, metaFileNamePattern, code);
+    }
+
+    protected File getDataFile(String code) {
+        return RandomUtil.getCodeFile(blobsDir, dataFileNamePattern, code);
+    }
+
     public void ensureValidCode(String code) {
         if (!StringUtils.isAlphanumeric(code)) {
             throw new IllegalArgumentException(
@@ -115,13 +118,11 @@ public class SimpleFileBlobManager implements BlobManager {
     }
 
     @Override
-    public SimpleFileBlob load(String code) throws IOException {
+    public FileBlob load(String code) throws IOException {
         ensureValidCode(code);
-        File metaFile =
-                RandomUtil.getCodeFile(blobsDir, metaFileNamePattern, code);
-        File dataFile =
-                RandomUtil.getCodeFile(blobsDir, dataFileNamePattern, code);
-        SimpleFileBlob blob = new SimpleFileBlob(code, metaFile, dataFile);
+        File metaFile = getMetaFile(code);
+        File dataFile = getDataFile(code);
+        FileBlob blob = new FileBlob(code, metaFile, dataFile);
 
         blob.loadMetaProperties();
 
@@ -131,10 +132,8 @@ public class SimpleFileBlobManager implements BlobManager {
     @Override
     public boolean delete(String code) {
         ensureValidCode(code);
-        File metaFile =
-                RandomUtil.getCodeFile(blobsDir, metaFileNamePattern, code);
-        File dataFile =
-                RandomUtil.getCodeFile(blobsDir, dataFileNamePattern, code);
+        File metaFile = getMetaFile(code);
+        File dataFile = getDataFile(code);
         boolean success = true;
         try {
             success = metaFile.delete() && success;

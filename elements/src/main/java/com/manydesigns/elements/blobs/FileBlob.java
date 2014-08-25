@@ -34,7 +34,7 @@ import java.util.Properties;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class SimpleFileBlob extends Blob {
+public class FileBlob extends Blob {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
@@ -56,13 +56,13 @@ public class SimpleFileBlob extends Blob {
     // Logging
     //**************************************************************************
 
-    public final static Logger logger = LoggerFactory.getLogger(SimpleFileBlob.class);
+    public final static Logger logger = LoggerFactory.getLogger(FileBlob.class);
 
     //**************************************************************************
     // Constructor
     //**************************************************************************
 
-    public SimpleFileBlob(String code, @NotNull File metaFile, @NotNull File dataFile) {
+    public FileBlob(String code, @NotNull File metaFile, @NotNull File dataFile) {
         super(code);
         this.metaFile = metaFile;
         this.dataFile = dataFile;
@@ -136,9 +136,9 @@ public class SimpleFileBlob extends Blob {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SimpleFileBlob)) return false;
+        if (!(o instanceof FileBlob)) return false;
 
-        SimpleFileBlob blob = (SimpleFileBlob) o;
+        FileBlob blob = (FileBlob) o;
 
         if (size != blob.size) return false;
         if (characterEncoding != null ? !characterEncoding.equals(blob.characterEncoding) : blob.characterEncoding != null)

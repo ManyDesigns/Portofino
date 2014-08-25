@@ -20,7 +20,6 @@
 
 package com.manydesigns.elements;
 
-import com.manydesigns.elements.blobs.SimpleFileBlobManager;
 import com.manydesigns.elements.i18n.TextProvider;
 import ognl.OgnlContext;
 

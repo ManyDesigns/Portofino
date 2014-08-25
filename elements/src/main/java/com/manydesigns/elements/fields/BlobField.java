@@ -34,7 +34,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -342,7 +341,7 @@ public class BlobField extends AbstractField implements MultipartRequestField, H
         return blob;
     }
 
-    public void setValue(SimpleFileBlob blob) {
+    public void setValue(Blob blob) {
         this.blob = blob;
     }
 
