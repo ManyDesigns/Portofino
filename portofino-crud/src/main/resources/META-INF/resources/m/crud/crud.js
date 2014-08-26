@@ -18,11 +18,17 @@ portofino.dataTable = function(elem) {
             }
             href = removeQueryStringArgument(href, "ajax");
             var additionalParameters = (href.indexOf("?") > -1 ? "&" : "?") + "getSearchResultsPage=&ajax=true";
-            $.ajax(href + additionalParameters, {
+            var url = href + additionalParameters;
+            var datatableDescription = {
+                url: url
+            };
+            $(document).trigger("portofino/datatable/load/started", [datatableDescription]);
+            $.ajax(url, {
                 dataType: "text",
                 success: function(data, status, xhr) {
                     var newElem = $(data);
                     elem.replaceWith(newElem);
+                    $(document).trigger("portofino/datatable/load/completed", [datatableDescription, newElem, status, xhr]);
                     setupDataTable(newElem);
                 },
                 error: function(xhr, status, errorThrown) {
@@ -34,8 +40,7 @@ portofino.dataTable = function(elem) {
                                 loginUrl + (loginUrl.indexOf("?") > -1 ? "&" : "?") + "returnUrl=" +
                                 encodeURIComponent(window.location.href);
                     } else {
-                        //TODO
-                        alert("There was an error fetching the requested data");
+                        $(document).trigger("portofino/datatable/load/error", [datatableDescription, xhr, status, errorThrown]);
                     }
                 }
             });
