@@ -537,9 +537,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         setupForm(Mode.EDIT);
         editSetup(object);
         form.readFromObject(object);
+        List<Blob> blobsBefore = getBlobs();
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
-            List<Blob> blobsBefore = getBlobs();
             writeFormToObject();
             if(editValidate(object)) {
                 try {
