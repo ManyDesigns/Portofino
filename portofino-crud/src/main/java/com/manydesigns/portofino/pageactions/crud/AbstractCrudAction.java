@@ -537,7 +537,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         setupForm(Mode.EDIT);
         editSetup(object);
         form.readFromObject(object);
-        List<Blob> blobsBefore = getBlobs();
+        List<Blob> blobsBefore = getBlobsFromForm();
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
             writeFormToObject();
@@ -546,7 +546,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     doUpdate(object);
                     editPostProcess(object);
                     commitTransaction();
-                    List<Blob> blobsAfter = getBlobs();
+                    List<Blob> blobsAfter = getBlobsFromForm();
                     blobsBefore.removeAll(blobsAfter);
                     for(Blob blob : blobsBefore) {
                         if(!blobManager.delete(blob.getCode())) {
@@ -1393,17 +1393,29 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected void deleteBlobs(T object) {
         setupForm(Mode.VIEW);
         form.readFromObject(object);
-        List<Blob> blobs = getBlobs();
-        for(Blob blob : blobs) {
-            if(!blobManager.delete(blob.getCode())) {
-                logger.warn("Could not delete blob: " + blob.getCode());
+        List<String> blobCodes = getBlobCodesFromObject();
+        for(String blobCode : blobCodes) {
+            if(!blobManager.delete(blobCode)) {
+                logger.warn("Could not delete blob: " + blobCode);
             }
         }
     }
 
-    protected List<Blob> getBlobs() {
+    protected List<String> getBlobCodesFromObject() {
+        List<String> blobCodes = new ArrayList<String>();
+        for(PropertyAccessor property : classAccessor.getProperties()) {
+            if(property.getAnnotation(FileBlob.class) != null) {
+                String blobCode = (String) property.get(object);
+                if(blobCode != null) {
+                    blobCodes.add(blobCode);
+                }
+            }
+        }
+        return blobCodes;
+    }
+
+    protected List<Blob> getBlobsFromForm() {
         List<Blob> blobs = new ArrayList<Blob>();
-        BlobManager blobManager = getBlobManager();
         for(FieldSet fieldSet : form) {
             for(FormElement field : fieldSet) {
                 if(field instanceof BlobField) {
