@@ -128,47 +128,4 @@ public class FileBlob extends Blob {
         return dataFile;
     }
 
-    //**************************************************************************
-    // Overrides
-    //**************************************************************************
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof FileBlob)) return false;
-
-        FileBlob blob = (FileBlob) o;
-
-        if (size != blob.size) return false;
-        if (characterEncoding != null ? !characterEncoding.equals(blob.characterEncoding) : blob.characterEncoding != null)
-            return false;
-        if (code != null ? !code.equals(blob.code) : blob.code != null)
-            return false;
-        if (contentType != null ? !contentType.equals(blob.contentType) : blob.contentType != null)
-            return false;
-        if (createTimestamp != null ? !createTimestamp.equals(blob.createTimestamp) : blob.createTimestamp != null)
-            return false;
-        if (dataFile != null ? !dataFile.equals(blob.dataFile) : blob.dataFile != null)
-            return false;
-        if (filename != null ? !filename.equals(blob.filename) : blob.filename != null)
-            return false;
-        if (metaFile != null ? !metaFile.equals(blob.metaFile) : blob.metaFile != null)
-            return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = metaFile != null ? metaFile.hashCode() : 0;
-        result = 31 * result + (dataFile != null ? dataFile.hashCode() : 0);
-        result = 31 * result + (code != null ? code.hashCode() : 0);
-        result = 31 * result + (contentType != null ? contentType.hashCode() : 0);
-        result = 31 * result + (filename != null ? filename.hashCode() : 0);
-        result = 31 * result + (int) (size ^ (size >>> 32));
-        result = 31 * result + (createTimestamp != null ? createTimestamp.hashCode() : 0);
-        result = 31 * result + (characterEncoding != null ? characterEncoding.hashCode() : 0);
-        return result;
-    }
 }

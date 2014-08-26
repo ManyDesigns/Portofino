@@ -539,12 +539,20 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         form.readFromObject(object);
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
+            List<Blob> blobsBefore = getBlobs();
             writeFormToObject();
             if(editValidate(object)) {
                 try {
                     doUpdate(object);
                     editPostProcess(object);
                     commitTransaction();
+                    List<Blob> blobsAfter = getBlobs();
+                    blobsBefore.removeAll(blobsAfter);
+                    for(Blob blob : blobsBefore) {
+                        if(!blobManager.delete(blob.getCode())) {
+                            logger.warn("Could not delete blob: " + blob.getCode());
+                        }
+                    }
                 } catch (Throwable e) {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
@@ -1385,19 +1393,28 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected void deleteBlobs(T object) {
         setupForm(Mode.VIEW);
         form.readFromObject(object);
+        List<Blob> blobs = getBlobs();
+        for(Blob blob : blobs) {
+            if(!blobManager.delete(blob.getCode())) {
+                logger.warn("Could not delete blob: " + blob.getCode());
+            }
+        }
+    }
+
+    protected List<Blob> getBlobs() {
+        List<Blob> blobs = new ArrayList<Blob>();
         BlobManager blobManager = getBlobManager();
         for(FieldSet fieldSet : form) {
             for(FormElement field : fieldSet) {
                 if(field instanceof BlobField) {
                     Blob blob = ((BlobField) field).getValue();
                     if(blob != null) {
-                        if(!blobManager.delete(blob.getCode())) {
-                            logger.warn("Could not delete blob: " + blob.getCode());
-                        }
+                        blobs.add(blob);
                     }
                 }
             }
         }
+        return blobs;
     }
 
     //**************************************************************************
