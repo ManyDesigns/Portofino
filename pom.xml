@@ -133,6 +133,7 @@
         <module>portofino-admin</module>
         <module>portofino-theme</module>
         <!-- Optional services -->
+        <module>portofino-atmosphere</module>
         <module>portofino-mail</module>
         <module>portofino-openid</module>
         <module>portofino-quartz</module>
