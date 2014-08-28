@@ -79,6 +79,7 @@ Forms (Elements)
     padding-left: 15px;
     padding-right: 15px;
     width: 280px;
+    min-width: 280px;
     position: relative;
     float: left;
 }

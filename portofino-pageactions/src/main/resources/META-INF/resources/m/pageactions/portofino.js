@@ -188,11 +188,6 @@ function setupSelectFieldLinks() {
     });
 }
 
-$(function() {
-    setupRichTextEditors();
-    setupSelectFieldLinks();
-});
-
 function configureBulkEditTextField(id, checkboxName) {
     $("#" + id).keypress(function(event) {
         var keyCode = event.keyCode || event.which;
@@ -420,6 +415,20 @@ $(function() {
     $(':input').on("change", function() {
         $(this).closest("form").data("dirty", true);
     });
+
+    //Adjust textarea size
+    $("textarea.form-control").each(function(index, elem) {
+        elem = $(elem);
+        var parentWidthProperty = elem.parent().parent().css("width");
+        if(parentWidthProperty) {
+            if(!parentWidthProperty.endsWith("%")) {
+                elem.parent().css("width", parseInt(parentWidthProperty) - 175);
+            }
+        }
+    });
+
+    setupRichTextEditors();
+    setupSelectFieldLinks();
 
     window.onbeforeunload = function() {
         var dirty = false;
