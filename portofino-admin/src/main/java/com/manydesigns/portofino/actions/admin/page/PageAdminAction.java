@@ -52,8 +52,6 @@ import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import com.manydesigns.portofino.pages.*;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
-import com.manydesigns.portofino.security.RequiresAdministrator;
-import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.shiro.PortofinoRealm;
 import com.manydesigns.portofino.shiro.ShiroUtils;
@@ -88,7 +86,6 @@ import java.util.*;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 @RequiresAuthentication
-@RequiresAdministrator
 @UrlBinding("/actions/admin/page")
 public class PageAdminAction extends AbstractPageAction {
     public static final String copyright =
@@ -147,6 +144,9 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     public Resolution updateLayout() {
+        if (!checkPermissionsOnTargetPage(getPageInstance())) {
+            return new ForbiddenAccessResolution("You are not authorized to edit the layout of this page.");
+        }
         HttpServletRequest request = context.getRequest();
         Enumeration parameters = request.getParameterNames();
         while(parameters.hasMoreElements()) {
@@ -190,7 +190,6 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     @Button(list = "page-create", key = "create.new", order = 1, type = Button.TYPE_PRIMARY)
-    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution createPage() {
         try {
             return doCreateNewPage();
@@ -288,10 +287,7 @@ public class PageAdminAction extends AbstractPageAction {
                     throw new IllegalStateException("Don't know how to add page " + page + " at position " + insertPosition);
             }
 
-            //Check permissions on target parent
-            Subject subject = SecurityUtils.getSubject();
-            if(!SecurityLogic.hasPermissions(portofinoConfiguration, parentPageInstance, subject, AccessLevel.EDIT)) {
-                logger.warn("User not authorized to create page.");
+            if (!checkPermissionsOnTargetPage(parentPageInstance)) {
                 return new ForbiddenAccessResolution("You are not authorized to create a new page here.");
             }
 
@@ -353,12 +349,28 @@ public class PageAdminAction extends AbstractPageAction {
         }
     }
 
+    protected boolean checkPermissionsOnTargetPage(PageInstance targetPageInstance) {
+        return checkPermissionsOnTargetPage(targetPageInstance, AccessLevel.EDIT);
+    }
+
+    protected boolean checkPermissionsOnTargetPage(PageInstance targetPageInstance, AccessLevel accessLevel) {
+        Subject subject = SecurityUtils.getSubject();
+        if(!SecurityLogic.hasPermissions(portofinoConfiguration, targetPageInstance, subject, accessLevel)) {
+            logger.warn("User not authorized modify page {}", targetPageInstance);
+            return false;
+        }
+        return true;
+    }
+
     public Resolution deletePage() {
         PageInstance pageInstance = getPageInstance();
         PageInstance parentPageInstance = pageInstance.getParent();
         if(parentPageInstance == null) {
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("you.cant.delete.the.root.page"));
         } else {
+            if (!checkPermissionsOnTargetPage(parentPageInstance)) {
+                return new ForbiddenAccessResolution("You are not authorized to delete this page.");
+            }
             Dispatcher dispatcher = DispatcherUtil.get(context.getRequest());
             String contextPath = context.getRequest().getContextPath();
             String landingPagePath = portofinoConfiguration.getString(PortofinoProperties.LANDING_PAGE);
@@ -477,11 +489,8 @@ public class PageAdminAction extends AbstractPageAction {
             newParent.getParameters().addAll(params);
         }
 
-        //Check permissions on target parent page
-        Subject subject = SecurityUtils.getSubject();
-        if(!SecurityLogic.hasPermissions(portofinoConfiguration, newParent, subject, AccessLevel.EDIT)) {
-            SessionMessages.addErrorMessage(ElementsThreadLocals.getText("you.dont.have.edit.access.level.on.the.destination.page"));
-            return new RedirectResolution(originalPath);
+        if (!checkPermissionsOnTargetPage(newParent)) {
+            return new ForbiddenAccessResolution(ElementsThreadLocals.getText("you.dont.have.edit.access.level.on.the.destination.page"));
         }
 
         if(newParent != null) { //TODO vedi sopra
@@ -700,8 +709,10 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     @Button(list = "page-children-edit", key = "update", order = 1, type = Button.TYPE_PRIMARY)
-    @RequiresPermissions(level = AccessLevel.EDIT)
     public Resolution updatePageChildren() {
+        if (!checkPermissionsOnTargetPage(getPageInstance())) {
+            return new ForbiddenAccessResolution(ElementsThreadLocals.getText("you.dont.have.edit.access.level.on.the.destination.page"));
+        }
         setupChildPages();
         String[] order = context.getRequest().getParameterValues("directChildren");
         boolean success = updatePageChildren(childPagesForm, childPages, getPage().getLayout(), order);
@@ -817,8 +828,10 @@ public class PageAdminAction extends AbstractPageAction {
     protected AccessLevel testedAccessLevel;
     protected Set<String> testedPermissions;
 
-    @RequiresPermissions(level = AccessLevel.DEVELOP) //Altrimenti un utente può cambiare i propri permessi
     public Resolution pagePermissions() {
+        if (!checkPermissionsOnTargetPage(getPageInstance(), AccessLevel.DEVELOP)) { //Altrimenti un utente può cambiare i propri permessi
+            return new ForbiddenAccessResolution("You don't have permissions to do that");
+        }
         setupGroups();
 
         PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
@@ -830,8 +843,10 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     @Button(list = "testUserPermissions", key = "test")
-    @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution testUserPermissions() {
+        if (!checkPermissionsOnTargetPage(getPageInstance(), AccessLevel.DEVELOP)) { //Altrimenti un utente può cambiare i propri permessi
+            return new ForbiddenAccessResolution("You don't have permissions to do that");
+        }
         testUserId = StringUtils.defaultIfEmpty(testUserId, null);
         PortofinoRealm portofinoRealm = ShiroUtils.getPortofinoRealm();
         PrincipalCollection principalCollection;
@@ -894,8 +909,10 @@ public class PageAdminAction extends AbstractPageAction {
     }
 
     @Button(list = "page-permissions-edit", key = "update", order = 1, type = Button.TYPE_PRIMARY)
-    @RequiresPermissions(level = AccessLevel.DEVELOP)
     public Resolution updatePagePermissions() {
+        if (!checkPermissionsOnTargetPage(getPageInstance(), AccessLevel.DEVELOP)) { //Altrimenti un utente può cambiare i propri permessi
+            return new ForbiddenAccessResolution("You don't have permissions to do that");
+        }
         try {
             updatePagePermissions(getPageInstance());
             SessionMessages.addInfoMessage(ElementsThreadLocals.getText("page.permissions.saved.successfully"));
