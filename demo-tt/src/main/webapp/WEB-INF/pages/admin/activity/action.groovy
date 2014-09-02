@@ -17,6 +17,8 @@ import net.sourceforge.stripes.action.Resolution
 import net.sourceforge.stripes.action.StreamingResolution
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.hibernate.Session
+import com.manydesigns.elements.blobs.BlobManager
+import com.manydesigns.elements.blobs.BlobManager
 
 @RequiresAuthentication
 @RequiresPermissions(level = AccessLevel.VIEW)
@@ -58,7 +60,7 @@ class MyActivityStreamAction extends ActivityStreamAction {
         if(user.avatar == null) {
             return new RedirectResolution("/images/user-placeholder-40x40.png");
         } else {
-            Blob blob = blobManager.load(user.avatar);
+            Blob blob = blobManager.read(user.avatar);
             long contentLength = blob.getSize();
             String contentType = blob.getContentType();
             InputStream inputStream = new FileInputStream(blob.getDataFile());

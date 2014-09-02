@@ -232,7 +232,7 @@ class ProjectMembersAction extends CrudAction {
         if(user == null || user.avatar == null) {
             return new RedirectResolution("/images/user-placeholder-40x40.png");
         } else {
-            Blob blob = blobManager.load(user.avatar);
+            Blob blob = blobManager.read(user.avatar);
             long contentLength = blob.size;
             String contentType = blob.contentType;
             InputStream inputStream = blob.inputStream;

@@ -23,7 +23,7 @@ package com.manydesigns.elements.fields.helpers;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.FileBlob;
 import com.manydesigns.elements.fields.Field;
-import com.manydesigns.elements.fields.BlobField;
+import com.manydesigns.elements.fields.FileBlobField;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -44,7 +44,7 @@ public class FileBlobFieldHelper implements FieldHelper {
                                        String prefix) {
         if (String.class.isAssignableFrom(propertyAccessor.getType())
                 && propertyAccessor.isAnnotationPresent(FileBlob.class)) {
-                return new BlobField(propertyAccessor, mode, prefix);
+                return new FileBlobField(propertyAccessor, mode, prefix);
         }
         return null;
     }

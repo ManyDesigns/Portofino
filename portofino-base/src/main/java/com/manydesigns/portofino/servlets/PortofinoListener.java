@@ -23,8 +23,8 @@ package com.manydesigns.portofino.servlets;
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.blobs.BlobManager;
-import com.manydesigns.elements.blobs.FileBlobManager;
-import com.manydesigns.elements.blobs.HierarchicalFileBlobManager;
+import com.manydesigns.elements.blobs.SimpleBlobManager;
+import com.manydesigns.elements.blobs.HierarchicalBlobManager;
 import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.elements.servlet.AttributeMap;
 import com.manydesigns.elements.servlet.ElementsFilter;
@@ -93,8 +93,6 @@ public class PortofinoListener
     protected ServerInfo serverInfo;
 
     protected ModuleRegistry moduleRegistry;
-
-    protected BlobManager defaultBlobManager;
 
     //**************************************************************************
     // Logging
@@ -165,7 +163,8 @@ public class PortofinoListener
 
         String metaFilenamePattern = "blob-{0}.properties";
         String dataFilenamePattern = "blob-{0}.data";
-        BlobManager tempBlobManager = new HierarchicalFileBlobManager(tempBlobsDir, metaFilenamePattern, dataFilenamePattern);
+        BlobManager tempBlobManager = new HierarchicalBlobManager(tempBlobsDir, metaFilenamePattern, dataFilenamePattern);
+        BlobManager defaultBlobManager;
         File[] blobs = appBlobsDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -174,12 +173,12 @@ public class PortofinoListener
         });
         if(blobs == null || blobs.length == 0) { //Null if the directory does not exist yet
             logger.info("Using new style (4.1.1+) hierarchical blob manager");
-            defaultBlobManager = new HierarchicalFileBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
+            defaultBlobManager = new HierarchicalBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
         } else {
             logger.info("Blobs found directly under the blobs directory; using old style (pre-4.1.1) flat file blob manager");
-            defaultBlobManager = new FileBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
+            defaultBlobManager = new SimpleBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
         }
-        defaultBlobManager.setTemporaryBlobManager(tempBlobManager);
+        servletContext.setAttribute(BaseModule.TEMPORARY_BLOB_MANAGER, tempBlobManager);
         servletContext.setAttribute(BaseModule.DEFAULT_BLOB_MANAGER, defaultBlobManager);
 
         File groovyClasspath = new File(applicationDirectory, "groovy");

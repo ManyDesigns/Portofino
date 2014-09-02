@@ -20,33 +20,25 @@
 
 package com.manydesigns.elements.blobs;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.io.IOException;
 import java.io.InputStream;
 
-/*
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public interface BlobManager {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
-    Blob save(String code,
-              InputStream sourceStream,
-              String fileName,
-              String contentType,
-              @Nullable String characterEncoding
-    ) throws IOException;
+    void loadMetadata(Blob blob) throws IOException;
 
-    Blob load(String code) throws IOException;
+    InputStream openStream(Blob blob) throws IOException;
 
-    boolean delete(String code);
+    void save(Blob blob) throws IOException;
 
-    BlobManager getTemporaryBlobManager();
+    boolean delete(Blob blob) throws IOException;
 
-    void setTemporaryBlobManager(BlobManager temporaryBlobManager);
 }

@@ -28,13 +28,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-public abstract class Blob {
+/**
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public class Blob {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
@@ -52,13 +52,14 @@ public abstract class Blob {
     protected long size;
     protected DateTime createTimestamp;
     protected String characterEncoding;
+    protected InputStream inputStream;
+    protected boolean propertiesLoaded;
 
     public Blob(String code) {
         this.code = code;
     }
 
-    protected void safeSetProperty(Properties metaProperties,
-                                   String key, String value) {
+    protected void safeSetProperty(Properties metaProperties, String key, String value) {
         if (value == null) {
             metaProperties.remove(key);
         } else {
@@ -66,7 +67,7 @@ public abstract class Blob {
         }
     }
 
-    public void saveMetaProperties() throws IOException {
+    public Properties getMetaProperties() throws IOException {
         Properties metaProperties = new Properties();
         createTimestamp = new DateTime();
 
@@ -76,13 +77,10 @@ public abstract class Blob {
         safeSetProperty(metaProperties, CREATE_TIMESTAMP_PROPERTY, formatter.print(createTimestamp));
         safeSetProperty(metaProperties, CHARACTER_ENCODING_PROPERTY, characterEncoding);
 
-        storeMetaProperties(metaProperties);
+        return metaProperties;
     }
 
-    protected abstract void storeMetaProperties(Properties metaProperties) throws IOException;
-
-    public void loadMetaProperties() throws IOException {
-        Properties metaProperties = readMetaProperties();
+    public void setMetaProperties(Properties metaProperties) throws IOException {
         filename = metaProperties.getProperty(FILENAME_PROPERTY);
         contentType = metaProperties.getProperty(CONTENT_TYPE_PROPERTY);
         size = Long.parseLong(metaProperties.getProperty(SIZE_PROPERTY));
@@ -90,14 +88,9 @@ public abstract class Blob {
         characterEncoding = metaProperties.getProperty(CHARACTER_ENCODING_PROPERTY);
     }
 
-    protected abstract Properties readMetaProperties() throws IOException;
-
-    public abstract InputStream getInputStream() throws IOException;
-
     //**************************************************************************
     // Getter/setter
     //**************************************************************************
-
 
     public String getCode() {
         return code;
@@ -139,20 +132,36 @@ public abstract class Blob {
         this.characterEncoding = characterEncoding;
     }
 
+    public InputStream getInputStream() {
+        return inputStream;
+    }
+
+    public void setInputStream(InputStream inputStream) {
+        this.inputStream = inputStream;
+    }
+
+    public boolean isPropertiesLoaded() {
+        return propertiesLoaded;
+    }
+
+    public void setPropertiesLoaded(boolean propertiesLoaded) {
+        this.propertiesLoaded = propertiesLoaded;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if(this == o) {
-            return true;
-        }
-        if(o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
         Blob blob = (Blob) o;
-        return code.equals(blob.code);
+
+        if (code != null ? !code.equals(blob.code) : blob.code != null) return false;
+
+        return true;
     }
 
     @Override
     public int hashCode() {
-        return code.hashCode();
+        return code != null ? code.hashCode() : 0;
     }
 }

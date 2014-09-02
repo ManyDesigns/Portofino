@@ -4,7 +4,7 @@ import com.manydesigns.elements.annotations.FileBlob
 import com.manydesigns.elements.annotations.LabelI18N
 import com.manydesigns.elements.blobs.Blob
 import com.manydesigns.elements.blobs.BlobManager
-import com.manydesigns.elements.fields.BlobField
+import com.manydesigns.elements.fields.FileBlobField
 import com.manydesigns.elements.forms.Form
 import com.manydesigns.elements.forms.FormBuilder
 import com.manydesigns.portofino.buttons.annotations.Button
@@ -31,6 +31,8 @@ import net.sourceforge.stripes.action.StreamingResolution
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authz.annotation.RequiresAuthentication
+import com.manydesigns.elements.blobs.BlobManager
+import com.manydesigns.elements.blobs.BlobManager
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 public class Profile extends CustomAction {
@@ -91,7 +93,7 @@ public class Profile extends CustomAction {
         if(StringUtils.isEmpty(avatar)) {
             return new RedirectResolution("/images/user-placeholder-40x40.png");
         } else {
-            def blob = blobManager.load(avatar);
+            def blob = blobManager.read(avatar);
             return new StreamingResolution(blob.contentType, new FileInputStream(blob.dataFile));
         }
     }
@@ -152,7 +154,7 @@ public class Profile extends CustomAction {
     }
 
     protected Blob scaleAndCropAvatar() {
-        BlobField field = (BlobField) form.findFieldByPropertyName("avatar");
+        FileBlobField field = (FileBlobField) form.findFieldByPropertyName("avatar");
         def blob = field.getValue()
         File file = blob.dataFile; //TODO use proper blob API
         def image = ImageIO.read(file);

@@ -24,7 +24,6 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Enabled;
 import com.manydesigns.elements.annotations.FieldSet;
-import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.options.SelectionModel;
@@ -135,11 +134,6 @@ public class FormBuilder extends AbstractFormBuilder {
 
     public FormBuilder configMode(Mode mode) {
         this.mode = mode;
-        return this;
-    }
-
-    public FormBuilder configBlobManager(BlobManager blobManager) {
-        this.blobManager = blobManager;
         return this;
     }
 

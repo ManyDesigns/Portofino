@@ -4,9 +4,15 @@ import com.manydesigns.elements.util.RandomUtil;
 
 import java.io.File;
 
-public class HierarchicalFileBlobManager extends FileBlobManager {
+/**
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public class HierarchicalBlobManager extends SimpleBlobManager {
 
-    public HierarchicalFileBlobManager(File blobsDir, String metaFileNamePattern, String dataFileNamePattern) {
+    public HierarchicalBlobManager(File blobsDir, String metaFileNamePattern, String dataFileNamePattern) {
         super(blobsDir, metaFileNamePattern, dataFileNamePattern);
     }
 
@@ -23,10 +29,6 @@ public class HierarchicalFileBlobManager extends FileBlobManager {
     }
 
     protected File getBlobSubdir(String code) {
-        File dir = new File(new File(new File(blobsDir, code.substring(0, 2)), code.substring(2, 4)), code.substring(4, 6));
-        if(!dir.isDirectory() && dir.mkdirs()) {
-            logger.warn("Invalid blob directory: {}", dir.getAbsolutePath());
-        }
-        return dir;
+        return new File(new File(new File(blobsDir, code.substring(0, 2)), code.substring(2, 4)), code.substring(4, 6));
     }
 }

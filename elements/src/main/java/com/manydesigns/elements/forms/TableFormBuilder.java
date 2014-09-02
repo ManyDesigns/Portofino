@@ -22,7 +22,6 @@ package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.InSummary;
-import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.options.SelectionModel;
@@ -117,11 +116,6 @@ public class TableFormBuilder extends AbstractFormBuilder {
 
     public TableFormBuilder configMode(Mode mode) {
         this.mode = mode;
-        return this;
-    }
-
-    public TableFormBuilder configBlobManager(BlobManager blobManager) {
-        this.blobManager = blobManager;
         return this;
     }
 

@@ -21,21 +21,21 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.blobs.*;
+import com.manydesigns.elements.blobs.Blob;
+import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MemoryUtil;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.controller.StripesRequestWrapper;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.io.InputStream;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -43,7 +43,7 @@ import java.io.InputStream;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class BlobField extends AbstractField implements MultipartRequestField, HasBlobManager {
+public class FileBlobField extends AbstractField implements MultipartRequestField {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
@@ -59,21 +59,19 @@ public class BlobField extends AbstractField implements MultipartRequestField, H
     protected String operationInputName;
     protected String codeInputName;
 
-    protected BlobManager blobManager;
     protected Blob blob;
     protected String blobError;
-    protected boolean blobIsTemporary;
 
     //**************************************************************************
     // Costruttori
     //**************************************************************************
-    public BlobField(PropertyAccessor accessor, Mode mode) {
+    public FileBlobField(PropertyAccessor accessor, Mode mode) {
         this(accessor, mode, null);
     }
 
-    public BlobField(@NotNull PropertyAccessor accessor,
-                     @NotNull Mode mode,
-                     @Nullable String prefix) {
+    public FileBlobField(@NotNull PropertyAccessor accessor,
+                         @NotNull Mode mode,
+                         @Nullable String prefix) {
         super(accessor, mode, prefix);
 
         innerId = id + INNER_SUFFIX;
@@ -207,11 +205,9 @@ public class BlobField extends AbstractField implements MultipartRequestField, H
     //**************************************************************************
     public void readFromRequest(HttpServletRequest req) {
         super.readFromRequest(req);
-
         if (mode.isView(insertable, updatable)) {
             return;
         }
-
         String updateTypeStr = req.getParameter(operationInputName);
         if (UPLOAD_MODIFY.equals(updateTypeStr)) {
             saveUpload(req);
@@ -220,16 +216,15 @@ public class BlobField extends AbstractField implements MultipartRequestField, H
         } else {
             // in all other cases (updateTypeStr is UPLOAD_KEEP,
             // null, or other values) keep the existing blob
+            keepOldBlob(req);
+        }
+    }
+
+    protected void keepOldBlob(HttpServletRequest req) {
+        if(blob == null) {
             String code = req.getParameter(codeInputName);
-            try {
-                blob = blobManager.getTemporaryBlobManager().load(code);
-                blobIsTemporary = true;
-            } catch (IOException e) {
-                logger.debug("Could not load temporary blob: " + code, e);
-                blob = null;
-            }
-            if(blob == null) {
-                safeLoadBlob(code);
+            if(!StringUtils.isBlank(code)) {
+                blob = new Blob(code);
             }
         }
     }
@@ -243,17 +238,14 @@ public class BlobField extends AbstractField implements MultipartRequestField, H
 
             if (fileBean != null) {
                 String code = RandomUtil.createRandomId();
-                blob = blobManager.getTemporaryBlobManager().save(
-                        code,
-                        fileBean.getInputStream(),
-                        fileBean.getFileName(),
-                        fileBean.getContentType(),
-                        null);
-                blobIsTemporary = true;
+                blob = new Blob(code);
+                blob.setInputStream(fileBean.getInputStream());
+                blob.setFilename(fileBean.getFileName());
+                blob.setContentType(fileBean.getContentType());
+                blob.setPropertiesLoaded(true);
             } else {
                 logger.debug("An update of a blob was requested, but nothing was uploaded. The previous value will be kept.");
-                String code = req.getParameter(codeInputName);
-                safeLoadBlob(code);
+                keepOldBlob(req);
             }
         } catch (Throwable e) {
             logger.warn("Cannot save upload", e);
@@ -287,28 +279,8 @@ public class BlobField extends AbstractField implements MultipartRequestField, H
         if (obj == null) {
             blob = null;
         } else {
-            String code = (String) accessor.get(obj);
-            safeLoadBlob(code);
-        }
-    }
-
-    protected void safeLoadBlob(String code) {
-        if (code == null) {
-            blob = null;
-        } else {
-            if (blobManager == null) {
-                logger.warn("No blob manager configured. Cannot load blob with code '{}'.", code);
-                return;
-            }
-            try {
-                blob = blobManager.load(code);
-                blobIsTemporary = false;
-            } catch (Throwable e) {
-                blob = null;
-                blobError = getText("elements.error.field.fileblob.cannotLoad");
-                logger.warn("Cannot load blob with code '{}'. Cause: {}",
-                        code, e.getMessage());
-            }
+            String code  = (String)accessor.get(obj);
+            blob = new Blob(code);
         }
     }
 
@@ -316,24 +288,7 @@ public class BlobField extends AbstractField implements MultipartRequestField, H
         if (blob == null) {
             writeToObject(obj, null);
         } else {
-            if (blobManager == null) {
-                logger.warn("No blob manager configured. Cannot save blob with code '{}'.", blob.getCode());
-                return;
-            }
-            InputStream in = null;
-            try {
-                if(blobIsTemporary) {
-                    logger.debug("Blob {} is temporary, persist it", blob.getCode());
-                    in = blob.getInputStream();
-                    blob = blobManager.save(blob.getCode(), in, blob.getFilename(), blob.getContentType(), blob.getCharacterEncoding());
-                }
-                writeToObject(obj, blob.getCode());
-            } catch (IOException e) {
-                throw new RuntimeException("Could not save blob: " + getPropertyAccessor(), e);
-            } finally {
-                IOUtils.closeQuietly(in);
-            }
-            blobManager.getTemporaryBlobManager().delete(blob.getCode());
+            writeToObject(obj, blob.getCode());
         }
     }
 
@@ -365,11 +320,4 @@ public class BlobField extends AbstractField implements MultipartRequestField, H
         this.blobError = blobError;
     }
 
-    public BlobManager getBlobManager() {
-        return blobManager;
-    }
-
-    public void setBlobManager(BlobManager blobManager) {
-        this.blobManager = blobManager;
-    }
 }

@@ -23,7 +23,6 @@ package com.manydesigns.elements.forms;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.Enabled;
 import com.manydesigns.elements.blobs.BlobManager;
-import com.manydesigns.elements.blobs.HasBlobManager;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.helpers.FieldsManager;
@@ -55,7 +54,6 @@ public class AbstractFormBuilder {
 
     protected String prefix;
     protected Mode mode = Mode.EDIT;
-    protected BlobManager blobManager;
 
     //**************************************************************************
     // Logging
@@ -117,10 +115,6 @@ public class AbstractFormBuilder {
         }
         if (field == null) {
             logger.warn("Cannot instantiate field for property {}", propertyAccessor);
-        }
-        if(field instanceof HasBlobManager) {
-            logger.debug("Injecting blob manager in field {}", propertyAccessor);
-            ((HasBlobManager) field).setBlobManager(blobManager);
         }
         return field;
     }
