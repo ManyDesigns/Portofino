@@ -297,14 +297,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
 
         try {
-            setupSearchForm();
-            if(maxResults == null) {
-                //Load only the first page if the crud is paginated
-                maxResults = getCrudConfiguration().getRowsPerPage();
-            }
-            loadObjects();
-            setupTableForm(Mode.VIEW);
-
+            executeSearch();
             if(PageActionLogic.isEmbedded(this)) {
                 return getEmbeddedSearchView();
             } else {
@@ -327,20 +320,24 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
 
         try {
-            setupSearchForm();
-            if(maxResults == null) {
-                //Load only the first page if the crud is paginated
-                maxResults = getCrudConfiguration().getRowsPerPage();
-            }
-            loadObjects();
-            setupTableForm(Mode.VIEW);
-
+            executeSearch();
             context.getRequest().setAttribute("actionBean", this);
             return getSearchResultsPageView();
         } catch(Exception e) {
             logger.warn("Crud not correctly configured", e);
             return new ErrorResolution(500, "Crud not correctly configured");
         }
+    }
+
+    protected void executeSearch() {
+        setupSearchForm();
+        if(maxResults == null) {
+            //Load only the first page if the crud is paginated
+            maxResults = getCrudConfiguration().getRowsPerPage();
+        }
+        loadObjects();
+        setupTableForm(Mode.VIEW);
+        BlobUtils.loadBlobs(tableForm, getBlobManager(), false);
     }
 
     public Resolution jsonSearchData() throws JSONException {
@@ -398,6 +395,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         setupForm(Mode.VIEW);
         form.readFromObject(object);
+        BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
 
         returnUrl = new UrlBuilder(
@@ -490,14 +488,13 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         createSetup(object);
         form.readFromObject(object);
         form.readFromRequest(context.getRequest());
-        BlobUtils.loadBlobs(form, getTemporaryBlobManager());
+        BlobUtils.loadBlobs(form, getTemporaryBlobManager(), false);
         if (form.validate()) {
             writeFormToObject();
             if(createValidate(object)) {
                 try {
                     doSave(object);
                     createPostProcess(object);
-                    BlobUtils.saveBlobs(form, getBlobManager());
                     commitTransaction();
                 } catch (Throwable e) {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
@@ -505,6 +502,15 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     SessionMessages.addErrorMessage(rootCauseMessage);
                     saveTemporaryBlobs();
                     return getCreateView();
+                }
+                //The object on the database was persisted. Now we can save the blobs.
+                try {
+                    BlobUtils.loadBlobs(form, getTemporaryBlobManager(), true);
+                    BlobUtils.saveBlobs(form, getBlobManager());
+                } catch (IOException e) {
+                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                    logger.error("Could not persist blobs!", e);
+                    SessionMessages.addErrorMessage(rootCauseMessage);
                 }
                 if(isPopup()) {
                     popupCloseCallback += "(true)";
@@ -553,8 +559,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         form.readFromObject(object);
         List<Blob> blobsBefore = getBlobsFromForm();
         form.readFromRequest(context.getRequest());
-        BlobUtils.loadBlobs(form, getBlobManager());
-        BlobUtils.loadBlobs(form, getTemporaryBlobManager());
+        BlobUtils.loadBlobs(form, getBlobManager(), false);
+        BlobUtils.loadBlobs(form, getTemporaryBlobManager(), false);
         if (form.validate()) {
             writeFormToObject();
             if(editValidate(object)) {
@@ -562,9 +568,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     doUpdate(object);
                     editPostProcess(object);
                     commitTransaction();
-                    List<Blob> blobsAfter = getBlobsFromForm();
-                    deleteOldBlobs(blobsBefore, blobsAfter);
-                    persistNewBlobs(blobsBefore, blobsAfter);
                 } catch (Throwable e) {
                     String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                     logger.warn(rootCauseMessage, e);
@@ -572,6 +575,17 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     saveTemporaryBlobs();
                     return getEditView();
                 }
+                try {
+                    List<Blob> blobsAfter = getBlobsFromForm();
+                    deleteOldBlobs(blobsBefore, blobsAfter);
+                    BlobUtils.loadBlobs(form, getTemporaryBlobManager(), true);
+                    persistNewBlobs(blobsBefore, blobsAfter);
+                } catch (IOException e) {
+                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                    logger.error("Could not persist blobs!", e);
+                    SessionMessages.addErrorMessage(rootCauseMessage);
+                }
+
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.updated.successfully"));
                 return new RedirectResolution(
                         appendSearchStringParamIfNecessary(context.getActionPath()));

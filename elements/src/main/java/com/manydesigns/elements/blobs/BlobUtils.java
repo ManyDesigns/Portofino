@@ -5,6 +5,9 @@ import com.manydesigns.elements.FormElement;
 import com.manydesigns.elements.fields.FileBlobField;
 import com.manydesigns.elements.forms.FieldSet;
 import com.manydesigns.elements.forms.Form;
+import com.manydesigns.elements.forms.TableForm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -16,24 +19,48 @@ import java.io.IOException;
  */
 public abstract class BlobUtils {
 
-    public static void loadBlobs(Form form, BlobManager blobManager) {
+    private static final Logger logger = LoggerFactory.getLogger(BlobUtils.class);
+
+    public static void loadBlobs(Form form, BlobManager blobManager, boolean loadContents) {
         for(FieldSet fieldSet : form) {
-            loadBlobs(fieldSet, blobManager);
+            loadBlobs(fieldSet, blobManager, loadContents);
         }
     }
 
-    public static void loadBlobs(FieldSet fieldSet, BlobManager blobManager) {
+    public static void loadBlobs(FieldSet fieldSet, BlobManager blobManager, boolean loadContents) {
         for(FormElement field : fieldSet) {
-            if(FileBlobField.class.isInstance(field)) {
-                FileBlobField fbf = FileBlobField.class.cast(field);
-                Blob blob = fbf.getValue();
-                if(blob != null && !blob.isPropertiesLoaded()) {
-                    try {
+            loadBlob(field, blobManager, loadContents);
+        }
+    }
+
+    public static void loadBlobs(TableForm form, BlobManager blobManager, boolean loadContents) {
+        for(TableForm.Row row : form.getRows()) {
+            loadBlobs(row, blobManager, loadContents);
+        }
+    }
+
+    public static void loadBlobs(TableForm.Row row, BlobManager blobManager, boolean loadContents) {
+        for(FormElement field : row) {
+            loadBlob(field, blobManager, loadContents);
+        }
+    }
+
+    public static void loadBlob(FormElement field, BlobManager blobManager, boolean loadContents) {
+        if(FileBlobField.class.isInstance(field)) {
+            FileBlobField fbf = FileBlobField.class.cast(field);
+            Blob blob = fbf.getValue();
+            if(blob != null) {
+                try {
+                    if(!blob.isPropertiesLoaded()) {
                         blobManager.loadMetadata(blob);
-                        fbf.setBlobError(null);
-                    } catch (IOException e) {
-                        fbf.setBlobError(ElementsThreadLocals.getText("elements.error.field.fileblob.cannotLoad"));
                     }
+                    if(loadContents) {
+                        blobManager.openStream(blob);
+                    }
+                    fbf.setBlobError(null);
+                } catch (Exception e) {
+                    logger.debug("Could not load blob with code " + blob.getCode() + " from BlobManager " + blobManager, e);
+                    fbf.setBlobError(ElementsThreadLocals.getText("elements.error.field.fileblob.cannotLoad"));
                 }
             }
         }
@@ -50,7 +77,7 @@ public abstract class BlobUtils {
             if(FileBlobField.class.isInstance(field)) {
                 FileBlobField fbf = FileBlobField.class.cast(field);
                 Blob blob = fbf.getValue();
-                if(blob != null) {
+                if(blob != null && blob.getInputStream() != null) {
                     blobManager.save(blob);
                 }
             }

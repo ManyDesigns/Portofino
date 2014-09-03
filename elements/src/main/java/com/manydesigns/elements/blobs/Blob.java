@@ -20,6 +20,7 @@
 
 package com.manydesigns.elements.blobs;
 
+import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -86,6 +87,7 @@ public class Blob {
         size = Long.parseLong(metaProperties.getProperty(SIZE_PROPERTY));
         createTimestamp = formatter.parseDateTime(metaProperties.getProperty(CREATE_TIMESTAMP_PROPERTY));
         characterEncoding = metaProperties.getProperty(CHARACTER_ENCODING_PROPERTY);
+        propertiesLoaded = true;
     }
 
     //**************************************************************************
@@ -146,6 +148,10 @@ public class Blob {
 
     public void setPropertiesLoaded(boolean propertiesLoaded) {
         this.propertiesLoaded = propertiesLoaded;
+    }
+
+    public void dispose() {
+        IOUtils.closeQuietly(inputStream);
     }
 
     @Override

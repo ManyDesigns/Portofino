@@ -135,6 +135,7 @@ public class SimpleBlobManager implements BlobManager {
         } finally {
             IOUtils.closeQuietly(out);
         }
+        blob.dispose();
     }
 
     @Override

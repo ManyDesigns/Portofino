@@ -22,7 +22,6 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.blobs.Blob;
-import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MemoryUtil;
 import com.manydesigns.elements.util.RandomUtil;
@@ -230,34 +229,41 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
     }
 
     protected void saveUpload(HttpServletRequest req) {
-        FileBean fileBean = null;
-        try {
-            StripesRequestWrapper stripesRequest =
-                StripesRequestWrapper.findStripesWrapper(req);
-            fileBean = stripesRequest.getFileParameterValue(inputName);
+        StripesRequestWrapper stripesRequest =
+            StripesRequestWrapper.findStripesWrapper(req);
+        final FileBean fileBean = stripesRequest.getFileParameterValue(inputName);
 
-            if (fileBean != null) {
-                String code = RandomUtil.createRandomId();
-                blob = new Blob(code);
+        if (fileBean != null) {
+            String code = RandomUtil.createRandomId();
+            blob = new Blob(code) {
+                @Override
+                public void dispose() {
+                    super.dispose();
+                    try {
+                        fileBean.delete();
+                    } catch (IOException e) {
+                        logger.warn("Could not delete file bean", e);
+                    }
+                }
+            };
+            try {
                 blob.setInputStream(fileBean.getInputStream());
                 blob.setFilename(fileBean.getFileName());
                 blob.setContentType(fileBean.getContentType());
                 blob.setPropertiesLoaded(true);
-            } else {
-                logger.debug("An update of a blob was requested, but nothing was uploaded. The previous value will be kept.");
-                keepOldBlob(req);
-            }
-        } catch (Throwable e) {
-            logger.warn("Cannot save upload", e);
-            throw new Error("Cannot save upload", e);
-        } finally {
-            if(fileBean != null) {
+            } catch (IOException e) {
+                logger.error("Could not read upload", e);
+                blob = null;
+                blobError = "Upload failed"; //TODO I18n
                 try {
                     fileBean.delete();
-                } catch (IOException e) {
-                    logger.warn("Could not delete file bean", e);
+                } catch (IOException e1) {
+                    logger.error("Could not delete FileBean", e1);
                 }
             }
+        } else {
+            logger.debug("An update of a blob was requested, but nothing was uploaded. The previous value will be kept.");
+            keepOldBlob(req);
         }
     }
 
@@ -279,8 +285,12 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
         if (obj == null) {
             blob = null;
         } else {
-            String code  = (String)accessor.get(obj);
-            blob = new Blob(code);
+            String code  = (String) accessor.get(obj);
+            if(StringUtils.isBlank(code)) {
+                blob = null;
+            } else {
+                blob = new Blob(code);
+            }
         }
     }
 
