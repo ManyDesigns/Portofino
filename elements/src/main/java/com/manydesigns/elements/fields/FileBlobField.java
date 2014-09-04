@@ -145,7 +145,7 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
     }
 
     private void valueToXhtmlEdit(XhtmlBuffer xb) {
-        if (blob == null) {
+        if (blob == null || blobError != null) { //TODO if there is an error, you cannot remove the old, wrong blob value without first uploading a new file
             xb.writeInputHidden(operationInputName, UPLOAD_MODIFY);
             xb.writeInputFile(id, inputName, false);
         } else {
@@ -211,7 +211,7 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
         if (UPLOAD_MODIFY.equals(updateTypeStr)) {
             saveUpload(req);
         } else if (UPLOAD_DELETE.equals(updateTypeStr)) {
-            blob = null;
+            forgetBlob();
         } else {
             // in all other cases (updateTypeStr is UPLOAD_KEEP,
             // null, or other values) keep the existing blob
@@ -219,12 +219,14 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
         }
     }
 
+    protected void forgetBlob() {
+        blob = null;
+    }
+
     protected void keepOldBlob(HttpServletRequest req) {
-        if(blob == null) {
-            String code = req.getParameter(codeInputName);
-            if(!StringUtils.isBlank(code)) {
-                blob = new Blob(code);
-            }
+        String code = req.getParameter(codeInputName);
+        if(!StringUtils.isBlank(code)) {
+            blob = new Blob(code);
         }
     }
 
@@ -253,7 +255,7 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
                 blob.setPropertiesLoaded(true);
             } catch (IOException e) {
                 logger.error("Could not read upload", e);
-                blob = null;
+                forgetBlob();
                 blobError = "Upload failed"; //TODO I18n
                 try {
                     fileBean.delete();
@@ -283,11 +285,11 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
     public void readFromObject(Object obj) {
         super.readFromObject(obj);
         if (obj == null) {
-            blob = null;
+            forgetBlob();
         } else {
             String code  = (String) accessor.get(obj);
             if(StringUtils.isBlank(code)) {
-                blob = null;
+                forgetBlob();
             } else {
                 blob = new Blob(code);
             }

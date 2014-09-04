@@ -13,7 +13,7 @@
     <stripes:layout-component name="pageBody">
         <p><fmt:message key = "in.the.first.column.select.the.fields.you.want.to.edit"/></p>
         <stripes:form action="${actionBean.context.actionPath}" method="post"
-                      class="form-horizontal">
+                      enctype="multipart/form-data" class="form-horizontal">
             <mde:write name="actionBean" property="form"/>
             <stripes:hidden name="selection"/>
             <c:if test="${not empty actionBean.searchString}">

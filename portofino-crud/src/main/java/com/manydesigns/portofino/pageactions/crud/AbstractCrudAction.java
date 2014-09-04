@@ -347,6 +347,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         long totalRecords = getTotalSearchRecords();
 
         setupTableForm(Mode.VIEW);
+        BlobUtils.loadBlobs(tableForm, getBlobManager(), false);
         JSONStringer js = new JSONStringer();
         js.object()
                 .key("recordsReturned")
@@ -418,6 +419,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
         setupForm(Mode.VIEW);
         form.readFromObject(object);
+        BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
         JSONStringer js = new JSONStringer();
         js.object();
@@ -548,6 +550,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         setupForm(Mode.EDIT);
         editSetup(object);
         form.readFromObject(object);
+        BlobUtils.loadBlobs(form, getBlobManager(), false);
         return getEditView();
     }
 
@@ -674,6 +677,15 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 logger.warn(rootCauseMessage, e);
                 SessionMessages.addErrorMessage(rootCauseMessage);
                 return getBulkEditView();
+            }
+            try {
+                BlobUtils.loadBlobs(form, getTemporaryBlobManager(), true);
+                BlobUtils.saveBlobs(form, getBlobManager());
+                //TODO blob gc
+            } catch (IOException e) {
+                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                logger.error("Could not persist blobs!", e);
+                SessionMessages.addErrorMessage(rootCauseMessage);
             }
             SessionMessages.addInfoMessage(
                     ElementsThreadLocals.getText("update.of._.objects.successful", updated));
@@ -1443,9 +1455,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @param object the persistent object.
      */
     protected void deleteBlobs(T object) {
-        setupForm(Mode.VIEW);
-        form.readFromObject(object);
-        List<Blob> blobs = getBlobsFromObject();
+        List<Blob> blobs = getBlobsFromObject(object);
         for(Blob blob : blobs) {
             try {
                 blobManager.delete(blob);
@@ -1455,7 +1465,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
     }
 
-    protected List<Blob> getBlobsFromObject() {
+    protected List<Blob> getBlobsFromObject(T object) {
         List<Blob> blobs = new ArrayList<Blob>();
         for(PropertyAccessor property : classAccessor.getProperties()) {
             if(property.getAnnotation(FileBlob.class) != null) {
