@@ -61,6 +61,7 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
             }
         } else {
             xb.openElement("fieldset");
+            xb.addAttribute("class", "mde-columns-" + nColumns);
             if (name != null) {
                 xb.writeLegend(name, null);
             }
@@ -82,7 +83,7 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
                 }
 
                 xb.openElement("div");
-                xb.addAttribute("class", "col-md-" + (colSpan * (12 / nColumns)));
+                xb.addAttribute("class", "col-md-" + (colSpan * (12 / nColumns)) + " mde-colspan-" + colSpan);
                 current.toXhtml(xb);
                 xb.closeElement("div");
 
