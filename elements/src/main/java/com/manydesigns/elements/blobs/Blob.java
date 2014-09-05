@@ -70,7 +70,9 @@ public class Blob {
 
     public Properties getMetaProperties() throws IOException {
         Properties metaProperties = new Properties();
-        createTimestamp = new DateTime();
+        if(createTimestamp == null) {
+            createTimestamp = new DateTime();
+        }
 
         safeSetProperty(metaProperties, FILENAME_PROPERTY, filename);
         safeSetProperty(metaProperties, CONTENT_TYPE_PROPERTY, contentType);
