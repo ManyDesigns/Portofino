@@ -1,5 +1,6 @@
 package com.manydesigns.portofino.atmosphere.notifications;
 
+import org.atmosphere.cpr.AtmosphereFramework;
 import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.Broadcaster;
 import org.atmosphere.cpr.BroadcasterFactory;
@@ -15,6 +16,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public class NotificationService {
+
+    private AtmosphereFramework framework;
+
+    public NotificationService(AtmosphereFramework framework) {
+        this.framework = framework;
+    }
 
     public final List<Topic> topics = new CopyOnWriteArrayList<Topic>();
 
@@ -33,7 +40,8 @@ public class NotificationService {
     }
 
     public boolean sendNotification(String topicName, String message) throws IOException {
-        Broadcaster b =  BroadcasterFactory.getDefault().lookup(Notifications.BASE_PATH + topicName);
+        BroadcasterFactory broadcasterFactory = framework.getBroadcasterFactory();
+        Broadcaster b =  broadcasterFactory.lookup(Notifications.BASE_PATH + topicName);
         if(b != null) {
             b.broadcast(message);
             return true;

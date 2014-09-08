@@ -136,7 +136,6 @@ function setupRichTextEditors() {
 function setupSelectFieldLinks() {
     $("a.mde-select-field-create-new-link").click(function(event) {
         var href = $(event.target).attr("href");
-        //window.open(href, '_blank', 'width=700, height=500, location=0, scrollbars=1');
         var dialogDiv = $('<div></div>').appendTo($("body"));
         function setupDialogContents(dialog) {
             function submitForm(form, event, action) {

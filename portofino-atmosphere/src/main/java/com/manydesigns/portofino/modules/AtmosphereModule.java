@@ -22,6 +22,7 @@ package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.atmosphere.notifications.NotificationService;
 import com.manydesigns.portofino.di.Inject;
+import org.atmosphere.cpr.AtmosphereFramework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +89,8 @@ public class AtmosphereModule implements Module {
 
     @Override
     public void init() {
-        servletContext.setAttribute(NOTIFICATION_SERVICE, new NotificationService());
+        AtmosphereFramework framework = (AtmosphereFramework) servletContext.getAttribute("AtmosphereServlet");
+        servletContext.setAttribute(NOTIFICATION_SERVICE, new NotificationService(framework));
         status = ModuleStatus.ACTIVE;
     }
 
