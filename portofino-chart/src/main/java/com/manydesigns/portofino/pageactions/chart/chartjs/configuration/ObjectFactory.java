@@ -18,11 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.pageactions.chart.configuration;
+package com.manydesigns.portofino.pageactions.chart.chartjs.configuration;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
 @XmlRegistry
 public class ObjectFactory {
-    public ChartConfiguration createChartConfiguration() { return new ChartConfiguration(); }
+    public ChartJsConfiguration createChartConfiguration() { return new ChartJsConfiguration(); }
 }

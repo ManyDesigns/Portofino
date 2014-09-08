@@ -21,7 +21,8 @@
 package com.manydesigns.portofino.modules;
 
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.pageactions.chart.ChartAction;
+import com.manydesigns.portofino.pageactions.chart.chartjs.ChartJsAction;
+import com.manydesigns.portofino.pageactions.chart.jfreechart.JFreeChartAction;
 import com.manydesigns.portofino.pageactions.registry.PageActionRegistry;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
@@ -88,7 +89,8 @@ public class ChartModule implements Module {
 
     @Override
     public void init() {
-        pageActionRegistry.register(ChartAction.class);
+        pageActionRegistry.register(JFreeChartAction.class);
+        pageActionRegistry.register(ChartJsAction.class);
         status = ModuleStatus.ACTIVE;
     }
 

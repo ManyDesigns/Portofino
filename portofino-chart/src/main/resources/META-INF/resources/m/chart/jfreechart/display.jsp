@@ -5,7 +5,7 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
-    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.chart.ChartAction"/>
+    <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.chart.jfreechart.JFreeChartAction"/>
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.pageInstance.page.title}"/>
     </stripes:layout-component>

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.pageactions.chart.configuration;
+package com.manydesigns.portofino.pageactions.chart.jfreechart.configuration;
 
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.util.BootstrapSizes;
@@ -45,7 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 */
 @XmlRootElement(name = "configuration")
 @XmlAccessorType(XmlAccessType.NONE)
-public class ChartConfiguration implements PageActionConfiguration, ChartDefinition {
+public class JFreeChartConfiguration implements PageActionConfiguration, ChartDefinition {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
@@ -107,14 +107,14 @@ public class ChartConfiguration implements PageActionConfiguration, ChartDefinit
     //**************************************************************************
 
     public static final Logger logger =
-            LoggerFactory.getLogger(ChartConfiguration.class);
+            LoggerFactory.getLogger(JFreeChartConfiguration.class);
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
 
-    public ChartConfiguration() {
+    public JFreeChartConfiguration() {
         super();
     }
 

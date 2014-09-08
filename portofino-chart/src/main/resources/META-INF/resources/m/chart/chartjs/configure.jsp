@@ -7,7 +7,7 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><jsp:useBean id="actionBean" scope="request"
-               type="com.manydesigns.portofino.pageactions.chart.ChartAction"
+               type="com.manydesigns.portofino.pageactions.chart.chartjs.ChartJsAction"
 /><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
     <stripes:layout-component name="pageTitle">
         <fmt:message key="configure.page._">
@@ -21,10 +21,8 @@
             <br />
             <h4>SQL Query parameters</h4>
             <ul>
-                <li><strong>1D Charts:</strong>
-                    key, value, (optional) label</li>
-                <li><strong>2D Charts:</strong>
-                    x axis key, y axis key, value, (optional) x axis label, (optional) y axis label</li>
+                <li><strong>1D Charts:</strong> key, value (for example: select city, population from cities)</li>
+                <li><strong>2D Charts:</strong> group, key, value (for example: select year, city, income-per-capita)</li>
             </ul>
             <jsp:include page="/m/pageactions/script-configuration.jsp" />
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
