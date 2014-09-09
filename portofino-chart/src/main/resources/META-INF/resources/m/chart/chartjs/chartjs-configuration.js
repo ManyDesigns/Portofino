@@ -5,6 +5,57 @@ var portofino = portofino || {};
 portofino.charts = portofino.charts || {};
 portofino.charts.chartjs = portofino.charts.chartjs || {};
 
+portofino.charts.chartjs.colorConfigurarions1D = [
+    {
+        highlight: "rgba(204,82,82,0.2)",
+        color: "rgba(204,82,82,1)"
+    },
+    {
+        highlight: "rgba(82,204,82,0.2)",
+        color: "rgba(82,204,82,1)"
+    },
+    {
+        highlight: "rgba(82,82,204,0.2)",
+        color: "rgba(82,82,204,1)"
+    },
+    {
+        highlight: "rgba(217,217,87,0.2)",
+        color: "rgba(217,217,87,1)"
+    },
+    {
+        highlight: "rgba(87,217,217,0.2)",
+        color: "rgba(87,217,217,1)"
+    },
+    {
+        highlight: "rgba(217,87,217,0.2)",
+        color: "rgba(217,87,217,1)"
+    },
+    {
+        highlight: "rgba(212,148,85,0.2)",
+        color: "rgba(212,148,85,1)"
+    },
+    {
+        highlight: "rgba(148,212,85,0.2)",
+        color: "rgba(148,212,85,1)"
+    },
+    {
+        highlight: "rgba(85,212,148,0.2)",
+        color: "rgba(85,212,148,1)"
+    },
+    {
+        highlight: "rgba(85,148,212,0.2)",
+        color: "rgba(85,148,212,1)"
+    },
+    {
+        highlight: "rgba(148,85,212,0.2)",
+        color: "rgba(148,85,212,1)"
+    },
+    {
+        highlight: "rgba(212,85,148,0.2)",
+        color: "rgba(212,85,148,1)"
+    }
+];
+
 portofino.charts.chartjs.colorConfigurarions2D = [
     {
         fillColor: "rgba(204,82,82,0.2)",

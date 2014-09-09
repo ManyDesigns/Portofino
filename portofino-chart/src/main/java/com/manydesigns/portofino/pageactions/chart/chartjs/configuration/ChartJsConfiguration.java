@@ -20,10 +20,7 @@
 
 package com.manydesigns.portofino.pageactions.chart.chartjs.configuration;
 
-import com.manydesigns.elements.annotations.CssClass;
-import com.manydesigns.elements.annotations.Label;
-import com.manydesigns.elements.annotations.Multiline;
-import com.manydesigns.elements.annotations.Required;
+import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.util.BootstrapSizes;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.PageActionConfiguration;
@@ -111,6 +108,7 @@ public class ChartJsConfiguration implements PageActionConfiguration {
     //**************************************************************************
     @Required
     @XmlAttribute(required = true)
+    @LabelI18N("name")
     public String getName() {
         return name;
     }
@@ -121,7 +119,7 @@ public class ChartJsConfiguration implements PageActionConfiguration {
 
     @XmlAttribute(name = "type", required = true)
     @Required
-    @Label("Type")
+    @LabelI18N("type")
     public String getType() {
         return type;
     }
@@ -132,6 +130,7 @@ public class ChartJsConfiguration implements PageActionConfiguration {
 
     @Required
     @XmlAttribute(required = true)
+    @LabelI18N("legend")
     public String getLegend() {
         return legend;
     }
@@ -142,6 +141,7 @@ public class ChartJsConfiguration implements PageActionConfiguration {
 
     @Required
     @XmlAttribute(required = true)
+    @LabelI18N("database")
     public String getDatabase() {
         return database;
     }
@@ -151,7 +151,7 @@ public class ChartJsConfiguration implements PageActionConfiguration {
     }
 
     @Required
-    @Label("SQL Query")
+    @LabelI18N("sql.query")
     @Multiline
     @XmlAttribute(required = true)
     @CssClass(BootstrapSizes.FILL_ROW)

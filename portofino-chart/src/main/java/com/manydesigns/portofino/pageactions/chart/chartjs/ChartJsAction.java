@@ -96,16 +96,37 @@ public class ChartJsAction extends AbstractPageAction {
         Session session = persistence.getSession(chartConfiguration.getDatabase());
         List<Object[]> result;
         result = QueryUtils.runSql(session, query);
-        JSONObject data = new JSONObject();
-        if(chartConfiguration.getActualType().kind == 2) {
+        if(chartConfiguration.getActualType().kind == 1) {
+            JSONArray data = new JSONArray();
+            if (!fillData1D(result, data)) {
+                return forwardToPageActionNotConfigured();
+            }
+            chartData = data.toString();
+        } else if(chartConfiguration.getActualType().kind == 2) {
+            JSONObject data = new JSONObject();
             if (!fillData2D(result, data)) {
                 return forwardToPageActionNotConfigured();
             }
+            chartData = data.toString();
         } else {
-            //TODO
+            logger.error("Unsupported chart type: " + chartConfiguration.getActualType());
+            return forwardToPageActionNotConfigured();
         }
-        chartData = data.toString();
         return forwardTo("/m/chart/chartjs/display.jsp");
+    }
+
+    protected boolean fillData1D(List<Object[]> result, JSONArray data) {
+        for (Object[] current : result) {
+            if(current.length < 2) {
+                SessionMessages.addErrorMessage("The query returned the wrong number of parameters (" + current.length + ") - 2 are required.");
+                return false;
+            }
+            JSONObject datum = new JSONObject();
+            datum.put("label", ObjectUtils.toString(current[0]));
+            datum.put("value", current[1]);
+            data.put(datum);
+        }
+        return true;
     }
 
     protected boolean fillData2D(List<Object[]> result, JSONObject data) {

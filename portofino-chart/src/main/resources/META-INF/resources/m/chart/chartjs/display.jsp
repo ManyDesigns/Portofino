@@ -16,12 +16,22 @@
                 var ctx = document.getElementById("${actionBean.chartId}").getContext("2d");
                 var data = ${actionBean.chartData};
                 var chartKind = ${actionBean.chartConfiguration.actualType.kind};
-                if(chartKind == 2) { //2D charts
-                    var index = 0;
-                    var cfgs = portofino.charts.chartjs.colorConfigurarions2D;
-                    for(var ds in data.datasets) {
+
+                var index = 0;
+                var cfgs, ds, cc;
+                if(chartKind == 1) { //2D charts
+                    cfgs = portofino.charts.chartjs.colorConfigurarions1D;
+                    for(ds in data) {
+                        var datum = data[ds];
+                        cc = cfgs[index % cfgs.length];
+                        $.extend(datum, cc);
+                        index++;
+                    }
+                } else if(chartKind == 2) { //2D charts
+                    cfgs = portofino.charts.chartjs.colorConfigurarions2D;
+                    for(ds in data.datasets) {
                         var dataset = data.datasets[ds];
-                        var cc = cfgs[index % cfgs.length];
+                        cc = cfgs[index % cfgs.length];
                         $.extend(dataset, cc);
                         index++;
                     }
