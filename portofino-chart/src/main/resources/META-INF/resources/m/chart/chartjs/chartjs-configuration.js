@@ -153,3 +153,65 @@ portofino.charts.chartjs.colorConfigurarions2D = [
         pointHighlightFill: "#fff",
         pointHighlightStroke: "rgba(212,85,148,1)"
     }];
+
+portofino.charts.chartjs.create = function (chartId, chartKind, chartJsMethod, data) {
+    var canvas = document.getElementById(chartId);
+        var ctx = canvas.getContext("2d");
+        var index = 0;
+        var cfgs, ds, cc;
+        if (chartKind == 1) { //1D charts
+            cfgs = portofino.charts.chartjs.colorConfigurarions1D;
+            for (ds in data) {
+                var datum = data[ds];
+                cc = cfgs[index % cfgs.length];
+                $.extend(datum, cc);
+                index++;
+            }
+        } else if (chartKind == 2) { //2D charts
+            cfgs = portofino.charts.chartjs.colorConfigurarions2D;
+            for (ds in data.datasets) {
+                var dataset = data.datasets[ds];
+                cc = cfgs[index % cfgs.length];
+                $.extend(dataset, cc);
+                index++;
+            }
+        }
+        var chart = ((new Chart(ctx))[chartJsMethod])(data);
+        var legend = $(chart.generateLegend());
+        $(canvas).parent().siblings(".legend-container").append(legend);
+        legend.find("li").each(function(index, elem) {
+            $(elem).mouseover(function() {
+                if (chart.segments) {
+                    var activeSegment = chart.segments[index];
+                    activeSegment.save();
+                    activeSegment.fillColor = activeSegment.highlightColor;
+                    chart.showTooltip([activeSegment], true);
+                    activeSegment.restore();
+                } else if (chart.datasets) {
+                    var activeDs = chart.datasets[index];
+                    var k, array, object;
+                    if (activeDs.points) {
+                        array = activeDs.points;
+                    } else if (activeDs.bars) {
+                        array = activeDs.bars;
+                    } else {
+                        array = []; //Not supported
+                    }
+                    for (k in array) {
+                        object = array[k];
+                        object.save();
+                        object.fillColor = object.highlightFill;
+                        object.strokeColor = object.highlightStroke;
+                    }
+                    chart.draw();
+                    for (k in array) {
+                        object = array[k];
+                        object.restore();
+                    }
+                }
+            });
+        });
+        legend.mouseout(function() {
+            chart.draw();
+        });
+    };

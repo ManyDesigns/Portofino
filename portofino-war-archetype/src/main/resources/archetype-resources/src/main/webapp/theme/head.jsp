@@ -10,9 +10,10 @@
 --%><head>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements + Canvas support -->
 <!--[if lt IE 9]>
-  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <script src="<stripes:url value='/theme/html5shiv/html5shiv-printshiv.min.js' />"></script>
+    <script src="<stripes:url value='/m/chart/chartjs/excanvas.js' />"></script>
 <![endif]-->
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/bootstrap/css/bootstrap.min.css' />">
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/bootstrap/css/bootstrap-theme.min.css' />">
@@ -23,14 +24,13 @@
 <script type="text/javascript" src="<stripes:url value='/theme/datepicker/js/bootstrap-datepicker.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/theme/typeahead/typeahead.bundle.min.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/theme/jquery-ui/js/jquery-ui-1.10.3.custom.min.js' />" ></script>
+<!-- Charts with chart.js -->
+<script type="text/javascript" src="<stripes:url value='/m/chart/chartjs/Chart.js' />" ></script>
+<script type="text/javascript" src="<stripes:url value='/m/chart/chartjs/chartjs-configuration.js' />" ></script>
 
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/portofino.css' />">
 <link type="text/css" rel="stylesheet" href="<stripes:url value="/m/openid/openid-selector/css/openid.css" />" />
-<style type="text/css">
-    #openid_form { width: auto; }
-    #openid_username { margin-right: .5em; }
-    div#openid_highlight { padding: 0; }
-</style>
+<link type="text/css" rel="stylesheet" href="<stripes:url value="/m/openid/openid-form.css" />" />
 
 <script type="text/javascript" src="<stripes:url value='/m/pageactions/portofino-messages.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/m/pageactions/portofino.js' />" ></script>

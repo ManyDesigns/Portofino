@@ -10,33 +10,21 @@
         <c:out value="${actionBean.pageInstance.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <canvas id="${actionBean.chartId}" width="${actionBean.width}" height="${actionBean.height}"></canvas>
+        <div class="chart-container">
+            <button type="button" class="btn btn-link" onclick="$('#legend-${actionBean.chartId}').toggle();">Legend</button>
+            <div id="legend-${actionBean.chartId}" class="legend-container" style="display: none;"></div>
+            <div class="canvas-container">
+                <canvas id="${actionBean.chartId}" width="${actionBean.width}" height="${actionBean.height}"></canvas>
+            </div>
+        </div>
         <script type="text/javascript">
             $(function() {
-                var ctx = document.getElementById("${actionBean.chartId}").getContext("2d");
-                var data = ${actionBean.chartData};
+                var chartId = "${actionBean.chartId}";
                 var chartKind = ${actionBean.chartConfiguration.actualType.kind};
+                var chartJsMethod = "${actionBean.chartConfiguration.actualType.jsName}";
+                var data = ${actionBean.chartData};
 
-                var index = 0;
-                var cfgs, ds, cc;
-                if(chartKind == 1) { //2D charts
-                    cfgs = portofino.charts.chartjs.colorConfigurarions1D;
-                    for(ds in data) {
-                        var datum = data[ds];
-                        cc = cfgs[index % cfgs.length];
-                        $.extend(datum, cc);
-                        index++;
-                    }
-                } else if(chartKind == 2) { //2D charts
-                    cfgs = portofino.charts.chartjs.colorConfigurarions2D;
-                    for(ds in data.datasets) {
-                        var dataset = data.datasets[ds];
-                        cc = cfgs[index % cfgs.length];
-                        $.extend(dataset, cc);
-                        index++;
-                    }
-                }
-                new Chart(ctx).${actionBean.chartConfiguration.actualType.jsName}(data);
+                portofino.charts.chartjs.create(chartId, chartKind, chartJsMethod, data);
             });
         </script>
         <portofino:buttons list="chart-buttons" />
