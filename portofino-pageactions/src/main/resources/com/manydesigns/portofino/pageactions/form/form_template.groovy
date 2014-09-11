@@ -1,24 +1,17 @@
 package com.manydesigns.portofino.pageactions.form
 
-import com.manydesigns.elements.annotations.MaxIntValue
-import com.manydesigns.elements.annotations.MinIntValue
-import com.manydesigns.elements.annotations.Multiline
-import com.manydesigns.elements.annotations.RegExp
+import com.manydesigns.elements.Mode
 import com.manydesigns.elements.forms.Form
+import com.manydesigns.elements.forms.FormBuilder
+import com.manydesigns.elements.messages.SessionMessages
+import com.manydesigns.elements.options.DefaultSelectionProvider
 import com.manydesigns.elements.reflection.ClassAccessor
 import com.manydesigns.elements.reflection.GroovyClassAccessor
 import com.manydesigns.portofino.buttons.annotations.Button
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import net.sourceforge.stripes.action.Resolution
-import com.manydesigns.elements.forms.FormBuilder
-import com.manydesigns.elements.Mode
-import com.manydesigns.elements.annotations.ColSpan
-import com.manydesigns.elements.annotations.Required
-import com.manydesigns.elements.messages.SessionMessages
-import com.manydesigns.elements.annotations.Enabled
-import com.manydesigns.elements.annotations.Insertable
-import com.manydesigns.elements.annotations.Updatable
+import com.manydesigns.elements.annotations.*
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 class MyFormAction extends FormAction {
@@ -34,6 +27,7 @@ class MyFormAction extends FormAction {
         protected int anotherField;
         protected Date aDateField;
         protected String aReadOnlyField = "I am read only";
+        protected String aSelectField;
         protected String aDisabledField;
 
         @RegExp("a+.*")
@@ -84,6 +78,15 @@ class MyFormAction extends FormAction {
         void setaDisabledField(String aDisabledField) {
             this.aDisabledField = aDisabledField
         }
+
+
+        String getaSelectField() {
+            return aSelectField
+        }
+
+        void setaSelectField(String aSelectField) {
+            this.aSelectField = aSelectField
+        }
     }
 
     protected MyFormBean object = new MyFormBean();
@@ -122,13 +125,20 @@ class MyFormAction extends FormAction {
         // - choose which fields to show and in what order
         // - add selection providers
         // - build a 2-columns or 3-columns form
-        return super.configureFormBuilder(formBuilder, mode).configNColumns(2).configFields("aField", "anotherField", "aDateField", "aReadOnlyField");
+        DefaultSelectionProvider selectionProvider = new DefaultSelectionProvider("aSelectField");
+        selectionProvider.appendRow(1, "One", true);
+        selectionProvider.appendRow(2, "Two", true);
+        selectionProvider.appendRow(3, "Three", true);
+        return super.configureFormBuilder(formBuilder, mode).
+                configNColumns(2).
+                configFields("aField", "anotherField", "aDateField", "aReadOnlyField", "aSelectField").
+                configSelectionProvider(selectionProvider, "aSelectField");
     }
 
     @Override
     protected void setupForm(Mode mode) {
-        super.setupForm(mode)
-        form.findFieldByPropertyName("aReadOnlyField").setHref("javascript:alert('And I\\'m also a link!');")
+        super.setupForm(mode);
+        form.findFieldByPropertyName("aReadOnlyField").setHref("javascript:alert('And I\\'m also a link!');");
     }
 
 
