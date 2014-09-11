@@ -50,7 +50,6 @@ public class ChartJsConfiguration implements PageActionConfiguration {
 
     protected String name;
     protected String type;
-    protected String legend;
     protected String database;
     protected String query;
 
@@ -96,7 +95,6 @@ public class ChartJsConfiguration implements PageActionConfiguration {
     public void init() {
         assert name != null;
         assert type != null;
-        assert legend != null;
         assert database != null;
         assert query != null;
         actualDatabase = DatabaseLogic.findDatabaseByName(persistence.getModel(), database);
@@ -126,17 +124,6 @@ public class ChartJsConfiguration implements PageActionConfiguration {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    @Required
-    @XmlAttribute(required = true)
-    @LabelI18N("legend")
-    public String getLegend() {
-        return legend;
-    }
-
-    public void setLegend(String legend) {
-        this.legend = legend;
     }
 
     @Required
