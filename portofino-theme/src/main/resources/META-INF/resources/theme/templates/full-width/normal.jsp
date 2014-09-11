@@ -75,12 +75,12 @@
                     <stripes:layout-component name="pageFooter" />
                 </div>
                 <div class="embeddedPages">
-                    <portofino:embedded-page-actions list="default" cssClass="row" />
+                    <portofino:embedded-page-actions list="default" />
                     <div class="row">
                         <portofino:embedded-page-actions list="contentLayoutLeft" cssClass="col-md-6" />
                         <portofino:embedded-page-actions list="contentLayoutRight" cssClass="col-md-6" />
                     </div>
-                    <portofino:embedded-page-actions list="contentLayoutBottom" cssClass="row" />
+                    <portofino:embedded-page-actions list="contentLayoutBottom" />
                 </div>
                 <div class="contentFooter">
                     <stripes:layout-component name="contentFooter" />
