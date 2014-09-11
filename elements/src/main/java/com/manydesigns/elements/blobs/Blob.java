@@ -47,7 +47,7 @@ public class Blob {
 
     protected final DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
 
-    protected final String code;
+    protected String code;
     protected String contentType;
     protected String filename;
     protected long size;
@@ -98,6 +98,10 @@ public class Blob {
 
     public String getCode() {
         return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getFilename() {

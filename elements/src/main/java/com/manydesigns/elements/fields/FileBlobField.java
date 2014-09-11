@@ -24,7 +24,6 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MemoryUtil;
-import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.controller.StripesRequestWrapper;
@@ -236,8 +235,7 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
         final FileBean fileBean = stripesRequest.getFileParameterValue(inputName);
 
         if (fileBean != null) {
-            String code = RandomUtil.createRandomId();
-            blob = new Blob(code) {
+            blob = new Blob(null) {
                 @Override
                 public void dispose() {
                     super.dispose();
