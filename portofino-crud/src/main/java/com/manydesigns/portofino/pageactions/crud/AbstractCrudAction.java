@@ -2004,6 +2004,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public String getCreateTitle() {
         String title = crudConfiguration.getCreateTitle();
+        if(StringUtils.isBlank(title)) {
+            title = getPage().getTitle();
+        }
         OgnlTextFormat textFormat = OgnlTextFormat.create(StringUtils.defaultString(title));
         return textFormat.format(this);
     }
