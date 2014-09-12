@@ -29,7 +29,8 @@
             </c:if>
         </p>
         <stripes:form action="${actionBean.context.actionPath}" method="post"
-                      enctype="multipart/form-data" class="form-horizontal">
+                      id="${(not empty actionBean.crudConfiguration.name) ? actionBean.crudConfiguration.name : null}"
+                      enctype="multipart/form-data" class="form-horizontal edit">
             <mde:write name="actionBean" property="form"/>
             <c:if test="${not empty actionBean.searchString}">
                 <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>

@@ -13,7 +13,8 @@
     <stripes:layout-component name="pageBody">
         <stripes:form
                 action="${actionBean.context.actionPath}" method="post"
-                class="form-inline crud-search-form dont-prompt-on-page-abandon">
+                id="${(not empty actionBean.crudConfiguration.name) ? actionBean.crudConfiguration.name : null}"
+                class="form-inline crud-search-form dont-prompt-on-page-abandon search">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="crud-search-form-default-button" /></div>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>

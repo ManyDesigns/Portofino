@@ -28,7 +28,8 @@
             <p><fmt:message key="fields.marked.with.a.star.are.required"/>.</p>
         </c:if>
         <stripes:form action="${actionBean.context.actionPath}" method="post"
-                      enctype="multipart/form-data" class="form-horizontal">
+                      id="${(not empty actionBean.crudConfiguration.name) ? actionBean.crudConfiguration.name : null}"
+                      enctype="multipart/form-data" class="form-horizontal create">
             <mde:write name="actionBean" property="form"/>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <input type="hidden" name="popup" value="true" />
