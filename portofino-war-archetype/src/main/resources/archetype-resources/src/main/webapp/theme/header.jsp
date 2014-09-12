@@ -96,20 +96,6 @@
                                 <fmt:message key="log.out" />
                             </a>
                         </li>
-                        <shiro:notAuthenticated>
-                            <%
-                            UrlBuilder loginUrlBuilder =
-                                    new UrlBuilder(request.getLocale(), loginPage, false);
-                            loginUrlBuilder.addParameter("returnUrl", actionPath);
-                            loginUrlBuilder.addParameter("cancelReturnUrl", actionPath);
-                            String loginUrl = Util.getAbsoluteUrl(loginUrlBuilder.toString());
-                            %>
-                            <li>
-                                <a href="<%= loginUrl %>">
-                                    <fmt:message key="log.in" />
-                                </a>
-                            </li>
-                        </shiro:notAuthenticated>
                         <%
                             if(request.getAttribute("actionBean") instanceof PageAction) {
                                 PageAction pageAction = (PageAction) request.getAttribute("actionBean");
