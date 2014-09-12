@@ -590,8 +590,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 }
 
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.updated.successfully"));
-                return new RedirectResolution(
-                        appendSearchStringParamIfNecessary(context.getActionPath()));
+                return getSuccessfulUpdateView();
             }
         } else {
             saveTemporaryBlobs();
@@ -689,8 +688,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }
             SessionMessages.addInfoMessage(
                     ElementsThreadLocals.getText("update.of._.objects.successful", updated));
-            return new RedirectResolution(
-                    appendSearchStringParamIfNecessary(context.getActionPath()));
+            return getSuccessfulUpdateView();
         } else {
             return getBulkEditView();
         }
@@ -720,7 +718,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 SessionMessages.addErrorMessage(rootCauseMessage);
             }
         }
-        return new RedirectResolution(appendSearchStringParamIfNecessary(url), false);
+        return getSuccessfulDeleteView();
     }
 
     @Button(list = "crud-search", key = "delete", order = 3, icon = Button.ICON_TRASH, group = "crud")
@@ -728,9 +726,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution bulkDelete() {
         int deleted = 0;
-        if (selection == null) {
+        if (selection == null || selection.length == 0) {
             SessionMessages.addWarningMessage(ElementsThreadLocals.getText("no.object.was.selected"));
-            return new RedirectResolution(appendSearchStringParamIfNecessary(context.getActionPath()));
+            return new RedirectResolution(appendSearchStringParamIfNecessary(context.getActionPath())); //TODO why is this different from bulkEdit?
         }
         List<T> objects = new ArrayList<T>(selection.length);
         for (String current : selection) {
@@ -755,7 +753,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             SessionMessages.addErrorMessage(ExceptionUtils.getRootCauseMessage(e));
         }
 
-        return new RedirectResolution(appendSearchStringParamIfNecessary(context.getActionPath()));
+        return getSuccessfulDeleteView();
     }
 
     //**************************************************************************
@@ -860,6 +858,22 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         } else {
             return new RedirectResolution(returnUrl, false);
         }
+    }
+
+    /**
+     * Returns the Resolution used to show the effect of a successful update action.
+     * @return by default, a redirect to the detail, propagating the search string.
+     */
+    protected Resolution getSuccessfulUpdateView() {
+        return new RedirectResolution(appendSearchStringParamIfNecessary(context.getActionPath()));
+    }
+
+    /**
+     * Returns the Resolution used to show the effect of a successful update action.
+     * @return by default, a redirect to the detail, propagating the search string.
+     */
+    protected Resolution getSuccessfulDeleteView() {
+        return new RedirectResolution(appendSearchStringParamIfNecessary(context.getActionPath()));
     }
 
     /**
