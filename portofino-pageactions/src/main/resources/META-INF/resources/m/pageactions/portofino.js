@@ -307,56 +307,86 @@ portofino.enablePageActionDragAndDrop = function(button, originalPath) {
 
 portofino.confirmDeletePage = function(pagePath, contextPath) {
     var dialogDiv = $("<div></div>").appendTo($("body"));
-    dialogDiv.load(contextPath + "/actions/admin/page?confirmDelete&originalPath=" + pagePath, function() {
-        var dialog = dialogDiv.find(".dialog-confirm-delete-page");
-        dialog.find("button[name=confirmDeletePageButton]").click(function() {
-            var form = $("#pageAdminForm");
-            portofino.copyFormAsHiddenFields(dialog, form);
-            form.submit();
-        });
+    dialogDiv.load(contextPath + "/actions/admin/page?confirmDelete&ajax=true&originalPath=" + pagePath,
+        function(response, status, xhr) {
+            if(xhr.status == 403) {
+                portofino.redirectToLogin(xhr);
+            }
+            var dialog = dialogDiv.find(".dialog-confirm-delete-page");
+            dialog.find("button[name=confirmDeletePageButton]").click(function() {
+                var form = $("#pageAdminForm");
+                portofino.copyFormAsHiddenFields(dialog, form);
+                form.submit();
+            });
 
-        dialog.find("button[name=cancelDeletePageButton], button[name=closeDeletePageButton]").click(function() {
-            dialog.modal("hide");
-            dialog.remove();
+            dialog.find("button[name=cancelDeletePageButton], button[name=closeDeletePageButton]").click(function() {
+                dialog.modal("hide");
+                dialog.remove();
+            });
+            dialog.modal({ backdrop: 'static', show: true });
         });
-        dialog.modal({ backdrop: 'static', show: true });
-    });
 };
 
 portofino.showMovePageDialog = function(pagePath, contextPath) {
     var dialogDiv = $("<div></div>").appendTo($("body"));
-    dialogDiv.load(contextPath + "/actions/admin/page?chooseNewLocation&originalPath=" + pagePath, function() {
-        var dialog = dialogDiv.find(".dialog-move-page");
-        dialog.find("button[name=confirmMovePageButton]").click(function() {
-            var form = $("#pageAdminForm");
-            portofino.copyFormAsHiddenFields(dialog, form);
-            form.submit();
-        });
+    dialogDiv.load(contextPath + "/actions/admin/page?chooseNewLocation&ajax=true&originalPath=" + pagePath,
+        function(response, status, xhr) {
+            if(xhr.status == 403) {
+                portofino.redirectToLogin(xhr);
+            }
+            var dialog = dialogDiv.find(".dialog-move-page");
+            dialog.find("button[name=confirmMovePageButton]").click(function() {
+                var form = $("#pageAdminForm");
+                portofino.copyFormAsHiddenFields(dialog, form);
+                form.submit();
+            });
 
-        dialog.find("button[name=cancelMovePageButton], button[name=closeMovePageButton]").click(function() {
-            dialog.modal("hide");
-            dialog.remove();
+            dialog.find("button[name=cancelMovePageButton], button[name=closeMovePageButton]").click(function() {
+                dialog.modal("hide");
+                dialog.remove();
+            });
+            dialog.modal({ backdrop: 'static', show: true });
         });
-        dialog.modal({ backdrop: 'static', show: true });
-    });
 };
 
 portofino.showCopyPageDialog = function(pagePath, contextPath) {
     var dialogDiv = $("<div></div>").appendTo($("body"));
-    dialogDiv.load(contextPath + "/actions/admin/page?copyPageDialog&originalPath=" + pagePath, function() {
-        var dialog = dialogDiv.find(".dialog-copy-page");
-        dialog.find("button[name=confirmCopyPageButton]").click(function() {
-            var form = $("#pageAdminForm");
-            portofino.copyFormAsHiddenFields(dialog, form);
-            form.submit();
-        });
+    dialogDiv.load(
+        contextPath + "/actions/admin/page?copyPageDialog&ajax=true&originalPath=" + pagePath,
+        function(response, status, xhr) {
+            if(xhr.status == 403) {
+                portofino.redirectToLogin(xhr);
+            }
+            var dialog = dialogDiv.find(".dialog-copy-page");
+            dialog.find("button[name=confirmCopyPageButton]").click(function() {
+                var form = $("#pageAdminForm");
+                portofino.copyFormAsHiddenFields(dialog, form);
+                form.submit();
+            });
 
-        dialog.find("button[name=cancelCopyPageButton], button[name=closeCopyPageButton]").click(function() {
-            dialog.modal("hide");
-            dialog.remove();
+            dialog.find("button[name=cancelCopyPageButton], button[name=closeCopyPageButton]").click(function() {
+                dialog.modal("hide");
+                dialog.remove();
+            });
+            dialog.modal({ backdrop: 'static', show: true });
         });
-        dialog.modal({ backdrop: 'static', show: true });
-    });
+};
+
+portofino.util = portofino.util || {};
+
+portofino.util.removeQueryStringArgument = function removeQueryStringArgument(href, arg) {
+    href = href.replace(new RegExp("[?]" + arg + "=[^&]*&", "g"), "?");
+    href = href.replace(new RegExp("[?]" + arg + "=[^&]*", "g"), "");
+    href = href.replace(new RegExp("[&]" + arg + "=[^&]*&", "g"), "&");
+    href = href.replace(new RegExp("[&]" + arg + "=[^&]*", "g"), "");
+    return href;
+};
+
+portofino.redirectToLogin = function redirectToLogin(xhr) {
+    //Redirect to login page (link included in the response)
+    var loginUrl = xhr.responseText;
+    loginUrl = portofino.util.removeQueryStringArgument(loginUrl, "returnUrl");
+    window.location.href = loginUrl + (loginUrl.indexOf("?") > -1 ? "&" : "?") + "returnUrl=" + encodeURIComponent(window.location.href);
 };
 
 setupRichTextEditors = function() {/* Do nothing (remove default initialization by Elements) */};
