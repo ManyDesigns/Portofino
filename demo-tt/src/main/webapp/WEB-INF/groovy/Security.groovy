@@ -250,10 +250,8 @@ class Security extends AbstractPortofinoRealm {
 
     @Override
     ClassAccessor getUserClassAccessor() {
-        Database database =
-            DatabaseLogic.findDatabaseByName(persistence.model, "tt");
-        Table table =
-            DatabaseLogic.findTableByEntityName(database, "users");
+        Database database = DatabaseLogic.findDatabaseByName(persistence.model, "tt");
+        Table table = DatabaseLogic.findTableByEntityName(database, "users");
         return new TableAccessor(table);
     }
 

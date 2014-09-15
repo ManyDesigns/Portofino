@@ -288,9 +288,7 @@
 </column>
 <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="email" autoincrement="false">
     <annotations>
-        <annotation type="com.manydesigns.elements.annotations.CssClass">
-            <value>input-xlarge</value>
-        </annotation>
+        <annotation type="com.manydesigns.elements.annotations.Email" />
     </annotations>
 </column>
 <column scale="0" nullable="true" length="255" jdbcType="12" columnType="VARCHAR" columnName="password" autoincrement="false">
