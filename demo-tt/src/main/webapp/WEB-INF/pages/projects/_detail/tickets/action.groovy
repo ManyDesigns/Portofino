@@ -131,9 +131,10 @@ class ProjectsTicketsAction extends CrudAction {
 
     @Override
     protected TableForm buildTableForm(TableFormBuilder tableFormBuilder) {
-        OgnlTextFormat titleHrefFormat = new OgnlTextFormat("/projects/%{project}/tickets/%{project}/%{n}");
+        OgnlTextFormat titleHrefFormat = new OgnlTextFormat(
+                appendSearchStringParamIfNecessary("/projects/%{project}/tickets/%{project}/%{n}"));
         titleHrefFormat.url = true;
-        tableFormBuilder.configHrefTextFormat("title", titleHrefFormat)
+        tableFormBuilder.configHrefTextFormat("title", titleHrefFormat);
 
         OgnlTextFormat fixVersionHrefFormat =
                 new OgnlTextFormat("/projects/%{project}/versions/%{fix_version}");
