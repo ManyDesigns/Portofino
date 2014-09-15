@@ -103,28 +103,6 @@ public abstract class ConnectionProvider {
     // Initialization
     //**************************************************************************
 
-    public void reset() {
-        types.clear();
-
-        databaseProductName = null;
-        databaseProductVersion = null;
-        databaseMajorVersion = null;
-        databaseMinorVersion = null;
-        databaseMajorMinorVersion = null;
-        driverName = null;
-        driverVersion = null;
-        driverMajorVersion = null;
-        driverMinorVersion = null;
-        driverMajorMinorVersion = null;
-        JDBCMajorVersion = null;
-        JDBCMinorVersion = null;
-        JDBCMajorMinorVersion = null;
-        databasePlatform = null;
-        status = null;
-        errorMessage = null;
-        lastTested = null;
-    }
-
     public void init(DatabasePlatformsRegistry databasePlatformsRegistry) {
         Connection conn = null;
         ResultSet typeRs = null;

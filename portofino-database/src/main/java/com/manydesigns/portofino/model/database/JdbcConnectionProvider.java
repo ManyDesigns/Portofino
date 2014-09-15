@@ -22,6 +22,7 @@ package com.manydesigns.portofino.model.database;
 
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -52,11 +53,16 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     protected String username;
     protected String password;
 
+    protected Configuration configuration;
+    protected String keyPrefix;
+
     //**************************************************************************
     // Fields (calcuated values)
     //**************************************************************************
 
     protected String actualUrl;
+    protected String actualUsername;
+    protected String actualPassword;
 
     //**************************************************************************
     // Constructors
@@ -71,14 +77,25 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     //**************************************************************************
 
     @Override
-    public void reset() {
-        actualUrl = null;
-        super.reset();
-    }
-
-    @Override
     public void init(DatabasePlatformsRegistry databasePlatformsRegistry) {
-        actualUrl = OgnlTextFormat.format(url, null);
+        keyPrefix = "portofino.database." + getDatabase().getDatabaseName() + ".";
+        configuration = databasePlatformsRegistry.getPortofinoConfiguration();
+        if(url.startsWith(keyPrefix) && configuration.containsKey(url)) {
+            actualUrl = configuration.getString(url);
+        } else {
+            actualUrl = url;
+        }
+        actualUrl = OgnlTextFormat.format(actualUrl, null);
+        if(username.startsWith(keyPrefix) && configuration.containsKey(username)) {
+            actualUsername = configuration.getString(username);
+        } else {
+            actualUsername = username;
+        }
+        if(password.startsWith(keyPrefix) && configuration.containsKey(password)) {
+            actualPassword = configuration.getString(password);
+        } else {
+            actualPassword = password;
+        }
         super.init(databasePlatformsRegistry);
     }
 
@@ -94,8 +111,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
 
     public Connection acquireConnection() throws Exception {
         Class.forName(driver);
-        return DriverManager.getConnection(actualUrl,
-                username, password);
+        return DriverManager.getConnection(actualUrl, actualUsername, actualPassword);
     }
 
     public void releaseConnection(Connection conn) {
@@ -147,6 +163,41 @@ public class JdbcConnectionProvider extends ConnectionProvider {
         return actualUrl;
     }
 
+    public void setActualUrl(String url) {
+        if(this.url.startsWith(keyPrefix) && configuration.containsKey(this.url)) {
+            configuration.setProperty(this.url, url);
+        } else {
+            this.url = url;
+        }
+        actualUrl = url;
+    }
+
+    public String getActualUsername() {
+        return actualUsername;
+    }
+
+    public void setActualUsername(String username) {
+        if(this.username.startsWith(keyPrefix) && configuration.containsKey(this.username)) {
+            configuration.setProperty(this.username, username);
+        } else {
+            this.username = username;
+        }
+        actualUsername = username;
+    }
+
+    public String getActualPassword() {
+        return actualPassword;
+    }
+
+    public void setActualPassword(String password) {
+        if(this.password.startsWith(keyPrefix) && configuration.containsKey(this.password)) {
+            configuration.setProperty(this.password, password);
+        } else {
+            this.password = password;
+        }
+        actualPassword = password;
+    }
+
     //**************************************************************************
     // Other methods
     //**************************************************************************
@@ -155,9 +206,9 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("driver", driver)
-                .append("url", url)
-                .append("username", username)
-                .append("password", password)
+                .append("url", actualUrl)
+                .append("username", actualUsername)
+                .append("password", actualPassword)
                 .toString();
     }
 }

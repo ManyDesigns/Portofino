@@ -95,28 +95,28 @@ public class ConnectionProviderForm {
     @Required
     @Label("connection URL")
     public String getUrl() {
-        return jdbcConnectionProvider.getUrl();
+        return jdbcConnectionProvider.getActualUrl();
     }
 
     public void setUrl(String url) {
-        jdbcConnectionProvider.setUrl(url);
+        jdbcConnectionProvider.setActualUrl(url);
     }
 
     public String getUsername() {
-        return jdbcConnectionProvider.getUsername();
+        return jdbcConnectionProvider.getActualUsername();
     }
 
     public void setUsername(String username) {
-        jdbcConnectionProvider.setUsername(username);
+        jdbcConnectionProvider.setActualUsername(username);
     }
 
     @Password
     public String getPassword() {
-        return jdbcConnectionProvider.getPassword();
+        return jdbcConnectionProvider.getActualPassword();
     }
 
     public void setPassword(String password) {
-        jdbcConnectionProvider.setPassword(password);
+        jdbcConnectionProvider.setActualPassword(password);
     }
 
     @Required

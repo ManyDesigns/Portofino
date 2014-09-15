@@ -22,6 +22,7 @@ package com.manydesigns.portofino.actions.admin.database;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.configuration.CommonsConfigurationUtils;
 import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.forms.TableForm;
@@ -44,12 +45,12 @@ import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.security.RequiresAdministrator;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import net.sourceforge.stripes.action.*;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
@@ -93,8 +94,8 @@ public class ConnectionProvidersAction extends AbstractActionBean {
     @Inject(DatabaseModule.PERSISTENCE)
     Persistence persistence;
 
-    @Inject(BaseModule.APPLICATION_DIRECTORY)
-    File appDir;
+    @Inject(BaseModule.PORTOFINO_CONFIGURATION)
+    Configuration configuration;
 
     //**************************************************************************
     // Logging
@@ -348,6 +349,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                 connectionProvider.init(persistence.getDatabasePlatformsRegistry());
                 persistence.initModel();
                 persistence.saveXmlModel();
+                CommonsConfigurationUtils.save(configuration);
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("connection.provider.updated.successfully"));
             } catch (Exception e) {
                 String msg = "Cannot save model: " +

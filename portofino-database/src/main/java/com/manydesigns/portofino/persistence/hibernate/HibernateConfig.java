@@ -120,11 +120,11 @@ public class HibernateConfig {
                     (JdbcConnectionProvider) connectionProvider;
             configuration.setProperty("hibernate.connection.url", jdbcConnectionProvider.getActualUrl());
             configuration.setProperty("hibernate.connection.driver_class", jdbcConnectionProvider.getDriver());
-            if(jdbcConnectionProvider.getUsername() != null) {
-                configuration.setProperty("hibernate.connection.username", jdbcConnectionProvider.getUsername());
+            if(jdbcConnectionProvider.getActualUsername() != null) {
+                configuration.setProperty("hibernate.connection.username", jdbcConnectionProvider.getActualUsername());
             }
-            if(jdbcConnectionProvider.getPassword() != null) {
-                    configuration.setProperty("hibernate.connection.password", jdbcConnectionProvider.getPassword());
+            if(jdbcConnectionProvider.getActualPassword() != null) {
+                configuration.setProperty("hibernate.connection.password", jdbcConnectionProvider.getActualPassword());
             }
         } else if(connectionProvider instanceof JndiConnectionProvider) {
             JndiConnectionProvider jndiConnectionProvider =
