@@ -648,15 +648,21 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         }
 
         setupForm(Mode.BULK_EDIT);
-
+        disableBlobFields();
         return getBulkEditView();
     }
 
+    /**
+     * Handles a bulk update operation (typically invoked by the user submitting a bulk edit form).
+     * Note: doesn't handle blobs.
+     * @return which view to render next.
+     */
     @Button(list = "crud-bulk-edit", key = "update", order = 1, type = Button.TYPE_PRIMARY)
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     public Resolution bulkUpdate() {
         int updated = 0;
         setupForm(Mode.BULK_EDIT);
+        disableBlobFields();
         form.readFromRequest(context.getRequest());
         if (form.validate()) {
             for (String current : selection) {
@@ -677,15 +683,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 SessionMessages.addErrorMessage(rootCauseMessage);
                 return getBulkEditView();
             }
-            try {
-                BlobUtils.loadBlobs(form, getTemporaryBlobManager(), true);
-                BlobUtils.saveBlobs(form, getBlobManager());
-                //TODO blob gc
-            } catch (IOException e) {
-                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-                logger.error("Could not persist blobs!", e);
-                SessionMessages.addErrorMessage(rootCauseMessage);
-            }
             SessionMessages.addInfoMessage(
                     ElementsThreadLocals.getText("update.of._.objects.successful", updated));
             return getSuccessfulUpdateView();
@@ -701,7 +698,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Button(list = "crud-read", key = "delete", order = 2, icon = Button.ICON_TRASH, group = "crud")
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution delete() {
-        String url = calculateBaseSearchUrl();
         if(deleteValidate(object)) {
             doDelete(object);
             try {
@@ -1322,6 +1318,18 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return formBuilder.build();
     }
 
+    protected void disableBlobFields() {
+        //Disable blob fields: we don't support them.
+        for(FieldSet fieldSet : form) {
+            for(FormElement element : fieldSet) {
+                if(element instanceof FileBlobField) {
+                    ((FileBlobField) element).setInsertable(false);
+                    ((FileBlobField) element).setUpdatable(false);
+                }
+            }
+        }
+    }
+
     protected FormBuilder createFormBuilder() {
         return new FormBuilder(classAccessor);
     }
@@ -1436,7 +1444,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     public Resolution downloadBlob() throws IOException, NoSuchFieldException {
-        //TODO generalize for non-file blobs
         PropertyAccessor propertyAccessor = classAccessor.getProperty(propertyName);
         String code = (String) propertyAccessor.get(object);
         if(StringUtils.isBlank(code)) {

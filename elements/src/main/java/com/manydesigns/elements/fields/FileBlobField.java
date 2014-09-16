@@ -254,7 +254,7 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
             } catch (IOException e) {
                 logger.error("Could not read upload", e);
                 forgetBlob();
-                blobError = "Upload failed"; //TODO I18n
+                blobError = getText("elements.error.field.fileblob.uploadFailed");
                 try {
                     fileBean.delete();
                 } catch (IOException e1) {
