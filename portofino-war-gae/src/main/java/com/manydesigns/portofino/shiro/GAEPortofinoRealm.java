@@ -23,10 +23,12 @@ package com.manydesigns.portofino.shiro;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
-import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.authc.*;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
 
 import java.io.Serializable;
@@ -75,21 +77,6 @@ public class GAEPortofinoRealm extends AbstractPortofinoRealm {
 
     public Map<Serializable, String> getUsers() {
         return new HashMap<Serializable, String>();
-    }
-
-    @Override
-    public Serializable saveUser(Serializable user) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Serializable updateUser(Serializable user) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ClassAccessor getUserClassAccessor() {
-        throw new UnsupportedOperationException();
     }
 
     @Override

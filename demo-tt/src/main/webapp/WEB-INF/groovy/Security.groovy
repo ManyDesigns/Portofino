@@ -233,31 +233,10 @@ class Security extends AbstractPortofinoRealm {
     }
 
     @Override
-    Serializable saveUser(Serializable user) {
-        def session = persistence.getSession("tt");
-        session.save("users", (Object) user);
-        session.transaction.commit();
-        return user;
-    }
-
-    @Override
-    Serializable updateUser(Serializable user) {
-        def session = persistence.getSession("tt");
-        session.update("users", (Object) user);
-        session.transaction.commit();
-        return user;
-    }
-
-    @Override
-    ClassAccessor getUserClassAccessor() {
+    ClassAccessor getSelfRegisteredUserClassAccessor() {
         Database database = DatabaseLogic.findDatabaseByName(persistence.model, "tt");
         Table table = DatabaseLogic.findTableByEntityName(database, "users");
         return new TableAccessor(table);
-    }
-
-    @Override
-    ClassAccessor getSelfRegisteredUserClassAccessor() {
-        return getUserClassAccessor();
     }
 
     @Override
