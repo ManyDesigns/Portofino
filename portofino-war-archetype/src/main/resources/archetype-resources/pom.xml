@@ -13,28 +13,20 @@
     <packaging>war</packaging>
     <version>${version}</version>
     <dependencies>
-        <!-- Support for page actions. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-pageactions</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Support for database connectivity. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-database</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Administration (CMS, database, wizard). Remove to disable this feature. -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-admin</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Database implementations. Choose the ones that apply. -->
+        <!--
+        ///////////////////////////////////////////////////////////////////////
+        // This file by default includes all available modules. You can      //
+        // disable those that you won't use in your application. Core        //
+        // modules that you shouldn't touch unless you know very well what   //
+        // you're doing are at the bottom of this file.                      //
+        ///////////////////////////////////////////////////////////////////////
+        -->
+
+        <!--
+        ///////////////////////////////////////////////////////////////////////
+        // Database implementations. Choose the ones that apply.             //
+        ///////////////////////////////////////////////////////////////////////
+        -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-derby</artifactId>
@@ -83,7 +75,14 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- CRUD pages. Remove to disable this feature. -->
+
+        <!--
+        ///////////////////////////////////////////////////////////////////////
+        // Page types. Remove a module to disable its features.              //
+        ///////////////////////////////////////////////////////////////////////
+        -->
+
+        <!-- CRUD and many-to-many pages. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-crud</artifactId>
@@ -104,80 +103,49 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- Reliable mail sender. Remove to disable this feature. -->
+
+        <!--
+        ///////////////////////////////////////////////////////////////////////
+        // Optional services. Remove a module to disable its features.       //
+        ///////////////////////////////////////////////////////////////////////
+        -->
+
+        <!-- Reliable mail sender. -->
         <dependency>
             <groupId>com.manydesigns</groupId>
             <artifactId>portofino-mail</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-stripes</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Theme -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-theme</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Quartz -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-quartz</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- OpenID -->
-        <dependency>
-            <groupId>com.manydesigns</groupId>
-            <artifactId>portofino-openid</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- Servlet API -->
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-web-api</artifactId>
-            <version>${javaee-web-api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${logback.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <!-- mail -->
+        <!-- javax.mail. Some application servers natively provide it. -->
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
             <version>${javax.mail.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- Export -->
+        <!-- Quartz integration. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-quartz</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- OpenID support. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-openid</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Support for the Atmosphere framework (push notifications). -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-atmosphere</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Exports to PDF and XLS. -->
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>
             <artifactId>fop</artifactId>
@@ -202,9 +170,92 @@
             </exclusions>
             <scope>compile</scope>
         </dependency>
+
+        <!--
+        ///////////////////////////////////////////////////////////////////////
+        // Base Portofino services. Some of them can be disabled.            //
+        ///////////////////////////////////////////////////////////////////////
+        -->
+
+        <!-- Support for page actions. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-pageactions</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Support for database connectivity. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-database</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Administration (CMS, database, wizard). Remove to disable this feature. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-admin</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Stripes framework integration. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-stripes</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Theme -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-theme</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Servlet API -->
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-web-api</artifactId>
+            <version>${javaee-web-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
+            <!--
+            To run the application in an embedded Tomcat 7:
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.0</version>
+            </plugin>
+            -->
+            
             <!--
             To run the application in an embedded JBoss AS 7:
               export MAVEN_OPTS="-Xmx1024M -XX:MaxPermSize=512m"

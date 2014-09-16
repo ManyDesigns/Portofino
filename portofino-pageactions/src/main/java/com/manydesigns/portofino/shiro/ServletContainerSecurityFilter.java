@@ -36,7 +36,7 @@ import java.io.Serializable;
 import java.security.Principal;
 
 /**
- * Add this to web.xml to manage user authentication with the servlet container. Note: also requires support in
+ * Add this to shiro.ini to manage user authentication with the servlet container. Note: also requires support in
  * Security.groovy and the login action.
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -100,8 +100,6 @@ public class ServletContainerSecurityFilter extends PathMatchingFilter {
                 HttpServletRequest httpRequest = (HttpServletRequest) request;
                 return httpRequest.getUserPrincipal();
             }
-
-            logger.warn("Not sure about who is authenticated in the container!");
         }
         return req.getUserPrincipal();
     }

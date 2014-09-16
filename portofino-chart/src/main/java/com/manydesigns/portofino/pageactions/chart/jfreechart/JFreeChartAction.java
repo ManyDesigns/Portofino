@@ -141,7 +141,7 @@ public class JFreeChartAction extends AbstractPageAction {
             file = RandomUtil.getTempCodeFile(CHART_FILENAME_FORMAT, chartId);
 
             jfreeChartInstance =
-                    new JFreeChartInstance(chart, file, chartId, "alt", //TODO
+                    new JFreeChartInstance(chart, file, chartId, "Chart: " + chartConfiguration.getName(),
                                            width, height, url);
         } catch (Throwable e) {
             logger.error("Chart exception", e);

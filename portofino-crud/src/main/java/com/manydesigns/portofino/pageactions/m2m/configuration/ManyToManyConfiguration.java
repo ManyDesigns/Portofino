@@ -195,7 +195,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
         this.viewType = viewType;
     }
 
-    @CssClass(BootstrapSizes.SPAN6)
+    @CssClass(BootstrapSizes.COL_SM_6)
     @XmlAttribute(required = false)
     public String getOneExpression() {
         return oneExpression;
@@ -206,7 +206,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     }
 
     @XmlAttribute(required = false)
-    @CssClass(BootstrapSizes.SPAN6)
+    @CssClass(BootstrapSizes.COL_SM_6)
     public String getOnePropertyName() {
         return onePropertyName;
     }

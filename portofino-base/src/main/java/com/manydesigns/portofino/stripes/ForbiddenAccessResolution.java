@@ -66,7 +66,6 @@ public class ForbiddenAccessResolution implements Resolution {
 
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Subject subject = SecurityUtils.getSubject();
-        //TODO ElementsActionBeanContext
         ElementsActionBeanContext context = new ElementsActionBeanContext();
         context.setRequest(request);
         String originalPath = context.getActionPath();

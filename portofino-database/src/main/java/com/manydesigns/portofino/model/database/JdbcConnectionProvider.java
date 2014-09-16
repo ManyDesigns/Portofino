@@ -80,19 +80,25 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     public void init(DatabasePlatformsRegistry databasePlatformsRegistry) {
         keyPrefix = "portofino.database." + getDatabase().getDatabaseName() + ".";
         configuration = databasePlatformsRegistry.getPortofinoConfiguration();
-        if(url.startsWith(keyPrefix) && configuration.containsKey(url)) {
-            actualUrl = configuration.getString(url);
+        if(url == null || url.equals(keyPrefix + "url")) {
+            actualUrl = configuration.getString(keyPrefix + "url");
+            if(actualUrl == null) {
+                throw new RuntimeException("Invalid connection provider for database " + getDatabase().getDatabaseName() + " - no URL specified");
+            }
         } else {
             actualUrl = url;
         }
         actualUrl = OgnlTextFormat.format(actualUrl, null);
-        if(username.startsWith(keyPrefix) && configuration.containsKey(username)) {
-            actualUsername = configuration.getString(username);
+        if(username == null || username.equals(keyPrefix + "username")) {
+            actualUsername = configuration.getString(keyPrefix + "username");
+            if(actualUsername == null) {
+                throw new RuntimeException("Invalid connection provider for database " + getDatabase().getDatabaseName() + " - no username specified");
+            }
         } else {
             actualUsername = username;
         }
-        if(password.startsWith(keyPrefix) && configuration.containsKey(password)) {
-            actualPassword = configuration.getString(password);
+        if(password == null || password.equals(keyPrefix + "password")) {
+            actualPassword = configuration.getString(keyPrefix + "password");
         } else {
             actualPassword = password;
         }
@@ -106,7 +112,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
 
     public String getDescription() {
         return MessageFormat.format(
-                "JDBC connection to URL: {0}", url);
+                "JDBC connection to URL: {0}", actualUrl);
     }
 
     public Connection acquireConnection() throws Exception {
@@ -164,8 +170,8 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     }
 
     public void setActualUrl(String url) {
-        if(this.url.startsWith(keyPrefix) && configuration.containsKey(this.url)) {
-            configuration.setProperty(this.url, url);
+        if(this.url == null || this.url.equals(keyPrefix + "url")) {
+            configuration.setProperty(keyPrefix + "url", url);
         } else {
             this.url = url;
         }
@@ -177,8 +183,8 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     }
 
     public void setActualUsername(String username) {
-        if(this.username.startsWith(keyPrefix) && configuration.containsKey(this.username)) {
-            configuration.setProperty(this.username, username);
+        if(this.username == null || this.username.equals(keyPrefix + "username")) {
+            configuration.setProperty(keyPrefix + "username", username);
         } else {
             this.username = username;
         }
@@ -190,8 +196,8 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     }
 
     public void setActualPassword(String password) {
-        if(this.password.startsWith(keyPrefix) && configuration.containsKey(this.password)) {
-            configuration.setProperty(this.password, password);
+        if(this.password == null || this.password.equals(keyPrefix + "url")) {
+            configuration.setProperty(keyPrefix + "password", password);
         } else {
             this.password = password;
         }

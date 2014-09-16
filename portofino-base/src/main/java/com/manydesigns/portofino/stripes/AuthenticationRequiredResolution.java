@@ -62,7 +62,6 @@ public class AuthenticationRequiredResolution implements Resolution {
     }
 
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        //TODO ElementsActionBeanContext
         ElementsActionBeanContext context = new ElementsActionBeanContext();
         context.setRequest(request);
         String originalPath = context.getActionPath();

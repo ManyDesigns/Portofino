@@ -155,9 +155,9 @@ public class Profile extends CustomAction {
 
     protected Blob scaleAndCropAvatar() {
         FileBlobField field = (FileBlobField) form.findFieldByPropertyName("avatar");
-        def blob = field.getValue()
-        File file = blob.dataFile; //TODO use proper blob API
-        def image = ImageIO.read(file);
+        def blob = field.getValue();
+        def image = ImageIO.read(blob.getInputStream());
+        blob.dispose();
         double scaleXFactor = ((double) MAX_WIDTH) / image.width;
         double scaleYFactor = ((double) MAX_HEIGHT) / image.height;
         double scaleFactor = Math.max(scaleXFactor, scaleYFactor);
@@ -180,12 +180,14 @@ public class Profile extends CustomAction {
                 writer = ImageIO.getImageWritersByFormatName("png").next();
                 field.getValue().setContentType("image/png");
             }
-            def stream = new FileImageOutputStream(file);
+            //blobManager.save(blob);
+            //def blobStream = blobManager.openStream(blob);
+            def stream = new ByteArrayOutputStream()
             writer.output = stream;
             writer.write(imageBuff);
             writer.dispose();
-            field.getValue().setSize(file.length());
-            field.getValue().saveMetaProperties();
+            blob.setInputStream(new ByteArrayInputStream(stream.toByteArray()));
+            blobManager.save(blob);
             stream.close();
         }
         return blob
