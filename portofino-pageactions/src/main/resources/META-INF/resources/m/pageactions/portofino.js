@@ -154,8 +154,10 @@ function setupSelectFieldLinks() {
                     dialog.modal("hide");
                     dialogDiv.html(data);
                     var newDialog = dialogDiv.find("div.modal");
-                    setupDialogContents(newDialog);
-                    newDialog.modal({ backdrop: 'static', show: true });
+                    if(newDialog.length > 0) {
+                        setupDialogContents(newDialog);
+                        newDialog.modal({ backdrop: 'static', show: true });
+                    }
                 }).fail(function() {
                     alert("Form submission failed!"); //TODO
                 });
