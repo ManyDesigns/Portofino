@@ -91,11 +91,10 @@ public class ChartJsAction extends AbstractPageAction {
         if(chartConfiguration == null) {
             return forwardToPageActionNotConfigured();
         }
-        chartId = RandomUtil.createRandomId();
-        String query = chartConfiguration.getQuery();
-        Session session = persistence.getSession(chartConfiguration.getDatabase());
-        List<Object[]> result;
-        result = QueryUtils.runSql(session, query);
+        List<Object[]> result = loadChartData();
+        if(result == null) {
+            return forwardTo("/m/chart/chartjs/no-data-available.jsp");
+        }
         if(chartConfiguration.getActualType().kind == 1) {
             JSONArray data = new JSONArray();
             if (!fillData1D(result, data)) {
@@ -113,6 +112,18 @@ public class ChartJsAction extends AbstractPageAction {
             return forwardToPageActionNotConfigured();
         }
         return forwardTo("/m/chart/chartjs/display.jsp");
+    }
+
+    protected List<Object[]> loadChartData() {
+        try {
+            chartId = RandomUtil.createRandomId();
+            String query = chartConfiguration.getQuery();
+            Session session = persistence.getSession(chartConfiguration.getDatabase());
+            return QueryUtils.runSql(session, query);
+        } catch(Exception e) {
+            logger.error("Error executing query", e);
+            return null;
+        }
     }
 
     protected boolean fillData1D(List<Object[]> result, JSONArray data) {
