@@ -158,7 +158,7 @@ public class PortofinoListener
         }
         logger.info("Blobs directory: " + appBlobsDir.getAbsolutePath());
         File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        File tempBlobsDir = new File(tmpDir, "portofino-blobs-" + servletContext.getContextPath());
+        File tempBlobsDir = new File(tmpDir, "portofino-blobs" + servletContext.getContextPath().replace("/", "-"));
         logger.info("Temporary blobs directory: " + tempBlobsDir.getAbsolutePath());
 
         String metaFilenamePattern = "blob-{0}.properties";
