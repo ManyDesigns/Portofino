@@ -28,7 +28,7 @@
                 <mde:write name="actionBean" property="jdbcCPForm"/>
             </div>
             <div class="form-group">
-                <div class="align-with-input col-sm-10">
+                <div class="col-md-offset-2 col-md-10">
                     <portofino:buttons list="select-user-fields" />
                 </div>
             </div>

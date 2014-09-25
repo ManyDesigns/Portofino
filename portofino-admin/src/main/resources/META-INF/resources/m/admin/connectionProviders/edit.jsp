@@ -24,7 +24,7 @@
             </c:if>
             <stripes:hidden name="databaseName" value="${actionBean.databaseName}"/>
             <div class="form-group">
-                <div class="align-with-input col-sm-10">
+                <div class="col-md-offset-2 col-md-10">
                     <portofino:buttons list="connectionProviders-edit" />
                 </div>
             </div>

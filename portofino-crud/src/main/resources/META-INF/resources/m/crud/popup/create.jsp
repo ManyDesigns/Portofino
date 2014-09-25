@@ -35,7 +35,7 @@
             <input type="hidden" name="popup" value="true" />
             <input type="hidden" name="popupCloseCallback" value="${actionBean.popupCloseCallback}" />
             <div class="form-group">
-                <div class="align-with-input col-sm-10">
+                <div class="col-md-offset-2 col-md-10">
                     <portofino:buttons list="crud-create" />
                 </div>
             </div>
