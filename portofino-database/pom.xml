@@ -65,17 +65,10 @@
             <version>${liquibase.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.sf.jsqlparser</groupId>
-            <artifactId>jsqlparser</artifactId>
-            <version>0.8.0</version>
-        </dependency>
-        <!--
-                <dependency>
             <groupId>com.github.jsqlparser</groupId>
             <artifactId>jsqlparser</artifactId>
-            <version>0.8.5</version>
+            <version>0.9.1</version>
         </dependency>
-        -->
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>

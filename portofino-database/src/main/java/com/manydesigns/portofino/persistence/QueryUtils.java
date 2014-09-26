@@ -726,13 +726,13 @@ public class QueryUtils {
     protected static String getEntityAlias(String entityName, PlainSelect query) {
         FromItem fromItem = query.getFromItem();
         if (hasEntityAlias(entityName, fromItem)) {
-            return fromItem.getAlias();
+            return fromItem.getAlias().getName();
         }
         if(query.getJoins() != null) {
             for(Object o : query.getJoins()) {
                 Join join = (Join) o;
                 if (hasEntityAlias(entityName, join.getRightItem())) {
-                    return join.getRightItem().getAlias();
+                    return join.getRightItem().getAlias().getName();
                 }
             }
         }
@@ -743,7 +743,8 @@ public class QueryUtils {
     private static boolean hasEntityAlias(String entityName, FromItem fromItem) {
         return fromItem instanceof net.sf.jsqlparser.schema.Table &&
                ((net.sf.jsqlparser.schema.Table) fromItem).getName().equals(entityName) &&
-               !StringUtils.isBlank(fromItem.getAlias());
+               fromItem.getAlias() != null &&
+               !StringUtils.isBlank(fromItem.getAlias().getName());
     }
 
     /**
