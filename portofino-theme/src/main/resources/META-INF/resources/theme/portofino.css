@@ -153,6 +153,15 @@ Forms (Elements)
     width: 83.33333333%;
 }
 
+/* form in well */
+.well-with-tabs .form-horizontal .control-label {
+    width: 33.33333333%;
+}
+
+.well-with-tabs .form-horizontal fieldset.mde-columns-1 .input-container {
+    width: 66.66666667%;
+}
+
 tbody div.form-control {
     background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
     border-radius: 0;

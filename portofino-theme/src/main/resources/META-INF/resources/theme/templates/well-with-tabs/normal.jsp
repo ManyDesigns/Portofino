@@ -119,7 +119,7 @@
                     <div class="col-md-4">
                         <div class="well">
                             <div>
-                                <div class="pageBody">
+                                <div class="pageBody well-with-tabs">
                                     <stripes:layout-component name="pageBody" />
                                 </div>
                             </div>

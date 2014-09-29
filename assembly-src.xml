@@ -54,6 +54,12 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
+      <source>portofino-atmosphere/pom.xml</source>
+      <outputDirectory>portofino-atmosphere</outputDirectory>
+      <destName>pom.xml</destName>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
       <source>portofino-base/pom.xml</source>
       <outputDirectory>portofino-base</outputDirectory>
       <destName>pom.xml</destName>
@@ -192,6 +198,13 @@
     <fileSet>
       <directory>portofino-admin/src/main</directory>
       <outputDirectory>portofino-admin/src/main</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-atmosphere/src/main</directory>
+      <outputDirectory>portofino-atmosphere/src/main</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -354,6 +367,13 @@
     <fileSet>
       <directory>portofino-admin/target/apidocs</directory>
       <outputDirectory>javadocs/portofino-admin</outputDirectory>
+      <useDefaultExcludes>true</useDefaultExcludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>portofino-atmosphere/target/apidocs</directory>
+      <outputDirectory>javadocs/portofino-atmosphere</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>

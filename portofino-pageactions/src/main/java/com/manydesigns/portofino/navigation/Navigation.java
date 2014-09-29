@@ -128,7 +128,8 @@ public class Navigation {
                 try {
                     page = DispatcherLogic.getPage(pageDir);
                 } catch (Exception e) {
-                    logger.warn("Nonexisting child page: " + pageDir, e);
+                    logger.warn("Nonexisting child page: " + pageDir);
+                    logger.debug("Detailed explanation", e);
                     continue;
                 }
                 String path = prefix + childPage.getName();
