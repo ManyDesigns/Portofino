@@ -41,6 +41,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
+import org.apache.shiro.authz.annotation.RequiresUser;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -505,11 +506,13 @@ public abstract class LoginAction extends AbstractActionBean {
     // Change password
     //**************************************************************************
 
+    @RequiresUser
     public Resolution changePassword() throws Exception {
         return new ForwardResolution("/m/base/actions/user/changePassword.jsp");
     }
 
     @Button(list = "changepassword", key = "ok", order = 1, type = Button.TYPE_PRIMARY)
+    @RequiresUser
     public Resolution changePassword2() throws Exception {
         Subject subject = SecurityUtils.getSubject();
 
@@ -562,15 +565,15 @@ public abstract class LoginAction extends AbstractActionBean {
 
     protected boolean checkPasswordStrength(String password, List<String> errorMessages) {
         if (password == null) {
-            logger.debug("Null password");
+            errorMessages.add(ElementsThreadLocals.getText("null.password"));
             return false;
         }
         if (password.length() < 8) {
-            logger.debug("Password too short");
+            errorMessages.add(ElementsThreadLocals.getText("password.too.short", 8));
             return false;
         }
         if (StringUtils.isAlpha(password)) {
-            logger.debug("Password only alpha chars");
+            errorMessages.add(ElementsThreadLocals.getText("password.only.letters"));
             return false;
         }
         return true;
