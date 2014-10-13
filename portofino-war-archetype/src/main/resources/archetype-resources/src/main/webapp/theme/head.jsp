@@ -10,9 +10,11 @@
 --%><head>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<!-- HTML5 shim, for IE6-8 support of HTML5 elements + Canvas support -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements + media queries + Canvas support -->
 <!--[if lt IE 9]>
     <script src="<stripes:url value='/theme/html5shiv/html5shiv-printshiv.min.js' />"></script>
+    <script src="<stripes:url value='/theme/respond/respond.min.js' />"></script>
     <script src="<stripes:url value='/m/chart/chartjs/excanvas.js' />"></script>
 <![endif]-->
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/bootstrap/css/bootstrap.min.css' />">
@@ -41,5 +43,5 @@
 <%
     BaseHref.emit(request, new XhtmlBuffer(out));
 %>
-<title><c:out value='<%= request.getParameter("pageTitle") %>' escapeXml="false"/></title>
+<title><c:out value='<%= request.getParameter("pageTitle") %>' escapeXml="false" /></title>
 </head>
