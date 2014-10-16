@@ -40,6 +40,10 @@
         <param-name>ActionBeanContext.Class</param-name>
         <param-value>com.manydesigns.elements.stripes.ElementsActionBeanContext</param-value>
     </context-param>
+    <context-param>
+        <param-name>ExceptionHandler.Class</param-name>
+        <param-value>com.manydesigns.portofino.stripes.ExceptionHandler</param-value>
+    </context-param>
 
     <!-- Stripes -->
     <filter>
