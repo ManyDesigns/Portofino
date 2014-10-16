@@ -116,11 +116,7 @@ public class SimpleBlobManager implements BlobManager {
 
     @Override
     public void save(Blob blob) throws IOException {
-        if(blob.getCode() == null) {
-            blob.setCode(generateNewCode());
-        } else {
-            ensureValidCode(blob.getCode());
-        }
+        ensureValidCode(blob.getCode());
         File dataFile = getDataFile(blob.getCode());
         if(!dataFile.getParentFile().isDirectory()) {
             dataFile.getParentFile().mkdirs();
@@ -142,10 +138,6 @@ public class SimpleBlobManager implements BlobManager {
             IOUtils.closeQuietly(out);
         }
         blob.dispose();
-    }
-
-    protected String generateNewCode() {
-        return RandomUtil.createRandomId();
     }
 
     @Override

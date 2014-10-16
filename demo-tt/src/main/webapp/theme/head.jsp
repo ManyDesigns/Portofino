@@ -8,7 +8,7 @@
     This is only an example. You should customize your head.jsp depending on the installed modules.
 
 --%><head>
-<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements + media queries + Canvas support -->

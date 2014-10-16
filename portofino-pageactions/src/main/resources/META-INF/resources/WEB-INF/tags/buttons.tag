@@ -123,6 +123,7 @@
         }
         if(group != null) {
             buffer.closeElement("div");
+            buffer.write(" ");
         }
     }
 %><%!

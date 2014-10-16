@@ -24,6 +24,7 @@ import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MemoryUtil;
+import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.controller.StripesRequestWrapper;
@@ -34,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.concurrent.Callable;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -52,6 +54,12 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
     public static final String OPERATION_SUFFIX = "_operation";
     public static final String CODE_SUFFIX = "_code";
     public static final String INNER_SUFFIX = "_inner";
+    public static final Callable<String> DEFAULT_CODE_GENERATOR = new Callable<String>() {
+        @Override
+        public String call() {
+            return RandomUtil.createRandomId();
+        }
+    };
 
     protected String innerId;
     protected String operationInputName;
@@ -59,6 +67,7 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
 
     protected Blob blob;
     protected String blobError;
+    protected Callable<String> blobCodeGenerator = DEFAULT_CODE_GENERATOR;
 
     //**************************************************************************
     // Costruttori
@@ -235,7 +244,7 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
         final FileBean fileBean = stripesRequest.getFileParameterValue(inputName);
 
         if (fileBean != null) {
-            blob = new Blob(null) {
+            blob = new Blob(generateNewCode()) {
                 @Override
                 public void dispose() {
                     super.dispose();
@@ -264,6 +273,14 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
         } else {
             logger.debug("An update of a blob was requested, but nothing was uploaded. The previous value will be kept.");
             keepOldBlob(req);
+        }
+    }
+
+    protected String generateNewCode() {
+        try {
+            return blobCodeGenerator.call();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -330,4 +347,11 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
         this.blobError = blobError;
     }
 
+    public Callable<String> getBlobCodeGenerator() {
+        return blobCodeGenerator;
+    }
+
+    public void setBlobCodeGenerator(Callable<String> blobCodeGenerator) {
+        this.blobCodeGenerator = blobCodeGenerator;
+    }
 }
