@@ -60,14 +60,11 @@ class MyActivityStreamAction extends ActivityStreamAction {
         if(user.avatar == null) {
             return new RedirectResolution("/images/user-placeholder-40x40.png");
         } else {
-            Blob blob = blobManager.read(user.avatar);
-            long contentLength = blob.getSize();
-            String contentType = blob.getContentType();
-            InputStream inputStream = new FileInputStream(blob.getDataFile());
-
-            //Cache blobs (they're immutable)
-            HttpServletResponse response = context.getResponse();
-            ServletUtils.markCacheableForever(response);
+            Blob blob = new Blob(user.avatar);
+            blobManager.loadMetadata(blob);
+            long contentLength = blob.size;
+            String contentType = blob.contentType;
+            InputStream inputStream = blobManager.openStream(blob);
 
             return new StreamingResolution(contentType, inputStream)
                     .setLength(contentLength)

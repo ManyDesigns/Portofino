@@ -232,13 +232,11 @@ class ProjectMembersAction extends CrudAction {
         if(user == null || user.avatar == null) {
             return new RedirectResolution("/images/user-placeholder-40x40.png");
         } else {
-            Blob blob = blobManager.read(user.avatar);
+            Blob blob = new Blob(user.avatar);
+            blobManager.loadMetadata(blob);
             long contentLength = blob.size;
             String contentType = blob.contentType;
-            InputStream inputStream = blob.inputStream;
-
-            //Cache blobs (they're immutable)
-            ServletUtils.markCacheableForever(context.response);
+            InputStream inputStream = blobManager.openStream(blob);
 
             return new StreamingResolution(contentType, inputStream)
                     .setLength(contentLength)

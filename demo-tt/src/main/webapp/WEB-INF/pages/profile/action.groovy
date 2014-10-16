@@ -93,8 +93,10 @@ public class Profile extends CustomAction {
         if(StringUtils.isEmpty(avatar)) {
             return new RedirectResolution("/images/user-placeholder-40x40.png");
         } else {
-            def blob = blobManager.read(avatar);
-            return new StreamingResolution(blob.contentType, new FileInputStream(blob.dataFile));
+            Blob blob = new Blob(user.avatar);
+            blobManager.loadMetadata(blob);
+            InputStream inputStream = blobManager.openStream(blob);
+            return new StreamingResolution(blob.contentType, inputStream);
         }
     }
 
