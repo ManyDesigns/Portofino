@@ -36,9 +36,6 @@
             </stripes:layout-component>
         </h3>
     </stripes:layout-component>
-    <stripes:layout-component name="pageTitle">
-        <c:out value="${actionBean.object.title}"/>
-    </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post" class="ticket-read">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
