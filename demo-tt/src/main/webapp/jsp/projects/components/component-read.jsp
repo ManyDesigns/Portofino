@@ -31,9 +31,6 @@
         </h3>
         <div><c:out value="${version.description}"/></div>
     </stripes:layout-component>
-    <stripes:layout-component name="pageTitle">
-        <c:out value="${actionBean.readTitle}"/>
-    </stripes:layout-component>
     <stripes:layout-component name="pageBody">
     </stripes:layout-component>
 </stripes:layout-render>
