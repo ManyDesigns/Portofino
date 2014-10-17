@@ -139,6 +139,5 @@
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>
     </body>
-</html>
-</c:if>
-</stripes:layout-definition>
+</html><%--
+--%></c:if></stripes:layout-definition>
