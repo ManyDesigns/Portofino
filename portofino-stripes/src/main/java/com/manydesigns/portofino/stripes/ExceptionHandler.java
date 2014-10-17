@@ -1,6 +1,10 @@
 package com.manydesigns.portofino.stripes;
 
+import net.sourceforge.stripes.action.ErrorResolution;
+import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.exception.DefaultExceptionHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletRequestWrapper;
@@ -9,7 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 
 public class ExceptionHandler extends DefaultExceptionHandler {
 
-    public void handle(StackOverflowError ex, HttpServletRequest req, HttpServletResponse resp) {
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);
+
+    public Resolution handle(StackOverflowError ex, HttpServletRequest req, HttpServletResponse resp) {
         String contextInfo = " Request: " + req;
         if(req instanceof ServletRequestWrapper) {
             contextInfo += " Wrapped request: " + ((ServletRequestWrapper) req).getRequest();
@@ -24,14 +30,10 @@ public class ExceptionHandler extends DefaultExceptionHandler {
             contextInfo += " Include path: " + req.getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
         } catch (Throwable e) {}
         try {
-            contextInfo += " Forward string: " + req.getAttribute(RequestDispatcher.FORWARD_SERVLET_PATH);
+            contextInfo += " Forward path: " + req.getAttribute(RequestDispatcher.FORWARD_SERVLET_PATH);
         } catch (Throwable e) {}
-        throw new RuntimeException("Stack Overflow! Exception swallowed to prevent log flooding." + contextInfo) {
-            @Override
-            public Throwable fillInStackTrace() {
-                return this;
-            }
-        };
+        logger.error("Stack Overflow! Exception swallowed to prevent log flooding." + contextInfo);
+        return new ErrorResolution(500);
     }
 
 }
