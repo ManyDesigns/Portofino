@@ -175,7 +175,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
                 String layoutContainerInParent = childPage.getContainer();
                 if(layoutContainerInParent != null) {
                     String newPath = context.getActionPath() + "/" + childPage.getName();
-                    newPath = ServletUtils.removePathParameters(newPath); //Path parameters mess with include
+                    newPath = ServletUtils.removePathParameters(newPath); //#PRT-1650 Path parameters mess with include
                     File pageDir = new File(pageInstance.getChildrenDirectory(), childPage.getName());
                     try {
                         Page page = DispatcherLogic.getPage(pageDir);
