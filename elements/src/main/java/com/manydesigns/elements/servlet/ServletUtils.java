@@ -20,6 +20,7 @@
 
 package com.manydesigns.elements.servlet;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,4 +96,30 @@ public class ServletUtils {
                 ServletConstants.HTTP_CACHE_CONTROL_MAX_AGE + ONE_YEAR_MILLIS);
     }
 
+    /**
+     * See <a href="http://tomcat.10.n6.nabble.com/Path-parameters-and-getRequestURI-td4377159.html">this</a>
+     * and <a href="http://tomcat.markmail.org/thread/ykx72wcuzcmiyujz">this</a>.
+     */
+    public static String removePathParameters(String originalPath) {
+        String[] tokens = originalPath.split("/");
+        for(int i = 0; i < tokens.length; i++) {
+            int index = tokens[i].indexOf(";");
+            if(index >= 0) {
+                tokens[i] = tokens[i].substring(0, index);
+            }
+        }
+        return StringUtils.join(tokens, "/");
+    }
+
+    public static String removeRedundantTrailingSlashes(String path) {
+        int trimPosition = path.length() - 1;
+        while(trimPosition >= 0 && path.charAt(trimPosition) == '/') {
+            trimPosition--;
+        }
+        String withoutTrailingSlashes = path.substring(0, trimPosition + 1);
+        while (withoutTrailingSlashes.contains("//")) {
+            withoutTrailingSlashes = withoutTrailingSlashes.replace("//", "/");
+        }
+        return withoutTrailingSlashes;
+    }
 }

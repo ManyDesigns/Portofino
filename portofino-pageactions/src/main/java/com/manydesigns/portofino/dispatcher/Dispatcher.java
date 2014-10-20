@@ -20,6 +20,7 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Page;
 import org.apache.commons.configuration.Configuration;
@@ -196,36 +197,9 @@ public class Dispatcher {
     }
 
     protected static String normalizePath(String originalPath) {
-        String path = removePathParameters(originalPath);
-        path = removeRedundantTrailingSlashes(path);
+        String path = ServletUtils.removePathParameters(originalPath);
+        path = ServletUtils.removeRedundantTrailingSlashes(path);
         return path;
-    }
-
-    /**
-     * See <a href="http://tomcat.10.n6.nabble.com/Path-parameters-and-getRequestURI-td4377159.html">this</a>
-     * and <a href="http://tomcat.markmail.org/thread/ykx72wcuzcmiyujz">this</a>.
-     */
-    protected static String removePathParameters(String originalPath) {
-        String[] tokens = originalPath.split("/");
-        for(int i = 0; i < tokens.length; i++) {
-            int index = tokens[i].indexOf(";");
-            if(index >= 0) {
-                tokens[i] = tokens[i].substring(0, index);
-            }
-        }
-        return StringUtils.join(tokens, "/");
-    }
-
-    protected static String removeRedundantTrailingSlashes(String path) {
-        int trimPosition = path.length() - 1;
-        while(trimPosition >= 0 && path.charAt(trimPosition) == '/') {
-            trimPosition--;
-        }
-        String withoutTrailingSlashes = path.substring(0, trimPosition + 1);
-        while (withoutTrailingSlashes.contains("//")) {
-            withoutTrailingSlashes = withoutTrailingSlashes.replace("//", "/");
-        }
-        return withoutTrailingSlashes;
     }
 
 }
