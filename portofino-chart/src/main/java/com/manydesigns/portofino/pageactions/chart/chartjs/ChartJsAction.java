@@ -198,7 +198,7 @@ public class ChartJsAction extends AbstractPageAction {
     //**************************************************************************
 
     public static final String[][] CONFIGURATION_FIELDS =
-            {{"name", "type", "legend", "database", "query" }};
+            {{"name", "type", "database", "query" }};
 
     public static final String[] chartTypes1D;
     public static final String[] chartTypes2D;
