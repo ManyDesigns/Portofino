@@ -2,11 +2,11 @@ package com.manydesigns.portofino.pageactions.activitystream
 
 import com.manydesigns.portofino.tt.TtUtils
 
-import com.manydesigns.elements.ElementsThreadLocals
 import com.manydesigns.elements.blobs.Blob
 import com.manydesigns.elements.blobs.BlobManager
 import com.manydesigns.elements.servlet.ServletUtils
 import com.manydesigns.portofino.di.Inject
+import com.manydesigns.portofino.modules.BaseModule
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.security.AccessLevel
@@ -17,6 +17,8 @@ import net.sourceforge.stripes.action.Resolution
 import net.sourceforge.stripes.action.StreamingResolution
 import org.apache.shiro.authz.annotation.RequiresAuthentication
 import org.hibernate.Session
+import com.manydesigns.elements.blobs.BlobManager
+import com.manydesigns.elements.blobs.BlobManager
 
 @RequiresAuthentication
 @RequiresPermissions(level = AccessLevel.VIEW)
@@ -27,6 +29,9 @@ class MyActivityStreamAction extends ActivityStreamAction {
 
     @Inject(DatabaseModule.PERSISTENCE)
     private Persistence persistence;
+
+    @Inject(BaseModule.DEFAULT_BLOB_MANAGER)
+    protected BlobManager blobManager;
 
     @Override
     public void populateActivityItems() {
@@ -55,15 +60,11 @@ class MyActivityStreamAction extends ActivityStreamAction {
         if(user.avatar == null) {
             return new RedirectResolution("/images/user-placeholder-40x40.png");
         } else {
-            BlobManager mgr = ElementsThreadLocals.blobManager;
-            Blob blob = mgr.loadBlob(user.avatar);
-            long contentLength = blob.getSize();
-            String contentType = blob.getContentType();
-            InputStream inputStream = new FileInputStream(blob.getDataFile());
-
-            //Cache blobs (they're immutable)
-            HttpServletResponse response = context.getResponse();
-            ServletUtils.markCacheableForever(response);
+            Blob blob = new Blob(user.avatar);
+            blobManager.loadMetadata(blob);
+            long contentLength = blob.size;
+            String contentType = blob.contentType;
+            InputStream inputStream = blobManager.openStream(blob);
 
             return new StreamingResolution(contentType, inputStream)
                     .setLength(contentLength)

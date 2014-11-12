@@ -35,7 +35,7 @@
             <input name="selectionProviderName" type="hidden" value="${actionBean.selectionProviderName}" />
             <input name="selectedTabId" type="hidden" value="tab-fk-sp" />
             <div class="form-group">
-                <div class="align-with-input col-sm-10">
+                <div class="col-md-offset-2 col-md-10">
                     <portofino:buttons list="table-selection-provider" />
                 </div>
             </div>

@@ -20,10 +20,8 @@
 
 package com.manydesigns.elements.fields;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.blobs.Blob;
-import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MemoryUtil;
 import com.manydesigns.elements.util.RandomUtil;
@@ -31,11 +29,13 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.controller.StripesRequestWrapper;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.concurrent.Callable;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -43,8 +43,7 @@ import java.io.IOException;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class FileBlobField extends AbstractField
-        implements MultipartRequestField {
+public class FileBlobField extends AbstractField implements MultipartRequestField {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
@@ -55,6 +54,12 @@ public class FileBlobField extends AbstractField
     public static final String OPERATION_SUFFIX = "_operation";
     public static final String CODE_SUFFIX = "_code";
     public static final String INNER_SUFFIX = "_inner";
+    public static final Callable<String> DEFAULT_CODE_GENERATOR = new Callable<String>() {
+        @Override
+        public String call() {
+            return RandomUtil.createRandomId();
+        }
+    };
 
     protected String innerId;
     protected String operationInputName;
@@ -62,6 +67,7 @@ public class FileBlobField extends AbstractField
 
     protected Blob blob;
     protected String blobError;
+    protected Callable<String> blobCodeGenerator = DEFAULT_CODE_GENERATOR;
 
     //**************************************************************************
     // Costruttori
@@ -147,7 +153,7 @@ public class FileBlobField extends AbstractField
     }
 
     private void valueToXhtmlEdit(XhtmlBuffer xb) {
-        if (blob == null) {
+        if (blob == null || blobError != null) { //TODO if there is an error, you cannot remove the old, wrong blob value without first uploading a new file
             xb.writeInputHidden(operationInputName, UPLOAD_MODIFY);
             xb.writeInputFile(id, inputName, false);
         } else {
@@ -206,61 +212,75 @@ public class FileBlobField extends AbstractField
     //**************************************************************************
     public void readFromRequest(HttpServletRequest req) {
         super.readFromRequest(req);
-
         if (mode.isView(insertable, updatable)) {
             return;
         }
-
         String updateTypeStr = req.getParameter(operationInputName);
         if (UPLOAD_MODIFY.equals(updateTypeStr)) {
             saveUpload(req);
         } else if (UPLOAD_DELETE.equals(updateTypeStr)) {
-            blob = null;
+            forgetBlob();
         } else {
             // in all other cases (updateTypeStr is UPLOAD_KEEP,
             // null, or other values) keep the existing blob
-            String code = req.getParameter(codeInputName);
-            safeLoadBlob(code);
+            keepOldBlob(req);
         }
     }
 
-    private void saveUpload(HttpServletRequest req) {
-        BlobManager blobManager = ElementsThreadLocals.getBlobManager();
-        if (blobManager == null) {
-            logger.warn("No blob manager found. Cannot save upload.");
-            throw new Error("No blob manager found. Cannot save upload.");
+    protected void forgetBlob() {
+        blob = null;
+    }
+
+    protected void keepOldBlob(HttpServletRequest req) {
+        String code = req.getParameter(codeInputName);
+        if(!StringUtils.isBlank(code)) {
+            blob = new Blob(code);
         }
+    }
 
-        FileBean fileBean = null;
-        try {
-            StripesRequestWrapper stripesRequest =
-                StripesRequestWrapper.findStripesWrapper(req);
-            fileBean = stripesRequest.getFileParameterValue(inputName);
+    protected void saveUpload(HttpServletRequest req) {
+        StripesRequestWrapper stripesRequest =
+            StripesRequestWrapper.findStripesWrapper(req);
+        final FileBean fileBean = stripesRequest.getFileParameterValue(inputName);
 
-            if (fileBean != null) {
-                String code = RandomUtil.createRandomId();
-                blob = blobManager.saveBlob(
-                        code,
-                        fileBean.getInputStream(),
-                        fileBean.getFileName(),
-                        fileBean.getContentType(),
-                        null);
-            } else {
-                logger.debug("An update of a blob was requested, but nothing was uploaded. The previous value will be kept.");
-                String code = req.getParameter(codeInputName);
-                safeLoadBlob(code);
-            }
-        } catch (Throwable e) {
-            logger.warn("Cannot save upload", e);
-            throw new Error("Cannot save upload", e);
-        } finally {
-            if(fileBean != null) {
+        if (fileBean != null) {
+            blob = new Blob(generateNewCode()) {
+                @Override
+                public void dispose() {
+                    super.dispose();
+                    try {
+                        fileBean.delete();
+                    } catch (IOException e) {
+                        logger.warn("Could not delete file bean", e);
+                    }
+                }
+            };
+            try {
+                blob.setInputStream(fileBean.getInputStream());
+                blob.setFilename(fileBean.getFileName());
+                blob.setContentType(fileBean.getContentType());
+                blob.setPropertiesLoaded(true);
+            } catch (IOException e) {
+                logger.error("Could not read upload", e);
+                forgetBlob();
+                blobError = getText("elements.error.field.fileblob.uploadFailed");
                 try {
                     fileBean.delete();
-                } catch (IOException e) {
-                    logger.warn("Could not delete file bean", e);
+                } catch (IOException e1) {
+                    logger.error("Could not delete FileBean", e1);
                 }
             }
+        } else {
+            logger.debug("An update of a blob was requested, but nothing was uploaded. The previous value will be kept.");
+            keepOldBlob(req);
+        }
+    }
+
+    protected String generateNewCode() {
+        try {
+            return blobCodeGenerator.call();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -280,29 +300,13 @@ public class FileBlobField extends AbstractField
     public void readFromObject(Object obj) {
         super.readFromObject(obj);
         if (obj == null) {
-            blob = null;
+            forgetBlob();
         } else {
-            String code = (String) accessor.get(obj);
-            safeLoadBlob(code);
-        }
-    }
-
-    protected void safeLoadBlob(String code) {
-        if (code == null) {
-            blob = null;
-        } else {
-            BlobManager blobManager = ElementsThreadLocals.getBlobManager();
-            if (blobManager == null) {
-                logger.warn("No blob manager found. Cannot load blob with code '{}'.", code);
-                return;
-            }
-            try {
-                blob = blobManager.loadBlob(code);
-            } catch (Throwable e) {
-                blob = null;
-                blobError = getText("elements.error.field.fileblob.cannotLoad");
-                logger.warn("Cannot load blob with code '{}'. Cause: {}",
-                        code, e.getMessage());
+            String code  = (String) accessor.get(obj);
+            if(StringUtils.isBlank(code)) {
+                forgetBlob();
+            } else {
+                blob = new Blob(code);
             }
         }
     }
@@ -341,5 +345,13 @@ public class FileBlobField extends AbstractField
 
     public void setBlobError(String blobError) {
         this.blobError = blobError;
+    }
+
+    public Callable<String> getBlobCodeGenerator() {
+        return blobCodeGenerator;
+    }
+
+    public void setBlobCodeGenerator(Callable<String> blobCodeGenerator) {
+        this.blobCodeGenerator = blobCodeGenerator;
     }
 }

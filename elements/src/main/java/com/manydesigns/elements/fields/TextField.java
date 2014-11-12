@@ -92,6 +92,11 @@ public class TextField extends AbstractTextField {
             amber = annotation.amber();
             green = annotation.green();
         }
+
+        if(multiline) {
+            //By default, hint that textareas and rich text editors should take up all available horizontal space
+            fieldCssClass = "fill-row";
+        }
     }
 
     //**************************************************************************

@@ -25,6 +25,7 @@ import com.manydesigns.mail.queue.MailQueue;
 import com.manydesigns.mail.queue.model.Attachment;
 import com.manydesigns.mail.queue.model.Email;
 import com.manydesigns.mail.queue.model.Recipient;
+import com.sun.mail.smtp.SMTPAddressFailedException;
 import org.apache.commons.mail.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ import javax.activation.FileDataSource;
 import javax.mail.IllegalWriteException;
 import javax.mail.MessagingException;
 import javax.mail.MethodNotSupportedException;
+import javax.mail.SendFailedException;
 import javax.mail.internet.ParseException;
 import java.io.File;
 import java.util.List;
@@ -107,8 +109,13 @@ public class DefaultMailSender implements MailSender {
                        cause instanceof MethodNotSupportedException) {
                         markFailed(id, cause);
                     } else if(cause instanceof MessagingException) {
-                        logger.warn("Mail not sent due to known server error, NOT marking as failed", e);
-                        serverErrors++;
+                        if(e.getCause() instanceof SendFailedException && e.getCause().getCause() instanceof SMTPAddressFailedException) {
+                            logger.warn("Mail not sent due to known server error, marking as failed");
+                            markFailed(id, e);
+                        } else {
+                            logger.warn("Mail not sent due to known server error, NOT marking as failed", e);
+                            serverErrors++;
+                        }
                     } else {
                         markFailed(id, e);
                     }
@@ -116,7 +123,7 @@ public class DefaultMailSender implements MailSender {
                     markFailed(id, e);
                 }
                 if(sent) try {
-                    logger.info("Email with id {} sent, marking", id);
+                    logger.info("Email with id {} sent, marking as sent ", id);
                     queue.markSent(id);
                 } catch (Throwable e) {
                     logger.error("Couldn't mark mail as sent", e);

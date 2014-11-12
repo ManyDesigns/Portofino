@@ -13,6 +13,7 @@ import com.manydesigns.portofino.di.Inject
 import com.manydesigns.portofino.model.database.Database
 import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.model.database.Table
+import com.manydesigns.portofino.modules.BaseModule
 import com.manydesigns.portofino.modules.DatabaseModule
 import com.manydesigns.portofino.pageactions.custom.CustomAction
 import com.manydesigns.portofino.persistence.Persistence
@@ -30,12 +31,17 @@ import net.sourceforge.stripes.action.StreamingResolution
 import org.apache.commons.lang.StringUtils
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authz.annotation.RequiresAuthentication
+import com.manydesigns.elements.blobs.BlobManager
+import com.manydesigns.elements.blobs.BlobManager
 
 @RequiresPermissions(level = AccessLevel.VIEW)
 public class Profile extends CustomAction {
 
     @Inject(DatabaseModule.PERSISTENCE)
     public Persistence persistence;
+
+    @Inject(BaseModule.DEFAULT_BLOB_MANAGER)
+    protected BlobManager blobManager;
 
     protected Form form;
     protected Map user;
@@ -87,8 +93,10 @@ public class Profile extends CustomAction {
         if(StringUtils.isEmpty(avatar)) {
             return new RedirectResolution("/images/user-placeholder-40x40.png");
         } else {
-            def blob = ElementsThreadLocals.blobManager.loadBlob(avatar);
-            return new StreamingResolution(blob.contentType, new FileInputStream(blob.dataFile));
+            Blob blob = new Blob(user.avatar);
+            blobManager.loadMetadata(blob);
+            InputStream inputStream = blobManager.openStream(blob);
+            return new StreamingResolution(blob.contentType, inputStream);
         }
     }
 
@@ -136,8 +144,7 @@ public class Profile extends CustomAction {
             Blob blob = scaleAndCropAvatar();
             loadUser();
             if(user.avatar != null) {
-                BlobManager mgr = ElementsThreadLocals.blobManager;
-                mgr.deleteBlob(user.avatar);
+                blobManager.delete(user.avatar);
             }
             user.avatar = blob.code;
             def session = persistence.getSession("tt")
@@ -150,9 +157,9 @@ public class Profile extends CustomAction {
 
     protected Blob scaleAndCropAvatar() {
         FileBlobField field = (FileBlobField) form.findFieldByPropertyName("avatar");
-        def blob = field.getValue()
-        File file = blob.dataFile;
-        def image = ImageIO.read(file);
+        def blob = field.getValue();
+        def image = ImageIO.read(blob.getInputStream());
+        blob.dispose();
         double scaleXFactor = ((double) MAX_WIDTH) / image.width;
         double scaleYFactor = ((double) MAX_HEIGHT) / image.height;
         double scaleFactor = Math.max(scaleXFactor, scaleYFactor);
@@ -175,12 +182,14 @@ public class Profile extends CustomAction {
                 writer = ImageIO.getImageWritersByFormatName("png").next();
                 field.getValue().setContentType("image/png");
             }
-            def stream = new FileImageOutputStream(file);
+            //blobManager.save(blob);
+            //def blobStream = blobManager.openStream(blob);
+            def stream = new ByteArrayOutputStream()
             writer.output = stream;
             writer.write(imageBuff);
             writer.dispose();
-            field.getValue().setSize(file.length());
-            field.getValue().saveMetaProperties();
+            blob.setInputStream(new ByteArrayInputStream(stream.toByteArray()));
+            blobManager.save(blob);
             stream.close();
         }
         return blob
@@ -206,8 +215,7 @@ public class Profile extends CustomAction {
     public Resolution deletePhoto() {
         loadUser();
         if(user.avatar != null) {
-            BlobManager mgr = ElementsThreadLocals.blobManager;
-            mgr.deleteBlob(user.avatar);
+            blobManager.delete(user.avatar);
             user.avatar = null;
             def session = persistence.getSession("tt")
             session.update("users", (Object) user);

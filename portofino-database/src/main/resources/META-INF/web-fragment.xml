@@ -8,11 +8,6 @@
         <after><name>pageactions</name></after>
     </ordering>
 
-    <listener>
-        <description>Blob Cleanup Listener</description>
-        <listener-class>com.manydesigns.portofino.servlets.BlobCleanupListener</listener-class>
-    </listener>
-
     <filter>
         <filter-name>cleanup-filter</filter-name>
         <filter-class>

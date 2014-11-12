@@ -31,9 +31,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Delegate interface used by Portofino's default Shiro realm implementation.
- * Key functionality is delegated to instances of this interface to allow
- * arbitrary implementations by users (security.groovy) without touching the core framework.
+ * Portofino Shiro realm extension.
+ * Key functionality related to application users and groups is delegated to instances of this interface to allow
+ * arbitrary security implementations by developers (Security.groovy) without touching the core framework.
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -71,13 +71,33 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
     void changePassword(Serializable user, String oldPassword, String newPassword) throws IncorrectCredentialsException;
 
     /**
-     * Generates a one-time token, for use in email validation and password reset
-     * Unlike a password, which needs to be associated to a login to be a ShiroToken
+     * Generates a one-time token, for use in email validation and password reset.
+     * Unlike a password, which needs to be associated to a login to be a ShiroToken,
      * a one-time token is valid ShiroToken.
      * @param user the user object.
      * @return the one-time token
      */
     String generateOneTimeToken(Serializable user);
+
+    //--------------------------------------------------------------------------
+    // Self registration
+    //--------------------------------------------------------------------------
+
+    /**
+     * Returns a ClassAccessor that describes the properties which a self-registered user must or can provide to
+     * initiate the sign up process.
+     * @return the ClassAccessor.
+     */
+    ClassAccessor getSelfRegisteredUserClassAccessor();
+
+    /**
+     * Saves a self-registered user on the system. The user should be in a invalid state (cannot log in) until he or she
+     * confirms registration providing a token (typically by clicking a link in an email message).
+     * @param user the user object to save. It is the same kind of object known by getSelfRegisteredUserClassAccessor().
+     * @return the unique token necessary to confirm the registration.
+     * @throws RegistrationException if the user could not be saved for whatever reason.
+     */
+    String saveSelfRegisteredUser(Object user) throws RegistrationException;
 
     //--------------------------------------------------------------------------
     // Users CRUD
@@ -99,30 +119,26 @@ public interface PortofinoRealm extends Realm, Authorizer, CacheManagerAware {
      */
     Serializable getUserById(String encodedUserId);
 
-    Serializable saveUser(Serializable user);
-
-    Serializable updateUser(Serializable user);
-
-    ClassAccessor getUserClassAccessor();
-
     /**
-     * Loads a user by email address.
+     * Loads a user by email address. Used by the reset password implementation.
      * @param email the email address of the user.
      * @return the user object.
      */
     Serializable getUserByEmail(String email);
 
     /**
-     * Returns a ClassAccessor that describes the properties which a self-registered user must or can provide to
-     * initiate the sign up process.
-     * @return the ClassAccessor.
+     * Computes a string describing the user, meant to be shown on the UI. For example, a username, an email address,
+     * a name, etc.
+     * @param user the user's primary principal (as returned by loadAuthenticationInfo()).
+     * @return the pretty name.
      */
-    ClassAccessor getSelfRegisteredUserClassAccessor();
-
-    String saveSelfRegisteredUser(Object user) throws RegistrationException;
-
     String getUserPrettyName(Serializable user);
 
+    /**
+     * Extracts a value that uniquely identifies the user. For example, a database ID.
+     * @param user the user's primary principal (as returned by loadAuthenticationInfo()).
+     * @return the user id.
+     */
     Serializable getUserId(Serializable user);
 
     //--------------------------------------------------------------------------

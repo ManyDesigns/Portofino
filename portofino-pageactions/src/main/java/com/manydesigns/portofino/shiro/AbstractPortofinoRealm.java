@@ -141,21 +141,6 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
         return user.toString();
     }
 
-    @Override
-    public Serializable saveUser(Serializable user) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Serializable updateUser(Serializable user) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ClassAccessor getUserClassAccessor() {
-        throw new UnsupportedOperationException();
-    }
-
     //--------------------------------------------------------------------------
     // User workflow
     //--------------------------------------------------------------------------

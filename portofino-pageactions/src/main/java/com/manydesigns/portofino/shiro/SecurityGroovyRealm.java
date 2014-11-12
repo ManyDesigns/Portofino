@@ -42,6 +42,8 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
+ * Realm implementation that delegates to another class, written in Groovy and dynamically reloaded.
+ *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -159,21 +161,6 @@ public class SecurityGroovyRealm implements PortofinoRealm, Destroyable {
     @Override
     public Serializable getUserById(String encodedUserId) {
         return ensureDelegate().getUserById(encodedUserId);
-    }
-
-    @Override
-    public Serializable saveUser(Serializable user) {
-        return ensureDelegate().saveUser(user);
-    }
-
-    @Override
-    public Serializable updateUser(Serializable user) {
-        return ensureDelegate().updateUser(user);
-    }
-
-    @Override
-    public ClassAccessor getUserClassAccessor() {
-        return ensureDelegate().getUserClassAccessor();
     }
 
     @Override

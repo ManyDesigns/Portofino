@@ -26,7 +26,6 @@ import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.reflection.ClassAccessor;
-import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionName;
@@ -34,7 +33,6 @@ import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
-import groovy.lang.Closure;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -106,42 +104,69 @@ public abstract class FormAction extends AbstractPageAction {
         return formBuilder.build();
     }
 
+    /**
+     * Returns the ClassAccessor to access the data underlying the form
+     */
     protected abstract ClassAccessor getClassAccessor();
 
+    /**
+     * Returns the object underlying the form, e.g. from a database query.
+     */
     protected abstract Object getObject();
+
+    /**
+     * Returns what mode should the form be in.
+     */
+    protected Mode getMode() {
+        return Mode.EDIT;
+    }
 
     @DefaultHandler
     public Resolution execute() {
-        setupForm(Mode.EDIT);
+        setupForm(getMode());
         Object object = getObject();
         form.readFromObject(object);
-        return forwardTo("/m/pageactions/pageactions/form/form.jsp");
+        return getShowFormResolution();
     }
 
-    protected Resolution doWithForm(Closure<?> closure) {
-        return doWithForm(Mode.EDIT, closure);
+    protected Resolution doWithForm(ActionOnForm closure) {
+        return doWithForm(getMode(), closure);
     }
 
-    protected Resolution doWithForm(Mode mode, Closure<?> closure) {
+    protected Resolution doWithForm(Mode mode, ActionOnForm closure) {
         setupForm(mode);
         Object object = getObject();
         form.readFromObject(object);
         form.readFromRequest(context.getRequest());
         if(form.validate()) {
             form.writeToObject(object);
-            closure.call(form, object);
+            Object result = closure.invoke(form, object);
+            if(result instanceof Resolution) {
+                return (Resolution) result;
+            }
         } else {
             validationFailed(form, object);
         }
+        return getShowFormResolution();
+    }
+
+    protected Resolution getShowFormResolution() {
         return forwardTo("/m/pageactions/pageactions/form/form.jsp");
     }
 
+    /**
+     * Invoked when form validation fails.
+     */
     protected void validationFailed(Form form, Object object) {
         logger.debug("Form validation failed");
     }
 
     public Form getForm() {
         return form;
+    }
+
+    public static interface ActionOnForm {
+        Object invoke(Form form, Object object);
     }
 
 }

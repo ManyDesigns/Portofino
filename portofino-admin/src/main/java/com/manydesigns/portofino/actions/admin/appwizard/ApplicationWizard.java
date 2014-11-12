@@ -286,7 +286,13 @@ public class ApplicationWizard extends AbstractPageAction {
             return afterCreateConnectionProvider();
         }
         if(JDBC.equals(connectionProviderType)) {
-            connectionProvider = new JdbcConnectionProvider();
+            JdbcConnectionProvider jdbcConnectionProvider = new JdbcConnectionProvider();
+            //Fill with dummy values so the form overwrites them (and doesn't try to write on the Configuration which
+            //is not available and anyway should not be modified right now
+            jdbcConnectionProvider.setUrl("replace me");
+            jdbcConnectionProvider.setUsername("replace me");
+            jdbcConnectionProvider.setPassword("replace me");
+            connectionProvider = jdbcConnectionProvider;
             connectionProviderForm = jdbcCPForm;
         } else if(JNDI.equals(connectionProviderType)) {
             connectionProvider = new JndiConnectionProvider();
@@ -1137,10 +1143,6 @@ public class ApplicationWizard extends AbstractPageAction {
             detectLargeResultSet(table, configuration);
 
             configuration.setName(table.getActualEntityName());
-            configuration.setSearchTitle("Search " + title);
-            configuration.setCreateTitle("Create " + title);
-            configuration.setEditTitle("Edit " + title);
-            configuration.setReadTitle(title);
 
             int summ = 0;
             String linkToParentProperty = bindings.get("linkToParentProperty");

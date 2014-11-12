@@ -22,7 +22,6 @@ package com.manydesigns.portofino.pageactions.form;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
-import com.manydesigns.elements.forms.Form;
 import com.manydesigns.elements.forms.TableForm;
 import com.manydesigns.elements.forms.TableFormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
@@ -34,7 +33,6 @@ import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
-import groovy.lang.Closure;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -115,42 +113,69 @@ public abstract class TableFormAction extends AbstractPageAction {
         return formBuilder.build();
     }
 
+    /**
+     * Returns the ClassAccessor to access the data underlying the form
+     */
     protected abstract ClassAccessor getClassAccessor();
 
+    /**
+     * Returns the list of objects underlying the form, e.g. from a database query.
+     */
     protected abstract List<?> getObjects();
+
+    /**
+     * Returns what mode should the form be in.
+     */
+    protected Mode getMode() {
+        return Mode.EDIT;
+    }
 
     @DefaultHandler
     public Resolution execute() {
-        setupTableForm(Mode.EDIT);
+        setupTableForm(getMode());
         List<?> objects = getObjects();
         form.readFromObject(objects);
-        return forwardTo("/m/pageactions/pageactions/form/table-form.jsp");
+        return getShowFormResolution();
     }
 
-    protected Resolution doWithForm(Closure<?> closure) {
-        return doWithForm(Mode.EDIT, closure);
+    protected Resolution doWithForm(ActionOnForm closure) {
+        return doWithForm(getMode(), closure);
     }
 
-    protected Resolution doWithForm(Mode mode, Closure<?> closure) {
+    protected Resolution doWithForm(Mode mode, ActionOnForm closure) {
         setupTableForm(mode);
         List<?> objects = getObjects();
         form.readFromObject(objects);
         form.readFromRequest(context.getRequest());
         if(form.validate()) {
             form.writeToObject(objects);
-            closure.call(form, objects);
+            Object result = closure.invoke(form, objects);
+            if(result instanceof Resolution) {
+                return (Resolution) result;
+            }
         } else {
             validationFailed(form, objects);
         }
+        return getShowFormResolution();
+    }
+
+    protected Resolution getShowFormResolution() {
         return forwardTo("/m/pageactions/pageactions/form/table-form.jsp");
     }
 
+    /**
+     * Invoked when form validation fails.
+     */
     protected void validationFailed(TableForm form, Object object) {
         logger.debug("Form validation failed");
     }
 
     public TableForm getForm() {
         return form;
+    }
+
+    public static interface ActionOnForm {
+        Object invoke(TableForm form, Object object);
     }
 
 }

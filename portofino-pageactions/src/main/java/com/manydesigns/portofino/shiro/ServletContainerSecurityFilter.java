@@ -24,6 +24,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.PathMatchingFilter;
+import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,9 +33,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
+import java.security.Principal;
 
 /**
- * Add this to web.xml to manage user authentication with the servlet container.
+ * Add this to shiro.ini to manage user authentication with the servlet container. Note: also requires support in
+ * Security.groovy and the login action.
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -50,12 +53,13 @@ public class ServletContainerSecurityFilter extends PathMatchingFilter {
     @Override
     protected boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
         Subject subject = SecurityUtils.getSubject();
-        Object principal = subject.getPrincipal();
         HttpServletRequest req = (HttpServletRequest) request;
-        boolean shiroAuthenticated = principal != null;
+        boolean shiroAuthenticated = subject.isAuthenticated();
+
         //Returns: a java.security.Principal containing the name of the user making this request;
         //null if the user has not been authenticated
-        boolean containerAuthenticated = req.getUserPrincipal() != null;
+        Principal containerPrincipal = getContainerPrincipal(req);
+        boolean containerAuthenticated = containerPrincipal != null;
         logger.debug("User authenticated by Shiro? {} User authenticated by the container? {}",
                 shiroAuthenticated, containerAuthenticated);
         if (!shiroAuthenticated && containerAuthenticated) {
@@ -68,28 +72,35 @@ public class ServletContainerSecurityFilter extends PathMatchingFilter {
                 HttpSession session = req.getSession(false);
                 String attrName = ServletContainerSecurityFilter.class.getName() + ".shiroLoginFailedErrorLogged";
                 String msg =
-                        "User " + req.getUserPrincipal() + " is known to the servlet container, " +
+                        "User " + containerPrincipal + " is known to the servlet container, " +
                         "but not to Shiro, and programmatic login failed!";
-                if(session == null || session.getAttribute(attrName) == null) {
+                if (session == null || session.getAttribute(attrName) == null) {
                     logger.error(msg, e);
                 } else {
                     logger.debug(msg, e);
                 }
-                if(session != null) {
+                if (session != null) {
                     session.setAttribute(attrName, true);
                 }
             }
-        } else if(shiroAuthenticated && !containerAuthenticated) {
+        } else if (shiroAuthenticated && !containerAuthenticated) {
             logger.debug("User is authenticated to Shiro, but not to the servlet container; logging out of Shiro.");
             Serializable userId = ShiroUtils.getUserId(SecurityUtils.getSubject());
             subject.logout();
             logger.info("User {} logout", userId);
-            //TODO valutare effetti del distruggere o meno la sessione
-            /*HttpSession session = req.getSession(false);
-            if(session != null) {
-                session.invalidate();
-            }*/
         }
         return true;
+    }
+
+    protected Principal getContainerPrincipal(HttpServletRequest req) {
+        if (req instanceof ShiroHttpServletRequest) {
+
+            ServletRequest request = ((ShiroHttpServletRequest) req).getRequest();
+            if (request instanceof HttpServletRequest) {
+                HttpServletRequest httpRequest = (HttpServletRequest) request;
+                return httpRequest.getUserPrincipal();
+            }
+        }
+        return req.getUserPrincipal();
     }
 }

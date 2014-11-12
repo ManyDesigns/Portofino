@@ -133,9 +133,61 @@ function setupRichTextEditors() {
     });
 }
 
-$(function() {
-    setupRichTextEditors();
-});
+function setupSelectFieldLinks() {
+    $("a.mde-select-field-create-new-link").click(function(event) {
+        var href = $(event.target).attr("href");
+        var dialogDiv = $('<div></div>').appendTo($("body"));
+        function setupDialogContents(dialog) {
+            function submitForm(form, event, action) {
+                var data = form.serializeArray();
+                if(action) {
+                    var datum = new Object();
+                    datum.name = action;
+                    datum.value = "";
+                    data.push(datum);
+                }
+                $.ajax({
+                    type: form.attr('method'),
+                    url: form.attr('action'),
+                    data: data
+                }).done(function(data) {
+                    dialog.modal("hide");
+                    dialogDiv.html(data);
+                    var newDialog = dialogDiv.find("div.modal");
+                    if(newDialog.length > 0) {
+                        setupDialogContents(newDialog);
+                        newDialog.modal({ backdrop: 'static', show: true });
+                    }
+                }).fail(function() {
+                    alert("Form submission failed!"); //TODO
+                });
+                event.preventDefault(); // Prevent the form from submitting via the browser.
+            }
+
+            dialog.find("form").submit(function(event) {
+                var form = $(this);
+                submitForm(form, event, form.find("button[type=submit]").first().attr("name"));
+            });
+
+            dialog.find("form button[type=submit]").click(function(event) {
+                var button = $(this);
+                submitForm(button.closest("form"), event, button.attr("name"));
+            });
+
+            dialog.find(".modal-header button.close").click(function() {
+                dialog.modal("hide");
+                dialogDiv.remove();
+            });
+        }
+
+        dialogDiv.load(href, function() {
+            var dialog = $(this).find("div.modal");
+            setupDialogContents(dialog);
+            dialog.modal({ backdrop: 'static', show: true });
+        });
+        return false;
+    });
+}
 
 function configureBulkEditTextField(id, checkboxName) {
     $("#" + id).keypress(function(event) {
@@ -257,56 +309,86 @@ portofino.enablePageActionDragAndDrop = function(button, originalPath) {
 
 portofino.confirmDeletePage = function(pagePath, contextPath) {
     var dialogDiv = $("<div></div>").appendTo($("body"));
-    dialogDiv.load(contextPath + "/actions/admin/page?confirmDelete&originalPath=" + pagePath, function() {
-        var dialog = dialogDiv.find(".dialog-confirm-delete-page");
-        dialog.find("button[name=confirmDeletePageButton]").click(function() {
-            var form = $("#pageAdminForm");
-            portofino.copyFormAsHiddenFields(dialog, form);
-            form.submit();
-        });
+    dialogDiv.load(contextPath + "/actions/admin/page?confirmDelete&ajax=true&originalPath=" + pagePath,
+        function(response, status, xhr) {
+            if(xhr.status == 403) {
+                portofino.redirectToLogin(xhr);
+            }
+            var dialog = dialogDiv.find(".dialog-confirm-delete-page");
+            dialog.find("button[name=confirmDeletePageButton]").click(function() {
+                var form = $("#pageAdminForm");
+                portofino.copyFormAsHiddenFields(dialog, form);
+                form.submit();
+            });
 
-        dialog.find("button[name=cancelDeletePageButton], button[name=closeDeletePageButton]").click(function() {
-            dialog.modal("hide");
-            dialog.remove();
+            dialog.find("button[name=cancelDeletePageButton], button[name=closeDeletePageButton]").click(function() {
+                dialog.modal("hide");
+                dialog.remove();
+            });
+            dialog.modal({ backdrop: 'static', show: true });
         });
-        dialog.modal({ backdrop: 'static', show: true });
-    });
 };
 
 portofino.showMovePageDialog = function(pagePath, contextPath) {
     var dialogDiv = $("<div></div>").appendTo($("body"));
-    dialogDiv.load(contextPath + "/actions/admin/page?chooseNewLocation&originalPath=" + pagePath, function() {
-        var dialog = dialogDiv.find(".dialog-move-page");
-        dialog.find("button[name=confirmMovePageButton]").click(function() {
-            var form = $("#pageAdminForm");
-            portofino.copyFormAsHiddenFields(dialog, form);
-            form.submit();
-        });
+    dialogDiv.load(contextPath + "/actions/admin/page?chooseNewLocation&ajax=true&originalPath=" + pagePath,
+        function(response, status, xhr) {
+            if(xhr.status == 403) {
+                portofino.redirectToLogin(xhr);
+            }
+            var dialog = dialogDiv.find(".dialog-move-page");
+            dialog.find("button[name=confirmMovePageButton]").click(function() {
+                var form = $("#pageAdminForm");
+                portofino.copyFormAsHiddenFields(dialog, form);
+                form.submit();
+            });
 
-        dialog.find("button[name=cancelMovePageButton], button[name=closeMovePageButton]").click(function() {
-            dialog.modal("hide");
-            dialog.remove();
+            dialog.find("button[name=cancelMovePageButton], button[name=closeMovePageButton]").click(function() {
+                dialog.modal("hide");
+                dialog.remove();
+            });
+            dialog.modal({ backdrop: 'static', show: true });
         });
-        dialog.modal({ backdrop: 'static', show: true });
-    });
 };
 
 portofino.showCopyPageDialog = function(pagePath, contextPath) {
     var dialogDiv = $("<div></div>").appendTo($("body"));
-    dialogDiv.load(contextPath + "/actions/admin/page?copyPageDialog&originalPath=" + pagePath, function() {
-        var dialog = dialogDiv.find(".dialog-copy-page");
-        dialog.find("button[name=confirmCopyPageButton]").click(function() {
-            var form = $("#pageAdminForm");
-            portofino.copyFormAsHiddenFields(dialog, form);
-            form.submit();
-        });
+    dialogDiv.load(
+        contextPath + "/actions/admin/page?copyPageDialog&ajax=true&originalPath=" + pagePath,
+        function(response, status, xhr) {
+            if(xhr.status == 403) {
+                portofino.redirectToLogin(xhr);
+            }
+            var dialog = dialogDiv.find(".dialog-copy-page");
+            dialog.find("button[name=confirmCopyPageButton]").click(function() {
+                var form = $("#pageAdminForm");
+                portofino.copyFormAsHiddenFields(dialog, form);
+                form.submit();
+            });
 
-        dialog.find("button[name=cancelCopyPageButton], button[name=closeCopyPageButton]").click(function() {
-            dialog.modal("hide");
-            dialog.remove();
+            dialog.find("button[name=cancelCopyPageButton], button[name=closeCopyPageButton]").click(function() {
+                dialog.modal("hide");
+                dialog.remove();
+            });
+            dialog.modal({ backdrop: 'static', show: true });
         });
-        dialog.modal({ backdrop: 'static', show: true });
-    });
+};
+
+portofino.util = portofino.util || {};
+
+portofino.util.removeQueryStringArgument = function removeQueryStringArgument(href, arg) {
+    href = href.replace(new RegExp("[?]" + arg + "=[^&]*&", "g"), "?");
+    href = href.replace(new RegExp("[?]" + arg + "=[^&]*", "g"), "");
+    href = href.replace(new RegExp("[&]" + arg + "=[^&]*&", "g"), "&");
+    href = href.replace(new RegExp("[&]" + arg + "=[^&]*", "g"), "");
+    return href;
+};
+
+portofino.redirectToLogin = function redirectToLogin(xhr) {
+    //Redirect to login page (link included in the response)
+    var loginUrl = xhr.responseText;
+    loginUrl = portofino.util.removeQueryStringArgument(loginUrl, "returnUrl");
+    window.location.href = loginUrl + (loginUrl.indexOf("?") > -1 ? "&" : "?") + "returnUrl=" + encodeURIComponent(window.location.href);
 };
 
 setupRichTextEditors = function() {/* Do nothing (remove default initialization by Elements) */};
@@ -364,6 +446,9 @@ $(function() {
     $(':input').on("change", function() {
         $(this).closest("form").data("dirty", true);
     });
+
+    setupRichTextEditors();
+    setupSelectFieldLinks();
 
     window.onbeforeunload = function() {
         var dirty = false;

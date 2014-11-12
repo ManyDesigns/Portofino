@@ -298,11 +298,14 @@ public class DatabaseSyncer {
         String fkTableName = tableName;
         //Work around MySQL & case-insensitive dbs
         liquibase.database.structure.Table fkTable = databaseSnapshot.getTable(fkTableName);
+
         if(fkTable != null) {
             fkTableName = fkTable.getName();
         } else {
-            logger.debug("Referenced foreign key table not found: `" + fkTableName + "`. Is it in another schema?");
+            logger.warn("Could not normalize table name: " + fkTableName + "; most probably this is a sign of a foreign key to another schema, which is not supported at the moment.");
+            fkTableName = null;
         }
+
         return fkTableName;
     }
 

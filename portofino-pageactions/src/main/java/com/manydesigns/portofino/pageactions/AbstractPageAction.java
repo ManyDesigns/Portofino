@@ -26,6 +26,7 @@ import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
+import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
@@ -174,6 +175,7 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
                 String layoutContainerInParent = childPage.getContainer();
                 if(layoutContainerInParent != null) {
                     String newPath = context.getActionPath() + "/" + childPage.getName();
+                    newPath = ServletUtils.removePathParameters(newPath); //#PRT-1650 Path parameters mess with include
                     File pageDir = new File(pageInstance.getChildrenDirectory(), childPage.getName());
                     try {
                         Page page = DispatcherLogic.getPage(pageDir);

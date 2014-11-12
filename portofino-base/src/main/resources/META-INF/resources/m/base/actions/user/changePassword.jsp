@@ -9,9 +9,6 @@
     <stripes:layout-component name="pageTitle">
         Password change
     </stripes:layout-component>
-    <stripes:layout-component name="pageTitle">
-        Password change
-    </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post">
             <div class="form-group">

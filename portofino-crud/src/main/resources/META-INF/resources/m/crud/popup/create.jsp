@@ -6,11 +6,12 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"
-/><stripes:layout-render name="/theme/templates/naked/modal.jsp">
+/><stripes:layout-render name="/theme/templates/popup/modal.jsp">
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.createTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
+        <mde:sessionMessages />
         <c:if test="${actionBean.formWithRichTextFields}">
             <script type="text/javascript" src="<stripes:url value="/theme/ckeditor/ckeditor.js"/>"></script>
             <script type="text/javascript" src="<stripes:url value="/theme/ckeditor/adapters/jquery.js"/>"></script>
@@ -27,13 +28,14 @@
             <p><fmt:message key="fields.marked.with.a.star.are.required"/>.</p>
         </c:if>
         <stripes:form action="${actionBean.context.actionPath}" method="post"
-                      enctype="multipart/form-data" class="form-horizontal">
+                      id="${(not empty actionBean.crudConfiguration.name) ? actionBean.crudConfiguration.name : null}"
+                      enctype="multipart/form-data" class="form-horizontal create">
             <mde:write name="actionBean" property="form"/>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <input type="hidden" name="popup" value="true" />
             <input type="hidden" name="popupCloseCallback" value="${actionBean.popupCloseCallback}" />
             <div class="form-group">
-                <div class="align-with-input col-sm-10">
+                <div class="col-md-offset-2 col-md-10">
                     <portofino:buttons list="crud-create" />
                 </div>
             </div>

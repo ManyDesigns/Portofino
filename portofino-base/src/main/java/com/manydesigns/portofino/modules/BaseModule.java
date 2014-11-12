@@ -69,6 +69,8 @@ public class BaseModule implements Module {
     public final static String CLASS_LOADER = "com.manydesigns.portofino.application.classLoader";
     public final static String MODULE_REGISTRY = "com.manydesigns.portofino.modules.ModuleRegistry";
     public final static String CACHE_RESET_LISTENER_REGISTRY = "com.manydesigns.portofino.cache.CacheResetListenerRegistry";
+    public static final String DEFAULT_BLOB_MANAGER = "com.manydesigns.portofino.blobs.DefaultBlobManager";
+    public static final String TEMPORARY_BLOB_MANAGER = "com.manydesigns.portofino.blobs.TemporaryBlobManager";
 
     //**************************************************************************
     // Injected objects

@@ -44,7 +44,7 @@ public class DatabaseLogic {
 
     public static final Logger logger =
             LoggerFactory.getLogger(DatabaseLogic.class);
-    public static final String[] HQL_KEYWORDS = { "member", "order", "group", "select", "update", "from" };
+    public static final String[] HQL_KEYWORDS = { "member", "order", "group", "select", "insert", "update", "from" };
 
     //**************************************************************************
     // Get all objects of a certain kind

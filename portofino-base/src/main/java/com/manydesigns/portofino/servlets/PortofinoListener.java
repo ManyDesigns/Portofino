@@ -22,6 +22,9 @@ package com.manydesigns.portofino.servlets;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.blobs.BlobManager;
+import com.manydesigns.elements.blobs.SimpleBlobManager;
+import com.manydesigns.elements.blobs.HierarchicalBlobManager;
 import com.manydesigns.elements.configuration.BeanLookup;
 import com.manydesigns.elements.servlet.AttributeMap;
 import com.manydesigns.elements.servlet.ElementsFilter;
@@ -48,6 +51,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -152,9 +156,30 @@ public class PortofinoListener
             File appDir = (File) servletContext.getAttribute(BaseModule.APPLICATION_DIRECTORY);
             appBlobsDir = new File(appDir, "blobs");
         }
-        String blobsDirPath = appBlobsDir.getAbsolutePath();
-        elementsConfiguration.setProperty(ElementsProperties.BLOBS_DIR, blobsDirPath);
-        logger.info("Blobs directory: " + blobsDirPath);
+        logger.info("Blobs directory: " + appBlobsDir.getAbsolutePath());
+        File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+        File tempBlobsDir = new File(tmpDir, "portofino-blobs" + servletContext.getContextPath().replace("/", "-"));
+        logger.info("Temporary blobs directory: " + tempBlobsDir.getAbsolutePath());
+
+        String metaFilenamePattern = "blob-{0}.properties";
+        String dataFilenamePattern = "blob-{0}.data";
+        BlobManager tempBlobManager = new HierarchicalBlobManager(tempBlobsDir, metaFilenamePattern, dataFilenamePattern);
+        BlobManager defaultBlobManager;
+        File[] blobs = appBlobsDir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.startsWith("blob-") && name.endsWith(".properties");
+            }
+        });
+        if(blobs == null || blobs.length == 0) { //Null if the directory does not exist yet
+            logger.info("Using new style (4.1.1+) hierarchical blob manager");
+            defaultBlobManager = new HierarchicalBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
+        } else {
+            logger.info("Blobs found directly under the blobs directory; using old style (pre-4.1.1) flat file blob manager");
+            defaultBlobManager = new SimpleBlobManager(appBlobsDir, metaFilenamePattern, dataFilenamePattern);
+        }
+        servletContext.setAttribute(BaseModule.TEMPORARY_BLOB_MANAGER, tempBlobManager);
+        servletContext.setAttribute(BaseModule.DEFAULT_BLOB_MANAGER, defaultBlobManager);
 
         File groovyClasspath = new File(applicationDirectory, "groovy");
         logger.info("Initializing Groovy script engine with classpath: " + groovyClasspath.getAbsolutePath());

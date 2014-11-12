@@ -60,7 +60,6 @@ public class TableFormBuilder extends AbstractFormBuilder {
     protected List<PropertyAccessor> propertyAccessors;
     protected int nRows = DEFAULT_N_ROWS;
     protected final List<Map<String[], SelectionProvider>> rowSelectionProviders;
-    protected Mode mode = Mode.EDIT;
 
     public static final Logger logger =
             LoggerFactory.getLogger(TableFormBuilder.class);
@@ -224,7 +223,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
         int index = 0;
         for (TableForm.Row row : tableForm.getRows()) {
             String rowPrefix =
-                    StringUtils.join(new Object[] {prefix, "row", index, "_"});
+                    StringUtils.join(new Object[]{prefix, "row", index, "_"});
 
             for (PropertyAccessor propertyAccessor : propertyAccessors) {
                 Field field = buildField(propertyAccessor, rowPrefix);
@@ -285,8 +284,7 @@ public class TableFormBuilder extends AbstractFormBuilder {
         return -1;
     }
 
-    private Field buildField(PropertyAccessor propertyAccessor,
-                             String rowPrefix) {
+    protected Field buildField(PropertyAccessor propertyAccessor, String rowPrefix) {
         Field field = null;
         String fieldName = propertyAccessor.getName();
         for (Map.Entry<String[], SelectionProvider> current
@@ -294,16 +292,11 @@ public class TableFormBuilder extends AbstractFormBuilder {
             String[] fieldNames = current.getKey();
             int index = ArrayUtils.indexOf(fieldNames, fieldName);
             if (index >= 0) {
-                field = new SelectField(propertyAccessor, mode, rowPrefix);
+                field = buildSelectField(propertyAccessor, null, rowPrefix);
                 break;
             }
         }
-        if (field == null) {
-            field = manager.tryToInstantiateField(
-                    classAccessor, propertyAccessor, mode, rowPrefix);
-        }
-
-        return field;
+        return buildField(propertyAccessor, field, rowPrefix);
     }
 
     public List<PropertyAccessor> getPropertyAccessors() {

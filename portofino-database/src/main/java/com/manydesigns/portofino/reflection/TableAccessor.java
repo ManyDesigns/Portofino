@@ -160,7 +160,7 @@ public class TableAccessor
     public Object newInstance() {
         if (javaClassAccessor == null) {
             HashMap<String, Object> obj =  new HashMap<String, Object>();
-            obj.put("$type$", table.getQualifiedName());
+            obj.put("$type$", table.getEntityName());
             return obj;
         } else {
             return javaClassAccessor.newInstance();

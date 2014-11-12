@@ -141,9 +141,9 @@ public class PasswordField extends TextField {
                 } else {
                     actualLabel = confirmLabel;
                 }
-                xb.writeLabel(actualLabel, confirmationHtmlId, FORM_LABEL_CLASS);
+                xb.writeLabel(actualLabel, confirmationHtmlId, FORM_LABEL_CSS_CLASS);
                 xb.openElement("div");
-                xb.addAttribute("class", "input-container " + fieldCssClass);
+                xb.addAttribute("class", INPUT_CONTAINER_CSS_CLASS + " " + fieldCssClass);
                 // print out confirmation input field
                 valueToXhtml(xb, confirmationHtmlId, confirmationInputName, confirmationValue);
             }
@@ -163,7 +163,7 @@ public class PasswordField extends TextField {
                              String actualLabel) {
         xb.openElement("label");
         xb.addAttribute("for", actualHtmlId);
-        xb.addAttribute("class", FORM_LABEL_CLASS);
+        xb.addAttribute("class", FORM_LABEL_CSS_CLASS);
         xb.write(StringUtils.capitalize(actualLabel));
         xb.closeElement("label");
     }

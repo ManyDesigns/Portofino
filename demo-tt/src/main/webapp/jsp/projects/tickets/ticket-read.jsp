@@ -31,13 +31,11 @@
             <span class="<c:out value="${actionBean.object.fk_ticket_priority.css_class}"/>">Priority: <c:out value="${actionBean.object.fk_ticket_priority.priority}"/></span>
         </div>
         <h3 class="pageTitle">
-            <stripes:layout-component name="pageTitle">
-                <c:out value="${actionBean.object.title}"/>
-            </stripes:layout-component>
+            <c:out value="${actionBean.object.title}"/>
         </h3>
     </stripes:layout-component>
     <stripes:layout-component name="pageTitle">
-        <c:out value="${actionBean.object.title}"/>
+        <c:out value="${actionBean.object.project}-${actionBean.object.n} ${actionBean.object.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post" class="ticket-read">

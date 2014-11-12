@@ -59,5 +59,5 @@
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>
     </body>
-    </html>
+</html>
 </stripes:layout-definition>

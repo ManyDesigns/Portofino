@@ -30,6 +30,7 @@
     <input type="hidden" name="sortProperty" value="${actionBean.sortProperty}" />
     <input type="hidden" name="sortDirection" value="${actionBean.sortDirection}" />
     <input type="hidden" name="eventName" value="${actionBean.context.eventName}" />
+    <input type="hidden" name="firstResult" value="${actionBean.firstResult}" />
     <div style="clear: both;"></div>
 </div>
 <%!

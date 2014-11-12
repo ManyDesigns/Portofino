@@ -24,9 +24,7 @@
             </stripes:form>
         </div>
         <h3 class="pageTitle">
-            <stripes:layout-component name="pageTitle">
-                <c:out value="${version.id} - ${version.title}"/>
-            </stripes:layout-component>
+            <c:out value="${version.id} - ${version.title}"/>
             <span style="vertical-align: middle" class="<c:out value="${version.fk_version_state.css_class}"/>"><c:out value="${version.fk_version_state.state}"/></span>
         </h3>
         <div><c:out value="${version.description}"/></div>

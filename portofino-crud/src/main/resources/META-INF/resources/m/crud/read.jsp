@@ -19,7 +19,8 @@
         <c:out value="${actionBean.readTitle}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <stripes:form action="${actionBean.context.actionPath}" method="post" class="form-horizontal">
+        <stripes:form action="${actionBean.context.actionPath}" method="post" class="form-horizontal read"
+                      id="${(not empty actionBean.crudConfiguration.name) ? actionBean.crudConfiguration.name : null}">
             <%-- Hidden submit so that ENTER on a form executes the default action --%>
             <div class="hidden-submit"><portofino:buttons list="crud-read-default-button" /></div>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>

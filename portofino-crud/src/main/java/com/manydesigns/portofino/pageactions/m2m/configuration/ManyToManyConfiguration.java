@@ -95,10 +95,14 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     //**************************************************************************
 
     public void init() {
-        if(viewType == null) {
-            viewType = ViewType.CHECKBOXES.name();
+        try {
+            actualViewType = ViewType.valueOf(viewType);
+        } catch (Exception e) {
+            actualViewType = ViewType.CHECKBOXES;
+            if(!StringUtils.isEmpty(viewType)) {
+                logger.warn("Invalid viewType: " + viewType);
+            }
         }
-        actualViewType = ViewType.valueOf(viewType);
 
         if(database != null && query != null) {
             actualRelationDatabase = DatabaseLogic.findDatabaseByName(persistence.getModel(), database);
@@ -195,7 +199,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
         this.viewType = viewType;
     }
 
-    @CssClass(BootstrapSizes.SPAN6)
+    @CssClass(BootstrapSizes.COL_SM_6)
     @XmlAttribute(required = false)
     public String getOneExpression() {
         return oneExpression;
@@ -206,7 +210,7 @@ public class ManyToManyConfiguration implements PageActionConfiguration {
     }
 
     @XmlAttribute(required = false)
-    @CssClass(BootstrapSizes.SPAN6)
+    @CssClass(BootstrapSizes.COL_SM_6)
     public String getOnePropertyName() {
         return onePropertyName;
     }

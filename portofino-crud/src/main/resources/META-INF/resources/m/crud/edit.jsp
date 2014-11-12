@@ -29,14 +29,15 @@
             </c:if>
         </p>
         <stripes:form action="${actionBean.context.actionPath}" method="post"
-                      enctype="multipart/form-data" class="form-horizontal">
+                      id="${(not empty actionBean.crudConfiguration.name) ? actionBean.crudConfiguration.name : null}"
+                      enctype="multipart/form-data" class="form-horizontal edit">
             <mde:write name="actionBean" property="form"/>
             <c:if test="${not empty actionBean.searchString}">
                 <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
             </c:if>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <div class="form-group">
-                <div class="align-with-input col-sm-10">
+                <div class="col-md-offset-2 col-md-10">
                     <portofino:buttons list="crud-edit" />
                 </div>
             </div>

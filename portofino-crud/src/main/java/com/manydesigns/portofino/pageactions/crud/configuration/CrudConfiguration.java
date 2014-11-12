@@ -248,7 +248,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         return actualTable;
     }
 
-    @CssClass(BootstrapSizes.SPAN1)
+    @CssClass(BootstrapSizes.COL_SM_1)
     @XmlAttribute(required = false)
     public Integer getRowsPerPage() {
         return rowsPerPage;

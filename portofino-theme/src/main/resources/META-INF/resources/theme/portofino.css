@@ -65,37 +65,101 @@ Forms (Elements)
     overflow: hidden;
 }
 
-.form-horizontal .control-label {
-    width: 160px;
-    min-height: 1px;
-    padding-left: 15px;
-    padding-right: 15px;
-    position: relative;
-    float: left;
-}
-
-.form-horizontal div.input-container {
-    min-height: 1px;
-    padding-left: 15px;
-    padding-right: 15px;
-    width: 280px;
-    position: relative;
-    float: left;
-}
-
-.form-horizontal div.input-container.fill-row {
-    width: 100%;
-}
-
 @media (min-width: 768px) {
-    .form-horizontal div.input-container.fill-row {
-        margin-top: -27px;
-        padding-left: 175px;
+    .form-horizontal .control-label {
+        float: left;
     }
 
-    .form-horizontal .align-with-input {
-        margin-left: 160px;
+    .form-horizontal .input-container {
+        float: left;
     }
+}
+
+/* 1-column form default */
+.form-horizontal .control-label {
+    width: 16.66666667%;
+}
+
+@media (max-width: 991px) {
+    /* 1-column form */
+    .form-horizontal .input-container {
+        width: 83.33333333%;
+    }
+}
+
+@media (min-width: 992px) {
+    /* 1-column form */
+    .form-horizontal fieldset.mde-columns-1 .input-container {
+        width: 33.33333333%;
+    }
+
+    /* 2-columns form */
+    .form-horizontal fieldset.mde-columns-2 .mde-colspan-1 .control-label {
+        width: 33.33333333%;
+    }
+
+    .form-horizontal fieldset.mde-columns-2 .mde-colspan-1 .input-container {
+        width: 66.66666667%;
+    }
+
+    .form-horizontal fieldset.mde-columns-2 .mde-colspan-2 .control-label {
+        width: 16.66666667%;
+    }
+
+    .form-horizontal fieldset.mde-columns-2 .mde-colspan-2 .input-container {
+        width: 83.33333333%;
+    }
+
+    /* 3-columns form */
+    .form-horizontal fieldset.mde-columns-3 .mde-colspan-1 .control-label {
+        width: 50%;
+    }
+
+    .form-horizontal fieldset.mde-columns-3 .mde-colspan-1 .input-container {
+        width: 50%;
+    }
+
+    .form-horizontal fieldset.mde-columns-3 .mde-colspan-2 .control-label {
+        width: 25%;
+    }
+
+    .form-horizontal fieldset.mde-columns-3 .mde-colspan-2 .input-container {
+        width: 75%;
+    }
+
+    .form-horizontal fieldset.mde-columns-3 .mde-colspan-3 .control-label {
+        width: 16.66666667%;
+    }
+
+    .form-horizontal fieldset.mde-columns-3 .mde-colspan-3 .input-container {
+        width: 83.33333333%;
+    }
+}
+
+.form-horizontal .control-label {
+    padding-left: 15px;
+    padding-right: 15px;
+    position: relative;
+}
+
+.form-horizontal .input-container {
+    padding-left: 15px;
+    padding-right: 15px;
+    position: relative;
+}
+
+/* 1-column form */
+.form-horizontal .row .col-md-12 div.input-container.fill-row {
+    width: 83.33333333%;
+}
+
+/* form in well */
+.well-with-tabs .form-horizontal .control-label {
+    width: 33.33333333%;
+}
+
+.well-with-tabs .form-horizontal fieldset.mde-columns-1 .input-container {
+    width: 66.66666667%;
 }
 
 tbody div.form-control {
@@ -208,6 +272,22 @@ body.dialog {
 
 .spacingTop {
     margin-top: 20px;
+}
+
+.dialog-move-page .form-horizontal fieldset.mde-columns-1 label.control-label {
+    width: 40%;
+}
+
+.dialog-move-page .form-horizontal fieldset.mde-columns-1 div.input-container {
+    width: 60%;
+}
+
+.dialog-copy-page .form-horizontal fieldset.mde-columns-1 label.control-label {
+    width: 25%;
+}
+
+.dialog-copy-page .form-horizontal fieldset.mde-columns-1 div.input-container {
+    width: 75%;
 }
 
 /*******************************************************************************

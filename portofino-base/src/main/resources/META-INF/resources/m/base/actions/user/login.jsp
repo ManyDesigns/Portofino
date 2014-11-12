@@ -13,11 +13,6 @@
             <fmt:param value="${actionBean.applicationName}" />
         </fmt:message>
     </stripes:layout-component>
-    <stripes:layout-component name="pageTitle">
-        <fmt:message key="login.to">
-            <fmt:param value="${actionBean.applicationName}" />
-        </fmt:message>
-    </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <stripes:form action="${actionBean.context.actionPath}" method="post" class="dont-prompt-on-page-abandon">
             <div class="form-group">

@@ -48,7 +48,8 @@ public abstract class AbstractField implements Field {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
-    public static final String FORM_LABEL_CLASS = "control-label";
+    public static final String INPUT_CONTAINER_CSS_CLASS = "input-container";
+    public static final String FORM_LABEL_CSS_CLASS = "control-label";
     public static final String EDITABLE_FIELD_CSS_CLASS = "form-control";
     public static final String STATIC_VALUE_CSS_CLASS = "form-control-static";
 
@@ -219,7 +220,7 @@ public abstract class AbstractField implements Field {
         xb.addAttribute("class", cssClass);
         labelToXhtml(xb);
         xb.openElement("div");
-        xb.addAttribute("class", "input-container " + fieldCssClass);
+        xb.addAttribute("class", INPUT_CONTAINER_CSS_CLASS + " " + fieldCssClass);
     }
 
     /**
@@ -241,7 +242,7 @@ public abstract class AbstractField implements Field {
         if(!mode.isView(insertable, updatable)) {
             xb.addAttribute("for", id); //HTML5 validation
         }
-        xb.addAttribute("class", FORM_LABEL_CLASS);
+        xb.addAttribute("class", FORM_LABEL_CSS_CLASS);
         if (mode.isBulk() && mode.isEdit() && !mode.isView(insertable, updatable)) {
             xb.writeInputCheckbox(null, bulkCheckboxName, "checked", bulkChecked, false, "pull-left");
         }
