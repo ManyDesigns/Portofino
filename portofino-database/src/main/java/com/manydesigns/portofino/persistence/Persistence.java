@@ -34,6 +34,7 @@ import com.manydesigns.portofino.persistence.hibernate.HibernateConfig;
 import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
+import liquibase.Contexts;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
@@ -202,7 +203,7 @@ public class Persistence {
                             relativeChangelogPath,
                             resourceAccessor,
                             lqDatabase);
-                    lq.update(null);
+                    lq.update((Contexts) null);
                 } catch (Exception e) {
                     String msg = "Couldn't update database: " + schemaName;
                     logger.error(msg, e);

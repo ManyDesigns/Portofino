@@ -23,12 +23,6 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.PostgreSQLDatabasePlatform;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.liquibase.databases.PortofinoPostgresDatabase;
-import com.manydesigns.portofino.liquibase.databasesnapshotgenerators.PortofinoPostgresDatabaseSnapshotGenerator;
-import com.manydesigns.portofino.liquibase.sqlgenerators.*;
-import liquibase.database.DatabaseFactory;
-import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
-import liquibase.sqlgenerator.SqlGeneratorFactory;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,24 +88,6 @@ public class PostgresqlModule implements Module {
 
     @Override
     public void init() {
-        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
-            logger.debug("Registering Postgres");
-            DatabaseFactory.getInstance().register(new PortofinoPostgresDatabase());
-            DatabaseSnapshotGeneratorFactory.getInstance().register(new PortofinoPostgresDatabaseSnapshotGenerator());
-            logger.debug("Setting up Liquibase sql generator factory");
-            SqlGeneratorFactory sqlGeneratorFactory =
-                    SqlGeneratorFactory.getInstance();
-            sqlGeneratorFactory.register(
-                    new PortofinoPostgresCreateDatabaseChangeLogTableGenerator());
-            sqlGeneratorFactory.register(
-                    new PortofinoPostgresCreateDatabaseChangeLogLockTableGenerator());
-            sqlGeneratorFactory.register(
-                    new PortofinoPostgresLockDatabaseChangeLogGenerator());
-            sqlGeneratorFactory.register(
-                    new PortofinoPostgresMarkChangeSetRanGenerator());
-            sqlGeneratorFactory.register(
-                    new PortofinoPostgresUnlockDatabaseChangeLogGenerator());
-        }
         databasePlatformsRegistry.addDatabasePlatform(new PostgreSQLDatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }

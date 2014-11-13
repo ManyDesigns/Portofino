@@ -23,10 +23,6 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.MySql5DatabasePlatform;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.liquibase.databases.PortofinoMySQLDatabase;
-import liquibase.database.DatabaseFactory;
-import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
-import liquibase.snapshot.jvm.MySQLDatabaseSnapshotGenerator;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,11 +88,6 @@ public class MysqlModule implements Module {
 
     @Override
     public void init() {
-        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
-            logger.debug("Registering MySQL");
-            DatabaseFactory.getInstance().register(new PortofinoMySQLDatabase());
-            DatabaseSnapshotGeneratorFactory.getInstance().register(new MySQLDatabaseSnapshotGenerator());
-        }
         databasePlatformsRegistry.addDatabasePlatform(new MySql5DatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }

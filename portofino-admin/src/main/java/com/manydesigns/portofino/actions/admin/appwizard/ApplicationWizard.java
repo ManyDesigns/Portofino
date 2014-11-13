@@ -1307,8 +1307,8 @@ public class ApplicationWizard extends AbstractPageAction {
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(
                                 new JdbcConnection(connection));
                 String sql =
-                    "select count(" + implementation.escapeDatabaseObject(column.getColumnName()) + ") " +
-                    "from " + implementation.escapeTableName(table.getSchemaName(), table.getTableName());
+                    "select count(" + implementation.escapeColumnName(null, null, null, column.getColumnName()) + ") " +
+                    "from " + implementation.escapeTableName(null, table.getSchemaName(), table.getTableName());
                 PreparedStatement statement =
                         connection.prepareStatement(
                                 sql);
@@ -1327,8 +1327,8 @@ public class ApplicationWizard extends AbstractPageAction {
                 }
 
                 sql =
-                    "select distinct(" + implementation.escapeDatabaseObject(column.getColumnName()) + ") " +
-                    "from " + implementation.escapeTableName(table.getSchemaName(), table.getTableName());
+                    "select distinct(" + implementation.escapeColumnName(null, null, null, column.getColumnName()) + ") " +
+                    "from " + implementation.escapeTableName(null, table.getSchemaName(), table.getTableName());
                 statement =
                         connection.prepareStatement(
                                 sql);
@@ -1385,7 +1385,7 @@ public class ApplicationWizard extends AbstractPageAction {
             liquibase.database.Database implementation =
                         DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
             String sql =
-                    "select count(*) from " + implementation.escapeTableName(table.getSchemaName(), table.getTableName());
+                    "select count(*) from " + implementation.escapeTableName(null, table.getSchemaName(), table.getTableName());
             PreparedStatement statement = connection.prepareStatement(sql);
             setQueryTimeout(statement, 1);
             statement.setMaxRows(1);

@@ -26,7 +26,7 @@ import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.portofino.database.StringBooleanType;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.ForeignKey;
-import liquibase.database.structure.ForeignKeyConstraintType;
+import liquibase.structure.core.ForeignKeyConstraintType;
 import org.hibernate.FetchMode;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Mappings;
@@ -268,9 +268,13 @@ public class HibernateConfig {
                                 com.manydesigns.portofino.model.database.Column column) {
         Column col = new Column();
         col.setName(quoteIdentifier(column.getColumnName()));
-        col.setLength(column.getLength());
-        col.setPrecision(column.getLength());
-        col.setScale(column.getScale());
+        if(column.getLength() != null) {
+            col.setLength(column.getLength());
+            col.setPrecision(column.getLength());
+        }
+        if(column.getScale() != null) {
+            col.setScale(column.getScale());
+        }
         col.setNullable(column.isNullable());
         String columnType = column.getColumnType();
         int jdbcType = column.getJdbcType();

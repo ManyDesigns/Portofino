@@ -213,10 +213,10 @@ public abstract class ConnectionProvider {
             throws SQLException {
         String typeName = typeRs.getString("TYPE_NAME");
         int dataType = typeRs.getInt("DATA_TYPE");
-        Long maximumPrecision;
+        Integer maximumPrecision;
         Object maximumPrecisionObj = typeRs.getObject("PRECISION");
         if (maximumPrecisionObj instanceof Number) {
-            maximumPrecision = ((Number)maximumPrecisionObj).longValue();
+            maximumPrecision = ((Number)maximumPrecisionObj).intValue();
         } else {
             maximumPrecision = null;
             logger.warn("Cannot get maximum precision for type: {} value: {}", typeName, maximumPrecisionObj);

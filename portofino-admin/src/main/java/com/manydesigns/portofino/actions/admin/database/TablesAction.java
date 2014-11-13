@@ -608,8 +608,8 @@ public class TablesAction extends AbstractActionBean {
     protected void configureTypesSelectionProvider(DefaultSelectionProvider typesSP, ColumnForm columnForm) {
         Type type = columnForm.getType();
         Class[] javaTypes = getAvailableJavaTypes(type, columnForm.getLength());
-        long precision = columnForm.getLength() != null ? columnForm.getLength() : type.getMaximumPrecision();
-        int scale = columnForm.getScale() != null ? columnForm.getScale() : type.getMaximumScale();
+        Integer precision = columnForm.getLength();
+        Integer scale = columnForm.getScale();
         Class defaultJavaType = Type.getDefaultJavaType(columnForm.getJdbcType(), precision, scale);
         if(defaultJavaType == null) {
             defaultJavaType = Object.class;

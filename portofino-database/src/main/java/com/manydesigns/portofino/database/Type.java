@@ -53,14 +53,14 @@ public class Type {
     protected final String typeName;
     protected final int jdbcType;
     protected final boolean autoincrement;
-    protected final Long maximumPrecision;
+    protected final Integer maximumPrecision;
     protected final String literalPrefix;
     protected final String literalSuffix;
     protected final boolean nullable;
     protected final boolean caseSensitive;
     protected final boolean searchable;
-    protected final short minimumScale;
-    protected final short maximumScale;
+    protected final int minimumScale;
+    protected final int maximumScale;
     protected final Boolean precisionRequired;
     protected final Boolean scaleRequired;
 
@@ -69,10 +69,10 @@ public class Type {
     // Constructors
     //**************************************************************************
 
-    public Type(String typeName, int jdbcType, Long maximumPrecision,
+    public Type(String typeName, int jdbcType, Integer maximumPrecision,
                 String literalPrefix, String literalSuffix,
                 boolean nullable, boolean caseSensitive, boolean searchable,
-                boolean autoincrement, short minimumScale, short maximumScale) {
+                boolean autoincrement, int minimumScale, int maximumScale) {
         this.typeName = typeName;
         this.jdbcType = jdbcType;
         this.maximumPrecision = maximumPrecision;
@@ -90,10 +90,10 @@ public class Type {
 
     }
 
-    public Type(String typeName, int jdbcType, Long maximumPrecision,
+    public Type(String typeName, int jdbcType, Integer maximumPrecision,
                 String literalPrefix, String literalSuffix,
                 boolean nullable, boolean caseSensitive, boolean searchable,
-                boolean autoincrement, short minimumScale, short maximumScale,
+                boolean autoincrement, int minimumScale, int maximumScale,
                 boolean precisionRequired, boolean scaleRequired) {
         this.typeName = typeName;
         this.jdbcType = jdbcType;
@@ -128,7 +128,7 @@ public class Type {
         return getDefaultJavaType(jdbcType, maximumPrecision, maximumScale);
     }
 
-    public static @Nullable Class getDefaultJavaType(int jdbcType, long precision, int scale) {
+    public static @Nullable Class getDefaultJavaType(int jdbcType, Integer precision, Integer scale) {
         switch (jdbcType) {
             case Types.BIGINT:
                 return Long.class;
@@ -149,7 +149,7 @@ public class Type {
                 return Timestamp.class;
             case Types.DECIMAL:
             case Types.NUMERIC:
-                if(scale > 0) {
+                if(scale != null && scale > 0) {
                     return BigDecimal.class;
                 } else {
                     return getDefaultIntegerType(precision);
@@ -197,7 +197,10 @@ public class Type {
         }
     }
 
-    public static Class<? extends Number> getDefaultIntegerType(long precision) {
+    public static Class<? extends Number> getDefaultIntegerType(Integer precision) {
+        if(precision == null) {
+            return BigInteger.class;
+        }
         if(precision < Math.log10(Integer.MAX_VALUE)) {
             return Integer.class;
         } else if(precision < Math.log10(Long.MAX_VALUE)) {
@@ -216,7 +219,7 @@ public class Type {
         return autoincrement;
     }
 
-    public Long getMaximumPrecision() {
+    public Integer getMaximumPrecision() {
         return maximumPrecision;
     }
 
@@ -240,11 +243,11 @@ public class Type {
         return searchable;
     }
 
-    public short getMinimumScale() {
+    public Integer getMinimumScale() {
         return minimumScale;
     }
 
-    public short getMaximumScale() {
+    public Integer getMaximumScale() {
         return maximumScale;
     }
 

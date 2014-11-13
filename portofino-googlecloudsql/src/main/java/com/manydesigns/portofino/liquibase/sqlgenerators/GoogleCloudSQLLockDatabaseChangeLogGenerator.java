@@ -22,7 +22,7 @@ package com.manydesigns.portofino.liquibase.sqlgenerators;
 
 import com.manydesigns.portofino.liquibase.databases.GoogleCloudSQLDatabase;
 import liquibase.database.Database;
-import liquibase.database.typeconversion.TypeConverterFactory;
+import liquibase.datatype.DataTypeFactory;
 import liquibase.exception.ValidationErrors;
 import liquibase.sql.Sql;
 import liquibase.sqlgenerator.SqlGeneratorChain;
@@ -58,12 +58,14 @@ public class GoogleCloudSQLLockDatabaseChangeLogGenerator extends AbstractSqlGen
     }
 
     public Sql[] generateSql(LockDatabaseChangeLogStatement statement, Database database, SqlGeneratorChain sqlGeneratorChain) {
+        String liquibaseCatalog = database.getLiquibaseCatalogName();
         String liquibaseSchema = database.getLiquibaseSchemaName();
-        UpdateStatement updateStatement = new UpdateStatement(liquibaseSchema, database.getDatabaseChangeLogLockTableName());
+
+        UpdateStatement updateStatement = new UpdateStatement(liquibaseCatalog, liquibaseSchema, database.getDatabaseChangeLogLockTableName());
         updateStatement.addNewColumnValue("locked", true);
         updateStatement.addNewColumnValue("lockgranted", new Timestamp(new java.util.Date().getTime()));
         updateStatement.addNewColumnValue("lockedby", "Google Cloud SQL");
-        updateStatement.setWhereClause("id = 1 AND locked = "+ TypeConverterFactory.getInstance().findTypeConverter(database).getBooleanType().getFalseBooleanValue());
+        updateStatement.setWhereClause(database.escapeColumnName(liquibaseCatalog, liquibaseSchema, database.getDatabaseChangeLogTableName(), "ID") + " = 1 AND " + database.escapeColumnName(liquibaseCatalog, liquibaseSchema, database.getDatabaseChangeLogTableName(), "LOCKED") + " = "+ DataTypeFactory.getInstance().fromDescription("boolean", database).objectToSql(false, database));
 
         return SqlGeneratorFactory.getInstance().generateSql(updateStatement, database);
 
