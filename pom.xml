@@ -56,16 +56,16 @@
     </scm>
     <developers>
         <developer>
-            <name>Paolo Predonzani</name>
-            <email>paolo.predonzani@manydesigns.com</email>
-        </developer>
-        <developer>
             <name>Angelo Lupo</name>
             <email>angelo.lupo@manydesigns.com</email>
         </developer>
         <developer>
             <name>Giampiero Granatella</name>
             <email>giampiero.granatella@manydesigns.com</email>
+        </developer>
+        <developer>
+            <name>Emanuele Poggi</name>
+            <email>emanuele.poggi@manydesigns.com</email>
         </developer>
         <developer>
             <name>Alessio Stalla</name>
