@@ -561,8 +561,8 @@ Forms
     padding: 0;
 }
 
-td.selection-cell {
-    width: 13px;
+.table > tbody > tr > td.selection-cell {
+    vertical-align: middle;
 }
 
 .attachment {
