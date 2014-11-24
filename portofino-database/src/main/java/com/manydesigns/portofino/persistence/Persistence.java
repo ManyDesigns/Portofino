@@ -44,6 +44,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -266,7 +267,9 @@ public class Persistence {
                 }
                 Configuration configuration =
                         builder.buildSessionFactory(database);
-                SessionFactory sessionFactory = configuration.buildSessionFactory();
+                StandardServiceRegistryBuilder registryBuilder =
+                        new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
+                SessionFactory sessionFactory = configuration.buildSessionFactory(registryBuilder.build());
 
                 HibernateDatabaseSetup setup =
                         new HibernateDatabaseSetup(

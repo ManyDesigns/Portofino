@@ -1255,7 +1255,7 @@ public class ApplicationWizard extends AbstractPageAction {
 
         if(!propertyIsUserPassword &&
            column.getActualJavaType() == String.class &&
-           column.getLength() > MULTILINE_THRESHOLD &&
+           (column.getLength() == null || column.getLength() > MULTILINE_THRESHOLD) &&
            isNewConnectionProvider()) {
             Annotation annotation = DatabaseLogic.findAnnotation(column, Multiline.class);
             if(annotation == null) {
