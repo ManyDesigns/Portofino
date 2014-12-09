@@ -28,6 +28,7 @@ import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.model.database.ForeignKey;
 import liquibase.structure.core.ForeignKeyConstraintType;
 import org.hibernate.FetchMode;
+import org.hibernate.MappingException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Mappings;
 import org.hibernate.id.IncrementGenerator;
@@ -88,6 +89,9 @@ public class HibernateConfig {
             o2mMapping(database, configuration, mappings);
             //Many2One Mapping
             m2oMapping(database, configuration, mappings);
+
+            //TODO
+            //mappings.addSecondPass(new ToOneFkSecondPass(?));
 
             return configuration;
         }
@@ -582,12 +586,9 @@ public class HibernateConfig {
         OneToMany oneToMany = new OneToMany(mappings, set.getOwner());
         set.setElement(oneToMany);
 
-
         oneToMany.setReferencedEntityName(manyMDQualifiedTableName);
-
         oneToMany.setAssociatedClass(clazzMany);
-        oneToMany.setEmbedded(true);
-        
+
         set.setSorted(false);
         set.setFetchMode(FetchMode.DEFAULT);
         //Riferimenti alle colonne
@@ -735,29 +736,25 @@ public class HibernateConfig {
         }
 
         Table tab = clazz.getTable();
-        List<String> columnNames = new ArrayList<String>();
-
-        for (Reference ref : relationship.getReferences()) {
-            if(ref.getActualFromColumn() == null) {
-                logger.error("Missing from column {}, skipping relationship", ref.getFromColumn());
-                return;
-            }
-            columnNames.add(ref.getFromColumn());
-        }
 
         ManyToOne m2o = new ManyToOne(mappings, tab);
         m2o.setLazy(LAZY);
-        final HashMap<String, PersistentClass> persistentClasses =
-                new HashMap<String, PersistentClass>();
+        final HashMap<String, PersistentClass> persistentClasses = new HashMap<String, PersistentClass>();
         persistentClasses.put(oneMDQualifiedTableName,
                 config.getClassMapping(oneMDQualifiedTableName));
         m2o.setReferencedEntityName(oneMDQualifiedTableName);
         m2o.createPropertyRefConstraints(persistentClasses);
 
+        boolean referenceToPrimaryKey = true;
         PersistentClass manyClass = config.getClassMapping(manyMDQualifiedTableName);
-        for (String columnName : columnNames) {
+        for (Reference ref : relationship.getReferences()) {
+            com.manydesigns.portofino.model.database.Column fromColumn = ref.getActualFromColumn();
+            if(fromColumn == null) {
+                logger.error("Missing from column {}, skipping relationship", ref.getFromColumn());
+                return;
+            }
             Column col = new Column();
-            col.setName(quoteIdentifier(columnName));
+            col.setName(quoteIdentifier(fromColumn.getColumnName()));
             //Recupero la colonna precedentemente associata alla tabella:
             //essa ha uno uniqueIdentifier generato al momento dell'associazione alla tabella;
             //questo viene utilizzato per disambiguare l'alias della colonna nelle query
@@ -765,15 +762,20 @@ public class HibernateConfig {
             col = manyClass.getTable().getColumn(col);
             if(col == null) {
                 logger.error("Column not found in 'many' entity {}: {}, " +
-                             "skipping relationship", manyClass.getEntityName(), columnName);
+                             "skipping relationship", manyClass.getEntityName(), fromColumn.getColumnName());
                 return;
             }
             m2o.addColumn(col);
+            referenceToPrimaryKey &= manyMDTable.getPrimaryKey().getColumns().contains(fromColumn);
+        }
+        m2o.setReferenceToPrimaryKey(referenceToPrimaryKey);
+        if(!referenceToPrimaryKey) {
+            //TODO generate synthetic property as Hibernate does for annotated classes (see second passes)
+            //m2o.setReferencedPropertyName(syntheticPropertyName);
         }
 
         Property prop = new Property();
         prop.setName(relationship.getActualOnePropertyName());
-        //prop.setNodeName(relationship.getActualOnePropertyName());
         prop.setValue(m2o);
         prop.setCascade("none"); //TODO era "all", capire
         prop.setInsertable(false);
@@ -782,16 +784,18 @@ public class HibernateConfig {
     }
 
     private Property getRefProperty(PersistentClass clazzOne, String propertyName) {
-        Property refProp;
-        //TODO alessio ha senso questo automatismo?
-        if (null != clazzOne.getIdentifierProperty()) {
-            refProp = clazzOne.getIdentifierProperty();
-        } else if (null != clazzOne.getIdentifier()) {
-            refProp = ((Component) clazzOne.getIdentifier())
-                    .getProperty(propertyName);
-        } else {
+        Property refProp = null;
+        if (clazzOne.getIdentifier() instanceof Component) { //Composite id
+            try {
+                refProp = ((Component) clazzOne.getIdentifier()).getProperty(propertyName);
+            } catch (MappingException e) {
+                logger.debug("Property " + propertyName + " not found in identifier", e);
+            }
+        }
+        if(refProp == null) {
             refProp = clazzOne.getProperty(propertyName);
         }
+        assert refProp != null;
         return refProp;
     }
 
