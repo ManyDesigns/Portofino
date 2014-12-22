@@ -23,7 +23,7 @@
                 <label for="pwd"><fmt:message key='password'/></label>
                 <stripes:password name="pwd" id="pwd" class="form-control"/>
             </div>
-            <div class="form-group">
+            <div class="checkbox">
                 <label class="checkbox">
                     <stripes:checkbox name="rememberMe" id="rememberMe"/> <fmt:message key='remember.me.on.this.computer'/>
                 </label>

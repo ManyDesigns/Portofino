@@ -184,16 +184,12 @@ fieldset.radio {
     clear: both;
 }
 
-table.mde-table-form input[type='checkbox'] {
-    margin: 0;
-}
-
 table.mde-table-form th, table.mde-table-form td {
     vertical-align: middle;
 }
 
 table.mde-table-form div.checkbox {
-    margin: 0;
+    margin-bottom: 0;
 }
 
 table.mde-table-form div.checkbox label.checkbox-inline {

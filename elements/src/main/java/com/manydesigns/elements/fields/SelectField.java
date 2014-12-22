@@ -418,13 +418,14 @@ public class SelectField extends AbstractField {
                                        String label,
                                        String stringValue,
                                        boolean checked) {
+        xb.openElement("div");
+        xb.addAttribute("class", "radio");
         xb.openElement("label");
         xb.addAttribute("for", radioId);
-        xb.addAttribute("class", "radio");
-        xb.write(label);
-        xb.writeNbsp();
         xb.writeInputRadio(radioId, inputName, stringValue, checked);
+        xb.write(label);
         xb.closeElement("label");
+        xb.closeElement("div");
     }
 
     public void valueToXhtmlEditAutocomplete(XhtmlBuffer xb) {
