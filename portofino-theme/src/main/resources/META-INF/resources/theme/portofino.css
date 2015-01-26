@@ -756,3 +756,17 @@ input.tt-input {
 .tt-suggestion p {
   margin: 0;
 }
+
+/*******************************************************************************
+Charts
+*******************************************************************************/
+
+.legend-container span {
+    display: inline-block;
+    min-width: 20px;
+}
+
+.legend-container ul {
+    list-style: outside none none;
+    padding-left: 13px;
+}

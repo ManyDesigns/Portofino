@@ -182,7 +182,8 @@ portofino.charts.chartjs.create = function (chartId, chartKind, chartJsMethod, d
     var legend = $(chart.generateLegend());
     $(canvas).parent().siblings(".legend-container").append(legend);
     legend.find("li").each(function(index, elem) {
-        $(elem).mouseover(function() {
+        elem = $(elem);
+        elem.mouseover(function() {
             if (chart.segments) {
                 var activeSegment = chart.segments[index];
                 activeSegment.save();
@@ -212,6 +213,7 @@ portofino.charts.chartjs.create = function (chartId, chartKind, chartJsMethod, d
                 }
             }
         });
+        elem.find("span").html("&nbsp;").after(" ");
     });
     legend.mouseout(function() {
         chart.draw();
