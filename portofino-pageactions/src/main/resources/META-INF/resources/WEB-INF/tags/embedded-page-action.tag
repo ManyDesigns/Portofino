@@ -20,6 +20,7 @@
     <% try {%>
         <jsp:include page="${path}" flush="false">
             <jsp:param name="returnUrl" value="${returnUrl}" />
+            <jsp:param name="__portofino_quiet_auth_failure" value="true" />
         </jsp:include>
     <%} catch (Throwable t) {
         LoggerFactory.getLogger(PageAction.class).error("Error in included page", t);

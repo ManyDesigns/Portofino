@@ -65,6 +65,9 @@ public class ForbiddenAccessResolution implements Resolution {
     }
 
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        if(request.getParameter("__portofino_quiet_auth_failure") != null) {
+            return;
+        }
         Subject subject = SecurityUtils.getSubject();
         ElementsActionBeanContext context = new ElementsActionBeanContext();
         context.setRequest(request);
@@ -79,7 +82,7 @@ public class ForbiddenAccessResolution implements Resolution {
         Configuration configuration =
                 (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
         if (!subject.isAuthenticated() && !ajax) {
-            logger.info("Unauthenticated user not allowed. Redirecting to login.");
+            logger.info("Unauthenticated user not allowed to see {}. Redirecting to login.", originalPath);
             String loginPage = configuration.getString(PortofinoProperties.LOGIN_PAGE);
             RedirectResolution redirectResolution =
                     new RedirectResolution(loginPage, true);
@@ -95,7 +98,7 @@ public class ForbiddenAccessResolution implements Resolution {
                 response.setStatus(STATUS);
                 new StreamingResolution("text/plain", loginUrlBuilder.toString()).execute(request, response);
             } else {
-                logger.warn("User not authorized for url {}.", returnUrl);
+                logger.warn("User not authorized for url {}.", originalPath);
                 new ErrorResolution(STATUS, errorMessage).execute(request, response);
             }
         }

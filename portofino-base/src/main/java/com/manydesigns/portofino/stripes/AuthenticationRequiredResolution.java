@@ -62,6 +62,9 @@ public class AuthenticationRequiredResolution implements Resolution {
     }
 
     public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        if(request.getParameter("__portofino_quiet_auth_failure") != null) {
+            return;
+        }
         ElementsActionBeanContext context = new ElementsActionBeanContext();
         context.setRequest(request);
         String originalPath = context.getActionPath();
@@ -75,7 +78,7 @@ public class AuthenticationRequiredResolution implements Resolution {
         Configuration configuration =
                 (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
         if (!ajax) {
-            logger.info("Anonymous user not allowed. Redirecting to login.");
+            logger.info("Anonymous user not allowed to see {}. Redirecting to login.", originalPath);
             String loginPage = configuration.getString(PortofinoProperties.LOGIN_PAGE);
             RedirectResolution redirectResolution =
                     new RedirectResolution(loginPage, true);
