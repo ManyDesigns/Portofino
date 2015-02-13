@@ -23,11 +23,9 @@
                 });
             </script>
         </c:if>
-        <p>
-            <c:if test="${actionBean.requiredFieldsPresent}">
-                <fmt:message key="fields.marked.with.a.star.are.required"/>.
-            </c:if>
-        </p>
+        <c:if test="${actionBean.requiredFieldsPresent}">
+            <p><fmt:message key="fields.marked.with.a.star.are.required"/>.</p>
+        </c:if>
         <stripes:form action="${actionBean.context.actionPath}" method="post"
                       id="${(not empty actionBean.crudConfiguration.name) ? actionBean.crudConfiguration.name : null}"
                       enctype="multipart/form-data" class="form-horizontal edit">

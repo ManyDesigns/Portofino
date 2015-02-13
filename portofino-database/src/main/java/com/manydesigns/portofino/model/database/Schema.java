@@ -81,6 +81,9 @@ public class Schema implements ModelObject {
     }
 
     public String getQualifiedName() {
+        if(getDatabaseName() == null) {
+            return schemaName;
+        }
         return MessageFormat.format("{0}.{1}", getDatabaseName(), schemaName);
     }
 
@@ -112,7 +115,7 @@ public class Schema implements ModelObject {
     }
 
     public String getDatabaseName() {
-        return database.getDatabaseName();
+        return database != null ? database.getDatabaseName() : null;
     }
 
     @XmlAttribute(required = true)

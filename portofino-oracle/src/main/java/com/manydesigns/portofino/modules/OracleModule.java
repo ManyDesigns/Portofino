@@ -23,10 +23,6 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.OracleDatabasePlatform;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.liquibase.databases.PortofinoOracleDatabase;
-import com.manydesigns.portofino.liquibase.databasesnapshotgenerators.PortofinoOracleDatabaseSnapshotGenerator;
-import liquibase.database.DatabaseFactory;
-import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,12 +88,6 @@ public class OracleModule implements Module {
 
     @Override
     public void init() {
-        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
-            logger.debug("Registering Oracle");
-            DatabaseFactory.getInstance().register(new PortofinoOracleDatabase());
-            logger.debug("Registering GoogleCloudSQLLockDatabaseChangeLogGenerator");
-            DatabaseSnapshotGeneratorFactory.getInstance().register(new PortofinoOracleDatabaseSnapshotGenerator());
-        }
         databasePlatformsRegistry.addDatabasePlatform(new OracleDatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }

@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.liquibase.databases;
 
 import liquibase.database.DatabaseConnection;
+import liquibase.database.core.MySQLDatabase;
 import liquibase.exception.DatabaseException;
 
 /**
@@ -29,7 +30,7 @@ import liquibase.exception.DatabaseException;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class GoogleCloudSQLDatabase extends PortofinoMySQLDatabase {
+public class GoogleCloudSQLDatabase extends MySQLDatabase {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 

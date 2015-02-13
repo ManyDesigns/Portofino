@@ -97,6 +97,9 @@ public class Table implements ModelObject, Annotated {
     //**************************************************************************
 
     public String getQualifiedName() {
+        if(schema.getQualifiedName() == null) {
+            return tableName;
+        }
         return MessageFormat.format("{0}.{1}",
                 schema.getQualifiedName(), tableName);
     }

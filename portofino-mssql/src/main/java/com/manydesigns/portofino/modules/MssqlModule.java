@@ -24,10 +24,6 @@ import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.JTDSDatabasePlatform;
 import com.manydesigns.portofino.database.platforms.MSSqlServerDatabasePlatform;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.liquibase.databases.PortofinoMSSQLDatabase;
-import liquibase.database.DatabaseFactory;
-import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
-import liquibase.snapshot.jvm.MSSQLDatabaseSnapshotGenerator;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,11 +89,6 @@ public class MssqlModule implements Module {
 
     @Override
     public void init() {
-        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
-            logger.debug("Registering MSSQL");
-            DatabaseFactory.getInstance().register(new PortofinoMSSQLDatabase());
-            DatabaseSnapshotGeneratorFactory.getInstance().register(new MSSQLDatabaseSnapshotGenerator());
-        }
         databasePlatformsRegistry.addDatabasePlatform(new MSSqlServerDatabasePlatform());
 
 

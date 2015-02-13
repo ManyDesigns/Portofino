@@ -23,10 +23,6 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.database.platforms.ApacheDerbyDatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.liquibase.databases.PortofinoDerbyDatabase;
-import liquibase.database.DatabaseFactory;
-import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
-import liquibase.snapshot.jvm.DerbyDatabaseSnapshotGenerator;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,11 +88,6 @@ public class DerbyModule implements Module {
 
     @Override
     public void init() {
-        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
-            logger.debug("Registering Derby");
-            DatabaseFactory.getInstance().register(new PortofinoDerbyDatabase());
-            DatabaseSnapshotGeneratorFactory.getInstance().register(new DerbyDatabaseSnapshotGenerator());
-        }
         databasePlatformsRegistry.addDatabasePlatform(new ApacheDerbyDatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }

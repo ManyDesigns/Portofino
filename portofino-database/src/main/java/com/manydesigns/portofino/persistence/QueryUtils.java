@@ -31,6 +31,7 @@ import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.JdbcParameter;
 import net.sf.jsqlparser.expression.Parenthesis;
@@ -444,13 +445,13 @@ public class QueryUtils {
             throw new RuntimeException("Couldn't merge query", e);
         }
 
-        String mainEntityAlias = null;
+        Alias mainEntityAlias = null;
         if(criteria != null) {
             mainEntityAlias = getEntityAlias(criteria.getTable().getActualEntityName(), parsedQueryString);
         }
 
         QueryStringWithParameters criteriaQuery =
-                getQueryStringWithParametersForCriteria(criteria, mainEntityAlias);
+                getQueryStringWithParametersForCriteria(criteria, mainEntityAlias != null ? mainEntityAlias.getName() : null);
         String criteriaQueryString = criteriaQuery.getQueryString();
         Object[] criteriaParameters = criteriaQuery.getParameters();
 
@@ -687,10 +688,10 @@ public class QueryUtils {
                 return getObjectByPk(persistence, database, entityName, pk);
             }
 
-            String mainEntityAlias = getEntityAlias(entityName, parsedQuery);
+            Alias mainEntityAlias = getEntityAlias(entityName, parsedQuery);
             net.sf.jsqlparser.schema.Table mainEntityTable;
             if(mainEntityAlias != null) {
-                mainEntityTable = new net.sf.jsqlparser.schema.Table(null, mainEntityAlias);
+                mainEntityTable = new net.sf.jsqlparser.schema.Table(null, mainEntityAlias.getName());
             } else {
                 mainEntityTable = new net.sf.jsqlparser.schema.Table();
             }
@@ -723,16 +724,16 @@ public class QueryUtils {
         }
     }
 
-    protected static String getEntityAlias(String entityName, PlainSelect query) {
+    protected static Alias getEntityAlias(String entityName, PlainSelect query) {
         FromItem fromItem = query.getFromItem();
         if (hasEntityAlias(entityName, fromItem)) {
-            return fromItem.getAlias().getName();
+            return fromItem.getAlias();
         }
         if(query.getJoins() != null) {
             for(Object o : query.getJoins()) {
                 Join join = (Join) o;
                 if (hasEntityAlias(entityName, join.getRightItem())) {
-                    return join.getRightItem().getAlias().getName();
+                    return join.getRightItem().getAlias();
                 }
             }
         }

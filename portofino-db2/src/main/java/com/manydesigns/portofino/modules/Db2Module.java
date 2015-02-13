@@ -23,10 +23,6 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.IbmDb2DatabasePlatform;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.liquibase.databases.PortofinoDB2Database;
-import liquibase.database.DatabaseFactory;
-import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
-import liquibase.snapshot.jvm.DB2DatabaseSnapshotGenerator;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,11 +88,6 @@ public class Db2Module implements Module {
 
     @Override
     public void init() {
-        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
-            logger.debug("Registering DB2");
-            DatabaseFactory.getInstance().register(new PortofinoDB2Database());
-            DatabaseSnapshotGeneratorFactory.getInstance().register(new DB2DatabaseSnapshotGenerator());
-        }
         databasePlatformsRegistry.addDatabasePlatform(new IbmDb2DatabasePlatform());
         status = ModuleStatus.ACTIVE;
     }

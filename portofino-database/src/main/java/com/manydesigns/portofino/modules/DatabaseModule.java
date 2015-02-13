@@ -23,21 +23,13 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.di.Injections;
-import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoAddColumnGenerator;
-import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoCreateTableGenerator;
-import com.manydesigns.portofino.liquibase.sqlgenerators.PortofinoSelectFromDatabaseChangeLogLockGenerator;
 import com.manydesigns.portofino.persistence.Persistence;
-import liquibase.database.DatabaseFactory;
-import liquibase.snapshot.DatabaseSnapshotGenerator;
-import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
-import liquibase.sqlgenerator.SqlGeneratorFactory;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
 import java.io.File;
-import java.util.List;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -116,21 +108,6 @@ public class DatabaseModule implements Module {
 
     @Override
     public void init() {
-        if(configuration.getBoolean(LIQUIBASE_ENABLED, true)) {
-            logger.info("Setting up Liquibase");
-            DatabaseFactory databaseFactory = DatabaseFactory.getInstance();
-            logger.debug("Clearing Liquibase database factory registry");
-            databaseFactory.clearRegistry();
-            logger.debug("Clearing Liquibase database snapshot generator factory registry");
-            List<DatabaseSnapshotGenerator> registry = DatabaseSnapshotGeneratorFactory.getInstance().getRegistry();
-            registry.clear();
-            SqlGeneratorFactory.getInstance().register(new PortofinoSelectFromDatabaseChangeLogLockGenerator());
-            SqlGeneratorFactory.getInstance().register(new PortofinoCreateTableGenerator());
-            SqlGeneratorFactory.getInstance().register(new PortofinoAddColumnGenerator());
-        } else {
-            logger.info("Liquibase is disabled");
-        }
-
         logger.info("Initializing persistence");
         DatabasePlatformsRegistry databasePlatformsRegistry = new DatabasePlatformsRegistry(configuration);
 

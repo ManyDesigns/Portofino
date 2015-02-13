@@ -25,12 +25,14 @@ import com.manydesigns.portofino.model.Annotated;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
 import com.manydesigns.portofino.model.database.*;
+import liquibase.CatalogAndSchema;
 import liquibase.database.DatabaseConnection;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
-import liquibase.database.structure.ForeignKeyConstraintType;
 import liquibase.snapshot.DatabaseSnapshot;
-import liquibase.snapshot.DatabaseSnapshotGeneratorFactory;
+import liquibase.snapshot.SnapshotControl;
+import liquibase.snapshot.SnapshotGeneratorFactory;
+import liquibase.structure.core.ForeignKeyConstraintType;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,8 +92,7 @@ public class DatabaseSyncer {
             logger.debug("Reading schema names from metadata");
             List<Schema> schemas = connectionProvider.getDatabase().getSchemas();
 
-            DatabaseSnapshotGeneratorFactory dsgf =
-                    DatabaseSnapshotGeneratorFactory.getInstance();
+            SnapshotGeneratorFactory dsgf = SnapshotGeneratorFactory.getInstance();
 
             logger.debug("Finding Liquibase database");
             DatabaseFactory databaseFactory = DatabaseFactory.getInstance();
@@ -99,19 +100,22 @@ public class DatabaseSyncer {
                     databaseFactory.findCorrectDatabaseImplementation(liquibaseConnection);
 
             for (Schema schema : schemas) {
-                logger.info("Processing schema: {}", schema.getSchemaName());
+                String schemaName = schema.getSchemaName();
+                logger.info("Processing schema: {}", schemaName);
                 Schema sourceSchema =
                         DatabaseLogic.findSchemaByNameIgnoreCase(
-                                sourceDatabase, schema.getSchemaName());
+                                sourceDatabase, schemaName);
                 if (sourceSchema == null) {
                     logger.debug("Source schema not found. Creating an empty one.");
                     sourceSchema = new Schema();
-                    sourceSchema.setSchemaName(schema.getSchemaName());
+                    sourceSchema.setSchemaName(schemaName);
                 }
 
                 logger.debug("Creating Liquibase database snapshot");
+                String catalog = liquibaseDatabase.getDefaultCatalogName();
+                SnapshotControl snapshotControl = new SnapshotControl(liquibaseDatabase);
                 DatabaseSnapshot snapshot =
-                        dsgf.createSnapshot(liquibaseDatabase, schema.getSchemaName(), null);
+                        dsgf.createSnapshot(new CatalogAndSchema(catalog, schemaName), liquibaseDatabase, snapshotControl);
 
                 logger.debug("Synchronizing schema");
                 Schema targetSchema = new Schema();
@@ -142,7 +146,7 @@ public class DatabaseSyncer {
 
     protected void syncForeignKeys(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
         logger.info("Synchronizing foreign keys");
-        for(liquibase.database.structure.ForeignKey liquibaseFK : databaseSnapshot.getForeignKeys()) {
+        for(liquibase.structure.core.ForeignKey liquibaseFK : databaseSnapshot.get(liquibase.structure.core.ForeignKey.class)) {
             String fkName = liquibaseFK.getName();
             logger.info("Synchronizing foreign key {}", fkName);
             String fkTableName = liquibaseFK.getForeignKeyTable().getName();
@@ -162,13 +166,13 @@ public class DatabaseSyncer {
             ForeignKey targetFK = new ForeignKey(targetFromTable);
             targetFK.setName(fkName);
 
-            liquibase.database.structure.Table liquibasePkTable =
+            liquibase.structure.core.Table liquibasePkTable =
                     liquibaseFK.getPrimaryKeyTable();
 
             targetFK.setToDatabase(targetSchema.getDatabaseName());
 
-            String pkSchemaName = liquibasePkTable.getSchema();
-            String pkTableName = normalizeTableName(liquibasePkTable.getName(), databaseSnapshot);
+            String pkSchemaName = liquibasePkTable.getSchema().getName();
+            String pkTableName = normalizeTableName(liquibasePkTable, databaseSnapshot);
             targetFK.setToSchema(pkSchemaName);
             targetFK.setToTableName(pkTableName);
             if (pkSchemaName == null || pkTableName == null) {
@@ -219,17 +223,17 @@ public class DatabaseSyncer {
             }
             targetFK.setOnDelete(deleteRule.name());
 
-            String[] fromColumnNames = liquibaseFK.getForeignKeyColumns().split(",\\s+");
-            String[] toColumnNames = liquibaseFK.getPrimaryKeyColumns().split(",\\s+");
-            if(fromColumnNames.length != toColumnNames.length) {
+            List<liquibase.structure.core.Column> fromColumns = liquibaseFK.getForeignKeyColumns();
+            List<liquibase.structure.core.Column> toColumns = liquibaseFK.getPrimaryKeyColumns();
+            if(fromColumns.size() != toColumns.size()) {
                 logger.error("Invalid foreign key {} - columns don't match", fkName);
                 continue;
             }
 
             boolean referencesHaveErrors = false;
-            for(int i = 0; i < fromColumnNames.length; i++) {
-                String fromColumnName = fromColumnNames[i];
-                String toColumnName = toColumnNames[i];
+            for(int i = 0; i < fromColumns.size(); i++) {
+                String fromColumnName = fromColumns.get(i).getName();
+                String toColumnName = toColumns.get(i).getName();
 
                 Column fromColumn =
                         DatabaseLogic.findColumnByNameIgnoreCase(
@@ -294,15 +298,15 @@ public class DatabaseSyncer {
         }
     }
 
-    protected String normalizeTableName(String tableName, DatabaseSnapshot databaseSnapshot) {
-        String fkTableName = tableName;
+    protected String normalizeTableName(liquibase.structure.core.Table table, DatabaseSnapshot databaseSnapshot) {
         //Work around MySQL & case-insensitive dbs
-        liquibase.database.structure.Table fkTable = databaseSnapshot.getTable(fkTableName);
+        liquibase.structure.core.Table fkTable = databaseSnapshot.get(table);
+        String fkTableName;
 
         if(fkTable != null) {
             fkTableName = fkTable.getName();
         } else {
-            logger.warn("Could not normalize table name: " + fkTableName + "; most probably this is a sign of a foreign key to another schema, which is not supported at the moment.");
+            logger.warn("Could not normalize table name: " + table.getName() + "; most probably this is a sign of a foreign key to another schema, which is not supported at the moment.");
             fkTableName = null;
         }
 
@@ -311,7 +315,7 @@ public class DatabaseSyncer {
 
     protected void syncPrimaryKeys(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
         logger.info("Synchronizing primary keys");
-        for(liquibase.database.structure.PrimaryKey liquibasePK : databaseSnapshot.getPrimaryKeys()) {
+        for(liquibase.structure.core.PrimaryKey liquibasePK : databaseSnapshot.get(liquibase.structure.core.PrimaryKey.class)) {
             String pkTableName = liquibasePK.getTable().getName();
 
             Table sourceTable = DatabaseLogic.findTableByNameIgnoreCase(sourceSchema, pkTableName);
@@ -402,8 +406,7 @@ public class DatabaseSyncer {
 
     protected void syncTables(DatabaseSnapshot databaseSnapshot, Schema sourceSchema, Schema targetSchema) {
         logger.info("Synchronizing tables");
-        for (liquibase.database.structure.Table liquibaseTable
-                : databaseSnapshot.getTables()) {
+        for (liquibase.structure.core.Table liquibaseTable : databaseSnapshot.get(liquibase.structure.core.Table.class)) {
             String tableName = liquibaseTable.getName();
             logger.debug("Processing table: {}", tableName);
             Table sourceTable = DatabaseLogic.findTableByNameIgnoreCase(sourceSchema, tableName);
@@ -449,9 +452,9 @@ public class DatabaseSyncer {
     }
 
     protected void syncColumns
-            (liquibase.database.structure.Table liquibaseTable, final Table sourceTable, Table targetTable) {
+            (liquibase.structure.core.Table liquibaseTable, final Table sourceTable, Table targetTable) {
         logger.debug("Synchronizing columns");
-        for(liquibase.database.structure.Column liquibaseColumn : liquibaseTable.getColumns()) {
+        for(liquibase.structure.core.Column liquibaseColumn : liquibaseTable.getColumns()) {
             logger.debug("Processing column: {}", liquibaseColumn.getName());
 
             Column targetColumn = new Column(targetTable);
@@ -460,10 +463,10 @@ public class DatabaseSyncer {
 
             logger.debug("Merging column attributes and annotations");
             targetColumn.setAutoincrement(liquibaseColumn.isAutoIncrement());
-            int jdbcType = liquibaseColumn.getDataType();
+            int jdbcType = liquibaseColumn.getType().getDataTypeId();
             if(jdbcType == Types.OTHER) {
                 logger.debug("jdbcType = OTHER, trying to determine more specific type from type name");
-                String jdbcTypeName = liquibaseColumn.getTypeName();
+                String jdbcTypeName = liquibaseColumn.getType().getTypeName();
                 try {
                     Field field = Types.class.getField(jdbcTypeName);
                     jdbcType = (Integer) field.get(null);
@@ -472,10 +475,10 @@ public class DatabaseSyncer {
                 }
             }
             targetColumn.setJdbcType(jdbcType);
-            targetColumn.setColumnType(liquibaseColumn.getTypeName());
-            targetColumn.setLength(liquibaseColumn.getColumnSize());
+            targetColumn.setColumnType(liquibaseColumn.getType().getTypeName());
+            targetColumn.setLength(liquibaseColumn.getType().getColumnSize());
             targetColumn.setNullable(liquibaseColumn.isNullable());
-            targetColumn.setScale(liquibaseColumn.getDecimalDigits());
+            targetColumn.setScale(liquibaseColumn.getType().getDecimalDigits());
             //TODO liquibaseColumn.getLengthSemantics()
 
             Column sourceColumn = DatabaseLogic.findColumnByNameIgnoreCase(sourceTable, liquibaseColumn.getName());

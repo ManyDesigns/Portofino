@@ -34,6 +34,7 @@ import com.manydesigns.portofino.persistence.hibernate.HibernateConfig;
 import com.manydesigns.portofino.persistence.hibernate.HibernateDatabaseSetup;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.sync.DatabaseSyncer;
+import liquibase.Contexts;
 import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
@@ -43,6 +44,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -202,7 +204,7 @@ public class Persistence {
                             relativeChangelogPath,
                             resourceAccessor,
                             lqDatabase);
-                    lq.update(null);
+                    lq.update((Contexts) null);
                 } catch (Exception e) {
                     String msg = "Couldn't update database: " + schemaName;
                     logger.error(msg, e);
@@ -265,7 +267,9 @@ public class Persistence {
                 }
                 Configuration configuration =
                         builder.buildSessionFactory(database);
-                SessionFactory sessionFactory = configuration.buildSessionFactory();
+                StandardServiceRegistryBuilder registryBuilder =
+                        new StandardServiceRegistryBuilder().applySettings(configuration.getProperties());
+                SessionFactory sessionFactory = configuration.buildSessionFactory(registryBuilder.build());
 
                 HibernateDatabaseSetup setup =
                         new HibernateDatabaseSetup(

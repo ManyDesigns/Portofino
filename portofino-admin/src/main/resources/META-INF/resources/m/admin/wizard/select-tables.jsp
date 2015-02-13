@@ -29,21 +29,27 @@
             </style>
             <p><fmt:message key="select.the.generation.strategy" /></p>
             <div class="form-group">
-                <label class="radio">
-                    <input type="radio" name="generationStrategy" value="AUTO" id="generationStrategy_auto"
-                           ${actionBean.generationStrategy eq 'AUTO' ? 'checked="checked"' : ''} />
-                    <fmt:message key="automatic" />
-                </label>
-                <label class="radio">
-                    <input type="radio" name="generationStrategy" value="MANUAL" id="generationStrategy_manual"
-                           ${actionBean.generationStrategy eq 'MANUAL' ? 'checked="checked"' : ''} />
-                    <fmt:message key="manual.choose.which.pages.will.be.created" />
-                </label>
-                <label class="radio">
-                    <input type="radio" name="generationStrategy" value="NO" id="generationStrategy_no"
-                           ${actionBean.generationStrategy eq 'NO' ? 'checked="checked"' : ''} />
-                    <fmt:message key="dont.generate.anything" />
-                </label>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="generationStrategy" value="AUTO" id="generationStrategy_auto"
+                               ${actionBean.generationStrategy eq 'AUTO' ? 'checked="checked"' : ''} />
+                        <fmt:message key="automatic" />
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="generationStrategy" value="MANUAL" id="generationStrategy_manual"
+                               ${actionBean.generationStrategy eq 'MANUAL' ? 'checked="checked"' : ''} />
+                        <fmt:message key="manual.choose.which.pages.will.be.created" />
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="generationStrategy" value="NO" id="generationStrategy_no"
+                               ${actionBean.generationStrategy eq 'NO' ? 'checked="checked"' : ''} />
+                        <fmt:message key="dont.generate.anything" />
+                    </label>
+                </div>
             </div>
             <div id="rootsFormContainer">
                 <span id="calendarField"><mde:write name="actionBean" property="generateCalendarField" /></span>

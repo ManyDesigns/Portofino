@@ -11,7 +11,15 @@
     <stripes:layout-component name="pageBody">
     <style type="text/css">
         ul.calendars {
-            margin:  0;
+            padding:  0;
+        }
+
+        ul.calendars li {
+            margin: 0.5em 0; list-style: none;
+        }
+
+        ul.calendars div {
+            height: 100%; width: 1em; display: inline-block;
         }
     </style>
     <div class="row">
@@ -19,9 +27,8 @@
             <strong><fmt:message key="calendars" /></strong>
             <ul class="calendars">
                 <c:forEach var="calendar" items="${actionBean.calendars}">
-                    <li style="margin: 0.5em 0; list-style: none;">
-                        <div style="background-color: ${calendar.backgroundHtmlColor}; height: 1em;
-                             width: 1em; display: inline-block;">&nbsp;</div>
+                    <li>
+                        <div style="background-color: ${calendar.backgroundHtmlColor};">&nbsp;</div>
                         ${calendar.name}
                     </li>
                 </c:forEach>

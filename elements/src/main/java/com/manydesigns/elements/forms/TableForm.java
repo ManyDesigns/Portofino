@@ -100,13 +100,17 @@ public class TableForm implements Element {
 
         if (selectable) {
             xb.openElement("th");
+            xb.openElement("div");
+            xb.addAttribute("class", "checkbox");
+            xb.openElement("label");
             xb.openElement("input");
             xb.addAttribute("type", "checkbox");
             String js =
-                    //       th       tr       thead    table
-                    "$(this).parent().parent().parent().parent().find('td." + SELECTION_CELL_CLASS + " input').prop('checked', $(this).prop('checked'));";
+                    "$(this).closest('table').find('td." + SELECTION_CELL_CLASS + " input').prop('checked', $(this).prop('checked'));";
             xb.addAttribute("onchange", js);
             xb.closeElement("input");
+            xb.closeElement("label");
+            xb.closeElement("div");
             xb.closeElement("th");
         }
 
@@ -117,6 +121,8 @@ public class TableForm implements Element {
             }
             PropertyAccessor property = column.getPropertyAccessor();
             xb.addAttribute("data-property-name", property.getName());
+            xb.openElement("p");
+            xb.addAttribute("class", "form-control-static");
             if(column.headerTextFormat != null) {
                 Map<String, Object> formatParameters = new HashMap<String, Object>();
                 formatParameters.put("label", StringEscapeUtils.escapeHtml(column.getActualLabel()));
@@ -125,6 +131,7 @@ public class TableForm implements Element {
             } else {
                 xb.write(column.getActualLabel());
             }
+            xb.closeElement("p");
             xb.closeElement("th");
         }
         xb.closeElement("tr");
