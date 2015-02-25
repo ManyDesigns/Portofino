@@ -34,6 +34,6 @@ public interface SearchField extends Element {
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
     PropertyAccessor getPropertyAccessor();
-    void toSearchString(StringBuilder sb);
+    void toSearchString(StringBuilder sb, String encoding);
     void configureCriteria(Criteria criteria);
 }

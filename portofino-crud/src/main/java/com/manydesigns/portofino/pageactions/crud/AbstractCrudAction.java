@@ -1075,7 +1075,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected void readSearchFormFromRequest() {
         if (StringUtils.isBlank(searchString)) {
             searchForm.readFromRequest(context.getRequest());
-            searchString = searchForm.toSearchString();
+            searchString = searchForm.toSearchString(getUrlEncoding());
             if (searchString.length() == 0) {
                 searchString = null;
             } else {

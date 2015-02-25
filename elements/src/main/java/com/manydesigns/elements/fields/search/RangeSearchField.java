@@ -136,12 +136,12 @@ public class RangeSearchField extends AbstractSearchField {
         return true;
     }
 
-    public void toSearchString(StringBuilder sb) {
+    public void toSearchString(StringBuilder sb, String encoding) {
         if (minStringValue != null) {
-            appendToSearchString(sb, minInputName, minStringValue);
+            appendToSearchString(sb, minInputName, minStringValue, encoding);
         }
         if (maxStringValue != null) {
-            appendToSearchString(sb, maxInputName, maxStringValue);
+            appendToSearchString(sb, maxInputName, maxStringValue, encoding);
         }
     }
 

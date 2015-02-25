@@ -47,10 +47,10 @@ public class SearchForm extends AbstractCompositeElement<SearchField> {
         xb.closeElement("div");
     }
 
-    public String toSearchString() {
+    public String toSearchString(String encoding) {
         StringBuilder sb = new StringBuilder();
         for (SearchField current : this) {
-            current.toSearchString(sb);
+            current.toSearchString(sb, encoding);
         }
         return sb.toString();
     }

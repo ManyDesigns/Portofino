@@ -38,12 +38,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.Map;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public class SelectSearchField extends AbstractSearchField {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
@@ -101,9 +101,9 @@ public class SelectSearchField extends AbstractSearchField {
         initializeModel(accessor, selectionProvider);
     }
 
-    public void toSearchString(StringBuilder sb) {
+    public void toSearchString(StringBuilder sb, String encoding) {
         if(!required && notSet) {
-            appendToSearchString(sb, inputName, VALUE_NOT_SET);
+            appendToSearchString(sb, inputName, VALUE_NOT_SET, encoding);
             return;
         }
         Object[] values = getValues();
@@ -112,7 +112,7 @@ public class SelectSearchField extends AbstractSearchField {
         } else {
             for (Object value : values){
                 String valueString = OgnlUtils.convertValueToString(value);
-                appendToSearchString(sb, inputName, valueString);
+                appendToSearchString(sb, inputName, valueString, encoding);
             }
         }
     }

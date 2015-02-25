@@ -115,12 +115,12 @@ public class TextSearchField extends AbstractSearchField {
         return true;
     }
 
-    public void toSearchString(StringBuilder sb) {
+    public void toSearchString(StringBuilder sb, String encoding) {
         if (value != null) {
-            appendToSearchString(sb, inputName, value);
+            appendToSearchString(sb, inputName, value, encoding);
         }
         if(matchMode != null && matchMode != TextMatchMode.CONTAINS && showMatchMode) {
-            appendToSearchString(sb, matchModeParam, matchMode.getStringValue());
+            appendToSearchString(sb, matchModeParam, matchMode.getStringValue(), encoding);
         }
     }
 

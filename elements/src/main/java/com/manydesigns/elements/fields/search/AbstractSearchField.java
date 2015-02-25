@@ -30,6 +30,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
 * @author Angelo Lupo          - angelo.lupo@manydesigns.com
@@ -135,12 +138,16 @@ public abstract class AbstractSearchField implements SearchField {
         this.inputName = inputName;
     }
 
-    protected void appendToSearchString(StringBuilder sb, String name, String value) {
+    protected void appendToSearchString(StringBuilder sb, String name, String value, String encoding) {
         if (sb.length() > 0) {
             sb.append(",");
         }
-        sb.append(name);
-        sb.append("=");
-        sb.append(value);
+        try {
+            sb.append(URLEncoder.encode(name, encoding));
+            sb.append("=");
+            sb.append(URLEncoder.encode(value, encoding));
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

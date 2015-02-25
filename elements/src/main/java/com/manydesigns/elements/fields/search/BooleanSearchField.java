@@ -60,9 +60,9 @@ public class BooleanSearchField extends AbstractSearchField {
     // SearchField implementation
     //**************************************************************************
 
-    public void toSearchString(StringBuilder sb) {
+    public void toSearchString(StringBuilder sb, String encoding) {
         if (value != null && value != BooleanSearchValue.ANY) {
-            appendToSearchString(sb, inputName, value.getStringValue());
+            appendToSearchString(sb, inputName, value.getStringValue(), encoding);
         }
     }
 
