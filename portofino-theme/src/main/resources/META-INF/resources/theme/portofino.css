@@ -184,7 +184,8 @@ fieldset.radio {
     clear: both;
 }
 
-table.mde-table-form th, table.mde-table-form td {
+table.table.mde-table-form > tbody > tr > td, table.table.mde-table-form > tbody > tr > th,
+table.table.mde-table-form > thead > tr > td, table.table.mde-table-form > thead > tr > th {
     vertical-align: middle;
 }
 
@@ -560,10 +561,6 @@ Forms
     display: none;
     position: relative;
     padding: 0;
-}
-
-.table > tbody > tr > td.selection-cell {
-    vertical-align: middle;
 }
 
 .attachment {

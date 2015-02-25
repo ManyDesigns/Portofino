@@ -81,25 +81,22 @@ public class ActivityItem implements XhtmlFragment {
 
     public void writeImage(XhtmlBuffer xb) {
         String absoluteSrc = Util.getAbsoluteUrl(imageSrc, fullUrls);
-        if (imageHref == null) {
-            xb.openElement("div");
-        } else {
+        xb.openElement("div");
+        xb.addAttribute("class", "media-left");
+        if (imageHref != null) {
             xb.openElement("a");
             xb.addAttribute("href", imageHref);
         }
-        xb.addAttribute("class", "pull-left");
-
         xb.openElement("img");
         xb.addAttribute("class", "media-object");
         xb.addAttribute("alt", imageAlt);
         xb.addAttribute("src", absoluteSrc);
         xb.closeElement("img");
 
-        if (imageHref == null) {
-            xb.closeElement("div");
-        } else {
+        if (imageHref != null) {
             xb.closeElement("a");
         }
+        xb.closeElement("div");
     }
 
     public void writeBody(XhtmlBuffer xb) {
