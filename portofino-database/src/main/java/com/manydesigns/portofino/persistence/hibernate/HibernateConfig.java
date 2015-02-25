@@ -766,10 +766,12 @@ public class HibernateConfig {
                 return;
             }
             m2o.addColumn(col);
-            referenceToPrimaryKey &= manyMDTable.getPrimaryKey().getColumns().contains(fromColumn);
+            //Is the relationship a reference to the primary key or to a unique key?
+            referenceToPrimaryKey &= oneMDTable.getPrimaryKey().getColumns().contains(ref.getActualToColumn());
         }
         m2o.setReferenceToPrimaryKey(referenceToPrimaryKey);
         if(!referenceToPrimaryKey) {
+            logger.warn("M2O " + relationship.getActualManyPropertyName() + " -> " + relationship.getActualOnePropertyName() + " is not a reference to the primary key. This is not supported!");
             //TODO generate synthetic property as Hibernate does for annotated classes (see second passes)
             //m2o.setReferencedPropertyName(syntheticPropertyName);
         }
