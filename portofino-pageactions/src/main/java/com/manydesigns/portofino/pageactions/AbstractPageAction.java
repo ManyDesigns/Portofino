@@ -40,7 +40,6 @@ import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Layout;
-import com.manydesigns.portofino.pages.NavigationRoot;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
@@ -86,9 +85,9 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     public static final String DEFAULT_LAYOUT_CONTAINER = "default";
     public static final String[][] PAGE_CONFIGURATION_FIELDS =
-            {{"id", "title", "description", "navigationRoot", "template", "detailTemplate", "applyTemplateRecursively"}};
+            {{"id", "title", "description", "template", "detailTemplate", "applyTemplateRecursively"}};
     public static final String[][] PAGE_CONFIGURATION_FIELDS_NO_DETAIL =
-            {{"id", "title", "description", "navigationRoot", "template", "applyTemplateRecursively"}};
+            {{"id", "title", "description", "template", "applyTemplateRecursively"}};
     public static final String PORTOFINO_PAGEACTION_EXCEPTION = "portofino.pageaction.exception";
 
     public static final String CONF_FORM_PREFIX = "config";
@@ -287,21 +286,11 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         SelectionProvider detailLayoutSelectionProvider = createTemplateSelectionProvider();
         formBuilder.configSelectionProvider(detailLayoutSelectionProvider, "detailTemplate");
 
-        DefaultSelectionProvider navRootSelectionProvider = new DefaultSelectionProvider("navigationRoot");
-        String label = ElementsThreadLocals.getText("inherit");
-        navRootSelectionProvider.appendRow(NavigationRoot.INHERIT, label, true);
-        label = ElementsThreadLocals.getText("root");
-        navRootSelectionProvider.appendRow(NavigationRoot.ROOT, label, true);
-        label = ElementsThreadLocals.getText("ghost.root");
-        navRootSelectionProvider.appendRow(NavigationRoot.GHOST_ROOT, label, true);
-        formBuilder.configSelectionProvider(navRootSelectionProvider, "navigationRoot");
-
         pageConfigurationForm = formBuilder.build();
         EditPage edit = new EditPage();
         edit.id = page.getId();
         edit.title = page.getTitle();
         edit.description = page.getDescription();
-        edit.navigationRoot = page.getActualNavigationRoot();
         edit.template = page.getLayout().getTemplate();
         edit.detailTemplate = page.getDetailLayout().getTemplate();
         pageConfigurationForm.readFromObject(edit);
@@ -347,7 +336,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         Page page = pageInstance.getPage();
         page.setTitle(edit.title);
         page.setDescription(edit.description);
-        page.setNavigationRoot(edit.navigationRoot.name());
         page.getLayout().setTemplate(edit.template);
         page.getDetailLayout().setTemplate(edit.detailTemplate);
         try {

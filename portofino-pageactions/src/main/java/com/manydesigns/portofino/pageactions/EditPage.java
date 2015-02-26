@@ -48,10 +48,6 @@ public class EditPage {
     @CssClass(BootstrapSizes.FILL_ROW)
     public String description;
 
-    @LabelI18N("navigation.root")
-    @Required
-    public NavigationRoot navigationRoot;
-
     @LabelI18N("template")
     @Required
     public String template;
