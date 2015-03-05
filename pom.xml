@@ -99,7 +99,7 @@
         <jsoup.version>1.7.1</jsoup.version>
         <jstl.version>1.1.2</jstl.version>
         <jxl.version>2.6.12</jxl.version>
-        <liquibase.version>3.3.0</liquibase.version>
+        <liquibase.version>3.3.2</liquibase.version>
         <logback.version>0.9.26</logback.version>
         <ognl.version>3.0.8</ognl.version>
         <shiro.version>1.2.3</shiro.version>
@@ -253,11 +253,11 @@
                         <version>2.9.1</version>
                         <configuration>
                             <links>
-                                <link>http://shiro.apache.org/static/1.2.3/apidocs/</link>
+                                <link>http://shiro.apache.org/static/${shiro.version}/apidocs/</link>
                                 <link>http://stripes.sourceforge.net/docs/current/javadoc/</link>
                                 <link>http://commons.apache.org/configuration/apidocs/</link>
-                                <link>http://docs.jboss.org/hibernate/core/3.6/javadocs/</link>
-                                <link>http://groovy.codehaus.org/api/</link>
+                                <link>http://docs.jboss.org/hibernate/orm/4.3/javadocs/</link>
+                                <link>http://docs.groovy-lang.org/docs/groovy-${groovy.version}/html/api/</link>
                                 <link>http://tomcat.apache.org/tomcat-7.0-doc/servletapi/</link>
                             </links>
                         </configuration>

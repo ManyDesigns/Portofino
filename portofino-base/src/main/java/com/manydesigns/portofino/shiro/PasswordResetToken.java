@@ -55,8 +55,8 @@ public class PasswordResetToken implements AuthenticationToken {
     }
 
     @Override
-    public Object getCredentials() {
-        return token;
+    public String getCredentials() {
+        return newPassword;
     }
 
     public String getToken() {

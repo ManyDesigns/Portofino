@@ -26,10 +26,14 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import org.apache.commons.configuration.Configuration;
+import org.apache.shiro.authc.credential.PasswordMatcher;
+import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.crypto.hash.HashService;
+import org.apache.shiro.crypto.hash.format.HashFormat;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
@@ -48,12 +52,15 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
-    //--------------------------------------------------------------------------
-    // Injections
-    //--------------------------------------------------------------------------
-
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     protected Configuration portofinoConfiguration;
+
+    protected PasswordService passwordService;
+
+    protected AbstractPortofinoRealm() {
+        //Legacy - let the actual implementation handle hashing
+        setup(new PlaintextHashService(), new PlaintextHashFormat());
+    }
 
     //--------------------------------------------------------------------------
     // Authorization
@@ -167,5 +174,15 @@ public abstract class AbstractPortofinoRealm extends AuthorizingRealm implements
     @Override
     public String saveSelfRegisteredUser(Object user) {
         throw new UnsupportedOperationException();
+    }
+
+    protected void setup(HashService hashService, HashFormat hashFormat) {
+        PortofinoPasswordService passwordService = new PortofinoPasswordService();
+        passwordService.setHashService(hashService);
+        passwordService.setHashFormat(hashFormat);
+        PasswordMatcher passwordMatcher = new PasswordMatcher();
+        passwordMatcher.setPasswordService(passwordService);
+        setCredentialsMatcher(passwordMatcher);
+        this.passwordService = passwordService;
     }
 }

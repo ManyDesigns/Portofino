@@ -53,7 +53,7 @@ public class SignUpToken implements AuthenticationToken {
     }
 
     @Override
-    public Object getCredentials() {
+    public String getCredentials() {
         return token;
     }
 

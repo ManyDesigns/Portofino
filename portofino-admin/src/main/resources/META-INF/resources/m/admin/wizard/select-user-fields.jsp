@@ -18,6 +18,7 @@
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard"
                       method="post" class="form-horizontal">
             <p><fmt:message key="warning.configuring.user.management.will.overwrite" /></p>
+            <p><fmt:message key="if.you.want.more.control.on.password.encryption" /></p>
             <mde:write name="actionBean" property="userManagementSetupForm"/>
             <div style="display: none;">
                 <mde:write name="actionBean" property="userAndGroupTablesForm"/>

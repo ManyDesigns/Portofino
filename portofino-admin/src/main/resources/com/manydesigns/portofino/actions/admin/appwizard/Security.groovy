@@ -1,6 +1,7 @@
 import com.manydesigns.elements.messages.SessionMessages
 import com.manydesigns.elements.util.RandomUtil
 import com.manydesigns.portofino.di.Inject
+import com.manydesigns.portofino.logic.SecurityLogic
 import com.manydesigns.portofino.model.database.Database
 import com.manydesigns.portofino.model.database.DatabaseLogic
 import com.manydesigns.portofino.model.database.Table
@@ -9,10 +10,10 @@ import com.manydesigns.portofino.persistence.Persistence
 import com.manydesigns.portofino.persistence.QueryUtils
 import com.manydesigns.portofino.reflection.TableAccessor
 import com.manydesigns.portofino.util.PkHelper
-import java.security.MessageDigest
 import org.apache.commons.lang.StringUtils
-import org.apache.shiro.codec.Base64
-import org.apache.shiro.codec.Hex
+import org.apache.shiro.crypto.hash.DefaultHashService
+import org.apache.shiro.crypto.hash.HashService
+import org.apache.shiro.crypto.hash.format.HashFormat
 import org.hibernate.Criteria
 import org.hibernate.Query
 import org.hibernate.Session
@@ -24,7 +25,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import com.manydesigns.portofino.shiro.*
 import org.apache.shiro.authc.*
-import com.manydesigns.portofino.logic.SecurityLogic
 
 public class Security extends AbstractPortofinoRealm {
 
@@ -49,8 +49,23 @@ public class Security extends AbstractPortofinoRealm {
 
     protected String adminGroupName = "$adminGroupName";
 
+    ////Password Hashing
+    protected int hashIterations = $hashIterations;
+    protected String hashAlgorithm = $hashAlgorithm;
+    protected HashFormat hashFormat = $hashFormat;
+
     @Inject(DatabaseModule.PERSISTENCE)
     Persistence persistence;
+
+    public Security() {
+        if(!"plaintext".equals(hashAlgorithm)) {
+            HashService hashService = new DefaultHashService();
+            hashService.setHashIterations(hashIterations);
+            hashService.setHashAlgorithmName(hashAlgorithm);
+            hashService.setGeneratePublicSalt(false); //to enable salting, set this to true and/or call setPrivateSalt
+            setup(hashService, hashFormat);
+        }
+    }
 
     @Override
     protected Collection<String> loadAuthorizationInfo(Serializable principal) {
@@ -111,24 +126,23 @@ public class Security extends AbstractPortofinoRealm {
                 SessionMessages.addWarningMessage("Generated Security.groovy is using the hardcoded 'admin' user; " +
                                                   "remember to disable it in production!")
                 SimpleAuthenticationInfo info =
-                        new SimpleAuthenticationInfo(userName, password.toCharArray(), getName());
+                        new SimpleAuthenticationInfo(userName, encryptPassword(password), getName());
                 return info;
             }
             /////////////////////////////////////////////////////////////////
         }
 
-        String hashedPassword = encryptPassword(password);
-
         Session session = persistence.getSession(databaseName);
         org.hibernate.Criteria criteria = session.createCriteria(userTableEntityName);
         criteria.add(Restrictions.eq(userNameProperty, userName));
-        criteria.add(Restrictions.eq(passwordProperty, hashedPassword));
 
         List result = criteria.list();
 
         if (result.size() == 1) {
+            def user = result.get(0);
+
             SimpleAuthenticationInfo info =
-                    new SimpleAuthenticationInfo(result.get(0), password.toCharArray(), getName());
+                    new SimpleAuthenticationInfo(user, user[passwordProperty], getName());
             return info;
         } else {
             throw new IncorrectCredentialsException("Login failed");
@@ -147,13 +161,14 @@ public class Security extends AbstractPortofinoRealm {
         List result = criteria.list();
 
         if (result.size() == 1) {
+            def hashedPassword = encryptPassword(token.newPassword)
             def user = result.get(0);
             user[userTokenProperty] = null; //Consume token
-            user[passwordProperty] = encryptPassword(token.newPassword);
+            user[passwordProperty] = hashedPassword;
             session.update(userTableEntityName, (Object) user);
             session.transaction.commit();
             SimpleAuthenticationInfo info =
-                new SimpleAuthenticationInfo(user, token.credentials, getName());
+                new SimpleAuthenticationInfo(user, hashedPassword, getName());
             return info;
         } else {
             throw new IncorrectCredentialsException("Invalid token");
@@ -178,7 +193,7 @@ public class Security extends AbstractPortofinoRealm {
             session.update(userTableEntityName, (Object) user);
             session.transaction.commit();
             SimpleAuthenticationInfo info =
-                new SimpleAuthenticationInfo(user, token.credentials, getName());
+                new SimpleAuthenticationInfo(user, encryptPassword(token.credentials), getName());
             return info;
         } else {
             throw new IncorrectCredentialsException("Invalid token");
@@ -217,7 +232,7 @@ public class Security extends AbstractPortofinoRealm {
     }
 
     String encryptPassword(String password) {
-        return this.$encryptionAlgorithm(password);
+        return passwordService.encryptPassword(password);
     }
 
     Map<Serializable, String> getUsers() {
@@ -336,46 +351,6 @@ public class Security extends AbstractPortofinoRealm {
             }
         }
         return groups;
-    }
-
-    def sha1Hex(String password) {
-        MessageDigest md = MessageDigest.getInstance("SHA-1");
-        md.update(password.getBytes("UTF-8"));
-        byte[] raw = md.digest();
-        return toHex(raw);
-    }
-
-    def sha1Base64(String password) {
-        MessageDigest md = MessageDigest.getInstance("SHA-1");
-        md.update(password.getBytes("UTF-8"));
-        byte[] raw = md.digest();
-        return toBase64(raw);
-    }
-
-    def md5Hex(String password) {
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        md.update(password.getBytes("UTF-8"));
-        byte[] raw = md.digest();
-        return toHex(raw);
-    }
-
-    def md5Base64(String password) {
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        md.update(password.getBytes("UTF-8"));
-        byte[] raw = md.digest();
-        return toBase64(raw);
-    }
-
-    def plaintext(String password) {
-        return password
-    }
-
-    protected String toHex(byte[] raw) {
-        return Hex.encodeToString(raw)
-    }
-
-    protected String toBase64(byte[] bytes) {
-        return Base64.encodeToString(bytes)
     }
 
 }

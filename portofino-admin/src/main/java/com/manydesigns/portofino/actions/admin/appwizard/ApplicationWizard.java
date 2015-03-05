@@ -566,24 +566,32 @@ public class ApplicationWizard extends AbstractPageAction {
 
         DefaultSelectionProvider algoSelectionProvider = new DefaultSelectionProvider("");
         algoSelectionProvider.appendRow(
-                "plaintext",
+                "plaintext:plaintext",
                 ElementsThreadLocals.getText("plain.text"),
                 true);
         algoSelectionProvider.appendRow(
-                "md5Base64",
+                "MD5:base64",
                 ElementsThreadLocals.getText("md5.base64.encoded"),
                 true);
         algoSelectionProvider.appendRow(
-                "md5Hex",
+                "MD5:hex",
                 ElementsThreadLocals.getText("md5.hex.encoded"),
                 true);
         algoSelectionProvider.appendRow(
-                "sha1Base64",
+                "SHA-1:base64",
                 ElementsThreadLocals.getText("sha1.base64.encoded.portofino3"),
                 true);
         algoSelectionProvider.appendRow(
-                "sha1Hex",
+                "SHA-1:hex",
                 ElementsThreadLocals.getText("sha1.hex.encoded"),
+                true);
+        algoSelectionProvider.appendRow(
+                "SHA-256:base64",
+                ElementsThreadLocals.getText("sha256.base64.encoded"),
+                true);
+        algoSelectionProvider.appendRow(
+                "SHA-256:hex",
+                ElementsThreadLocals.getText("sha256.hex.encoded"),
                 true);
         try {
             ClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(getClass());
@@ -1090,7 +1098,16 @@ public class ApplicationWizard extends AbstractPageAction {
             bindings.put("userLinkProperty", StringUtils.defaultString(userLinkProperty));
             bindings.put("adminGroupName", StringUtils.defaultString(adminGroupName));
 
-            bindings.put("encryptionAlgorithm", encryptionAlgorithm);
+            bindings.put("hashIterations", "1");
+            String[] algoAndEncoding = encryptionAlgorithm.split(":");
+            bindings.put("hashAlgorithm", '"' + algoAndEncoding[0] + '"');
+            if(algoAndEncoding[1].equals("plaintext")) {
+                bindings.put("hashFormat", "null");
+            } else if(algoAndEncoding[1].equals("hex")) {
+                bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.HexFormat()");
+            } else if(algoAndEncoding[1].equals("base64")) {
+                bindings.put("hashFormat", "new org.apache.shiro.crypto.hash.format.Base64Format()");
+            }
             File gcp = (File) context.getServletContext().getAttribute(BaseModule.GROOVY_CLASS_PATH);
             FileWriter fw = new FileWriter(new File(gcp, "Security.groovy"));
             secTemplate.make(bindings).writeTo(fw);
