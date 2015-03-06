@@ -287,6 +287,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public Resolution search() {
         searchVisible = true;
         searchString = null;
+        sortProperty = null;
+        sortDirection = null;
+        firstResult = null;
+        maxResults = null;
         return doSearch();
     }
 
