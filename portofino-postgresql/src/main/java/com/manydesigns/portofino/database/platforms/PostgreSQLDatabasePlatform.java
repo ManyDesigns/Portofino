@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.model.database.ConnectionProvider;
-import org.hibernate.dialect.PostgreSQLDialect;
+import org.hibernate.dialect.PostgreSQL82Dialect;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -47,7 +47,7 @@ public class PostgreSQLDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public PostgreSQLDatabasePlatform() {
-        super(new PostgreSQLDialect(), "jdbc:postgresql://<host>[:<port, default 5432>]/<database>");
+        super(new PostgreSQL82Dialect(), "jdbc:postgresql://<host>[:<port, default 5432>]/<database>");
     }
 
     //**************************************************************************
