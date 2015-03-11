@@ -29,8 +29,10 @@ import com.manydesigns.portofino.model.database.ForeignKey;
 import liquibase.structure.core.ForeignKeyConstraintType;
 import org.hibernate.FetchMode;
 import org.hibernate.MappingException;
+import org.hibernate.cfg.BinderHelper;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Mappings;
+import org.hibernate.cfg.annotations.TableBinder;
 import org.hibernate.id.IncrementGenerator;
 import org.hibernate.id.PersistentIdentifierGenerator;
 import org.hibernate.id.enhanced.SequenceStyleGenerator;
@@ -50,6 +52,7 @@ import java.sql.Types;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
@@ -745,8 +748,9 @@ public class HibernateConfig {
         m2o.setReferencedEntityName(oneMDQualifiedTableName);
         m2o.createPropertyRefConstraints(persistentClasses);
 
-        boolean referenceToPrimaryKey = true;
         PersistentClass manyClass = config.getClassMapping(manyMDQualifiedTableName);
+        Set<com.manydesigns.portofino.model.database.Column> referencedColumns =
+                new HashSet<com.manydesigns.portofino.model.database.Column>();
         for (Reference ref : relationship.getReferences()) {
             com.manydesigns.portofino.model.database.Column fromColumn = ref.getActualFromColumn();
             if(fromColumn == null) {
@@ -767,13 +771,21 @@ public class HibernateConfig {
             }
             m2o.addColumn(col);
             //Is the relationship a reference to the primary key or to a unique key?
-            referenceToPrimaryKey &= oneMDTable.getPrimaryKey().getColumns().contains(ref.getActualToColumn());
+            referencedColumns.add(ref.getActualToColumn());
         }
+        List<?> pkColumns = oneMDTable.getPrimaryKey().getColumns();
+        boolean referenceToPrimaryKey =
+                pkColumns.containsAll(referencedColumns) && pkColumns.size() == referencedColumns.size();
         m2o.setReferenceToPrimaryKey(referenceToPrimaryKey);
         if(!referenceToPrimaryKey) {
-            logger.warn("M2O " + relationship.getActualManyPropertyName() + " -> " + relationship.getActualOnePropertyName() + " is not a reference to the primary key. This is not supported!");
-            //TODO generate synthetic property as Hibernate does for annotated classes (see second passes)
-            //m2o.setReferencedPropertyName(syntheticPropertyName);
+            logger.debug("Foreign key {} is not a reference to the primary key. Creating synthetic property.",
+                    relationship.getName());
+            try {
+                addSyntheticProperty(mappings, m2o, relationship, oneMDTable, oneMDQualifiedTableName);
+            } catch (Exception e) {
+                logger.error("Unsupported reference to columns outside the primary key, skipping relationship: " +
+                        relationship.getName(), e);
+            }
         }
 
         Property prop = new Property();
@@ -783,6 +795,62 @@ public class HibernateConfig {
         prop.setInsertable(false);
         prop.setUpdateable(false);
         clazz.addProperty(prop);
+    }
+
+    /** (Adapted from Hibernate) Create a synthetic property to refer to including an embedded component value
+     * containing all the properties mapped to the referenced columns. We need to shallow copy those properties to mark
+     * them as non insertable / non updatable.
+     */
+    protected void addSyntheticProperty(
+            Mappings mappings, ManyToOne m2o, ForeignKey relationship,
+            com.manydesigns.portofino.model.database.Table oneMDTable, String oneMDQualifiedTableName) {
+        StringBuilder propertyNameBuffer = new StringBuilder("_");
+        propertyNameBuffer.append(oneMDTable.getActualEntityName());
+        String firstPropertyName = relationship.getReferences().get(0).getActualToColumn().getActualPropertyName();
+        propertyNameBuffer.append("_").append(firstPropertyName);
+        String syntheticPropertyName = propertyNameBuffer.toString();
+        PersistentClass referencedClass = mappings.getClass(oneMDQualifiedTableName);
+        Component embeddedComp = new Component(mappings, referencedClass);
+        embeddedComp.setEmbedded(true);
+        embeddedComp.setNodeName(syntheticPropertyName);
+        embeddedComp.setComponentClassName(embeddedComp.getOwner().getClassName());
+        for(Reference ref : relationship.getReferences()) {
+            String propertyName = ref.getActualToColumn().getActualPropertyName();
+            Property property;
+            if(referencedClass.getIdentifier() instanceof Component) {
+                //Composite id
+                property = ((Component) referencedClass.getIdentifier()).getProperty(propertyName);
+            } else {
+                property = referencedClass.getProperty(propertyName);
+            }
+            Property clone = BinderHelper.shallowCopy(property);
+            clone.setInsertable(false);
+            clone.setUpdateable(false);
+            clone.setNaturalIdentifier(false);
+            clone.setValueGenerationStrategy(property.getValueGenerationStrategy());
+            embeddedComp.addProperty(clone);
+        }
+        //String colToPropertyName = reference.getActualToColumn().getActualPropertyName();
+        //refProp = getRefProperty(clazzOne, colToPropertyName);
+        SyntheticProperty synthProp = new SyntheticProperty();
+        synthProp.setName(syntheticPropertyName);
+        synthProp.setNodeName(syntheticPropertyName);
+        synthProp.setPersistentClass(referencedClass);
+        synthProp.setUpdateable(false);
+        synthProp.setInsertable(false);
+        synthProp.setValue(embeddedComp);
+        synthProp.setPropertyAccessorName("embedded");
+        referencedClass.addProperty(synthProp);
+        //make it unique
+        TableBinder.createUniqueConstraint(embeddedComp);
+
+        /*
+         * creating the property ref to the new synthetic property
+         */
+        m2o.setReferencedPropertyName(syntheticPropertyName);
+        mappings.addUniquePropertyReference(referencedClass.getEntityName(), syntheticPropertyName);
+        mappings.addPropertyReferencedAssociation(
+                referencedClass.getEntityName(), firstPropertyName, syntheticPropertyName);
     }
 
     private Property getRefProperty(PersistentClass clazzOne, String propertyName) {

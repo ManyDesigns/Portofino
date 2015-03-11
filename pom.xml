@@ -52,7 +52,7 @@
         <connection>scm:hg:http://hg.code.sf.net/p/portofino/mercurial</connection>
         <developerConnection>scm:hg:https://hg.code.sf.net/p/portofino/mercurial</developerConnection>
         <url>http://sourceforge.net/p/portofino/mercurial/</url>
-        <tag>HEAD</tag>
+        <tag>tip</tag>
     </scm>
     <developers>
         <developer>
