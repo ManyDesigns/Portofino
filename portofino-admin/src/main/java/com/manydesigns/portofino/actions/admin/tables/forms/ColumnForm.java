@@ -415,4 +415,9 @@ public class ColumnForm extends Column {
     public void setDateFormat(String dateFormat) {
         this.dateFormat = dateFormat;
     }
+
+    @Override
+    public String toString() {
+        return "Not used.";
+    }
 }

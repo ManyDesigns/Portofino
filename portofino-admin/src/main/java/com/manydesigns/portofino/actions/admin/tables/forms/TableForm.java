@@ -82,4 +82,9 @@ public class TableForm extends Table {
     public String getHqlQuery() {
         return "from " + StringUtils.defaultIfEmpty(entityName, actualEntityName);
     }
+
+    @Override
+    public String toString() {
+        return "Not used.";
+    }
 }
