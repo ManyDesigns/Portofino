@@ -116,10 +116,10 @@ public class HibernateConfig {
     }
 
     protected void setupConnection(Configuration configuration) {
-        if(!connectionProvider.getDatabasePlatform().isDialectAutodetected()) {
+        if(!connectionProvider.isHibernateDialectAutodetected()) {
             configuration.setProperty(
                     "hibernate.dialect",
-                    connectionProvider.getDatabasePlatform().getHibernateDialect().getClass().getName());
+                    connectionProvider.getActualHibernateDialectName());
         }
         if(connectionProvider instanceof JdbcConnectionProvider) {
             JdbcConnectionProvider jdbcConnectionProvider =

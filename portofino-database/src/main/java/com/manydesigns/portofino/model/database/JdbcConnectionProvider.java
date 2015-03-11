@@ -105,7 +105,6 @@ public class JdbcConnectionProvider extends ConnectionProvider {
         super.init(databasePlatformsRegistry);
     }
 
-
     //**************************************************************************
     // Implementation of ConnectionProvider
     //**************************************************************************
@@ -123,7 +122,6 @@ public class JdbcConnectionProvider extends ConnectionProvider {
     public void releaseConnection(Connection conn) {
         DbUtils.closeQuietly(conn);
     }
-
 
     //**************************************************************************
     // Getters

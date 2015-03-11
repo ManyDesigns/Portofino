@@ -128,6 +128,27 @@ public class ConnectionProviderForm {
         jndiConnectionProvider.setJndiResource(jndiResource);
     }
 
+    @Label("Hibernate dialect (leave empty to use default)")
+    public String getHibernateDialect() {
+        if(jdbcConnectionProvider != null) {
+            return jdbcConnectionProvider.getHibernateDialect();
+        } else if(jndiConnectionProvider != null) {
+            return jndiConnectionProvider.getHibernateDialect();
+        } else {
+            return null;
+        }
+    }
+
+    public void setHibernateDialect(String dialect) {
+        if(jdbcConnectionProvider != null) {
+            jdbcConnectionProvider.setHibernateDialect(dialect);
+        } else if(jndiConnectionProvider != null) {
+            jndiConnectionProvider.setHibernateDialect(dialect);
+        } else {
+            throw new Error("Misconfigured");
+        }
+    }
+
     public String getErrorMessage() {
         if(jdbcConnectionProvider != null) {
             return jdbcConnectionProvider.getErrorMessage();

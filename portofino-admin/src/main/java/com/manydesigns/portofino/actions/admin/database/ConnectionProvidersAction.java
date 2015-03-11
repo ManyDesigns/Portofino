@@ -182,13 +182,13 @@ public class ConnectionProvidersAction extends AbstractActionBean {
                             "status", "errorMessage", "lastTested"};
 
     public final static String[] jdbcEditFields = {"databaseName", "driver",
-                            "url", "username", "password", "trueString", "falseString"
+                            "url", "username", "password", "hibernateDialect", "trueString", "falseString"
                             };
 
     public final static String[] jndiViewFields = {"databaseName", "jndiResource",
                             "status", "errorMessage", "lastTested"};
 
-    public final static String[] jndiEditFields = {"databaseName", "jndiResource", "trueString", "falseString"};
+    public final static String[] jndiEditFields = {"databaseName", "jndiResource", "hibernateDialect", "trueString", "falseString"};
 
     private void buildConnectionProviderForm(Mode mode) {
         String [] fields;

@@ -27,12 +27,14 @@ import com.manydesigns.portofino.database.DbUtil;
 import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.database.platforms.DatabasePlatform;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import java.sql.*;
 import java.text.MessageFormat;
 import java.util.*;
@@ -81,6 +83,7 @@ public abstract class ConnectionProvider {
     protected String errorMessage;
     protected Date lastTested;
     protected Database database;
+    protected String hibernateDialect;
 
     //**************************************************************************
     // Logging
@@ -331,6 +334,15 @@ public abstract class ConnectionProvider {
         return JDBCMajorMinorVersion;
     }
 
+    @XmlAttribute(required = false)
+    public String getHibernateDialect() {
+        return hibernateDialect;
+    }
+
+    public void setHibernateDialect(String hibernateDialect) {
+        this.hibernateDialect = hibernateDialect;
+    }
+
     public Database getDatabase() {
         return database;
     }
@@ -342,6 +354,18 @@ public abstract class ConnectionProvider {
     public Type[] getTypes() {
         Type[] result = new Type[types.size()];
         return types.toArray(result);
+    }
+
+    public boolean isHibernateDialectAutodetected() {
+        return StringUtils.isBlank(hibernateDialect) && getDatabasePlatform().isDialectAutodetected();
+    }
+
+    public String getActualHibernateDialectName() {
+        if(StringUtils.isBlank(hibernateDialect)) {
+            return getDatabasePlatform().getHibernateDialect().getClass().getName();
+        } else {
+            return hibernateDialect;
+        }
     }
 
     private static class TypeComparator implements Comparator<Type> {
