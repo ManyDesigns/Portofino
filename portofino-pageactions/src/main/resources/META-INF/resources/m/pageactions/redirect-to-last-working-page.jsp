@@ -5,7 +5,7 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><%@ page import="com.manydesigns.portofino.dispatcher.PageInstance"
-%><%@ page import="com.manydesigns.portofino.interceptors.ApplicationInterceptor"
+%><%@ page import="com.manydesigns.portofino.dispatcher.DispatcherLogic"
 %><%@ page import="org.slf4j.Logger"
 %><%@ page import="org.slf4j.LoggerFactory"
 %><%@ page import="com.manydesigns.portofino.pageactions.PageActionLogic"
@@ -14,7 +14,7 @@
 %><%
 
     PageInstance invalidPage =
-            (PageInstance) request.getAttribute(ApplicationInterceptor.INVALID_PAGE_INSTANCE);
+            (PageInstance) request.getAttribute(DispatcherLogic.INVALID_PAGE_INSTANCE);
 
     if(PageActionLogic.isEmbedded(invalidPage.getActionBean())) {
         request.getRequestDispatcher("/m/pageactions/safemode/safemode.jsp").include(request, response);

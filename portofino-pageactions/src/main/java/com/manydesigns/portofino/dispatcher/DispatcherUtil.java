@@ -26,6 +26,7 @@ import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
+import net.sourceforge.stripes.action.ActionBeanContext;
 import org.apache.commons.configuration.Configuration;
 
 import javax.servlet.ServletContext;
@@ -69,6 +70,17 @@ public class DispatcherUtil {
         Dispatcher dispatcher = get(request);
         if(actionBean instanceof AbstractActionBean) {
             String actionPath = ((AbstractActionBean) actionBean).getContext().getActionPath();
+            return dispatcher.getDispatch(actionPath);
+        } else {
+            return getDispatch(request);
+        }
+    }
+
+    public static Dispatch getDispatch(ActionBeanContext context) {
+        HttpServletRequest request = context.getRequest();
+        Dispatcher dispatcher = get(request);
+        if(context instanceof ElementsActionBeanContext) {
+            String actionPath = ((ElementsActionBeanContext) context).getActionPath();
             return dispatcher.getDispatch(actionPath);
         } else {
             return getDispatch(request);

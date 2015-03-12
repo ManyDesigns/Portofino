@@ -26,27 +26,34 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.ElementsFileUtils;
+import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.safemode.SafeModeAction;
 import com.manydesigns.portofino.di.Injections;
+import com.manydesigns.portofino.pageactions.PageActionLogic;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.Resolution;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +74,7 @@ public class DispatcherLogic {
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
     public static final Logger logger = LoggerFactory.getLogger(DispatcherLogic.class);
+    public static final String INVALID_PAGE_INSTANCE = "validDispatchPathLength";
 
     public static SelectionProvider createPagesSelectionProvider
             (File baseDir, File... excludes) {
@@ -481,5 +489,78 @@ public class DispatcherLogic {
             return false;
         }
         return true;
+    }
+    
+    public static Resolution dispatch(ActionBeanContext actionContext) throws Exception {
+        Dispatch dispatch = DispatcherUtil.getDispatch(actionContext);
+        if (dispatch != null) {
+            HttpServletRequest request = actionContext.getRequest();
+            logger.debug("Preparing PageActions");
+            for(PageInstance page : dispatch.getPageInstancePath()) {
+                if(page.getParent() == null) {
+                    logger.debug("Not preparing root");
+                    continue;
+                }
+                if(page.isPrepared()) {
+                    continue;
+                }
+                logger.debug("Preparing PageAction {}", page);
+                PageAction actionBean = ensureActionBean(page);
+                configureActionBean(actionBean, page, request);
+                try {
+                    actionBean.setContext(actionContext);
+                    actionBean.setPageInstance(page);
+                    Resolution resolution = actionBean.preparePage();
+                    if(resolution != null) {
+                        logger.debug("PageAction prepare returned a resolution: {}", resolution);
+                        request.setAttribute(INVALID_PAGE_INSTANCE, page);
+                        return resolution;
+                    }
+                    page.setPrepared(true);
+                } catch (Throwable t) {
+                    request.setAttribute(INVALID_PAGE_INSTANCE, page);
+                    logger.error("PageAction prepare failed for " + page, t);
+                    if(!PageActionLogic.isEmbedded(actionBean)) {
+                        String msg = MessageFormat.format
+                                (ElementsThreadLocals.getText("this.page.has.thrown.an.exception.during.execution"), ExceptionUtils.getRootCause(t));
+                        SessionMessages.addErrorMessage(msg);
+                    }
+                    return new ForwardResolution("/m/pageactions/redirect-to-last-working-page.jsp");
+                }
+            }
+            PageInstance pageInstance = dispatch.getLastPageInstance();
+            request.setAttribute(RequestAttributes.PAGE_INSTANCE, pageInstance);
+        }
+        return null;
+    }
+
+    public static PageAction ensureActionBean(PageInstance page) throws IllegalAccessException, InstantiationException {
+        PageAction action = page.getActionBean();
+        if(action == null) {
+            action = page.getActionClass().newInstance();
+            page.setActionBean(action);
+        }
+        return action;
+    }
+
+    public static void configureActionBean
+            (PageAction actionBean, PageInstance pageInstance, HttpServletRequest request)
+            throws JAXBException, IOException {
+        ServletContext servletContext = ElementsThreadLocals.getServletContext();
+        Injections.inject(actionBean, servletContext, request);
+
+        if(pageInstance.getConfiguration() != null) {
+            logger.debug("Page instance {} is already configured");
+            return;
+        }
+        File configurationFile = new File(pageInstance.getDirectory(), "configuration.xml");
+        Class<?> configurationClass = PageActionLogic.getConfigurationClass(actionBean.getClass());
+        try {
+            Object configuration =
+                    getConfiguration(configurationFile, configurationClass);
+            pageInstance.setConfiguration(configuration);
+        } catch (Throwable t) {
+            logger.error("Couldn't load configuration from " + configurationFile.getAbsolutePath(), t);
+        }
     }
 }

@@ -264,4 +264,38 @@ public class SecurityLogic {
         return conf.getString(GROUP_REGISTERED, GROUP_REGISTERED_DEFAULT);
     }
 
+    public static boolean isAllowed(
+            HttpServletRequest request, Dispatch dispatch, ActionBean actionBean, Method handler) {
+        Subject subject = SecurityUtils.getSubject();
+
+        if (!satisfiesRequiresAdministrator(request, actionBean, handler)) {
+            return false;
+        }
+
+        logger.debug("Checking page permissions");
+        boolean isNotAdmin = !isAdministrator(request);
+        if (isNotAdmin) {
+            ServletContext servletContext = request.getServletContext();
+            Configuration configuration = (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
+            Permissions permissions;
+            String resource;
+            boolean allowed;
+            if(dispatch != null) {
+                logger.debug("The protected resource is a page action");
+                resource = dispatch.getLastPageInstance().getPath();
+                allowed = hasPermissions(configuration, dispatch, subject, handler);
+            } else {
+                logger.debug("The protected resource is a plain Stripes ActionBean");
+                resource = request.getRequestURI();
+                permissions = new Permissions();
+                allowed = hasPermissions
+                        (configuration, permissions, subject, handler, actionBean.getClass());
+            }
+            if(!allowed) {
+                logger.info("Access to {} is forbidden", resource);
+                return false;
+            }
+        }
+        return true;
+    }
 }

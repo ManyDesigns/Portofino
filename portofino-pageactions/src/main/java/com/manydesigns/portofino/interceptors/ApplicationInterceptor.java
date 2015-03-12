@@ -20,31 +20,20 @@
 
 package com.manydesigns.portofino.interceptors;
 
-import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.RequestAttributes;
-import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.dispatcher.*;
-import com.manydesigns.portofino.pageactions.PageActionLogic;
 import net.sourceforge.stripes.action.ActionBeanContext;
-import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.DispatcherType;
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBException;
-import java.io.File;
-import java.io.IOException;
-import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -59,7 +48,6 @@ public class ApplicationInterceptor implements Interceptor {
 
     public final static Logger logger =
             LoggerFactory.getLogger(ApplicationInterceptor.class);
-    public static final String INVALID_PAGE_INSTANCE = "validDispatchPathLength";
 
     public Resolution intercept(ExecutionContext context) throws Exception {
         logger.debug("Retrieving Stripes objects");
@@ -76,76 +64,8 @@ public class ApplicationInterceptor implements Interceptor {
             request.setAttribute(RequestAttributes.STOP_WATCH, stopWatch);
         }
 
-        Dispatch dispatch = DispatcherUtil.getDispatch(request);
-        if (dispatch != null) {
-            logger.debug("Preparing PageActions");
-            for(PageInstance page : dispatch.getPageInstancePath()) {
-                if(page.getParent() == null) {
-                    logger.debug("Not preparing root");
-                    continue;
-                }
-                if(page.isPrepared()) {
-                    continue;
-                }
-                logger.debug("Preparing PageAction {}", page);
-                PageAction actionBean = ensureActionBean(page);
-                configureActionBean(actionBean, page, request);
-                try {
-                    actionBean.setContext(actionContext);
-                    actionBean.setPageInstance(page);
-                    Resolution resolution = actionBean.preparePage();
-                    if(resolution != null) {
-                        logger.debug("PageAction prepare returned a resolution: {}", resolution);
-                        request.setAttribute(INVALID_PAGE_INSTANCE, page);
-                        return resolution;
-                    }
-                    page.setPrepared(true);
-                } catch (Throwable t) {
-                    request.setAttribute(INVALID_PAGE_INSTANCE, page);
-                    logger.error("PageAction prepare failed for " + page, t);
-                    if(!PageActionLogic.isEmbedded(actionBean)) {
-                        String msg = MessageFormat.format
-                                (ElementsThreadLocals.getText("this.page.has.thrown.an.exception.during.execution"), ExceptionUtils.getRootCause(t));
-                        SessionMessages.addErrorMessage(msg);
-                    }
-                    return new ForwardResolution("/m/pageactions/redirect-to-last-working-page.jsp");
-                }
-            }
-            PageInstance pageInstance = dispatch.getLastPageInstance();
-            request.setAttribute(RequestAttributes.PAGE_INSTANCE, pageInstance);
-        }
-
-        return context.proceed();
-    }
-
-    protected PageAction ensureActionBean(PageInstance page) throws IllegalAccessException, InstantiationException {
-        PageAction action = page.getActionBean();
-        if(action == null) {
-            action = page.getActionClass().newInstance();
-            page.setActionBean(action);
-        }
-        return action;
-    }
-
-    protected void configureActionBean
-            (PageAction actionBean, PageInstance pageInstance, HttpServletRequest request)
-            throws JAXBException, IOException {
-        ServletContext servletContext = ElementsThreadLocals.getServletContext();
-        Injections.inject(actionBean, servletContext, request);
-
-        if(pageInstance.getConfiguration() != null) {
-            logger.debug("Page instance {} is already configured");
-            return;
-        }
-        File configurationFile = new File(pageInstance.getDirectory(), "configuration.xml");
-        Class<?> configurationClass = PageActionLogic.getConfigurationClass(actionBean.getClass());
-        try {
-            Object configuration =
-                    DispatcherLogic.getConfiguration(configurationFile, configurationClass);
-            pageInstance.setConfiguration(configuration);
-        } catch (Throwable t) {
-            logger.error("Couldn't load configuration from " + configurationFile.getAbsolutePath(), t);
-        }
+        Resolution resolution = DispatcherLogic.dispatch(actionContext);
+        return resolution != null ? resolution : context.proceed();
     }
 
 }

@@ -63,4 +63,7 @@ public class ElementsActionBeanContext extends ActionBeanContext {
         return actionPath;
     }
 
+    public void setActionPath(String actionPath) {
+        this.actionPath = actionPath;
+    }
 }
