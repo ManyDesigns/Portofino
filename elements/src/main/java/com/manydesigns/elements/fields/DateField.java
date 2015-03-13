@@ -53,7 +53,6 @@ public class DateField extends AbstractTextField {
     protected final String datePattern;
     protected DateTimeFormatter dateTimeFormatter;
     protected final boolean containsTime;
-    protected final String jsDatePattern;
 
     protected Date dateValue;
     protected boolean dateFormatError;
@@ -86,12 +85,6 @@ public class DateField extends AbstractTextField {
         containsTime = datePattern.contains("HH")
                 || datePattern.contains("mm")
                 || datePattern.contains("ss");
-
-        String tmpPattern = datePattern;
-        if (tmpPattern.contains("MM")) {
-            tmpPattern = tmpPattern.replaceAll("MM", "mm");
-        }
-        jsDatePattern = tmpPattern;
     }
 
 
@@ -186,13 +179,11 @@ public class DateField extends AbstractTextField {
         xb.write(") ");
         xb.closeElement("span");
 
-        if (!containsTime) {
-            String js = MessageFormat.format(
-                    "setupDatePicker(''#{0}'', ''{1}'');",
-                    StringEscapeUtils.escapeJavaScript(id),
-                    StringEscapeUtils.escapeJavaScript(jsDatePattern));
-            xb.writeJavaScript(js);
-        }
+        String js = MessageFormat.format(
+                "setupDatePicker(''#{0}'', ''{1}'');",
+                StringEscapeUtils.escapeJavaScript(id),
+                StringEscapeUtils.escapeJavaScript(datePattern));
+        xb.writeJavaScript(js);
 
         if(mode.isBulk()) {
             xb.writeJavaScript(

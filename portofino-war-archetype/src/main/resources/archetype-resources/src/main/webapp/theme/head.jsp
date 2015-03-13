@@ -19,11 +19,12 @@
 <![endif]-->
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/bootstrap/css/bootstrap.min.css' />">
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/bootstrap/css/bootstrap-theme.min.css' />">
-<link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/datepicker/css/datepicker.css' />">
+<link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css' />">
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css' />">
 <script type="text/javascript" src="<stripes:url value='/theme/jquery/jquery.min.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/theme/bootstrap/js/bootstrap.min.js' />" ></script>
-<script type="text/javascript" src="<stripes:url value='/theme/datepicker/js/bootstrap-datepicker.js' />" ></script>
+<script type="text/javascript" src="<stripes:url value='/webjars/momentjs/2.9.0/min/moment-with-locales.min.js' />" ></script>
+<script type="text/javascript" src="<stripes:url value='/theme/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/theme/typeahead/typeahead.bundle.min.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/theme/jquery-ui/js/jquery-ui-1.10.3.custom.min.js' />" ></script>
 <!-- Charts with chart.js -->

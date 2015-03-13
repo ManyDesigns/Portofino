@@ -102,7 +102,7 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, meth
 
 function setupDatePicker(dateFieldId, dateFormat) {
     var dateField = $(dateFieldId);
-    dateField.datepicker({ format: dateFormat, autoclose: true });
+    dateField.datetimepicker({ format: dateFormat.replace("y", "Y").replace("d", "D"), useCurrent: false });
 }
 
 function stripQueryString(url) {

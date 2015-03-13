@@ -51,8 +51,6 @@ public class DateSearchField extends RangeSearchField {
     protected String datePattern;
     protected DateTimeFormatter dateTimeFormatter;
     protected boolean containsTime;
-    protected String jsDatePattern;
-
 
     //**************************************************************************
     // Constructors
@@ -81,12 +79,6 @@ public class DateSearchField extends RangeSearchField {
         containsTime = datePattern.contains("HH")
                 || datePattern.contains("mm")
                 || datePattern.contains("ss");
-
-        String tmpPattern = datePattern;
-        if (tmpPattern.contains("MM")) {
-            tmpPattern = tmpPattern.replaceAll("MM", "mm");
-        }
-        jsDatePattern = tmpPattern;
     }
 
     //**************************************************************************
@@ -96,14 +88,12 @@ public class DateSearchField extends RangeSearchField {
     @Override
     public void rangeEndToXhtml(XhtmlBuffer xb, String id,
                                 String inputName, String stringValue, String label) {
-        if (!containsTime) {
-            //Must be before to avoid breaking Bootstrap input-group
-            String js = MessageFormat.format(
-                    "$(function() '{' setupDatePicker(''#{0}'', ''{1}''); '}');",
-                    StringEscapeUtils.escapeJavaScript(id),
-                    StringEscapeUtils.escapeJavaScript(jsDatePattern));
-            xb.writeJavaScript(js);
-        }
+        //Must be before to avoid breaking Bootstrap input-group
+        String js = MessageFormat.format(
+                "$(function() '{' setupDatePicker(''#{0}'', ''{1}''); '}');",
+                StringEscapeUtils.escapeJavaScript(id),
+                StringEscapeUtils.escapeJavaScript(datePattern));
+        xb.writeJavaScript(js);
         super.rangeEndToXhtml(xb, id, inputName, stringValue, label);
     }
 
@@ -154,14 +144,6 @@ public class DateSearchField extends RangeSearchField {
 
     public void setContainsTime(boolean containsTime) {
         this.containsTime = containsTime;
-    }
-
-    public String getJsDatePattern() {
-        return jsDatePattern;
-    }
-
-    public void setJsDatePattern(String jsDatePattern) {
-        this.jsDatePattern = jsDatePattern;
     }
 
 }
