@@ -95,6 +95,7 @@
         <javax.mail.version>1.4.1</javax.mail.version> <!-- According to commons-email -->
         <jfreechart.version>1.0.12</jfreechart.version>
         <joda-time.version>2.3</joda-time.version>
+        <jsqlparser.version>0.9.2</jsqlparser.version>
         <json.version>20140107</json.version>
         <jsoup.version>1.7.1</jsoup.version>
         <jstl.version>1.1.2</jstl.version>

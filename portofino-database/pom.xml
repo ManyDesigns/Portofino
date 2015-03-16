@@ -62,7 +62,7 @@
         <dependency>
             <groupId>com.github.jsqlparser</groupId>
             <artifactId>jsqlparser</artifactId>
-            <version>0.9</version>
+            <version>${jsqlparser.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
