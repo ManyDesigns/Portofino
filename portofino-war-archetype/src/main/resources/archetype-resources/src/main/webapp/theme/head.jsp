@@ -13,8 +13,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements + media queries + Canvas support -->
 <!--[if lt IE 9]>
-    <script src="<stripes:url value='/theme/html5shiv/html5shiv-printshiv.min.js' />"></script>
-    <script src="<stripes:url value='/theme/respond/respond.min.js' />"></script>
+    <script src="<stripes:url value='/webjars/html5shiv/3.7.2/html5shiv-printshiv.js' />"></script>
+    <script src="<stripes:url value='/webjars/respond/1.4.2/dest/respond.min.js' />"></script>
     <script src="<stripes:url value='/m/chart/chartjs/excanvas.js' />"></script>
 <![endif]-->
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/bootstrap/css/bootstrap.min.css' />">
