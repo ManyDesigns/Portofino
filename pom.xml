@@ -85,7 +85,7 @@
         <ehcache.version>2.5.2</ehcache.version>
         <fop.version>1.0</fop.version>
         <google.appengine.sdk.version>1.7.7.1</google.appengine.sdk.version> <!-- Last version supporting Java 6 -->
-        <groovy.version>2.4.1</groovy.version>
+        <groovy.version>2.4.3</groovy.version>
         <guava.version>16.0.1</guava.version> <!-- Following GAE dependency -->
         <hibernate.version>4.3.8.Final</hibernate.version>
         <itext.version>2.1.7</itext.version>
