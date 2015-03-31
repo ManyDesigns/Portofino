@@ -103,6 +103,8 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, meth
 function setupDatePicker(dateFieldId, dateFormat) {
     var dateField = $(dateFieldId);
     dateField.datetimepicker({ format: dateFormat.replace(/y/g, "Y").replace(/d/g, "D"), useCurrent: false });
+    //Propagate change event. Required e.g. for AngularJS to pick up the change.
+    dateField.on("dp.change", function() { $(dateField).change() });
 }
 
 function stripQueryString(url) {
