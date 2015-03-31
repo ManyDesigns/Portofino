@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.Types;
 import java.util.Collections;
 import java.util.Comparator;
@@ -74,9 +73,6 @@ public class DatabaseSyncer {
             logger.debug("Acquiring connection");
             conn = connectionProvider.acquireConnection();
 
-            logger.debug("Reading database metadata");
-            DatabaseMetaData metadata = conn.getMetaData();
-
             logger.debug("Creating Liquibase connection");
             DatabaseConnection liquibaseConnection =
                     new JdbcConnection(conn);
@@ -87,6 +83,10 @@ public class DatabaseSyncer {
             if (sourceDatabase == null) {
                 logger.debug("Source database not found. Creating an empty one.");
                 sourceDatabase = new Database();
+            } else {
+                logger.debug("Source database was already configured. Copying true string and false string.");
+                targetDatabase.setTrueString(sourceDatabase.getTrueString());
+                targetDatabase.setFalseString(sourceDatabase.getFalseString());
             }
 
             logger.debug("Reading schema names from metadata");

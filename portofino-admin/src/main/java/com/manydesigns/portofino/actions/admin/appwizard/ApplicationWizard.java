@@ -288,7 +288,7 @@ public class ApplicationWizard extends AbstractPageAction {
         if(JDBC.equals(connectionProviderType)) {
             JdbcConnectionProvider jdbcConnectionProvider = new JdbcConnectionProvider();
             //Fill with dummy values so the form overwrites them (and doesn't try to write on the Configuration which
-            //is not available and anyway should not be modified right now
+            //is not available and anyway should not be modified right now)
             jdbcConnectionProvider.setUrl("replace me");
             jdbcConnectionProvider.setUsername("replace me");
             jdbcConnectionProvider.setPassword("replace me");
