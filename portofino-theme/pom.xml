@@ -41,5 +41,10 @@
             <artifactId>html5shiv</artifactId>
             <version>3.7.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>es5-shim</artifactId>
+            <version>4.0.6</version>
+        </dependency>
     </dependencies>
 </project>
