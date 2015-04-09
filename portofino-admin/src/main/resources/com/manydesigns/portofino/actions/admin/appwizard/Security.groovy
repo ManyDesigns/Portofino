@@ -63,6 +63,9 @@ public class Security extends AbstractPortofinoRealm {
             hashService.setHashIterations(hashIterations);
             hashService.setHashAlgorithmName(hashAlgorithm);
             hashService.setGeneratePublicSalt(false); //to enable salting, set this to true and/or call setPrivateSalt
+            //Also, if using a public salt, you should uncomment the following, otherwise different Security.groovy
+            //instances will fail to match credentials stored in the database
+            //hashFormat = new Shiro1CryptFormat()
             setup(hashService, hashFormat);
         }
     }
@@ -214,19 +217,13 @@ public class Security extends AbstractPortofinoRealm {
             throw new UnsupportedOperationException("Users table is not configured");
         }
         Session session = persistence.getSession(databaseName);
-        def q = session.createQuery("""
-                update $userTableEntityName set ${passwordProperty} = :newPwd
-                where $userIdProperty = :id and ${passwordProperty} = :oldPwd""");
-        q.setParameter("newPwd", encryptPassword(newPassword));
-        q.setParameter("id", user[userIdProperty]);
-        q.setParameter("oldPwd", encryptPassword(oldPassword));
-        int rows = q.executeUpdate();
-        if(rows == 0) {
-            //Probably the password did not match
-            throw new IncorrectCredentialsException("The password update query modified 0 rows. This most probably means that the old password is wrong. It may also mean that the user has been deleted.");
-        } else if(rows > 1) {
-            throw new Error("Password update query modified more than 1 row! Rolling back.");
+        def savedUser = session.load(userTableEntityName, user[userIdProperty] as Serializable);
+        if(savedUser == null) {
+            throw new UnknownAccountException("User has been deleted");
+        } else if(!passwordService.passwordsMatch(oldPassword, savedUser[passwordProperty] as String)) {
+            throw new IncorrectCredentialsException("Wrong password");
         } else {
+            savedUser[passwordProperty] = encryptPassword(newPassword);
             session.transaction.commit();
         }
     }
