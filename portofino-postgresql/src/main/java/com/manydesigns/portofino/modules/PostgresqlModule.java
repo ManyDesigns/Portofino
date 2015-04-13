@@ -23,6 +23,8 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.PostgreSQLDatabasePlatform;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.liquibase.databases.PortofinoPostgresDatabase;
+import liquibase.database.DatabaseFactory;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +91,7 @@ public class PostgresqlModule implements Module {
     @Override
     public void init() {
         databasePlatformsRegistry.addDatabasePlatform(new PostgreSQLDatabasePlatform());
+        DatabaseFactory.getInstance().register(new PortofinoPostgresDatabase());
         status = ModuleStatus.ACTIVE;
     }
 
