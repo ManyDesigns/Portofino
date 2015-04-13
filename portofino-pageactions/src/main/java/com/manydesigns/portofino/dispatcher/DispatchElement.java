@@ -21,27 +21,31 @@
 package com.manydesigns.portofino.dispatcher;
 
 /**
- * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class PageNotActiveException extends RuntimeException {
+public interface DispatchElement {
+
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
-    public PageNotActiveException() {
-    }
+    /**
+     * Returns the PageInstance of this action.
+     */
+    PageInstance getPageInstance();
 
-    public PageNotActiveException(String message) {
-        super(message);
-    }
+    /**
+     * Sets the PageInstance of this action. Invoked automatically by the framework before calling preparePage().
+     */
+    void setPageInstance(PageInstance pageInstance);
 
-    public PageNotActiveException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    /**
+     * Visits a path element
+     * @param pathFragment
+     * @return
+     */
+    public DispatchElement consumePathFragment(String pathFragment);
 
-    public PageNotActiveException(Throwable cause) {
-        super(cause);
-    }
 }

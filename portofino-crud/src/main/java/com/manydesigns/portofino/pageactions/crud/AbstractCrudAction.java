@@ -27,8 +27,8 @@ import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.blobs.BlobUtils;
-import com.manydesigns.elements.fields.FileBlobField;
 import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.FileBlobField;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.TextField;
 import com.manydesigns.elements.forms.FieldSet;
@@ -2086,6 +2086,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return objects;
     }
 
+    @Deprecated
     public void setObjects(List<? extends T> objects) {
         this.objects = objects;
     }

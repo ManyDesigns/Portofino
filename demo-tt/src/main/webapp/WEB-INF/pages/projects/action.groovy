@@ -11,6 +11,7 @@ import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
+import javax.ws.rs.GET
 import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
 import org.apache.shiro.SecurityUtils
@@ -57,6 +58,11 @@ class ProjectsCrudAction extends CrudAction {
             path = path.substring(0, path.length() -1 );
         }
         return new RedirectResolution(path + "/summary");
+    }
+
+    @GET
+    String go() {
+        "GO!!!"
     }
 
     //**************************************************************************
