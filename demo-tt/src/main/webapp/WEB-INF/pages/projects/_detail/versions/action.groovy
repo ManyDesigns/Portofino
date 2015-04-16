@@ -25,7 +25,8 @@ class ProjectVersionsAction extends CrudAction {
     Object old;
 
     @Before
-    public void prepareProject() {
+    public void prepare() {
+        super.prepare();
         project = ElementsThreadLocals.getOgnlContext().get("project");
     }
 

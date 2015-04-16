@@ -23,7 +23,8 @@ class TicketAttachementsCrudAction extends CrudAction {
     Object ticket;
 
     @Before
-    public void prepareProject() {
+    public void prepare() {
+        super.prepare();
         project = ElementsThreadLocals.getOgnlContext().get("project");
         ticket = ElementsThreadLocals.getOgnlContext().get("ticket");
     }

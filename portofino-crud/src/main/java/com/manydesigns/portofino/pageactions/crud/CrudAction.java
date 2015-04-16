@@ -194,6 +194,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
     //**************************************************************************
 
     @Before
+    @Override
     public void prepare() {
         if(crudConfiguration != null && crudConfiguration.getActualDatabase() != null) {
             selectionProviderSupport = createSelectionProviderSupport();

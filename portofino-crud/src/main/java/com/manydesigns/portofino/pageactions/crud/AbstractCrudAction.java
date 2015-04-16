@@ -75,6 +75,8 @@ import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Produces;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -345,8 +347,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     public Resolution jsonSearchData() throws JSONException {
-        setupSearchForm();
-        loadObjects();
+        executeSearch();
 
         long totalRecords = getTotalSearchRecords();
 
@@ -1981,6 +1982,28 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     //--------------------------------------------------------------------------
+    // REST
+    //--------------------------------------------------------------------------
+
+    protected void prepare() {}
+
+    @GET
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public Resolution getAsJson() {
+        prepare();
+        if(object == null) {
+            Form form = new FormBuilder(AbstractCrudAction.class).
+                    configFields("searchString", "firstResult", "maxResults", "sortProperty", "sortDirection").
+                    build();
+            form.readFromRequest(context.getRequest());
+            form.writeToObject(this);
+            return jsonSearchData();
+        } else {
+            return jsonReadData();
+        }
+    }
+
+    //--------------------------------------------------------------------------
     // Accessors
     //--------------------------------------------------------------------------
 
@@ -2084,11 +2107,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public List<? extends T> getObjects() {
         return objects;
-    }
-
-    @Deprecated
-    public void setObjects(List<? extends T> objects) {
-        this.objects = objects;
     }
 
     public T getObject() {
