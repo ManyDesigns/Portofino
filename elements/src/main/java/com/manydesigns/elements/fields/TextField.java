@@ -40,7 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class TextField extends AbstractTextField {
+public class TextField extends AbstractTextField<String> {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
@@ -207,6 +207,11 @@ public class TextField extends AbstractTextField {
 
     public String getValue() {
         return stringValue;
+    }
+
+    @Override
+    public void setValue(String value) {
+        stringValue = value;
     }
 
     //**************************************************************************

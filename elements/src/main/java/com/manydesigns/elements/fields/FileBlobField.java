@@ -43,7 +43,7 @@ import java.util.concurrent.Callable;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class FileBlobField extends AbstractField implements MultipartRequestField {
+public class FileBlobField extends AbstractField<Blob> implements MultipartRequestField<Blob> {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
@@ -108,6 +108,13 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
             return null;
         } else {
             return blob.getFilename();
+        }
+    }
+
+    @Override
+    public void setStringValue(String stringValue) {
+        if(blob != null) {
+            blob.setFilename(stringValue);
         }
     }
 

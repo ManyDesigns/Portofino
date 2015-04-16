@@ -53,4 +53,8 @@ public interface FormElement extends Element {
     List<String> getErrors();
 
     boolean hasRequiredFields();
+
+    void readFrom(KeyValueAccessor keyValueAccessor);
+    void writeTo(KeyValueAccessor keyValueAccessor);
+
 }

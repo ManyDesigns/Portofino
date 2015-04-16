@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class BooleanField extends AbstractField {
+public class BooleanField extends AbstractField<Boolean> {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
@@ -93,15 +93,7 @@ public class BooleanField extends AbstractField {
             return;
         }
 
-        if (TRUE_VALUE.equals(stringValue)) {
-            booleanValue = true;
-        } else if (FALSE_VALUE.equals(stringValue)) {
-            booleanValue = false;
-        } else if (required) {
-            booleanValue = false;
-        } else { // not required
-            booleanValue = null;
-        }
+        setStringValue(stringValue);
     }
 
     public boolean validate() {
@@ -199,6 +191,18 @@ public class BooleanField extends AbstractField {
             return TRUE_VALUE;
         } else {
             return FALSE_VALUE;
+        }
+    }
+
+    public void setStringValue(String stringValue) {
+        if (TRUE_VALUE.equals(stringValue)) {
+            booleanValue = true;
+        } else if (FALSE_VALUE.equals(stringValue)) {
+            booleanValue = false;
+        } else if (required) {
+            booleanValue = false;
+        } else { // not required
+            booleanValue = null;
         }
     }
 

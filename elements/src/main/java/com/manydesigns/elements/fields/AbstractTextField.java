@@ -33,7 +33,7 @@ import org.apache.commons.lang.StringUtils;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public abstract class AbstractTextField extends AbstractField {
+public abstract class AbstractTextField<T> extends AbstractField<T> {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
