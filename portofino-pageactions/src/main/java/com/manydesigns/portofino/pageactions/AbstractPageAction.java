@@ -187,6 +187,9 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     public DispatchElement getSubResource(@PathParam("pathFragment") String pathFragment) {
         DispatchElement resource = consumePathFragment(pathFragment);
         if(resource != this) {
+            if(context == null) {
+                setContext(pageInstance.getParent().getActionBean().getContext());
+            }
             preparePage();
         }
         return resource;

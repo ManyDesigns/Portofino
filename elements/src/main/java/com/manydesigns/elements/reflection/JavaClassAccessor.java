@@ -113,6 +113,10 @@ public class JavaClassAccessor implements ClassAccessor {
             PropertyDescriptor[] propertyDescriptors =
                     beanInfo.getPropertyDescriptors();
             for (PropertyDescriptor current : propertyDescriptors) {
+                if(current.getReadMethod() == null) {
+                    logger.debug("Skipping unreadable property {}", current.getName());
+                    continue;
+                }
                 JavaPropertyAccessor accessor = new JavaPropertyAccessor(current);
                 if(isValidProperty(accessor)) {
                     accessorList.add(accessor);

@@ -75,6 +75,7 @@ public class APIRoot {
         PageInstance pageInstance = new PageInstance(null, pagesDirectory, rootPage, null);
 
         PageAction subpage = DispatcherLogic.getSubpage(configuration, pageInstance, pathFragment);
+        subpage.setContext(context);
         Injections.inject(subpage, servletContext, request);
         return subpage;
     }
