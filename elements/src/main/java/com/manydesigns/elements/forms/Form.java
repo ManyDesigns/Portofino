@@ -20,6 +20,7 @@
 
 package com.manydesigns.elements.forms;
 
+import com.manydesigns.elements.KeyValueAccessor;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -67,6 +68,18 @@ public class Form extends AbstractCompositeElement<FieldSet> {
 
     public Mode getMode() {
         return mode;
+    }
+
+    public void readFrom(KeyValueAccessor accessor) {
+        for (FieldSet current : this) {
+            current.readFrom(accessor);
+        }
+    }
+
+    public void writeTo(KeyValueAccessor accessor) {
+        for (FieldSet current : this) {
+            current.writeTo(accessor);
+        }
     }
 
 }

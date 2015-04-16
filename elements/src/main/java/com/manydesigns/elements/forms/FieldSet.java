@@ -21,6 +21,7 @@
 package com.manydesigns.elements.forms;
 
 import com.manydesigns.elements.FormElement;
+import com.manydesigns.elements.KeyValueAccessor;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.composites.AbstractCompositeElement;
 import com.manydesigns.elements.fields.MultipartRequestField;
@@ -145,5 +146,17 @@ public class FieldSet extends AbstractCompositeElement<FormElement> {
             }
         }
         return false;
+    }
+
+    public void readFrom(KeyValueAccessor accessor) {
+        for (FormElement current : this) {
+            current.readFrom(accessor);
+        }
+    }
+
+    public void writeTo(KeyValueAccessor accessor) {
+        for (FormElement current : this) {
+            current.writeTo(accessor);
+        }
     }
 }

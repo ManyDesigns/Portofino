@@ -110,8 +110,6 @@ public class Column implements ModelObject, Annotated {
         //TODO questi assert dovrebbero essere test + throw exception
         assert columnName != null;
         assert columnType != null;
-        assert length != null;
-        assert scale != null;
 
         if (propertyName == null) {
             actualPropertyName = DatabaseLogic.getUniquePropertyName(table, DatabaseLogic.normalizeName(columnName));

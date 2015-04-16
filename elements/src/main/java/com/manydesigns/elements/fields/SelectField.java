@@ -44,7 +44,7 @@ import java.util.Map;
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  */
-public class SelectField extends AbstractField {
+public class SelectField extends AbstractField<Object> {
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
@@ -478,6 +478,12 @@ public class SelectField extends AbstractField {
         String result = selectionModel.getOption(selectionModelIndex, value, true);
         logger.trace("getStringValue() - name: {} - value: {} - result: {}", new Object[] {getPropertyAccessor().getName(), value, result});
         return result;
+    }
+
+    @Override
+    public void setStringValue(String stringValue) {
+        Object value = OgnlUtils.convertValue(stringValue, accessor.getType());
+        selectionModel.setValue(selectionModelIndex, value);
     }
 
     public String jsonSelectFieldOptions(boolean includeSelectPrompt) {

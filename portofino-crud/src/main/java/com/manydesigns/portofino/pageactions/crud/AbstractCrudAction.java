@@ -42,6 +42,7 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.elements.text.OgnlTextFormat;
+import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
@@ -366,7 +367,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             js.object()
                     .key("__rowKey")
                     .value(row.getKey());
-            fieldsToJson(js, row);
+            FormUtil.fieldsToJson(js, row);
             js.endObject();
         }
         js.endArray();
@@ -425,13 +426,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         form.readFromObject(object);
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
-        JSONStringer js = new JSONStringer();
-        js.object();
-        List<Field> fields = new ArrayList<Field>();
-        collectVisibleFields(form, fields);
-        fieldsToJson(js, fields);
-        js.endObject();
-        String jsonText = js.toString();
+        String jsonText = FormUtil.formToJson(form);
         return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
     }
 
@@ -1936,48 +1931,19 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return encodedSearchString;
     }
 
-    /**
-     * Writes a collection of fields as properties of a JSON object.
-     * @param js the JSONStringer to write to. Must have a JSON object open for writing.
-     * @param fields the fields to output
-     * @throws JSONException if the JSON can not be generated.
-     */
+    @Deprecated
     protected void fieldsToJson(JSONStringer js, Collection<Field> fields) throws JSONException {
-        for (Field field : fields) {
-            Object value = field.getValue();
-            String displayValue = field.getDisplayValue();
-            String href = field.getHref();
-            js.key(field.getPropertyAccessor().getName());
-            js.object()
-                    .key("value")
-                    .value(value)
-                    .key("displayValue")
-                    .value(displayValue)
-                    .key("href")
-                    .value(href)
-                    .endObject();
-        }
+        FormUtil.fieldsToJson(js, fields);
     }
 
+    @Deprecated
     protected List<Field> collectVisibleFields(Form form, List<Field> fields) {
-        for(FieldSet fieldSet : form) {
-             collectVisibleFields(fieldSet, fields);
-        }
-        return fields;
+        return FormUtil.collectVisibleFields(form, fields);
     }
 
+    @Deprecated
     protected List<Field> collectVisibleFields(FieldSet fieldSet, List<Field> fields) {
-        for(FormElement element : fieldSet) {
-            if(element instanceof Field) {
-                Field field = (Field) element;
-                if(field.isEnabled()) {
-                    fields.add(field);
-                }
-            } else if(element instanceof FieldSet) {
-                collectVisibleFields((FieldSet) element, fields);
-            }
-        }
-        return fields;
+        return FormUtil.collectVisibleFields(fieldSet, fields);
     }
 
     //--------------------------------------------------------------------------
