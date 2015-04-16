@@ -9,6 +9,7 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.shiro.ShiroUtils;
 import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.controller.StripesConstants;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.aop.MethodInvocation;
 import org.apache.shiro.authz.AuthorizationException;
@@ -71,11 +72,13 @@ public class PortofinoFilter implements ContainerRequestFilter {
     protected void preparePage(ContainerRequestContext requestContext, Object resource) {
         if(resource instanceof PageAction) {
             PageAction pageAction = (PageAction) resource;
+            request.setAttribute(StripesConstants.REQ_ATTR_ACTION_BEAN, pageAction);
             if(!pageAction.getPageInstance().isPrepared()) {
                 ElementsActionBeanContext context = new ElementsActionBeanContext();
                 context.setRequest(request);
                 context.setResponse(response);
                 context.setServletContext(request.getServletContext());
+                context.setEventName("");
                 String path = requestContext.getUriInfo().getPath();
                 if(!path.startsWith("/")) {
                     path = "/" + path;

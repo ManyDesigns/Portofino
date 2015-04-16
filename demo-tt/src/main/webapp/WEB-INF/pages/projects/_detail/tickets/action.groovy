@@ -41,11 +41,6 @@ class ProjectsTicketsAction extends CrudAction {
         project = ElementsThreadLocals.getOgnlContext().get("project");
     }
 
-    @GET
-    String go() {
-        "GO2!!!"
-    }
-
     //**************************************************************************
     // Role checking
     //**************************************************************************

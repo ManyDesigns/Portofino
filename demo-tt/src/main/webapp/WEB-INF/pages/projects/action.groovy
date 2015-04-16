@@ -60,11 +60,6 @@ class ProjectsCrudAction extends CrudAction {
         return new RedirectResolution(path + "/summary");
     }
 
-    @GET
-    String go() {
-        "GO!!!"
-    }
-
     //**************************************************************************
     // Extension hooks
     //**************************************************************************

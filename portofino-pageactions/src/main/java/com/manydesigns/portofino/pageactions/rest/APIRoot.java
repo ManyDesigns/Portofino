@@ -66,6 +66,7 @@ public class APIRoot {
         context.setServletContext(servletContext);
         context.setRequest(request);
         context.setResponse(response);
+        context.setEventName("");
         context.setActionPath(actionPath);
 
         Configuration configuration = (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
