@@ -20,7 +20,6 @@ import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
 import com.manydesigns.portofino.shiro.ShiroUtils
-import javax.ws.rs.GET
 import net.sourceforge.stripes.action.Before
 import net.sourceforge.stripes.action.ForwardResolution
 import net.sourceforge.stripes.action.RedirectResolution
@@ -488,6 +487,5 @@ class ProjectsTicketsAction extends CrudAction {
         }
         return isEditor();
     }
-
 
 }

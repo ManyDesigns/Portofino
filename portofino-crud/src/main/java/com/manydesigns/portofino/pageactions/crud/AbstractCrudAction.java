@@ -77,10 +77,8 @@ import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -430,7 +428,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         form.readFromObject(object);
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
-        String jsonText = FormUtil.formToJson(form);
+        String jsonText = FormUtil.writeToJson(form);
         return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
     }
 
@@ -2001,14 +1999,43 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     logger.warn(rootCauseMessage, e);
                     throw e;
                 }
-                //The object on the database was persisted. Now we can save the blobs.
+                form.readFromObject(object); //Re-read so that the full object is returned
+                return FormUtil.writeToJson(form);
+            } else {
+                throw new Exception("Validation failed"); //TODO failure details?
+            }
+        } else {
+            throw new Exception("Validation failed"); //TODO failure details?
+        }
+    }
+
+    @PUT
+    @RequiresPermissions(permissions = PERMISSION_EDIT)
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
+    public String updateAsJson(String jsonObject) throws Throwable {
+        prepare();
+        if(object == null) {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build());
+        }
+        setupForm(Mode.EDIT);
+        editSetup(object);
+        form.readFromObject(object);
+        FormUtil.readFromJson(form, new JSONObject(jsonObject));
+        if (form.validate()) {
+            writeFormToObject();
+            if(editValidate(object)) {
                 try {
-                    BlobUtils.saveBlobs(form, getBlobManager());
-                } catch (IOException e) {
-                    logger.error("Could not persist blobs!", e);
-                    throw e; //TODO include object that was saved?
+                    doUpdate(object);
+                    editPostProcess(object);
+                    commitTransaction();
+                } catch (Throwable e) {
+                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                    logger.warn(rootCauseMessage, e);
+                    throw e;
                 }
-                return FormUtil.formToJson(form);
+                form.readFromObject(object); //Re-read so that the full object is returned
+                return FormUtil.writeToJson(form);
             } else {
                 throw new Exception("Validation failed"); //TODO failure details?
             }

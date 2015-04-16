@@ -98,7 +98,7 @@ public class FormUtil {
         return fields;
     }
 
-    public static String formToJson(Form form) {
+    public static String writeToJson(Form form) {
         JSONStringer js = new JSONStringer();
         js.object();
         List<Field> fields = new ArrayList<Field>();
