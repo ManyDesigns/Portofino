@@ -21,6 +21,7 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.MaxLength;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MemoryUtil;
@@ -54,10 +55,12 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
     public static final String OPERATION_SUFFIX = "_operation";
     public static final String CODE_SUFFIX = "_code";
     public static final String INNER_SUFFIX = "_inner";
-    public static final Callable<String> DEFAULT_CODE_GENERATOR = new Callable<String>() {
+
+    private final int size;
+    public final Callable<String> DEFAULT_CODE_GENERATOR = new Callable<String>() {
         @Override
         public String call() {
-            return RandomUtil.createRandomId();
+            return RandomUtil.createRandomId(size);
         }
     };
 
@@ -84,6 +87,12 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
         innerId = id + INNER_SUFFIX;
         operationInputName = inputName + OPERATION_SUFFIX;
         codeInputName = inputName + CODE_SUFFIX;
+
+        if (accessor.isAnnotationPresent(MaxLength.class)) {
+            size = Math.min(25, accessor.getAnnotation(MaxLength.class).value());
+        } else {
+            size = 25;
+        }
     }
 
     //**************************************************************************
