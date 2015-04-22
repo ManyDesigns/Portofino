@@ -101,7 +101,7 @@
         display: none;
     }
 </style>
-<h3><%= StringUtils.capitalize(monthFormatter.print(monthView.getReferenceDateTime())) %></h3>
+<h1><%= StringUtils.capitalize(monthFormatter.print(monthView.getReferenceDateTime())) %></h1>
 <div>
     <div class="pull-right" >
         <button type="submit" name="agendaView" class="btn btn-default btn-sm">
@@ -277,10 +277,10 @@
 
             PresentationHelper.writeDialogCloseButtonInHeader(xhtmlBuffer);
 
-            xhtmlBuffer.openElement("h3");
+            xhtmlBuffer.openElement("h1");
             xhtmlBuffer.addAttribute("class", "modal-title");
             xhtmlBuffer.write(ElementsThreadLocals.getText("more.events"));
-            xhtmlBuffer.closeElement("h3");
+            xhtmlBuffer.closeElement("h1");
             xhtmlBuffer.closeElement("div"); // modal-header
 
 
@@ -341,7 +341,7 @@
 
         PresentationHelper.writeDialogCloseButtonInHeader(xhtmlBuffer);
 
-        xhtmlBuffer.openElement("h3");
+        xhtmlBuffer.openElement("h1");
         xhtmlBuffer.addAttribute("id", dialogLabelId);
         xhtmlBuffer.addAttribute("class", "modal-title");
         if(event.getReadUrl() != null) {
@@ -349,7 +349,7 @@
         } else {
             xhtmlBuffer.write(event.getDescription());
         }
-        xhtmlBuffer.closeElement("h3");
+        xhtmlBuffer.closeElement("h1");
         xhtmlBuffer.closeElement("div"); // modal-header
 
         // modal-body
