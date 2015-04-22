@@ -117,12 +117,12 @@
             <fmt:message key="current.month" />
         </button>
         <button type="submit" name="prevMonth" class="btn btn-default btn-sm">
-            <i class="glyphicon glyphicon-chevron-left"></i>
+            <em class="glyphicon glyphicon-chevron-left"></em>
             <fmt:message key="previous" />
         </button>
         <button type="submit" name="nextMonth" class="btn btn-default btn-sm">
             <fmt:message key="next" />
-            <i class="glyphicon glyphicon-chevron-right"></i>
+            <em class="glyphicon glyphicon-chevron-right"></em>
         </button>
     </div>
 </div>

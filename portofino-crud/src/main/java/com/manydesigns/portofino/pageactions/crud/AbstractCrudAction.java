@@ -1218,9 +1218,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             xb.addAttribute("href", urlBuilder.toString());
             xb.writeNoHtmlEscape("%{label}");
             if(propName.equals(sortProperty)) {
-                xb.openElement("i");
+                xb.openElement("em");
                 xb.addAttribute("class", "pull-right glyphicon glyphicon-chevron-" + ("desc".equals(sortDirection) ? "up" : "down"));
-                xb.closeElement("i");
+                xb.closeElement("em");
             }
             xb.closeElement("a");
             OgnlTextFormat hrefFormat = OgnlTextFormat.create(xb.toString());

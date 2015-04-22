@@ -208,10 +208,10 @@
                                                 <td rowspan="${fn:length(sp.references)}"><c:out value="${sp.toDatabase}" /></td>
                                                 <td rowspan="${fn:length(sp.references)}">
                                                     <c:if test="${not empty sp.hql}">
-                                                        <b>HQL:</b> <c:out value="${sp.hql}" /><br />
+                                                        <strong>HQL:</strong> <c:out value="${sp.hql}" /><br />
                                                     </c:if>
                                                     <c:if test="${not empty sp.sql}">
-                                                        <b>SQL:</b> <c:out value="${sp.sql}" />
+                                                        <strong>SQL:</strong> <c:out value="${sp.sql}" />
                                                     </c:if>
                                                 </td>
                                             </tr>

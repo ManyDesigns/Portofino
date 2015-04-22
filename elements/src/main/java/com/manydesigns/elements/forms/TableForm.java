@@ -102,14 +102,13 @@ public class TableForm implements Element {
             xb.openElement("th");
             xb.openElement("div");
             xb.addAttribute("class", "checkbox");
-            xb.openElement("label");
             xb.openElement("input");
             xb.addAttribute("type", "checkbox");
+            xb.addAttribute("title", "select-all");
             String js =
                     "$(this).closest('table').find('td." + SELECTION_CELL_CLASS + " input').prop('checked', $(this).prop('checked'));";
             xb.addAttribute("onchange", js);
             xb.closeElement("input");
-            xb.closeElement("label");
             xb.closeElement("div");
             xb.closeElement("th");
         }
@@ -310,7 +309,7 @@ public class TableForm implements Element {
                 String selection = StringUtils.join(inputNameArgs);
                 xb.openElement("td");
                 xb.addAttribute("class", SELECTION_CELL_CLASS);
-                xb.writeInputCheckbox(null, selection, key, false, false, null);
+                xb.writeInputCheckbox(null, selection, key, false, false, null, String.valueOf(index));
                 xb.closeElement("td");
             }
 

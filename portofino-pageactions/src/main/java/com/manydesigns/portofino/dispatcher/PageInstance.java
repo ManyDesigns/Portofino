@@ -33,7 +33,7 @@ import java.util.List;
  * <p>A PageInstance is the realization of a Portofino page on permanent storage (page.xml + configuration.xml +
  * action.groovy) into a live object in the context of a single http request.<br />
  * A PageInstance includes the parameters extracted from the decomposition of the URL in a sequence of
- * <i>fragments</i> (not to be confused with query string parameters).</p>
+ * <em>fragments</em> (not to be confused with query string parameters).</p>
  *
  * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com

@@ -77,12 +77,12 @@
             <fmt:message key="today" />
         </button>
         <button type="submit" name="prevDay" class="btn btn-default btn-sm">
-            <i class="glyphicon glyphicon-chevron-left"></i>
+            <em class="glyphicon glyphicon-chevron-left"></em>
             <fmt:message key="previous" />
         </button>
         <button type="submit" name="nextDay" class="btn btn-default btn-sm">
             <fmt:message key="next" />
-            <i class="glyphicon glyphicon-chevron-right"></i>
+            <em class="glyphicon glyphicon-chevron-right"></em>
         </button>
     </div>
 </div>

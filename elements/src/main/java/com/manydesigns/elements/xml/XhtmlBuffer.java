@@ -180,6 +180,37 @@ public class XhtmlBuffer extends XmlBuffer implements XhtmlFragment {
         closeElement("input");
     }
 
+    public void writeInputCheckbox(@Nullable String id,
+                                       @Nullable String name,
+                                       @Nullable String value,
+                                       boolean checked,
+                                       boolean disabed,
+                                       @Nullable String cssClass,
+                                       @Nullable String title) {
+            openElement("input");
+            addAttribute("id", id);
+            addAttribute("type", "checkbox");
+            addAttribute("name", name);
+            addAttribute("value", value);
+
+            if (checked) {
+                addAttribute("checked", "checked");
+            }
+
+            if (disabed)
+                addAttribute("disabled", "disabled");
+
+            if(cssClass != null) {
+                addAttribute("class", cssClass);
+            }
+
+            if(title != null) {
+                addAttribute("title", title);
+            }
+
+            closeElement("input");
+        }
+
     public void writeInputHidden(String name, String value) {
         openElement("input");
         addAttribute("type", "hidden");
