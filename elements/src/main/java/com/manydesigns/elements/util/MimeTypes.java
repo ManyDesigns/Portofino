@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -28,7 +28,7 @@ package com.manydesigns.elements.util;
  */
 public class MimeTypes {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public final static String APPLICATION_PDF = "application/pdf";
     public final static String APPLICATION_JSON_UTF8 = "application/json;charset=UTF-8";
