@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -47,7 +47,7 @@ import java.util.Map;
 */
 public class TableForm implements Element {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     protected String selectInputName = "select";
 
@@ -292,7 +292,7 @@ public class TableForm implements Element {
 
     public class Row extends AbstractCompositeElement<Field> {
         public static final String copyright =
-                "Copyright (c) 2005-2014, ManyDesigns srl";
+                "Copyright (c) 2005-2015, ManyDesigns srl";
 
         protected String key;
         protected final int index;
@@ -384,7 +384,7 @@ public class TableForm implements Element {
 
     public class Column {
         public static final String copyright =
-                "Copyright (c) 2005-2014, ManyDesigns srl";
+                "Copyright (c) 2005-2015, ManyDesigns srl";
 
         protected final PropertyAccessor propertyAccessor;
 

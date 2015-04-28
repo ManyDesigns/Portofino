@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -21,6 +21,7 @@
 package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.annotations.MaxLength;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.MemoryUtil;
@@ -45,7 +46,7 @@ import java.util.concurrent.Callable;
 */
 public class FileBlobField extends AbstractField<Blob> implements MultipartRequestField<Blob> {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public static final String UPLOAD_KEEP = "_keep";
     public static final String UPLOAD_MODIFY = "_modify";
@@ -54,10 +55,12 @@ public class FileBlobField extends AbstractField<Blob> implements MultipartReque
     public static final String OPERATION_SUFFIX = "_operation";
     public static final String CODE_SUFFIX = "_code";
     public static final String INNER_SUFFIX = "_inner";
-    public static final Callable<String> DEFAULT_CODE_GENERATOR = new Callable<String>() {
+
+    private final int size;
+    public final Callable<String> DEFAULT_CODE_GENERATOR = new Callable<String>() {
         @Override
         public String call() {
-            return RandomUtil.createRandomId();
+            return RandomUtil.createRandomId(size);
         }
     };
 
@@ -84,6 +87,12 @@ public class FileBlobField extends AbstractField<Blob> implements MultipartReque
         innerId = id + INNER_SUFFIX;
         operationInputName = inputName + OPERATION_SUFFIX;
         codeInputName = inputName + CODE_SUFFIX;
+
+        if (accessor.isAnnotationPresent(MaxLength.class)) {
+            size = Math.min(25, accessor.getAnnotation(MaxLength.class).value());
+        } else {
+            size = 25;
+        }
     }
 
     //**************************************************************************

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -23,6 +23,8 @@ package com.manydesigns.portofino.modules;
 import com.manydesigns.portofino.database.platforms.DatabasePlatformsRegistry;
 import com.manydesigns.portofino.database.platforms.PostgreSQLDatabasePlatform;
 import com.manydesigns.portofino.di.Inject;
+import com.manydesigns.portofino.liquibase.databases.PortofinoPostgresDatabase;
+import liquibase.database.DatabaseFactory;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +37,7 @@ import org.slf4j.LoggerFactory;
 */
 public class PostgresqlModule implements Module {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -89,6 +91,7 @@ public class PostgresqlModule implements Module {
     @Override
     public void init() {
         databasePlatformsRegistry.addDatabasePlatform(new PostgreSQLDatabasePlatform());
+        DatabaseFactory.getInstance().register(new PortofinoPostgresDatabase());
         status = ModuleStatus.ACTIVE;
     }
 

@@ -54,7 +54,7 @@ import java.util.Map;
 @PageActionName("OpenID Login")
 public class OpenIdLoginAction extends DefaultLoginAction implements PageAction {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public static final String OPENID_DISCOVERED = "openID.discovered";
     public static final String OPENID_CONSUMER_MANAGER = "openID.consumerManager";

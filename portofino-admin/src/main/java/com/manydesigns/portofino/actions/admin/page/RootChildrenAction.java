@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -43,7 +43,7 @@ import java.io.File;
 @UrlBinding(RootChildrenAction.URL_BINDING)
 public class RootChildrenAction extends RootConfigurationAction {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public static final String URL_BINDING = "/actions/admin/root-page/children";
 

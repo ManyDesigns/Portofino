@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -34,7 +34,7 @@ import net.sourceforge.stripes.action.Resolution;
  */
 public interface PageAction extends ActionBean, DispatchElement {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     /**
      * A lifecycle method invoked during the dispatch phase, where a http request is translated to a dispatch
