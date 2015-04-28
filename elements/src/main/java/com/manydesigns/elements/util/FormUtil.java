@@ -37,6 +37,7 @@ import com.manydesigns.elements.json.JsonKeyValueAccessor;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
+import org.json.JSONWriter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,15 +66,23 @@ public class FormUtil {
             Object value = field.getValue();
             String displayValue = field.getDisplayValue();
             String href = field.getHref();
+            List<String> errors = field.getErrors();
             js.key(field.getPropertyAccessor().getName());
-            js.object()
-                    .key(JSON_VALUE)
-                    .value(value)
-                    .key("displayValue")
-                    .value(displayValue)
-                    .key("href")
-                    .value(href)
-                    .endObject();
+            JSONWriter json = js.object().key(JSON_VALUE).value(value);
+            if(displayValue != null) {
+                json.key("displayValue").value(displayValue);
+            }
+            if(href != null) {
+                json.key("href").value(href);
+            }
+            if(!errors.isEmpty()) {
+                json.key("errors").array();
+                for(String error : errors) {
+                    json.value(error);
+                }
+                json.endArray();
+            }
+            json.endObject();
         }
     }
 

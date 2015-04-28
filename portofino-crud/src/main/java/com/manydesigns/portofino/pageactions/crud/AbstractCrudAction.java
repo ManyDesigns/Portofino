@@ -947,11 +947,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     // Setup
     //--------------------------------------------------------------------------
 
-    /**
-     * Method to be executed before each HTTP action method.
-     */
-    protected void prepare() {}
-
     public Resolution preparePage() {
         this.crudConfiguration = (CrudConfiguration) pageInstance.getConfiguration();
 
@@ -1960,7 +1955,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @GET
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public Resolution getAsJson() {
-        prepare();
         if(object == null) {
             Form form = new FormBuilder(AbstractCrudAction.class).
                     configFields("searchString", "firstResult", "maxResults", "sortProperty", "sortDirection").
@@ -1978,7 +1972,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
     public String saveAsJson(String jsonObject) throws Throwable {
-        prepare();
         if(object != null) {
             throw new Exception("update not supported, PUT to /pk instead");
         }
@@ -2014,7 +2007,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
     public String updateAsJson(String jsonObject) throws Throwable {
-        prepare();
         if(object == null) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build());
         }
