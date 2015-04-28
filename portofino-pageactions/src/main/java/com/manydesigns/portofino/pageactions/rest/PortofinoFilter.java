@@ -8,7 +8,11 @@ import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.shiro.ShiroUtils;
+import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.controller.BeforeAfterMethodInterceptor;
+import net.sourceforge.stripes.controller.ExecutionContext;
+import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.controller.StripesConstants;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.aop.MethodInvocation;
@@ -24,9 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.ConstrainedTo;
 import javax.ws.rs.RuntimeType;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.container.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -39,13 +41,15 @@ import java.util.List;
 
 @Provider
 @ConstrainedTo(RuntimeType.SERVER)
-public class PortofinoFilter implements ContainerRequestFilter {
+public class PortofinoFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     public static final String copyright =
             "Copyright (c) 2005-2014, ManyDesigns srl";
 
     public final static Logger logger =
             LoggerFactory.getLogger(PortofinoFilter.class);
+
+    protected final BeforeAfterMethodInterceptor beforeAfterMethodInterceptor = new BeforeAfterMethodInterceptor();
 
     @Context
     protected ResourceInfo resourceInfo;
@@ -67,6 +71,39 @@ public class PortofinoFilter implements ContainerRequestFilter {
         publishUser();
         checkAuthorizations(requestContext, resource);
         preparePage(requestContext, resource);
+        runStripesInterceptors(requestContext, resource, true);
+    }
+
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+        UriInfo uriInfo = requestContext.getUriInfo();
+        if(uriInfo.getMatchedResources().isEmpty()) {
+            return;
+        }
+        Object resource = uriInfo.getMatchedResources().get(0);
+        if(resource.getClass() != resourceInfo.getResourceClass()) {
+            throw new RuntimeException("Inconsistency: matched resource is not of the right type, " + resourceInfo.getResourceClass());
+        }
+
+        runStripesInterceptors(requestContext, resource, false);
+    }
+
+    protected void runStripesInterceptors(ContainerRequestContext requestContext, Object resource, boolean before) {
+        if(resource instanceof ActionBean) {
+            BridgeExecutionContext executionContext = new BridgeExecutionContext(before);
+            ActionBean actionBean = (ActionBean) resource;
+            executionContext.setActionBean(actionBean);
+            executionContext.setActionBeanContext(actionBean.getContext());
+            executionContext.setHandler(resourceInfo.getResourceMethod());
+            executionContext.setLifecycleStage(LifecycleStage.EventHandling);
+            try {
+                Resolution resolution = beforeAfterMethodInterceptor.intercept(executionContext);
+                if(resolution != null) {
+                    requestContext.abortWith(Response.ok(resolution).build());
+                }
+            } catch (Exception e) {
+                requestContext.abortWith(Response.serverError().entity(e).build());
+            }
+        }
     }
 
     protected void preparePage(ContainerRequestContext requestContext, Object resource) {
@@ -183,4 +220,31 @@ public class PortofinoFilter implements ContainerRequestFilter {
     }
 
     protected static final AuthChecker AUTH_CHECKER = new AuthChecker();
+
+    public static final class BridgeExecutionContext extends ExecutionContext {
+
+        private final boolean before;
+        private boolean proceedCalled;
+
+        public BridgeExecutionContext(boolean before) {
+            this.before = before;
+        }
+
+        @Override
+        public Resolution proceed() throws Exception {
+            proceedCalled = true;
+            return null;
+        }
+
+        @Override
+        public ActionBean getActionBean() {
+            //BeforeAfterMethodInterceptor conditionalizes on context.getActionBean() != null, so trick it into
+            //not executing @Before/@After methods in the appropriate phase
+            if((before && !proceedCalled) || (!before && proceedCalled)) {
+                return super.getActionBean();
+            } else {
+                return null;
+            }
+        }
+    }
 }

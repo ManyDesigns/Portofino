@@ -36,8 +36,7 @@ class ProjectsTicketsAction extends CrudAction {
     Object old;
 
     @Before
-    public void prepare() {
-        super.prepare();
+    public void prepareProject() {
         project = ElementsThreadLocals.getOgnlContext().get("project");
     }
 

@@ -21,8 +21,7 @@ class MyCrudAction extends CrudAction {
     Serializable project;
 
     @Before
-    public void prepare() {
-        super.prepare();
+    public void prepareProject() {
         project = ElementsThreadLocals.getOgnlContext().get("project");
     }
 

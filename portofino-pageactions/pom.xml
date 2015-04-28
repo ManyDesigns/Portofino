@@ -43,9 +43,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-web-api</artifactId>
-            <version>${javaee-web-api.version}</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- To avoid Groovy compilation error in IDEA -->
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.0.1</version>
+            <version>${javax.ws.rs.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- Google OAuth client -->
