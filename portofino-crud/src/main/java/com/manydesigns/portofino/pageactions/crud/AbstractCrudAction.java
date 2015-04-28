@@ -1995,10 +1995,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 form.readFromObject(object); //Re-read so that the full object is returned
                 return FormUtil.writeToJson(form);
             } else {
-                throw new Exception("Validation failed"); //TODO failure details?
+                throw new WebApplicationException(Response.serverError().entity(FormUtil.writeToJson(form)).build());
             }
         } else {
-            throw new Exception("Validation failed"); //TODO failure details?
+            throw new WebApplicationException(Response.serverError().entity(FormUtil.writeToJson(form)).build());
         }
     }
 
@@ -2029,10 +2029,10 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 form.readFromObject(object); //Re-read so that the full object is returned
                 return FormUtil.writeToJson(form);
             } else {
-                throw new Exception("Validation failed"); //TODO failure details?
+                throw new WebApplicationException(Response.serverError().entity(FormUtil.writeToJson(form)).build());
             }
         } else {
-            throw new Exception("Validation failed"); //TODO failure details?
+            throw new WebApplicationException(Response.serverError().entity(FormUtil.writeToJson(form)).build());
         }
     }
 
