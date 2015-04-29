@@ -57,7 +57,6 @@ public class APIRoot {
         if (request.getDispatcherType() == DispatcherType.REQUEST) {
             logger.debug("Starting page response timer");
             StopWatch stopWatch = new StopWatch();
-            // There is no need to stop this timer.
             stopWatch.start();
             request.setAttribute(RequestAttributes.STOP_WATCH, stopWatch);
         }

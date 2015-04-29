@@ -5,7 +5,7 @@
         version="3.0">
     <name>jersey</name>
     <ordering>
-        <after><others /></after>
+        <after><name>stripes</name></after>
     </ordering>
 
     <filter>
