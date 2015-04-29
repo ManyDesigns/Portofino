@@ -83,6 +83,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.*;
@@ -1162,12 +1163,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }
         }
 
-        String readLinkExpression = getReadLinkExpression();
-        OgnlTextFormat hrefFormat =
-                OgnlTextFormat.create(readLinkExpression);
-        hrefFormat.setUrl(true);
-        String encoding = getUrlEncoding();
-        hrefFormat.setEncoding(encoding);
+        OgnlTextFormat hrefFormat = getReadURLFormat();
 
         if(isShowingKey) {
             logger.debug("TableForm: configuring detail links for primary key properties");
@@ -1408,12 +1404,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 Field field = fieldIterator.next();
                 if (field instanceof FileBlobField) {
                     if(baseUrl == null) {
-                        String readLinkExpression = getReadLinkExpression();
-                        String encoding = getUrlEncoding();
-                        OgnlTextFormat hrefFormat =
-                                OgnlTextFormat.create(readLinkExpression);
-                        hrefFormat.setUrl(true);
-                        hrefFormat.setEncoding(encoding);
+                        OgnlTextFormat hrefFormat = getReadURLFormat();
                         baseUrl = hrefFormat.format(obj);
                     }
 
@@ -1879,6 +1870,19 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
+     * Computes an OgnlTextFormat from the result of getReadLinkExpression(), with the correct URL encoding.
+     * @return the OgnlTextFormat.
+     */
+    protected OgnlTextFormat getReadURLFormat() {
+        String readLinkExpression = getReadLinkExpression();
+        OgnlTextFormat hrefFormat = OgnlTextFormat.create(readLinkExpression);
+        hrefFormat.setUrl(true);
+        String encoding = getUrlEncoding();
+        hrefFormat.setEncoding(encoding);
+        return hrefFormat;
+    }
+
+    /**
      * If a search has been executed, appends a URL-encoded String representation of the search criteria
      * to the given string, as a GET parameter.
      * @param s the base string.
@@ -1971,9 +1975,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
-    public String saveAsJson(String jsonObject) throws Throwable {
+    public Response saveAsJson(String jsonObject) throws Throwable {
         if(object != null) {
-            throw new Exception("update not supported, PUT to /pk instead");
+            return Response.status(Response.Status.BAD_REQUEST).entity("update not supported, PUT to /pk instead").build();
         }
         setupForm(Mode.CREATE);
         object = (T) classAccessor.newInstance();
@@ -1993,12 +1997,16 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     throw e;
                 }
                 form.readFromObject(object); //Re-read so that the full object is returned
-                return FormUtil.writeToJson(form);
+                OgnlTextFormat textFormat = getReadURLFormat();
+                return Response.status(Response.Status.CREATED).
+                        entity(FormUtil.writeToJson(form)).
+                        location(new URI(textFormat.format(object))).
+                        build();
             } else {
-                throw new WebApplicationException(Response.serverError().entity(FormUtil.writeToJson(form)).build());
+                return Response.serverError().entity(FormUtil.writeToJson(form)).build();
             }
         } else {
-            throw new WebApplicationException(Response.serverError().entity(FormUtil.writeToJson(form)).build());
+            return Response.serverError().entity(FormUtil.writeToJson(form)).build();
         }
     }
 
@@ -2006,9 +2014,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
-    public String updateAsJson(String jsonObject) throws Throwable {
+    public Response updateAsJson(String jsonObject) throws Throwable {
         if(object == null) {
-            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build());
+            return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
         }
         setupForm(Mode.EDIT);
         editSetup(object);
@@ -2027,12 +2035,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     throw e;
                 }
                 form.readFromObject(object); //Re-read so that the full object is returned
-                return FormUtil.writeToJson(form);
+                return Response.ok(FormUtil.writeToJson(form)).build();
             } else {
-                throw new WebApplicationException(Response.serverError().entity(FormUtil.writeToJson(form)).build());
+                return Response.serverError().entity(FormUtil.writeToJson(form)).build();
             }
         } else {
-            throw new WebApplicationException(Response.serverError().entity(FormUtil.writeToJson(form)).build());
+            return Response.serverError().entity(FormUtil.writeToJson(form)).build();
         }
     }
 
