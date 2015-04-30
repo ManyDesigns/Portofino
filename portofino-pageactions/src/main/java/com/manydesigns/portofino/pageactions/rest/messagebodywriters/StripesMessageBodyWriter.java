@@ -1,4 +1,4 @@
-package com.manydesigns.portofino.pageactions.rest;
+package com.manydesigns.portofino.pageactions.rest.messagebodywriters;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import net.sourceforge.stripes.action.Resolution;
@@ -22,9 +22,18 @@ import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+/**
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 @Provider
 @ConstrainedTo(RuntimeType.SERVER)
 public class StripesMessageBodyWriter implements MessageBodyWriter<Resolution> {
+
+    public static final String copyright =
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -38,7 +47,7 @@ public class StripesMessageBodyWriter implements MessageBodyWriter<Resolution> {
 
     @Override
     public void writeTo(
-            Resolution resolution, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
+            Resolution resolution, Class<?> type, Type genericType, Annotation[] annotations, final MediaType mediaType,
             final MultivaluedMap<String, Object> httpHeaders, final OutputStream entityStream)
             throws IOException, WebApplicationException {
         // OutputStream and Writer for HttpServletResponseWrapper.
@@ -97,6 +106,11 @@ public class StripesMessageBodyWriter implements MessageBodyWriter<Resolution> {
                 @Override
                 public void setHeader(String name, String value) {
                     httpHeaders.putSingle(name, value);
+                }
+
+                @Override
+                public String getContentType() {
+                    return mediaType.toString();
                 }
             });
             responseWriter.flush();

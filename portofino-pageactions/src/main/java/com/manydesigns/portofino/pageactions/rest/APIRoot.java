@@ -28,8 +28,17 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import java.io.File;
 
+/**
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 @Path(APIRoot.PATH_PREFIX)
 public class APIRoot {
+
+    public static final String copyright =
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     private static final Logger logger = LoggerFactory.getLogger(APIRoot.class);
 

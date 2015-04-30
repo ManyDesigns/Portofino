@@ -44,6 +44,7 @@ import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.MimeTypes;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
@@ -1001,10 +1002,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected Resolution notInUseCase(ActionBeanContext context, List<String> parameters) {
-        logger.info("Not in use case: " + crudConfiguration.getName());
-        String msg = ElementsThreadLocals.getText("object.not.found._", StringUtils.join(parameters, "/"));
-        SessionMessages.addWarningMessage(msg);
-        return new ForwardResolution("/m/pageactions/redirect-to-last-working-page.jsp");
+        logger.debug("Not in use case: {}", crudConfiguration.getName());
+        return new NotInUseCaseResolution(StringUtils.join(parameters, "/"));
     }
 
     /**
@@ -1999,14 +1998,14 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 form.readFromObject(object); //Re-read so that the full object is returned
                 OgnlTextFormat textFormat = getReadURLFormat();
                 return Response.status(Response.Status.CREATED).
-                        entity(FormUtil.writeToJson(form)).
+                        entity(form).
                         location(new URI(textFormat.format(object))).
                         build();
             } else {
-                return Response.serverError().entity(FormUtil.writeToJson(form)).build();
+                return Response.serverError().entity(form).build();
             }
         } else {
-            return Response.serverError().entity(FormUtil.writeToJson(form)).build();
+            return Response.serverError().entity(form).build();
         }
     }
 
@@ -2035,13 +2034,42 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     throw e;
                 }
                 form.readFromObject(object); //Re-read so that the full object is returned
-                return Response.ok(FormUtil.writeToJson(form)).build();
+                return Response.ok(form).build();
             } else {
-                return Response.serverError().entity(FormUtil.writeToJson(form)).build();
+                return Response.serverError().entity(form).build();
             }
         } else {
-            return Response.serverError().entity(FormUtil.writeToJson(form)).build();
+            return Response.serverError().entity(form).build();
         }
+    }
+
+    @DELETE
+    @RequiresPermissions(permissions = PERMISSION_DELETE)
+    public void httpDelete() throws Exception {
+        if(object == null) {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("DELETE requires a /pk path parameter").build());
+        }
+        if(deleteValidate(object)) {
+            doDelete(object);
+            try {
+                deletePostProcess(object);
+                commitTransaction();
+                deleteBlobs(object);
+            } catch (Exception e) {
+                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                logger.warn(rootCauseMessage, e);
+                throw e;
+            }
+        }
+    }
+
+    @Path(":classAccessor")
+    @GET
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public String describeClassAccessor() {
+        JSONStringer jsonStringer = new JSONStringer();
+        ReflectionUtil.classAccessorToJson(jsonStringer, getClassAccessor());
+        return jsonStringer.toString();
     }
 
     //--------------------------------------------------------------------------

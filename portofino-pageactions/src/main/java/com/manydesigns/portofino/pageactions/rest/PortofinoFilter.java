@@ -39,12 +39,18 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 @Provider
 @ConstrainedTo(RuntimeType.SERVER)
 public class PortofinoFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public final static Logger logger =
             LoggerFactory.getLogger(PortofinoFilter.class);
