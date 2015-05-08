@@ -419,7 +419,7 @@ public class SelectField extends AbstractField<Object> {
                                        String stringValue,
                                        boolean checked) {
         xb.openElement("div");
-        xb.addAttribute("class", "radio");
+        xb.addAttribute("class", "radio-inline");
         xb.openElement("label");
         xb.addAttribute("for", radioId);
         xb.writeInputRadio(radioId, inputName, stringValue, checked);

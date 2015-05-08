@@ -23,24 +23,26 @@ package com.manydesigns.portofino.pageactions.crud;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
+import com.manydesigns.elements.options.DefaultSelectionProvider;
+import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.QueryStringWithParameters;
-import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.modules.DatabaseModule;
-import com.manydesigns.portofino.persistence.Persistence;
-import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.database.TableCriteria;
+import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
 import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
+import com.manydesigns.portofino.persistence.Persistence;
+import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
@@ -87,7 +89,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     public static final String[][] CRUD_CONFIGURATION_FIELDS =
                 {{"name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
-                  "largeResultSet", "rowsPerPage"}};
+                  "largeResultSet", "rowsPerPage", "columns"}};
 
     public Table baseTable;
 
@@ -216,10 +218,19 @@ public class CrudAction extends AbstractCrudAction<Object> {
                         Database.class,
                         null,
                         new String[]{"databaseName"});
+
+        DefaultSelectionProvider nColumnsSelectionProvider = new DefaultSelectionProvider("columns");
+        nColumnsSelectionProvider.setDisplayMode(DisplayMode.RADIO);
+        nColumnsSelectionProvider.appendRow(1, "1", true);
+        nColumnsSelectionProvider.appendRow(2, "2", true);
+        nColumnsSelectionProvider.appendRow(3, "3", true);
+        nColumnsSelectionProvider.appendRow(4, "4", true);
+        nColumnsSelectionProvider.appendRow(6, "6", true);
         crudConfigurationForm = new FormBuilder(CrudConfiguration.class)
                 .configFields(CRUD_CONFIGURATION_FIELDS)
                 .configFieldSetNames("Crud")
                 .configSelectionProvider(databaseSelectionProvider, "database")
+                .configSelectionProvider(nColumnsSelectionProvider, "columns")
                 .build();
 
     }
