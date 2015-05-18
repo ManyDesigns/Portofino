@@ -57,6 +57,7 @@ public @interface Button {
         ICON_MINUS = " glyphicon-minus ",
         ICON_TRASH = " glyphicon-trash ",
         ICON_WRENCH = " glyphicon-wrench ",
+        ICON_RELOAD= " glyphicon-reload ",
         ICON_PICTURE = " glyphicon-picture ";
     
     /**

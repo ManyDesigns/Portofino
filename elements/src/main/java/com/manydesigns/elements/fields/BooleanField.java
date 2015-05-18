@@ -53,6 +53,8 @@ public class BooleanField extends AbstractField {
     public static final String FALSE_VALUE = "false";
     public static final String FALSE_LABEL_I18N = "elements.No";
 
+    public static final String FORM_CONTROL_CSS_CLASS = "form-control";
+
     //**************************************************************************
     // Campi
     //**************************************************************************
@@ -150,6 +152,7 @@ public class BooleanField extends AbstractField {
         } else {
             xb.openElement("select");
             xb.addAttribute("id", id);
+            xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
             xb.addAttribute("name", inputName);
             xb.writeOption(NULL_VALUE, (booleanValue == null),
                     getText(NULL_LABEL_I18N));

@@ -90,8 +90,8 @@ public class SelectSearchField extends AbstractSearchField {
             displayMode = SearchDisplayMode.DROPDOWN;
         }
         selectionModelIndex = 0;
-        comboLabel = getText("elements.field.select.select", label);
-        notSetLabel = getText("elements.search.select.notset", label);
+        comboLabel = getText("elements.field.select.select", label );
+        notSetLabel = getText("elements.search.select.notset", label );
         autocompleteId = id + AUTOCOMPLETE_SUFFIX;
         autocompleteInputName = inputName + AUTOCOMPLETE_SUFFIX;
     }
