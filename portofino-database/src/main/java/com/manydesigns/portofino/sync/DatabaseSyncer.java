@@ -21,6 +21,7 @@
 package com.manydesigns.portofino.sync;
 
 import com.manydesigns.elements.util.ReflectionUtil;
+import com.manydesigns.portofino.database.Type;
 import com.manydesigns.portofino.model.Annotated;
 import com.manydesigns.portofino.model.Annotation;
 import com.manydesigns.portofino.model.Model;
@@ -476,7 +477,16 @@ public class DatabaseSyncer {
                 } else if ("LONG".equals(typeName)) {
                     jdbcType = -1;
                 } else if("DATE".equals(typeName)) {
-                    jdbcType = 91;
+                    for(Type type : connectionProvider.getTypes()) {
+                        if(type.getTypeName().equals(typeName)) {
+                            jdbcType = 91;
+                            break;
+                        }
+                    }
+                    if(jdbcType == null) {
+                        //DATE type not present, map to TIMESTAMP
+                        jdbcType = 93;
+                    }
                 } else if("RAW".equals(typeName)) {
                     jdbcType = -3;
                 } else if("LONG RAW".equals(typeName)) {
