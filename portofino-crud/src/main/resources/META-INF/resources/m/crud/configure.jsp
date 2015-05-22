@@ -49,7 +49,7 @@
                         });
 
                         var firstCell = $("#crudPropertiesFieldset tr:first th:first");
-                        firstCell.append("<input type='checkbox' />")
+                        firstCell.html("<input type='checkbox' />")
                         var allCheckbox = firstCell.find("input")
                         allCheckbox.click(function() {
                             inputs.each(function() {

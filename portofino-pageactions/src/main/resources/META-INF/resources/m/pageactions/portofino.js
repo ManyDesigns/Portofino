@@ -313,7 +313,7 @@ portofino.confirmDeletePage = function(pagePath, contextPath) {
     var dialogDiv = $("<div></div>").appendTo($("body"));
     dialogDiv.load(contextPath + "/actions/admin/page?confirmDelete&ajax=true&originalPath=" + pagePath,
         function(response, status, xhr) {
-            if(xhr.status == 403) {
+            if(xhr.status == 401) {
                 portofino.redirectToLogin(xhr);
             }
             var dialog = dialogDiv.find(".dialog-confirm-delete-page");
@@ -335,7 +335,7 @@ portofino.showMovePageDialog = function(pagePath, contextPath) {
     var dialogDiv = $("<div></div>").appendTo($("body"));
     dialogDiv.load(contextPath + "/actions/admin/page?chooseNewLocation&ajax=true&originalPath=" + pagePath,
         function(response, status, xhr) {
-            if(xhr.status == 403) {
+            if(xhr.status == 401) {
                 portofino.redirectToLogin(xhr);
             }
             var dialog = dialogDiv.find(".dialog-move-page");
@@ -358,7 +358,7 @@ portofino.showCopyPageDialog = function(pagePath, contextPath) {
     dialogDiv.load(
         contextPath + "/actions/admin/page?copyPageDialog&ajax=true&originalPath=" + pagePath,
         function(response, status, xhr) {
-            if(xhr.status == 403) {
+            if(xhr.status == 401) {
                 portofino.redirectToLogin(xhr);
             }
             var dialog = dialogDiv.find(".dialog-copy-page");
@@ -388,7 +388,7 @@ portofino.util.removeQueryStringArgument = function removeQueryStringArgument(hr
 
 portofino.redirectToLogin = function redirectToLogin(xhr) {
     //Redirect to login page (link included in the response)
-    var loginUrl = xhr.responseText;
+    var loginUrl = xhr.getResponseHeader("X-Portofino-Login-Page");
     loginUrl = portofino.util.removeQueryStringArgument(loginUrl, "returnUrl");
     window.location.href = loginUrl + (loginUrl.indexOf("?") > -1 ? "&" : "?") + "returnUrl=" + encodeURIComponent(window.location.href);
 };

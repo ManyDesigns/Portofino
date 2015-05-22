@@ -9,6 +9,8 @@ import org.apache.shiro.authc.credential.DefaultPasswordService;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public class PortofinoPasswordService extends DefaultPasswordService {
+    public static final String copyright =
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     @Override
     protected void checkHashFormatDurability() {

@@ -189,12 +189,8 @@ table.table.mde-table-form > thead > tr > td, table.table.mde-table-form > thead
     vertical-align: middle;
 }
 
-table.mde-table-form div.checkbox {
-    margin-bottom: 0;
-}
-
-table.mde-table-form div.checkbox label.checkbox-inline {
-    vertical-align: inherit;
+.checkbox-inline > label, .radio-inline > label {
+    font-weight: inherit;
 }
 
 label.control-label:after {

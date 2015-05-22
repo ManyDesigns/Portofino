@@ -1331,7 +1331,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Configures the builder for the search detail (view, create, edit) form.
+     * Configures the builder for the detail form (view, create, edit).
      * You can override this method to customize how the form is generated
      * (e.g. adding custom links on specific properties, hiding or showing properties
      * based on some runtime condition, etc.).
@@ -1340,7 +1340,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @return the form builder.
      */
     protected FormBuilder configureFormBuilder(FormBuilder formBuilder, Mode mode) {
-        formBuilder.configPrefix(prefix).configMode(mode);
+        formBuilder.configPrefix(prefix).configMode(mode).configNColumns(crudConfiguration.getColumns());
         configureFormSelectionProviders(formBuilder);
         return formBuilder;
     }
@@ -1414,7 +1414,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                             .addParameter("propertyName", field.getPropertyAccessor().getName())
                             .addParameter("code", blob.getCode());
                         // although unused, the code parameter makes the url change if the
-                        // blob changes. In this way we can ask the browser to cache the url
+                        // blob changes. This way we can ask the browser to cache the url
                         // indefinitely.
 
                         field.setHref(urlBuilder.toString());
@@ -1430,7 +1430,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 .addParameter("downloadBlob","")
                 .addParameter("propertyName", field.getPropertyAccessor().getName())
                 .addParameter("code", field.getValue().getCode());
-        // The code parameter must be kept. See not in refreshTableBlobDownloadHref
+        // The code parameter must be kept. See note in refreshTableBlobDownloadHref
         return urlBuilder.toString();
     }
 

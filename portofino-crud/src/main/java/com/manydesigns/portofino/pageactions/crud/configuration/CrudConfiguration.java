@@ -23,6 +23,7 @@ package com.manydesigns.portofino.pageactions.crud.configuration;
 import com.manydesigns.elements.annotations.CssClass;
 import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.annotations.Multiline;
+import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.BootstrapSizes;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.ConfigurationWithDefaults;
@@ -71,6 +72,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
     protected boolean largeResultSet;
 
     protected Integer rowsPerPage;
+    protected Integer columns = 1;
 
     @Inject(DatabaseModule.PERSISTENCE)
     public Persistence persistence;
@@ -258,4 +260,14 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         this.rowsPerPage = rowsPerPage;
     }
 
+    @Required
+    @CssClass(BootstrapSizes.COL_SM_1)
+    @XmlAttribute(required = false)
+    public Integer getColumns() {
+        return columns;
+    }
+
+    public void setColumns(Integer columns) {
+        this.columns = columns;
+    }
 }
