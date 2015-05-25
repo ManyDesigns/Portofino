@@ -48,10 +48,10 @@ public class Schema implements ModelObject {
     //**************************************************************************
 
     protected Database database;
-    protected final List<Table> tables;
+    protected final List<Table> immediateTables;
+    protected final List<Table> tables = new ArrayList<Table>();
 
     protected String schemaName;
-
     
     //**************************************************************************
     // Logging
@@ -64,7 +64,7 @@ public class Schema implements ModelObject {
     // Constructors and init
     //**************************************************************************
     public Schema() {
-        tables = new ArrayList<Table>();
+        immediateTables = new ArrayList<Table>();
     }
 
     public Schema(Database database) {
@@ -78,6 +78,7 @@ public class Schema implements ModelObject {
 
     public void afterUnmarshal(Unmarshaller u, Object parent) {
         database = (Database)parent;
+        tables.addAll(immediateTables);
     }
 
     public String getQualifiedName() {
@@ -130,6 +131,10 @@ public class Schema implements ModelObject {
     @XmlElementWrapper(name="tables")
     @XmlElement(name = "table",
             type = com.manydesigns.portofino.model.database.Table.class)
+    public List<Table> getImmediateTables() {
+        return immediateTables;
+    }
+
     public List<Table> getTables() {
         return tables;
     }
@@ -141,7 +146,7 @@ public class Schema implements ModelObject {
 
     public List<Column> getAllColumns() {
         List<Column> result = new ArrayList<Column>();
-        for (Table table : tables) {
+        for (Table table : immediateTables) {
             for (Column column : table.getColumns()) {
                 result.add(column);
             }

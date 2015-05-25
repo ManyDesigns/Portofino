@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<table tableName="tickets" shortName="%{project}-%{n}">
+    <annotations/>
+    <columns>
+        <column scale="0" nullable="false" length="10" jdbcType="12" columnType="VARCHAR" columnName="project"
+                autoincrement="false">
+            <annotations>
+                <annotation type="com.manydesigns.elements.annotations.MaxLength">
+                    <value>10</value>
+                </annotation>
+            </annotations>
+        </column>
+        <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="n"
+                autoincrement="false">
+            <annotations/>
+        </column>
+        <column scale="0" nullable="false" length="255" jdbcType="12" columnType="VARCHAR" columnName="title"
+                autoincrement="false">
+            <annotations>
+                <annotation type="com.manydesigns.elements.annotations.CssClass">
+                    <value>input-xxlarge</value>
+                </annotation>
+                <annotation type="com.manydesigns.elements.annotations.MaxLength">
+                    <value>255</value>
+                </annotation>
+            </annotations>
+        </column>
+        <column scale="0" nullable="true" length="4000" jdbcType="12" columnType="VARCHAR" columnName="description"
+                autoincrement="false">
+            <annotations>
+                <annotation type="com.manydesigns.elements.annotations.MaxLength">
+                    <value>4000</value>
+                </annotation>
+                <annotation type="com.manydesigns.elements.annotations.Multiline">
+                    <value>true</value>
+                </annotation>
+            </annotations>
+        </column>
+        <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="type"
+                autoincrement="false">
+            <annotations/>
+        </column>
+        <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="priority"
+                autoincrement="false">
+            <annotations/>
+        </column>
+        <column scale="0" nullable="true" length="10" jdbcType="4" columnType="INT" columnName="affected_version"
+                autoincrement="false">
+            <annotations/>
+        </column>
+        <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="created_by"
+                autoincrement="false">
+            <annotations>
+                <annotation type="com.manydesigns.elements.annotations.FieldSet">
+                    <value>Workflow</value>
+                </annotation>
+            </annotations>
+        </column>
+        <column scale="0" nullable="false" length="10" jdbcType="4" columnType="INT" columnName="state"
+                autoincrement="false">
+            <annotations/>
+        </column>
+        <column scale="0" nullable="true" length="10" jdbcType="4" columnType="INT" columnName="assignee"
+                autoincrement="false">
+            <annotations/>
+        </column>
+        <column scale="0" nullable="true" length="10" jdbcType="4" columnType="INT" columnName="fix_version"
+                autoincrement="false">
+            <annotations/>
+        </column>
+        <column scale="0" nullable="true" length="10" jdbcType="4" columnType="INT" columnName="resolution"
+                autoincrement="false">
+            <annotations/>
+        </column>
+        <column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="created"
+                autoincrement="false">
+            <annotations/>
+        </column>
+        <column scale="0" nullable="false" length="19" jdbcType="93" columnType="TIMESTAMP" columnName="last_updated"
+                autoincrement="false">
+            <annotations/>
+        </column>
+    </columns>
+    <foreignKeys>
+        <foreignKey toTable="versions" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction"
+                    toDatabase="tt" name="fk_ticket_fix_version" hql="from versions">
+            <references>
+                <reference toColumn="id" fromColumn="fix_version"/>
+            </references>
+        </foreignKey>
+        <foreignKey toTable="users" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction"
+                    toDatabase="tt" name="fk_ticket_assignee" hql="from users">
+            <references>
+                <reference toColumn="id" fromColumn="assignee"/>
+            </references>
+        </foreignKey>
+        <foreignKey toTable="ticket_resolutions" toSchema="tt" onUpdate="importedKeyNoAction"
+                    onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_resolution"
+                    hql="from ticket_resolutions">
+            <references>
+                <reference toColumn="id" fromColumn="resolution"/>
+            </references>
+        </foreignKey>
+        <foreignKey toTable="ticket_states" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction"
+                    toDatabase="tt" name="fk_ticket_state" hql="from ticket_states">
+            <references>
+                <reference toColumn="id" fromColumn="state"/>
+            </references>
+        </foreignKey>
+        <foreignKey toTable="projects" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction"
+                    toDatabase="tt" name="fk_ticket_project" hql="from projects">
+            <references>
+                <reference toColumn="id" fromColumn="project"/>
+            </references>
+        </foreignKey>
+        <foreignKey toTable="ticket_types" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction"
+                    toDatabase="tt" name="fk_ticket_type" hql="from ticket_types">
+            <references>
+                <reference toColumn="id" fromColumn="type"/>
+            </references>
+        </foreignKey>
+        <foreignKey toTable="ticket_priorities" toSchema="tt" onUpdate="importedKeyNoAction"
+                    onDelete="importedKeyNoAction" toDatabase="tt" name="fk_ticket_priority"
+                    hql="from ticket_priorities">
+            <references>
+                <reference toColumn="id" fromColumn="priority"/>
+            </references>
+        </foreignKey>
+        <foreignKey toTable="versions" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction"
+                    toDatabase="tt" name="fk_ticket_affected_version" hql="from versions">
+            <references>
+                <reference toColumn="id" fromColumn="affected_version"/>
+            </references>
+        </foreignKey>
+        <foreignKey toTable="users" toSchema="tt" onUpdate="importedKeyNoAction" onDelete="importedKeyNoAction"
+                    toDatabase="tt" name="fk_ticket_created_by" hql="from users">
+            <references>
+                <reference toColumn="id" fromColumn="created_by"/>
+            </references>
+        </foreignKey>
+    </foreignKeys>
+    <primaryKey>
+        <column columnName="project"/>
+        <column columnName="n"/>
+    </primaryKey>
+    <selectionProviders>
+        <query toDatabase="tt" sql="" name="ticket_types" hql="from ticket_types order by id">
+            <references>
+                <reference fromColumn="type"/>
+            </references>
+        </query>
+        <query toDatabase="tt" sql="" name="ticket_priorities" hql="from ticket_priorities order by id">
+            <references>
+                <reference fromColumn="priority"/>
+            </references>
+        </query>
+        <query toDatabase="tt" sql="" name="ticket_states" hql="from ticket_states order by id">
+            <references>
+                <reference fromColumn="state"/>
+            </references>
+        </query>
+        <query toDatabase="tt"
+               sql="select u.id, concat(u.first_name, ' ', u.last_name), m.id is not null&#xD;&#xA;from users u&#xD;&#xA;left join members m on m.user_ = u.id&#xD;&#xA;where m.project = %{#project.id}&#xD;&#xA;order by u.first_name, u.last_name"
+               name="ticket_assignee" hql="">
+            <references>
+                <reference fromColumn="assignee"/>
+            </references>
+        </query>
+        <query toDatabase="tt" sql="" name="ticket_fix_version"
+               hql="from versions&#xD;&#xA;where project = %{#project.id}&#xD;&#xA;order by state, release_date desc, planned_date desc, id desc">
+            <references>
+                <reference fromColumn="fix_version"/>
+            </references>
+        </query>
+        <query toDatabase="tt" sql="" name="ticket_affected_version"
+               hql="from versions&#xD;&#xA;where project = %{#project.id}&#xD;&#xA;order by state, release_date desc, planned_date desc, id desc">
+            <references>
+                <reference fromColumn="affected_version"/>
+            </references>
+        </query>
+        <query toDatabase="tt"
+               sql="select u.id, concat(u.first_name, ' ', u.last_name), m.id is not null&#xD;&#xA;from users u&#xD;&#xA;left join members m on m.user_ = u.id&#xD;&#xA;where m.project = %{#project.id}&#xD;&#xA;order by u.first_name, u.last_name"
+               name="ticket_created_by" hql="">
+            <references>
+                <reference fromColumn="created_by"/>
+            </references>
+        </query>
+    </selectionProviders>
+</table>

@@ -40,6 +40,7 @@ import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.FileSystemResourceAccessor;
 import liquibase.resource.ResourceAccessor;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -55,6 +56,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.text.MessageFormat;
@@ -139,8 +141,35 @@ public class Persistence {
         try {
             JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
             Unmarshaller um = jc.createUnmarshaller();
-            model = (Model) um.unmarshal(appModelFile);
+            Model model = (Model) um.unmarshal(appModelFile);
             boolean syncOnStart = false;
+            File modelDir = getModelDirectory();
+            for(Database database : model.getDatabases()) {
+                File databaseDir = new File(modelDir, database.getDatabaseName());
+                for(Schema schema : database.getSchemas()) {
+                    File schemaDir = new File(databaseDir, schema.getSchemaName());
+                    if(schemaDir.isDirectory()) {
+                        logger.debug("Schema directory {} exists", schemaDir);
+                        File[] tableFiles = schemaDir.listFiles(new FilenameFilter() {
+                            @Override
+                            public boolean accept(File dir, String name) {
+                                return name.endsWith(".table.xml");
+                            }
+                        });
+                        for(File tableFile : tableFiles) {
+                            Table table = (Table) um.unmarshal(tableFile);
+                            if(!tableFile.getName().equalsIgnoreCase(table.getTableName() + ".table.xml")) {
+                                throw new Exception("Found table " + table.getTableName() + " defined in file " + tableFile);
+                            }
+                            table.afterUnmarshal(um, schema);
+                            schema.getTables().add(table);
+                        }
+                    } else {
+                        logger.debug("Schema directory {} does not exist", schemaDir);
+                    }
+                }
+            }
+            this.model = model;
             initModel();
             if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
                 runLiquibaseScripts();
@@ -160,6 +189,10 @@ public class Persistence {
             String msg = "Cannot load/parse model: " + appModelFile;
             logger.error(msg, e);
         }
+    }
+
+    protected File getModelDirectory() {
+        return new File(appModelFile.getParentFile(), FilenameUtils.getBaseName(appModelFile.getName()));
     }
 
     protected Date lastLiquibaseRunTime = new Date(0);
@@ -226,6 +259,37 @@ public class Persistence {
         m.marshal(model, tempFile);
 
         ElementsFileUtils.moveFileSafely(tempFile, appModelFile.getAbsolutePath());
+
+        File modelDir = getModelDirectory();
+        for(Database database : model.getDatabases()) {
+            File databaseDir = new File(modelDir, database.getDatabaseName());
+            for(Schema schema : database.getSchemas()) {
+                File schemaDir = new File(databaseDir, schema.getSchemaName());
+                if(schemaDir.mkdirs()) {
+                    logger.debug("Schema directory {} exists", schemaDir);
+                    File[] tableFiles = schemaDir.listFiles(new FilenameFilter() {
+                        @Override
+                        public boolean accept(File dir, String name) {
+                            return name.endsWith(".table.xml");
+                        }
+                    });
+                    for(File tableFile : tableFiles) {
+                        if(!tableFile.delete()) {
+                            logger.warn("Could not delete table file {}", tableFile.getAbsolutePath());
+                        }
+                    }
+                    for(Table table : schema.getTables()) {
+                        if(!schema.getImmediateTables().contains(table)) {
+                            File tableFile = new File(schemaDir, table.getTableName() + ".table.xml");
+                            m.marshal(table, tableFile);
+                        }
+                    }
+                } else {
+                    logger.debug("Schema directory {} does not exist", schemaDir);
+                }
+            }
+        }
+
         lastLiquibaseRunTime = new Date(0);
         logger.info("Saved xml model to file: {}", appModelFile);
     }
