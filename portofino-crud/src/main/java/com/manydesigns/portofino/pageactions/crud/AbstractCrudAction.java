@@ -78,6 +78,7 @@ import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -353,7 +354,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public Resolution jsonSearchData() throws JSONException {
         executeSearch();
 
-        long totalRecords = getTotalSearchRecords();
+        final long totalRecords = getTotalSearchRecords();
 
         setupTableForm(Mode.VIEW);
         BlobUtils.loadBlobs(tableForm, getBlobManager(), false);
@@ -377,7 +378,34 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         js.endArray();
         js.endObject();
         String jsonText = js.toString();
-        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
+        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText) {
+            @Override
+            protected void applyHeaders(HttpServletResponse response) {
+                super.applyHeaders(response);
+                Integer rowsPerPage = getCrudConfiguration().getRowsPerPage();
+                if(rowsPerPage != null && totalRecords > rowsPerPage) {
+                    int firstResult = getFirstResult() != null ? getFirstResult() : 1;
+                    int currentPage = firstResult / rowsPerPage;
+                    int lastPage = (int) (totalRecords / rowsPerPage);
+                    if(totalRecords % rowsPerPage == 0) {
+                        lastPage--;
+                    }
+                    StringBuilder sb = new StringBuilder();
+                    if(currentPage > 0) {
+                        sb.append("<").append(getLinkToPage(0)).append(">; rel=\"first\", ");
+                        sb.append("<").append(getLinkToPage(currentPage - 1)).append(">; rel=\"prev\"");
+                    }
+                    if(currentPage != lastPage) {
+                        if(currentPage > 0) {
+                            sb.append(", ");
+                        }
+                        sb.append("<").append(getLinkToPage(currentPage + 1)).append(">; rel=\"next\", ");
+                        sb.append("<").append(getLinkToPage(lastPage)).append(">; rel=\"last\"");
+                    }
+                    response.setHeader("Link", sb.toString());
+                }
+            }
+        };
     }
 
     /**
