@@ -142,7 +142,6 @@ public class Persistence {
             JAXBContext jc = JAXBContext.newInstance(Model.JAXB_MODEL_PACKAGES);
             Unmarshaller um = jc.createUnmarshaller();
             Model model = (Model) um.unmarshal(appModelFile);
-            boolean syncOnStart = false;
             File modelDir = getModelDirectory();
             for(Database database : model.getDatabases()) {
                 File databaseDir = new File(modelDir, database.getDatabaseName());
@@ -171,20 +170,6 @@ public class Persistence {
             }
             this.model = model;
             initModel();
-            if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
-                runLiquibaseScripts();
-            }
-            if (syncOnStart) {
-                List<String> databaseNames = new ArrayList<String>();
-                for (Database sourceDatabase : model.getDatabases()) {
-                    String databaseName = sourceDatabase.getDatabaseName();
-                    databaseNames.add(databaseName);
-                }
-                for (String databaseName : databaseNames) {
-                    syncDataModel(databaseName);
-                }
-                initModel();
-            }
         } catch (Exception e) {
             String msg = "Cannot load/parse model: " + appModelFile;
             logger.error(msg, e);
@@ -195,58 +180,49 @@ public class Persistence {
         return new File(appModelFile.getParentFile(), FilenameUtils.getBaseName(appModelFile.getName()));
     }
 
-    protected Date lastLiquibaseRunTime = new Date(0);
-
-    protected void runLiquibaseScripts() {
+    protected void runLiquibase(Database database) {
         logger.info("Updating database definitions");
         ResourceAccessor resourceAccessor =
                 new FileSystemResourceAccessor(appDir.getAbsolutePath());
-        for (Database database : model.getDatabases()) {
-            ConnectionProvider connectionProvider =
-                    database.getConnectionProvider();
-            String databaseName = database.getDatabaseName();
-            for(Schema schema : database.getSchemas()) {
-                String schemaName = schema.getSchemaName();
-                String changelogFileName =
-                        MessageFormat.format(
-                                changelogFileNameTemplate, databaseName + "-" + schemaName);
-                File changelogFile = new File(appDbsDir, changelogFileName);
-                if(!changelogFile.isFile()) {
-                    logger.info("Changelog file does not exist or is not a normal file, skipping: {}", changelogFile);
-                    continue;
+        ConnectionProvider connectionProvider =
+                database.getConnectionProvider();
+        String databaseName = database.getDatabaseName();
+        for(Schema schema : database.getSchemas()) {
+            String schemaName = schema.getSchemaName();
+            String changelogFileName =
+                    MessageFormat.format(
+                            changelogFileNameTemplate, databaseName + "-" + schemaName);
+            File changelogFile = new File(appDbsDir, changelogFileName);
+            if(!changelogFile.isFile()) {
+                logger.info("Changelog file does not exist or is not a normal file, skipping: {}", changelogFile);
+                continue;
+            }
+            logger.info("Running changelog file: {}", changelogFile);
+            Connection connection = null;
+            try {
+                connection = connectionProvider.acquireConnection();
+                JdbcConnection jdbcConnection = new JdbcConnection(connection);
+                liquibase.database.Database lqDatabase =
+                        DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
+                lqDatabase.setDefaultSchemaName(schemaName);
+                String relativeChangelogPath =
+                        ElementsFileUtils.getRelativePath(appDir, changelogFile, System.getProperty("file.separator"));
+                if(new File(relativeChangelogPath).isAbsolute()) {
+                    logger.warn("The application dbs dir {} is not inside the apps dir {}; using an absolute path for Liquibase update",
+                            appDbsDir, appDir);
                 }
-                if(changelogFile.lastModified() <= lastLiquibaseRunTime.getTime()) {
-                    logger.info("Changelog file not modified since last reload, skipping: {}", changelogFile);
-                    continue;
-                }
-                logger.info("Running changelog file: {}", changelogFile);
-                Connection connection = null;
-                try {
-                    connection = connectionProvider.acquireConnection();
-                    JdbcConnection jdbcConnection = new JdbcConnection(connection);
-                    liquibase.database.Database lqDatabase =
-                            DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcConnection);
-                    lqDatabase.setDefaultSchemaName(schemaName);
-                    String relativeChangelogPath =
-                            ElementsFileUtils.getRelativePath(appDir, changelogFile, System.getProperty("file.separator"));
-                    if(new File(relativeChangelogPath).isAbsolute()) {
-                        logger.warn("The application dbs dir {} is not inside the apps dir {}; using an absolute path for Liquibase update",
-                                appDbsDir, appDir);
-                    }
-                    Liquibase lq = new Liquibase(
-                            relativeChangelogPath,
-                            resourceAccessor,
-                            lqDatabase);
-                    lq.update((Contexts) null);
-                } catch (Exception e) {
-                    String msg = "Couldn't update database: " + schemaName;
-                    logger.error(msg, e);
-                } finally {
-                    connectionProvider.releaseConnection(connection);
-                }
+                Liquibase lq = new Liquibase(
+                        relativeChangelogPath,
+                        resourceAccessor,
+                        lqDatabase);
+                lq.update((Contexts) null);
+            } catch (Exception e) {
+                String msg = "Couldn't update database: " + schemaName;
+                logger.error(msg, e);
+            } finally {
+                connectionProvider.releaseConnection(connection);
             }
         }
-        lastLiquibaseRunTime = new Date();
     }
 
     public synchronized void saveXmlModel() throws IOException, JAXBException {
@@ -289,8 +265,6 @@ public class Persistence {
                 }
             }
         }
-
-        lastLiquibaseRunTime = new Date(0);
         logger.info("Saved xml model to file: {}", appModelFile);
     }
 
@@ -375,15 +349,14 @@ public class Persistence {
         return model;
     }
 
-    public void syncDataModel(String databaseName) throws Exception {
-        if(!configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
-            logger.warn("syncDataModel called, but Liquibase is not enabled");
-            return;
+    public synchronized void syncDataModel(String databaseName) throws Exception {
+        Database sourceDatabase = DatabaseLogic.findDatabaseByName(model, databaseName);
+        if(configuration.getBoolean(DatabaseModule.LIQUIBASE_ENABLED, true)) {
+            runLiquibase(sourceDatabase);
+        } else {
+            logger.debug("syncDataModel called, but Liquibase is not enabled");
         }
-        Database sourceDatabase =
-            DatabaseLogic.findDatabaseByName(model, databaseName);
-        ConnectionProvider connectionProvider =
-                sourceDatabase.getConnectionProvider();
+        ConnectionProvider connectionProvider = sourceDatabase.getConnectionProvider();
         DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
         Database targetDatabase = dbSyncer.syncDatabase(model);
         model.getDatabases().remove(sourceDatabase);
@@ -444,7 +417,14 @@ public class Persistence {
     // User
     //**************************************************************************
 
-    public void shutdown() {
+    public void start() {
+        loadXmlModel();
+        for(Database database : model.getDatabases()) {
+            runLiquibase(database);
+        }
+    }
+
+    public void stop() {
         for(HibernateDatabaseSetup setup : setups.values()) {
             //TODO It is the responsibility of the application to ensure that there are no open Sessions before calling close().
             //http://ajava.org/online/hibernate3api/org/hibernate/SessionFactory.html#close%28%29

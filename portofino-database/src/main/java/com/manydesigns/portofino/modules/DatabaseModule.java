@@ -121,13 +121,13 @@ public class DatabaseModule implements Module {
 
     @Override
     public void start() {
-        persistence.loadXmlModel();
+        persistence.start();
         status = ModuleStatus.STARTED;
     }
 
     @Override
     public void stop() {
-        persistence.shutdown();
+        persistence.stop();
         status = ModuleStatus.STOPPED;
     }
 

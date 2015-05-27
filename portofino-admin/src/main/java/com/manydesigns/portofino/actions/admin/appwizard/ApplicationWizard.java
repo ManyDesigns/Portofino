@@ -434,7 +434,9 @@ public class ApplicationWizard extends AbstractPageAction {
         Database targetDatabase;
         DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
         try {
-            targetDatabase = dbSyncer.syncDatabase(refModel);
+            synchronized (persistence) {
+                targetDatabase = dbSyncer.syncDatabase(refModel);
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("error.in.database.synchronization._", e));
