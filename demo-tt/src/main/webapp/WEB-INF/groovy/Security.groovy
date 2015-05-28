@@ -20,6 +20,7 @@ import org.hibernate.criterion.Restrictions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.apache.shiro.authc.*
+import com.manydesigns.portofino.logic.SecurityLogic
 
 class Security extends AbstractPortofinoRealm {
 
@@ -64,7 +65,7 @@ class Security extends AbstractPortofinoRealm {
         } else if (principal.validated == null) {
             throw new DisabledAccountException("User not validated");
         } else {
-            logger.debug("Aggiorno i campi accesso.");
+            logger.debug("Updating access fields.");
             updateAccess(principal, new Date());
             session.update("users", (Object)principal);
             session.getTransaction().commit();
@@ -165,6 +166,7 @@ class Security extends AbstractPortofinoRealm {
         List<String> result = new ArrayList<String>()
         if (principal.admin) {
             result.add(ADMIN_GROUP_NAME);
+            //result.add(SecurityLogic.getAdministratorsGroup(portofinoConfiguration));
         }
         if (principal.project_manager) {
             result.add(PROJECT_MANAGER_GROUP_NAME);
