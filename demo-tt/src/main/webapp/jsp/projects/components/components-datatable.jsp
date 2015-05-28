@@ -87,6 +87,7 @@
             buf.addAttribute("href", actionBean.getLinkToPage(0));
         }
         buf.addAttribute("title", ElementsThreadLocals.getText("first"));
+        buf.addAttribute("accesskey", ElementsThreadLocals.getText("f"));
         buf.writeNoHtmlEscape("&lt;&lt;");
         buf.closeElement("a");
         buf.closeElement("li");
@@ -102,6 +103,7 @@
             buf.addAttribute("href", actionBean.getLinkToPage(currentPage - 1));
         }
         buf.addAttribute("title", ElementsThreadLocals.getText("previous"));
+        buf.addAttribute("accesskey", ElementsThreadLocals.getText("p"));
         buf.writeNoHtmlEscape("&lt;");
         buf.closeElement("a");
         buf.closeElement("li");
@@ -145,6 +147,7 @@
             buf.addAttribute("href", actionBean.getLinkToPage(currentPage + 1));
         }
         buf.addAttribute("title", ElementsThreadLocals.getText("next"));
+        buf.addAttribute("accesskey", ElementsThreadLocals.getText("n"));
         buf.writeNoHtmlEscape("&gt;");
         buf.closeElement("a");
         buf.closeElement("li");
@@ -160,6 +163,7 @@
             buf.addAttribute("href", actionBean.getLinkToPage(lastPage));
         }
         buf.addAttribute("title", ElementsThreadLocals.getText("last") + " (" + (lastPage + 1) + ")");
+        buf.addAttribute("accesskey", ElementsThreadLocals.getText("l"));
         buf.writeNoHtmlEscape("&gt;&gt;");
         buf.closeElement("a");
         buf.closeElement("li");

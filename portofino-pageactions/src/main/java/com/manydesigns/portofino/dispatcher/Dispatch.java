@@ -25,7 +25,7 @@ import com.manydesigns.portofino.pages.NavigationRoot;
 import net.sourceforge.stripes.action.ActionBean;
 
 /**
- * A <i>Dispatch</i> is an object representing a path of page instances from the root of the application,
+ * A <em>Dispatch</em> is an object representing a path of page instances from the root of the application,
  * where each page except the first is an instance of a child (subdirectory) of the previous one.
  * Additionally, a dispatch retains information about the path that was requested to the Web server
  * and that generated the dispatch itself.

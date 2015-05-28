@@ -21,7 +21,7 @@
                     <span class="input-group-btn">
                         <a onclick="$('#captcha-image').attr('src', '${pageContext.request.contextPath}${actionBean.context.actionPath}?captcha=' + Math.random());"
                            class="btn btn-default btn-sm" >
-                            <i class="glyphicon glyphicon-refresh"></i>
+                            <em class="glyphicon glyphicon-refresh"></em>
                         </a>
                     </span>
                 </div>

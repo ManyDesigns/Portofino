@@ -11,7 +11,7 @@
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
         <div>
-            <strong><i class="glyphicon glyphicon-tag"></i> Ticket description:</strong>
+            <strong><em class="glyphicon glyphicon-tag"></em> Ticket description:</strong>
         </div>
         <c:if test="${not empty actionBean.ticket.description}">
             <div><c:out value="${mde:formattedText(actionBean.ticket.description, false)}" escapeXml="false"/></div>

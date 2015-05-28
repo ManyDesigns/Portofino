@@ -87,7 +87,7 @@ public class RangeSearchField extends AbstractSearchField {
         xb.openElement("div");
         xb.addAttribute("class", "input-group");
         xb.openElement("label");
-        xb.addAttribute("for", minId);
+        //xb.addAttribute("for", minId);
         xb.addAttribute("class", ATTR_NAME_HTML_CLASS + " input-group-addon");
         xb.write(StringUtils.capitalize(label));
         xb.closeElement("label");

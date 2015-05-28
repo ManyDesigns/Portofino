@@ -43,7 +43,7 @@
                 <stripes:link href="/login" class="btn">
                     <stripes:param name="logout"/>
                     Log out
-                    <i class="glyphicon glyphicon-chevron-right"></i>
+                    <em class="glyphicon glyphicon-chevron-right"></em>
                 </stripes:link>
             </div>
         </div>

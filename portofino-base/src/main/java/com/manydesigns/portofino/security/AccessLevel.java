@@ -21,7 +21,7 @@
 package com.manydesigns.portofino.security;
 
 /**
- * Enumerates the possible <i>access levels</i> to a page. In order of priority:
+ * Enumerates the possible <em>access levels</em> to a page. In order of priority:
  * <ul>
  *     <li><strong><code>NONE</code></strong> - neither grants, nor forbids access.</li>
  *     <li><strong><code>VIEW</code></strong> - grants access to the page in read-only mode.</li>

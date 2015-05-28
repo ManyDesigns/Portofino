@@ -60,7 +60,7 @@
         width: 15%; white-space: nowrap;
     }
 </style>
-<h3><%= StringUtils.capitalize(dateFormatter.print(referenceDateTime)) %></h3>
+<h1><%= StringUtils.capitalize(dateFormatter.print(referenceDateTime)) %></h1>
 <div>
     <div class="pull-right" >
         <button type="submit" name="monthView" class="btn btn-default btn-sm">
@@ -77,12 +77,12 @@
             <fmt:message key="today" />
         </button>
         <button type="submit" name="prevDay" class="btn btn-default btn-sm">
-            <i class="glyphicon glyphicon-chevron-left"></i>
+            <em class="glyphicon glyphicon-chevron-left"></em>
             <fmt:message key="previous" />
         </button>
         <button type="submit" name="nextDay" class="btn btn-default btn-sm">
             <fmt:message key="next" />
-            <i class="glyphicon glyphicon-chevron-right"></i>
+            <em class="glyphicon glyphicon-chevron-right"></em>
         </button>
     </div>
 </div>
@@ -158,14 +158,14 @@
 
         PresentationHelper.writeDialogCloseButtonInHeader(xhtmlBuffer);
 
-        xhtmlBuffer.openElement("h3");
+        xhtmlBuffer.openElement("h1");
         xhtmlBuffer.addAttribute("class", "modal-title");
         if(event.getReadUrl() != null) {
             xhtmlBuffer.writeAnchor(event.getReadUrl(), event.getDescription());
         } else {
             xhtmlBuffer.write(event.getDescription());
         }
-        xhtmlBuffer.closeElement("h3");
+        xhtmlBuffer.closeElement("h1");
         xhtmlBuffer.closeElement("div"); // modal-header
 
         // modal-body

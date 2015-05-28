@@ -51,40 +51,40 @@
                             <ul class="dropdown-menu">
                                 <li>
                                     <a href="javascript:portofino.enablePageActionDragAndDrop($(this), '${actionBean.context.actionPath}');">
-                                        <i class="glyphicon glyphicon-file"></i> Edit layout
+                                        <em class="glyphicon glyphicon-file"></em> Edit layout
                                     </a>
                                 </li>
                                 <li>
                                     <stripes:link beanclass="com.manydesigns.portofino.actions.admin.page.PageAdminAction" event="pageChildren">
                                         <stripes:param name="originalPath" value="${actionBean.context.actionPath}"/>
-                                        <i class="glyphicon glyphicon-folder-open"></i> Page children
+                                        <em class="glyphicon glyphicon-folder-open"></em> Page children
                                     </stripes:link>
                                 </li>
                                 <li>
                                     <stripes:link beanclass="com.manydesigns.portofino.actions.admin.page.PageAdminAction" event="newPage">
                                         <stripes:param name="originalPath" value="${actionBean.context.actionPath}"/>
-                                        <i class="glyphicon-plus"></i> Add new page
+                                        <em class="glyphicon-plus"></em> Add new page
                                     </stripes:link>
                                 </li>
                                 <li>
                                     <a href="javascript:portofino.confirmDeletePage('<c:out value="${actionBean.context.actionPath}"/>','<c:out value="${pageContext.request.contextPath}"/>');">
-                                        <i class="glyphicon glyphicon-minus"></i> Delete page
+                                        <em class="glyphicon glyphicon-minus"></em> Delete page
                                     </a>
                                 </li>
                                 <li>
                                     <a href="javascript:portofino.showCopyPageDialog('<c:out value="${actionBean.context.actionPath}"/>','<c:out value="${pageContext.request.contextPath}"/>');">
-                                        <i class="glyphicon glyphicon-file"></i> Copy page
+                                        <em class="glyphicon glyphicon-file"></em> Copy page
                                     </a>
                                 </li>
                                 <li>
                                     <a href="javascript:portofino.showMovePageDialog('<c:out value="${actionBean.context.actionPath}"/>','<c:out value="${pageContext.request.contextPath}"/>');">
-                                        <i class="glyphicon glyphicon-share"></i> Move page
+                                        <em class="glyphicon glyphicon-share"></em> Move page
                                     </a>
                                 </li>
                                 <li>
                                     <stripes:link beanclass="com.manydesigns.portofino.actions.admin.page.PageAdminAction" event="pagePermissions">
                                         <stripes:param name="originalPath" value="${actionBean.context.actionPath}"/>
-                                        <i class="glyphicon glyphicon-user"></i> Page permissions
+                                        <em class="glyphicon glyphicon-user"></em> Page permissions
                                     </stripes:link>
                                 </li>
                             </ul>
@@ -92,7 +92,7 @@
                     </shiro:hasRole>
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="glyphicon glyphicon-user"></i>
+                            <em class="glyphicon glyphicon-user"></em>
                             <c:out value="${principal.first_name} ${principal.last_name}"/> <b class="caret"></b>
                         </a>
                         <ul class="dropdown-menu">
