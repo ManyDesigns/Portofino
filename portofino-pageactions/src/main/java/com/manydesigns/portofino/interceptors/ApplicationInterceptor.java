@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -20,20 +20,26 @@
 
 package com.manydesigns.portofino.interceptors;
 
+import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.dispatcher.*;
+import com.manydesigns.portofino.pageactions.PageActionLogic;
 import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.controller.ExecutionContext;
 import net.sourceforge.stripes.controller.Interceptor;
 import net.sourceforge.stripes.controller.Intercepts;
 import net.sourceforge.stripes.controller.LifecycleStage;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.http.HttpServletRequest;
+import java.text.MessageFormat;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -44,10 +50,51 @@ import javax.servlet.http.HttpServletRequest;
 @Intercepts(LifecycleStage.CustomValidation)
 public class ApplicationInterceptor implements Interceptor {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public final static Logger logger =
             LoggerFactory.getLogger(ApplicationInterceptor.class);
+
+    public static Resolution dispatch(ActionBeanContext actionContext) throws Exception {
+        Dispatch dispatch = DispatcherUtil.getDispatch(actionContext);
+        if (dispatch != null) {
+            HttpServletRequest request = actionContext.getRequest();
+            logger.debug("Preparing PageActions");
+            for(PageInstance page : dispatch.getPageInstancePath()) {
+                if(page.getParent() == null) {
+                    logger.debug("Not preparing root");
+                    continue;
+                }
+                if(page.isPrepared()) {
+                    continue;
+                }
+                logger.debug("Preparing PageAction {}", page);
+                PageAction actionBean = page.getActionBean();
+                try {
+                    actionBean.setContext(actionContext);
+                    Resolution resolution = actionBean.preparePage();
+                    if(resolution != null) {
+                        logger.debug("PageAction prepare returned a resolution: {}", resolution);
+                        request.setAttribute(DispatcherLogic.INVALID_PAGE_INSTANCE, page);
+                        return resolution;
+                    }
+                    page.setPrepared(true);
+                } catch (Throwable t) {
+                    request.setAttribute(DispatcherLogic.INVALID_PAGE_INSTANCE, page);
+                    logger.error("PageAction prepare failed for " + page, t);
+                    if(!PageActionLogic.isEmbedded(actionBean)) {
+                        String msg = MessageFormat.format
+                                (ElementsThreadLocals.getText("this.page.has.thrown.an.exception.during.execution"), ExceptionUtils.getRootCause(t));
+                        SessionMessages.addErrorMessage(msg);
+                    }
+                    return new ForwardResolution("/m/pageactions/redirect-to-last-working-page.jsp");
+                }
+            }
+            PageInstance pageInstance = dispatch.getLastPageInstance();
+            request.setAttribute(RequestAttributes.PAGE_INSTANCE, pageInstance);
+        }
+        return null;
+    }
 
     public Resolution intercept(ExecutionContext context) throws Exception {
         logger.debug("Retrieving Stripes objects");
@@ -64,7 +111,7 @@ public class ApplicationInterceptor implements Interceptor {
             request.setAttribute(RequestAttributes.STOP_WATCH, stopWatch);
         }
 
-        Resolution resolution = DispatcherLogic.dispatch(actionContext);
+        Resolution resolution = dispatch(actionContext);
         return resolution != null ? resolution : context.proceed();
     }
 

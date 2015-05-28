@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -22,6 +22,7 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.KeyValueAccessor;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.ognl.OgnlUtils;
@@ -44,9 +45,9 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public abstract class AbstractField implements Field {
+public abstract class AbstractField<T> implements Field<T> {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public static final String INPUT_CONTAINER_CSS_CLASS = "input-container";
     public static final String FORM_LABEL_CSS_CLASS = "control-label";
@@ -287,7 +288,24 @@ public abstract class AbstractField implements Field {
         bulkChecked = (req.getParameter(bulkCheckboxName) != null);
     }
 
-    public void readFromObject(Object obj) {
+    public void readFromObject(Object obj) {}
+
+    @Override
+    public void readFrom(KeyValueAccessor keyValueAccessor) {
+        if (mode.isView(insertable, updatable)) {
+            return;
+        }
+        Object value = keyValueAccessor.get(accessor.getName());
+        if(value instanceof String) {
+            setStringValue((String) value);
+        } else {
+            setValue((T) value);
+        }
+    }
+
+    @Override
+    public void writeTo(KeyValueAccessor keyValueAccessor) {
+        keyValueAccessor.set(accessor.getName(), getValue());
     }
 
     public String getDisplayValue() {

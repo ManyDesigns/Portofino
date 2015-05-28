@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+* Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
 * http://www.manydesigns.com/
 *
 * Unless you have purchased a commercial license agreement from ManyDesigns srl,
@@ -37,6 +37,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.DispatchElement;
 import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.modules.MailModule;
@@ -54,7 +55,7 @@ import net.sourceforge.stripes.action.Resolution;
 @PageActionName("Login")
 public class DefaultLoginAction extends LoginAction implements PageAction {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     //--------------------------------------------------------------------------
     // Properties
@@ -122,6 +123,11 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     @Override
     public void setPageInstance(PageInstance pageInstance) {
         this.pageInstance = pageInstance;
+    }
+
+    @Override
+    public DispatchElement consumePathFragment(String pathFragment) {
+        return null;
     }
 
 }

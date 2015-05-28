@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -21,6 +21,7 @@
 package com.manydesigns.elements.composites;
 
 import com.manydesigns.elements.Element;
+import com.manydesigns.elements.KeyValueAccessor;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 
@@ -39,7 +40,7 @@ public abstract class AbstractCompositeElement<T extends Element>
         extends ArrayList<T>
         implements Element {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     protected String id;
 

@@ -11,6 +11,7 @@ import com.manydesigns.portofino.buttons.annotations.Guard
 import com.manydesigns.portofino.security.AccessLevel
 import com.manydesigns.portofino.security.RequiresPermissions
 import com.manydesigns.portofino.security.SupportsPermissions
+import javax.ws.rs.GET
 import net.sourceforge.stripes.action.RedirectResolution
 import net.sourceforge.stripes.action.Resolution
 import org.apache.shiro.SecurityUtils

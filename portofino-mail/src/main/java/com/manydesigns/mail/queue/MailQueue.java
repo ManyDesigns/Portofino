@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -32,7 +32,7 @@ import java.util.List;
  */
 public interface MailQueue {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     String enqueue(Email email) throws QueueException;
 

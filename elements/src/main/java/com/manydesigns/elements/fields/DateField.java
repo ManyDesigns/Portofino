@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -42,9 +42,9 @@ import java.util.Date;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class DateField extends AbstractTextField {
+public class DateField extends AbstractTextField<Date> {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -104,20 +104,7 @@ public class DateField extends AbstractTextField {
             return;
         }
 
-        stringValue = reqValue.trim();
-        dateFormatError = false;
-        dateValue = null;
-
-        if (stringValue.length() == 0) {
-            return;
-        }
-
-        try {
-            dateValue = Util.parseDateTime(dateTimeFormatter, stringValue, containsTime);
-        } catch (Throwable e) {
-            dateFormatError = true;
-            logger.debug("Cannot parse date: {}", stringValue);
-        }
+        setStringValue(reqValue.trim());
     }
 
     @Override
@@ -190,6 +177,24 @@ public class DateField extends AbstractTextField {
                     "$(function() { " +
                         "configureBulkEditDateField('" + id + "', '" + bulkCheckboxName + "'); " +
                     "});");
+        }
+    }
+
+    @Override
+    public void setStringValue(String stringValue) {
+        super.setStringValue(stringValue);
+        dateFormatError = false;
+        dateValue = null;
+
+        if (stringValue.length() == 0) {
+            return;
+        }
+
+        try {
+            dateValue = Util.parseDateTime(dateTimeFormatter, stringValue, containsTime);
+        } catch (Throwable e) {
+            dateFormatError = true;
+            logger.debug("Cannot parse date: {}", stringValue);
         }
     }
 

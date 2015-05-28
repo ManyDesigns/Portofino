@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -38,7 +38,7 @@ import java.sql.Types;
 */
 public class Type {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     //**************************************************************************
     // Logger
@@ -138,8 +138,8 @@ public class Type {
                 return Boolean.class;
             case Types.CHAR:
             case Types.VARCHAR:
-            case -15: // Types.NCHAR is on JDBC4/Java6 - we try to stay compatible with JDBC3/Java5
-            case -9:  // Types.NVARCHAR (same)
+            case Types.NCHAR:
+            case Types.NVARCHAR:
                 return String.class;
             case Types.DATE:
                 return java.sql.Date.class;

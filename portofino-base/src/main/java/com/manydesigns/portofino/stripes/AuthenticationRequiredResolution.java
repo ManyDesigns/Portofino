@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -24,9 +24,9 @@ import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.stripes.ElementsActionBeanContext;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.modules.BaseModule;
+import net.sourceforge.stripes.action.ErrorResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.StreamingResolution;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
@@ -46,14 +46,15 @@ import java.util.Map;
  */
 public class AuthenticationRequiredResolution implements Resolution {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public final static Logger logger =
             LoggerFactory.getLogger(AuthenticationRequiredResolution.class);
 
-    public static final int STATUS = 403;
+    public static final int STATUS = 401;
 
     private String errorMessage;
+    public static final String LOGIN_PAGE_HEADER = "X-Portofino-Login-Page";
 
     public AuthenticationRequiredResolution() {}
 
@@ -65,33 +66,30 @@ public class AuthenticationRequiredResolution implements Resolution {
         if(request.getParameter("__portofino_quiet_auth_failure") != null) {
             return;
         }
-        ElementsActionBeanContext context = new ElementsActionBeanContext();
-        context.setRequest(request);
-        String originalPath = context.getActionPath();
-        UrlBuilder urlBuilder =
-                new UrlBuilder(Locale.getDefault(), originalPath, false);
-        Map<?, ?> parameters = request.getParameterMap();
-        urlBuilder.addParameters(parameters);
-        String returnUrl = urlBuilder.toString();
-        boolean ajax = "true".equals(request.getParameter("ajax"));
-        ServletContext servletContext = ElementsThreadLocals.getServletContext();
+        ServletContext servletContext = request.getServletContext();
         Configuration configuration =
                 (Configuration) servletContext.getAttribute(BaseModule.PORTOFINO_CONFIGURATION);
-        if (!ajax) {
+        String loginPage = configuration.getString(PortofinoProperties.LOGIN_PAGE);
+        if (response.getContentType() == null || response.getContentType().contains("text/html")) {
+            ElementsActionBeanContext context = new ElementsActionBeanContext();
+            context.setRequest(request);
+            String originalPath = context.getActionPath();
+            UrlBuilder urlBuilder =
+                    new UrlBuilder(Locale.getDefault(), originalPath, false);
+            Map<?, ?> parameters = request.getParameterMap();
+            urlBuilder.addParameters(parameters);
+            String returnUrl = urlBuilder.toString();
             logger.info("Anonymous user not allowed to see {}. Redirecting to login.", originalPath);
-            String loginPage = configuration.getString(PortofinoProperties.LOGIN_PAGE);
             RedirectResolution redirectResolution =
                     new RedirectResolution(loginPage, true);
             redirectResolution.addParameter("returnUrl", returnUrl);
             redirectResolution.execute(request, response);
         } else {
             logger.debug("AJAX call while user disconnected");
-            //TODO where to redirect?
-            String loginPage = configuration.getString(PortofinoProperties.LOGIN_PAGE);
             UrlBuilder loginUrlBuilder =
-                    new UrlBuilder(Locale.getDefault(), loginPage, false);
-            response.setStatus(STATUS);
-            new StreamingResolution("text/plain", loginUrlBuilder.toString()).execute(request, response);
+                    new UrlBuilder(request.getLocale(), loginPage, false);
+            response.setHeader(LOGIN_PAGE_HEADER, loginUrlBuilder.toString());
+            new ErrorResolution(STATUS, errorMessage).execute(request, response);
         }
     }
 }

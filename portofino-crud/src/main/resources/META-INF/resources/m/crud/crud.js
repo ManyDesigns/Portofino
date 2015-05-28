@@ -24,7 +24,7 @@ portofino.dataTable = function(elem) {
                     setupDataTable(newElem);
                 },
                 error: function(xhr, status, errorThrown) {
-                    if(xhr.status == 403) {
+                    if(xhr.status == 401) {
                         portofino.redirectToLogin(xhr);
                     } else {
                         $(document).trigger("portofino/datatable/load/error", [datatableDescription, xhr, status, errorThrown]);

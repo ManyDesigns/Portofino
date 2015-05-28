@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -102,7 +102,7 @@ import java.util.List;
 @UrlBinding(ApplicationWizard.URL_BINDING)
 public class ApplicationWizard extends AbstractPageAction {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public static final String URL_BINDING = "/actions/admin/wizard";
 
@@ -434,7 +434,9 @@ public class ApplicationWizard extends AbstractPageAction {
         Database targetDatabase;
         DatabaseSyncer dbSyncer = new DatabaseSyncer(connectionProvider);
         try {
-            targetDatabase = dbSyncer.syncDatabase(refModel);
+            synchronized (persistence) {
+                targetDatabase = dbSyncer.syncDatabase(refModel);
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             SessionMessages.addErrorMessage(ElementsThreadLocals.getText("error.in.database.synchronization._", e));

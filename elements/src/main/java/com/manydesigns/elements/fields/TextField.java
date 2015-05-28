@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -41,9 +41,9 @@ import java.lang.annotation.Annotation;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class TextField extends AbstractTextField {
+public class TextField extends AbstractTextField<String> {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     protected boolean highlightLinks = false;
     protected boolean multiline = false;
@@ -208,6 +208,11 @@ public class TextField extends AbstractTextField {
 
     public String getValue() {
         return stringValue;
+    }
+
+    @Override
+    public void setValue(String value) {
+        stringValue = value;
     }
 
     //**************************************************************************

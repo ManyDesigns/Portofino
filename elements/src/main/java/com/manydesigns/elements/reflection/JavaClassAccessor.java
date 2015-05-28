@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -44,7 +44,7 @@ import java.util.*;
 */
 public class JavaClassAccessor implements ClassAccessor {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     //**************************************************************************
     // Constants
@@ -113,6 +113,10 @@ public class JavaClassAccessor implements ClassAccessor {
             PropertyDescriptor[] propertyDescriptors =
                     beanInfo.getPropertyDescriptors();
             for (PropertyDescriptor current : propertyDescriptors) {
+                if(current.getReadMethod() == null) {
+                    logger.debug("Skipping unreadable property {}", current.getName());
+                    continue;
+                }
                 JavaPropertyAccessor accessor = new JavaPropertyAccessor(current);
                 if(isValidProperty(accessor)) {
                     accessorList.add(accessor);

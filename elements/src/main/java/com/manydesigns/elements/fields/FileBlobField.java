@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -44,9 +44,9 @@ import java.util.concurrent.Callable;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class FileBlobField extends AbstractField implements MultipartRequestField {
+public class FileBlobField extends AbstractField<Blob> implements MultipartRequestField<Blob> {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public static final String UPLOAD_KEEP = "_keep";
     public static final String UPLOAD_MODIFY = "_modify";
@@ -117,6 +117,13 @@ public class FileBlobField extends AbstractField implements MultipartRequestFiel
             return null;
         } else {
             return blob.getFilename();
+        }
+    }
+
+    @Override
+    public void setStringValue(String stringValue) {
+        if(blob != null) {
+            blob.setFilename(stringValue);
         }
     }
 

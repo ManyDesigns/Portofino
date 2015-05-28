@@ -44,11 +44,6 @@ Site: http://xmlgraphics.apache.org/fop/
 File: fop-1.0.jar
 License: Apache License v2.0
 
-Apache HttpClient
-Site: http://hc.apache.org/index.html
-Files: httpclient-4.0.jar, httpcore-4.0.1.jar
-License: Apache License v2.0
-
 Apache Shiro
 Site: http://shiro.apache.org
 Files: shiro-core-1.2.3.jar, shiro-web-1.2.3.jar

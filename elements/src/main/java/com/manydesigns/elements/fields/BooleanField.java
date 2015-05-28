@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -33,9 +33,9 @@ import javax.servlet.http.HttpServletRequest;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class BooleanField extends AbstractField {
+public class BooleanField extends AbstractField<Boolean> {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     //**************************************************************************
     // Costanti
@@ -93,15 +93,7 @@ public class BooleanField extends AbstractField {
             return;
         }
 
-        if (TRUE_VALUE.equals(stringValue)) {
-            booleanValue = true;
-        } else if (FALSE_VALUE.equals(stringValue)) {
-            booleanValue = false;
-        } else if (required) {
-            booleanValue = false;
-        } else { // not required
-            booleanValue = null;
-        }
+        setStringValue(stringValue);
     }
 
     public boolean validate() {
@@ -141,7 +133,6 @@ public class BooleanField extends AbstractField {
             xb.openElement("div");
             xb.addAttribute("class", "checkbox");
             xb.openElement("label");
-            xb.addAttribute("class", "checkbox-inline");
             xb.writeInputCheckbox(id, inputName, TRUE_VALUE,
                     BooleanUtils.isTrue(booleanValue), false, null);
             xb.writeInputHidden(checkInputName, CHECK_VALUE);
@@ -199,6 +190,18 @@ public class BooleanField extends AbstractField {
             return TRUE_VALUE;
         } else {
             return FALSE_VALUE;
+        }
+    }
+
+    public void setStringValue(String stringValue) {
+        if (TRUE_VALUE.equals(stringValue)) {
+            booleanValue = true;
+        } else if (FALSE_VALUE.equals(stringValue)) {
+            booleanValue = false;
+        } else if (required) {
+            booleanValue = false;
+        } else { // not required
+            booleanValue = null;
         }
     }
 

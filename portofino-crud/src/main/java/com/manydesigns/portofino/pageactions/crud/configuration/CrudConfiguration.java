@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -23,6 +23,7 @@ package com.manydesigns.portofino.pageactions.crud.configuration;
 import com.manydesigns.elements.annotations.CssClass;
 import com.manydesigns.elements.annotations.LabelI18N;
 import com.manydesigns.elements.annotations.Multiline;
+import com.manydesigns.elements.annotations.Required;
 import com.manydesigns.elements.util.BootstrapSizes;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.ConfigurationWithDefaults;
@@ -49,7 +50,7 @@ import java.util.List;
 @XmlAccessorType(value = XmlAccessType.NONE)
 public class CrudConfiguration implements PageActionConfiguration, ConfigurationWithDefaults {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
     
 
     //**************************************************************************
@@ -71,6 +72,7 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
     protected boolean largeResultSet;
 
     protected Integer rowsPerPage;
+    protected Integer columns = 1;
 
     @Inject(DatabaseModule.PERSISTENCE)
     public Persistence persistence;
@@ -258,4 +260,14 @@ public class CrudConfiguration implements PageActionConfiguration, Configuration
         this.rowsPerPage = rowsPerPage;
     }
 
+    @Required
+    @CssClass(BootstrapSizes.COL_SM_1)
+    @XmlAttribute(required = false)
+    public Integer getColumns() {
+        return columns;
+    }
+
+    public void setColumns(Integer columns) {
+        this.columns = columns;
+    }
 }

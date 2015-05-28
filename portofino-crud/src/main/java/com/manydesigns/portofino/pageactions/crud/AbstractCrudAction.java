@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -27,8 +27,8 @@ import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.blobs.BlobUtils;
-import com.manydesigns.elements.fields.FileBlobField;
 import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.FileBlobField;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.TextField;
 import com.manydesigns.elements.forms.FieldSet;
@@ -42,7 +42,9 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.elements.text.OgnlTextFormat;
+import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.MimeTypes;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
@@ -69,16 +71,21 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.*;
@@ -123,7 +130,7 @@ import java.util.regex.Pattern;
  */
 public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public final static String SEARCH_STRING_PARAM = "searchString";
     public final static String prefix = "";
@@ -345,10 +352,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     public Resolution jsonSearchData() throws JSONException {
-        setupSearchForm();
-        loadObjects();
+        executeSearch();
 
-        long totalRecords = getTotalSearchRecords();
+        final long totalRecords = getTotalSearchRecords();
 
         setupTableForm(Mode.VIEW);
         BlobUtils.loadBlobs(tableForm, getBlobManager(), false);
@@ -366,13 +372,40 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             js.object()
                     .key("__rowKey")
                     .value(row.getKey());
-            fieldsToJson(js, row);
+            FormUtil.fieldsToJson(js, row);
             js.endObject();
         }
         js.endArray();
         js.endObject();
         String jsonText = js.toString();
-        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
+        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText) {
+            @Override
+            protected void applyHeaders(HttpServletResponse response) {
+                super.applyHeaders(response);
+                Integer rowsPerPage = getCrudConfiguration().getRowsPerPage();
+                if(rowsPerPage != null && totalRecords > rowsPerPage) {
+                    int firstResult = getFirstResult() != null ? getFirstResult() : 1;
+                    int currentPage = firstResult / rowsPerPage;
+                    int lastPage = (int) (totalRecords / rowsPerPage);
+                    if(totalRecords % rowsPerPage == 0) {
+                        lastPage--;
+                    }
+                    StringBuilder sb = new StringBuilder();
+                    if(currentPage > 0) {
+                        sb.append("<").append(getLinkToPage(0)).append(">; rel=\"first\", ");
+                        sb.append("<").append(getLinkToPage(currentPage - 1)).append(">; rel=\"prev\"");
+                    }
+                    if(currentPage != lastPage) {
+                        if(currentPage > 0) {
+                            sb.append(", ");
+                        }
+                        sb.append("<").append(getLinkToPage(currentPage + 1)).append(">; rel=\"next\", ");
+                        sb.append("<").append(getLinkToPage(lastPage)).append(">; rel=\"last\"");
+                    }
+                    response.setHeader("Link", sb.toString());
+                }
+            }
+        };
     }
 
     /**
@@ -425,13 +458,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         form.readFromObject(object);
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
-        JSONStringer js = new JSONStringer();
-        js.object();
-        List<Field> fields = new ArrayList<Field>();
-        collectVisibleFields(form, fields);
-        fieldsToJson(js, fields);
-        js.endObject();
-        String jsonText = js.toString();
+        String jsonText = FormUtil.writeToJson(form);
         return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
     }
 
@@ -1003,10 +1030,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected Resolution notInUseCase(ActionBeanContext context, List<String> parameters) {
-        logger.info("Not in use case: " + crudConfiguration.getName());
-        String msg = ElementsThreadLocals.getText("object.not.found._", StringUtils.join(parameters, "/"));
-        SessionMessages.addWarningMessage(msg);
-        return new ForwardResolution("/m/pageactions/redirect-to-last-working-page.jsp");
+        logger.debug("Not in use case: {}", crudConfiguration.getName());
+        return new NotInUseCaseResolution(StringUtils.join(parameters, "/"));
     }
 
     /**
@@ -1165,12 +1190,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }
         }
 
-        String readLinkExpression = getReadLinkExpression();
-        OgnlTextFormat hrefFormat =
-                OgnlTextFormat.create(readLinkExpression);
-        hrefFormat.setUrl(true);
-        String encoding = getUrlEncoding();
-        hrefFormat.setEncoding(encoding);
+        OgnlTextFormat hrefFormat = getReadURLFormat();
 
         if(isShowingKey) {
             logger.debug("TableForm: configuring detail links for primary key properties");
@@ -1339,7 +1359,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Configures the builder for the search detail (view, create, edit) form.
+     * Configures the builder for the detail form (view, create, edit).
      * You can override this method to customize how the form is generated
      * (e.g. adding custom links on specific properties, hiding or showing properties
      * based on some runtime condition, etc.).
@@ -1348,7 +1368,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @return the form builder.
      */
     protected FormBuilder configureFormBuilder(FormBuilder formBuilder, Mode mode) {
-        formBuilder.configPrefix(prefix).configMode(mode);
+        formBuilder.configPrefix(prefix).configMode(mode).configNColumns(crudConfiguration.getColumns());
         configureFormSelectionProviders(formBuilder);
         return formBuilder;
     }
@@ -1411,12 +1431,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 Field field = fieldIterator.next();
                 if (field instanceof FileBlobField) {
                     if(baseUrl == null) {
-                        String readLinkExpression = getReadLinkExpression();
-                        String encoding = getUrlEncoding();
-                        OgnlTextFormat hrefFormat =
-                                OgnlTextFormat.create(readLinkExpression);
-                        hrefFormat.setUrl(true);
-                        hrefFormat.setEncoding(encoding);
+                        OgnlTextFormat hrefFormat = getReadURLFormat();
                         baseUrl = hrefFormat.format(obj);
                     }
 
@@ -1427,7 +1442,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                             .addParameter("propertyName", field.getPropertyAccessor().getName())
                             .addParameter("code", blob.getCode());
                         // although unused, the code parameter makes the url change if the
-                        // blob changes. In this way we can ask the browser to cache the url
+                        // blob changes. This way we can ask the browser to cache the url
                         // indefinitely.
 
                         field.setHref(urlBuilder.toString());
@@ -1443,7 +1458,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 .addParameter("downloadBlob","")
                 .addParameter("propertyName", field.getPropertyAccessor().getName())
                 .addParameter("code", field.getValue().getCode());
-        // The code parameter must be kept. See not in refreshTableBlobDownloadHref
+        // The code parameter must be kept. See note in refreshTableBlobDownloadHref
         return urlBuilder.toString();
     }
 
@@ -1882,6 +1897,19 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
+     * Computes an OgnlTextFormat from the result of getReadLinkExpression(), with the correct URL encoding.
+     * @return the OgnlTextFormat.
+     */
+    protected OgnlTextFormat getReadURLFormat() {
+        String readLinkExpression = getReadLinkExpression();
+        OgnlTextFormat hrefFormat = OgnlTextFormat.create(readLinkExpression);
+        hrefFormat.setUrl(true);
+        String encoding = getUrlEncoding();
+        hrefFormat.setEncoding(encoding);
+        return hrefFormat;
+    }
+
+    /**
      * If a search has been executed, appends a URL-encoded String representation of the search criteria
      * to the given string, as a GET parameter.
      * @param s the base string.
@@ -1936,48 +1964,140 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return encodedSearchString;
     }
 
-    /**
-     * Writes a collection of fields as properties of a JSON object.
-     * @param js the JSONStringer to write to. Must have a JSON object open for writing.
-     * @param fields the fields to output
-     * @throws JSONException if the JSON can not be generated.
-     */
+    @Deprecated
     protected void fieldsToJson(JSONStringer js, Collection<Field> fields) throws JSONException {
-        for (Field field : fields) {
-            Object value = field.getValue();
-            String displayValue = field.getDisplayValue();
-            String href = field.getHref();
-            js.key(field.getPropertyAccessor().getName());
-            js.object()
-                    .key("value")
-                    .value(value)
-                    .key("displayValue")
-                    .value(displayValue)
-                    .key("href")
-                    .value(href)
-                    .endObject();
-        }
+        FormUtil.fieldsToJson(js, fields);
     }
 
+    @Deprecated
     protected List<Field> collectVisibleFields(Form form, List<Field> fields) {
-        for(FieldSet fieldSet : form) {
-             collectVisibleFields(fieldSet, fields);
-        }
-        return fields;
+        return FormUtil.collectVisibleFields(form, fields);
     }
 
+    @Deprecated
     protected List<Field> collectVisibleFields(FieldSet fieldSet, List<Field> fields) {
-        for(FormElement element : fieldSet) {
-            if(element instanceof Field) {
-                Field field = (Field) element;
-                if(field.isEnabled()) {
-                    fields.add(field);
+        return FormUtil.collectVisibleFields(fieldSet, fields);
+    }
+
+    //--------------------------------------------------------------------------
+    // REST
+    //--------------------------------------------------------------------------
+
+    @GET
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public Resolution getAsJson() {
+        if(object == null) {
+            Form form = new FormBuilder(AbstractCrudAction.class).
+                    configFields("searchString", "firstResult", "maxResults", "sortProperty", "sortDirection").
+                    build();
+            form.readFromRequest(context.getRequest());
+            form.writeToObject(this);
+            return jsonSearchData();
+        } else {
+            return jsonReadData();
+        }
+    }
+
+    @POST
+    @RequiresPermissions(permissions = PERMISSION_CREATE)
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
+    public Response saveAsJson(String jsonObject) throws Throwable {
+        if(object != null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("update not supported, PUT to /pk instead").build();
+        }
+        setupForm(Mode.CREATE);
+        object = (T) classAccessor.newInstance();
+        createSetup(object);
+        form.readFromObject(object);
+        FormUtil.readFromJson(form, new JSONObject(jsonObject));
+        if (form.validate()) {
+            writeFormToObject();
+            if(createValidate(object)) {
+                try {
+                    doSave(object);
+                    createPostProcess(object);
+                    commitTransaction();
+                } catch (Throwable e) {
+                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                    logger.warn(rootCauseMessage, e);
+                    throw e;
                 }
-            } else if(element instanceof FieldSet) {
-                collectVisibleFields((FieldSet) element, fields);
+                form.readFromObject(object); //Re-read so that the full object is returned
+                OgnlTextFormat textFormat = getReadURLFormat();
+                return Response.status(Response.Status.CREATED).
+                        entity(form).
+                        location(new URI(textFormat.format(object))).
+                        build();
+            } else {
+                return Response.serverError().entity(form).build();
+            }
+        } else {
+            return Response.serverError().entity(form).build();
+        }
+    }
+
+    @PUT
+    @RequiresPermissions(permissions = PERMISSION_EDIT)
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
+    public Response updateAsJson(String jsonObject) throws Throwable {
+        if(object == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
+        }
+        setupForm(Mode.EDIT);
+        editSetup(object);
+        form.readFromObject(object);
+        FormUtil.readFromJson(form, new JSONObject(jsonObject));
+        if (form.validate()) {
+            writeFormToObject();
+            if(editValidate(object)) {
+                try {
+                    doUpdate(object);
+                    editPostProcess(object);
+                    commitTransaction();
+                } catch (Throwable e) {
+                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                    logger.warn(rootCauseMessage, e);
+                    throw e;
+                }
+                form.readFromObject(object); //Re-read so that the full object is returned
+                return Response.ok(form).build();
+            } else {
+                return Response.serverError().entity(form).build();
+            }
+        } else {
+            return Response.serverError().entity(form).build();
+        }
+    }
+
+    @DELETE
+    @RequiresPermissions(permissions = PERMISSION_DELETE)
+    public void httpDelete() throws Exception {
+        if(object == null) {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("DELETE requires a /pk path parameter").build());
+        }
+        if(deleteValidate(object)) {
+            doDelete(object);
+            try {
+                deletePostProcess(object);
+                commitTransaction();
+                deleteBlobs(object);
+            } catch (Exception e) {
+                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                logger.warn(rootCauseMessage, e);
+                throw e;
             }
         }
-        return fields;
+    }
+
+    @Path(":classAccessor")
+    @GET
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public String describeClassAccessor() {
+        JSONStringer jsonStringer = new JSONStringer();
+        ReflectionUtil.classAccessorToJson(jsonStringer, getClassAccessor());
+        return jsonStringer.toString();
     }
 
     //--------------------------------------------------------------------------
@@ -2084,10 +2204,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public List<? extends T> getObjects() {
         return objects;
-    }
-
-    public void setObjects(List<? extends T> objects) {
-        this.objects = objects;
     }
 
     public T getObject() {

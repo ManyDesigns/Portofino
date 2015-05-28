@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -30,9 +30,9 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public interface Field extends FormElement {
+public interface Field<T> extends FormElement {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     PropertyAccessor getPropertyAccessor();
 
@@ -57,6 +57,7 @@ public interface Field extends FormElement {
     void setTitle(String alt);
 
     String getStringValue();
+    void setStringValue(String stringValue);
 
     boolean isEnabled();
     void setEnabled(boolean enabled);
@@ -67,7 +68,8 @@ public interface Field extends FormElement {
     boolean isUpdatable();
     void setUpdatable(boolean updatable);
 
-    Object getValue();
+    T getValue();
+    void setValue(T value);
 
     String getDisplayValue();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2014 ManyDesigns srl.  All rights reserved.
+ * Copyright (C) 2005-2015 ManyDesigns srl.  All rights reserved.
  * http://www.manydesigns.com/
  *
  * This is free software; you can redistribute it and/or modify it
@@ -41,7 +41,7 @@ public class ColumnAccessor
         extends AbstractAnnotatedAccessor 
         implements PropertyAccessor {
     public static final String copyright =
-            "Copyright (c) 2005-2014, ManyDesigns srl";
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     //**************************************************************************
     // Fields
@@ -69,7 +69,7 @@ public class ColumnAccessor
         if(column.getLength() != null && column.getLength() > 0) {
             if(String.class.equals(column.getActualJavaType())) {
                 annotations.put(MaxLength.class, new MaxLengthImpl(column.getLength()));
-            } else if(column.getScale()  != null && column.getScale() >= 0) {
+            } else if(column.getScale() != null && column.getScale() >= 0) {
                 annotations.put(PrecisionScale.class, new PrecisionScaleImpl(column.getLength(), column.getScale()));
             }
         }
