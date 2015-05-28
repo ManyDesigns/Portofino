@@ -33,6 +33,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.lang.annotation.Annotation;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -273,3 +274,4 @@ public class TextField extends AbstractTextField {
         this.textAreaMinRows = textAreaMinRows;
     }
 }
+
