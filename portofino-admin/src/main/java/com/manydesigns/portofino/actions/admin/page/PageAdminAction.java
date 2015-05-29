@@ -549,7 +549,7 @@ public class PageAdminAction extends AbstractPageAction {
                 SessionMessages.addErrorMessage(msg);
                 return new RedirectResolution(originalPath);
             }
-            return new RedirectResolution(getClosestSafePath(newParent));
+            return new RedirectResolution(getClosestSafePath(newParent, newName));
         } else {
             String msg = ElementsThreadLocals.getText("invalid.destination._", destinationPagePath);
             SessionMessages.addErrorMessage(msg);
@@ -557,13 +557,13 @@ public class PageAdminAction extends AbstractPageAction {
         }
     }
 
-    protected String getClosestSafePath(PageInstance newParent) {
+    protected String getClosestSafePath(PageInstance newParent, String newName) {
         String path = newParent.getPath();
         int indexOfDetail = path.indexOf(PageInstance.DETAIL);
         if(indexOfDetail > 0) {
             return path.substring(0, indexOfDetail);
         } else {
-            return path;
+            return path + (path.endsWith("/") ? "" : "/") + newName;
         }
     }
 
