@@ -129,6 +129,7 @@
         <!-- Pages -->
         <module>portofino-pageactions</module>
         <module>portofino-calendar</module>
+        <module>portofino-map</module>
         <module>portofino-chart</module>
         <module>portofino-crud</module>
         <module>portofino-admin</module>
