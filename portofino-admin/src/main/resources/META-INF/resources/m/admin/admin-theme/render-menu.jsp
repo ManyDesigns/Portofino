@@ -10,16 +10,16 @@
             <li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                     <% if(item.icon != null) { %>
-                        <i class="<%= item.icon %>"></i>
+                        <em class="<%= item.icon %>"></em>
                     <% } %>
-                    <%= item.label %> <b class="caret"></b>
+                    <%= item.label %> <strong class="caret"></strong>
                 </a>
                 <ul class="dropdown-menu">
                 <% for(MenuLink link : ((MenuGroup) item).menuLinks) { %>
                     <li>
                         <stripes:link href='<%= StringUtils.defaultString(link.link, "#") %>'>
                             <% if(link.icon != null) { %>
-                                <i class="<%= link.icon %>"></i>
+                                <em class="<%= link.icon %>"></em>
                             <% } %>
                             <c:out value="<%= link.label %>"/>
                         </stripes:link>
@@ -31,7 +31,7 @@
             <li>
                 <stripes:link href='<%= StringUtils.defaultString(link.link, "#") %>'>
                     <% if(link.icon != null) { %>
-                        <i class="<%= link.icon %>"></i>
+                        <em class="<%= link.icon %>"></em>
                     <% } %>
                     <c:out value="<%= link.label %>"/>
                 </stripes:link>

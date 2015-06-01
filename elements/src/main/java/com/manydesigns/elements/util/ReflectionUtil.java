@@ -20,18 +20,28 @@
 
 package com.manydesigns.elements.util;
 
+import com.manydesigns.elements.reflection.ClassAccessor;
+import com.manydesigns.elements.reflection.PropertyAccessor;
+import org.json.JSONObject;
+import org.json.JSONStringer;
+import org.json.JSONWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public class ReflectionUtil {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
@@ -41,15 +51,8 @@ public class ReflectionUtil {
     // Static fields and initialization
     //**************************************************************************
 
-    //protected final static ClassLoader classLoader;
-
     public final static Logger logger =
             LoggerFactory.getLogger(ReflectionUtil.class);
-
-    /*static {
-        classLoader = ReflectionUtil.class.getClassLoader();
-    }*/
-
 
     //**************************************************************************
     // Utility methods
@@ -57,9 +60,6 @@ public class ReflectionUtil {
 
     public static Class loadClass(String className) {
         try {
-            // loadClass() non sa gestire nomi di classi tipo "[B" (byte array)
-            // Class.forName() ce la fa.
-//            Class<?> aClass = classLoader.loadClass(className);
             Class<?> aClass = Class.forName(className);
             logger.debug("Loaded class: {}", aClass);
             return aClass;
@@ -128,5 +128,91 @@ public class ReflectionUtil {
 
     public static InputStream getResourceAsStream(String resourceName) {
         return ReflectionUtil.class.getClassLoader().getResourceAsStream(resourceName);
+    }
+
+    public static JSONWriter propertyAccessorToJson(JSONStringer js, PropertyAccessor accessor) {
+        js.object();
+        js.key("name").value(accessor.getName());
+        js.key("type").value(accessor.getType().getName());
+        js.key("modifiers").array();
+        int modifiers = accessor.getModifiers();
+        if(Modifier.isAbstract(modifiers)) {
+            js.value("abstract");
+        }
+        if(Modifier.isFinal(modifiers)) {
+            js.value("final");
+        }
+        if(Modifier.isPrivate(modifiers)) {
+            js.value("private");
+        }
+        if(Modifier.isProtected(modifiers)) {
+            js.value("protected");
+        }
+        if(Modifier.isPublic(modifiers)) {
+            js.value("public");
+        }
+        js.endArray();
+        js.key("annotations").array();
+        for(Annotation ann : accessor.getAnnotations()) {
+            annotationToJson(js, ann);
+        }
+        js.endArray();
+        return js.endObject();
+    }
+
+    public static void annotationToJson(JSONStringer js, Annotation ann) {
+        js.object();
+        Class<? extends Annotation> annotationType = ann.annotationType();
+        js.key("type").value(annotationType.getName());
+        js.key("properties").object();
+        for (Method method : annotationType.getDeclaredMethods()) {
+            try {
+                Object propertyValue = method.invoke(ann);
+                js.key(method.getName());
+                annotationPropertyValueAsJson(js, propertyValue);
+            } catch (Exception e) {
+                logger.warn("Exception reading annotation property, skipping", e);
+            }
+        }
+        js.endObject();
+        js.endObject();
+    }
+
+    public static void annotationPropertyValueAsJson(JSONStringer js, Object propertyValue) {
+        if(propertyValue instanceof Annotation) {
+            annotationToJson(js, (Annotation) propertyValue);
+        } else if(propertyValue instanceof Class) {
+            js.value(propertyValue.toString());
+        } else if(propertyValue != null && propertyValue.getClass().isArray()) {
+            js.array();
+            //TODO handle primitive arrays. Elements annotations only have String[] arrays currently.
+            for (Object element : (Object[]) propertyValue) {
+                annotationPropertyValueAsJson(js, element);
+            }
+            js.endArray();
+        } else {
+            js.value(propertyValue);
+        }
+    }
+
+    public static JSONWriter classAccessorToJson(JSONStringer js, ClassAccessor accessor) {
+        js.object();
+        js.key("name").value(accessor.getName());
+        js.key("keyProperties").array();
+        for(PropertyAccessor p : accessor.getKeyProperties()) {
+            js.value(p.getName());
+        }
+        js.endArray();
+        js.key("properties").array();
+        for(PropertyAccessor p : accessor.getProperties()) {
+            propertyAccessorToJson(js, p);
+        }
+        js.endArray();
+        js.key("annotations").array();
+        for(Annotation ann : accessor.getAnnotations()) {
+            annotationToJson(js, ann);
+        }
+        js.endArray();
+        return js.endObject();
     }
 }

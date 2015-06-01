@@ -19,7 +19,7 @@
                 <c:forEach var="attachment" items="${actionBean.downloadableAttachments}">
                     <div class="attachment">
                         <div class="attachmentName">
-                            <i class="glyphicon glyphicon-file"></i>
+                            <em class="glyphicon glyphicon-file"></em>
                             <c:out value="${attachment.filename}"/>
                         </div>
                         <c:out value="${mde:bytesToHumanString(attachment.size)}"/>

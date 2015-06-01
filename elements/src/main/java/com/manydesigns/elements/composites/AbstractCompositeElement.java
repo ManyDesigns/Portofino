@@ -21,6 +21,7 @@
 package com.manydesigns.elements.composites;
 
 import com.manydesigns.elements.Element;
+import com.manydesigns.elements.KeyValueAccessor;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 

@@ -26,7 +26,7 @@ package com.manydesigns.portofino.dispatcher;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public class PageNotActiveException extends Exception {
+public class PageNotActiveException extends RuntimeException {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
 

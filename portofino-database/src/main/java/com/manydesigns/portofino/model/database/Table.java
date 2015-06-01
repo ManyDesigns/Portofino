@@ -38,6 +38,7 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@XmlRootElement(name = "table")
 @XmlAccessorType(XmlAccessType.NONE)
 public class Table implements ModelObject, Annotated {
     public static final String copyright =

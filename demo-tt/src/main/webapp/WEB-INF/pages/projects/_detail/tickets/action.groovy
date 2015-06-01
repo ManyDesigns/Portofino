@@ -487,5 +487,4 @@ class ProjectsTicketsAction extends CrudAction {
         return isEditor();
     }
 
-
 }

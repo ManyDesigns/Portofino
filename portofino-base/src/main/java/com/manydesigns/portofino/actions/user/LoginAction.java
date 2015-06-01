@@ -33,6 +33,7 @@ import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.shiro.*;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
+import com.manydesigns.portofino.stripes.AuthenticationRequiredResolution;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
 import org.apache.commons.configuration.Configuration;
@@ -176,6 +177,10 @@ public abstract class LoginAction extends AbstractActionBean {
 
     public Resolution authenticate() {
         Subject subject = SecurityUtils.getSubject();
+        context.getResponse().setStatus(401);
+        context.getResponse().setHeader(
+                AuthenticationRequiredResolution.LOGIN_PAGE_HEADER,
+                context.getRequest().getRequestURL().toString());
         if(subject.isRemembered()) {
             Serializable principal = (Serializable) ShiroUtils.getPrimaryPrincipal(subject);
             userName = getRememberedUserName(principal);

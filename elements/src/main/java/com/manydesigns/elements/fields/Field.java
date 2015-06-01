@@ -30,7 +30,7 @@ import com.manydesigns.elements.xml.XhtmlBuffer;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public interface Field extends FormElement {
+public interface Field<T> extends FormElement {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
@@ -57,6 +57,7 @@ public interface Field extends FormElement {
     void setTitle(String alt);
 
     String getStringValue();
+    void setStringValue(String stringValue);
 
     boolean isEnabled();
     void setEnabled(boolean enabled);
@@ -67,7 +68,8 @@ public interface Field extends FormElement {
     boolean isUpdatable();
     void setUpdatable(boolean updatable);
 
-    Object getValue();
+    T getValue();
+    void setValue(T value);
 
     String getDisplayValue();
 }

@@ -549,18 +549,21 @@ public class PageAdminAction extends AbstractPageAction {
                 SessionMessages.addErrorMessage(msg);
                 return new RedirectResolution(originalPath);
             }
-            if(newParent.getParameters().isEmpty()) {
-                return new RedirectResolution(
-                        destinationPagePath + (destinationPagePath.endsWith("/") ? "" : "/") + newName);
-            } else {
-                //Detail
-                newParent.getParameters().clear();
-                return new RedirectResolution(newParent.getPath());
-            }
+            return new RedirectResolution(getClosestSafePath(newParent, newName));
         } else {
             String msg = ElementsThreadLocals.getText("invalid.destination._", destinationPagePath);
             SessionMessages.addErrorMessage(msg);
             return new RedirectResolution(originalPath);
+        }
+    }
+
+    protected String getClosestSafePath(PageInstance newParent, String newName) {
+        String path = newParent.getPath();
+        int indexOfDetail = path.indexOf(PageInstance.DETAIL);
+        if(indexOfDetail > 0) {
+            return path.substring(0, indexOfDetail);
+        } else {
+            return path + (path.endsWith("/") ? "" : "/") + newName;
         }
     }
 

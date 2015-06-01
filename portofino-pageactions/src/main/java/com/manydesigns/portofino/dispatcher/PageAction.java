@@ -32,7 +32,7 @@ import net.sourceforge.stripes.action.Resolution;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
-public interface PageAction extends ActionBean {
+public interface PageAction extends ActionBean, DispatchElement {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
@@ -46,16 +46,6 @@ public interface PageAction extends ActionBean {
      * executed, interrupting normal action invocation.
      */
     Resolution preparePage();
-
-    /**
-     * Returns the PageInstance of this action.
-     */
-    PageInstance getPageInstance();
-
-    /**
-     * Sets the PageInstance of this action. Invoked automatically by the framework before calling preparePage().
-     */
-    void setPageInstance(PageInstance pageInstance);
 
     @Override
     ElementsActionBeanContext getContext();

@@ -22,6 +22,7 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.ElementsProperties;
 import com.manydesigns.elements.ElementsThreadLocals;
+import com.manydesigns.elements.KeyValueAccessor;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.ognl.OgnlUtils;
@@ -44,7 +45,7 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public abstract class AbstractField implements Field {
+public abstract class AbstractField<T> implements Field<T> {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
@@ -287,7 +288,24 @@ public abstract class AbstractField implements Field {
         bulkChecked = (req.getParameter(bulkCheckboxName) != null);
     }
 
-    public void readFromObject(Object obj) {
+    public void readFromObject(Object obj) {}
+
+    @Override
+    public void readFrom(KeyValueAccessor keyValueAccessor) {
+        if (mode.isView(insertable, updatable)) {
+            return;
+        }
+        Object value = keyValueAccessor.get(accessor.getName());
+        if(value instanceof String) {
+            setStringValue((String) value);
+        } else {
+            setValue((T) value);
+        }
+    }
+
+    @Override
+    public void writeTo(KeyValueAccessor keyValueAccessor) {
+        keyValueAccessor.set(accessor.getName(), getValue());
     }
 
     public String getDisplayValue() {

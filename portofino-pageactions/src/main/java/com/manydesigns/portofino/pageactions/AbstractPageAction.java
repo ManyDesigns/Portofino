@@ -30,10 +30,8 @@ import com.manydesigns.elements.servlet.ServletUtils;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.dispatcher.DispatcherLogic;
-import com.manydesigns.portofino.dispatcher.PageAction;
-import com.manydesigns.portofino.dispatcher.PageInstance;
-import com.manydesigns.portofino.dispatcher.PageNotActiveException;
+import com.manydesigns.portofino.di.Injections;
+import com.manydesigns.portofino.dispatcher.*;
 import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
@@ -61,6 +59,9 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import java.io.*;
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -163,8 +164,36 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     }
 
     //--------------------------------------------------------------------------
-    // Getters/Setters
+    // Dispatch
     //--------------------------------------------------------------------------
+
+    @Override
+    public DispatchElement consumePathFragment(String pathFragment) {
+        PageAction subpage = DispatcherLogic.getSubpage(portofinoConfiguration, pageInstance, pathFragment);
+        if(subpage != null) {
+            HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
+            Injections.inject(subpage, request.getServletContext(), request);
+            return subpage;
+        } else if(PageActionLogic.supportsDetail(getClass())) {
+            pageInstance.getParameters().add(pathFragment);
+            return this;
+        } else {
+            return null;
+        }
+    }
+
+    //REST support
+    @Path("{pathFragment}")
+    public DispatchElement getSubResource(@PathParam("pathFragment") String pathFragment) {
+        DispatchElement resource = consumePathFragment(pathFragment);
+        if(resource != this) {
+            if(context == null) {
+                setContext(pageInstance.getParent().getActionBean().getContext());
+            }
+            preparePage();
+        }
+        return resource;
+    }
 
     public MultiMap initEmbeddedPageActions() {
         if(embeddedPageActions == null) {
@@ -201,6 +230,10 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return embeddedPageActions;
     }
 
+    //--------------------------------------------------------------------------
+    // Getters/Setters
+    //--------------------------------------------------------------------------
+
     public MultiMap getEmbeddedPageActions() {
         return embeddedPageActions;
     }
@@ -227,10 +260,12 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return new RedirectResolution(getReturnUrl(), false);
     }
 
+    @Override
     public PageInstance getPageInstance() {
         return pageInstance;
     }
 
+    @Override
     public void setPageInstance(PageInstance pageInstance) {
         this.pageInstance = pageInstance;
     }

@@ -37,7 +37,7 @@ import java.text.ParsePosition;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class NumericField extends AbstractTextField {
+public class NumericField extends AbstractTextField<BigDecimal> {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
@@ -134,36 +134,7 @@ public class NumericField extends AbstractTextField {
             return;
         }
 
-        stringValue = reqValue.trim();
-        decimalValue = null;
-        decimalFormatError = false;
-
-        if (stringValue.length() == 0) {
-            return;
-        }
-
-        BigDecimal tmpValue;
-        try {
-            //Provo a parserizzare il numero come BigDecimal
-            tmpValue = (BigDecimal) OgnlUtils.convertValue(
-                    stringValue, BigDecimal.class);
-        } catch (Throwable e) {
-            //Se il testo non e' un BigDecimal provo a parserizzarlo
-            // con il pattern specificato nel format
-            if (decimalFormat == null) {
-                decimalFormatError = true;
-                return;
-            } else {
-                decimalFormat.setParseBigDecimal(true);
-                ParsePosition parsePos = new ParsePosition(0);
-                tmpValue = (BigDecimal) decimalFormat.parse(stringValue, parsePos);
-                if (stringValue.length() != parsePos.getIndex()) {
-                    decimalFormatError = true;
-                    return;
-                }
-            }
-        }
-        decimalValue = tmpValue.setScale(scale, BigDecimal.ROUND_HALF_EVEN);
+        setStringValue(reqValue.trim());
     }
 
     @Override
@@ -217,6 +188,40 @@ public class NumericField extends AbstractTextField {
         Class type = accessor.getType();
         Object value = OgnlUtils.convertValue(decimalValue, type);
         writeToObject(obj, value);
+    }
+
+    @Override
+    public void setStringValue(String stringValue) {
+        super.setStringValue(stringValue);
+        decimalValue = null;
+        decimalFormatError = false;
+
+        if (stringValue.length() == 0) {
+            return;
+        }
+
+        BigDecimal tmpValue;
+        try {
+            //Provo a parserizzare il numero come BigDecimal
+            tmpValue = (BigDecimal) OgnlUtils.convertValue(
+                    stringValue, BigDecimal.class);
+        } catch (Throwable e) {
+            //Se il testo non e' un BigDecimal provo a parserizzarlo
+            // con il pattern specificato nel format
+            if (decimalFormat == null) {
+                decimalFormatError = true;
+                return;
+            } else {
+                decimalFormat.setParseBigDecimal(true);
+                ParsePosition parsePos = new ParsePosition(0);
+                tmpValue = (BigDecimal) decimalFormat.parse(stringValue, parsePos);
+                if (stringValue.length() != parsePos.getIndex()) {
+                    decimalFormatError = true;
+                    return;
+                }
+            }
+        }
+        decimalValue = tmpValue.setScale(scale, BigDecimal.ROUND_HALF_EVEN);
     }
 
     //**************************************************************************
