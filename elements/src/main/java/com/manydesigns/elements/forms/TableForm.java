@@ -101,7 +101,7 @@ public class TableForm implements Element {
         if (selectable) {
             xb.openElement("th");
             xb.openElement("div");
-            xb.addAttribute("class", "checkbox");
+            xb.addAttribute("class", "checkbox square");
             xb.openElement("input");
             xb.addAttribute("type", "checkbox");
             xb.addAttribute("title", "select-all");
@@ -109,6 +109,10 @@ public class TableForm implements Element {
                     "$(this).closest('table').find('td." + SELECTION_CELL_CLASS + " input').prop('checked', $(this).prop('checked'));";
             xb.addAttribute("onchange", js);
             xb.closeElement("input");
+
+            xb.openElement("label");
+            xb.addAttribute("for", ""); //TODO
+            xb.closeElement("label");
             xb.closeElement("div");
             xb.closeElement("th");
         }

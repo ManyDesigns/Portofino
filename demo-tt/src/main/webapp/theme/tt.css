@@ -33,3 +33,178 @@ li.ticket-list-item {
 h3.pageTitle span.label {
     font-size: 50%;
 }
+
+
+/****************
+    TEST
+****************/
+
+footer {
+  color: rgb(90, 90, 90);
+  font-size: smaller;
+}
+
+.table>caption+thead>tr:first-child>td, .table>caption+thead>tr:first-child>th, .table>colgroup+thead>tr:first-child>td, .table>colgroup+thead>tr:first-child>th, .table>thead:first-child>tr:first-child>td, .table>thead:first-child>tr:first-child>th {
+  /*  border-left: 1px solid #555;
+  border-right: 1px solid #777;*/
+  border-top: 1px solid #555;
+  border-bottom: 1px solid #333;
+  box-shadow: inset 0 1px 0 #999;
+  color: #fff;
+  font-weight: bold;
+  padding: 10px 15px;
+  position: relative;
+  text-shadow: 0 1px 0 #000;
+  /* background-color: rgb(48, 48, 48); */
+  /* background-image: -webkit-linear-gradient(top,#080808 0,#545454 100%); */
+  background-image: linear-gradient(to bottom,#323232 0,#5C5C5C 100%);
+  /* color: white; */
+}
+
+/* menu */
+.portofino-sidenav>li>a {
+    position: relative;
+    display: block;
+    padding: 2px 1px;
+}
+
+/* Angular brace */
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+}
+
+.navbar{ box-shadow: 1px 0px 5px  #666666} /* TODO test */
+
+.portofino-sidenav>li.active {
+  border-left: 2px solid #2B5494;
+}
+.portofino-sidenav>li { padding-left: 5px; border-left: 1px solid #ffffff;}
+.portofino-sidenav>li:hover { border-left: 1px solid #2B5494;  }
+.portofino-sidenav>li.active:hover { border-left: 2px solid #2B5494;  }
+.portofino-sidenav>li.bookmark:hover {border-left: 1px solid #ffffff;}
+
+.portofino-sidenav>li>a:hover , .portofino-sidenav>li>a:focus  { background-color: white; }
+
+li.active a{
+    font-weight: bolder;
+    color: #2B5494;
+}
+
+li.subpages a{
+   /*font-size: smaller;*/
+   font-size: 12px;
+   /*color: #446aa4;*/
+   color: #7b7b7c;
+   line-height: 12px;
+}
+
+li.subpages a:hover { /*color: #1c3863;*/ color: #454545; }
+
+.portofino-sidenav>li.subpages:hover { border-left: 1px solid #454545;  }
+
+li.subpages{
+    padding-left: 15px;
+}
+
+hr.nav-separator{
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+.portofino-sidenav>li>a {
+    position: relative;
+    display: block;
+    padding: 2px 1px;
+}
+
+/*   ------ */
+
+.search_results th a {
+  color: #faf9f9;
+}
+
+.breadcrumb {
+  margin-bottom: 5px;
+}
+
+.h1, .h2, .h3, h1, h2, h3 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+/*********
+.checkbox, .radio {
+  display: inline-block;
+  position: relative;
+  min-height: 18px;
+  margin: 5px 13px 5px 0;
+  line-height: 1.167;
+}
+
+.checkbox > input, .radio > input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  opacity: 0;
+}
+*/
+
+/***************/
+
+
+.searchFormButtons{ margin: 0px;}
+
+a.search_form_toggle_link{
+    font-weight: 600;
+    display: block;
+    padding-bottom: 10px;
+    text-decoration: none;
+      text-align: right;
+}
+
+a.search_form_toggle_link:hover{
+    color: #2B5494;
+}
+
+.search_form {
+  border-right-width: 1px;
+  border-right-color:  #E5E5E5;
+  border-right-style: solid;
+}
+
+.well {
+  background-color: initial;
+  /* background-image: -webkit-linear-gradient(top,#e8e8e8 0,#f5f5f5 100%); */
+  background-image: -o-linear-gradient(top,#e8e8e8 0,#f5f5f5 100%);
+  background-image:-webkit-gradient(linear,left top,left bottom,from(rgba(245, 245, 245, 0.79)),to(rgba(255, 255, 255, 0.94)));
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffe8e8e8', endColorstr='#fff5f5f5', GradientType=0);
+
+  background-repeat: repeat-x;
+   border-color: #dcdcdc;
+  -webkit-box-shadow: inset 0 1px 3px rgba(0,0,0,.05),0 1px 0 rgba(255,255,255,.1);
+   box-shadow: inset 0 1px 3px rgba(0,0,0,.05),0 1px 0 rgba(255,255,255,.1);
+}
+
+.btn-danger, .btn-default, .btn-info, .btn-primary, .btn-success, .btn-warning { box-shadow: 0 1px 1px rgba(0, 0, 0, 0.23); }
+
+footer{
+    /*background-color: #faf9f9*/
+    background-image: -o-linear-gradient(top,#e8e8e8 0,#f5f5f5 100%);
+  background-image:-webkit-gradient(linear,left top,left bottom,from(rgba(245, 245, 245, 0.79)),to(rgba(255, 255, 255, 0.94)));
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffe8e8e8', endColorstr='#fff5f5f5', GradientType=0);
+}
+
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    border: none;
+}
+
+.table-striped>tbody>tr:nth-of-type(odd) {
+  background-color: #F5F5F5;
+}
+
+input[type=checkbox], input[type=radio] {
+  margin: 5px;
+  line-height: normal;
+}

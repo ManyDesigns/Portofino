@@ -23,7 +23,7 @@
         Integer rowsPerPage = actionBean.getCrudConfiguration().getRowsPerPage();
         long totalSearchRecords = rowsPerPage != null ? actionBean.getTotalSearchRecords() : 0;
         if(rowsPerPage != null && totalSearchRecords > rowsPerPage) { %>
-            <ul class="pagination">
+            <ul class="pagination pagination-sm">
                 <% writePaginator(out, actionBean, rowsPerPage, totalSearchRecords); %>
             </ul>
     <%  } %>

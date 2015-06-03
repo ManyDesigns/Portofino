@@ -7,7 +7,7 @@
     page import="java.util.List" %><%@
     page contentType="text/html;charset=UTF-8" language="java"
 %><jsp:useBean id="actionBean" scope="request" type="net.sourceforge.stripes.action.ActionBean" />
-<div class="breadcrumbs">
+<ol class="breadcrumb">
     <%
         Dispatch dispatch = DispatcherUtil.getDispatch(request, actionBean);
         Breadcrumbs breadcrumbs = new Breadcrumbs(dispatch);
@@ -15,25 +15,19 @@
         for (int i = 0; i < items.size(); i++) {
             BreadcrumbItem current = items.get(i);
             pageContext.setAttribute("current", current);
-            if (i > 0) {
-                %><span class="breadcrumb-separator"> &gt; </span><%
-            }
             boolean last = i == items.size() - 1;
             if (last) {
                 %>
-                <span class="breadcrumb-item selected"
-                      title="<c:out value='${current.title}' />">
-                    <c:out value='${current.text}' />
-                </span>
+    <li class="active" title="<c:out value='${current.title}' />" ><c:out value='${current.text}' /></li>
                 <%
             } else {
                 %>
-                    <a class="breadcrumb-item"
+                    <li><a
                        href="<c:out value='${pageContext.request.contextPath}${current.href}' />"
                        title="<c:out value='${current.title}' />"
-                    ><c:out value='${current.text}' /></a>
+                    ><c:out value='${current.text}' /></a></li>
                 <%
             }
         }
     %>
-</div>
+</ol>

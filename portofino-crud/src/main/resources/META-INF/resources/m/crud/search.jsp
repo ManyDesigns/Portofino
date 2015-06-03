@@ -20,15 +20,15 @@
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <c:if test="${not empty actionBean.searchForm}">
                 <c:if test="${actionBean.searchVisible}">
-                    <a href="${pageContext.request.contextPath}${actionBean.context.actionPath}"
-                       class="search_form_toggle_link" data-search-visible="true">
+                    <a href="${pageContext.request.contextPath}${actionBean.context.actionPath}" class="search_form_toggle_link" data-search-visible="true">
+                        <div style="display: inline;" class="glyphicon glyphicon-search" aria-hidden="true"></div>
                         <span><fmt:message key="hide.search<<" /></span>
                         <span style="display: none;"><fmt:message key="search>>" /></span>
                     </a>
                 </c:if>
                 <c:if test="${!actionBean.searchVisible}">
-                    <a href="${pageContext.request.contextPath}${actionBean.context.actionPath}?search="
-                       class="search_form_toggle_link" data-search-visible="false">
+                    <a href="${pageContext.request.contextPath}${actionBean.context.actionPath}?search=" class="search_form_toggle_link" data-search-visible="false">
+                        <div style="display: inline;" class="glyphicon glyphicon-search" aria-hidden="true"></div>
                         <span style="display: none;"><fmt:message key="hide.search<<" /></span>
                         <span><fmt:message key="search>>" /></span>
                     </a>
