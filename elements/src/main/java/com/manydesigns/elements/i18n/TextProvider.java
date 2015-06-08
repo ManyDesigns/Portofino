@@ -31,4 +31,6 @@ public interface TextProvider {
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public String getText(String key, Object... args);
+
+    public String getTextOrNull(String key, Object... args);
 }

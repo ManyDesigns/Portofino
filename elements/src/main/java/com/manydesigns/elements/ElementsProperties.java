@@ -64,6 +64,8 @@ public final class ElementsProperties {
             "fields.label.capitalize";
     public static final String FIELDS_DATE_FORMAT =
             "fields.date.format";
+    public static final String FIELDS_DECIMAL_FORMAT =
+            "elements.fields.format.decimal";
 
     //**************************************************************************
     // Static fields, singleton initialization and retrieval
