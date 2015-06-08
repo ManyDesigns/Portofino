@@ -13,7 +13,7 @@ function updateSelectOptions(relName, selectionProviderIndex, methodName) {
         data[current.attr('name')] = current.val();
     }
     var selectField = $(selectFieldId);
-    var postUrl = stripQueryString(selectField.closest("form").action || location.href);
+    var postUrl = stripQueryString(selectField.closest("form[action]").attr("action") || location.href);
 
     jQuery.ajax({
         type: 'POST',
@@ -66,7 +66,7 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, meth
                     data[current.attr('name')] = current.attr('value');
                 }
 
-                var postUrl = stripQueryString(autocompleteObj.closest("form").action || location.href);
+                var postUrl = stripQueryString(autocompleteObj.closest("form[action]").attr("action") || location.href);
                 selectField.val(""); //Reset selected object when user types
                 $.ajax({
                     type: 'POST',
