@@ -87,6 +87,7 @@ public class ApplicationInterceptor implements Interceptor {
                                 (ElementsThreadLocals.getText("this.page.has.thrown.an.exception.during.execution"), ExceptionUtils.getRootCause(t));
                         SessionMessages.addErrorMessage(msg);
                     }
+                    request.setAttribute("http-error-code", 500);
                     return new ForwardResolution("/m/pageactions/redirect-to-last-working-page.jsp");
                 }
             }

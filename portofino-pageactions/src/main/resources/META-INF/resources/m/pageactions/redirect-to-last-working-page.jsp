@@ -21,7 +21,8 @@
         return;
     }
 
-    response.setStatus(404);
+    Integer httpError = (Integer) request.getAttribute("http-error-code");
+    response.setStatus(httpError != null ? httpError : 404);
 
     if(!invalidPage.getParameters().isEmpty()) {
         logger.debug("Page instance with parameters failed, trying without parameters");
@@ -45,5 +46,16 @@
     <head>
         <meta http-equiv="refresh" content='<%= "0; " + targetUrl %>' />
     </head>
-    <body onload="window.location.href = '<%= targetUrl %>';"></body>
+    <body onload="window.location.href = '<%= targetUrl %>';">
+        <p>
+            The page you asked for wasn't found, or failed due to an error. You should be automatically be redirected to
+            <a href="<%= targetUrl %>"><%= targetUrl %></a>, but if that doesn't happen, follow the link to
+            <a href="<%= targetUrl %>"><%= targetUrl %></a>.
+        </p>
+        <!--
+        This is a comment to make this page bigger and make Internet Explorer happy, otherwise it will show its
+        built-in 404 page. See for example http://serverfault.com/questions/129008/apaches-404-page-not-shown-in-ie-but-works-in-firefox
+        This should really be enough, but to be sure, let's go on for a little while still. Ok, that should do it. Really.
+        -->
+    </body>
 </html>
