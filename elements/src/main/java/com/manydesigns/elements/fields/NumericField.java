@@ -173,7 +173,7 @@ public class NumericField extends AbstractTextField<BigDecimal> {
         return true;
     }
 
-    protected DecimalFormat getDecimaFormat() {
+    public DecimalFormat getDecimalFormat() {
         if(decimalFormat != null) {
             return decimalFormat;
         } else {
@@ -227,7 +227,7 @@ public class NumericField extends AbstractTextField<BigDecimal> {
             return;
         }
 
-        DecimalFormat decimaFormat = getDecimaFormat();
+        DecimalFormat decimaFormat = getDecimalFormat();
         decimaFormat.setParseBigDecimal(true);
         ParsePosition parsePos = new ParsePosition(0);
         BigDecimal tmpValue;
@@ -269,10 +269,6 @@ public class NumericField extends AbstractTextField<BigDecimal> {
         } else {
             this.maxValue = new BigDecimal(maxValue);
         }
-    }
-
-    public DecimalFormat getDecimalFormat() {
-        return decimalFormat;
     }
 
     public void setDecimalFormat(DecimalFormat decimalFormat) {
