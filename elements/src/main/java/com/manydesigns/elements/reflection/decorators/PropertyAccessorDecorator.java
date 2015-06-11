@@ -12,6 +12,8 @@ import java.lang.annotation.Annotation;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public class PropertyAccessorDecorator extends AbstractAnnotatedAccessor implements PropertyAccessor {
+    public static final String copyright =
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     private final PropertyAccessor delegate;
 

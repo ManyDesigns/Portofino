@@ -102,6 +102,8 @@ public class CrudAction extends AbstractCrudAction<Object> {
     @Inject(DatabaseModule.PERSISTENCE)
     public Persistence persistence;
 
+    protected long totalSearchRecords = -1;
+
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -111,13 +113,20 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     @Override
     public long getTotalSearchRecords() {
+        if(totalSearchRecords < 0) {
+            calculateTotalSearchRecords();
+        }
+        return totalSearchRecords;
+    }
+
+    protected long calculateTotalSearchRecords() {
         // calculate totalRecords
         TableCriteria criteria = new TableCriteria(baseTable);
         if(searchForm != null) {
             searchForm.configureCriteria(criteria);
         }
         QueryStringWithParameters query =
-                QueryUtils.mergeQuery(crudConfiguration.getQuery(), criteria, this);
+                QueryUtils.mergeQuery(getBaseQuery(), criteria, this);
 
         String queryString = query.getQueryString();
         String totalRecordsQueryString;
@@ -130,7 +139,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
         List<Object> result = QueryUtils.runHqlQuery
                 (session, totalRecordsQueryString,
                         query.getParameters());
-        return (Long) result.get(0);
+        return totalSearchRecords = ((Number) result.get(0)).longValue();
     }
 
     protected String generateCountQuery(String queryString) throws JSQLParserException {
@@ -152,7 +161,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
             plainSelect.setOrderByElements(null);
             return plainSelect.toString();
         } catch(Exception e) {
-            logger.debug("Query string {} does not contain select");
+            logger.debug("Query string {} does not contain select", e);
             queryString = "SELECT count(*) " + queryString;
             PlainSelect plainSelect =
                 (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
@@ -275,8 +284,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
                     logger.error("Can't order by " + sortProperty + ", property accessor not found", e);
                 }
             }
-            objects = QueryUtils.getObjects(session,
-                    crudConfiguration.getQuery(), criteria, this, firstResult, maxResults);
+            objects = QueryUtils.getObjects(session, getBaseQuery(), criteria, this, firstResult, maxResults);
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
             logger.warn("Incorrect Field Type", e);
@@ -284,12 +292,16 @@ public class CrudAction extends AbstractCrudAction<Object> {
         }
     }
 
+    protected String getBaseQuery() {
+        return crudConfiguration.getQuery();
+    }
+
     @Override
     protected Object loadObjectByPrimaryKey(Serializable pkObject) {
         return QueryUtils.getObjectByPk(
                 persistence,
                 baseTable, pkObject,
-                crudConfiguration.getQuery(), this);
+                getBaseQuery(), this);
     }
 
     //**************************************************************************

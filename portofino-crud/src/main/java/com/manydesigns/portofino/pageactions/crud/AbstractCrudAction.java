@@ -730,8 +730,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution delete() {
         if(deleteValidate(object)) {
-            doDelete(object);
             try {
+                doDelete(object);
                 deletePostProcess(object);
                 commitTransaction();
                 deleteBlobs(object);
@@ -743,6 +743,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.debug(rootCauseMessage, e);
                 SessionMessages.addErrorMessage(rootCauseMessage);
+                return read();
             }
         }
         return getSuccessfulDeleteView();
@@ -896,11 +897,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Returns the Resolution used to show the effect of a successful update action.
+     * Returns the Resolution used to show the effect of a successful delete action.
      * @return by default, a redirect to the detail, propagating the search string.
      */
     protected Resolution getSuccessfulDeleteView() {
-        return new RedirectResolution(appendSearchStringParamIfNecessary(context.getActionPath()));
+        return new RedirectResolution(appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
     }
 
     /**
@@ -2002,7 +2003,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
-    public Response saveAsJson(String jsonObject) throws Throwable {
+    public Response httpPostJson(String jsonObject) throws Throwable {
         if(object != null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("update not supported, PUT to /pk instead").build();
         }
@@ -2041,7 +2042,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
-    public Response updateAsJson(String jsonObject) throws Throwable {
+    public Response httpPutJson(String jsonObject) throws Throwable {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
         }
@@ -2078,8 +2079,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("DELETE requires a /pk path parameter").build());
         }
         if(deleteValidate(object)) {
-            doDelete(object);
             try {
+                doDelete(object);
                 deletePostProcess(object);
                 commitTransaction();
                 deleteBlobs(object);
