@@ -39,7 +39,6 @@ import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
-import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
@@ -81,7 +80,6 @@ import java.util.List;
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ScriptTemplate("script_template.groovy")
 @ConfigurationClass(CrudConfiguration.class)
-@SupportsDetail
 @PageActionName("Crud")
 public class CrudAction extends AbstractCrudAction<Object> {
     public static final String copyright =
@@ -217,9 +215,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
     }
 
     @Override
-    protected void prepareConfigurationForms() {
-        super.prepareConfigurationForms();
-
+    protected void buildConfigurationForm() {
         SelectionProvider databaseSelectionProvider =
                 SelectionProviderLogic.createSelectionProvider(
                         "database",

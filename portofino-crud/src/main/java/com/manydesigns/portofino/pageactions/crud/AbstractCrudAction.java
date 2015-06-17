@@ -57,11 +57,13 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
+import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
+import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.*;
@@ -128,6 +130,9 @@ import java.util.regex.Pattern;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+@SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
+@RequiresPermissions(level = AccessLevel.VIEW)
+@SupportsDetail
 public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
@@ -1589,6 +1594,12 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 setupSelectionProvidersForm(selectionProviderNames);
             }
         }
+
+        buildConfigurationForm();
+    }
+
+    protected void buildConfigurationForm() {
+        crudConfigurationForm = new FormBuilder(PageActionLogic.getConfigurationClass(getClass())).build();
     }
 
     protected void setupSelectionProvidersForm(Map<List<String>, Collection<String>> selectionProviderNames) {
