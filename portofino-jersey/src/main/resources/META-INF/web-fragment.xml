@@ -19,10 +19,6 @@
             <param-name>jersey.config.server.tracing</param-name>
             <param-value>ALL</param-value>
         </init-param>
-        <init-param>
-            <param-name>jersey.config.servlet.filter.staticContentRegex</param-name>
-            <param-value>^.*[.].+$</param-value>
-        </init-param>
     </filter>
     <filter-mapping>
         <filter-name>Jersey Web Application</filter-name>
