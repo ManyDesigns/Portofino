@@ -136,7 +136,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
                 if(!path.startsWith("/")) {
                     path = "/" + path;
                 }
-                context.setActionPath(path);
+                context.setActionPath(path); //TODO
                 pageAction.setContext(context);
                 Resolution resolution = pageAction.preparePage();
                 if(resolution != null) {

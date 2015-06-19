@@ -72,15 +72,14 @@
     <filter-mapping>
         <filter-name>I18nFilter</filter-name>
         <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
 
     <filter>
         <description>Dynamically maps URLs to ActionBeans.</description>
         <display-name>Stripes Dynamic Mapping Filter</display-name>
         <filter-name>DynamicMappingFilter</filter-name>
-        <filter-class>
-            net.sourceforge.stripes.controller.DynamicMappingFilter
-        </filter-class>
+        <filter-class>com.manydesigns.portofino.stripes.SimpleDynamicMappingFilter</filter-class>
     </filter>
 
     <filter-mapping>
