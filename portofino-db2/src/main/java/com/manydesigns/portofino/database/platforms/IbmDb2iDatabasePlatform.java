@@ -42,7 +42,7 @@ public class IbmDb2iDatabasePlatform extends AbstractDatabasePlatform {
     //**************************************************************************
 
     public IbmDb2iDatabasePlatform() {
-        super(new DB2400Dialect(), "jdbc:as400:<host>;database name=<database_name>;prompt=false;translate binary=true;naming=system");
+        super(new DB2400Dialect(), "jdbc:as400:<host>");
     }
 
     //**************************************************************************
