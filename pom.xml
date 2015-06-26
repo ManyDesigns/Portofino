@@ -101,7 +101,7 @@
         <jsoup.version>1.7.1</jsoup.version>
         <jstl.version>1.1.2</jstl.version>
         <jxl.version>2.6.12</jxl.version>
-        <liquibase.version>3.3.5</liquibase.version>
+        <liquibase.version>3.4.0</liquibase.version>
         <logback.version>0.9.26</logback.version>
         <ognl.version>3.0.8</ognl.version>
         <quartz.version>2.2.1</quartz.version>

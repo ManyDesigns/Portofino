@@ -515,9 +515,10 @@ public class DatabaseSyncer {
                     jdbcType = 101;
                 } else if("XMLTYPE".equals(typeName)) {
                     jdbcType = 2009;
-                } else {
-                    jdbcType = 1111;
                 }
+            }
+            if(jdbcType == null) {
+                jdbcType = Types.OTHER;
             }
             if(jdbcType == Types.OTHER) {
                 logger.debug("jdbcType = OTHER, trying to determine more specific type from type name");
@@ -526,7 +527,7 @@ public class DatabaseSyncer {
                     Field field = Types.class.getField(jdbcTypeName);
                     jdbcType = (Integer) field.get(null);
                 } catch (Exception e) {
-                    logger.debug("Could not determine type (type name = {})", jdbcTypeName);
+                    logger.warn("Could not determine type (type name = {})", jdbcTypeName);
                 }
             }
             targetColumn.setJdbcType(jdbcType);
