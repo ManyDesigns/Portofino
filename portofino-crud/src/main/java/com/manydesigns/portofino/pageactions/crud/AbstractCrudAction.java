@@ -741,9 +741,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 commitTransaction();
                 deleteBlobs(object);
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.deleted.successfully"));
-
-                // invalidate the pk on this crud
-                pk = null;
             } catch (Exception e) {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.debug(rootCauseMessage, e);
@@ -903,7 +900,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     /**
      * Returns the Resolution used to show the effect of a successful delete action.
-     * @return by default, a redirect to the detail, propagating the search string.
+     * @return by default, a redirect to the search, propagating the search string.
      */
     protected Resolution getSuccessfulDeleteView() {
         return new RedirectResolution(appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
