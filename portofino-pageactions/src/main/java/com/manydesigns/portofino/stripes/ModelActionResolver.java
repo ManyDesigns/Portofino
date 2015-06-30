@@ -67,7 +67,7 @@ public class ModelActionResolver extends NameBasedActionResolver {
     @Override
     public Class<? extends ActionBean> getActionBeanType(String path) {
         if(path.startsWith(APIRoot.PATH_PREFIX)) {
-            path = path.substring(APIRoot.PATH_PREFIX.length());
+            return null; //Not an ActionBean (as far as Stripes is concerned)
         }
         Dispatch dispatch = getDispatch(path);
         if(dispatch != null) {

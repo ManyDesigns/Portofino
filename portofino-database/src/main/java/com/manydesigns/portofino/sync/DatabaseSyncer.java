@@ -113,7 +113,12 @@ public class DatabaseSyncer {
                 }
 
                 logger.debug("Creating Liquibase database snapshot");
-                String catalog = liquibaseDatabase.getDefaultCatalogName();
+                String catalog;
+                if(sourceSchema.getCatalog() != null) {
+                    catalog = sourceSchema.getCatalog();
+                } else {
+                    catalog = liquibaseDatabase.getDefaultCatalogName();
+                }
                 SnapshotControl snapshotControl = new SnapshotControl(liquibaseDatabase);
                 DatabaseSnapshot snapshot =
                         dsgf.createSnapshot(new CatalogAndSchema(catalog, schemaName), liquibaseDatabase, snapshotControl);
@@ -121,6 +126,7 @@ public class DatabaseSyncer {
                 logger.debug("Synchronizing schema");
                 Schema targetSchema = new Schema();
                 targetSchema.setDatabase(targetDatabase);
+                targetSchema.setCatalog(catalog);
                 targetDatabase.getSchemas().add(targetSchema);
                 syncSchema(snapshot, sourceSchema, targetSchema);
             }
