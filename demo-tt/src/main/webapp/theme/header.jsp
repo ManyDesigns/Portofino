@@ -23,6 +23,7 @@
                 <span class="icon-bar"></span>
             </button>
             <stripes:link href="/" class="navbar-brand">
+                <img onerror="this.style.display='none'" src="${ portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) }" width=32px />
                 <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
             </stripes:link>
         </div>
