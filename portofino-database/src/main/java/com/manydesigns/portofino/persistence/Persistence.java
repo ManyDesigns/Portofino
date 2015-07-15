@@ -241,7 +241,7 @@ public class Persistence {
             File databaseDir = new File(modelDir, database.getDatabaseName());
             for(Schema schema : database.getSchemas()) {
                 File schemaDir = new File(databaseDir, schema.getSchemaName());
-                if(schemaDir.mkdirs()) {
+                if(schemaDir.isDirectory() || schemaDir.mkdirs()) {
                     logger.debug("Schema directory {} exists", schemaDir);
                     File[] tableFiles = schemaDir.listFiles(new FilenameFilter() {
                         @Override
