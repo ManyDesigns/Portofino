@@ -23,8 +23,6 @@ package com.manydesigns.portofino.pageactions.crud;
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.forms.FormBuilder;
 import com.manydesigns.elements.messages.SessionMessages;
-import com.manydesigns.elements.options.DefaultSelectionProvider;
-import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
@@ -215,7 +213,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
     }
 
     @Override
-    protected void buildConfigurationForm() {
+    protected void setupConfigurationForm(FormBuilder formBuilder) {
         SelectionProvider databaseSelectionProvider =
                 SelectionProviderLogic.createSelectionProvider(
                         "database",
@@ -224,20 +222,10 @@ public class CrudAction extends AbstractCrudAction<Object> {
                         null,
                         new String[]{"databaseName"});
 
-        DefaultSelectionProvider nColumnsSelectionProvider = new DefaultSelectionProvider("columns");
-        nColumnsSelectionProvider.setDisplayMode(DisplayMode.RADIO);
-        nColumnsSelectionProvider.appendRow(1, "1", true);
-        nColumnsSelectionProvider.appendRow(2, "2", true);
-        nColumnsSelectionProvider.appendRow(3, "3", true);
-        nColumnsSelectionProvider.appendRow(4, "4", true);
-        nColumnsSelectionProvider.appendRow(6, "6", true);
-        crudConfigurationForm = new FormBuilder(CrudConfiguration.class)
+        formBuilder
                 .configFields(CRUD_CONFIGURATION_FIELDS)
                 .configFieldSetNames("Crud")
-                .configSelectionProvider(databaseSelectionProvider, "database")
-                .configSelectionProvider(nColumnsSelectionProvider, "columns")
-                .build();
-
+                .configSelectionProvider(databaseSelectionProvider, "database");
     }
 
     @Override

@@ -1596,7 +1596,20 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected void buildConfigurationForm() {
-        crudConfigurationForm = new FormBuilder(PageActionLogic.getConfigurationClass(getClass())).build();
+        FormBuilder formBuilder = new FormBuilder(PageActionLogic.getConfigurationClass(getClass()));
+        setupConfigurationForm(formBuilder);
+        crudConfigurationForm = formBuilder.build();
+    }
+
+    protected void setupConfigurationForm(FormBuilder formBuilder) {
+        DefaultSelectionProvider nColumnsSelectionProvider = new DefaultSelectionProvider("columns");
+        nColumnsSelectionProvider.setDisplayMode(DisplayMode.RADIO);
+        nColumnsSelectionProvider.appendRow(1, "1", true);
+        nColumnsSelectionProvider.appendRow(2, "2", true);
+        nColumnsSelectionProvider.appendRow(3, "3", true);
+        nColumnsSelectionProvider.appendRow(4, "4", true);
+        nColumnsSelectionProvider.appendRow(6, "6", true);
+        formBuilder.configSelectionProvider(nColumnsSelectionProvider, "columns");
     }
 
     protected void setupSelectionProvidersForm(Map<List<String>, Collection<String>> selectionProviderNames) {
