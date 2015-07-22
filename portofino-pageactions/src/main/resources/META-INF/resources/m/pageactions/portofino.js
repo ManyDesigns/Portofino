@@ -101,9 +101,9 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, meth
 }
 
 function setupDatePicker(dateFieldId, dateFormat) {
-    if(dateFormat.contains("z")) {
+    if(dateFormat.indexOf("z") >= 0) {
         if(console && console.debug) {
-            console.debug("'z' is unsupported in date/time pattern " + dateFormat);
+            console.debug("'z' and 'zz' are unsupported in date/time patterns. Offending pattern: " + dateFormat);
         }
         return;
     }

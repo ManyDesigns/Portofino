@@ -1123,7 +1123,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     String key = matcher.group(1);
                     String value = matcher.group(2);
                     logger.debug("Matched part: {}={}", key, value);
-                    dummyRequest.addParameter(key, value);
+                    try {
+                        dummyRequest.addParameter(URLDecoder.decode(key, getUrlEncoding()), URLDecoder.decode(value, getUrlEncoding()));
+                    } catch (UnsupportedEncodingException e) {
+                        logger.error("Unsupported encoding when parsing search string", e);
+                    }
                 } else {
                     logger.debug("Could not match part: {}", part);
                 }
