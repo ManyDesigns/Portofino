@@ -58,7 +58,7 @@ import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
-import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
+import com.manydesigns.portofino.pageactions.crud.configuration.database.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Group;

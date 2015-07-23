@@ -20,15 +20,21 @@ public class AggregateClassAccessor implements ClassAccessor {
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
     protected final List<ClassAccessor> accessors;
+    protected final List<String> aliases;
     protected String name;
     protected Class<? extends List> collectionClass = ArrayList.class;
 
     public AggregateClassAccessor(List<ClassAccessor> accessors) {
         this.accessors = accessors;
+        aliases = Arrays.asList(new String[accessors.size()]);
     }
 
     public AggregateClassAccessor(ClassAccessor... accessors) {
         this(Arrays.asList(accessors));
+    }
+
+    public void alias(int index, String alias) {
+        aliases.set(index, alias);
     }
 
     public List<ClassAccessor> getAccessors() {
@@ -57,7 +63,7 @@ public class AggregateClassAccessor implements ClassAccessor {
         int index = 0;
         for(ClassAccessor accessor : accessors) {
             try {
-                return new PropertyAccessorWrapper(accessor.getProperty(propertyName), index);
+                return new PropertyAccessorWrapper(accessor, accessor.getProperty(propertyName), index);
             } catch (NoSuchFieldException e) {}
             index++;
         }
@@ -72,7 +78,7 @@ public class AggregateClassAccessor implements ClassAccessor {
             PropertyAccessor[] properties = accessor.getProperties();
             PropertyAccessor[] wrappers = new PropertyAccessor[properties.length];
             for(int i = 0; i < properties.length; i++) {
-                wrappers[i] = new PropertyAccessorWrapper(properties[i], index);
+                wrappers[i] = new PropertyAccessorWrapper(accessor, properties[i], index);
             }
             Collections.addAll(allProperties, wrappers);
             index++;
@@ -88,7 +94,7 @@ public class AggregateClassAccessor implements ClassAccessor {
             PropertyAccessor[] properties = accessor.getKeyProperties();
             PropertyAccessor[] wrappers = new PropertyAccessor[properties.length];
             for(int i = 0; i < properties.length; i++) {
-                wrappers[i] = new PropertyAccessorWrapper(properties[i], index);
+                wrappers[i] = new PropertyAccessorWrapper(accessor, properties[i], index);
             }
             Collections.addAll(allProperties, wrappers);
             index++;
@@ -154,19 +160,40 @@ public class AggregateClassAccessor implements ClassAccessor {
         return allAnnotations.toArray(new Annotation[allAnnotations.size()]);
     }
 
+    public String getAccessorName(ClassAccessor classAccessor) {
+        return getAccessorName(classAccessor, accessors.indexOf(classAccessor));
+    }
+
+    public String getAccessorName(int index) {
+        return getAccessorName(accessors.get(index), index);
+    }
+
+    protected String getAccessorName(ClassAccessor classAccessor, int index) {
+        String alias = aliases.get(index);
+        if(alias != null) {
+            return alias;
+        }
+        return StringUtils.defaultString(
+                classAccessor.getName(),
+                StringUtils.defaultString(name) + "[" + index + "]");
+    }
+
     public class PropertyAccessorWrapper implements PropertyAccessor {
 
+        protected final ClassAccessor classAccessor;
         protected final PropertyAccessor delegate;
         protected final int index;
 
-        public PropertyAccessorWrapper(PropertyAccessor delegate, int index) {
-            this.delegate = delegate;
+        public PropertyAccessorWrapper(ClassAccessor accessor, PropertyAccessor propertyAccessor, int index) {
+            this.classAccessor = accessor;
+            this.delegate = propertyAccessor;
             this.index = index;
         }
 
         @Override
         public String getName() {
-            return StringUtils.defaultString(name) + "[" + index + "]." + delegate.getName();
+            String accessorName = getAccessorName(classAccessor, index);
+            return accessorName + "." + delegate.getName();
         }
 
         @Override

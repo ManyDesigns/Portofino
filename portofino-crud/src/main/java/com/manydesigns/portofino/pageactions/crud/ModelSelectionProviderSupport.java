@@ -32,12 +32,12 @@ import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
+import com.manydesigns.portofino.pageactions.crud.configuration.database.SelectionProviderReference;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
-import com.manydesigns.portofino.pageactions.crud.configuration.SelectionProviderReference;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -62,12 +62,12 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
     public static final Logger logger =
             LoggerFactory.getLogger(ModelSelectionProviderSupport.class);
 
-    protected final AbstractCrudAction crudAction;
+    protected final CrudAction crudAction;
     protected final Persistence persistence;
     protected List<CrudSelectionProvider> crudSelectionProviders;
     protected final Multimap<List<String>, ModelSelectionProvider> availableSelectionProviders;
 
-    public ModelSelectionProviderSupport(AbstractCrudAction crudAction, Persistence persistence) {
+    public ModelSelectionProviderSupport(CrudAction crudAction, Persistence persistence) {
         this.crudAction = crudAction;
         this.persistence = persistence;
         availableSelectionProviders = HashMultimap.create();
@@ -231,6 +231,11 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
                 break;
             }
         }
+    }
+
+    @Override
+    public void clearSelectionProviders() {
+        crudAction.getCrudConfiguration().getSelectionProviders().clear();
     }
 
     protected SelectionProviderReference makeSelectionProviderReference(ModelSelectionProvider dsp) {

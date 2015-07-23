@@ -41,10 +41,8 @@ import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.*;
+import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -437,7 +435,10 @@ public class DispatcherLogic {
         String configurationPackage = configurationClass.getPackage().getName();
         JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        configuration = unmarshaller.unmarshal(inputStream);
+        configuration = unmarshaller.unmarshal(new StreamSource(inputStream), configurationClass);
+        if(configuration instanceof JAXBElement) {
+            configuration = ((JAXBElement) configuration).getValue();
+        }
         if (!configurationClass.isInstance(configuration)) {
             logger.error("Invalid configuration: expected " + configurationClass + ", got " + configuration);
             return null;

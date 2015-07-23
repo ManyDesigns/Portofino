@@ -57,6 +57,7 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
+import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
@@ -132,6 +133,7 @@ import java.util.regex.Pattern;
  */
 @SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
 @RequiresPermissions(level = AccessLevel.VIEW)
+@ConfigurationClass(CrudConfiguration.class)
 @SupportsDetail
 public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public static final String copyright =
@@ -433,7 +435,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         if(!crudConfiguration.isLargeResultSet()) {
             setupSearchForm(); // serve per la navigazione del result set
             loadObjects();
-            setupPagination();
+            setupResultSetNavigation();
         }
 
         setupForm(Mode.VIEW);
@@ -1049,25 +1051,35 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return (classAccessor != null);
     }
 
+    @Deprecated
     protected void setupPagination() {
-        resultSetNavigation = new ResultSetNavigation();
+        setupResultSetNavigation();
+    }
+
+    protected void setupResultSetNavigation() {
         int position = objects.indexOf(object);
+        if(position < 0) {
+            return;
+        }
         int size = objects.size();
+        setupResultSetNavigation(position, size);
+    }
+
+    protected void setupResultSetNavigation(int position, int size) {
+        resultSetNavigation = new ResultSetNavigation();
         resultSetNavigation.setPosition(position);
         resultSetNavigation.setSize(size);
         String baseUrl = calculateBaseSearchUrl();
-        if(position >= 0) {
-            if(position > 0) {
-                resultSetNavigation.setFirstUrl(generateObjectUrl(baseUrl, 0));
-                resultSetNavigation.setPreviousUrl(
-                        generateObjectUrl(baseUrl, position - 1));
-            }
-            if(position < size - 1) {
-                resultSetNavigation.setLastUrl(
-                        generateObjectUrl(baseUrl, size - 1));
-                resultSetNavigation.setNextUrl(
-                        generateObjectUrl(baseUrl, position + 1));
-            }
+        if(position > 0) {
+            resultSetNavigation.setFirstUrl(generateObjectUrl(baseUrl, 0));
+            resultSetNavigation.setPreviousUrl(
+                    generateObjectUrl(baseUrl, position - 1));
+        }
+        if(position < size - 1) {
+            resultSetNavigation.setLastUrl(
+                    generateObjectUrl(baseUrl, size - 1));
+            resultSetNavigation.setNextUrl(
+                    generateObjectUrl(baseUrl, position + 1));
         }
     }
 
@@ -1755,7 +1767,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     protected void updateSelectionProviders() {
         selectionProvidersForm.writeToObject(selectionProviderEdits);
-        crudConfiguration.getSelectionProviders().clear();
+        selectionProviderSupport.clearSelectionProviders();
         for(CrudSelectionProviderEdit sp : selectionProviderEdits) {
             List<String> key = Arrays.asList(sp.fieldNames);
             if(sp.selectionProvider == null) {
@@ -1772,8 +1784,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         propertiesTableForm.writeToObject(propertyEdits);
 
         List<CrudProperty> newProperties = new ArrayList<CrudProperty>();
+        List<CrudProperty> properties = crudConfiguration.getProperties();
         for (CrudPropertyEdit edit : propertyEdits) {
-            CrudProperty crudProperty = findProperty(edit.name, crudConfiguration.getProperties());
+            CrudProperty crudProperty = findProperty(edit.name, properties);
             if(crudProperty == null) {
                 crudProperty = new CrudProperty();
             }
@@ -1788,8 +1801,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
             newProperties.add(crudProperty);
         }
-        crudConfiguration.getProperties().clear();
-        crudConfiguration.getProperties().addAll(newProperties);
+        properties.clear();
+        properties.addAll(newProperties);
     }
 
     public boolean isRequiredFieldsPresent() {
