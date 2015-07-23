@@ -1143,13 +1143,15 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     protected SearchFormBuilder configureSearchFormBuilder(SearchFormBuilder searchFormBuilder) {
         // setup option providers
-        for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
-            SelectionProvider selectionProvider = current.getSelectionProvider();
-            if(selectionProvider == null) {
-                continue;
+        if(selectionProviderSupport != null) {
+            for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
+                SelectionProvider selectionProvider = current.getSelectionProvider();
+                if(selectionProvider == null) {
+                    continue;
+                }
+                String[] fieldNames = current.getFieldNames();
+                searchFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
             }
-            String[] fieldNames = current.getFieldNames();
-            searchFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
         return searchFormBuilder.configPrefix(searchPrefix);
     }
@@ -1176,6 +1178,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected void configureTableFormSelectionProviders(TableFormBuilder tableFormBuilder) {
+        if(selectionProviderSupport == null) {
+            return;
+        }
         // setup option providers
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
@@ -1317,6 +1322,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected void configureFormSelectionProviders(FormBuilder formBuilder) {
+        if(selectionProviderSupport == null) {
+            return;
+        }
         // setup option providers
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
@@ -1681,8 +1689,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                         selectionProviderEdits[i].selectionProvider = selectionProvider.getName();
                         selectionProviderEdits[i].displayMode = selectionProvider.getDisplayMode();
                         selectionProviderEdits[i].searchDisplayMode = selectionProvider.getSearchDisplayMode();
-                        selectionProviderEdits[i].createNewHref = cp.getCreateNewValueHref();
-                        selectionProviderEdits[i].createNewText = cp.getCreateNewValueText();
+                        selectionProviderEdits[i].createNewHref = selectionProvider.getCreateNewValueHref();
+                        selectionProviderEdits[i].createNewText = selectionProvider.getCreateNewValueText();
                     } else {
                         selectionProviderEdits[i].selectionProvider = null;
                         selectionProviderEdits[i].displayMode = DisplayMode.DROPDOWN;

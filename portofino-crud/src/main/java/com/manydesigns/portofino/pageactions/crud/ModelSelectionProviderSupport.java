@@ -84,11 +84,11 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
                 DatabaseSelectionProvider dsp = (DatabaseSelectionProvider) ref.getSelectionProvider();
                 added = setupSelectionProvider(ref, dsp, configuredSPs);
             } else {
-                AbstractCrudAction.logger.error("Unsupported selection provider: " + ref.getSelectionProvider());
+                logger.error("Unsupported selection provider: " + ref.getSelectionProvider());
                 continue;
             }
             if(ref.isEnabled() && !added) {
-                AbstractCrudAction.logger.warn("Selection provider {} not added; check whether the fields on which it is configured " +
+                logger.warn("Selection provider {} not added; check whether the fields on which it is configured " +
                         "overlap with some other selection provider", ref);
             }
         }
@@ -112,7 +112,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
                 if(dsp instanceof DatabaseSelectionProvider) {
                     setupSelectionProvider(null, (DatabaseSelectionProvider) dsp, configuredSPs);
                 } else {
-                    AbstractCrudAction.logger.error("Unsupported selection provider: " + dsp);
+                    logger.error("Unsupported selection provider: " + dsp);
                 }
             }
         }
@@ -152,14 +152,14 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
                     (current, fieldNames, fieldTypes, dm, sdm, newHref, newText);
 
             CrudSelectionProvider crudSelectionProvider =
-                new CrudSelectionProvider(selectionProvider, fieldNames, newHref, newText);
+                new CrudSelectionProvider(selectionProvider, fieldNames);
             crudSelectionProviders.add(crudSelectionProvider);
             Collections.addAll(configuredSPs, fieldNames);
             return true;
         } else {
             //To avoid automatically adding a FK later
             CrudSelectionProvider crudSelectionProvider =
-                new CrudSelectionProvider(null, fieldNames, null, null);
+                new CrudSelectionProvider(null, fieldNames);
             crudSelectionProviders.add(crudSelectionProvider);
             return false;
         }
