@@ -316,13 +316,16 @@ public class SelectSearchField extends AbstractSearchField {
                                        String label,
                                        String stringValue,
                                        boolean checked) {
+
+        xb.writeNbsp();
+        xb.writeInputRadio(radioId, inputName, stringValue, checked);
+        xb.writeNbsp();
+
         xb.openElement("label");
         xb.addAttribute("class", "radio");
         xb.addAttribute("for", radioId);
         xb.writeNbsp();
         xb.write(label);
-        xb.writeNbsp();
-        xb.writeInputRadio(radioId, inputName, stringValue, checked);
         xb.writeNbsp();
         xb.closeElement("label");
     }
@@ -351,8 +354,7 @@ public class SelectSearchField extends AbstractSearchField {
     private void valueToXhtmlCheckbox(XhtmlBuffer xb) {
         xb.writeLabel(StringUtils.capitalize(label), id, ATTR_NAME_HTML_CLASS);
 
-        xb.openElement("div");
-        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS + " checkbox");
+
 
         Object[] values = getValues();
         Map<Object, SelectionModel.Option> options =
@@ -363,24 +365,36 @@ public class SelectSearchField extends AbstractSearchField {
             if(!option.getValue().active) {
                 continue;
             }
+
+            xb.openElement("div");
+        xb.addAttribute("class", FORM_CONTROL_CSS_CLASS + " checkbox");
+
             Object optionValue = option.getKey();
             String optionStringValue =
                     OgnlUtils.convertValueToString(optionValue);
             String optionLabel = option.getValue().label;
             boolean checked =  ArrayUtils.contains(values, optionValue);
             String checkboxId = id + "_" + counter;
-            xb.openElement("label");
-            xb.addAttribute("class", "checkbox");
-            xb.addAttribute("for", checkboxId);
-            xb.writeNbsp();
-            xb.write(optionLabel);
-            xb.writeNbsp();
+
+            //xb.writeNbsp();
             xb.writeInputCheckbox(checkboxId, inputName, optionStringValue, checked);
-            xb.writeNbsp();
-            xb.closeElement("label");
+            //xb.writeNbsp();
+            xb.openElement("label");
+            //xb.addAttribute("class", "checkbox");
+            xb.addAttribute("for", checkboxId);
+            //xb.writeNbsp();
+            //xb.write(optionLabel);
+
             counter++;
+
+            //xb.openElement("span");
+            //xb.addAttribute("class", "checkbox-label");
+            xb.write(optionLabel);
+            //xb.closeElement("span");
+            xb.closeElement("label");
+            xb.closeElement("div");
         }
-        xb.closeElement("div");
+
     }
 
     private void valueToXhtmlMultipleSelection(XhtmlBuffer xb) {

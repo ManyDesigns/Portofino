@@ -93,7 +93,7 @@ public class ModulesAction extends AbstractActionBean {
         form.readFromObject(modules);
     }
 
-    @Button(list = "modules", key = "return.to.pages", order = 2)
+    @Button(list = "modules", key = "return.to.pages", order = 2  , icon = Button.ICON_HOME)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

@@ -14,7 +14,10 @@
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.modules.ModulesAction"
                       method="post">
             <div class="form-group">
-                <button name="returnToPages" type="submit" class="btn btn-default">Return to pages</button>
+                <button name="returnToPages" type="submit" class="btn btn-default">
+                    <em class="glyphicon  glyphicon-home"></em>
+                    <fmt:message key='return.to.pages'/>
+                </button>
             </div>
         </stripes:form>
     </stripes:layout-component>

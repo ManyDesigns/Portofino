@@ -24,8 +24,9 @@
                 <stripes:password name="pwd" id="pwd" class="form-control"/>
             </div>
             <div class="checkbox">
-                <label class="checkbox">
-                    <stripes:checkbox name="rememberMe" id="rememberMe"/> <fmt:message key='remember.me.on.this.computer'/>
+                <stripes:checkbox name="rememberMe" id="rememberMe"/>
+                <label for="rememberMe">
+                    <fmt:message key='remember.me.on.this.computer'/>
                 </label>
             </div>
             <button type="submit" name="login" class="btn btn-primary">

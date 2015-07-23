@@ -44,7 +44,6 @@ public class EditPage {
     public String title;
 
     @LabelI18N("description")
-    @Required
     @CssClass(BootstrapSizes.FILL_ROW)
     public String description;
 

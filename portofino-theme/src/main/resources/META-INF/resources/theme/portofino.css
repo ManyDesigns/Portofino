@@ -6,6 +6,7 @@ footer {
     border-top: 1px solid #E5E5E5;
     padding-top: 10px;
     padding-bottom: 10px;
+    background: linear-gradient( to bottom, rgba(240, 240, 240, 0.5) , rgba(255, 255, 255, 0));
 }
 
 .header-menu {
@@ -423,7 +424,7 @@ Search form
     overflow-x: auto;
     overflow-y: hidden; /* Fixes a bug in Chrome */
     margin-bottom: 20px;
-    border-top: 1px solid #DDDDDD;
+    /*border-top: 1px solid #DDDDDD; */
 }
 
 .search_results th a {

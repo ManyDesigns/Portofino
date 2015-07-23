@@ -459,7 +459,7 @@ public class ConnectionProvidersAction extends AbstractActionBean {
         return new RedirectResolution(ConnectionProvidersAction.class);
     }
 
-    @Button(list = "connectionProviders-search", key = "return.to.pages", order = 3)
+    @Button(list = "connectionProviders-search", key = "return.to.pages", order = 3  , icon = Button.ICON_HOME)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

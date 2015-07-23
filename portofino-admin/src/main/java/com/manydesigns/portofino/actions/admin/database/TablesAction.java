@@ -336,7 +336,7 @@ public class TablesAction extends AbstractActionBean {
         return resolution;
     }
 
-    @Button(key = "layouts.admin.tables.addSelectionProvider", list="table-selection-providers")
+    @Button(key = "layouts.admin.tables.addSelectionProvider", list="table-selection-providers" , icon = Button.ICON_PLUS , type = Button.TYPE_INFO )
     public Resolution addSelectionProvider() {
         table = findTable();
         databaseSelectionProvider = new DatabaseSelectionProvider(table);
@@ -730,7 +730,7 @@ public class TablesAction extends AbstractActionBean {
         return column;
     }
 
-    @Button(list = "tables-list", key = "return.to.pages", order = 3)
+    @Button(list = "tables-list", key = "return.to.pages", order = 3  , icon = Button.ICON_HOME)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

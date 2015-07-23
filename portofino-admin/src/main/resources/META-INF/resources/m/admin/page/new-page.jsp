@@ -103,7 +103,7 @@
         StringBuilder sb = new StringBuilder();
         for (BreadcrumbItem current : items) {
             sb.append(current.getText());
-            sb.append(" > ");
+            sb.append(" / ");
         }
         return StringEscapeUtils.escapeJavaScript(sb.toString());
     }
