@@ -10,9 +10,10 @@
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        <div>
+        <br/>
+        <p>
             <strong><em class="glyphicon glyphicon-tag"></em> Ticket description:</strong>
-        </div>
+        </p>
         <c:if test="${not empty actionBean.ticket.description}">
             <div><c:out value="${mde:formattedText(actionBean.ticket.description, false)}" escapeXml="false"/></div>
         </c:if>
@@ -27,6 +28,7 @@
             <stripes:form action="${actionBean.context.actionPath}" method="post">
                 <label>Add a comment:</label>
                 <textarea maxlength="4000" name="comment" class="form-control"></textarea>
+                <br/>
                 <div>
                     <portofino:buttons list="activity"/>
                 </div>
