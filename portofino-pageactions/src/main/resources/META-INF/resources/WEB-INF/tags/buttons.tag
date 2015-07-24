@@ -19,11 +19,10 @@
 %><%@ tag import="org.slf4j.Logger"
 %><%@ tag import="org.slf4j.LoggerFactory"
 %><%@ tag import="javax.servlet.jsp.jstl.fmt.LocalizationContext"
-%>
-<%@ tag import="java.lang.reflect.Method" %>
-<%@ tag import="java.util.List" %>
-<%@ tag import="java.util.MissingResourceException" %>
-<%@ attribute name="list" required="true"
+%><%@ tag import="java.lang.reflect.Method"
+%><%@ tag import="java.util.List"
+%><%@ tag import="java.util.MissingResourceException"
+%><%@ attribute name="list" required="true"
 %><%@ attribute name="cssClass" required="false"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%
@@ -71,6 +70,7 @@
                 if(!theButton.group().equals(group)) {
                     if(group != null) {
                         buffer.closeElement("div");
+                        buffer.write(" ");
                     }
                     buffer.openElement("div");
                     buffer.addAttribute("class", "btn-group");
@@ -79,6 +79,7 @@
             } else {
                 if(group != null) {
                     buffer.closeElement("div");
+                    buffer.write(" ");
                 }
                 group = null;
             }
