@@ -38,9 +38,7 @@ import java.lang.annotation.Annotation;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class CrudAccessor
-        extends AbstractAnnotatedAccessor
-        implements ClassAccessor {
+public class CrudAccessor extends AbstractAnnotatedAccessor implements ClassAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
@@ -144,6 +142,11 @@ public class CrudAccessor
 
     public String getName() {
         return crudConfiguration.getName();
+    }
+
+    @Override
+    public Class<?> getType() {
+        return tableAccessor.getType();
     }
 
     public CrudPropertyAccessor getProperty(String propertyName) throws NoSuchFieldException {

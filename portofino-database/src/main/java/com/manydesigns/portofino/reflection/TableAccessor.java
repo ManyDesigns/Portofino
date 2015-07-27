@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -42,9 +43,7 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class TableAccessor
-        extends AbstractAnnotatedAccessor
-        implements ClassAccessor {
+public class TableAccessor extends AbstractAnnotatedAccessor implements ClassAccessor {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
@@ -134,6 +133,15 @@ public class TableAccessor
 
     public String getName() {
         return table.getQualifiedName();
+    }
+
+    @Override
+    public Class<?> getType() {
+        if (javaClassAccessor == null) {
+            return Map.class;
+        } else {
+            return javaClassAccessor.getType();
+        }
     }
 
     public PropertyAccessor getProperty(String propertyName)

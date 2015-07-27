@@ -218,6 +218,11 @@ public class JavaClassAccessor implements ClassAccessor {
         return javaClass.getName();
     }
 
+    @Override
+    public Class<?> getType() {
+        return javaClass;
+    }
+
     public PropertyAccessor getProperty(String propertyName)
             throws NoSuchFieldException {
         for (PropertyAccessor current : propertyAccessors) {

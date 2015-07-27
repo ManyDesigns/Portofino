@@ -107,5 +107,10 @@ public class ClassAccessorDecorator extends AbstractAnnotatedAccessor implements
         return delegate.newInstance();
     }
 
+    @Override
+    public Class<?> getType() {
+        return delegate.getType();
+    }
+
 
 }
