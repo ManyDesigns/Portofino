@@ -40,10 +40,8 @@
                     </div>
                 </div>
             </c:if>
-            <c:if test="${not empty actionBean.searchString}">
-                <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
-            </c:if>
-            <jsp:include page="/m/crud/datatable.jsp" />
+            <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
+            <div class="portofino-datatable"></div>
         </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

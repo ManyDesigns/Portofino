@@ -17,9 +17,7 @@
                       enctype="multipart/form-data" class="form-horizontal edit bulk">
             <mde:write name="actionBean" property="form"/>
             <stripes:hidden name="selection"/>
-            <c:if test="${not empty actionBean.searchString}">
-                <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
-            </c:if>
+            <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-10">

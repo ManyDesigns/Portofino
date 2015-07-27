@@ -18,12 +18,12 @@
     <script src="<stripes:url value='/webjars/respond/1.4.2/dest/respond.min.js' />"></script>
     <script src="<stripes:url value='/m/chart/chartjs/excanvas.js' />"></script>
 <![endif]-->
-<link rel="stylesheet" type="text/css" href="<stripes:url value='/webjars/bootstrap/3.3.4/css/bootstrap.min.css' />">
-<link rel="stylesheet" type="text/css" href="<stripes:url value='/webjars/bootstrap/3.3.4/css/bootstrap-theme.min.css' />">
+<link rel="stylesheet" type="text/css" href="<stripes:url value='/webjars/bootstrap/3.3.5/css/bootstrap.min.css' />">
+<link rel="stylesheet" type="text/css" href="<stripes:url value='/webjars/bootstrap/3.3.5/css/bootstrap-theme.min.css' />">
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/webjars/Eonasdan-bootstrap-datetimepicker/4.7.14/bootstrap-datetimepicker.min.css' />">
 <link rel="stylesheet" type="text/css" href="<stripes:url value='/theme/jquery-ui/css/no-theme/jquery-ui-1.10.3.custom.min.css' />">
 <script type="text/javascript" src="<stripes:url value='/webjars/jquery/1.11.3/jquery.min.js' />" ></script>
-<script type="text/javascript" src="<stripes:url value='/webjars/bootstrap/3.3.4/js/bootstrap.min.js' />" ></script>
+<script type="text/javascript" src="<stripes:url value='/webjars/bootstrap/3.3.5/js/bootstrap.min.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/webjars/momentjs/2.10.3/min/moment-with-locales.min.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/webjars/Eonasdan-bootstrap-datetimepicker/4.7.14/bootstrap-datetimepicker.min.js' />" ></script>
 <script type="text/javascript" src="<stripes:url value='/webjars/typeaheadjs/0.10.5/typeahead.bundle.min.js' />" ></script>

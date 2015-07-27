@@ -299,12 +299,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         @Button(list = "crud-search-form-default-button", key = "search")
     })
     public Resolution search() {
-        searchVisible = true;
-        searchString = null;
-        sortProperty = null;
-        sortDirection = null;
-        firstResult = null;
-        maxResults = null;
+        //Not really used. Search is AJAX these days.
         return doSearch();
     }
 
@@ -424,7 +419,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     @Button(list = "crud-search-form", key = "reset.search", order = 2)
     public Resolution resetSearch() {
-        return new RedirectResolution(context.getActionPath()).addParameter("searchVisible", true);
+        //Not really used. Search is AJAX these days.
+        return new RedirectResolution(context.getActionPath());
     }
 
     //**************************************************************************
@@ -2143,7 +2139,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public String describeClassAccessor() {
         JSONStringer jsonStringer = new JSONStringer();
-        ReflectionUtil.classAccessorToJson(jsonStringer, getClassAccessor());
+        ReflectionUtil.classAccessorToJson(getClassAccessor(), jsonStringer);
         return jsonStringer.toString();
     }
 
@@ -2255,10 +2251,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public T getObject() {
         return object;
-    }
-
-    public void setObject(T object) {
-        this.object = object;
     }
 
     public boolean isMultipartRequest() {

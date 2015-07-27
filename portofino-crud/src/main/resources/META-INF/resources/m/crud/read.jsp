@@ -25,9 +25,7 @@
             <div class="hidden-submit"><portofino:buttons list="crud-read-default-button" /></div>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <mde:write name="actionBean" property="form"/>
-            <c:if test="${not empty actionBean.searchString}">
-                <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
-            </c:if>
+            <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
             <div class="form-group crudReadButtons">
                 <portofino:buttons list="crud-read" />
             </div>
