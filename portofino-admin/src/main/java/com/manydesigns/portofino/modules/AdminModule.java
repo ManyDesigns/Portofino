@@ -25,6 +25,7 @@ import com.manydesigns.portofino.actions.admin.appwizard.ApplicationWizard;
 import com.manydesigns.portofino.actions.admin.database.ConnectionProvidersAction;
 import com.manydesigns.portofino.actions.admin.database.ReloadModelAction;
 import com.manydesigns.portofino.actions.admin.database.TablesAction;
+import com.manydesigns.portofino.actions.admin.groovy.GroovyAdminAction;
 import com.manydesigns.portofino.actions.admin.mail.MailSettingsAction;
 import com.manydesigns.portofino.actions.admin.modules.ModulesAction;
 import com.manydesigns.portofino.actions.admin.page.RootChildrenAction;
@@ -105,57 +106,61 @@ public class AdminModule implements Module {
         SimpleMenuAppender link;
 
         //General configuration
-        group = SimpleMenuAppender.group("configuration", null, "Configuration", 1.0);
+        group = SimpleMenuAppender.group("configuration", null, "configuration", 1.0);
         adminMenu.menuAppenders.add(group);
 
         link = SimpleMenuAppender.link(
-                "configuration", "settings", null, "Settings", SettingsAction.URL_BINDING, 1.0);
+                "configuration", "settings", null, "settings", SettingsAction.URL_BINDING, 1.0);
         adminMenu.menuAppenders.add(link);
 
         link = SimpleMenuAppender.link(
-                "configuration", "modules", null, "Modules", ModulesAction.URL_BINDING, 2.0);
+                "configuration", "modules", null, "modules", ModulesAction.URL_BINDING, 2.0);
         adminMenu.menuAppenders.add(link);
 
         link = SimpleMenuAppender.link(
-                "configuration", "servlet-context", null, "Servlet Context", ServletContextAction.URL_BINDING, 3.0);
+                "configuration", "servlet-context", null, "servlet.context", ServletContextAction.URL_BINDING, 3.0);
         adminMenu.menuAppenders.add(link);
 
         link = SimpleMenuAppender.link(
-                "configuration", "topLevelPages", null, "Top-level pages", RootChildrenAction.URL_BINDING, 4.0);
+                "configuration", "topLevelPages", null, "top.level.pages", RootChildrenAction.URL_BINDING, 4.0);
+        adminMenu.menuAppenders.add(link);
+
+        link = SimpleMenuAppender.link(
+                "configuration", "groovy", null, "groovy", GroovyAdminAction.URL_BINDING, 5.0);
         adminMenu.menuAppenders.add(link);
 
         //Security
-        group = SimpleMenuAppender.group("security", null, "Security", 2.0);
+        group = SimpleMenuAppender.group("security", null, "security", 2.0);
         adminMenu.menuAppenders.add(group);
 
         link = SimpleMenuAppender.link(
-                "security", "rootPermissions", null, "Root permissions", RootPermissionsAction.URL_BINDING, 1.0);
+                "security", "rootPermissions", null, "root.permissions", RootPermissionsAction.URL_BINDING, 1.0);
         adminMenu.menuAppenders.add(link);
 
         //Database & modeling
-        group = SimpleMenuAppender.group("dataModeling", null, "Data modeling", 3.0);
+        group = SimpleMenuAppender.group("dataModeling", null, "data.modeling", 3.0);
         adminMenu.menuAppenders.add(group);
 
         link = SimpleMenuAppender.link(
-                "dataModeling", "wizard", null, "Wizard", ApplicationWizard.URL_BINDING, 1.0);
+                "dataModeling", "wizard", null, "wizard", ApplicationWizard.URL_BINDING, 1.0);
         adminMenu.menuAppenders.add(link);
 
         link = SimpleMenuAppender.link(
-                "dataModeling", "connectionProviders", null, "Connection providers", ConnectionProvidersAction.URL_BINDING, 2.0);
+                "dataModeling", "connectionProviders", null, "connection.providers", ConnectionProvidersAction.URL_BINDING, 2.0);
         adminMenu.menuAppenders.add(link);
         link = SimpleMenuAppender.link(
-                "dataModeling", "tables", null, "Tables", TablesAction.BASE_ACTION_PATH, 3.0);
+                "dataModeling", "tables", null, "tables", TablesAction.BASE_ACTION_PATH, 3.0);
         adminMenu.menuAppenders.add(link);
         link = SimpleMenuAppender.link(
-                "dataModeling", "reloadModel", null, "Reload model", ReloadModelAction.URL_BINDING, 4.0);
+                "dataModeling", "reloadModel", null, "reload.model", ReloadModelAction.URL_BINDING, 4.0);
         adminMenu.menuAppenders.add(link);
 
         //Mail
-        group = SimpleMenuAppender.group("mail", null, "Mail", 4.0);
+        group = SimpleMenuAppender.group("mail", null, "mail", 4.0);
         adminMenu.menuAppenders.add(group);
 
         link = SimpleMenuAppender.link(
-                "mail", "Mail", null, "Mail", MailSettingsAction.URL_BINDING, 1.0);
+                "mail", "Mail", null, "mail", MailSettingsAction.URL_BINDING, 1.0);
         adminMenu.menuAppenders.add(link);
 
         servletContext.setAttribute(ADMIN_MENU, adminMenu);
