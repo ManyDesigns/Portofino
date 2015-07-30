@@ -42,7 +42,9 @@ import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PrimaryKey;
 import org.hibernate.mapping.Table;
 import org.hibernate.type.*;
+import org.jadira.usertype.dateandtime.joda.PersistentDateTime;
 import org.jetbrains.annotations.Nullable;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -910,6 +912,8 @@ public class HibernateConfig {
                 default:
                     typeName = null;
             }
+        } else if(DateTime.class.isAssignableFrom(javaType)) {
+            typeName = PersistentDateTime.class.getName();
         } else if (javaType == Boolean.class) {
             if(jdbcType == Types.BIT || jdbcType == Types.BOOLEAN) {
                 typeName = BooleanType.INSTANCE.getName();

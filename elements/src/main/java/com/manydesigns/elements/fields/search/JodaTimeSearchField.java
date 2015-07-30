@@ -18,45 +18,32 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.elements.fields;
+package com.manydesigns.elements.fields.search;
 
-import com.manydesigns.elements.Mode;
+import com.manydesigns.elements.fields.search.AbstractDateSearchField;
 import com.manydesigns.elements.reflection.PropertyAccessor;
-import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
-import java.util.Date;
-
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-public class DateField extends AbstractDateField<Date> {
+/**
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public class JodaTimeSearchField extends AbstractDateSearchField {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
-    //**************************************************************************
-    // Constructors
-    //**************************************************************************
-
-    public DateField(PropertyAccessor accessor, Mode mode) {
-        this(accessor, mode, null);
+    public JodaTimeSearchField(PropertyAccessor accessor) {
+        super(accessor);
     }
 
-    public DateField(PropertyAccessor accessor, Mode mode, String prefix) {
-        super(accessor, mode, prefix);
+    public JodaTimeSearchField(PropertyAccessor accessor, String prefix) {
+        super(accessor, prefix);
     }
 
     @Override
-    protected Date toDate(@NotNull DateTime dateTime) {
-        return dateTime.toDate();
+    protected Object toDate(DateTime dateTime) {
+        return dateTime;
     }
-
-    @Override
-    protected DateTime fromDate(@NotNull Date dateValue) {
-        return new DateTime(dateValue);
-    }
-
 }

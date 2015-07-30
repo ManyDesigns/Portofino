@@ -36,6 +36,12 @@
             <version>${javax.ws.rs.api.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- Reporting/export -->
         <dependency>
             <groupId>com.lowagie</groupId>

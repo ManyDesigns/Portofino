@@ -22,18 +22,20 @@ package com.manydesigns.elements.fields;
 
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.util.Util;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Date;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
-public class DateField extends AbstractDateField<Date> {
+/**
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
+public class JodaTimeField extends AbstractDateField<DateTime> {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
@@ -41,22 +43,22 @@ public class DateField extends AbstractDateField<Date> {
     // Constructors
     //**************************************************************************
 
-    public DateField(PropertyAccessor accessor, Mode mode) {
+    public JodaTimeField(PropertyAccessor accessor, Mode mode) {
         this(accessor, mode, null);
     }
 
-    public DateField(PropertyAccessor accessor, Mode mode, String prefix) {
+    public JodaTimeField(PropertyAccessor accessor, Mode mode, String prefix) {
         super(accessor, mode, prefix);
     }
 
     @Override
-    protected Date toDate(@NotNull DateTime dateTime) {
-        return dateTime.toDate();
+    protected DateTime toDate(@NotNull DateTime dateTime) {
+        return dateTime;
     }
 
     @Override
-    protected DateTime fromDate(@NotNull Date dateValue) {
-        return new DateTime(dateValue);
+    protected DateTime fromDate(@NotNull DateTime dateValue) {
+        return dateValue;
     }
 
 }

@@ -35,7 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.URLEncoder;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -473,13 +472,12 @@ public class Util {
         return sb.toString();
     }
 
-    public static Date parseDateTime(DateTimeFormatter dateTimeFormatter, String input, boolean withTime) {
+    public static DateTime parseDateTime(DateTimeFormatter dateTimeFormatter, String input, boolean withTime) {
         if(withTime) {
-            DateTime dateTime = dateTimeFormatter.parseDateTime(input);
-            return new Date(dateTime.getMillis());
+            return dateTimeFormatter.parseDateTime(input);
         } else {
             LocalDate localDate = dateTimeFormatter.parseLocalDate(input);
-            return localDate.toDateTimeAtStartOfDay().toDate();
+            return localDate.toDateTimeAtStartOfDay();
         }
     }
 
