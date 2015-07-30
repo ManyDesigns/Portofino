@@ -13,7 +13,7 @@
              type="org.apache.commons.configuration.Configuration"/>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.stripes.AbstractActionBean"/>
 <fmt:setLocale value="${pageContext.request.locale}"/>
-<header class="navbar navbar-inverse navbar-static-top" role="banner">
+<header class="navbar navbar-inverse navbar-static-top">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -26,7 +26,7 @@
                 <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
             </stripes:link>
         </div>
-        <nav id="header-menu" class="navbar-collapse collapse" role="navigation">
+        <nav id="header-menu" class="navbar-collapse collapse">
             <c:if test="${not empty actionBean.pageInstance}">
                 <form id="pageAdminForm" action="${pageContext.request.contextPath}/actions/admin/page">
                     <input type="hidden" name="originalPath" value="${actionBean.context.actionPath}" />

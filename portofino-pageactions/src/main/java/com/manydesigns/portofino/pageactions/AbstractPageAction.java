@@ -66,10 +66,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import java.io.*;
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Convenient abstract base class for PageActions. It has fields to hold values of properties specified by the
@@ -116,6 +116,8 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     @Inject(BaseModule.SERVER_INFO)
     public ServerInfo serverInfo;
+
+    protected String pageTemplate;
 
     //--------------------------------------------------------------------------
     // UI
@@ -274,11 +276,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     public void setPageConfigurationForm(Form pageConfigurationForm) {
         this.pageConfigurationForm = pageConfigurationForm;
-    }
-
-    @Deprecated
-    protected Resolution forwardToPortletPage(String pageJsp) {
-        return forwardTo(pageJsp);
     }
 
     @Button(list = "configuration", key = "cancel", order = 99)
@@ -520,24 +517,12 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     //--------------------------------------------------------------------------
 
     /**
-     * <p>Returns a string corresponding to a key in the resource bundle for the request locale.</p>
-     * <p>The string can contain placeholders (see the {@link MessageFormat} class for details) that will
-     * be substituted with values from the <code>args</code> array.</p>
-     * @param key the key to search in the resource bundle.
-     * @param args the arguments to be interpolated in the message string.
-     * @deprecated please use ElementsThreadLocals.getText instead.
-     */
-    @Deprecated
-    public String getMessage(String key, Object... args) {
-        return ElementsThreadLocals.getText(key, args);
-    }
-
-    /**
      * Returns a ForwardResolution to the given page, and sets up internal parameters that need to be propagated in case
      * of embedding.
      * @param page the path to the page, from the root of the webapp.
      * @return a Resolution that forwards to the given page.
      */
+    @Deprecated
     public Resolution forwardTo(String page) {
         return new ForwardResolution(page);
     }
@@ -550,23 +535,25 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return new ForwardResolution("/m/pageactions/pageaction-not-configured.jsp");
     }
 
-    @Deprecated
-    public Resolution forwardToPortletNotConfigured() {
-        return forwardToPageActionNotConfigured();
-    }
-
     /**
      * Returns a ForwardResolution to a standard page that reports an exception with an error message saying that
      * the pageaction is not properly configured.
      */
     public Resolution forwardToPageActionError(Throwable e) {
         context.getRequest().setAttribute(PORTOFINO_PAGEACTION_EXCEPTION, e);
-        return forwardTo("/m/pageactions/pageaction-error.jsp");
+        return new ForwardResolution("/m/pageactions/pageaction-error.jsp");
     }
 
-    @Deprecated
-    public Resolution forwardToPortletError(Throwable e) {
-        return forwardToPageActionError(e);
+    public String getPageTemplate() {
+        Pattern pattern = Pattern.compile("^(\\w|\\d|-)+");
+        if(pageTemplate != null && pattern.matcher(pageTemplate).matches()) {
+            return pageTemplate;
+        } else {
+            return getPageInstance().getLayout().getTemplate();
+        }
     }
 
+    public void setPageTemplate(String pageTemplate) {
+        this.pageTemplate = pageTemplate;
+    }
 }
