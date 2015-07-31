@@ -21,35 +21,28 @@
 package com.manydesigns.portofino.database.platforms;
 
 import com.manydesigns.portofino.model.database.ConnectionProvider;
-import org.apache.commons.dbutils.DbUtils;
-import org.hibernate.dialect.MySQLDialect;
+import org.hibernate.dialect.DB2400Dialect;
 
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
+/**
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
-public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
+public class IbmDb2iDatabasePlatform extends AbstractDatabasePlatform {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
-    public final static String DESCRIPTION = "MySQL 5.x";
+    public final static String DESCRIPTION = "IBM DB2 for iSeries (AS/400)";
     public final static String STANDARD_DRIVER_CLASS_NAME =
-            "com.mysql.jdbc.Driver";
+            "com.ibm.as400.access.AS400JDBCDriver";
 
     //**************************************************************************
     // Constructors
     //**************************************************************************
 
-    public MySql5DatabasePlatform() {
-        super(new MySQLDialect(), "jdbc:mysql://<host>[:<port>][/<database>]");
+    public IbmDb2iDatabasePlatform() {
+        super(new DB2400Dialect(), "jdbc:as400:<host>");
     }
 
     //**************************************************************************
@@ -65,22 +58,6 @@ public class MySql5DatabasePlatform extends AbstractDatabasePlatform {
     }
 
     public boolean isApplicable(ConnectionProvider connectionProvider) {
-        return "MySQL".equals(connectionProvider.getDatabaseProductName());
-    }
-
-
-    public List<String> getSchemaNames(DatabaseMetaData databaseMetaData) throws SQLException {
-        ResultSet rs = databaseMetaData.getCatalogs();
-        List<String> schemaNames = new ArrayList<String>();
-        try {
-            while(rs.next()) {
-                String schemaName = rs.getString(TABLE_CAT);
-                schemaNames.add(schemaName);
-            }
-        } finally {
-            DbUtils.closeQuietly(rs);
-        }
-        return schemaNames;
+        return connectionProvider.getDatabaseProductName().startsWith("DB2 UDB for AS/400");
     }
 }
-

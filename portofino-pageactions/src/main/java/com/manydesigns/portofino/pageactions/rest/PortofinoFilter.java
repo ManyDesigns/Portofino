@@ -69,7 +69,13 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         UriInfo uriInfo = requestContext.getUriInfo();
+        if(uriInfo.getMatchedResources().isEmpty()) {
+            return;
+        }
         Object resource = uriInfo.getMatchedResources().get(0);
+        if(resourceInfo == null || resourceInfo.getResourceClass() == null) {
+            return;
+        }
         if(resource.getClass() != resourceInfo.getResourceClass()) {
             throw new RuntimeException("Inconsistency: matched resource is not of the right type, " + resourceInfo.getResourceClass());
         }
@@ -86,6 +92,9 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
             return;
         }
         Object resource = uriInfo.getMatchedResources().get(0);
+        if(resourceInfo == null || resourceInfo.getResourceClass() == null) {
+            return;
+        }
         if(resource.getClass() != resourceInfo.getResourceClass()) {
             throw new RuntimeException("Inconsistency: matched resource is not of the right type, " + resourceInfo.getResourceClass());
         }
@@ -107,6 +116,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
                     requestContext.abortWith(Response.ok(resolution).build());
                 }
             } catch (Exception e) {
+                logger.error("Exception applying before/after method interceptor", e);
                 requestContext.abortWith(Response.serverError().entity(e).build());
             }
         }
@@ -126,7 +136,7 @@ public class PortofinoFilter implements ContainerRequestFilter, ContainerRespons
                 if(!path.startsWith("/")) {
                     path = "/" + path;
                 }
-                context.setActionPath(path);
+                context.setActionPath(path); //TODO
                 pageAction.setContext(context);
                 Resolution resolution = pageAction.preparePage();
                 if(resolution != null) {

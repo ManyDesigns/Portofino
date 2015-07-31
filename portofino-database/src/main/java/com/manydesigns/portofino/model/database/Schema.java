@@ -52,6 +52,7 @@ public class Schema implements ModelObject {
     protected final List<Table> tables = new ArrayList<Table>();
 
     protected String schemaName;
+    protected String catalog;
     
     //**************************************************************************
     // Logging
@@ -126,6 +127,15 @@ public class Schema implements ModelObject {
 
     public void setSchemaName(String schemaName) {
         this.schemaName = schemaName;
+    }
+
+    @XmlAttribute(required = false)
+    public String getCatalog() {
+        return catalog;
+    }
+
+    public void setCatalog(String catalog) {
+        this.catalog = catalog;
     }
 
     @XmlElementWrapper(name="tables")

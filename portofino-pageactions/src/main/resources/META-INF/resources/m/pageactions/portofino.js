@@ -13,7 +13,7 @@ function updateSelectOptions(relName, selectionProviderIndex, methodName) {
         data[current.attr('name')] = current.val();
     }
     var selectField = $(selectFieldId);
-    var postUrl = stripQueryString(selectField.closest("form").action || location.href);
+    var postUrl = stripQueryString(selectField.closest("form[action]").attr("action") || location.href);
 
     jQuery.ajax({
         type: 'POST',
@@ -66,7 +66,7 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, meth
                     data[current.attr('name')] = current.attr('value');
                 }
 
-                var postUrl = stripQueryString(autocompleteObj.closest("form").action || location.href);
+                var postUrl = stripQueryString(autocompleteObj.closest("form[action]").attr("action") || location.href);
                 selectField.val(""); //Reset selected object when user types
                 $.ajax({
                     type: 'POST',
@@ -101,8 +101,18 @@ function setupAutocomplete(autocompleteId, relName, selectionProviderIndex, meth
 }
 
 function setupDatePicker(dateFieldId, dateFormat) {
+    if(dateFormat.indexOf("z") >= 0) {
+        if(console && console.debug) {
+            console.debug("'z' and 'zz' are unsupported in date/time patterns. Offending pattern: " + dateFormat);
+        }
+        return;
+    }
     var dateField = $(dateFieldId);
-    dateField.datetimepicker({ format: dateFormat.replace(/y/g, "Y").replace(/d/g, "D"), useCurrent: false });
+    var config = {
+        format: dateFormat.replace(/y/g, "Y").replace(/d/g, "D"),
+        useCurrent: false,
+        locale: portofino.locale };
+    dateField.datetimepicker(config);
     //Propagate change event. Required e.g. for AngularJS to pick up the change.
     dateField.on("dp.change", function() { $(dateField).change() });
 }
@@ -416,6 +426,7 @@ function htmlEscape (string) {
 
 $(function() {
     portofino.locale = $("html").attr("lang").substring(0, 2).toLowerCase();
+    moment.locale(portofino.locale);
 
     $('form').find(':submit').click(function() {
         var form = $(this).prop('form');

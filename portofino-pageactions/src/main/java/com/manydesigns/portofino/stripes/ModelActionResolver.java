@@ -22,6 +22,7 @@ package com.manydesigns.portofino.stripes;
 
 import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.dispatcher.*;
+import com.manydesigns.portofino.pageactions.rest.APIRoot;
 import groovy.lang.GroovyObject;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
@@ -65,6 +66,9 @@ public class ModelActionResolver extends NameBasedActionResolver {
 
     @Override
     public Class<? extends ActionBean> getActionBeanType(String path) {
+        if(path.startsWith(APIRoot.PATH_PREFIX)) {
+            return null; //Not an ActionBean (as far as Stripes is concerned)
+        }
         Dispatch dispatch = getDispatch(path);
         if(dispatch != null) {
             Class<? extends ActionBean> actionBeanClass = dispatch.getActionBeanClass();

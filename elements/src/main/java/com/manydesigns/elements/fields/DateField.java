@@ -167,7 +167,7 @@ public class DateField extends AbstractTextField<Date> {
         xb.closeElement("span");
 
         String js = MessageFormat.format(
-                "setupDatePicker(''#{0}'', ''{1}'');",
+                "$(function() '{' setupDatePicker(''#{0}'', ''{1}''); '}');",
                 StringEscapeUtils.escapeJavaScript(id),
                 StringEscapeUtils.escapeJavaScript(datePattern));
         xb.writeJavaScript(js);

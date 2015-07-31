@@ -39,7 +39,8 @@
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>
     <body style="padding-top: 0;">
-    <div class="container">
+    <div id="wrapper">
+    <div id="content" class="container">
         <div class="row">
             <div class="col-md-12">
                 <div class="contentHeader">
@@ -84,6 +85,7 @@
             </div>
         </div>
     </div>
+        </div>
     </body>
 </html><%--
 --%></c:if></stripes:layout-definition>

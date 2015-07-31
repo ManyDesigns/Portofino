@@ -26,11 +26,11 @@
                     $("label[for='connectionProviderName']").css("width", "auto").css("margin-right", "20px");
                 })
             </script>
-            <c:if test="${not empty actionBean.persistence.model.databases}">
+            <c:if test="${not empty actionBean.activeDatabases}">
                 <mde:write name="actionBean" property="connectionProviderField" />
                 <fmt:message key="or.create.a.new.one.choose.its.type" />
             </c:if>
-            <c:if test="${empty actionBean.persistence.model.databases}">
+            <c:if test="${empty actionBean.activeDatabases}">
                 <fmt:message key="create.a.new.connection.choose.type" />
             </c:if>
             <div id="connectionProviderTypeForm" class="radio">
@@ -72,7 +72,7 @@
                     });
 
                     var toggleNewSPForm = function() {
-                        if(${empty actionBean.persistence.model.databases}) {
+                        if(${empty actionBean.activeDatabases}) {
                             return;
                         }
 

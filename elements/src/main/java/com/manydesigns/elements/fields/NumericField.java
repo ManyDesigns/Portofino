@@ -20,6 +20,8 @@
 
 package com.manydesigns.elements.fields;
 
+import com.manydesigns.elements.ElementsProperties;
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.ognl.OgnlUtils;
@@ -29,7 +31,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.ParsePosition;
+import java.util.Locale;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -109,13 +114,17 @@ public class NumericField extends AbstractTextField<BigDecimal> {
         }
 
         if (accessor.isAnnotationPresent(com.manydesigns.elements.annotations.Memory.class)) {
-            decimalFormat = new DecimalFormat("#,##0");
+            Locale locale = ElementsThreadLocals.getHttpServletRequest().getLocale();
+            DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(locale);
+            decimalFormat = new DecimalFormat("#,##0", decimalFormatSymbols);
         }
 
         com.manydesigns.elements.annotations.DecimalFormat decimalFormatAnnotation =
                 accessor.getAnnotation(com.manydesigns.elements.annotations.DecimalFormat.class);
         if (decimalFormatAnnotation != null) {
-            decimalFormat = new DecimalFormat(decimalFormatAnnotation.value());
+            Locale locale = ElementsThreadLocals.getHttpServletRequest().getLocale();
+            DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(locale);
+            decimalFormat = new DecimalFormat(decimalFormatAnnotation.value(), decimalFormatSymbols);
         }
     }
 
@@ -164,6 +173,26 @@ public class NumericField extends AbstractTextField<BigDecimal> {
         return true;
     }
 
+    public DecimalFormat getDecimalFormat() {
+        if(decimalFormat != null) {
+            return decimalFormat;
+        } else {
+            Locale locale = ElementsThreadLocals.getHttpServletRequest().getLocale();
+            String text = ElementsThreadLocals.getTextProvider().getTextOrNull(ElementsProperties.FIELDS_DECIMAL_FORMAT);
+            if(text != null) {
+                DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols(locale);
+                return new DecimalFormat(text, decimalFormatSymbols);
+            } else {
+                NumberFormat numberFormat = DecimalFormat.getInstance(locale);
+                if(numberFormat instanceof DecimalFormat) {
+                    return (DecimalFormat) numberFormat;
+                } else {
+                    return new DecimalFormat();
+                }
+            }
+        }
+    }
+
     public void readFromObject(Object obj) {
         super.readFromObject(obj);
 
@@ -177,10 +206,8 @@ public class NumericField extends AbstractTextField<BigDecimal> {
 
         if (decimalValue == null) {
             stringValue = null;
-        } else if (decimalFormat == null) {
-            stringValue = OgnlUtils.convertValueToString(decimalValue);
         } else {
-            stringValue = decimalFormat.format(decimalValue);
+            stringValue = getDecimalFormat().format(decimalValue);
         }
     }
 
@@ -200,28 +227,20 @@ public class NumericField extends AbstractTextField<BigDecimal> {
             return;
         }
 
+        DecimalFormat decimaFormat = getDecimalFormat();
+        decimaFormat.setParseBigDecimal(true);
+        ParsePosition parsePos = new ParsePosition(0);
         BigDecimal tmpValue;
         try {
-            //Provo a parserizzare il numero come BigDecimal
-            tmpValue = (BigDecimal) OgnlUtils.convertValue(
-                    stringValue, BigDecimal.class);
-        } catch (Throwable e) {
-            //Se il testo non e' un BigDecimal provo a parserizzarlo
-            // con il pattern specificato nel format
-            if (decimalFormat == null) {
+            tmpValue = (BigDecimal) decimaFormat.parse(stringValue, parsePos);
+            if (stringValue.length() != parsePos.getIndex()) {
                 decimalFormatError = true;
                 return;
-            } else {
-                decimalFormat.setParseBigDecimal(true);
-                ParsePosition parsePos = new ParsePosition(0);
-                tmpValue = (BigDecimal) decimalFormat.parse(stringValue, parsePos);
-                if (stringValue.length() != parsePos.getIndex()) {
-                    decimalFormatError = true;
-                    return;
-                }
             }
+            decimalValue = tmpValue.setScale(scale, BigDecimal.ROUND_HALF_EVEN);
+        } catch (Throwable e) {
+            logger.debug("Decimal parse error", e);
         }
-        decimalValue = tmpValue.setScale(scale, BigDecimal.ROUND_HALF_EVEN);
     }
 
     //**************************************************************************
@@ -250,10 +269,6 @@ public class NumericField extends AbstractTextField<BigDecimal> {
         } else {
             this.maxValue = new BigDecimal(maxValue);
         }
-    }
-
-    public DecimalFormat getDecimalFormat() {
-        return decimalFormat;
     }
 
     public void setDecimalFormat(DecimalFormat decimalFormat) {

@@ -27,6 +27,7 @@ import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.servlet.ServletUtils;
+import com.manydesigns.elements.util.ElementsFileUtils;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.di.Inject;
@@ -36,12 +37,14 @@ import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.pageactions.registry.TemplateRegistry;
+import com.manydesigns.portofino.pageactions.rest.APIRoot;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Layout;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
+import com.manydesigns.portofino.servlets.ServerInfo;
 import com.manydesigns.portofino.stripes.AbstractActionBean;
 import com.manydesigns.portofino.stripes.ModelActionResolver;
 import groovy.lang.GroovyObject;
@@ -110,6 +113,9 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     @Inject(PageactionsModule.TEMPLATES_REGISTRY)
     public TemplateRegistry templates;
+
+    @Inject(BaseModule.SERVER_INFO)
+    public ServerInfo serverInfo;
 
     //--------------------------------------------------------------------------
     // UI
@@ -228,6 +234,26 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
             embeddedPageActions = mm;
         }
         return embeddedPageActions;
+    }
+
+    /**
+     * Returns the path inside the web application of a resource relative to this action's directory.
+     * E.g. getResourcePath("my.jsp") might return /WEB-INF/pages/this/that/my.jsp.
+     * @param resource the path of the resource, relative to this action's directory.
+     * @return the path of the resource, relative to the web application root.
+     */
+    public String getResourcePath(String resource) {
+        File resourceFile = new File(pageInstance.getDirectory(), resource);
+        File appRoot = new File(serverInfo.getRealPath());
+        return ElementsFileUtils.getRelativePath(appRoot, resourceFile);
+    }
+
+    public String getActionPath() {
+        return context.getActionPath();
+    }
+
+    public String getActionAPIPath() {
+        return APIRoot.PATH_PREFIX + context.getActionPath();
     }
 
     //--------------------------------------------------------------------------

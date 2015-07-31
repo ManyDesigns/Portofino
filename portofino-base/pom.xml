@@ -24,6 +24,13 @@
             <version>${servlet.api.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- JAX-RS annotations for the Login action -->
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>${javax.ws.rs.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>

@@ -83,6 +83,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
         if(url == null || url.equals(keyPrefix + "url")) {
             actualUrl = configuration.getString(keyPrefix + "url");
             if(actualUrl == null) {
+                status = STATUS_ERROR;
                 throw new RuntimeException("Invalid connection provider for database " + getDatabase().getDatabaseName() + " - no URL specified");
             }
         } else {
@@ -92,6 +93,7 @@ public class JdbcConnectionProvider extends ConnectionProvider {
         if(username == null || username.equals(keyPrefix + "username")) {
             actualUsername = configuration.getString(keyPrefix + "username");
             if(actualUsername == null) {
+                status = STATUS_ERROR;
                 throw new RuntimeException("Invalid connection provider for database " + getDatabase().getDatabaseName() + " - no username specified");
             }
         } else {

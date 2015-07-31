@@ -43,13 +43,16 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.annotation.RequiresUser;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.json.JSONStringer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -191,6 +194,26 @@ public abstract class LoginAction extends AbstractActionBean {
         }
     }
 
+    @POST
+    @Produces("application/json")
+    public String login(@FormParam("username") String username, @FormParam("password") String password)
+            throws AuthenticationException{
+        Subject subject = SecurityUtils.getSubject();
+        if(!subject.isAuthenticated()) try {
+            UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, password);
+            usernamePasswordToken.setRememberMe(false);
+            subject.login(usernamePasswordToken);
+            logger.info("User {} login", ShiroUtils.getUserId(subject));
+            Session session = subject.getSession(true);
+            JSONStringer stringer = new JSONStringer();
+            stringer.object().key("portofinoSessionId").value((String) session.getId()).endObject();
+            return stringer.toString();
+        } catch (AuthenticationException e) {
+            logger.warn("Login failed for '" + username + "': " + e.getMessage(), e);
+        }
+        return "{}";
+    }
+
     protected String getLoginPage() {
         return "/m/base/actions/user/login.jsp";
     }
@@ -222,6 +245,20 @@ public abstract class LoginAction extends AbstractActionBean {
     //**************************************************************************
     // Logout
     //**************************************************************************
+
+    @Path("{sessionId}")
+    @DELETE
+    public void logout(@PathParam("sessionId") String sessionId) {
+        Subject subject = SecurityUtils.getSubject();
+        Session session = subject.getSession(false);
+        if(session != null && session.getId().equals(sessionId)) {
+            subject.logout();
+            session.stop();
+            logger.info("User logout");
+        } else {
+            logger.debug("Unnecessary call to logout");
+        }
+    }
 
     public Resolution logout() {
         Subject subject = SecurityUtils.getSubject();

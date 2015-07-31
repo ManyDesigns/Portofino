@@ -342,6 +342,17 @@ public class DatabaseLogic {
                     }
                 }
             }
+            if(!changed) {
+                for(String sp : table.getSyntheticPropertyNames()) {
+                    if(StringUtils.equals(initialName, sp)) {
+                        initialName = prefix + "_" + prog;
+                        logger.warn("Duplicate property found, renaming to {}", initialName);
+                        prog++;
+                        changed = true;
+                        break;
+                    }
+                }
+            }
         }
         return initialName;
     }

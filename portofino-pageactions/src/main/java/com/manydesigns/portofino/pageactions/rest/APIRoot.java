@@ -42,7 +42,7 @@ public class APIRoot {
 
     private static final Logger logger = LoggerFactory.getLogger(APIRoot.class);
 
-    public static final String PATH_PREFIX = "api/";
+    public static final String PATH_PREFIX = "/api";
 
     @Context
     protected ServletContext servletContext;

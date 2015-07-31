@@ -233,9 +233,10 @@ public class PortofinoListener
 
         String lineSeparator = System.getProperty("line.separator", "\n");
         logger.info(lineSeparator + SEPARATOR +
-                lineSeparator + "--- ManyDesigns Portofino started successfully" +
+                lineSeparator + "--- ManyDesigns Portofino " + ModuleRegistry.getPortofinoVersion() + " started successfully" +
                 lineSeparator + "--- Context path: {}" +
                 lineSeparator + "--- Real path: {}" +
+                lineSeparator + "--- Visit http://portofino.manydesigns.com for news, documentation, issue tracker, community forums, commercial support!" +
                 lineSeparator + SEPARATOR,
                 new String[]{
                         serverInfo.getContextPath(),

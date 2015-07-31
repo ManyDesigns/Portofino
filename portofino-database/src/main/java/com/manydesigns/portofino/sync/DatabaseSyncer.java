@@ -113,7 +113,12 @@ public class DatabaseSyncer {
                 }
 
                 logger.debug("Creating Liquibase database snapshot");
-                String catalog = liquibaseDatabase.getDefaultCatalogName();
+                String catalog;
+                if(sourceSchema.getCatalog() != null) {
+                    catalog = sourceSchema.getCatalog();
+                } else {
+                    catalog = liquibaseDatabase.getDefaultCatalogName();
+                }
                 SnapshotControl snapshotControl = new SnapshotControl(liquibaseDatabase);
                 DatabaseSnapshot snapshot =
                         dsgf.createSnapshot(new CatalogAndSchema(catalog, schemaName), liquibaseDatabase, snapshotControl);
@@ -121,6 +126,7 @@ public class DatabaseSyncer {
                 logger.debug("Synchronizing schema");
                 Schema targetSchema = new Schema();
                 targetSchema.setDatabase(targetDatabase);
+                targetSchema.setCatalog(catalog);
                 targetDatabase.getSchemas().add(targetSchema);
                 syncSchema(snapshot, sourceSchema, targetSchema);
             }
@@ -515,9 +521,10 @@ public class DatabaseSyncer {
                     jdbcType = 101;
                 } else if("XMLTYPE".equals(typeName)) {
                     jdbcType = 2009;
-                } else {
-                    jdbcType = 1111;
                 }
+            }
+            if(jdbcType == null) {
+                jdbcType = Types.OTHER;
             }
             if(jdbcType == Types.OTHER) {
                 logger.debug("jdbcType = OTHER, trying to determine more specific type from type name");
@@ -526,7 +533,7 @@ public class DatabaseSyncer {
                     Field field = Types.class.getField(jdbcTypeName);
                     jdbcType = (Integer) field.get(null);
                 } catch (Exception e) {
-                    logger.debug("Could not determine type (type name = {})", jdbcTypeName);
+                    logger.warn("Could not determine type (type name = {})", jdbcTypeName);
                 }
             }
             targetColumn.setJdbcType(jdbcType);

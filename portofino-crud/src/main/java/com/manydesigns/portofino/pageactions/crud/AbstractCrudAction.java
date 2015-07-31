@@ -61,12 +61,14 @@ import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
+import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
+import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.*;
@@ -135,6 +137,9 @@ import java.util.regex.Pattern;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+@SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
+@RequiresPermissions(level = AccessLevel.VIEW)
+@SupportsDetail
 public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
@@ -737,19 +742,17 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution delete() {
         if(deleteValidate(object)) {
-            doDelete(object);
             try {
+                doDelete(object);
                 deletePostProcess(object);
                 commitTransaction();
                 deleteBlobs(object);
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.deleted.successfully"));
-
-                // invalidate the pk on this crud
-                pk = null;
             } catch (Exception e) {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.debug(rootCauseMessage, e);
                 SessionMessages.addErrorMessage(rootCauseMessage);
+                return read();
             }
         }
         return getSuccessfulDeleteView();
@@ -903,11 +906,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Returns the Resolution used to show the effect of a successful update action.
-     * @return by default, a redirect to the detail, propagating the search string.
+     * Returns the Resolution used to show the effect of a successful delete action.
+     * @return by default, a redirect to the search, propagating the search string.
      */
     protected Resolution getSuccessfulDeleteView() {
-        return new RedirectResolution(appendSearchStringParamIfNecessary(context.getActionPath()));
+        return new RedirectResolution(appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
     }
 
     /**
@@ -1127,7 +1130,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     String key = matcher.group(1);
                     String value = matcher.group(2);
                     logger.debug("Matched part: {}={}", key, value);
-                    dummyRequest.addParameter(key, value);
+                    try {
+                        dummyRequest.addParameter(URLDecoder.decode(key, getUrlEncoding()), URLDecoder.decode(value, getUrlEncoding()));
+                    } catch (UnsupportedEncodingException e) {
+                        logger.error("Unsupported encoding when parsing search string", e);
+                    }
                 } else {
                     logger.debug("Could not match part: {}", part);
                 }
@@ -1644,6 +1651,25 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 setupSelectionProvidersForm(selectionProviderNames);
             }
         }
+
+        buildConfigurationForm();
+    }
+
+    protected void buildConfigurationForm() {
+        FormBuilder formBuilder = new FormBuilder(PageActionLogic.getConfigurationClass(getClass()));
+        setupConfigurationForm(formBuilder);
+        crudConfigurationForm = formBuilder.build();
+    }
+
+    protected void setupConfigurationForm(FormBuilder formBuilder) {
+        DefaultSelectionProvider nColumnsSelectionProvider = new DefaultSelectionProvider("columns");
+        nColumnsSelectionProvider.setDisplayMode(DisplayMode.RADIO);
+        nColumnsSelectionProvider.appendRow(1, "1", true);
+        nColumnsSelectionProvider.appendRow(2, "2", true);
+        nColumnsSelectionProvider.appendRow(3, "3", true);
+        nColumnsSelectionProvider.appendRow(4, "4", true);
+        nColumnsSelectionProvider.appendRow(6, "6", true);
+        formBuilder.configSelectionProvider(nColumnsSelectionProvider, "columns");
     }
 
     protected void setupSelectionProvidersForm(Map<List<String>, Collection<String>> selectionProviderNames) {
@@ -2058,7 +2084,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_CREATE)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
-    public Response saveAsJson(String jsonObject) throws Throwable {
+    public Response httpPostJson(String jsonObject) throws Throwable {
         if(object != null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("update not supported, PUT to /pk instead").build();
         }
@@ -2097,7 +2123,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_EDIT)
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
-    public Response updateAsJson(String jsonObject) throws Throwable {
+    public Response httpPutJson(String jsonObject) throws Throwable {
         if(object == null) {
             return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
         }
@@ -2134,8 +2160,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("DELETE requires a /pk path parameter").build());
         }
         if(deleteValidate(object)) {
-            doDelete(object);
             try {
+                doDelete(object);
                 deletePostProcess(object);
                 commitTransaction();
                 deleteBlobs(object);

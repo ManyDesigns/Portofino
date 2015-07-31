@@ -205,16 +205,25 @@ public class ApplicationWizard extends AbstractPageAction {
         connectionProviderName = context.getRequest().getParameter("connectionProviderName");
     }
 
-    protected void buildCPForms() {
-        DefaultSelectionProvider connectionProviderSP = new DefaultSelectionProvider("connectionProviderName");
+    public List<Database> getActiveDatabases() {
+        List<Database> dbs = new ArrayList<Database>();
         for(Database db : persistence.getModel().getDatabases()) {
             ConnectionProvider cp = db.getConnectionProvider();
             if(!ConnectionProvider.STATUS_ERROR.equals(cp.getStatus())) {
-                connectionProviderSP.appendRow(
-                        db.getDatabaseName(),
-                        db.getDatabaseName() + " (" + cp.getDatabasePlatform().getDescription() + ")",
-                        true);
+                dbs.add(db);
             }
+        }
+        return dbs;
+    }
+
+    protected void buildCPForms() {
+        DefaultSelectionProvider connectionProviderSP = new DefaultSelectionProvider("connectionProviderName");
+        for(Database db : getActiveDatabases()) {
+            ConnectionProvider cp = db.getConnectionProvider();
+            connectionProviderSP.appendRow(
+                    db.getDatabaseName(),
+                    db.getDatabaseName() + " (" + cp.getDatabasePlatform().getDescription() + ")",
+                    true);
         }
 
         ClassAccessor classAccessor = JavaClassAccessor.getClassAccessor(ApplicationWizard.class);
