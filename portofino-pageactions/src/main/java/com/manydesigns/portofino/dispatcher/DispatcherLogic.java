@@ -363,10 +363,6 @@ public class DispatcherLogic {
 
     public static Page getPage(File directory) throws PageNotActiveException {
         File pageFile = getPageFile(directory);
-        /*if(!pageFile.exists()) {
-            pageCache.invalidate(pageFile);
-            return null;
-        }*/
         try {
             FileCacheEntry<Page> entry = pageCache.get(pageFile);
             if(!entry.error) {
