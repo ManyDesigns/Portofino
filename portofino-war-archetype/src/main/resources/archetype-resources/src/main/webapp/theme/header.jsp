@@ -23,7 +23,7 @@
              type="org.apache.commons.configuration.Configuration"/>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.stripes.AbstractActionBean"/>
 <fmt:setLocale value="${pageContext.request.locale}"/>
-<header class="navbar navbar-inverse navbar-static-top" role="banner">
+<header class="navbar navbar-inverse navbar-static-top">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -36,7 +36,7 @@
                 <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
             </stripes:link>
         </div>
-        <nav id="header-menu" class="navbar-collapse collapse" role="navigation">
+        <nav id="header-menu" class="navbar-collapse collapse">
             <c:if test="${not empty actionBean.pageInstance}">
                 <form id="pageAdminForm" action="${pageContext.request.contextPath}/actions/admin/page">
                     <input type="hidden" name="originalPath" value="${actionBean.context.actionPath}" />
@@ -55,8 +55,8 @@
                 %>
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="glyphicon glyphicon-user"></i>
-                        <%= prettyName %> <b class="caret"></b>
+                        <em class="glyphicon glyphicon-user"></em>
+                        <%= prettyName %> <strong class="caret"></strong>
                     </a>
                     <ul class="dropdown-menu">
                         <%
@@ -106,7 +106,7 @@
                         <li class="divider"></li>
                         <li>
                             <a href="javascript:portofino.enablePageActionDragAndDrop($(this), '${actionBean.context.actionPath}');">
-                                <i class="glyphicon glyphicon-file"></i> Edit layout
+                                <em class="glyphicon glyphicon-file"></em> Edit layout
                             </a>
                         </li>
                         <li>
@@ -116,7 +116,7 @@
                                 urlBuilder.setEvent("pageChildren");
                             %>
                             <a href="<%= request.getContextPath() + urlBuilder %>">
-                                <i class="glyphicon glyphicon-folder-open"></i> Page children
+                                <em class="glyphicon glyphicon-folder-open"></em> Page children
                             </a>
                         </li>
                         <li>
@@ -126,7 +126,7 @@
                                 urlBuilder.setEvent("newPage");
                             %>
                             <a href="<%= request.getContextPath() + urlBuilder %>">
-                                <i class="glyphicon glyphicon-plus"></i> Add new page
+                                <em class="glyphicon glyphicon-plus"></em> Add new page
                             </a>
                         </li>
                         <%
@@ -137,17 +137,17 @@
                         %>
                         <li>
                             <a href="javascript:portofino.confirmDeletePage<%= jsArgs %>">
-                                <i class="glyphicon glyphicon-minus"></i> Delete page
+                                <em class="glyphicon glyphicon-minus"></em> Delete page
                             </a>
                         </li>
                         <li>
                             <a href="javascript:portofino.showCopyPageDialog<%= jsArgs %>">
-                                <i class="glyphicon glyphicon-file"></i> Copy page
+                                <em class="glyphicon glyphicon-file"></em> Copy page
                             </a>
                         </li>
                         <li>
                             <a href="javascript:portofino.showMovePageDialog<%= jsArgs %>">
-                                <i class="glyphicon glyphicon-share"></i> Move page
+                                <em class="glyphicon glyphicon-share"></em> Move page
                             </a>
                         </li>
                         <%
@@ -160,7 +160,7 @@
                         %>
                         <li>
                             <a href="<%= request.getContextPath() + urlBuilder %>">
-                                <i class="glyphicon glyphicon-user"></i> Page permissions
+                                <em class="glyphicon glyphicon-user"></em> Page permissions
                             </a>
                         </li>
                         <% }}} %>

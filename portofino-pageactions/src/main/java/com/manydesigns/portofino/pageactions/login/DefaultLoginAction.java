@@ -37,6 +37,7 @@ import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.actions.user.LoginAction;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.Dispatch;
+import com.manydesigns.portofino.dispatcher.DispatchElement;
 import com.manydesigns.portofino.dispatcher.PageAction;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.modules.MailModule;
@@ -122,6 +123,15 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
     @Override
     public void setPageInstance(PageInstance pageInstance) {
         this.pageInstance = pageInstance;
+    }
+
+    @Override
+    public DispatchElement consumePathFragment(String pathFragment) {
+        return null;
+    }
+
+    public String getPageTemplate() {
+        return getPageInstance().getLayout().getTemplate();
     }
 
 }

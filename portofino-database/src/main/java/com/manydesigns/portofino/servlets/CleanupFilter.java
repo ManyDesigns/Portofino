@@ -20,7 +20,6 @@
 
 package com.manydesigns.portofino.servlets;
 
-import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.persistence.Persistence;
 import org.slf4j.MDC;
@@ -46,7 +45,7 @@ public class CleanupFilter implements Filter {
         try {
             chain.doFilter(request, response);
         } finally {
-            ServletContext servletContext = ElementsThreadLocals.getServletContext();
+            ServletContext servletContext = request.getServletContext();
             Persistence persistence =
                     (Persistence) servletContext.getAttribute(DatabaseModule.PERSISTENCE);
             MDC.clear();

@@ -209,6 +209,13 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!-- REST support through Jersey. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-jersey</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- Theme -->
         <dependency>
             <groupId>com.manydesigns</groupId>
@@ -218,9 +225,15 @@
         </dependency>
         <!-- Servlet API -->
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-web-api</artifactId>
-            <version>${javaee-web-api.version}</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>javax.servlet.jsp-api</artifactId>
+            <version>${jsp.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- Logging -->

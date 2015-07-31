@@ -6,7 +6,7 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"
-/><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
+/><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/modal.jsp">
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.editTitle}"/>
     </stripes:layout-component>
@@ -30,9 +30,7 @@
                       id="${(not empty actionBean.crudConfiguration.name) ? actionBean.crudConfiguration.name : null}"
                       enctype="multipart/form-data" class="form-horizontal edit">
             <mde:write name="actionBean" property="form"/>
-            <c:if test="${not empty actionBean.searchString}">
-                <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
-            </c:if>
+            <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-10">

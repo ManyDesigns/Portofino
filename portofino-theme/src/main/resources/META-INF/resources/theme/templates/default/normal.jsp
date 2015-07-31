@@ -66,11 +66,11 @@
                                 <portofino:buttons list="pageHeaderButtons" cssClass="btn-xs" />
                             </stripes:form>
                         </div>
-                        <h3 class="pageTitle">
+                        <h1 class="pageTitle">
                             <stripes:layout-component name="pageTitle">
                                 <c:out value="${actionBean.pageInstance.description}"/>
                             </stripes:layout-component>
-                        </h3>
+                        </h1>
                     </stripes:layout-component>
                 </div>
                 <div class="pageBody">

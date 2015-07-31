@@ -6,7 +6,7 @@
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"
-/><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
+/><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="contentHeader">
         <mde:sessionMessages />
         <div class="pull-right">
@@ -25,9 +25,7 @@
             <div class="hidden-submit"><portofino:buttons list="crud-read-default-button" /></div>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <mde:write name="actionBean" property="form"/>
-            <c:if test="${not empty actionBean.searchString}">
-                <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
-            </c:if>
+            <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
             <div class="form-group crudReadButtons">
                 <portofino:buttons list="crud-read" />
             </div>

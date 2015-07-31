@@ -7,7 +7,7 @@
 <%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
 <%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"/>
-<stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
+<stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="pageTitle">
         <shiro:user>
             <%
@@ -26,14 +26,14 @@
             <p>
                 <stripes:link href="/profile" class="btn btn-success">
                     Edit your profile
-                    <i class="glyphicon glyphicon-chevron-right white"></i>
+                    <em class="glyphicon glyphicon-chevron-right white"></em>
                 </stripes:link>
             </p>
             <shiro:hasRole name="admin">
                 <p>
                     <stripes:link href="/admin" class="btn btn-success">
                         Manage users and settings
-                        <i class="glyphicon glyphicon-chevron-right white"></i>
+                        <em class="glyphicon glyphicon-chevron-right white"></em>
                     </stripes:link>
                 </p>
             </shiro:hasRole>
@@ -42,7 +42,7 @@
                     <stripes:link href="/projects" class="btn btn-success">
                         <stripes:param name="create"/>
                         Create a new project
-                        <i class="glyphicon glyphicon-chevron-right white"></i>
+                        <em class="glyphicon glyphicon-chevron-right white"></em>
                     </stripes:link>
                 </p>
             </shiro:hasRole>
@@ -51,7 +51,7 @@
             <stripes:link href="/login" class="btn">
                 <stripes:param name="logout"/>
                 Log out
-                <i class="glyphicon glyphicon-chevron-right"></i>
+                <em class="glyphicon glyphicon-chevron-right"></em>
             </stripes:link>
         </shiro:user>
         <shiro:guest>
@@ -79,7 +79,7 @@
                 To start using the system, please log in:
             </p>
             <p>
-                <stripes:link href="/login" class="btn btn-success">Log in <i class="glyphicon glyphicon-chevron-right white"></i></stripes:link>
+                <stripes:link href="/login" class="btn btn-success">Log in <em class="glyphicon glyphicon-chevron-right white"></em></stripes:link>
             </p>
         </shiro:guest>
     </stripes:layout-component>

@@ -13,7 +13,7 @@
     String fragment = parameters.get(0);
     String path = actionBean.getContext().getActionPath();
     path = path.substring(0, path.length() - fragment.length());
-%><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
+%><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/modal.jsp">
     <stripes:layout-component name="contentHeader" />
     <stripes:layout-component name="pageHeader" />
     <stripes:layout-component name="pageBody">

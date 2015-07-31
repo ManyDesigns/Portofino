@@ -53,6 +53,9 @@ class MyCrudAction extends CrudAction {
 
     protected void deletePostProcess(Object object) {}
 
+    //**************************************************************************
+    // View hooks
+    //**************************************************************************
 
     protected Resolution getBulkEditView() {
         return super.getBulkEditView();
@@ -70,6 +73,10 @@ class MyCrudAction extends CrudAction {
         return super.getReadView();
     }
 
+    protected Resolution getEmbeddedReadView() {
+        return super.getEmbeddedReadView()
+    }
+
     protected Resolution getSearchView() {
         return super.getSearchView();
     }
@@ -81,5 +88,22 @@ class MyCrudAction extends CrudAction {
     protected Resolution getSearchResultsPageView() {
         return super.getSearchResultsPageView()
     }
+
+    protected Resolution getConfigurationView() {
+        return super.getConfigurationView()
+    }
+
+    protected Resolution getSuccessfulSaveView() {
+        return super.getSuccessfulSaveView()
+    }
+
+    protected Resolution getSuccessfulUpdateView() {
+        return super.getSuccessfulUpdateView()
+    }
+
+    protected Resolution getSuccessfulDeleteView() {
+        return super.getSuccessfulDeleteView()
+    }
+
 
 }

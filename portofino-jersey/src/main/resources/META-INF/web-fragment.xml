@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-fragment xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-fragment_3_0.xsd"
+        version="3.0">
+    <name>jersey</name>
+    <ordering>
+        <after><name>stripes</name></after>
+    </ordering>
+
+    <filter>
+        <filter-name>Jersey Web Application</filter-name>
+        <filter-class>org.glassfish.jersey.servlet.ServletContainer</filter-class>
+        <init-param>
+            <param-name>jersey.config.server.provider.packages</param-name>
+            <param-value>com.manydesigns</param-value>
+        </init-param>
+        <init-param>
+            <param-name>jersey.config.server.tracing</param-name>
+            <param-value>ALL</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>Jersey Web Application</filter-name>
+        <url-pattern>/api/*</url-pattern>
+    </filter-mapping>
+</web-fragment>

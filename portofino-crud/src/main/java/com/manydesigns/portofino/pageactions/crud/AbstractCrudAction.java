@@ -27,8 +27,8 @@ import com.manydesigns.elements.annotations.*;
 import com.manydesigns.elements.blobs.Blob;
 import com.manydesigns.elements.blobs.BlobManager;
 import com.manydesigns.elements.blobs.BlobUtils;
-import com.manydesigns.elements.fields.FileBlobField;
 import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.FileBlobField;
 import com.manydesigns.elements.fields.SelectField;
 import com.manydesigns.elements.fields.TextField;
 import com.manydesigns.elements.forms.FieldSet;
@@ -42,7 +42,9 @@ import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.servlet.MutableHttpServletRequest;
 import com.manydesigns.elements.text.OgnlTextFormat;
+import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.MimeTypes;
+import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
@@ -55,11 +57,14 @@ import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
+import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
+import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
+import com.manydesigns.portofino.security.SupportsPermissions;
 import com.manydesigns.portofino.util.PkHelper;
 import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.*;
@@ -69,16 +74,21 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.*;
@@ -121,6 +131,10 @@ import java.util.regex.Pattern;
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
+@SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
+@RequiresPermissions(level = AccessLevel.VIEW)
+@ConfigurationClass(CrudConfiguration.class)
+@SupportsDetail
 public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
@@ -285,12 +299,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         @Button(list = "crud-search-form-default-button", key = "search")
     })
     public Resolution search() {
-        searchVisible = true;
-        searchString = null;
-        sortProperty = null;
-        sortDirection = null;
-        firstResult = null;
-        maxResults = null;
+        //Not really used. Search is AJAX these days.
         return doSearch();
     }
 
@@ -345,10 +354,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     public Resolution jsonSearchData() throws JSONException {
-        setupSearchForm();
-        loadObjects();
+        executeSearch();
 
-        long totalRecords = getTotalSearchRecords();
+        final long totalRecords = getTotalSearchRecords();
 
         setupTableForm(Mode.VIEW);
         BlobUtils.loadBlobs(tableForm, getBlobManager(), false);
@@ -366,13 +374,40 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             js.object()
                     .key("__rowKey")
                     .value(row.getKey());
-            fieldsToJson(js, row);
+            FormUtil.fieldsToJson(js, row);
             js.endObject();
         }
         js.endArray();
         js.endObject();
         String jsonText = js.toString();
-        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
+        return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText) {
+            @Override
+            protected void applyHeaders(HttpServletResponse response) {
+                super.applyHeaders(response);
+                Integer rowsPerPage = getCrudConfiguration().getRowsPerPage();
+                if(rowsPerPage != null && totalRecords > rowsPerPage) {
+                    int firstResult = getFirstResult() != null ? getFirstResult() : 1;
+                    int currentPage = firstResult / rowsPerPage;
+                    int lastPage = (int) (totalRecords / rowsPerPage);
+                    if(totalRecords % rowsPerPage == 0) {
+                        lastPage--;
+                    }
+                    StringBuilder sb = new StringBuilder();
+                    if(currentPage > 0) {
+                        sb.append("<").append(getLinkToPage(0)).append(">; rel=\"first\", ");
+                        sb.append("<").append(getLinkToPage(currentPage - 1)).append(">; rel=\"prev\"");
+                    }
+                    if(currentPage != lastPage) {
+                        if(currentPage > 0) {
+                            sb.append(", ");
+                        }
+                        sb.append("<").append(getLinkToPage(currentPage + 1)).append(">; rel=\"next\", ");
+                        sb.append("<").append(getLinkToPage(lastPage)).append(">; rel=\"last\"");
+                    }
+                    response.setHeader("Link", sb.toString());
+                }
+            }
+        };
     }
 
     /**
@@ -384,7 +419,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     @Button(list = "crud-search-form", key = "reset.search", order = 2)
     public Resolution resetSearch() {
-        return new RedirectResolution(context.getActionPath()).addParameter("searchVisible", true);
+        //Not really used. Search is AJAX these days.
+        return new RedirectResolution(context.getActionPath());
     }
 
     //**************************************************************************
@@ -395,7 +431,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         if(!crudConfiguration.isLargeResultSet()) {
             setupSearchForm(); // serve per la navigazione del result set
             loadObjects();
-            setupPagination();
+            setupResultSetNavigation();
         }
 
         setupForm(Mode.VIEW);
@@ -425,13 +461,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         form.readFromObject(object);
         BlobUtils.loadBlobs(form, getBlobManager(), false);
         refreshBlobDownloadHref();
-        JSONStringer js = new JSONStringer();
-        js.object();
-        List<Field> fields = new ArrayList<Field>();
-        collectVisibleFields(form, fields);
-        fieldsToJson(js, fields);
-        js.endObject();
-        String jsonText = js.toString();
+        String jsonText = FormUtil.writeToJson(form);
         return new StreamingResolution(MimeTypes.APPLICATION_JSON_UTF8, jsonText);
     }
 
@@ -703,19 +733,17 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @RequiresPermissions(permissions = PERMISSION_DELETE)
     public Resolution delete() {
         if(deleteValidate(object)) {
-            doDelete(object);
             try {
+                doDelete(object);
                 deletePostProcess(object);
                 commitTransaction();
                 deleteBlobs(object);
                 SessionMessages.addInfoMessage(ElementsThreadLocals.getText("object.deleted.successfully"));
-
-                // invalidate the pk on this crud
-                pk = null;
             } catch (Exception e) {
                 String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
                 logger.debug(rootCauseMessage, e);
                 SessionMessages.addErrorMessage(rootCauseMessage);
+                return read();
             }
         }
         return getSuccessfulDeleteView();
@@ -869,11 +897,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Returns the Resolution used to show the effect of a successful update action.
-     * @return by default, a redirect to the detail, propagating the search string.
+     * Returns the Resolution used to show the effect of a successful delete action.
+     * @return by default, a redirect to the search, propagating the search string.
      */
     protected Resolution getSuccessfulDeleteView() {
-        return new RedirectResolution(appendSearchStringParamIfNecessary(context.getActionPath()));
+        return new RedirectResolution(appendSearchStringParamIfNecessary(calculateBaseSearchUrl()), false);
     }
 
     /**
@@ -1003,10 +1031,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected Resolution notInUseCase(ActionBeanContext context, List<String> parameters) {
-        logger.info("Not in use case: " + crudConfiguration.getName());
-        String msg = ElementsThreadLocals.getText("object.not.found._", StringUtils.join(parameters, "/"));
-        SessionMessages.addWarningMessage(msg);
-        return new ForwardResolution("/m/pageactions/redirect-to-last-working-page.jsp");
+        logger.debug("Not in use case: {}", crudConfiguration.getName());
+        return new NotInUseCaseResolution(StringUtils.join(parameters, "/"));
     }
 
     /**
@@ -1021,25 +1047,35 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return (classAccessor != null);
     }
 
+    @Deprecated
     protected void setupPagination() {
-        resultSetNavigation = new ResultSetNavigation();
+        setupResultSetNavigation();
+    }
+
+    protected void setupResultSetNavigation() {
         int position = objects.indexOf(object);
+        if(position < 0) {
+            return;
+        }
         int size = objects.size();
+        setupResultSetNavigation(position, size);
+    }
+
+    protected void setupResultSetNavigation(int position, int size) {
+        resultSetNavigation = new ResultSetNavigation();
         resultSetNavigation.setPosition(position);
         resultSetNavigation.setSize(size);
         String baseUrl = calculateBaseSearchUrl();
-        if(position >= 0) {
-            if(position > 0) {
-                resultSetNavigation.setFirstUrl(generateObjectUrl(baseUrl, 0));
-                resultSetNavigation.setPreviousUrl(
-                        generateObjectUrl(baseUrl, position - 1));
-            }
-            if(position < size - 1) {
-                resultSetNavigation.setLastUrl(
-                        generateObjectUrl(baseUrl, size - 1));
-                resultSetNavigation.setNextUrl(
-                        generateObjectUrl(baseUrl, position + 1));
-            }
+        if(position > 0) {
+            resultSetNavigation.setFirstUrl(generateObjectUrl(baseUrl, 0));
+            resultSetNavigation.setPreviousUrl(
+                    generateObjectUrl(baseUrl, position - 1));
+        }
+        if(position < size - 1) {
+            resultSetNavigation.setLastUrl(
+                    generateObjectUrl(baseUrl, size - 1));
+            resultSetNavigation.setNextUrl(
+                    generateObjectUrl(baseUrl, position + 1));
         }
     }
 
@@ -1095,7 +1131,11 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                     String key = matcher.group(1);
                     String value = matcher.group(2);
                     logger.debug("Matched part: {}={}", key, value);
-                    dummyRequest.addParameter(key, value);
+                    try {
+                        dummyRequest.addParameter(URLDecoder.decode(key, getUrlEncoding()), URLDecoder.decode(value, getUrlEncoding()));
+                    } catch (UnsupportedEncodingException e) {
+                        logger.error("Unsupported encoding when parsing search string", e);
+                    }
                 } else {
                     logger.debug("Could not match part: {}", part);
                 }
@@ -1111,13 +1151,15 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     protected SearchFormBuilder configureSearchFormBuilder(SearchFormBuilder searchFormBuilder) {
         // setup option providers
-        for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
-            SelectionProvider selectionProvider = current.getSelectionProvider();
-            if(selectionProvider == null) {
-                continue;
+        if(selectionProviderSupport != null) {
+            for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
+                SelectionProvider selectionProvider = current.getSelectionProvider();
+                if(selectionProvider == null) {
+                    continue;
+                }
+                String[] fieldNames = current.getFieldNames();
+                searchFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
             }
-            String[] fieldNames = current.getFieldNames();
-            searchFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
         return searchFormBuilder.configPrefix(searchPrefix);
     }
@@ -1144,6 +1186,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected void configureTableFormSelectionProviders(TableFormBuilder tableFormBuilder) {
+        if(selectionProviderSupport == null) {
+            return;
+        }
         // setup option providers
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
@@ -1165,12 +1210,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             }
         }
 
-        String readLinkExpression = getReadLinkExpression();
-        OgnlTextFormat hrefFormat =
-                OgnlTextFormat.create(readLinkExpression);
-        hrefFormat.setUrl(true);
-        String encoding = getUrlEncoding();
-        hrefFormat.setEncoding(encoding);
+        OgnlTextFormat hrefFormat = getReadURLFormat();
 
         if(isShowingKey) {
             logger.debug("TableForm: configuring detail links for primary key properties");
@@ -1218,9 +1258,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
             xb.addAttribute("href", urlBuilder.toString());
             xb.writeNoHtmlEscape("%{label}");
             if(propName.equals(sortProperty)) {
-                xb.openElement("i");
+                xb.openElement("em");
                 xb.addAttribute("class", "pull-right glyphicon glyphicon-chevron-" + ("desc".equals(sortDirection) ? "up" : "down"));
-                xb.closeElement("i");
+                xb.closeElement("em");
             }
             xb.closeElement("a");
             OgnlTextFormat hrefFormat = OgnlTextFormat.create(xb.toString());
@@ -1290,6 +1330,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected void configureFormSelectionProviders(FormBuilder formBuilder) {
+        if(selectionProviderSupport == null) {
+            return;
+        }
         // setup option providers
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
@@ -1339,7 +1382,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
-     * Configures the builder for the search detail (view, create, edit) form.
+     * Configures the builder for the detail form (view, create, edit).
      * You can override this method to customize how the form is generated
      * (e.g. adding custom links on specific properties, hiding or showing properties
      * based on some runtime condition, etc.).
@@ -1348,7 +1391,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      * @return the form builder.
      */
     protected FormBuilder configureFormBuilder(FormBuilder formBuilder, Mode mode) {
-        formBuilder.configPrefix(prefix).configMode(mode);
+        formBuilder.configPrefix(prefix).configMode(mode).configNColumns(crudConfiguration.getColumns());
         configureFormSelectionProviders(formBuilder);
         return formBuilder;
     }
@@ -1411,12 +1454,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 Field field = fieldIterator.next();
                 if (field instanceof FileBlobField) {
                     if(baseUrl == null) {
-                        String readLinkExpression = getReadLinkExpression();
-                        String encoding = getUrlEncoding();
-                        OgnlTextFormat hrefFormat =
-                                OgnlTextFormat.create(readLinkExpression);
-                        hrefFormat.setUrl(true);
-                        hrefFormat.setEncoding(encoding);
+                        OgnlTextFormat hrefFormat = getReadURLFormat();
                         baseUrl = hrefFormat.format(obj);
                     }
 
@@ -1427,7 +1465,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                             .addParameter("propertyName", field.getPropertyAccessor().getName())
                             .addParameter("code", blob.getCode());
                         // although unused, the code parameter makes the url change if the
-                        // blob changes. In this way we can ask the browser to cache the url
+                        // blob changes. This way we can ask the browser to cache the url
                         // indefinitely.
 
                         field.setHref(urlBuilder.toString());
@@ -1443,7 +1481,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 .addParameter("downloadBlob","")
                 .addParameter("propertyName", field.getPropertyAccessor().getName())
                 .addParameter("code", field.getValue().getCode());
-        // The code parameter must be kept. See not in refreshTableBlobDownloadHref
+        // The code parameter must be kept. See note in refreshTableBlobDownloadHref
         return urlBuilder.toString();
     }
 
@@ -1573,6 +1611,25 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 setupSelectionProvidersForm(selectionProviderNames);
             }
         }
+
+        buildConfigurationForm();
+    }
+
+    protected void buildConfigurationForm() {
+        FormBuilder formBuilder = new FormBuilder(PageActionLogic.getConfigurationClass(getClass()));
+        setupConfigurationForm(formBuilder);
+        crudConfigurationForm = formBuilder.build();
+    }
+
+    protected void setupConfigurationForm(FormBuilder formBuilder) {
+        DefaultSelectionProvider nColumnsSelectionProvider = new DefaultSelectionProvider("columns");
+        nColumnsSelectionProvider.setDisplayMode(DisplayMode.RADIO);
+        nColumnsSelectionProvider.appendRow(1, "1", true);
+        nColumnsSelectionProvider.appendRow(2, "2", true);
+        nColumnsSelectionProvider.appendRow(3, "3", true);
+        nColumnsSelectionProvider.appendRow(4, "4", true);
+        nColumnsSelectionProvider.appendRow(6, "6", true);
+        formBuilder.configSelectionProvider(nColumnsSelectionProvider, "columns");
     }
 
     protected void setupSelectionProvidersForm(Map<List<String>, Collection<String>> selectionProviderNames) {
@@ -1640,8 +1697,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                         selectionProviderEdits[i].selectionProvider = selectionProvider.getName();
                         selectionProviderEdits[i].displayMode = selectionProvider.getDisplayMode();
                         selectionProviderEdits[i].searchDisplayMode = selectionProvider.getSearchDisplayMode();
-                        selectionProviderEdits[i].createNewHref = cp.getCreateNewValueHref();
-                        selectionProviderEdits[i].createNewText = cp.getCreateNewValueText();
+                        selectionProviderEdits[i].createNewHref = selectionProvider.getCreateNewValueHref();
+                        selectionProviderEdits[i].createNewText = selectionProvider.getCreateNewValueText();
                     } else {
                         selectionProviderEdits[i].selectionProvider = null;
                         selectionProviderEdits[i].displayMode = DisplayMode.DROPDOWN;
@@ -1706,7 +1763,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     protected void updateSelectionProviders() {
         selectionProvidersForm.writeToObject(selectionProviderEdits);
-        crudConfiguration.getSelectionProviders().clear();
+        selectionProviderSupport.clearSelectionProviders();
         for(CrudSelectionProviderEdit sp : selectionProviderEdits) {
             List<String> key = Arrays.asList(sp.fieldNames);
             if(sp.selectionProvider == null) {
@@ -1723,8 +1780,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         propertiesTableForm.writeToObject(propertyEdits);
 
         List<CrudProperty> newProperties = new ArrayList<CrudProperty>();
+        List<CrudProperty> properties = crudConfiguration.getProperties();
         for (CrudPropertyEdit edit : propertyEdits) {
-            CrudProperty crudProperty = findProperty(edit.name, crudConfiguration.getProperties());
+            CrudProperty crudProperty = findProperty(edit.name, properties);
             if(crudProperty == null) {
                 crudProperty = new CrudProperty();
             }
@@ -1739,8 +1797,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
             newProperties.add(crudProperty);
         }
-        crudConfiguration.getProperties().clear();
-        crudConfiguration.getProperties().addAll(newProperties);
+        properties.clear();
+        properties.addAll(newProperties);
     }
 
     public boolean isRequiredFieldsPresent() {
@@ -1882,6 +1940,19 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     /**
+     * Computes an OgnlTextFormat from the result of getReadLinkExpression(), with the correct URL encoding.
+     * @return the OgnlTextFormat.
+     */
+    protected OgnlTextFormat getReadURLFormat() {
+        String readLinkExpression = getReadLinkExpression();
+        OgnlTextFormat hrefFormat = OgnlTextFormat.create(readLinkExpression);
+        hrefFormat.setUrl(true);
+        String encoding = getUrlEncoding();
+        hrefFormat.setEncoding(encoding);
+        return hrefFormat;
+    }
+
+    /**
      * If a search has been executed, appends a URL-encoded String representation of the search criteria
      * to the given string, as a GET parameter.
      * @param s the base string.
@@ -1936,48 +2007,140 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return encodedSearchString;
     }
 
-    /**
-     * Writes a collection of fields as properties of a JSON object.
-     * @param js the JSONStringer to write to. Must have a JSON object open for writing.
-     * @param fields the fields to output
-     * @throws JSONException if the JSON can not be generated.
-     */
+    @Deprecated
     protected void fieldsToJson(JSONStringer js, Collection<Field> fields) throws JSONException {
-        for (Field field : fields) {
-            Object value = field.getValue();
-            String displayValue = field.getDisplayValue();
-            String href = field.getHref();
-            js.key(field.getPropertyAccessor().getName());
-            js.object()
-                    .key("value")
-                    .value(value)
-                    .key("displayValue")
-                    .value(displayValue)
-                    .key("href")
-                    .value(href)
-                    .endObject();
-        }
+        FormUtil.fieldsToJson(js, fields);
     }
 
+    @Deprecated
     protected List<Field> collectVisibleFields(Form form, List<Field> fields) {
-        for(FieldSet fieldSet : form) {
-             collectVisibleFields(fieldSet, fields);
-        }
-        return fields;
+        return FormUtil.collectVisibleFields(form, fields);
     }
 
+    @Deprecated
     protected List<Field> collectVisibleFields(FieldSet fieldSet, List<Field> fields) {
-        for(FormElement element : fieldSet) {
-            if(element instanceof Field) {
-                Field field = (Field) element;
-                if(field.isEnabled()) {
-                    fields.add(field);
+        return FormUtil.collectVisibleFields(fieldSet, fields);
+    }
+
+    //--------------------------------------------------------------------------
+    // REST
+    //--------------------------------------------------------------------------
+
+    @GET
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public Resolution getAsJson() {
+        if(object == null) {
+            Form form = new FormBuilder(AbstractCrudAction.class).
+                    configFields("searchString", "firstResult", "maxResults", "sortProperty", "sortDirection").
+                    build();
+            form.readFromRequest(context.getRequest());
+            form.writeToObject(this);
+            return jsonSearchData();
+        } else {
+            return jsonReadData();
+        }
+    }
+
+    @POST
+    @RequiresPermissions(permissions = PERMISSION_CREATE)
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
+    public Response httpPostJson(String jsonObject) throws Throwable {
+        if(object != null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("update not supported, PUT to /pk instead").build();
+        }
+        setupForm(Mode.CREATE);
+        object = (T) classAccessor.newInstance();
+        createSetup(object);
+        form.readFromObject(object);
+        FormUtil.readFromJson(form, new JSONObject(jsonObject));
+        if (form.validate()) {
+            writeFormToObject();
+            if(createValidate(object)) {
+                try {
+                    doSave(object);
+                    createPostProcess(object);
+                    commitTransaction();
+                } catch (Throwable e) {
+                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                    logger.warn(rootCauseMessage, e);
+                    throw e;
                 }
-            } else if(element instanceof FieldSet) {
-                collectVisibleFields((FieldSet) element, fields);
+                form.readFromObject(object); //Re-read so that the full object is returned
+                OgnlTextFormat textFormat = getReadURLFormat();
+                return Response.status(Response.Status.CREATED).
+                        entity(form).
+                        location(new URI(textFormat.format(object))).
+                        build();
+            } else {
+                return Response.serverError().entity(form).build();
+            }
+        } else {
+            return Response.serverError().entity(form).build();
+        }
+    }
+
+    @PUT
+    @RequiresPermissions(permissions = PERMISSION_EDIT)
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    @Consumes(MimeTypes.APPLICATION_JSON_UTF8)
+    public Response httpPutJson(String jsonObject) throws Throwable {
+        if(object == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("create not supported, POST to / instead").build();
+        }
+        setupForm(Mode.EDIT);
+        editSetup(object);
+        form.readFromObject(object);
+        FormUtil.readFromJson(form, new JSONObject(jsonObject));
+        if (form.validate()) {
+            writeFormToObject();
+            if(editValidate(object)) {
+                try {
+                    doUpdate(object);
+                    editPostProcess(object);
+                    commitTransaction();
+                } catch (Throwable e) {
+                    String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                    logger.warn(rootCauseMessage, e);
+                    throw e;
+                }
+                form.readFromObject(object); //Re-read so that the full object is returned
+                return Response.ok(form).build();
+            } else {
+                return Response.serverError().entity(form).build();
+            }
+        } else {
+            return Response.serverError().entity(form).build();
+        }
+    }
+
+    @DELETE
+    @RequiresPermissions(permissions = PERMISSION_DELETE)
+    public void httpDelete() throws Exception {
+        if(object == null) {
+            throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("DELETE requires a /pk path parameter").build());
+        }
+        if(deleteValidate(object)) {
+            try {
+                doDelete(object);
+                deletePostProcess(object);
+                commitTransaction();
+                deleteBlobs(object);
+            } catch (Exception e) {
+                String rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+                logger.warn(rootCauseMessage, e);
+                throw e;
             }
         }
-        return fields;
+    }
+
+    @Path(":classAccessor")
+    @GET
+    @Produces(MimeTypes.APPLICATION_JSON_UTF8)
+    public String describeClassAccessor() {
+        JSONStringer jsonStringer = new JSONStringer();
+        ReflectionUtil.classAccessorToJson(getClassAccessor(), jsonStringer);
+        return jsonStringer.toString();
     }
 
     //--------------------------------------------------------------------------
@@ -2086,16 +2249,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return objects;
     }
 
-    public void setObjects(List<? extends T> objects) {
-        this.objects = objects;
-    }
-
     public T getObject() {
         return object;
-    }
-
-    public void setObject(T object) {
-        this.object = object;
     }
 
     public boolean isMultipartRequest() {

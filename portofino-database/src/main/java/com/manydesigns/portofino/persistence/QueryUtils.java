@@ -24,6 +24,7 @@ import com.manydesigns.elements.fields.search.Criterion;
 import com.manydesigns.elements.fields.search.TextMatchMode;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import com.manydesigns.elements.text.OgnlHqlFormat;
 import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.portofino.database.TableCriteria;
@@ -87,9 +88,9 @@ public class QueryUtils {
      * @return the results of the query as an Object[] (an array cell per column)
      */
     public static List<Object[]> runSql(Session session, String sql) {
-        OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(sql);
-        String formatString = sqlFormat.getFormatString();
-        Object[] parameters = sqlFormat.evaluateOgnlExpressions(null);
+        OgnlHqlFormat hqlFormat = OgnlHqlFormat.create(sql);
+        String formatString = hqlFormat.getFormatString();
+        Object[] parameters = hqlFormat.evaluateOgnlExpressions(null);
         return runSql(session, formatString, parameters);
     }
 
@@ -173,9 +174,9 @@ public class QueryUtils {
             Session session, String queryString,
             Object rootObject,
             @Nullable Integer firstResult, @Nullable Integer maxResults) {
-        OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
-        String formatString = sqlFormat.getFormatString();
-        Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
+        OgnlHqlFormat hqlFormat = OgnlHqlFormat.create(queryString);
+        String formatString = hqlFormat.getFormatString();
+        Object[] parameters = hqlFormat.evaluateOgnlExpressions(rootObject);
 
         return runHqlQuery(session, formatString, parameters, firstResult, maxResults);
     }
@@ -202,7 +203,7 @@ public class QueryUtils {
      */
     public static QueryStringWithParameters getQueryStringWithParametersForCriteria(
             TableCriteria criteria) {
-        return getQueryStringWithParametersForCriteria(criteria, null);
+        return getQueryStringWithParametersForCriteria(criteria, null, 1);
     }
 
     /**
@@ -212,7 +213,7 @@ public class QueryUtils {
      * @return the same criteria encoded as a HQL query with parameters.
      */
     public static QueryStringWithParameters getQueryStringWithParametersForCriteria(
-            @Nullable TableCriteria criteria, @Nullable String alias) {
+            @Nullable TableCriteria criteria, @Nullable String alias, int initialParameterIndex) {
         if (criteria == null) {
             return new QueryStringWithParameters("", new Object[0]);
         }
@@ -227,7 +228,7 @@ public class QueryUtils {
                 TableCriteria.EqCriterion eqCriterion =
                         (TableCriteria.EqCriterion) criterion;
                 Object value = eqCriterion.getValue();
-                hqlFormat = "{0} = ?";
+                hqlFormat = "{0} = ?" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.InCriterion) {
                 TableCriteria.InCriterion inCriterion =
@@ -236,11 +237,11 @@ public class QueryUtils {
                 StringBuilder params = new StringBuilder();
                 if (values != null){
                     boolean first = true;
-                    for (Object value : values){
+                    for (Object value : values) {
                         if (!first){
-                            params.append(", ?");
+                            params.append(", ?").append(parametersList.size() + initialParameterIndex);
                         } else {
-                            params.append("?");
+                            params.append("?").append(parametersList.size() + initialParameterIndex);
                             first = false;
                         }
                         parametersList.add(value);
@@ -253,39 +254,41 @@ public class QueryUtils {
                 TableCriteria.NeCriterion neCriterion =
                         (TableCriteria.NeCriterion) criterion;
                 Object value = neCriterion.getValue();
-                hqlFormat = "{0} <> ?";
+                hqlFormat = "{0} <> ?" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.BetweenCriterion) {
                 TableCriteria.BetweenCriterion betweenCriterion =
                         (TableCriteria.BetweenCriterion) criterion;
                 Object min = betweenCriterion.getMin();
                 Object max = betweenCriterion.getMax();
-                hqlFormat = "{0} >= ? AND {0} <= ?";
+                hqlFormat =
+                        "{0} >= ?" + (parametersList.size() + initialParameterIndex) +
+                        " AND {0} <= ?" + (parametersList.size() + initialParameterIndex + 1);
                 parametersList.add(min);
                 parametersList.add(max);
             } else if (criterion instanceof TableCriteria.GtCriterion) {
                 TableCriteria.GtCriterion gtCriterion =
                         (TableCriteria.GtCriterion) criterion;
                 Object value = gtCriterion.getValue();
-                hqlFormat = "{0} > ?";
+                hqlFormat = "{0} > ?" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.GeCriterion) {
                 TableCriteria.GeCriterion gtCriterion =
                         (TableCriteria.GeCriterion) criterion;
                 Object value = gtCriterion.getValue();
-                hqlFormat = "{0} >= ?";
+                hqlFormat = "{0} >= ?" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.LtCriterion) {
                 TableCriteria.LtCriterion ltCriterion =
                         (TableCriteria.LtCriterion) criterion;
                 Object value = ltCriterion.getValue();
-                hqlFormat = "{0} < ?";
+                hqlFormat = "{0} < ?" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.LeCriterion) {
                 TableCriteria.LeCriterion leCriterion =
                         (TableCriteria.LeCriterion) criterion;
                 Object value = leCriterion.getValue();
-                hqlFormat = "{0} <= ?";
+                hqlFormat = "{0} <= ?" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(value);
             } else if (criterion instanceof TableCriteria.LikeCriterion) {
                 TableCriteria.LikeCriterion likeCriterion =
@@ -293,7 +296,7 @@ public class QueryUtils {
                 String value = (String) likeCriterion.getValue();
                 String pattern = processTextMatchMode(
                         likeCriterion.getTextMatchMode(), value);
-                hqlFormat = "{0} like ?";
+                hqlFormat = "{0} like ?" + (parametersList.size() + initialParameterIndex);
                 parametersList.add(pattern);
             } else if (criterion instanceof TableCriteria.IlikeCriterion) {
                 TableCriteria.IlikeCriterion ilikeCriterion =
@@ -301,7 +304,7 @@ public class QueryUtils {
                 String value = (String) ilikeCriterion.getValue();
                 String pattern = processTextMatchMode(
                         ilikeCriterion.getTextMatchMode(), value);
-                hqlFormat = "lower({0}) like lower(?)";
+                hqlFormat = "lower({0}) like lower(?" + (parametersList.size() + initialParameterIndex) + ")";
                 parametersList.add(pattern);
             } else if (criterion instanceof TableCriteria.IsNullCriterion) {
                 hqlFormat = "{0} is null";
@@ -432,9 +435,9 @@ public class QueryUtils {
      */
     public static QueryStringWithParameters mergeQuery
             (String queryString, @Nullable TableCriteria criteria, Object rootObject) {
-        OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(queryString);
-        String formatString = sqlFormat.getFormatString();
-        Object[] parameters = sqlFormat.evaluateOgnlExpressions(rootObject);
+        OgnlHqlFormat hqlFormat = OgnlHqlFormat.create(queryString);
+        String formatString = hqlFormat.getFormatString();
+        Object[] parameters = hqlFormat.evaluateOgnlExpressions(rootObject);
 
         CCJSqlParserManager parserManager = new CCJSqlParserManager();
         PlainSelect parsedQueryString;
@@ -451,7 +454,8 @@ public class QueryUtils {
         }
 
         QueryStringWithParameters criteriaQuery =
-                getQueryStringWithParametersForCriteria(criteria, mainEntityAlias != null ? mainEntityAlias.getName() : null);
+                getQueryStringWithParametersForCriteria(
+                        criteria, mainEntityAlias != null ? mainEntityAlias.getName() : null, parameters.length + 1);
         String criteriaQueryString = criteriaQuery.getQueryString();
         Object[] criteriaParameters = criteriaQuery.getParameters();
 
@@ -569,7 +573,7 @@ public class QueryUtils {
         Query query = session.createQuery(queryString);
         if (parameters != null) {
             for (int i = 0; i < parameters.length; i++) {
-                query.setParameter(i, parameters[i]);
+                query.setParameter(String.valueOf(i + 1), parameters[i]);
             }
         }
 
@@ -675,13 +679,12 @@ public class QueryUtils {
         TableAccessor table = persistence.getTableAccessor(database, entityName);
         List<Object> result;
         PropertyAccessor[] keyProperties = table.getKeyProperties();
-        OgnlSqlFormat sqlFormat = OgnlSqlFormat.create(hqlQueryString);
-        String formatString = sqlFormat.getFormatString();
-        Object[] ognlParameters = sqlFormat.evaluateOgnlExpressions(rootObject);
-        int i = keyProperties.length;
+        OgnlHqlFormat hqlFormat = OgnlHqlFormat.create(hqlQueryString);
+        String formatString = hqlFormat.getFormatString();
+        Object[] ognlParameters = hqlFormat.evaluateOgnlExpressions(rootObject);
         int p = ognlParameters.length;
-        Object[] parameters = new Object[p + i];
-        System.arraycopy(ognlParameters, 0, parameters, i, p);
+        Object[] parameters = new Object[p + keyProperties.length];
+        System.arraycopy(ognlParameters, 0, parameters, 0, p);
         try {
             PlainSelect parsedQuery = parseQuery(new CCJSqlParserManager(), formatString);
             if(parsedQuery.getWhere() == null) {
@@ -696,16 +699,19 @@ public class QueryUtils {
                 mainEntityTable = new net.sf.jsqlparser.schema.Table();
             }
 
-            for(PropertyAccessor propertyAccessor : keyProperties) {
-                i--;
+
+            for(int i = 0; i < keyProperties.length; i++) {
+                PropertyAccessor propertyAccessor = keyProperties[i];
                 EqualsTo condition = new EqualsTo();
                 parsedQuery.setWhere(
                         new AndExpression(condition, new Parenthesis(parsedQuery.getWhere())));
                 net.sf.jsqlparser.schema.Column column =
                         new net.sf.jsqlparser.schema.Column(mainEntityTable, propertyAccessor.getName());
                 condition.setLeftExpression(column);
-                condition.setRightExpression(new JdbcParameter());
-                parameters[i] = propertyAccessor.get(pk);
+                JdbcParameter jdbcParameter = new JdbcParameter();
+                jdbcParameter.setIndex(p + i + 1);
+                condition.setRightExpression(jdbcParameter);
+                parameters[p + i] = propertyAccessor.get(pk);
             }
 
             String fullQueryString = parsedQuery.toString();

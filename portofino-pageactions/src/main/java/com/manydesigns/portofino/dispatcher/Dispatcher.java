@@ -20,14 +20,16 @@
 
 package com.manydesigns.portofino.dispatcher;
 
+import com.manydesigns.elements.ElementsThreadLocals;
 import com.manydesigns.elements.servlet.ServletUtils;
-import com.manydesigns.portofino.pages.ChildPage;
+import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.pages.Page;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -69,6 +71,10 @@ public class Dispatcher {
 
         path = normalizePath(path);
 
+        if(path.isEmpty() || path.equals("/")) {
+            return null;
+        }
+
         Dispatch dispatch = cache.get(path);
         if(dispatch != null) {
             return dispatch;
@@ -83,123 +89,83 @@ public class Dispatcher {
                 break;
             }
         }
+
+        Iterator<String> fragmentsIterator;
+        DispatchElement currentElement;
+        PageInstance currentPageInstance;
+        List<PageInstance> pagePath = new ArrayList<PageInstance>();
         if(dispatch == null) {
-            List<PageInstance> pagePath = new ArrayList<PageInstance>();
             String[] fragments = StringUtils.split(path, '/');
-
             List<String> fragmentsAsList = Arrays.asList(fragments);
-            ListIterator<String> fragmentsIterator = fragmentsAsList.listIterator();
-
-            File rootDir = pagesDirectory;
-            Page rootPage;
+            fragmentsIterator = fragmentsAsList.iterator();
             try {
-                rootPage = DispatcherLogic.getPage(rootDir);
+                currentElement = new Root();
+                currentPageInstance = currentElement.getPageInstance();
+                pagePath.add(currentPageInstance);
             } catch (Exception e) {
                 logger.error("Cannot load root page", e);
                 return null;
             }
-
-            PageInstance rootPageInstance = new PageInstance(null, rootDir, rootPage, null);
-            pagePath.add(rootPageInstance);
-
-            dispatch = getDispatch(pagePath, fragmentsIterator);
-            if(dispatch != null) {
-                cache.put(path, dispatch);
-            }
-            return dispatch;
         } else {
-            List<PageInstance> pagePath =
-                    new ArrayList<PageInstance>(Arrays.asList(dispatch.getPageInstancePath()));
+            pagePath = new ArrayList<PageInstance>(Arrays.asList(dispatch.getPageInstancePath()));
             String[] fragments = StringUtils.split(path.substring(subPath.length()), '/');
 
             List<String> fragmentsAsList = Arrays.asList(fragments);
-            ListIterator<String> fragmentsIterator = fragmentsAsList.listIterator();
-
-            dispatch = getDispatch(pagePath, fragmentsIterator);
-            if(dispatch != null) {
-                cache.put(path, dispatch);
-            }
-            return dispatch;
-        }
-    }
-
-    protected Dispatch getDispatch(
-            List<PageInstance> initialPath,
-            ListIterator<String> fragmentsIterator) {
-        try {
-            makePageInstancePath(initialPath, fragmentsIterator);
-        } catch (PageNotActiveException e) {
-            logger.debug("Page not active, not creating dispatch");
-            return null;
-        } catch (Exception e) {
-            logger.error("Couldn't create dispatch", e);
-            return null;
+            fragmentsIterator = fragmentsAsList.listIterator();
+            currentElement = dispatch.getLastPageInstance().getActionBean();
         }
 
-        if (fragmentsIterator.hasNext()) {
-            logger.debug("Not all fragments matched");
-            return null;
-        }
-
-        // check path contains root page and some child page at least
-        if (initialPath.size() <= 1) {
-            return null;
-        }
-
-        PageInstance[] pageArray =
-                new PageInstance[initialPath.size()];
-        initialPath.toArray(pageArray);
-
-        Dispatch dispatch = new Dispatch(pageArray);
-        return dispatch;
-        //return checkDispatch(dispatch);
-    }
-
-    protected void makePageInstancePath
-            (List<PageInstance> pagePath, ListIterator<String> fragmentsIterator)
-            throws Exception {
-        PageInstance parentPageInstance = pagePath.get(pagePath.size() - 1);
-        File currentDirectory = parentPageInstance.getChildrenDirectory();
-        boolean params = !parentPageInstance.getParameters().isEmpty();
         while(fragmentsIterator.hasNext()) {
-            String nextFragment = fragmentsIterator.next();
-            File childDirectory = new File(currentDirectory, nextFragment);
-            if(childDirectory.isDirectory() && !PageInstance.DETAIL.equals(childDirectory.getName())) {
-                ChildPage childPage = null;
-                for(ChildPage candidate : parentPageInstance.getLayout().getChildPages()) {
-                    if(candidate.getName().equals(childDirectory.getName())) {
-                        childPage = candidate;
-                        break;
-                    }
+            try {
+                currentElement = currentElement.consumePathFragment(fragmentsIterator.next());
+                if(currentElement == null) {
+                    logger.debug("Couldn't create dispatch");
+                    return null;
                 }
-                if(childPage == null) {
-                    throw new PageNotActiveException();
+                currentPageInstance = currentElement.getPageInstance();
+                if(!pagePath.contains(currentPageInstance)) {
+                    pagePath.add(currentPageInstance);
                 }
-
-                Page page = DispatcherLogic.getPage(childDirectory);
-                Class<? extends PageAction> actionClass =
-                        DispatcherLogic.getActionClass(configuration, childDirectory);
-                PageInstance pageInstance =
-                        new PageInstance(parentPageInstance, childDirectory, page, actionClass);
-                pagePath.add(pageInstance);
-                makePageInstancePath(pagePath, fragmentsIterator);
-                return;
-            } else {
-                if(!params) {
-                    currentDirectory = new File(currentDirectory, PageInstance.DETAIL);
-                    params = true;
-                }
-                parentPageInstance = parentPageInstance.copy();
-                parentPageInstance.getParameters().add(nextFragment);
-                pagePath.set(pagePath.size() - 1, parentPageInstance);
+            } catch (Exception e) {
+                logger.debug("Couldn't create dispatch", e);
+                return null;
             }
         }
+        dispatch = new Dispatch(pagePath.toArray(new PageInstance[pagePath.size()]));
+        cache.put(path, dispatch);
+        return dispatch;
     }
 
     protected static String normalizePath(String originalPath) {
         String path = ServletUtils.removePathParameters(originalPath);
         path = ServletUtils.removeRedundantTrailingSlashes(path);
         return path;
+    }
+
+    public class Root implements DispatchElement {
+
+        private PageInstance pageInstance;
+
+        public Root() {
+            Page rootPage = DispatcherLogic.getPage(pagesDirectory);
+            pageInstance = new PageInstance(null, pagesDirectory, rootPage, null);
+        }
+
+        @Override
+        public DispatchElement consumePathFragment(String pathFragment) {
+            PageAction subpage = DispatcherLogic.getSubpage(configuration, pageInstance, pathFragment);
+            HttpServletRequest request = ElementsThreadLocals.getHttpServletRequest();
+            Injections.inject(subpage, request.getServletContext(), request);
+            return subpage;
+        }
+
+        public PageInstance getPageInstance() {
+            return pageInstance;
+        }
+
+        public void setPageInstance(PageInstance pageInstance) {
+            this.pageInstance = pageInstance;
+        }
     }
 
 }

@@ -42,7 +42,9 @@ import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PrimaryKey;
 import org.hibernate.mapping.Table;
 import org.hibernate.type.*;
+import org.jadira.usertype.dateandtime.joda.PersistentDateTime;
 import org.jetbrains.annotations.Nullable;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,8 +92,6 @@ public class HibernateConfig {
             classMapping(database, mappings);
             //One2Many Mapping
             o2mMapping(database, configuration, mappings);
-            //Many2One Mapping
-            m2oMapping(database, configuration, mappings);
 
             //TODO
             //mappings.addSecondPass(new ToOneFkSecondPass(?));
@@ -167,18 +167,6 @@ public class HibernateConfig {
             }
         }
         return mappings;
-    }
-    private void m2oMapping(Database database, Configuration configuration, Mappings mappings) {
-        for (Schema schema : database.getSchemas()) {
-            for (com.manydesigns.portofino.model.database.Table aTable :
-                    schema.getTables()) {
-                for (ForeignKey rel : aTable.getForeignKeys()) {
-                    logger.debug(MessageFormat.format("Many to one - {0} {1}",
-                            aTable.getQualifiedName(), rel.getName()));
-                    createM2O(configuration, mappings, rel);
-                }
-            }
-        }
     }
 
     private void o2mMapping(Database database, Configuration configuration, Mappings mappings) {
@@ -596,28 +584,36 @@ public class HibernateConfig {
         set.setFetchMode(FetchMode.DEFAULT);
         //Riferimenti alle colonne
 
-        DependantValue dv;
-        Table tableMany = clazzMany.getTable();
-        Table tableOne = clazzOne.getTable();
-        List<Column> oneColumns = new ArrayList<Column>();
-        List<Column> manyColumns = new ArrayList<Column>();
-        //Chiave multipla
-        final List<Reference> refs = relationship.getReferences();
-        if (refs.size() > 1) {
-            dv = createFKComposite(mappings, relationship, manyMDTable, clazzOne,
-                    clazzMany, set, tableMany, tableOne, oneColumns, manyColumns);
-        } else {  //chiave straniera singola
-            dv = createFKSingle(mappings, clazzOne, clazzMany, tableOne,
-                    oneColumns, manyColumns, refs);
+        ToOne m2o = createM2O(config, mappings, relationship);
+        if(m2o == null) {
+            return;
+        }
+        if(m2o.isReferenceToPrimaryKey()) {
+            DependantValue dv;
+            Table tableMany = clazzMany.getTable();
+            Table tableOne = clazzOne.getTable();
+            List<Column> oneColumns = new ArrayList<Column>();
+            List<Column> manyColumns = new ArrayList<Column>();
+            //Chiave multipla
+            final List<Reference> refs = relationship.getReferences();
+            if (refs.size() > 1) {
+                dv = createFKComposite(mappings, relationship, manyMDTable, clazzOne,
+                        clazzMany, set, tableMany, tableOne, oneColumns, manyColumns);
+            } else {  //chiave straniera singola
+                dv = createFKSingle(mappings, clazzOne, clazzMany, tableOne,
+                        oneColumns, manyColumns, refs);
+            }
+            dv.setForeignKeyName(relationship.getQualifiedName());
+            dv.setTypeName(null);
+            dv.setNullable(false);
+            set.setKey(dv);
+        } else {
+            set.setReferencedPropertyName(m2o.getReferencedPropertyName());
+            KeyValue keyVal = (KeyValue) set.getOwner().getReferencedProperty(m2o.getReferencedPropertyName()).getValue();
+            //dv = new DependantValue(mappings, set.getCollectionTable(), keyVal);
+            set.setKey(keyVal);
         }
 
-        tableMany.createForeignKey(relationship.getName(),
-                manyColumns,
-                oneMDQualifiedTableName,
-                oneColumns);
-
-        dv.setNullable(false);
-        set.setKey(dv);
         mappings.addCollection(set);
 
         Property prop = new Property();
@@ -651,7 +647,6 @@ public class HibernateConfig {
         dv = new DependantValue(mappings, clazzMany.getTable(), component);
         dv.setNullable(true);
         dv.setUpdateable(true);
-
 
         for (Reference ref : relationship.getReferences()) {
             String colToName = ref.getToColumn();
@@ -721,7 +716,7 @@ public class HibernateConfig {
     }
 
 
-    protected void createM2O(Configuration config, Mappings mappings,
+    protected ToOne createM2O(Configuration config, Mappings mappings,
                              ForeignKey relationship) {
         com.manydesigns.portofino.model.database.Table manyMDTable =
                 relationship.getFromTable();
@@ -735,7 +730,7 @@ public class HibernateConfig {
         if(clazz == null) {
             logger.error("Cannot find table '{}' as 'many' side of foreign key '{}'. Skipping relationship.",
                     manyMDQualifiedTableName, relationship.getName());
-            return;
+            return null;
         }
 
         Table tab = clazz.getTable();
@@ -746,7 +741,7 @@ public class HibernateConfig {
         persistentClasses.put(oneMDQualifiedTableName,
                 config.getClassMapping(oneMDQualifiedTableName));
         m2o.setReferencedEntityName(oneMDQualifiedTableName);
-        m2o.createPropertyRefConstraints(persistentClasses);
+        m2o.setForeignKeyName(relationship.getQualifiedName());
 
         PersistentClass manyClass = config.getClassMapping(manyMDQualifiedTableName);
         Set<com.manydesigns.portofino.model.database.Column> referencedColumns =
@@ -755,7 +750,7 @@ public class HibernateConfig {
             com.manydesigns.portofino.model.database.Column fromColumn = ref.getActualFromColumn();
             if(fromColumn == null) {
                 logger.error("Missing from column {}, skipping relationship", ref.getFromColumn());
-                return;
+                return null;
             }
             Column col = new Column();
             col.setName(quoteIdentifier(fromColumn.getColumnName()));
@@ -767,7 +762,7 @@ public class HibernateConfig {
             if(col == null) {
                 logger.error("Column not found in 'many' entity {}: {}, " +
                              "skipping relationship", manyClass.getEntityName(), fromColumn.getColumnName());
-                return;
+                return null;
             }
             m2o.addColumn(col);
             //Is the relationship a reference to the primary key or to a unique key?
@@ -787,6 +782,8 @@ public class HibernateConfig {
                         relationship.getName(), e);
             }
         }
+        m2o.createForeignKey();
+        m2o.createPropertyRefConstraints(persistentClasses);
 
         Property prop = new Property();
         prop.setName(relationship.getActualOnePropertyName());
@@ -795,6 +792,7 @@ public class HibernateConfig {
         prop.setInsertable(false);
         prop.setUpdateable(false);
         clazz.addProperty(prop);
+        return m2o;
     }
 
     /** (Adapted from Hibernate) Create a synthetic property to refer to including an embedded component value
@@ -808,7 +806,7 @@ public class HibernateConfig {
         propertyNameBuffer.append(oneMDTable.getActualEntityName());
         String firstPropertyName = relationship.getReferences().get(0).getActualToColumn().getActualPropertyName();
         propertyNameBuffer.append("_").append(firstPropertyName);
-        String syntheticPropertyName = propertyNameBuffer.toString();
+        String syntheticPropertyName = DatabaseLogic.getUniquePropertyName(oneMDTable, propertyNameBuffer.toString());
         PersistentClass referencedClass = mappings.getClass(oneMDQualifiedTableName);
         Component embeddedComp = new Component(mappings, referencedClass);
         embeddedComp.setEmbedded(true);
@@ -851,6 +849,7 @@ public class HibernateConfig {
         mappings.addUniquePropertyReference(referencedClass.getEntityName(), syntheticPropertyName);
         mappings.addPropertyReferencedAssociation(
                 referencedClass.getEntityName(), firstPropertyName, syntheticPropertyName);
+        oneMDTable.getSyntheticPropertyNames().add(syntheticPropertyName);
     }
 
     private Property getRefProperty(PersistentClass clazzOne, String propertyName) {
@@ -913,6 +912,8 @@ public class HibernateConfig {
                 default:
                     typeName = null;
             }
+        } else if(DateTime.class.isAssignableFrom(javaType)) {
+            typeName = PersistentDateTime.class.getName();
         } else if (javaType == Boolean.class) {
             if(jdbcType == Types.BIT || jdbcType == Types.BOOLEAN) {
                 typeName = BooleanType.INSTANCE.getName();

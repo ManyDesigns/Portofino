@@ -44,7 +44,7 @@ import java.util.Map;
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  */
-public class SelectField extends AbstractField {
+public class SelectField extends AbstractField<Object> {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
@@ -419,7 +419,7 @@ public class SelectField extends AbstractField {
                                        String stringValue,
                                        boolean checked) {
         xb.openElement("div");
-        xb.addAttribute("class", "radio");
+        xb.addAttribute("class", "radio-inline");
         xb.openElement("label");
         xb.addAttribute("for", radioId);
         xb.writeInputRadio(radioId, inputName, stringValue, checked);
@@ -480,6 +480,12 @@ public class SelectField extends AbstractField {
         return result;
     }
 
+    @Override
+    public void setStringValue(String stringValue) {
+        Object value = OgnlUtils.convertValue(stringValue, accessor.getType());
+        selectionModel.setValue(selectionModelIndex, value);
+    }
+
     public String jsonSelectFieldOptions(boolean includeSelectPrompt) {
         Map<Object, SelectionModel.Option> options =
                 selectionModel.getOptions(selectionModelIndex);
@@ -527,6 +533,7 @@ public class SelectField extends AbstractField {
     }
 
     public void setValue(Object value) {
+        value = OgnlUtils.convertValue(value, accessor.getType());
         selectionModel.setValue(selectionModelIndex, value);
     }
 

@@ -55,6 +55,7 @@ import net.sourceforge.stripes.action.*;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -619,7 +620,7 @@ public class TablesAction extends AbstractActionBean {
                 new String[] {
                         columnForm.getColumnName(),
                         type.getTypeName() + " (JDBC: " + type.getJdbcType() + ")",
-                        "Auto (" + defaultJavaType.getSimpleName() + ")" },
+                        "Auto (" + getJavaTypeName(defaultJavaType) + ")" },
                 true);
         try {
             Class existingType = Class.forName(columnForm.getJavaType());
@@ -629,7 +630,7 @@ public class TablesAction extends AbstractActionBean {
                 new String[] {
                         columnForm.getColumnName(),
                         type.getTypeName() + " (JDBC: " + type.getJdbcType() + ")",
-                        existingType.getSimpleName() },
+                        getJavaTypeName(existingType)},
                 true);
             }
         } catch (Exception e) {
@@ -641,8 +642,16 @@ public class TablesAction extends AbstractActionBean {
                     new String[] {
                             columnForm.getColumnName(),
                             type.getTypeName() + " (JDBC: " + type.getJdbcType() + ")",
-                            c.getSimpleName() },
+                            getJavaTypeName(c)},
                     true);
+        }
+    }
+
+    protected String getJavaTypeName(Class javaType) {
+        if(javaType.getPackage().getName().startsWith("java.")) {
+            return javaType.getSimpleName();
+        } else {
+            return javaType.getName();
         }
     }
 
@@ -684,9 +693,9 @@ public class TablesAction extends AbstractActionBean {
                 return new Class[] { String.class };
             }
         } else if(type.getDefaultJavaType() == Timestamp.class) {
-            return new Class[] { Timestamp.class, java.sql.Date.class };
+            return new Class[] { Timestamp.class, java.sql.Date.class, DateTime.class };
         } else if(type.getDefaultJavaType() == java.sql.Date.class) {
-            return new Class[] { java.sql.Date.class, Timestamp.class };
+            return new Class[] { java.sql.Date.class, Timestamp.class, DateTime.class };
         } else {
             Class defaultJavaType = type.getDefaultJavaType();
             if(defaultJavaType != null) {

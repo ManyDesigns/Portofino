@@ -26,34 +26,24 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.manydesigns.elements.ElementsThreadLocals;
-import com.manydesigns.elements.messages.SessionMessages;
 import com.manydesigns.elements.options.DefaultSelectionProvider;
 import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.util.ElementsFileUtils;
-import com.manydesigns.portofino.RequestAttributes;
 import com.manydesigns.portofino.actions.safemode.SafeModeAction;
 import com.manydesigns.portofino.di.Injections;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
+import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Page;
 import com.manydesigns.portofino.scripting.ScriptingUtil;
-import net.sourceforge.stripes.action.ActionBeanContext;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.Resolution;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.*;
+import javax.xml.transform.stream.StreamSource;
 import java.io.*;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -445,7 +435,10 @@ public class DispatcherLogic {
         String configurationPackage = configurationClass.getPackage().getName();
         JAXBContext jaxbContext = JAXBContext.newInstance(configurationPackage);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        configuration = unmarshaller.unmarshal(inputStream);
+        configuration = unmarshaller.unmarshal(new StreamSource(inputStream), configurationClass);
+        if(configuration instanceof JAXBElement) {
+            configuration = ((JAXBElement) configuration).getValue();
+        }
         if (!configurationClass.isInstance(configuration)) {
             logger.error("Invalid configuration: expected " + configurationClass + ", got " + configuration);
             return null;
@@ -490,52 +483,11 @@ public class DispatcherLogic {
         }
         return true;
     }
-    
-    public static Resolution dispatch(ActionBeanContext actionContext) throws Exception {
-        Dispatch dispatch = DispatcherUtil.getDispatch(actionContext);
-        if (dispatch != null) {
-            HttpServletRequest request = actionContext.getRequest();
-            logger.debug("Preparing PageActions");
-            for(PageInstance page : dispatch.getPageInstancePath()) {
-                if(page.getParent() == null) {
-                    logger.debug("Not preparing root");
-                    continue;
-                }
-                if(page.isPrepared()) {
-                    continue;
-                }
-                logger.debug("Preparing PageAction {}", page);
-                PageAction actionBean = ensureActionBean(page);
-                configureActionBean(actionBean, page, request);
-                try {
-                    actionBean.setContext(actionContext);
-                    actionBean.setPageInstance(page);
-                    Resolution resolution = actionBean.preparePage();
-                    if(resolution != null) {
-                        logger.debug("PageAction prepare returned a resolution: {}", resolution);
-                        request.setAttribute(INVALID_PAGE_INSTANCE, page);
-                        return resolution;
-                    }
-                    page.setPrepared(true);
-                } catch (Throwable t) {
-                    request.setAttribute(INVALID_PAGE_INSTANCE, page);
-                    logger.error("PageAction prepare failed for " + page, t);
-                    if(!PageActionLogic.isEmbedded(actionBean)) {
-                        String msg = MessageFormat.format
-                                (ElementsThreadLocals.getText("this.page.has.thrown.an.exception.during.execution"), ExceptionUtils.getRootCause(t));
-                        SessionMessages.addErrorMessage(msg);
-                    }
-                    return new ForwardResolution("/m/pageactions/redirect-to-last-working-page.jsp");
-                }
-            }
-            PageInstance pageInstance = dispatch.getLastPageInstance();
-            request.setAttribute(RequestAttributes.PAGE_INSTANCE, pageInstance);
-        }
-        return null;
-    }
 
+    @Deprecated
     public static PageAction ensureActionBean(PageInstance page) throws IllegalAccessException, InstantiationException {
         PageAction action = page.getActionBean();
+        assert action != null;
         if(action == null) {
             action = page.getActionClass().newInstance();
             page.setActionBean(action);
@@ -543,18 +495,15 @@ public class DispatcherLogic {
         return action;
     }
 
-    public static void configureActionBean
-            (PageAction actionBean, PageInstance pageInstance, HttpServletRequest request)
+    public static void configurePageAction(PageAction pageAction)
             throws JAXBException, IOException {
-        ServletContext servletContext = ElementsThreadLocals.getServletContext();
-        Injections.inject(actionBean, servletContext, request);
-
+        PageInstance pageInstance = pageAction.getPageInstance();
         if(pageInstance.getConfiguration() != null) {
             logger.debug("Page instance {} is already configured");
             return;
         }
         File configurationFile = new File(pageInstance.getDirectory(), "configuration.xml");
-        Class<?> configurationClass = PageActionLogic.getConfigurationClass(actionBean.getClass());
+        Class<?> configurationClass = PageActionLogic.getConfigurationClass(pageAction.getClass());
         try {
             Object configuration =
                     getConfiguration(configurationFile, configurationClass);
@@ -563,4 +512,41 @@ public class DispatcherLogic {
             logger.error("Couldn't load configuration from " + configurationFile.getAbsolutePath(), t);
         }
     }
+
+    public static PageAction getSubpage(
+            Configuration configuration, PageInstance parentPageInstance, String pathFragment)
+            throws PageNotActiveException {
+        File currentDirectory = parentPageInstance.getChildrenDirectory();
+        File childDirectory = new File(currentDirectory, pathFragment);
+        if(childDirectory.isDirectory() && !PageInstance.DETAIL.equals(childDirectory.getName())) {
+            ChildPage childPage = null;
+            for(ChildPage candidate : parentPageInstance.getLayout().getChildPages()) {
+                if(candidate.getName().equals(childDirectory.getName())) {
+                    childPage = candidate;
+                    break;
+                }
+            }
+            if(childPage == null) {
+                throw new PageNotActiveException();
+            }
+
+            Page page = DispatcherLogic.getPage(childDirectory);
+            Class<? extends PageAction> actionClass =
+                    DispatcherLogic.getActionClass(configuration, childDirectory);
+            try {
+                PageAction pageAction = actionClass.newInstance();
+                PageInstance pageInstance =
+                    new PageInstance(parentPageInstance, childDirectory, page, actionClass);
+                pageInstance.setActionBean(pageAction);
+                pageAction.setPageInstance(pageInstance);
+                configurePageAction(pageAction);
+                return pageAction;
+            } catch (Exception e) {
+                throw new PageNotActiveException(e);
+            }
+        } else {
+            return null;
+        }
+    }
+
 }

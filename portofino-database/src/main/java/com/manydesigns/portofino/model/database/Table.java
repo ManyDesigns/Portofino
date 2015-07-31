@@ -38,6 +38,7 @@ import java.util.List;
 * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
 * @author Alessio Stalla       - alessio.stalla@manydesigns.com
 */
+@XmlRootElement(name = "table")
 @XmlAccessorType(XmlAccessType.NONE)
 public class Table implements ModelObject, Annotated {
     public static final String copyright =
@@ -69,6 +70,7 @@ public class Table implements ModelObject, Annotated {
     protected final List<ForeignKey> oneToManyRelationships;
     protected Class actualJavaClass;
     protected String actualEntityName;
+    protected final List<String> syntheticPropertyNames = new ArrayList<String>();
 
     //**************************************************************************
     // Logging
@@ -272,6 +274,10 @@ public class Table implements ModelObject, Annotated {
 
     public void setShortName(String shortName) {
         this.shortName = shortName;
+    }
+
+    public List<String> getSyntheticPropertyNames() {
+        return syntheticPropertyNames;
     }
 
     //**************************************************************************

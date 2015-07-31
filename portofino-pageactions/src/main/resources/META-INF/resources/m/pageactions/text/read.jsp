@@ -5,7 +5,7 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-%><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
+%><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.text.TextAction"/>
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.pageInstance.page.title}"/>
@@ -19,7 +19,7 @@
                 <c:forEach var="attachment" items="${actionBean.downloadableAttachments}">
                     <div class="attachment">
                         <div class="attachmentName">
-                            <i class="glyphicon glyphicon-file"></i>
+                            <em class="glyphicon glyphicon-file"></em>
                             <c:out value="${attachment.filename}"/>
                         </div>
                         <c:out value="${mde:bytesToHumanString(attachment.size)}"/>

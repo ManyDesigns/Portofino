@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.manydesigns</groupId>
         <artifactId>portofino</artifactId>
-        <version>4.1.2</version>
+        <version>4.2-SNAPSHOT</version>
     </parent>
     <artifactId>demo-tt</artifactId>
     <packaging>war</packaging>
@@ -78,6 +78,12 @@
         </dependency>
         <dependency>
             <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-jersey</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.manydesigns</groupId>
             <artifactId>portofino-mail</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
@@ -96,9 +102,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-web-api</artifactId>
-            <version>${javaee-web-api.version}</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet.api.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- logging -->
@@ -126,14 +132,6 @@
             <version>${logback.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!-- GAE needs java logging
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        -->
         <!-- mail -->
         <dependency>
             <groupId>javax.mail</groupId>
@@ -141,142 +139,10 @@
             <version>${javax.mail.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!--
-        <dependency>
-           <groupId>com.google.appengine</groupId>
-           <artifactId>appengine-api-1.0-sdk</artifactId>
-           <version>${google.appengine.sdk.version}</version>
-           <scope>compile</scope>
-       </dependency>
-       -->
         <dependency>
             <groupId>com.sksamuel.diff</groupId>
             <artifactId>diff</artifactId>
             <version>1.1.11</version>
         </dependency>
     </dependencies>
-    <build>
-        <plugins>
-                        <!-- Plugins for GAE
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.8</version>
-                <executions>
-                    <execution>
-                    <id>copy</id>
-                    <phase>process-resources</phase>
-                    <goals>
-                        <goal>unpack</goal>
-                    </goals>
-                    <configuration>
-                    <artifactItems>
-                        <artifactItem>
-                            <groupId>com.manydesigns</groupId>
-                            <artifactId>portofino-base</artifactId>
-                            <version>${project.version}</version>
-                            <type>jar</type>
-                            <overWrite>true</overWrite>
-                            <outputDirectory>${project.build.directory}/tmp</outputDirectory>
-                            <includes>META-INF/resources/**</includes>
-                        </artifactItem>
-                        <artifactItem>
-                            <groupId>com.manydesigns</groupId>
-                            <artifactId>portofino-crud</artifactId>
-                            <version>${project.version}</version>
-                            <type>jar</type>
-                            <overWrite>true</overWrite>
-                            <outputDirectory>${project.build.directory}/tmp</outputDirectory>
-                            <includes>META-INF/resources/**</includes>
-                        </artifactItem>
-                        <artifactItem>
-                            <groupId>com.manydesigns</groupId>
-                            <artifactId>portofino-database</artifactId>
-                            <version>${project.version}</version>
-                            <type>jar</type>
-                            <overWrite>true</overWrite>
-                            <outputDirectory>${project.build.directory}/tmp</outputDirectory>
-                            <includes>META-INF/resources/**</includes>
-                        </artifactItem>
-                        <artifactItem>
-                            <groupId>com.manydesigns</groupId>
-                            <artifactId>portofino-openid</artifactId>
-                            <version>${project.version}</version>
-                            <type>jar</type>
-                            <overWrite>true</overWrite>
-                            <outputDirectory>${project.build.directory}/tmp</outputDirectory>
-                            <includes>META-INF/resources/**</includes>
-                        </artifactItem>
-                        <artifactItem>
-                            <groupId>com.manydesigns</groupId>
-                            <artifactId>portofino-pageactions</artifactId>
-                            <version>${project.version}</version>
-                            <type>jar</type>
-                            <overWrite>true</overWrite>
-                            <outputDirectory>${project.build.directory}/tmp</outputDirectory>
-                            <includes>META-INF/resources/**</includes>
-                        </artifactItem>
-                        <artifactItem>
-                            <groupId>com.manydesigns</groupId>
-                            <artifactId>portofino-admin</artifactId>
-                            <version>${project.version}</version>
-                            <type>jar</type>
-                            <overWrite>true</overWrite>
-                            <outputDirectory>${project.build.directory}/tmp</outputDirectory>
-                            <includes>META-INF/resources/**</includes>
-                        </artifactItem>
-                        <artifactItem>
-                            <groupId>com.manydesigns</groupId>
-                            <artifactId>portofino-theme</artifactId>
-                            <version>${project.version}</version>
-                            <type>jar</type>
-                            <overWrite>false</overWrite>
-                            <outputDirectory>${project.build.directory}/tmp</outputDirectory>
-                            <includes>META-INF/resources/**</includes>
-                        </artifactItem>
-                    </artifactItems>
-                    </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <webResources>
-                        <resource>
-                            <directory>${project.build.directory}/tmp/META-INF/resources</directory>
-                            <excludes>
-                                <exclude>theme/footer.jsp</exclude>
-                                <exclude>theme/head.jsp</exclude>
-                                <exclude>theme/header.jsp</exclude>
-                            </excludes>
-                        </resource>
-                    </webResources>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.google.appengine</groupId>
-                <artifactId>appengine-maven-plugin</artifactId>
-                <version>1.7.7.1</version>
-                <configuration>
-                    <jvmFlags>
-                        <jvmFlag>-Drdbms.server=local</jvmFlag>
-                        <jvmFlag>-Drdbms.driver=com.mysql.jdbc.Driver</jvmFlag>
-                        <jvmFlag>-Drdbms.url=jdbc:mysql://localhost/tt?characterEncoding=UTF-8&amp;useUnicode=true&amp;sessionVariables=sql_Mode=ANSI,character_set_database=utf8</jvmFlag>
-                        <jvmFlag>-Xdebug</jvmFlag>
-                        <jvmFlag>-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005</jvmFlag>
-                        <jvmFlag>-Xmx128M</jvmFlag>
-                        <jvmFlag>-XX:MaxPermSize=128M</jvmFlag>
-                        <jvmFlag>-XX:+UseConcMarkSweepGC</jvmFlag>
-                        <jvmFlag>-XX:+CMSClassUnloadingEnabled</jvmFlag>
-                        <jvmFlag>-ea</jvmFlag>
-                    </jvmFlags>
-                    <disableUpdateCheck>true</disableUpdateCheck>
-                </configuration>
-            </plugin>-->
-        </plugins>
-    </build>
 </project>

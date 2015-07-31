@@ -27,20 +27,19 @@ import com.manydesigns.elements.options.SelectionProvider;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.QueryStringWithParameters;
-import com.manydesigns.portofino.di.Inject;
-import com.manydesigns.portofino.modules.DatabaseModule;
-import com.manydesigns.portofino.persistence.Persistence;
-import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.database.TableCriteria;
+import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.PageInstance;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.Database;
 import com.manydesigns.portofino.model.database.Table;
+import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
-import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
-import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
+import com.manydesigns.portofino.pageactions.crud.configuration.database.CrudConfiguration;
+import com.manydesigns.portofino.persistence.Persistence;
+import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
@@ -79,7 +78,6 @@ import java.util.List;
 @RequiresPermissions(level = AccessLevel.VIEW)
 @ScriptTemplate("script_template.groovy")
 @ConfigurationClass(CrudConfiguration.class)
-@SupportsDetail
 @PageActionName("Crud")
 public class CrudAction extends AbstractCrudAction<Object> {
     public static final String copyright =
@@ -87,7 +85,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     public static final String[][] CRUD_CONFIGURATION_FIELDS =
                 {{"name", "database", "query", "searchTitle", "createTitle", "readTitle", "editTitle", "variable",
-                  "largeResultSet", "rowsPerPage"}};
+                  "largeResultSet", "rowsPerPage", "columns"}};
 
     public Table baseTable;
 
@@ -100,6 +98,8 @@ public class CrudAction extends AbstractCrudAction<Object> {
     @Inject(DatabaseModule.PERSISTENCE)
     public Persistence persistence;
 
+    protected long totalSearchRecords = -1;
+
     //**************************************************************************
     // Logging
     //**************************************************************************
@@ -109,13 +109,20 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     @Override
     public long getTotalSearchRecords() {
+        if(totalSearchRecords < 0) {
+            calculateTotalSearchRecords();
+        }
+        return totalSearchRecords;
+    }
+
+    protected long calculateTotalSearchRecords() {
         // calculate totalRecords
         TableCriteria criteria = new TableCriteria(baseTable);
         if(searchForm != null) {
             searchForm.configureCriteria(criteria);
         }
         QueryStringWithParameters query =
-                QueryUtils.mergeQuery(crudConfiguration.getQuery(), criteria, this);
+                QueryUtils.mergeQuery(getBaseQuery(), criteria, this);
 
         String queryString = query.getQueryString();
         String totalRecordsQueryString;
@@ -128,7 +135,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
         List<Object> result = QueryUtils.runHqlQuery
                 (session, totalRecordsQueryString,
                         query.getParameters());
-        return (Long) result.get(0);
+        return totalSearchRecords = ((Number) result.get(0)).longValue();
     }
 
     protected String generateCountQuery(String queryString) throws JSQLParserException {
@@ -150,7 +157,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
             plainSelect.setOrderByElements(null);
             return plainSelect.toString();
         } catch(Exception e) {
-            logger.debug("Query string {} does not contain select");
+            logger.debug("Query string {} does not contain select", e);
             queryString = "SELECT count(*) " + queryString;
             PlainSelect plainSelect =
                 (PlainSelect) ((Select) parserManager.parse(new StringReader(queryString))).getSelectBody();
@@ -195,7 +202,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     @Before
     public void prepare() {
-        if(crudConfiguration != null && crudConfiguration.getActualDatabase() != null) {
+        if(getCrudConfiguration() != null && getCrudConfiguration().getActualDatabase() != null) {
             selectionProviderSupport = createSelectionProviderSupport();
             selectionProviderSupport.setup();
         }
@@ -206,9 +213,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
     }
 
     @Override
-    protected void prepareConfigurationForms() {
-        super.prepareConfigurationForms();
-
+    protected void setupConfigurationForm(FormBuilder formBuilder) {
         SelectionProvider databaseSelectionProvider =
                 SelectionProviderLogic.createSelectionProvider(
                         "database",
@@ -216,31 +221,30 @@ public class CrudAction extends AbstractCrudAction<Object> {
                         Database.class,
                         null,
                         new String[]{"databaseName"});
-        crudConfigurationForm = new FormBuilder(CrudConfiguration.class)
+
+        formBuilder
                 .configFields(CRUD_CONFIGURATION_FIELDS)
                 .configFieldSetNames("Crud")
-                .configSelectionProvider(databaseSelectionProvider, "database")
-                .build();
-
+                .configSelectionProvider(databaseSelectionProvider, "database");
     }
 
     @Override
     protected ClassAccessor prepare(PageInstance pageInstance) {
-        Database actualDatabase = crudConfiguration.getActualDatabase();
+        Database actualDatabase = getCrudConfiguration().getActualDatabase();
         if (actualDatabase == null) {
             logger.warn("Crud " + crudConfiguration.getName() + " (" + pageInstance.getPath() + ") " +
-                        "has an invalid database: " + crudConfiguration.getDatabase());
+                        "has an invalid database: " + getCrudConfiguration().getDatabase());
             return null;
         }
 
-        baseTable = crudConfiguration.getActualTable();
+        baseTable = getCrudConfiguration().getActualTable();
         if (baseTable == null) {
             logger.warn("Crud " + crudConfiguration.getName() + " (" + pageInstance.getPath() + ") " +
                         "has an invalid table");
             return null;
         }
 
-        session = persistence.getSession(crudConfiguration.getDatabase());
+        session = persistence.getSession(getCrudConfiguration().getDatabase());
         return new TableAccessor(baseTable);
     }
 
@@ -264,8 +268,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
                     logger.error("Can't order by " + sortProperty + ", property accessor not found", e);
                 }
             }
-            objects = QueryUtils.getObjects(session,
-                    crudConfiguration.getQuery(), criteria, this, firstResult, maxResults);
+            objects = QueryUtils.getObjects(session, getBaseQuery(), criteria, this, firstResult, maxResults);
         } catch (ClassCastException e) {
             objects=new ArrayList<Object>();
             logger.warn("Incorrect Field Type", e);
@@ -273,12 +276,16 @@ public class CrudAction extends AbstractCrudAction<Object> {
         }
     }
 
+    protected String getBaseQuery() {
+        return getCrudConfiguration().getQuery();
+    }
+
     @Override
     protected Object loadObjectByPrimaryKey(Serializable pkObject) {
         return QueryUtils.getObjectByPk(
                 persistence,
                 baseTable, pkObject,
-                crudConfiguration.getQuery(), this);
+                getBaseQuery(), this);
     }
 
     //**************************************************************************
@@ -299,6 +306,10 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     public void setBaseTable(Table baseTable) {
         this.baseTable = baseTable;
+    }
+
+    public CrudConfiguration getCrudConfiguration() {
+        return (CrudConfiguration) crudConfiguration;
     }
 
 }

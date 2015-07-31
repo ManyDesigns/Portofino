@@ -16,6 +16,8 @@ import java.lang.annotation.Annotation;
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
  */
 public class ClassAccessorDecorator extends AbstractAnnotatedAccessor implements ClassAccessor {
+    public static final String copyright =
+            "Copyright (c) 2005-2015, ManyDesigns srl";
 
     private final ClassAccessor delegate;
     private final PropertyAccessor[] properties;
@@ -103,6 +105,11 @@ public class ClassAccessorDecorator extends AbstractAnnotatedAccessor implements
     @Override
     public Object newInstance() {
         return delegate.newInstance();
+    }
+
+    @Override
+    public Class<?> getType() {
+        return delegate.getType();
     }
 
 

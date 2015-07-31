@@ -8,7 +8,7 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><jsp:useBean id="actionBean" scope="request"
                type="com.manydesigns.portofino.pageactions.calendar.CalendarAction"
-/><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
+/><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/modal.jsp">
     <stripes:layout-component name="pageTitle">
         <fmt:message key="configure.page._">
             <fmt:param value="<%= StringEscapeUtils.escapeHtml(actionBean.getPage().getTitle()) %>" />

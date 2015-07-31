@@ -34,6 +34,7 @@ import com.manydesigns.portofino.i18n.ResourceBundleManager;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.modules.Module;
 import com.manydesigns.portofino.modules.ModuleRegistry;
+import com.manydesigns.portofino.scripting.ScriptingUtil;
 import com.manydesigns.portofino.stripes.ResolverUtil;
 import groovy.util.GroovyScriptEngine;
 import org.apache.commons.configuration.CompositeConfiguration;
@@ -41,7 +42,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.interpol.ConfigurationInterpolator;
-import org.codehaus.groovy.control.CompilerConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -186,7 +186,9 @@ public class PortofinoListener
         ElementsFileUtils.ensureDirectoryExistsAndWarnIfNotWritable(groovyClasspath);
 
         logger.debug("Registering Groovy class loader");
-        GroovyScriptEngine groovyScriptEngine = createScriptEngine(groovyClasspath);
+        logger.info("Groovy classpath: " + groovyClasspath.getAbsolutePath());
+        GroovyScriptEngine groovyScriptEngine =
+                ScriptingUtil.createScriptEngine(groovyClasspath, getClass().getClassLoader());
         ClassLoader classLoader = groovyScriptEngine.getGroovyClassLoader();
         servletContext.setAttribute(BaseModule.GROOVY_CLASS_PATH, groovyClasspath);
         servletContext.setAttribute(BaseModule.CLASS_LOADER, classLoader);
@@ -233,34 +235,16 @@ public class PortofinoListener
 
         String lineSeparator = System.getProperty("line.separator", "\n");
         logger.info(lineSeparator + SEPARATOR +
-                lineSeparator + "--- ManyDesigns Portofino started successfully" +
+                lineSeparator + "--- ManyDesigns Portofino " + ModuleRegistry.getPortofinoVersion() + " started successfully" +
                 lineSeparator + "--- Context path: {}" +
                 lineSeparator + "--- Real path: {}" +
+                lineSeparator + "--- Visit http://portofino.manydesigns.com for news, documentation, issue tracker, community forums, commercial support!" +
                 lineSeparator + SEPARATOR,
                 new String[]{
                         serverInfo.getContextPath(),
                         serverInfo.getRealPath()
                 }
         );
-    }
-
-    protected GroovyScriptEngine createScriptEngine(File classpathFile) {
-        CompilerConfiguration cc = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
-        String classpath = classpathFile.getAbsolutePath();
-        logger.info("Groovy classpath: " + classpath);
-        cc.setClasspath(classpath);
-        cc.setRecompileGroovySource(true);
-        GroovyScriptEngine scriptEngine;
-        try {
-            scriptEngine =
-                    new GroovyScriptEngine(new URL[] { classpathFile.toURI().toURL() },
-                                           getClass().getClassLoader());
-        } catch (IOException e) {
-            throw new Error(e);
-        }
-        scriptEngine.setConfig(cc);
-        scriptEngine.getGroovyClassLoader().setShouldRecompile(true);
-        return scriptEngine;
     }
 
     protected void discoverModules(ModuleRegistry moduleRegistry, ClassLoader classLoader) {

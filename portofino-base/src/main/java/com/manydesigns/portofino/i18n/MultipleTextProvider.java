@@ -51,7 +51,12 @@ public class MultipleTextProvider implements TextProvider {
 
     public String getText(String key, Object... args) {
         String localizedString = getLocalizedString(key);
-        return MessageFormat.format(localizedString, args);
+        return MessageFormat.format(localizedString != null ? localizedString : key, args);
+    }
+
+    public String getTextOrNull(String key, Object... args) {
+        String localizedString = getLocalizedString(key);
+        return localizedString != null ? MessageFormat.format(localizedString, args) : null;
     }
 
     public List<ResourceBundle> getResourceBundles() {
@@ -70,6 +75,6 @@ public class MultipleTextProvider implements TextProvider {
                 /* IGNORE */
             }
         }
-        return key;
+        return null;
     }
 }

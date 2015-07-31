@@ -69,9 +69,9 @@
                 <div class="row">
                     <mde:sessionMessages/>
                     <stripes:layout-component name="pageHeader">
-                        <h3 style="border-bottom: 1px solid #E5E5E5">
+                        <h1 style="border-bottom: 1px solid #E5E5E5">
                             <stripes:layout-component name="pageTitle" />
-                        </h3>
+                        </h1>
                     </stripes:layout-component>
                     <stripes:layout-component name="pageBody" />
                 </div>

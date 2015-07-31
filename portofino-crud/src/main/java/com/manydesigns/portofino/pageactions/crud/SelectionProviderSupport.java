@@ -50,4 +50,6 @@ public interface SelectionProviderSupport {
     void configureSelectionProvider(
             List<String> properties, String name, DisplayMode displayMode, SearchDisplayMode searchDisplayMode,
             String createNewHref, String createNewText);
+
+    void clearSelectionProviders();
 }

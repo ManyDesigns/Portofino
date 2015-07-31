@@ -39,6 +39,11 @@ public interface ClassAccessor extends AnnotatedElement {
 
     public String getName();
 
+    /**
+     * The type of the objects this accessor can operate on.
+     * @return the type, if any, or null.
+     */
+    public Class<?> getType();
 
     //**************************************************************************
     // Properties management

@@ -4,7 +4,7 @@
 <%@ taglib prefix="mde" uri="/manydesigns-elements"%>
 <%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"%>
 <jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.custom.CustomAction"/>
-<stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
+<stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>
@@ -43,7 +43,7 @@
                 <stripes:link href="/login" class="btn">
                     <stripes:param name="logout"/>
                     Log out
-                    <i class="glyphicon glyphicon-chevron-right"></i>
+                    <em class="glyphicon glyphicon-chevron-right"></em>
                 </stripes:link>
             </div>
         </div>

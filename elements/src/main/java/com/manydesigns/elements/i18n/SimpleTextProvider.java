@@ -20,6 +20,9 @@
 
 package com.manydesigns.elements.i18n;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -31,6 +34,8 @@ public class SimpleTextProvider implements TextProvider {
     //--------------------------------------------------------------------------
     // Fields
     //--------------------------------------------------------------------------
+
+    private static final Logger logger = LoggerFactory.getLogger(SimpleTextProvider.class);
 
     protected final Locale locale;
     protected final String messageResource;
@@ -83,7 +88,12 @@ public class SimpleTextProvider implements TextProvider {
 
     public String getText(String key, Object... args) {
         String localizedString = getLocalizedString(key);
-        return MessageFormat.format(localizedString, args);
+        return MessageFormat.format(localizedString != null ? localizedString : key, args);
+    }
+
+    public String getTextOrNull(String key, Object... args) {
+        String localizedString = getLocalizedString(key);
+        return localizedString != null ? MessageFormat.format(localizedString, args) : null;
     }
 
     //--------------------------------------------------------------------------
@@ -93,12 +103,13 @@ public class SimpleTextProvider implements TextProvider {
     public String getLocalizedString(String key) {
         try{
             if (resourceBundle == null) {
-                return key;
+                return null;
             } else {
                 return resourceBundle.getString(key);
             }
         } catch (Throwable e) {
-            return key;
+            logger.debug("Key not found: " + key, e);
+            return null;
         }
     }
 }
