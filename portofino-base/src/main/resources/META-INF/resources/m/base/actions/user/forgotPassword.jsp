@@ -13,7 +13,7 @@
         Forgot your password?
     </stripes:layout-component>
     <stripes:layout-component name="pageBody">
-        Enter your email address below and we'll send you password reset instructions.
+        <fmt:message key='possword.resend'/>
         <stripes:form action="${actionBean.context.actionPath}" method="post" class="spacingTop">
             <div class="form-group">
                 <input type="text" name="email" id="email" class="form-control"
@@ -21,7 +21,7 @@
             </div>
             <div class="marginTop20px">
                 <button type="submit" name="forgotPassword2" class="btn btn-primary">Next</button>
-                <button type="submit" name="cancel" class="btn btn-link">Cancel</button>
+                <button type="submit" name="cancel" class="btn btn-default">Cancel</button>
             </div>
             <input type="hidden" name="returnUrl" value="<c:out value="${actionBean.returnUrl}"/>"/>
             <input type="hidden" name="cancelReturnUrl" value="<c:out value="${actionBean.cancelReturnUrl}"/>"/>
@@ -31,9 +31,9 @@
         </script>
         <div>
             <hr />
-            If you don't receive an email from us within a few minutes,
-            please check your spam filter.
-            We send you emails from the following address:
+            <small>
+                <fmt:message key='password.spam.filter'/>
+            </small>
         </div>
     </stripes:layout-component>
 </stripes:layout-render>

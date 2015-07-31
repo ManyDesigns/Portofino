@@ -40,10 +40,11 @@
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>
     <body>
+    <div id="wrapper">
     <jsp:include page="/theme/header.jsp">
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>
-    <div class="container">
+    <div id="content" class="container">
         <div class="row">
             <div class="col-md-2">
                 <portofino:embedded-page-actions list="aboveNavigation" />
@@ -136,6 +137,7 @@
     <jsp:include page="/theme/footer.jsp">
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>
+        </div>
     </body>
 </html>
 </c:if>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<page title="Tickets" navigationRoot="INHERIT" id="wzfccowrega5htzisex76k8vu" description="Tickets">
+<page title="Tickets" navigationRoot="INHERIT" id="wzfccowrega5htzisex76k8vu" description="All the tickets">
     <detailLayout template="well-with-tabs">
         <childPages>
             <childPage showInNavigation="false" order="0" name="activity" container="default"/>

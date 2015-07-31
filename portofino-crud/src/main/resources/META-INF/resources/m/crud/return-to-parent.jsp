@@ -16,6 +16,7 @@
         urlBuilder.setEvent("returnToSearch");
     %>
     <stripes:link href="<%= urlBuilder.toString() %>" class="btn btn-default btn-sm">
+        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>
         <fmt:message key="return.to.search" />
     </stripes:link>
 </c:if>

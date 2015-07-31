@@ -40,25 +40,39 @@ public @interface Button {
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
     public static final String
-        TYPE_DEFAULT = " btn-default ",
-        TYPE_PRIMARY = " btn-primary ",
-        TYPE_INFO = " btn-info ",
-        TYPE_SUCCESS = " btn-success ",
-        TYPE_WARNING = " btn-warning ",
-        TYPE_DANGER = " btn-danger ",
-        TYPE_INVERSE = " btn-inverse ",
-        TYPE_LINK = " btn-link ",
-        TYPE_NO_UI_BLOCK = " no-ui-block ";
+            TYPE_DEFAULT = " btn-default ",
+            TYPE_PRIMARY = " btn-primary ",
+            TYPE_INFO = " btn-info ",
+            TYPE_SUCCESS = " btn-success ",
+            TYPE_WARNING = " btn-warning ",
+            TYPE_DANGER = " btn-danger ",
+            TYPE_INVERSE = " btn-inverse ",
+            TYPE_LINK = " btn-link ",
+            TYPE_NO_UI_BLOCK = " no-ui-block ";
 
     public static final String
-        ICON_WHITE = " white ",
-        ICON_EDIT = " glyphicon-edit ",
-        ICON_PLUS = " glyphicon-plus ",
-        ICON_MINUS = " glyphicon-minus ",
-        ICON_TRASH = " glyphicon-trash ",
-        ICON_WRENCH = " glyphicon-wrench ",
-        ICON_PICTURE = " glyphicon-picture ";
-    
+            ICON_WHITE = " white ",
+            ICON_EDIT = " glyphicon-edit ",
+            ICON_PLUS = " glyphicon-plus ",
+            ICON_MINUS = " glyphicon-minus ",
+            ICON_TRASH = " glyphicon-trash ",
+            ICON_WRENCH = " glyphicon-wrench ",
+            ICON_RELOAD= " glyphicon-refresh ",
+            ICON_PICTURE = " glyphicon-picture ",
+            ICON_SEARCH = " glyphicon-search ",
+            ICON_REMOVE = " glyphicon-remove ",
+            ICON_MAP_MARKER = " glyphicon-map-marker ",
+            ICON_COMMENT = " glyphicon-comment ",
+            ICON_PAPERCLIP = " glyphicon-paperclip ",
+            ICON_IMPORT = " glyphicon-import ",
+            ICON_EXPORT = " glyphicon-export ",
+            ICON_RIGHT = " glyphicon-chevron-right ",
+            ICON_LEFT= " glyphicon-chevron-left ",
+            ICON_HOME= " glyphicon-home",
+            ICON_SAVE= " glyphicon-floppy-disk",
+            ICON_DUPLICATE = " glyphicon-duplicate ";
+
+
     /**
      * The list where this button is to be placed. Web pages will include lists of buttons by name.
      */

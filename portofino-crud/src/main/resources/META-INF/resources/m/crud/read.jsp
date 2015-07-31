@@ -10,7 +10,6 @@
     <stripes:layout-component name="contentHeader">
         <mde:sessionMessages />
         <div class="pull-right">
-            <jsp:include page="/m/crud/result-set-navigation.jsp" />
             <jsp:include page="/m/crud/return-to-parent.jsp" />
         </div>
         <jsp:include page="/theme/breadcrumbs.jsp" />
@@ -34,6 +33,8 @@
                     return confirm ('<fmt:message key="are.you.sure" />');
                 });
             </script>
+
+            <jsp:include page="/m/crud/result-set-navigation.jsp" />
         </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

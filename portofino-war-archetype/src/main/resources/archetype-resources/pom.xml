@@ -104,6 +104,22 @@
             <scope>compile</scope>
         </dependency>
 
+         <!-- Map pages. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-map</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+         <!-- Gallery pages. -->
+        <dependency>
+            <groupId>com.manydesigns</groupId>
+            <artifactId>portofino-gallery</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
         <!--
         ///////////////////////////////////////////////////////////////////////
         // Optional services. Remove a module to disable its features.       //

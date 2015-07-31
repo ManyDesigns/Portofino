@@ -29,11 +29,14 @@
                 });
             });
         </script>
-        <table id="tables" style="width: auto;">
+        <table id="tables" style="width: auto;" class="table">
+            <thead>
             <tr>
-                <th width="20%"><fmt:message key="database/schema" /></th>
-                <th width="80%"><fmt:message key="table.entity" /></th>
+                <th><fmt:message key="database/schema" /></th>
+                <th><fmt:message key="table.entity" /></th>
             </tr>
+            </thead>
+            <tbody>
 
             <%
                 String lastDatabase = null;
@@ -85,6 +88,7 @@
                                 ><%= tableDescr %></a></td>
                     </tr><%
                 } %>
+            </tbody>
         </table>
         <stripes:form beanclass="com.manydesigns.portofino.actions.admin.database.TablesAction"
                       method="post">

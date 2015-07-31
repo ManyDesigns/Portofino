@@ -36,7 +36,7 @@
                 <button type="submit" name="signUp2" class="btn btn-primary">
                     <fmt:message key="sign.up" />
                 </button>
-                <button type="submit" name="cancel" class="btn btn-link">
+                <button type="submit" name="cancel" class="btn btn-default">
                     <fmt:message key="cancel" />
                 </button>
             </div>
@@ -51,6 +51,9 @@
             If you don't receive an email from us within a few minutes,
             please check your spam filter.
             We send you emails from the following address:
+
+            <!-- TODO: put text in portofino messages -->
+
         </div>
     </stripes:layout-component>
 </stripes:layout-render>

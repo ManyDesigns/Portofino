@@ -28,6 +28,7 @@ import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.FieldUtils;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.text.TextFormat;
+import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -101,14 +102,21 @@ public class TableForm implements Element {
         if (selectable) {
             xb.openElement("th");
             xb.openElement("div");
-            xb.addAttribute("class", "checkbox");
+            xb.addAttribute("class", " squared-dark ");
             xb.openElement("input");
             xb.addAttribute("type", "checkbox");
             xb.addAttribute("title", "select-all");
+
+            String id =  RandomUtil.createRandomId(10) ;
+            xb.addAttribute("id", id );
             String js =
-                    "$(this).closest('table').find('td." + SELECTION_CELL_CLASS + " input').prop('checked', $(this).prop('checked'));";
+                    "$(this).closest('table').find('div." + SELECTION_CELL_CLASS + " input').prop('checked', $(this).prop('checked'));";
             xb.addAttribute("onchange", js);
             xb.closeElement("input");
+
+            xb.openElement("label");
+            xb.addAttribute("for", id );
+            xb.closeElement("label");
             xb.closeElement("div");
             xb.closeElement("th");
         }
@@ -306,10 +314,17 @@ public class TableForm implements Element {
 
             if (selectable) {
                 String[] inputNameArgs = {prefix, "selection"};
+                String id = RandomUtil.createRandomId(10)+index;
                 String selection = StringUtils.join(inputNameArgs);
                 xb.openElement("td");
-                xb.addAttribute("class", SELECTION_CELL_CLASS);
-                xb.writeInputCheckbox(null, selection, key, false, false, null, String.valueOf(index));
+                xb.openElement("div");
+                xb.addAttribute("class", SELECTION_CELL_CLASS+" squared-light ");
+                xb.writeInputCheckbox(id, selection, key, false, false, null, String.valueOf(index));
+
+                xb.openElement("label");
+                xb.addAttribute("for", id);
+                xb.closeElement("label");
+                xb.closeElement("div");
                 xb.closeElement("td");
             }
 

@@ -107,7 +107,7 @@ public class MailSettingsAction extends AbstractActionBean {
         }
     }
 
-    @Button(list = "settings", key = "return.to.pages", order = 2)
+    @Button(list = "settings", key = "return.to.pages", order = 2  , icon = Button.ICON_HOME)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

@@ -11,7 +11,6 @@
         <mde:sessionMessages />
         <div class="pull-right">
             <jsp:include page="/m/crud/result-set-navigation.jsp" />
-            <jsp:include page="/m/crud/return-to-parent.jsp" />
         </div>
         <jsp:include page="/theme/breadcrumbs.jsp" />
     </stripes:layout-component>

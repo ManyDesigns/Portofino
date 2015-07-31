@@ -90,7 +90,7 @@ public class ServletContextAction extends AbstractActionBean {
         form.readFromObject(attributes);
     }
 
-    @Button(list = "modules", key = "return.to.pages", order = 2)
+    @Button(list = "modules", key = "return.to.pages", order = 2  , icon = Button.ICON_HOME)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

@@ -67,14 +67,14 @@ public class ReloadModelAction extends AbstractActionBean {
         return new ForwardResolution("/m/admin/reload-model.jsp");
     }
 
-    @Button(list = "reload-model", key = "reload", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "reload-model", key = "reload", order = 1, type = Button.TYPE_PRIMARY , icon = Button.ICON_RELOAD)
     public Resolution reloadModel() {
         persistence.loadXmlModel();
         SessionMessages.addInfoMessage(ElementsThreadLocals.getText("model.successfully.reloaded"));
         return new ForwardResolution("/m/admin/reload-model.jsp");
     }
 
-    @Button(list = "reload-model-bar", key = "return.to.pages", order = 1)
+    @Button(list = "reload-model-bar", key = "return.to.pages", order = 1 , icon = Button.ICON_HOME)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }

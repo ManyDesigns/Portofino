@@ -38,7 +38,7 @@
                     <hr />
                     <jsp:useBean id="portofinoConfiguration" scope="application"
                                  type="org.apache.commons.configuration.Configuration"/>
-                    Powered by <a href="http://www.manydesigns.com/">Portofino</a>
+                    Powered by <a href="http://portofino.manydesigns.com/">Portofino</a>
                     <c:out value="<%= ModuleRegistry.getPortofinoVersion() %>"/>
                 </stripes:layout-component>
             </div>

@@ -53,6 +53,8 @@ public class BooleanField extends AbstractField<Boolean> {
     public static final String FALSE_VALUE = "false";
     public static final String FALSE_LABEL_I18N = "elements.No";
 
+    public static final String FORM_CONTROL_CSS_CLASS = "form-control";
+
     //**************************************************************************
     // Campi
     //**************************************************************************
@@ -132,15 +134,20 @@ public class BooleanField extends AbstractField<Boolean> {
         if (required) {
             xb.openElement("div");
             xb.addAttribute("class", "checkbox");
+
+            xb.writeInputCheckbox(id, inputName, TRUE_VALUE, BooleanUtils.isTrue(booleanValue), false, null);
+
             xb.openElement("label");
-            xb.writeInputCheckbox(id, inputName, TRUE_VALUE,
-                    BooleanUtils.isTrue(booleanValue), false, null);
-            xb.writeInputHidden(checkInputName, CHECK_VALUE);
+            //xb.addAttribute("class", "checkbox");
+            xb.addAttribute("for",id);
             xb.closeElement("label");
+
+            xb.writeInputHidden(checkInputName, CHECK_VALUE);
             xb.closeElement("div");
         } else {
             xb.openElement("select");
             xb.addAttribute("id", id);
+            xb.addAttribute("class", FORM_CONTROL_CSS_CLASS);
             xb.addAttribute("name", inputName);
             xb.writeOption(NULL_VALUE, (booleanValue == null),
                     getText(NULL_LABEL_I18N));

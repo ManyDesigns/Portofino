@@ -73,7 +73,7 @@
                         buffer.write(" ");
                     }
                     buffer.openElement("div");
-                    buffer.addAttribute("class", "btn-group");
+                    buffer.addAttribute("class", "btn-group btn-group-sm");
                 }
                 group = theButton.group();
             } else {

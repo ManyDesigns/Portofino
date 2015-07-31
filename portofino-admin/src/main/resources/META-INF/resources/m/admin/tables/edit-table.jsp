@@ -83,8 +83,8 @@
                         <fieldset>
                             <legend>
                                 <fmt:message key="columns" />
-                                <button class="btn btn-default btn-sm sortButton"
-                                    type="button" role="button" aria-disabled="false">
+                                <button class="btn btn-default btn-xs sortButton" type="button" role="button" aria-disabled="false">
+                                    <span class="glyphicon glyphicon-sort" aria-hidden="true"></span>
                                     <fmt:message key="change.order" />
                                 </button>
                             </legend>
@@ -107,7 +107,7 @@
                                         <c:forEach var="col" items="${actionBean.decoratedColumns}" varStatus="status">
                                             <li class="ui-state-default" id="col_${status.index}">
                                                 <c:out value="${col.columnName}" />
-                                                <input type="hidden" name="sortedColumnNames[]" value="${col.columnName}" />
+                                                <input class="form-control" type="hidden" name="sortedColumnNames[]" value="${col.columnName}" />
                                             </li>
                                         </c:forEach>
                                     </ul>
@@ -122,7 +122,8 @@
                             <legend><fmt:message key="foreign.keys" /></legend>
                             <div>
                                 <c:if test="${not empty actionBean.table.foreignKeys}">
-                                    <table class="table">
+                                    <table class="table table-striped">
+                                        <thead>
                                         <tr>
                                             <th><fmt:message key="name" /></th>
                                             <th><fmt:message key="property.name.one.side" /></th>
@@ -131,14 +132,16 @@
                                             <th><fmt:message key="referenced.table" /></th>
                                             <th><fmt:message key="referenced.columns" /></th>
                                         </tr>
+                                        </thead>
+                                        <tbody>
                                         <c:forEach items="${actionBean.table.foreignKeys}" var="fk">
                                             <tr>
                                                 <td rowspan="${fn:length(fk.references)}"><c:out value="${fk.name}" /></td>
                                                 <td rowspan="${fn:length(fk.references)}">
-                                                    <input name="fkOnePropertyNames[${fk.name}]" type="text" value="${actionBean.fkOnePropertyNames[fk.name]}"/>
+                                                    <input class="form-control" name="fkOnePropertyNames[${fk.name}]" type="text" value="${actionBean.fkOnePropertyNames[fk.name]}"/>
                                                 </td>
                                                 <td rowspan="${fn:length(fk.references)}">
-                                                    <input name="fkManyPropertyNames[${fk.name}]" type="text" value="${actionBean.fkManyPropertyNames[fk.name]}"/>
+                                                    <input class="form-control" name="fkManyPropertyNames[${fk.name}]" type="text" value="${actionBean.fkManyPropertyNames[fk.name]}"/>
                                                 </td>
                                                 <td>
                                                     <a href="<stripes:url value="${actionBean.actionPath}/${fk.references[0].actualFromColumn.columnName}"/>">
@@ -173,6 +176,7 @@
                                                 </c:if>
                                             </c:forEach>
                                         </c:forEach>
+                                        </tbody>
                                     </table>
                                 </c:if>
                                 <c:if test="${empty actionBean.table.foreignKeys}">
@@ -186,13 +190,16 @@
                             <legend><fmt:message key="selection.providers" /></legend>
                             <div>
                                 <c:if test="${not empty actionBean.table.selectionProviders}">
-                                    <table class="table">
+                                    <table class="table table-striped">
+                                        <thead>
                                         <tr>
                                             <th><fmt:message key="name" /></th>
                                             <th><fmt:message key="columns" /></th>
                                             <th><fmt:message key="database" /></th>
                                             <th><fmt:message key="query" /></th>
                                         </tr>
+                                        </thead>
+                                        <tbody>
                                         <c:forEach items="${actionBean.table.selectionProviders}" var="sp">
                                             <tr>
                                                 <td rowspan="${fn:length(sp.references)}">
@@ -227,6 +234,7 @@
                                                 </c:if>
                                             </c:forEach>
                                         </c:forEach>
+                                        </tbody>
                                     </table>
                                 </c:if>
                                 <c:if test="${empty actionBean.table.selectionProviders}">

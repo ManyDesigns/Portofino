@@ -189,7 +189,7 @@ public class ApplicationWizard extends AbstractPageAction {
     public static final Logger logger = LoggerFactory.getLogger(ApplicationWizard.class);
 
     @DefaultHandler
-    @Button(list = "select-schemas", key="<<previous", order = 1)
+    @Button(list = "select-schemas", key="<<previous", order = 1 , icon = Button.ICON_LEFT)
     public Resolution start() {
         buildCPForms();
         context.getRequest().getSession().removeAttribute(databaseSessionKey);
@@ -274,13 +274,13 @@ public class ApplicationWizard extends AbstractPageAction {
         connectionProviderField.readFromRequest(context.getRequest());
     }
 
-    @Button(list = "user-management", key="<<previous", order = 1)
+    @Button(list = "user-management", key="<<previous", order = 1 , icon = Button.ICON_LEFT)
     public Resolution backToSelectSchemas() {
         context.getRequest().getSession().removeAttribute(databaseSessionKey);
         return configureConnectionProvider();
     }
 
-    @Button(list = "connection-provider", key="next>>", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "connection-provider", key="next>>", order = 1, type = Button.TYPE_PRIMARY , icon = Button.ICON_RIGHT )
     public Resolution configureConnectionProvider() {
         buildCPForms();
         if(connectionProviderField.validate()) {
@@ -371,8 +371,8 @@ public class ApplicationWizard extends AbstractPageAction {
     }
 
     @Buttons({
-        @Button(list = "select-schemas", key="next>>", order = 2, type = Button.TYPE_PRIMARY),
-        @Button(list = "select-user-fields", key="<<previous", order = 1)
+        @Button(list = "select-schemas", key="next>>", order = 2, type = Button.TYPE_PRIMARY , icon = Button.ICON_RIGHT ),
+        @Button(list = "select-user-fields", key="<<previous", order = 1 , icon = Button.ICON_LEFT)
     })
     public Resolution selectSchemas() {
         configureConnectionProvider();
@@ -538,7 +538,7 @@ public class ApplicationWizard extends AbstractPageAction {
         return new ForwardResolution("/m/admin/wizard/user-management.jsp");
     }
 
-    @Button(list = "user-management", key="next>>", order = 2, type = Button.TYPE_PRIMARY)
+    @Button(list = "user-management", key="next>>", order = 2, type = Button.TYPE_PRIMARY , icon = Button.ICON_RIGHT )
     public Resolution setupUserManagement() {
         selectSchemas();
 
@@ -709,7 +709,7 @@ public class ApplicationWizard extends AbstractPageAction {
         }
     }
 
-    @Button(list = "select-user-fields", key="next>>", order = 2, type = Button.TYPE_PRIMARY)
+    @Button(list = "select-user-fields", key="next>>", order = 2, type = Button.TYPE_PRIMARY , icon = Button.ICON_RIGHT )
     public Resolution selectUserFields() {
         setupUserManagement();
         if(userTable != null) {
@@ -828,7 +828,7 @@ public class ApplicationWizard extends AbstractPageAction {
         return roots;
     }
 
-    @Button(list = "select-tables", key="next>>", order = 2, type = Button.TYPE_PRIMARY)
+    @Button(list = "select-tables", key="next>>", order = 2, type = Button.TYPE_PRIMARY , icon = Button.ICON_RIGHT )
     public Resolution selectTables() {
         selectUserFields();
 
@@ -844,7 +844,7 @@ public class ApplicationWizard extends AbstractPageAction {
         return buildAppForm();
     }
 
-    @Button(list = "select-tables", key="<<previous", order = 1)
+    @Button(list = "select-tables", key="<<previous", order = 1 , icon = Button.ICON_LEFT )
     public Resolution goBackFromSelectTables() {
         selectUserFields();
         if(userTable == null) {
@@ -862,7 +862,7 @@ public class ApplicationWizard extends AbstractPageAction {
         return new ForwardResolution("/m/admin/wizard/build-app.jsp");
     }
 
-    @Button(list = "build-app", key="<<previous", order = 1)
+    @Button(list = "build-app", key="<<previous", order = 1 , icon = Button.ICON_LEFT)
     public Resolution returnToSelectTables() {
         selectTables();
         return selectTablesForm();

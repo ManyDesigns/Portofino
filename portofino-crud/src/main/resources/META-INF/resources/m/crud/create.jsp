@@ -24,7 +24,7 @@
             </script>
         </c:if>
         <c:if test="${actionBean.requiredFieldsPresent}">
-            <p><fmt:message key="fields.marked.with.a.star.are.required"/>.</p>
+            <p class="subtitle"><fmt:message key="fields.marked.with.a.star.are.required"/>.</p>
         </c:if>
         <stripes:form action="${actionBean.context.actionPath}" method="post"
                       id="${(not empty actionBean.crudConfiguration.name) ? actionBean.crudConfiguration.name : null}"

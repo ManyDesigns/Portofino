@@ -79,7 +79,11 @@ public class Page {
 
     public void init() {
         assert title != null;
-        assert description != null;
+
+        if( description==null ){
+            description="";
+        }
+        //assert description != null;
 
         if(navigationRoot == null) {
             actualNavigationRoot = NavigationRoot.INHERIT;
@@ -124,8 +128,7 @@ public class Page {
         this.title = title;
     }
 
-    @XmlAttribute(required = true)
-    @Required
+    @XmlAttribute(required = false)
     public String getDescription() {
         return description;
     }

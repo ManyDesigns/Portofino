@@ -46,14 +46,18 @@ import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
+import com.manydesigns.elements.xls.TableFormXlsExporter;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
+import com.manydesigns.portofino.buttons.ButtonInfo;
+import com.manydesigns.portofino.buttons.ButtonsLogic;
 import com.manydesigns.portofino.buttons.GuardType;
 import com.manydesigns.portofino.buttons.annotations.Button;
 import com.manydesigns.portofino.buttons.annotations.Buttons;
 import com.manydesigns.portofino.buttons.annotations.Guard;
 import com.manydesigns.portofino.di.Inject;
 import com.manydesigns.portofino.dispatcher.PageInstance;
+import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
@@ -62,6 +66,7 @@ import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pageactions.crud.reflection.CrudAccessor;
+import com.manydesigns.portofino.pages.Permissions;
 import com.manydesigns.portofino.security.AccessLevel;
 import com.manydesigns.portofino.security.RequiresPermissions;
 import com.manydesigns.portofino.security.SupportsPermissions;
@@ -70,9 +75,13 @@ import com.manydesigns.portofino.util.ShortNameUtils;
 import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.util.UrlBuilder;
 import ognl.OgnlContext;
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -84,10 +93,8 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -295,8 +302,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
 
     @Buttons({
-        @Button(list = "crud-search-form", key = "search", order = 1, type = Button.TYPE_PRIMARY),
-        @Button(list = "crud-search-form-default-button", key = "search")
+        @Button(list = "crud-search-form", key = "search", order = 1, type = Button.TYPE_PRIMARY , icon = Button.ICON_SEARCH),
+        @Button(list = "crud-search-form-default-button", key = "search" )
     })
     public Resolution search() {
         //Not really used. Search is AJAX these days.
@@ -417,7 +424,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     public abstract long getTotalSearchRecords();
 
-    @Button(list = "crud-search-form", key = "reset.search", order = 2)
+    @Button(list = "crud-search-form", key = "reset.search", order = 2 , type = Button.TYPE_DEFAULT , icon = Button.ICON_RELOAD )
     public Resolution resetSearch() {
         //Not really used. Search is AJAX these days.
         return new RedirectResolution(context.getActionPath());
@@ -575,7 +582,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
 
     @Buttons({
-        @Button(list = "crud-read", key = "edit", order = 1, icon = Button.ICON_EDIT + Button.ICON_WHITE,
+        @Button(list = "crud-read", key = "edit", order = 1 , icon = Button.ICON_EDIT + Button.ICON_WHITE,
                 group = "crud", type = Button.TYPE_SUCCESS),
         @Button(list = "crud-read-default-button", key = "search")
     })
@@ -1289,12 +1296,61 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     protected TableForm buildTableForm(TableFormBuilder tableFormBuilder) {
         TableForm tableForm = tableFormBuilder.build();
-
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
-        tableForm.setSelectable(true);
+
+       List<ButtonInfo> buttons = ButtonsLogic.getButtonsForClass( getClass() , "crud-search");
+
+        Boolean selectable = false ;
+        if(buttons == null) {
+            logger.trace("buttons == null");
+            logger.warn("buttons == null");
+        } else {
+            logger.trace("buttons != null");
+            logger.info(" There are " + buttons.size() + " buttons");
+            for(ButtonInfo button : buttons) {
+                logger.trace("ButtonInfo: {}", button);
+                Method handler = button.getMethod();
+                boolean isAdmin = SecurityLogic.isAdministrator(context.getRequest());
+                if(!isAdmin &&
+                        ((pageInstance != null && !hasPermissions(portofinoConfiguration, button, pageInstance, SecurityUtils.getSubject())) ||
+                                !SecurityLogic.satisfiesRequiresAdministrator(context.getRequest(), this, handler))) {
+                    //selectable = true ;
+                    //break;
+                    continue;
+                }
+
+                if( ButtonsLogic.doGuardsPass(this, handler, GuardType.VISIBLE)
+                        && !button.getButton().key().equals("create.new")
+                        && ButtonsLogic.doGuardsPass(this, handler, GuardType.ENABLED)
+                        ) {
+                    logger.trace("Visible " + button.getButton().key());
+                    logger.trace("Guards passed");
+                    selectable = true ;
+                    break;
+                } else {
+                    logger.trace("Guards do not pass");
+                }
+            }
+        }
+
+        tableForm.setSelectable(selectable);
         tableForm.setCondensed(true);
 
         return tableForm;
+    }
+
+
+    protected static boolean hasPermissions
+            (Configuration conf, @NotNull ButtonInfo button, @NotNull PageInstance pageInstance, @NotNull Subject subject) {
+        RequiresPermissions requiresPermissions =
+                    SecurityLogic.getRequiresPermissionsAnnotation(button.getMethod(), button.getFallbackClass());
+        if(requiresPermissions != null) {
+            Permissions permissions = SecurityLogic.calculateActualPermissions(pageInstance);
+            return SecurityLogic.hasPermissions
+                    (conf, permissions, subject, requiresPermissions);
+        } else {
+            return true;
+        }
     }
 
     protected TableFormBuilder createTableFormBuilder() {

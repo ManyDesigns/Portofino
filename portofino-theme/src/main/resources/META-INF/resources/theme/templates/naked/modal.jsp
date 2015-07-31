@@ -10,8 +10,9 @@
     <jsp:include page="/theme/head.jsp">
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>
+    <div id="wrapper">
     <body style="padding-top: 0;">
-    <div class="container">
+    <div id="content" class="container">
         <div class="row">
             <div class="col-md-12">
                 <div class="contentHeader">
@@ -47,6 +48,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
     </body>
 </html>

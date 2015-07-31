@@ -11,10 +11,11 @@
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>
     <body>
+    <div id="wrapper">
     <jsp:include page="/theme/header.jsp">
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>
-    <div class="container">
+    <div id="content" class="container">
         <div class="row">
             <div class="col-md-12">
                 <div class="contentHeader">
@@ -55,6 +56,7 @@
     <jsp:include page="/theme/footer.jsp">
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>
+        </div>
     </body>
     </html>
 </stripes:layout-definition>

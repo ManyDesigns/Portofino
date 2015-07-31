@@ -2,7 +2,10 @@
 %><%@ page import="com.manydesigns.portofino.navigation.BaseHref"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
-%><%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
+%>
+<%@ page import="com.manydesigns.portofino.PortofinoProperties"%>
+<jsp:useBean id="portofinoConfiguration" scope="application" type="org.apache.commons.configuration.Configuration"/>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%--
 
     This is only an example. You should customize your head.jsp depending on the installed modules.
@@ -45,5 +48,7 @@
 <%
     BaseHref.emit(request, new XhtmlBuffer(out));
 %>
+
+<link rel="shortcut icon"  type="image/png"  href="${ portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) }" />
 <title><c:out value='<%= request.getParameter("pageTitle") %>' escapeXml="false" /></title>
 </head>

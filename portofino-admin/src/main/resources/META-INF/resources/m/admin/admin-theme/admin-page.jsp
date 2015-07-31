@@ -4,12 +4,27 @@
 %><%@ page import="com.manydesigns.portofino.modules.ModuleRegistry"
 %><%@ page import="net.sourceforge.stripes.controller.ActionResolver"
 %><%@ page import="org.apache.commons.lang.StringUtils"
-%><%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
+%><%@ page import="com.manydesigns.elements.util.Util"
+%><%@ page import="com.manydesigns.portofino.PortofinoProperties"
+%><%@ page import="com.manydesigns.portofino.actions.admin.AdminAction"
+%><%@ page import="com.manydesigns.portofino.actions.admin.page.PageAdminAction"
+%><%@ page import="com.manydesigns.portofino.dispatcher.PageAction"
+%><%@ page import="com.manydesigns.portofino.logic.SecurityLogic"
+%><%@ page import="com.manydesigns.portofino.security.AccessLevel"
+%><%@ page import="com.manydesigns.portofino.shiro.ShiroUtils"
+%><%@ page import="net.sourceforge.stripes.util.UrlBuilder"
+%><%@ page import="org.apache.shiro.SecurityUtils"
+%><%@ page import="org.apache.shiro.subject.Subject"
+%>
+<%@ page import="java.io.Serializable" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"
 %><%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"
 %><%@ taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes-dynattr.tld"
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
-%><stripes:layout-definition><%--
+%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<stripes:layout-definition><%--
 --%><!doctype html>
     <html lang="<%= request.getLocale() %>">
     <jsp:include page="/theme/head.jsp">
@@ -19,12 +34,71 @@
     <jsp:useBean id="portofinoConfiguration" scope="application" type="org.apache.commons.configuration.Configuration"/>
     <header class="navbar navbar-inverse navbar-static-top">
         <div class="container">
-            <h4 class="pull-left">
-                <stripes:link href="/">
-                    <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
-                </stripes:link>
-            </h4>
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <stripes:link href="/" class="navbar-brand">
+                <img src="${ portofinoConfiguration.getString(PortofinoProperties.APP_LOGO) }" width=32px />
+                <c:out value="<%= portofinoConfiguration.getString(PortofinoProperties.APP_NAME) %>"/>
+            </stripes:link>
         </div>
+
+            <nav id="header-menu" class="navbar-collapse collapse" role="navigation">
+            <ul class="nav navbar-nav navbar-right">
+                <%
+                    String loginPage = portofinoConfiguration.getString(PortofinoProperties.LOGIN_PAGE);
+                    String actionPath = (String) request.getAttribute(ActionResolver.RESOLVED_ACTION);
+                %>
+                <shiro:user>
+                    <%
+                    Subject subject = SecurityUtils.getSubject();
+                    Object principal = subject.getPrincipal();
+                    String prettyName = ShiroUtils.getPortofinoRealm().getUserPrettyName((Serializable) principal);
+                %>
+
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <em class="glyphicon glyphicon-user"></em>
+                        <%= prettyName %> <strong class="caret"></strong>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <%
+                            UrlBuilder changePasswordUrlBuilder = new UrlBuilder(request.getLocale(), loginPage, true);
+                            changePasswordUrlBuilder.addParameter("returnUrl", actionPath);
+                            changePasswordUrlBuilder.addParameter("cancelReturnUrl", actionPath);
+                            changePasswordUrlBuilder.addParameter("changePassword");
+                            String changePasswordUrl = Util.getAbsoluteUrl(changePasswordUrlBuilder.toString());
+                        %>
+                        <li>
+                            <a href="<%= changePasswordUrl %>">
+                                <fmt:message key="change.password" />
+                            </a>
+                        </li>
+
+                        <%
+                            UrlBuilder logoutUrlBuilder = new UrlBuilder(request.getLocale(), loginPage, true);
+                            logoutUrlBuilder.addParameter("returnUrl", actionPath);
+                            logoutUrlBuilder.addParameter("cancelReturnUrl", actionPath);
+                            logoutUrlBuilder.addParameter("logout");
+                            String logoutUrl = Util.getAbsoluteUrl(logoutUrlBuilder.toString());
+                        %>
+                        <li>
+                            <a href="<%= logoutUrl %>">
+                                <fmt:message key="log.out" />
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                </shiro:user>
+            </ul>
+        </nav>
+
+    </div>
     </header>
     <div class="container">
         <div class="row">
@@ -80,7 +154,7 @@
     </div>
     <footer>
         <div class="container">
-            Powered by <a href="http://www.manydesigns.com/">Portofino</a>
+            Powered by <a href="http://portofino.manydesigns.com/">Portofino</a>
             <c:out value="<%= ModuleRegistry.getPortofinoVersion() %>"/>
         </div>
     </footer>

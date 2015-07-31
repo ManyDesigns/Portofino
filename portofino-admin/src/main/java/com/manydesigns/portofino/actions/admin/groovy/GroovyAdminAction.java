@@ -59,8 +59,7 @@ public class GroovyAdminAction extends AbstractActionBean {
     // Logging
     //--------------------------------------------------------------------------
 
-    public final static Logger logger =
-            LoggerFactory.getLogger(GroovyAdminAction.class);
+    public final static Logger logger = LoggerFactory.getLogger(GroovyAdminAction.class);
 
     //--------------------------------------------------------------------------
     // Action events
@@ -71,7 +70,7 @@ public class GroovyAdminAction extends AbstractActionBean {
         return new ForwardResolution("/m/admin/groovy.jsp");
     }
 
-    @Button(list = "groovy", key = "reset.groovy.script.engine", order = 1, type = Button.TYPE_PRIMARY)
+    @Button(list = "groovy", key = "reset.groovy.script.engine", order = 1, type = Button.TYPE_PRIMARY , icon = Button.ICON_RELOAD)
     public Resolution resetGroovyScriptEngine() {
         logger.info("Resetting Groovy script engine");
         ServletContext servletContext = context.getServletContext();
@@ -85,7 +84,7 @@ public class GroovyAdminAction extends AbstractActionBean {
         return new ForwardResolution("/m/admin/groovy.jsp");
     }
 
-    @Button(list = "groovy", key = "return.to.pages", order = 2)
+    @Button(list = "groovy", key = "return.to.pages", order = 2  , icon = Button.ICON_HOME)
     public Resolution returnToPages() {
         return new RedirectResolution("/");
     }
