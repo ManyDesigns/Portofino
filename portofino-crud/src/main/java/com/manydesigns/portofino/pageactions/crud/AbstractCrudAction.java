@@ -46,7 +46,6 @@ import com.manydesigns.elements.util.FormUtil;
 import com.manydesigns.elements.util.MimeTypes;
 import com.manydesigns.elements.util.ReflectionUtil;
 import com.manydesigns.elements.util.Util;
-import com.manydesigns.elements.xls.TableFormXlsExporter;
 import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.PortofinoProperties;
 import com.manydesigns.portofino.buttons.ButtonInfo;
@@ -93,7 +92,10 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -302,7 +304,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     //**************************************************************************
 
     @Buttons({
-        @Button(list = "crud-search-form", key = "search", order = 1, type = Button.TYPE_PRIMARY , icon = Button.ICON_SEARCH),
+        @Button(list = "crud-search-form", key = "search", order = 1, type = Button.TYPE_PRIMARY, icon = Button.ICON_SEARCH),
         @Button(list = "crud-search-form-default-button", key = "search" )
     })
     public Resolution search() {
@@ -424,7 +426,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
      */
     public abstract long getTotalSearchRecords();
 
-    @Button(list = "crud-search-form", key = "reset.search", order = 2 , type = Button.TYPE_DEFAULT , icon = Button.ICON_RELOAD )
+    @Button(list = "crud-search-form", key = "reset.search", order = 2, type = Button.TYPE_DEFAULT, icon = Button.ICON_RELOAD )
     public Resolution resetSearch() {
         //Not really used. Search is AJAX these days.
         return new RedirectResolution(context.getActionPath());
@@ -1297,16 +1299,19 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     protected TableForm buildTableForm(TableFormBuilder tableFormBuilder) {
         TableForm tableForm = tableFormBuilder.build();
         tableForm.setKeyGenerator(pkHelper.createPkGenerator());
+        tableForm.setSelectable(isTableFormSelectable());
+        tableForm.setCondensed(true);
 
-       List<ButtonInfo> buttons = ButtonsLogic.getButtonsForClass( getClass() , "crud-search");
+        return tableForm;
+    }
 
+    public Boolean isTableFormSelectable() {
+        List<ButtonInfo> buttons = ButtonsLogic.getButtonsForClass(getClass(), "crud-search");
         Boolean selectable = false ;
         if(buttons == null) {
             logger.trace("buttons == null");
-            logger.warn("buttons == null");
         } else {
-            logger.trace("buttons != null");
-            logger.info(" There are " + buttons.size() + " buttons");
+            logger.trace(" There are " + buttons.size() + " buttons");
             for(ButtonInfo button : buttons) {
                 logger.trace("ButtonInfo: {}", button);
                 Method handler = button.getMethod();
@@ -1332,11 +1337,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                 }
             }
         }
-
-        tableForm.setSelectable(selectable);
-        tableForm.setCondensed(true);
-
-        return tableForm;
+        return selectable;
     }
 
 

@@ -214,6 +214,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     @Override
     protected void setupConfigurationForm(FormBuilder formBuilder) {
+        super.setupConfigurationForm(formBuilder);
         SelectionProvider databaseSelectionProvider =
                 SelectionProviderLogic.createSelectionProvider(
                         "database",

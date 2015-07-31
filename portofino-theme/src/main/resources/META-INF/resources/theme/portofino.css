@@ -1046,10 +1046,10 @@ Checkbox
 /**radio****/
 /**/
 
-input[type=radio],
-input[type=checkbox] {
+.checkbox input[type=checkbox], .checkbox-inline input[type=checkbox] {
     display: none;
 }
+
 .checkbox label:before {
     content: "";
     display: inline-block;
@@ -1072,7 +1072,7 @@ input[type=checkbox] {
 .checkbox label:before {
     border-radius: 3px;
 }
-.checkbox input[type=radio]:checked + label:before {
+.radio input[type=radio]:checked + label:before, .radio-inline input[type=radio]:checked + label:before {
     content: "\2022";
     color: #337AB7;
     font-size: 34px;
@@ -1080,7 +1080,7 @@ input[type=checkbox] {
     line-height: 17px;
 
 }
-.checkbox input[type=checkbox]:checked + label:before {
+.checkbox input[type=checkbox]:checked + label:before, .checkbox-inline input[type=checkbox]:checked + label:before {
     content: "\2713";
     font-size: 15px;
     font-weight: bolder;
