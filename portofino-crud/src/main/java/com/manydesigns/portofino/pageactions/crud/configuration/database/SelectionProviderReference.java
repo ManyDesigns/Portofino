@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.manydesigns.portofino.pageactions.crud.configuration;
+package com.manydesigns.portofino.pageactions.crud.configuration.database;
 
 import com.manydesigns.elements.options.DisplayMode;
 import com.manydesigns.elements.options.SearchDisplayMode;

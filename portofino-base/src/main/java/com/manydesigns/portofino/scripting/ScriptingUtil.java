@@ -31,11 +31,13 @@ import groovy.util.GroovyScriptEngine;
 import groovy.util.ResourceException;
 import groovy.util.ScriptException;
 import ognl.OgnlContext;
+import org.codehaus.groovy.control.CompilerConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 /*
 * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
@@ -99,4 +101,20 @@ public class ScriptingUtil {
         return scriptEngine.loadScriptByName(scriptFile.toURI().toString());
     }
 
+    public static GroovyScriptEngine createScriptEngine(File classpathFile, ClassLoader parent) {
+        CompilerConfiguration cc = new CompilerConfiguration(CompilerConfiguration.DEFAULT);
+        String classpath = classpathFile.getAbsolutePath();
+        cc.setClasspath(classpath);
+        cc.setRecompileGroovySource(true);
+        GroovyScriptEngine scriptEngine;
+        try {
+            scriptEngine =
+                    new GroovyScriptEngine(new URL[] { classpathFile.toURI().toURL() }, parent);
+        } catch (IOException e) {
+            throw new Error(e);
+        }
+        scriptEngine.setConfig(cc);
+        scriptEngine.getGroovyClassLoader().setShouldRecompile(true);
+        return scriptEngine;
+    }
 }

@@ -61,6 +61,11 @@ public class PropertiesAccessor implements ClassAccessor {
         return null;
     }
 
+    @Override
+    public Class<?> getType() {
+        return Properties.class;
+    }
+
     public PropertyAccessor getProperty(String propertyName) throws NoSuchFieldException {
         for (PropertiesEntryAccessor current : accessors) {
             if (current.getName().equals(propertyName)) {

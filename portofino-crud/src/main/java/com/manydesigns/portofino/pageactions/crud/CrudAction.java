@@ -37,7 +37,7 @@ import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.pageactions.PageActionName;
 import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.ScriptTemplate;
-import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
+import com.manydesigns.portofino.pageactions.crud.configuration.database.CrudConfiguration;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.reflection.TableAccessor;
@@ -202,7 +202,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     @Before
     public void prepare() {
-        if(crudConfiguration != null && crudConfiguration.getActualDatabase() != null) {
+        if(getCrudConfiguration() != null && getCrudConfiguration().getActualDatabase() != null) {
             selectionProviderSupport = createSelectionProviderSupport();
             selectionProviderSupport.setup();
         }
@@ -230,21 +230,21 @@ public class CrudAction extends AbstractCrudAction<Object> {
 
     @Override
     protected ClassAccessor prepare(PageInstance pageInstance) {
-        Database actualDatabase = crudConfiguration.getActualDatabase();
+        Database actualDatabase = getCrudConfiguration().getActualDatabase();
         if (actualDatabase == null) {
             logger.warn("Crud " + crudConfiguration.getName() + " (" + pageInstance.getPath() + ") " +
-                        "has an invalid database: " + crudConfiguration.getDatabase());
+                        "has an invalid database: " + getCrudConfiguration().getDatabase());
             return null;
         }
 
-        baseTable = crudConfiguration.getActualTable();
+        baseTable = getCrudConfiguration().getActualTable();
         if (baseTable == null) {
             logger.warn("Crud " + crudConfiguration.getName() + " (" + pageInstance.getPath() + ") " +
                         "has an invalid table");
             return null;
         }
 
-        session = persistence.getSession(crudConfiguration.getDatabase());
+        session = persistence.getSession(getCrudConfiguration().getDatabase());
         return new TableAccessor(baseTable);
     }
 
@@ -277,7 +277,7 @@ public class CrudAction extends AbstractCrudAction<Object> {
     }
 
     protected String getBaseQuery() {
-        return crudConfiguration.getQuery();
+        return getCrudConfiguration().getQuery();
     }
 
     @Override
@@ -308,6 +308,8 @@ public class CrudAction extends AbstractCrudAction<Object> {
         this.baseTable = baseTable;
     }
 
-
+    public CrudConfiguration getCrudConfiguration() {
+        return (CrudConfiguration) crudConfiguration;
+    }
 
 }

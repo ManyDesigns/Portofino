@@ -61,6 +61,7 @@ import com.manydesigns.portofino.logic.SecurityLogic;
 import com.manydesigns.portofino.modules.BaseModule;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.PageActionLogic;
+import com.manydesigns.portofino.pageactions.annotations.ConfigurationClass;
 import com.manydesigns.portofino.pageactions.annotations.SupportsDetail;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
@@ -139,6 +140,7 @@ import java.util.regex.Pattern;
  */
 @SupportsPermissions({ CrudAction.PERMISSION_CREATE, CrudAction.PERMISSION_EDIT, CrudAction.PERMISSION_DELETE })
 @RequiresPermissions(level = AccessLevel.VIEW)
+@ConfigurationClass(CrudConfiguration.class)
 @SupportsDetail
 public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     public static final String copyright =
@@ -304,12 +306,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         @Button(list = "crud-search-form-default-button", key = "search" )
     })
     public Resolution search() {
-        searchVisible = true;
-        searchString = null;
-        sortProperty = null;
-        sortDirection = null;
-        firstResult = null;
-        maxResults = null;
+        //Not really used. Search is AJAX these days.
         return doSearch();
     }
 
@@ -429,7 +426,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     @Button(list = "crud-search-form", key = "reset.search", order = 2 , type = Button.TYPE_DEFAULT , icon = Button.ICON_RELOAD )
     public Resolution resetSearch() {
-        return new RedirectResolution(context.getActionPath()).addParameter("searchVisible", true);
+        //Not really used. Search is AJAX these days.
+        return new RedirectResolution(context.getActionPath());
     }
 
     //**************************************************************************
@@ -440,7 +438,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         if(!crudConfiguration.isLargeResultSet()) {
             setupSearchForm(); // serve per la navigazione del result set
             loadObjects();
-            setupPagination();
+            setupResultSetNavigation();
         }
 
         setupForm(Mode.VIEW);
@@ -1056,25 +1054,35 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         return (classAccessor != null);
     }
 
+    @Deprecated
     protected void setupPagination() {
-        resultSetNavigation = new ResultSetNavigation();
+        setupResultSetNavigation();
+    }
+
+    protected void setupResultSetNavigation() {
         int position = objects.indexOf(object);
+        if(position < 0) {
+            return;
+        }
         int size = objects.size();
+        setupResultSetNavigation(position, size);
+    }
+
+    protected void setupResultSetNavigation(int position, int size) {
+        resultSetNavigation = new ResultSetNavigation();
         resultSetNavigation.setPosition(position);
         resultSetNavigation.setSize(size);
         String baseUrl = calculateBaseSearchUrl();
-        if(position >= 0) {
-            if(position > 0) {
-                resultSetNavigation.setFirstUrl(generateObjectUrl(baseUrl, 0));
-                resultSetNavigation.setPreviousUrl(
-                        generateObjectUrl(baseUrl, position - 1));
-            }
-            if(position < size - 1) {
-                resultSetNavigation.setLastUrl(
-                        generateObjectUrl(baseUrl, size - 1));
-                resultSetNavigation.setNextUrl(
-                        generateObjectUrl(baseUrl, position + 1));
-            }
+        if(position > 0) {
+            resultSetNavigation.setFirstUrl(generateObjectUrl(baseUrl, 0));
+            resultSetNavigation.setPreviousUrl(
+                    generateObjectUrl(baseUrl, position - 1));
+        }
+        if(position < size - 1) {
+            resultSetNavigation.setLastUrl(
+                    generateObjectUrl(baseUrl, size - 1));
+            resultSetNavigation.setNextUrl(
+                    generateObjectUrl(baseUrl, position + 1));
         }
     }
 
@@ -1150,13 +1158,15 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     protected SearchFormBuilder configureSearchFormBuilder(SearchFormBuilder searchFormBuilder) {
         // setup option providers
-        for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
-            SelectionProvider selectionProvider = current.getSelectionProvider();
-            if(selectionProvider == null) {
-                continue;
+        if(selectionProviderSupport != null) {
+            for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
+                SelectionProvider selectionProvider = current.getSelectionProvider();
+                if(selectionProvider == null) {
+                    continue;
+                }
+                String[] fieldNames = current.getFieldNames();
+                searchFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
             }
-            String[] fieldNames = current.getFieldNames();
-            searchFormBuilder.configSelectionProvider(selectionProvider, fieldNames);
         }
         return searchFormBuilder.configPrefix(searchPrefix);
     }
@@ -1183,6 +1193,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected void configureTableFormSelectionProviders(TableFormBuilder tableFormBuilder) {
+        if(selectionProviderSupport == null) {
+            return;
+        }
         // setup option providers
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
@@ -1373,6 +1386,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     }
 
     protected void configureFormSelectionProviders(FormBuilder formBuilder) {
+        if(selectionProviderSupport == null) {
+            return;
+        }
         // setup option providers
         for (CrudSelectionProvider current : selectionProviderSupport.getCrudSelectionProviders()) {
             SelectionProvider selectionProvider = current.getSelectionProvider();
@@ -1737,8 +1753,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
                         selectionProviderEdits[i].selectionProvider = selectionProvider.getName();
                         selectionProviderEdits[i].displayMode = selectionProvider.getDisplayMode();
                         selectionProviderEdits[i].searchDisplayMode = selectionProvider.getSearchDisplayMode();
-                        selectionProviderEdits[i].createNewHref = cp.getCreateNewValueHref();
-                        selectionProviderEdits[i].createNewText = cp.getCreateNewValueText();
+                        selectionProviderEdits[i].createNewHref = selectionProvider.getCreateNewValueHref();
+                        selectionProviderEdits[i].createNewText = selectionProvider.getCreateNewValueText();
                     } else {
                         selectionProviderEdits[i].selectionProvider = null;
                         selectionProviderEdits[i].displayMode = DisplayMode.DROPDOWN;
@@ -1803,7 +1819,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     protected void updateSelectionProviders() {
         selectionProvidersForm.writeToObject(selectionProviderEdits);
-        crudConfiguration.getSelectionProviders().clear();
+        selectionProviderSupport.clearSelectionProviders();
         for(CrudSelectionProviderEdit sp : selectionProviderEdits) {
             List<String> key = Arrays.asList(sp.fieldNames);
             if(sp.selectionProvider == null) {
@@ -1820,8 +1836,9 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
         propertiesTableForm.writeToObject(propertyEdits);
 
         List<CrudProperty> newProperties = new ArrayList<CrudProperty>();
+        List<CrudProperty> properties = crudConfiguration.getProperties();
         for (CrudPropertyEdit edit : propertyEdits) {
-            CrudProperty crudProperty = findProperty(edit.name, crudConfiguration.getProperties());
+            CrudProperty crudProperty = findProperty(edit.name, properties);
             if(crudProperty == null) {
                 crudProperty = new CrudProperty();
             }
@@ -1836,8 +1853,8 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
             newProperties.add(crudProperty);
         }
-        crudConfiguration.getProperties().clear();
-        crudConfiguration.getProperties().addAll(newProperties);
+        properties.clear();
+        properties.addAll(newProperties);
     }
 
     public boolean isRequiredFieldsPresent() {
@@ -2178,7 +2195,7 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
     @Produces(MimeTypes.APPLICATION_JSON_UTF8)
     public String describeClassAccessor() {
         JSONStringer jsonStringer = new JSONStringer();
-        ReflectionUtil.classAccessorToJson(jsonStringer, getClassAccessor());
+        ReflectionUtil.classAccessorToJson(getClassAccessor(), jsonStringer);
         return jsonStringer.toString();
     }
 
@@ -2290,10 +2307,6 @@ public abstract class AbstractCrudAction<T> extends AbstractPageAction {
 
     public T getObject() {
         return object;
-    }
-
-    public void setObject(T object) {
-        this.object = object;
     }
 
     public boolean isMultipartRequest() {

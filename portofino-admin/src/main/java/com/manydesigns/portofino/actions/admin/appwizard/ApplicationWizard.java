@@ -40,6 +40,7 @@ import com.manydesigns.elements.reflection.JavaClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
 import com.manydesigns.elements.util.RandomUtil;
 import com.manydesigns.elements.util.Util;
+import com.manydesigns.elements.xml.XhtmlBuffer;
 import com.manydesigns.portofino.actions.admin.database.forms.ConnectionProviderForm;
 import com.manydesigns.portofino.actions.admin.database.forms.SelectableSchema;
 import com.manydesigns.portofino.buttons.annotations.Button;
@@ -58,7 +59,7 @@ import com.manydesigns.portofino.modules.DatabaseModule;
 import com.manydesigns.portofino.modules.PageactionsModule;
 import com.manydesigns.portofino.pageactions.AbstractPageAction;
 import com.manydesigns.portofino.pageactions.calendar.configuration.CalendarConfiguration;
-import com.manydesigns.portofino.pageactions.crud.configuration.CrudConfiguration;
+import com.manydesigns.portofino.pageactions.crud.configuration.database.CrudConfiguration;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
 import com.manydesigns.portofino.pages.ChildPage;
 import com.manydesigns.portofino.pages.Group;
@@ -934,7 +935,9 @@ public class ApplicationWizard extends AbstractPageAction {
             SessionMessages.addWarningMessage(ElementsThreadLocals.getText("user.management.has.been.configured.please.edit.security.groovy"));
             //ShiroUtils.clearCache(SecurityUtils.getSubject().getPrincipals());
         }
-        SessionMessages.addInfoMessage(ElementsThreadLocals.getText("application.created"));
+        XhtmlBuffer messageBuffer = new XhtmlBuffer();
+        messageBuffer.writeNoHtmlEscape(ElementsThreadLocals.getText("application.created"));
+        SessionMessages.addInfoMessage(messageBuffer);
         context.getRequest().getSession().removeAttribute(databaseSessionKey);
         return new RedirectResolution("/");
     }

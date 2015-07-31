@@ -7,7 +7,7 @@
 %><%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"
 %><jsp:useBean id="actionBean" scope="request"
                type="com.manydesigns.portofino.pageactions.form.TableFormAction"
-/><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
+/><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.page.title}"/>
     </stripes:layout-component>

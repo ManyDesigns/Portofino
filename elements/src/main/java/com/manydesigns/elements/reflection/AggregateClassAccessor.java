@@ -1,9 +1,9 @@
 package com.manydesigns.elements.reflection;
 
 import com.manydesigns.elements.util.ReflectionUtil;
-import org.apache.commons.lang.StringUtils;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,15 +20,29 @@ public class AggregateClassAccessor implements ClassAccessor {
             "Copyright (c) 2005-2015, ManyDesigns srl";
 
     protected final List<ClassAccessor> accessors;
+    protected final List<String> aliases;
     protected String name;
     protected Class<? extends List> collectionClass = ArrayList.class;
+    protected PropertyAccessor[] properties;
+    protected PropertyAccessor[] keyProperties;
 
     public AggregateClassAccessor(List<ClassAccessor> accessors) {
         this.accessors = accessors;
+        aliases = Arrays.asList(new String[accessors.size()]);
+        computeProperties();
     }
 
     public AggregateClassAccessor(ClassAccessor... accessors) {
         this(Arrays.asList(accessors));
+    }
+
+    public void alias(int index, String alias) {
+        aliases.set(index, alias);
+        computeProperties();
+    }
+
+    public String getAlias(int index) {
+        return aliases.get(index);
     }
 
     public List<ClassAccessor> getAccessors() {
@@ -38,6 +52,11 @@ public class AggregateClassAccessor implements ClassAccessor {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Class<?> getType() {
+        return collectionClass != null ? collectionClass : Object[].class;
     }
 
     public void setName(String name) {
@@ -52,48 +71,60 @@ public class AggregateClassAccessor implements ClassAccessor {
         this.collectionClass = collectionClass;
     }
 
-    @Override
-    public PropertyAccessor getProperty(String propertyName) throws NoSuchFieldException {
-        int index = 0;
-        for(ClassAccessor accessor : accessors) {
-            try {
-                return new PropertyAccessorWrapper(accessor.getProperty(propertyName), index);
-            } catch (NoSuchFieldException e) {}
-            index++;
-        }
-        throw new NoSuchFieldException(propertyName);
-    }
-
-    @Override
-    public PropertyAccessor[] getProperties() {
+    protected void computeProperties() {
         List<PropertyAccessor> allProperties = new ArrayList<PropertyAccessor>();
         int index = 0;
         for(ClassAccessor accessor : getAccessors()) {
+            String alias = aliases.get(index);
+            if(alias != null) {
+                allProperties.add(new AliasPropertyAccessor(alias, index, accessor));
+            }
+
             PropertyAccessor[] properties = accessor.getProperties();
             PropertyAccessor[] wrappers = new PropertyAccessor[properties.length];
             for(int i = 0; i < properties.length; i++) {
-                wrappers[i] = new PropertyAccessorWrapper(properties[i], index);
+                wrappers[i] = new PropertyAccessorWrapper(accessor, properties[i], index);
             }
             Collections.addAll(allProperties, wrappers);
             index++;
         }
-        return allProperties.toArray(new PropertyAccessor[allProperties.size()]);
+        properties = allProperties.toArray(new PropertyAccessor[allProperties.size()]);
+        computeKeyProperties();
     }
 
-    @Override
-    public PropertyAccessor[] getKeyProperties() {
+    protected void computeKeyProperties() {
         List<PropertyAccessor> allProperties = new ArrayList<PropertyAccessor>();
         int index = 0;
         for(ClassAccessor accessor : getAccessors()) {
             PropertyAccessor[] properties = accessor.getKeyProperties();
             PropertyAccessor[] wrappers = new PropertyAccessor[properties.length];
             for(int i = 0; i < properties.length; i++) {
-                wrappers[i] = new PropertyAccessorWrapper(properties[i], index);
+                wrappers[i] = new PropertyAccessorWrapper(accessor, properties[i], index);
             }
             Collections.addAll(allProperties, wrappers);
             index++;
         }
-        return allProperties.toArray(new PropertyAccessor[allProperties.size()]);
+        keyProperties = allProperties.toArray(new PropertyAccessor[allProperties.size()]);
+    }
+
+    @Override
+    public PropertyAccessor getProperty(String propertyName) throws NoSuchFieldException {
+        for(PropertyAccessor propertyAccessor : properties) {
+            if(propertyAccessor.getName().equals(propertyName)) {
+                return propertyAccessor;
+            }
+        }
+        throw new NoSuchFieldException(propertyName);
+    }
+
+    @Override
+    public PropertyAccessor[] getProperties() {
+        return properties;
+    }
+
+    @Override
+    public PropertyAccessor[] getKeyProperties() {
+        return keyProperties;
     }
 
     @Override
@@ -156,17 +187,26 @@ public class AggregateClassAccessor implements ClassAccessor {
 
     public class PropertyAccessorWrapper implements PropertyAccessor {
 
+        protected final ClassAccessor classAccessor;
         protected final PropertyAccessor delegate;
         protected final int index;
 
-        public PropertyAccessorWrapper(PropertyAccessor delegate, int index) {
-            this.delegate = delegate;
+        public PropertyAccessorWrapper(ClassAccessor accessor, PropertyAccessor propertyAccessor, int index) {
+            this.classAccessor = accessor;
+            this.delegate = propertyAccessor;
             this.index = index;
         }
 
         @Override
         public String getName() {
-            return StringUtils.defaultString(name) + "[" + index + "]." + delegate.getName();
+            String accessorName;
+            String alias = aliases.get(index);
+            if(alias != null) {
+                accessorName = alias;
+            } else {
+                accessorName = "[" + index + "]";
+            }
+            return accessorName + "." + delegate.getName();
         }
 
         @Override
@@ -215,6 +255,72 @@ public class AggregateClassAccessor implements ClassAccessor {
         @Override
         public Annotation[] getDeclaredAnnotations() {
             return delegate.getDeclaredAnnotations();
+        }
+    }
+
+    public class AliasPropertyAccessor implements PropertyAccessor {
+
+        protected final String name;
+        protected final int index;
+        protected final ClassAccessor accessor;
+
+        public AliasPropertyAccessor(String name, int index, ClassAccessor accessor) {
+            this.name = name;
+            this.index = index;
+            this.accessor = accessor;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public Class getType() {
+            return accessor.getType();
+        }
+
+        @Override
+        public int getModifiers() {
+            return Modifier.PUBLIC;
+        }
+
+        @Override
+        public Object get(Object obj) {
+            if(obj instanceof List) {
+                return ((List) obj).get(index);
+            } else {
+                return ((Object[]) obj)[index];
+            }
+        }
+
+        @Override
+        public void set(Object obj, Object value) {
+            if(obj instanceof List) {
+                ((List) obj).set(index, value);
+            } else {
+                ((Object[]) obj)[index] = value;
+            }
+        }
+
+        @Override
+        public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass) {
+            return accessor.isAnnotationPresent(annotationClass);
+        }
+
+        @Override
+        public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+            return accessor.getAnnotation(annotationClass);
+        }
+
+        @Override
+        public Annotation[] getAnnotations() {
+            return accessor.getAnnotations();
+        }
+
+        @Override
+        public Annotation[] getDeclaredAnnotations() {
+            return accessor.getDeclaredAnnotations();
         }
     }
 

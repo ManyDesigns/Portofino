@@ -56,4 +56,6 @@ public interface PageAction extends ActionBean, DispatchElement {
      * @return the return URL.
      */
     String getReturnUrl();
+
+    String getPageTemplate();
 }

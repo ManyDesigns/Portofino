@@ -6,7 +6,7 @@
 %><%@ taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"
-/><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/normal.jsp">
+/><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/normal.jsp">
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.searchTitle}"/>
     </stripes:layout-component>
@@ -40,10 +40,8 @@
                     </div>
                 </div>
             </c:if>
-            <c:if test="${not empty actionBean.searchString}">
-                <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
-            </c:if>
-            <jsp:include page="/m/crud/datatable.jsp" />
+            <input type="hidden" name="searchString" value="<c:out value="${actionBean.searchString}"/>"/>
+            <div class="portofino-datatable"></div>
         </stripes:form>
     </stripes:layout-component>
 </stripes:layout-render>

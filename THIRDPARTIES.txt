@@ -16,14 +16,14 @@ An original copy of the license agreement can be found at: http://www.h2database
 
 All trademarks belong to their respective owners.
 
-Ace (Ajax.org Cloud9 Editor)
+Ace (Ajax.org Cloud9 Editor) version 1.2.0
 Site: https://github.com/ajaxorg/ace/
-Files: ace directory
+Files: portofino-pageactions/src/main/resources/META-INF/resources/m/pageactions/ace directory
 License: Mozilla Public License
 
 ANTLR Parser Generator
 Site: http://www.antlr.org/
-File: antlr-2.7.6.jar
+File: antlr-2.7.7.jar
 License: BSD
 
 Apache Avalon
@@ -66,12 +66,12 @@ License: Apache License v2.0
 
 Bootstrap
 Site: http://twitter.github.io/bootstrap/index.html
-Files: portofino-theme/src/main/resources/META-INF/resources/theme/bootstrap/
+Files: bootstrap-3.3.5.jar
 License: Apache License v2.0
 
-Bootstrap Datepicker (1.3.0)
+Bootstrap DateTimePicker
 Site: https://github.com/eternicode/bootstrap-datepicker
-Files: portofino-theme/src/main/resources/META-INF/resources/theme/datepicker/
+Files: Eonasdan-bootstrap-datetimepicker-4.7.14.jar
 License: Apache License v2.0
 
 Bouncy Castle
@@ -81,7 +81,7 @@ License: MIT
 
 OpenSymphony ognl
 Site: http://www.opensymphony.com/ognl
-File: ognl-3.0.jar
+File: ognl-3.0.8.jar
 License: http://www.opensymphony.com/ognl/license.action
 
 c3p0 - JDBC3 Connection and Statement Pooling
@@ -161,7 +161,7 @@ License: Apache License v2
 
 Groovy
 Site: http://groovy.codehaus.org/
-File: groovy-all-2.3.1.jar
+File: groovy-all-2.4.3.jar
 License: Apache License v2
 
 H2 Database Engine
@@ -171,13 +171,13 @@ License: Eclipse Public License v1.0
 
 Hibernate ORM
 Site: http://www.hibernate.org/
-Files: hibernate-core-3.6.10.Final.jar,
-       hibernate-commons-annotations-3.2.0.Final.jar,
-       hibernate-jpa-2.0-api-1.0.1.Final.jar,
-       hibernate-c3p0-3.6.10.Final.jar
+Files: hibernate-core-4.3.8.Final.jar,
+       hibernate-commons-annotations-4.0.5.Final.jar,
+       hibernate-jpa-2.1-api-1.0.0.Final.jar,
+       hibernate-c3p0-4.3.8.Final.jar
 License: LGPL v2.1
 
-Intellij Annotations
+IntelliJ Annotations
 Site: http://www.jetbrains.com/idea
 File: annotations-7.0.3.jar
 License: Apache License
@@ -229,7 +229,7 @@ License: LGPL
 
 Joda Time
 Site: http://joda-time.sourceforge.net/
-File: joda-time-2.3.jar
+File: joda-time-2.8.jar
 License: Apache License v2
 
 JQuery UI
@@ -254,12 +254,12 @@ License: MIT
 
 JSqlParser
 Site: http://jsqlparser.sourceforge.net/home.php
-File: jsqlparser-0.8.0.jar
+File: jsqlparser-0.9.3.jar
 License: LGPL
 
 Liquibase
 Site: http://www.liquibase.org/
-File: liquibase-core-2.0.5.jar
+File: liquibase-core-3.4.1.jar
 License: Apache License v2.0
 
 LOGBack
@@ -284,7 +284,7 @@ License: Apache License v2.0
 
 Quartz Scheduler
 Site: http://quartz-scheduler.org/
-File: quartz-2.1.6.jar
+File: quartz-2.2.1.jar
 License: Apache License v2.0
 
 Standard: An Implementation of the JSP™ Standard Tag Library (JSTL)
@@ -304,7 +304,7 @@ License: Apache License v2
 
 Stripes
 Site: http://www.stripesframework.org
-File: stripes-1.5.7-classloaderfix.jar
+File: stripes-1.6.0.jar
 License: Apache License v2.0
 
 SweetiePlus Icon Set

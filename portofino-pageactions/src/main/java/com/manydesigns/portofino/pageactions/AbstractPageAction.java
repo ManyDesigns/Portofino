@@ -66,10 +66,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import java.io.*;
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Convenient abstract base class for PageActions. It has fields to hold values of properties specified by the
@@ -111,11 +111,22 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
 
+    /**
+     * The templates registry. Injected.
+     */
     @Inject(PageactionsModule.TEMPLATES_REGISTRY)
     public TemplateRegistry templates;
 
+    /**
+     * Information about the web server. Injected.
+     */
     @Inject(BaseModule.SERVER_INFO)
     public ServerInfo serverInfo;
+
+    /**
+     * The page template to use. It can be set using a request parameter. If not set, the one from page.xml is used.
+     */
+    protected String pageTemplate;
 
     //--------------------------------------------------------------------------
     // UI
@@ -127,18 +138,27 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Navigation
     //--------------------------------------------------------------------------
 
+    /**
+     * The URL the user cakeme from within the application.
+     */
     public String returnUrl;
 
     //**************************************************************************
     // Scripting
     //**************************************************************************
 
+    /**
+     * The Groovy script for this page.
+     */
     protected String script;
 
     //**************************************************************************
     // Page configuration
     //**************************************************************************
 
+    /**
+     * The Form to configure standard page settings.
+     */
     public Form pageConfigurationForm;
 
     //**************************************************************************
@@ -173,6 +193,16 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Dispatch
     //--------------------------------------------------------------------------
 
+    /**
+     * This is called to process a piece (fragment) of the requested URL. If the fragment matches a child page, that
+     * page is instantiated and initialized. Otherwise, the fragment is taken to be a parameter for the current page.
+     * Subclasses can override this method if they want to handle child pages differently (e.g. having them stored
+     * elsewhere).
+     * @param pathFragment the fragment to process. In path /foo/bar/baz, foo, bar and baz are three different fragments.
+     * @return the object that will potentially continue path dispatch if there are other fragments to consume. This is
+     * either a child page or <code>this</code>. A null return value means that the dispatch failed (no child page
+     * exists and this page does not accept parameters).
+     */
     @Override
     public DispatchElement consumePathFragment(String pathFragment) {
         PageAction subpage = DispatcherLogic.getSubpage(portofinoConfiguration, pageInstance, pathFragment);
@@ -188,7 +218,11 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
     }
 
-    //REST support
+    /**
+     * REST support. Called by the JAX-RS implementation to handle a path fragment.
+     * @param pathFragment the path fragment.
+     * @return @see #consumePathFragment(String)
+     */
     @Path("{pathFragment}")
     public DispatchElement getSubResource(@PathParam("pathFragment") String pathFragment) {
         DispatchElement resource = consumePathFragment(pathFragment);
@@ -274,11 +308,6 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
 
     public void setPageConfigurationForm(Form pageConfigurationForm) {
         this.pageConfigurationForm = pageConfigurationForm;
-    }
-
-    @Deprecated
-    protected Resolution forwardToPortletPage(String pageJsp) {
-        return forwardTo(pageJsp);
     }
 
     @Button(list = "configuration", key = "cancel", order = 99)
@@ -520,24 +549,12 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     //--------------------------------------------------------------------------
 
     /**
-     * <p>Returns a string corresponding to a key in the resource bundle for the request locale.</p>
-     * <p>The string can contain placeholders (see the {@link MessageFormat} class for details) that will
-     * be substituted with values from the <code>args</code> array.</p>
-     * @param key the key to search in the resource bundle.
-     * @param args the arguments to be interpolated in the message string.
-     * @deprecated please use ElementsThreadLocals.getText instead.
-     */
-    @Deprecated
-    public String getMessage(String key, Object... args) {
-        return ElementsThreadLocals.getText(key, args);
-    }
-
-    /**
      * Returns a ForwardResolution to the given page, and sets up internal parameters that need to be propagated in case
      * of embedding.
      * @param page the path to the page, from the root of the webapp.
      * @return a Resolution that forwards to the given page.
      */
+    @Deprecated
     public Resolution forwardTo(String page) {
         return new ForwardResolution(page);
     }
@@ -550,23 +567,25 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         return new ForwardResolution("/m/pageactions/pageaction-not-configured.jsp");
     }
 
-    @Deprecated
-    public Resolution forwardToPortletNotConfigured() {
-        return forwardToPageActionNotConfigured();
-    }
-
     /**
      * Returns a ForwardResolution to a standard page that reports an exception with an error message saying that
      * the pageaction is not properly configured.
      */
     public Resolution forwardToPageActionError(Throwable e) {
         context.getRequest().setAttribute(PORTOFINO_PAGEACTION_EXCEPTION, e);
-        return forwardTo("/m/pageactions/pageaction-error.jsp");
+        return new ForwardResolution("/m/pageactions/pageaction-error.jsp");
     }
 
-    @Deprecated
-    public Resolution forwardToPortletError(Throwable e) {
-        return forwardToPageActionError(e);
+    public String getPageTemplate() {
+        Pattern pattern = Pattern.compile("^(\\w|\\d|-)+");
+        if(pageTemplate != null && pattern.matcher(pageTemplate).matches()) {
+            return pageTemplate;
+        } else {
+            return getPageInstance().getLayout().getTemplate();
+        }
     }
 
+    public void setPageTemplate(String pageTemplate) {
+        this.pageTemplate = pageTemplate;
+    }
 }

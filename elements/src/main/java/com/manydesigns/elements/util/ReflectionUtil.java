@@ -195,7 +195,7 @@ public class ReflectionUtil {
         }
     }
 
-    public static JSONWriter classAccessorToJson(JSONStringer js, ClassAccessor accessor) {
+    public static JSONWriter classAccessorToJson(ClassAccessor accessor, JSONStringer js) {
         js.object();
         js.key("name").value(accessor.getName());
         js.key("keyProperties").array();

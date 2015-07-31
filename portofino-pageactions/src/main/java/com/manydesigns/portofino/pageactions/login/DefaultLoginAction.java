@@ -130,4 +130,8 @@ public class DefaultLoginAction extends LoginAction implements PageAction {
         return null;
     }
 
+    public String getPageTemplate() {
+        return getPageInstance().getLayout().getTemplate();
+    }
+
 }

@@ -27,7 +27,7 @@ class MyFormAction extends FormAction {
         protected int anotherField;
         protected Date aDateField;
         protected String aReadOnlyField = "I am read only";
-        protected String aSelectField;
+        protected int aSelectField;
         protected String aDisabledField;
 
         @RegExp("a+.*")
@@ -80,11 +80,11 @@ class MyFormAction extends FormAction {
         }
 
 
-        String getaSelectField() {
+        int getaSelectField() {
             return aSelectField
         }
 
-        void setaSelectField(String aSelectField) {
+        void setaSelectField(int aSelectField) {
             this.aSelectField = aSelectField
         }
     }

@@ -23,19 +23,22 @@ package com.manydesigns.elements.fields.helpers;
 import com.manydesigns.elements.Mode;
 import com.manydesigns.elements.fields.DateField;
 import com.manydesigns.elements.fields.Field;
+import com.manydesigns.elements.fields.JodaTimeField;
 import com.manydesigns.elements.fields.search.DateSearchField;
+import com.manydesigns.elements.fields.search.JodaTimeSearchField;
 import com.manydesigns.elements.fields.search.SearchField;
 import com.manydesigns.elements.reflection.ClassAccessor;
 import com.manydesigns.elements.reflection.PropertyAccessor;
+import org.joda.time.DateTime;
 
 import java.util.Date;
 
-/*
-* @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
-* @author Angelo Lupo          - angelo.lupo@manydesigns.com
-* @author Giampiero Granatella - giampiero.granatella@manydesigns.com
-* @author Alessio Stalla       - alessio.stalla@manydesigns.com
-*/
+/**
+ * @author Paolo Predonzani     - paolo.predonzani@manydesigns.com
+ * @author Angelo Lupo          - angelo.lupo@manydesigns.com
+ * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
+ * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ */
 public class DateFieldHelper implements FieldHelper {
     public static final String copyright =
             "Copyright (c) 2005-2015, ManyDesigns srl";
@@ -47,6 +50,9 @@ public class DateFieldHelper implements FieldHelper {
         if (Date.class.isAssignableFrom(propertyAccessor.getType())) {
             return new DateField(propertyAccessor, mode, prefix);
         }
+        if (DateTime.class.isAssignableFrom(propertyAccessor.getType())) {
+            return new JodaTimeField(propertyAccessor, mode, prefix);
+        }
         return null;
     }
 
@@ -55,6 +61,9 @@ public class DateFieldHelper implements FieldHelper {
                                                    String prefix) {
         if (Date.class.isAssignableFrom(propertyAccessor.getType())) {
             return new DateSearchField(propertyAccessor, prefix);
+        }
+        if (DateTime.class.isAssignableFrom(propertyAccessor.getType())) {
+            return new JodaTimeSearchField(propertyAccessor, prefix);
         }
         return null;
     }

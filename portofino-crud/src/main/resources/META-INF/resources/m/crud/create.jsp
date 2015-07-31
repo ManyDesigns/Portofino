@@ -6,7 +6,7 @@
 %><%@taglib prefix="mde" uri="/manydesigns-elements"
 %><%@ taglib tagdir="/WEB-INF/tags" prefix="portofino"
 %><jsp:useBean id="actionBean" scope="request" type="com.manydesigns.portofino.pageactions.crud.AbstractCrudAction"
-/><stripes:layout-render name="/theme/templates/${actionBean.pageInstance.layout.template}/modal.jsp">
+/><stripes:layout-render name="/theme/templates/${actionBean.pageTemplate}/modal.jsp">
     <stripes:layout-component name="pageTitle">
         <c:out value="${actionBean.createTitle}"/>
     </stripes:layout-component>

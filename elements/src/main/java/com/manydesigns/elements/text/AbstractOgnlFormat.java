@@ -60,12 +60,15 @@ public abstract class AbstractOgnlFormat {
     //**************************************************************************
 
     protected AbstractOgnlFormat(String ognlFormat) {
+        this(ognlFormat, 0);
+    }
+
+    protected AbstractOgnlFormat(String ognlFormat, int index) {
         List<String> ognlExpressionList = new ArrayList<String>();
         List<Object> parsedOgnlExpressionList = new ArrayList<Object>();
         Matcher m = pattern.matcher(ognlFormat);
         int previousEnd = 0;
         StringBuilder sb = new StringBuilder();
-        int index = 0;
         while (m.find()) {
             int start = m.start();
             String text = ognlFormat.substring(previousEnd, start);

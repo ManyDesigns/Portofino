@@ -84,6 +84,11 @@ public class CommonsConfigurationAccessor implements ClassAccessor {
         return null;
     }
 
+    @Override
+    public Class<?> getType() {
+        return Configuration.class;
+    }
+
     public boolean isAnnotationPresent(
             Class<? extends Annotation> annotationClass) {
         return false;

@@ -32,12 +32,12 @@ import com.manydesigns.elements.text.OgnlSqlFormat;
 import com.manydesigns.elements.text.OgnlTextFormat;
 import com.manydesigns.elements.text.QueryStringWithParameters;
 import com.manydesigns.elements.text.TextFormat;
+import com.manydesigns.portofino.pageactions.crud.configuration.database.SelectionProviderReference;
 import com.manydesigns.portofino.persistence.Persistence;
 import com.manydesigns.portofino.persistence.QueryUtils;
 import com.manydesigns.portofino.logic.SelectionProviderLogic;
 import com.manydesigns.portofino.model.database.*;
 import com.manydesigns.portofino.pageactions.crud.configuration.CrudProperty;
-import com.manydesigns.portofino.pageactions.crud.configuration.SelectionProviderReference;
 import com.manydesigns.portofino.reflection.TableAccessor;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -62,12 +62,12 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
     public static final Logger logger =
             LoggerFactory.getLogger(ModelSelectionProviderSupport.class);
 
-    protected final AbstractCrudAction crudAction;
+    protected final CrudAction crudAction;
     protected final Persistence persistence;
     protected List<CrudSelectionProvider> crudSelectionProviders;
     protected final Multimap<List<String>, ModelSelectionProvider> availableSelectionProviders;
 
-    public ModelSelectionProviderSupport(AbstractCrudAction crudAction, Persistence persistence) {
+    public ModelSelectionProviderSupport(CrudAction crudAction, Persistence persistence) {
         this.crudAction = crudAction;
         this.persistence = persistence;
         availableSelectionProviders = HashMultimap.create();
@@ -84,11 +84,11 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
                 DatabaseSelectionProvider dsp = (DatabaseSelectionProvider) ref.getSelectionProvider();
                 added = setupSelectionProvider(ref, dsp, configuredSPs);
             } else {
-                AbstractCrudAction.logger.error("Unsupported selection provider: " + ref.getSelectionProvider());
+                logger.error("Unsupported selection provider: " + ref.getSelectionProvider());
                 continue;
             }
             if(ref.isEnabled() && !added) {
-                AbstractCrudAction.logger.warn("Selection provider {} not added; check whether the fields on which it is configured " +
+                logger.warn("Selection provider {} not added; check whether the fields on which it is configured " +
                         "overlap with some other selection provider", ref);
             }
         }
@@ -112,7 +112,7 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
                 if(dsp instanceof DatabaseSelectionProvider) {
                     setupSelectionProvider(null, (DatabaseSelectionProvider) dsp, configuredSPs);
                 } else {
-                    AbstractCrudAction.logger.error("Unsupported selection provider: " + dsp);
+                    logger.error("Unsupported selection provider: " + dsp);
                 }
             }
         }
@@ -152,14 +152,14 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
                     (current, fieldNames, fieldTypes, dm, sdm, newHref, newText);
 
             CrudSelectionProvider crudSelectionProvider =
-                new CrudSelectionProvider(selectionProvider, fieldNames, newHref, newText);
+                new CrudSelectionProvider(selectionProvider, fieldNames);
             crudSelectionProviders.add(crudSelectionProvider);
             Collections.addAll(configuredSPs, fieldNames);
             return true;
         } else {
             //To avoid automatically adding a FK later
             CrudSelectionProvider crudSelectionProvider =
-                new CrudSelectionProvider(null, fieldNames, null, null);
+                new CrudSelectionProvider(null, fieldNames);
             crudSelectionProviders.add(crudSelectionProvider);
             return false;
         }
@@ -231,6 +231,11 @@ public class ModelSelectionProviderSupport implements SelectionProviderSupport {
                 break;
             }
         }
+    }
+
+    @Override
+    public void clearSelectionProviders() {
+        crudAction.getCrudConfiguration().getSelectionProviders().clear();
     }
 
     protected SelectionProviderReference makeSelectionProviderReference(ModelSelectionProvider dsp) {
