@@ -111,12 +111,21 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     @Inject(BaseModule.PORTOFINO_CONFIGURATION)
     public Configuration portofinoConfiguration;
 
+    /**
+     * The templates registry. Injected.
+     */
     @Inject(PageactionsModule.TEMPLATES_REGISTRY)
     public TemplateRegistry templates;
 
+    /**
+     * Information about the web server. Injected.
+     */
     @Inject(BaseModule.SERVER_INFO)
     public ServerInfo serverInfo;
 
+    /**
+     * The page template to use. It can be set using a request parameter. If not set, the one from page.xml is used.
+     */
     protected String pageTemplate;
 
     //--------------------------------------------------------------------------
@@ -129,18 +138,27 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Navigation
     //--------------------------------------------------------------------------
 
+    /**
+     * The URL the user cakeme from within the application.
+     */
     public String returnUrl;
 
     //**************************************************************************
     // Scripting
     //**************************************************************************
 
+    /**
+     * The Groovy script for this page.
+     */
     protected String script;
 
     //**************************************************************************
     // Page configuration
     //**************************************************************************
 
+    /**
+     * The Form to configure standard page settings.
+     */
     public Form pageConfigurationForm;
 
     //**************************************************************************
@@ -175,6 +193,16 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
     // Dispatch
     //--------------------------------------------------------------------------
 
+    /**
+     * This is called to process a piece (fragment) of the requested URL. If the fragment matches a child page, that
+     * page is instantiated and initialized. Otherwise, the fragment is taken to be a parameter for the current page.
+     * Subclasses can override this method if they want to handle child pages differently (e.g. having them stored
+     * elsewhere).
+     * @param pathFragment the fragment to process. In path /foo/bar/baz, foo, bar and baz are three different fragments.
+     * @return the object that will potentially continue path dispatch if there are other fragments to consume. This is
+     * either a child page or <code>this</code>. A null return value means that the dispatch failed (no child page
+     * exists and this page does not accept parameters).
+     */
     @Override
     public DispatchElement consumePathFragment(String pathFragment) {
         PageAction subpage = DispatcherLogic.getSubpage(portofinoConfiguration, pageInstance, pathFragment);
@@ -190,7 +218,11 @@ public abstract class AbstractPageAction extends AbstractActionBean implements P
         }
     }
 
-    //REST support
+    /**
+     * REST support. Called by the JAX-RS implementation to handle a path fragment.
+     * @param pathFragment the path fragment.
+     * @return @see #consumePathFragment(String)
+     */
     @Path("{pathFragment}")
     public DispatchElement getSubResource(@PathParam("pathFragment") String pathFragment) {
         DispatchElement resource = consumePathFragment(pathFragment);
