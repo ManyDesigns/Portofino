@@ -33,6 +33,7 @@ import com.manydesigns.elements.fields.DateField;
 import com.manydesigns.elements.fields.Field;
 import com.manydesigns.elements.fields.NumericField;
 import com.manydesigns.elements.fields.PasswordField;
+import jxl.CellView;
 import jxl.write.*;
 import jxl.write.Number;
 
@@ -44,6 +45,7 @@ import java.util.Date;
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
  */
 public class XlsUtil {
     public static final String copyright =
@@ -93,6 +95,14 @@ public class XlsUtil {
         } else {
             Label label = new Label(j, i, field.getStringValue());
             sheet.addCell(label);
+        }
+    }
+
+    public static  void autoSizeColumns(WritableSheet sheet, int columns){
+        for(int c=0;c<columns;c++) {
+            CellView cell = sheet.getColumnView(c);
+            cell.setAutosize(true);
+            sheet.setColumnView(c, cell);
         }
     }
 }

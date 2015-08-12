@@ -44,10 +44,10 @@ import java.io.OutputStream;
  * @author Angelo Lupo          - angelo.lupo@manydesigns.com
  * @author Giampiero Granatella - giampiero.granatella@manydesigns.com
  * @author Alessio Stalla       - alessio.stalla@manydesigns.com
+ * @author Emanuele Poggi       - emanuele.poggi@manydesigns.com
  */
 public class TableFormXlsExporter {
-    public static final String copyright =
-            "Copyright (c) 2005-2015, ManyDesigns srl";
+    public static final String copyright = "Copyright (c) 2005-2015, ManyDesigns srl";
 
     private final TableForm form;
     private String title;
@@ -65,8 +65,7 @@ public class TableFormXlsExporter {
         if(StringUtils.isBlank(title)) {
             title = "export";
         }
-        WritableSheet sheet =
-                workbook.createSheet(title, 0);
+        WritableSheet sheet = workbook.createSheet(title, 0);
 
         addHeaderToSheet(sheet);
 
@@ -75,6 +74,9 @@ public class TableFormXlsExporter {
             exportRows(sheet, i, row);
             i++;
         }
+
+        int count = form.getColumns().length ;
+        XlsUtil.autoSizeColumns(sheet,count);
 
         workbook.write();
         workbook.close();
@@ -90,8 +92,7 @@ public class TableFormXlsExporter {
         }
     }
 
-    private void exportRows(WritableSheet sheet, int i,
-                            TableForm.Row row) throws WriteException {
+    private void exportRows(WritableSheet sheet, int i,TableForm.Row row) throws WriteException {
         int j = 0;
         for (Field field : row) {
             XlsUtil.addFieldToCell(sheet, i, j, field);
@@ -100,8 +101,7 @@ public class TableFormXlsExporter {
     }
 
     private WritableCellFormat headerExcel() {
-        WritableFont fontCell = new WritableFont(WritableFont.ARIAL, 12,
-             WritableFont.BOLD, true);
+        WritableFont fontCell = new WritableFont(WritableFont.ARIAL, 12,WritableFont.BOLD, false);
         return new WritableCellFormat (fontCell);
     }
 
