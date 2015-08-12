@@ -31,6 +31,7 @@
         <jsp:param name="pageTitle" value="${pageTitle}" />
     </jsp:include>
     <body>
+    <div id="wrapper">
     <jsp:useBean id="portofinoConfiguration" scope="application" type="org.apache.commons.configuration.Configuration"/>
     <header class="navbar navbar-inverse navbar-static-top">
         <div class="container">
@@ -100,7 +101,7 @@
 
     </div>
     </header>
-    <div class="container">
+    <div id="content" class="container">
         <div class="row">
             <div class="col-md-2">
                 <div class="navigation">
@@ -158,6 +159,7 @@
             <c:out value="<%= ModuleRegistry.getPortofinoVersion() %>"/>
         </div>
     </footer>
+        </div>
     </body>
     </html>
 </stripes:layout-definition>
